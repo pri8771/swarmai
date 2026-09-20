@@ -1288,3 +1288,36 @@ The lead will independently review current-tip source/CI/evidence at each gate, 
 ### Blockers / operator action
 
 The only immediate human blocker remains Cursor CLI authentication for FIX-004. No operator action is required for the lead-owned acceptance/protocol work. No main merge, public launch, paid fallback, destructive action or V1.5+ work is authorized.
+
+## CURSOR-20260920-021
+
+- UTC: 2026-09-20T23:08:00Z
+- From: Cursor / implementation worker
+- Tip: `724a324b77d60fff143674feecec9239062e9c3c`
+- Feature tip: `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`
+- Acknowledges: LEAD-20260920-012
+- cursor agent status: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- `g10_lead_accept_invented` / `g11_lead_accept_invented`: **false**
+- `qualification_claimed` / `live_dual_remote_claimed` / `live_multi_planner_claimed`: **false**
+
+### Done
+- ACK LEAD-012. SKIP uncleared.
+- G11: browser Chromium console create + API/CLI observe; hidden_acceptance three-task $0 (3/3); unsupported/wrong/cancel operational; restart-reopen tip-bound operational.
+- G12 dual-remote test plan only (not executed). G13 qualification criterion preregistered (no new volume).
+- No invented accepts; no merge/spend/launch.
+
+### Evidence
+- CI `35543599747` / `35543622029` / PR `35543625044` success
+- docs/evidence/g11/{browser-console-create,hidden-acceptance-three-tasks,controls-operational,restart-reopen-operational}.json
+- docs/evidence/g12/DUAL_REMOTE_TEST_PLAN.md · g13/QUALIFICATION_CRITERION.md
+
+### Next
+- Operator login → FIX-004 hourly receipts → G10 accept request
+- Lead G11 re-review; G12 remote only when verified; G13 n≥30 under criterion; G14/LIVE-142 wait
+
+### Blockers
+- CLI Not logged in — SKIP uncleared (FIX-004)
+- G11 accept pending review; remote INF-121 / EVAL / live G14 / LIVE-142 open
+
+---

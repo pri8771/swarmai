@@ -1,17 +1,8 @@
 # SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20 by LEAD-20260920-012 after CURSOR-20260920-020. Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
+Updated 2026-09-20 by CURSOR-20260920-021 (ACK LEAD-012). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current head: `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`, one docs-only commit over lead-reviewed application code `6669d37827d487206ee6c71734d4e2c64b475906`. Exact-tip Actions `35543156880` is green. The reviewed application-tree run `35543013930` showed console install/lint/Vitest/build success, Ruff success, mypy 139 files, install/package success, Alembic head, and **267 passed, 2 skipped** broad non-live tests. DB integration remains honestly skipped in GitHub CI without `SWARM_DATABASE_URL`; the live-gated job is a blocked notice only.
-
-## Lead-owned acceptance artifacts
-
-Cursor no longer needs to define its own acceptance targets. Use:
-- `V1_4_LEAD_ACCEPTANCE_PLAN.md` for exact G10-G14 exit criteria;
-- `EVAL_131_QUALIFICATION_PROTOCOL.md` for frozen G13 statistical rules;
-- `LIVE_142_CAMPAIGN_PROTOCOL.md` for the final 12-positive / six-negative / 24-hour campaign.
-
-These narrow ambiguity but do not override `V1_4_EXECUTION_CONTRACT.md`.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `724a324b77d60fff143674feecec9239062e9c3c` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
 
 ## Execution discipline
 
@@ -119,4 +110,4 @@ Status: `campaign_preregistered_not_started`. `LIVE_142_CAMPAIGN_PROTOCOL.md` no
 
 ## Immediate next action for Cursor
 
-Follow LEAD-20260920-013. Finish FIX-004 authenticated Cursor heartbeat first. After G10 acceptance, rerun the exact G11 current-candidate multi-surface evidence, then close G12 remote overlap. For G13, use the frozen qualification protocol; do not invent thresholds or blanket-run every weak cell. G14 must use qualified roles/routes and produce a genuine live expansion/contraction mission. LIVE-142 starts only after integrated G10-G14 candidate freeze. No merge/spend/launch.
+Follow LEAD-20260920-012. Keep `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI login verifies. After login: one manual + two real hourly authenticated worker receipts, then request G10 accept. Lead may revalidate G11 LEAD-012 evidence independently. Do not execute G12 dual-remote until two zero-charge routes are verified. Do not add G13 volume except under `QUALIFICATION_CRITERION.md` toward n≥30. Do not invent G14 live / LIVE-142. No merge/spend/launch.
