@@ -1,75 +1,97 @@
-# SwarmAI lead work queue
+# SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20. Current authorized work: V1.0 repair/revalidation, not automatic V1.1–V2.0 promotion. Source audit: main `b9141fa3150f853586dede0334a47b344571bc16`; recheck current main and relevant changes before reproducing findings. The control branch is not the source baseline. ChatGPT reviews; Cursor implements; the operator promotes checkpoints.
+Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
 
-Latest owner directive is mandatory: no demo/mock runtime data. Read REAL_DATA_POLICY.md before any packet. Preserve existing isolated unit/security tests; never use test doubles, prewritten answers or replayed success as evidence that the actual swarm works.
+Last observed main: `b9141fa3150f853586dede0334a47b344571bc16`. Fetch current source before reproducing findings. The control branch carries coordination, not the source baseline. No Cursor ACK or completed repair was verified when this queue was updated. All new packet statuses below are assigned/queued, NOT completed.
 
-## Execution rules
+## Execution and ownership
 
-Claim a packet by appending a CURSOR message and recording branch/base/owned files. Use separate worktrees for independent tasks. Do not let two workers edit the same module, shared schema or lockfile without one integration owner. The lead may reorder packets based on evidence. A stopped worker leaves a compact next action and releases its lease. No fake heartbeat or claim of live verification.
+Use/reuse a dedicated integration branch such as `cursor/v1.4-live-integration`, with scoped task branches/worktrees. Claim a packet in AGENT_MESSAGES and STATE with base SHA and owned files. One integration owner controls shared schema, API/store conflicts, lockfiles and migration ordering. No simultaneous writers in the same worktree. Preserve unrelated work; no force-push.
 
-Status progression: assigned -> in_progress -> implemented -> tests_verified -> lead_reviewed. Checkpoint promotion is separate and requires the operator. A failed or missing required result blocks that result, not unrelated safe implementation work. Never erase the failure by changing the definition after seeing it.
+Status: queued -> assigned -> in_progress -> implemented -> tests_verified -> live_verified (where required) -> lead_reviewed. Acceptance is separate from merge/release. Continue ready independent implementation while a live prerequisite or review is pending; never fabricate that missing evidence. No known-answer or operational mock path is accepted. A fail/unknown/blocked state is preferable to fake success.
 
-## FIX-001 — Full CI and an honest baseline
+## G10 / V1.0 repair
 
-Status: assigned to Cursor; implementation evidence not yet received.
+### FIX-001 — comprehensive CI and honest baseline
 
-Priority: P0. Audit: AUD-01, AUD-11. Ownership: CI, lint/type fixes coordinated with module owners, release-status/handoff truth. Preserve the pinned historical V1 report; add current correction rather than rewrite history.
+Status: assigned; worker ACK/evidence pending. P0. Audit AUD-01/11.
 
-Do: reproduce the actual lint failure; fix causes without blanket excludes; run independent lint, types, backend and frontend checks; cover all applicable suites rather than only contracts/spikes. Separate gated live checks so absent credentials do not silently become passes. Pin source and dependency versions. Use local tests when extra CI billing is unverified; report real GitHub CI state without rerunning chargeable jobs blindly.
+Reproduce Ruff failure and repair causes. Execute actual lint, typing, backend, frontend/browser and migration/install checks appropriate to the code. CI must discover all applicable suites, not just contracts/spikes. Isolate live-gated jobs and give precise skipped/blocked reasons; do not imply they passed. Use permitted resources, avoiding unverified extra CI charges. Correct current status/handoffs without rewriting the immutable historical audit.
 
-Accept: exact commands, exit codes, backend/frontend test inventory and skipped-test reasons are saved; no disabled security tests; correct CI is run at the candidate SHA under permitted resources. Structural docs-only checks remain separate. Correct stale current handoffs/version wording.
+Accept: exact candidate SHA, test inventory, commands, exit results and actual remote CI evidence. No blanket ignores, disabled security checks or deleted failing tests to obtain green status.
 
-## FIX-002 — Authentication, project boundaries and real startup
+### FIX-002 — auth, project isolation, idempotency
 
-Status: assigned to Cursor; implementation evidence not yet received.
+Status: assigned; worker ACK/evidence pending. P0 security. Audit AUD-03/04/10.
 
-Priority: P0 security. Audit: AUD-03/04/10. Ownership: API auth/routes/store; coordinate FIX-005 fixture removal in these modules.
+Remove seeded installed-runtime identities; implement per-install auth and safe unconfigured startup. Authorize before cache/data/history access. Scope idempotency by actor/project/operation plus request digest and reject body mismatches. Validate ownership on reports, artifacts, history, approvals and workers. Coordinate API/store edits with FIX-005 and RUN-111.
 
-Do: remove seeded demonstration identities from installed runtime; use per-install auth with safe unconfigured behavior. Authorize before caches/data. Scope idempotency by actor/project/operation/request digest; reject mismatched payload reuse. Apply real owner/project checks to reports, artifacts, history, approvals and worker operations. Distinguish missing resource from forbidden resource.
+Accept: negative regressions fail before the fix and pass afterward, including two principals/projects, history-backed records, key reuse and non-loopback requests with known demo credentials. No secret leakage. Keep application private/loopback until this is reviewed.
 
-Accept: negative regressions reproduce and close the known failures; two independently authorized principals cannot cross project boundaries through any tested route or key reuse. Historical/file-backed records are not an authorization escape hatch. Known demo tokens fail under operational configuration, including a non-loopback client. No source tokens/passkeys/secrets in logs. Keep deployment loopback-only pending review.
+### FIX-003 — evidence-backed release/readiness
 
-## FIX-003 — Behavioral acceptance, not success labels
+Status: assigned; worker ACK/evidence pending. P0 integrity. Audit AUD-02/08/09.
 
-Status: assigned to Cursor; implementation evidence not yet received.
+Remove hard-coded verification/readiness flags. File existence is packaging evidence, not a test result. Key presence/public catalog access is not authenticated or zero-charge eligibility. Add exact-route observation provenance/expiry. Separate actual timeout/cancellation/recovery behavior from helper state transitions. Lock behavioral acceptance contracts before tests.
 
-Priority: P0 integrity. Audit: AUD-02/08/09. Ownership: release verification/evidence schemas/readiness; coordinate provider model with broker owner.
+Accept: missing/stale/failed evidence prevents the corresponding pass. Broken runtime behavior fails acceptance even with all documents present. No guessed cost eligibility, success or task suitability.
 
-Do: replace hard-coded `offline_tested=yes` and helper flags with actual current evidence. Remove the assumption that key presence means authentication/free eligibility/task competence. Structural packaging checks must not imply tests ran. Mark historical simulated recovery/timeout/scale proofs accurately. Define real process-failure/cancellation/recovery tests using the actual runtime; leave unexecuted ones blocked.
+### FIX-004 — platform sessions and real hourly worker
 
-Accept: a missing/stale/failed test attestation prevents verification for that item. Breaking actual runtime behavior fails the acceptance gate even when docs/manifests exist. Unsupported live checks show unknown/blocked, not green. Provider statuses keep configured/authenticated/inference-tested/qualified separately. No guessed zero-charge eligibility.
+Status: assigned; authorized local environment required. P1 parallel lane. Audit AUD-11.
 
-## FIX-004 — Login/session records and actual hourly worker
+Follow PLATFORM_ACCESS.md and CURSOR_HOURLY_PROMPT.md. Maintain per-platform aliases, login method/profile, private credential refs and actual session-check times. Preserve existing Google SSO restrictions. Restore the original protected destination after the essential human login step. The reported Apply URL itself is unavailable here; do not invent a reproduction. An authorized controlled expired-session test is distinct from reproducing that exact incident.
 
-Status: assigned to Cursor; local environment needed.
+Configure one permitted local/eligible runner with lock, bounded invocations, resumable state and sanitized evidence. No cloud-agent billing. Show an actual invocation and then two actual scheduler-triggered check-ins before marking recurring operation verified. Future observations stay pending. Missing profile/auth/entitlement affects that task, not all code work.
 
-Priority: P1; perform alongside non-conflicting repair. Ownership: onboarding docs, private access mapping, local scheduler configuration and sanitized evidence.
+### FIX-005 — remove operational demo dependence
 
-Do: follow ../onboarding/PLATFORM_ACCESS.md. Populate real login methods/profile aliases/private secret references using the authorized browser; sanitize existing tracked private identity fields without rewriting history. Reproduce the reported Apply-link failure when its actual destination is available, restore the right session, and resume the intended page. Do not ask the user to redo all signup steps. Do not fabricate the failed link.
+Status: assigned; worker ACK/evidence pending. P0 product truth. Audit AUD-05/06/07/10.
 
-Set up CURSOR_HOURLY_PROMPT.md on one supported, verified no-extra-spend runner. A normal browser profile, local CLI or task scheduler is not assumed available merely because it is documented. Inspect tool/auth/entitlement first. No paid cloud agent activation. Use no-overlap locks, timeout, resumable work and secret-safe logs. A scheduling instruction alone is not a running worker.
+Inventory default/runtime fixture imports, synthetic users/providers/activity, GOOD_FIX, canned responses and force-progress quota bypasses. Remove them from the shipped operational path. Failed output must fail or use bounded real repair/escalation. No assumption that every task is the demo parser. Integrate useful existing modules; keep missing generic capability explicitly incomplete until RUN-111. Preserve isolated tests but do not count them as live proof.
 
-Accept: real session-expiry/resume evidence with no duplicate side effect; private identity map remains outside Git. First actual invocation recorded, then two real scheduler-triggered check-ins observed before marking the hourly runner verified. Missing future executions remain pending; do not claim them prospectively. If an operator verification is unavoidable, prepare the exact page/step and continue other tasks.
+Accept: clean operational install has real empty state, no fake fallback on API failure, no supplied-answer patch and no execution after denied admission. Store/console/API show actual observations. Unimplemented features are blocked, not renamed complete.
 
-## FIX-005 — Remove demo dependence from normal operation
+## G11 / V1.1 — RUN-111: unified generic mission
 
-Status: assigned to Cursor; implementation evidence not yet received.
+Status: queued; implementation contracts can begin alongside independent G10 repairs, integrated acceptance depends on G10. Owner: runtime/API integration lead.
 
-Priority: P0 product truth. Audit: AUD-05/06/07/10. Ownership: mission worker/planner/runtime, fixture adapter boundaries, release/console wiring in coordination with FIX-002/003.
+One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
 
-Do: inventory all operational imports/defaults for fixtures/fakes/demo routes/GOOD_FIX/hash-only swarm claims. Remove known-answer substitution and the assumption that every problem is the parser bug. A failed model output must fail, retry within policy, subdivide or escalate—never install a supplied answer. Remove unconditional force-progress dispatch when quota admission denies work. Delete normal-mode fixture seeding and fake ready/connected values; show real empty/error states.
+Accept: three unfamiliar tasks across two families; same mission submitted/viewed across interfaces; actual service restart/reopen; wrong output rejected; unsupported task honest; no known-answer path. See G11 contract for details.
 
-Integrate existing generic execution/broker/store modules when they are ready. Do not add a second runtime or replace an absent integration with another mock. If a real generic capability is not yet wired, report unsupported/blocked and retain it as an explicit unfinished original requirement; do not claim the repaired baseline is a finished stable swarm. Completing that capability is planned in V1.1, not a retroactive V1 success.
+## G12 / V1.2 — INF-121: exact-route admission and concurrent pool
 
-Accept: clean operational install contains no synthetic users/projects/provider activity. Invalid model output cannot trigger GOOD_FIX or accepted task status. Denied quota never executes. Live product screens show actual data or actual absence. No fake fallback when API fails. Real local/remote evidence is separate from isolated tests. Status and README state exactly what is still missing.
+Status: queued; schema/adapter work may run independently, operational gate depends on G10/G11. Owner: inference lane.
 
-## Integration and review gate
+Every model call/retry goes through the broker. Exact route/account identity, independently evidenced auth/eligibility/health/capabilities, atomic shared-quota reservations, deadlines/reset/cooldown and accounting. No always-true local route or unmetered hidden model calls. Reuse configured accounts; browser hand off only essential human steps.
 
-After independent packets pass, integrate fixes into one repair branch based on the latest verified source. Re-run cross-module checks on that combined SHA. Append a CURSOR message with changes, actual evidence, remaining original requirements and requested lead review. Keep old audit immutable; add a resolution matrix with finding ID, fix SHA, regression evidence and reviewer status.
+Accept: actual overlapping calls to two independent remote providers in one mission, plus actual local inference/fallback; safe unavailable/quota behavior; failed/stale evidence denied; no double allocation. Live capacity missing = gate blocked, not simulated pass.
 
-The V1 repair gate certifies a safe, honest baseline only. It does not rename unimplemented swarm behavior as complete. The first full real generic mission is V1.1; concurrent qualified remote sources are V1.2; later gates are in ROADMAP_V1_TO_V3.md. No next-version merge, tag, public release or deployment without operator promotion.
+## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-## Immediate action
+Status: queued; input/grade contracts may start early, integrated gate depends on G11/G12. Owner: evaluation lane.
 
-Begin FIX-001 baseline reproduction and FIX-002 security negatives; run FIX-004 setup independently. Assign FIX-005 with explicit shared-file coordination. Do not spend the whole session rewriting plans. Do not start another portfolio project. Post an acknowledgement and actual work evidence to AGENT_MESSAGES.md.
+Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
+
+Accept: routing uses observed matching profiles and handles failure via bounded repair/subdivision/escalation; compare smaller-worker pipelines with direct execution including overhead. The contract's screening minimum is not automatic qualification. No forged model results or leaked reference answers.
+
+## G14 / V1.4 — SWARM-141: adaptive graph and organization
+
+Status: queued; follows G11/G12 contracts and G13 qualification. Owner: orchestration lane.
+
+Validated graph revisions for spawn/split/merge/reassign/cancel/review and multiple planning approaches; independent investigations, evidence exchange, duplicate suppression and bounded delegation. Separate logical agents, active sessions, requests and processes. Preserve permission/resource checks on every expansion.
+
+Accept: real mission expands on discovered work and contracts on convergence; two capable planning/review configurations contribute; smaller qualified workers actually run concurrently. Separately exercise 10/50/100 logical assignments and measure permitted real inference concurrency. Compare elastic/single/fixed approaches fairly; no hash-only proof or fixed permanent team ceiling.
+
+## G14 final — LIVE-142: clean installation and live acceptance
+
+Status: queued; requires integrated G10-G14 behavior and current evidence. Owner: independent QA lane with lead review.
+
+Run the final campaign in V1_4_EXECUTION_CONTRACT.md: all applicable checks, 12 preregistered positive missions across supported work, at least six specified failure scenarios, real provider overlap/fallback, real graph adaptation, actual restart and an observed 24-hour private/live operating window. Keep all attempts and triage every error. Revalidate relevant changes; do not fabricate time or cherry-pick only successes.
+
+Accept: no known unresolved supported-V1.4 defects; no unexpected application errors in the accepted campaign; no unapproved spend/secret leakage/duplicate side effects; current independent review. Missing live prerequisite = implemented/live-blocked with precise action. Deliver candidate SHA/draft PR, actual startup commands/address, evidence index and known-issue matrix. Final main merge/release stays with operator.
+
+## Immediate next action
+
+Acknowledge LEAD-20260920-003. Start FIX-001/FIX-002 reproduction and FIX-004 local setup in separate ownership lanes. Follow START_CURSOR_TO_V1_4.md. Do not stop at the old repair-only instruction; do not skip the repair gates either. Continue approved implementation through V1.4 and keep the lead informed.
