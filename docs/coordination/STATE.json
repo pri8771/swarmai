@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T23:16:30Z",
+  "updated_at": "2026-09-20T23:20:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -264,7 +264,7 @@
   },
   "open_blockers": [
     "Cursor agent CLI Not logged in; FIX-004 authenticated hourly receipts absent",
-    "G11 LEAD-012 evidence posted \u2014 awaiting lead revalidation (not auto-accepted)",
+    "G11 LEAD-012 evidence posted — awaiting lead revalidation (not auto-accepted)",
     "W-121A: 0 admissible remote routes; W-121B dual remote blocked",
     "G13 W-131A packaged; W-131B qualification / live G14 / LIVE-142 remain open"
   ],
@@ -338,7 +338,7 @@
     "future_implementation_version_gated": true
   },
   "future_work_policy": {
-    "directive": "prepare/research/decompose future tasks when current useful lead work is exhausted",
+    "directive": "advance useful future artifacts directly whenever possible, not only prepare TODOs",
     "implementation_ceiling": "1.4 until next tranche explicitly activated",
     "preparation_backlog": [
       "FUT-151",
@@ -346,6 +346,25 @@
       "FUT-171",
       "FUT-181",
       "FUT-191"
+    ],
+    "lead_future_artifact_work_authorized": true,
+    "future_design_research_acceptance_artifacts_may_progress_continuously": true,
+    "active_candidate_destabilizing_implementation_requires_explicit_coordination": true,
+    "initial_future_artifacts": [
+      "ART-V15-ARCH",
+      "ART-V16-KNOWLEDGE-CONTRACT",
+      "ART-V17-TOOL-CONTRACT",
+      "ART-V18-RECOVERY-ARCH",
+      "ART-V19-BETA-ACCEPTANCE"
     ]
+  },
+  "project_management": {
+    "model": "artifact_oriented",
+    "canonical_registry": "docs/coordination/ARTIFACT_REGISTRY.json",
+    "policy": "docs/coordination/ARTIFACT_MANAGEMENT.md",
+    "version_matrix": "docs/coordination/VERSION_ARTIFACT_MATRIX.md",
+    "task_queue_role": "derived_execution_view",
+    "story_points_role": "secondary_worker_complexity_metric",
+    "owner_directive": "Lead may advance useful future artifacts proactively; Cursor retains bulk routine implementation."
   }
 }
