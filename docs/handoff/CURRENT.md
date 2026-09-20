@@ -1,10 +1,11 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T13:10:00Z  
+**Updated:** 2026-09-20T13:15:00Z  
 **Packets complete (offline):** P01–P21  
 **Label:** `offline-verified-release-candidate`  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
-**Source:** local clone of SwarmAI product repo (see `.swarm-build-state.json`)  
+**Remote:** https://github.com/pri8771/swarmai  
+**Draft PR:** https://github.com/pri8771/swarmai/pull/1 (do not merge)  
 **RC status doc:** `docs/RELEASE_CANDIDATE_STATUS.md`
 
 ## What works

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T13:10:00Z",
+  "updated_at": "2026-09-20T13:15:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
@@ -161,22 +161,18 @@
     ]
   },
   "release_captain": {
-    "status": "offline_rc_checkpoint",
+    "status": "draft_pr_open",
     "label": "offline-verified-release-candidate",
-    "checks": {
-      "pytest_selfdev_regressions_release": "13 passed",
-      "release_verify": "passed",
-      "demo_parser_issue_mock": "accepted",
-      "ruff": "passed",
-      "mypy": "passed"
-    },
-    "remote": "not_configured",
-    "draft_pr": "blocked_no_remote",
-    "push": "blocked_no_remote",
+    "branch_url": "https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2",
+    "draft_pr_url": "https://github.com/pri8771/swarmai/pull/1",
+    "latest_sha": "774315c58fb2dfccffa28c0986d2d080d9408dfd",
+    "push": "ok",
+    "draft_pr": "open_do_not_merge",
     "live_packets_paused": [
       "P15",
       "P16",
       "P18"
     ]
-  }
+  },
+  "remote": "https://github.com/pri8771/swarmai.git"
 }

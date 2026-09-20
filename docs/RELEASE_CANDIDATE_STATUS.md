@@ -5,6 +5,15 @@
 **Label:** `offline-verified-release-candidate`  
 **Not:** cloud-operating, live-qualified, publicly launched, or merge-ready without human review
 
+## Links
+
+| Item | URL |
+|---|---|
+| Repo | https://github.com/pri8771/swarmai |
+| RC branch | https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2 |
+| Draft PR | https://github.com/pri8771/swarmai/pull/1 |
+| Latest SHA | `774315c58fb2dfccffa28c0986d2d080d9408dfd` |
+
 ## Status
 
 | Dimension | Result |
@@ -15,7 +24,8 @@
 | Fresh-install mock demo | pass |
 | Ruff / mypy (CI-defined) | pass |
 | Live P15/P16/P18 | **not attempted** (paused — keys) |
-| Remote / draft PR | blocked until GitHub remote exists |
+| Remote | `origin` → https://github.com/pri8771/swarmai.git |
+| Draft PR | open (draft) vs `main` — **do not merge** |
 | Merge / deploy / launch | **not authorized** |
 
 ## Implemented by subsystem
