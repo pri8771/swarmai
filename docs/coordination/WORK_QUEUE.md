@@ -56,7 +56,7 @@ Accept: clean operational install has real empty state, no fake fallback on API 
 
 ## G11 / V1.1 — RUN-111: unified generic mission
 
-Status: `in_progress` on `cursor/v1.4-live-integration-11e2` @ `d60394d`; durable MissionStore wired into ProductStore; full accept pending. Owner: Cursor.
+Status: `in_progress` on `cursor/v1.4-live-integration-11e2` @ `e32011d`; durable MissionStore + live accept-controls evidence posted; lead accept pending. Owner: Cursor.
 
 One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
 
@@ -64,7 +64,7 @@ Accept: three unfamiliar tasks across two families; same mission submitted/viewe
 
 ## G12 / V1.2 — INF-121: exact-route admission and concurrent pool
 
-Status: queued; schema/adapter work may run independently, operational gate depends on G10/G11. Owner: inference lane.
+Status: `in_progress` — local concurrent brokered pool evidenced; dual remote providers live-blocked (zero-spend). Owner: Cursor/inference.
 
 Every model call/retry goes through the broker. Exact route/account identity, independently evidenced auth/eligibility/health/capabilities, atomic shared-quota reservations, deadlines/reset/cooldown and accounting. No always-true local route or unmetered hidden model calls. Reuse configured accounts; browser hand off only essential human steps.
 
