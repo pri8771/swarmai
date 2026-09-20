@@ -1,6 +1,6 @@
 # G12 / INF-121 evidence index
 
-**Tip binding:** `aa6865a74249e046bfe697532accb00390bb5873`  
+**Tip binding:** `3b0011f0605573ab77318981691f588ac72f912f`  
 **Lead accepted:** no · **Remote dual-provider:** live-blocked
 
 | Artifact | Claim | Not claimed |

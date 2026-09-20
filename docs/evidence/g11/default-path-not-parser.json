@@ -2,7 +2,10 @@
   "gate": "G11",
   "check": "default_inspect_not_parser_dogfood",
   "ok": true,
+  "candidate_sha": "3b0011f0605573ab77318981691f588ac72f912f",
   "candidate_files": [],
   "parser_dogfood_fixture": false,
-  "summary": "inspection_no_candidates"
+  "summary": "inspection_no_candidates",
+  "verified_at": "2026-09-20T21:47:57.674381+00:00",
+  "note": "Re-verified on CI-green tip; default mission path does not auto-select parser dogfood. Not lead accept."
 }

@@ -1,6 +1,6 @@
 # G11 / RUN-111 evidence index
 
-**Tip binding:** package recorded against `aa6865a74249e046bfe697532accb00390bb5873`  
+**Tip binding:** `3b0011f0605573ab77318981691f588ac72f912f`  
 **Lead accepted:** no  
 **Spend:** $0 claimed in listed artifacts
 
@@ -12,7 +12,7 @@
 | `run-111/restart-reopen.json` | Service restart reopens durable IDs | Process-kill mid-task recovery |
 | `run-111/local-ollama-mission.json` | Local mission attempt at $0 (may be failed honestly) | Fake success |
 | `run-111/private-console.json` | Loopback console start notes | Public URL |
-| `g11/default-path-not-parser.json` | Default inspect does not auto-select parser dogfood | Full unfamiliar-task execution |
+| `g11/default-path-not-parser.json` | Default inspect does not auto-select parser dogfood (re-verified on tip) | Full unfamiliar-task execution |
 
 **Post–LEAD-009:** normal `swarm mission run` no longer hard-wires parser dogfood (`parser_dogfood_fixture` default false). Selfdev / `--fixture-parser-dogfood` remain explicit fixture paths.
 
