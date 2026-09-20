@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-09-20T18:49:00Z",
+  "repository": "pri8771/swarmai",
+  "coordination_branch": "coordination/swarm-control",
+  "source_default_branch": "main",
+  "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+  "audit_date": "2026-09-20",
+  "package_version_at_audit": "1.0.0rc1",
+  "product_status": "v1_repair_required_not_stable_release",
+  "current_checkpoint": "1.0-repair",
+  "roadmap_status": "proposed_operator_promotion_required",
+  "next_checkpoint_after_approval": "1.1",
+  "public_launch_authorized": false,
+  "additional_spend_authorized": false,
+  "paid_fallback_authorized": false,
+  "checkpoint_merge_authorized": false,
+  "roles": {"lead": "ChatGPT", "implementation": "Cursor", "final_authority": "operator"},
+  "last_lead_message_id": "LEAD-20260920-001",
+  "last_seen_cursor_message_id": null,
+  "last_lead_heartbeat_at": "2026-09-20T18:49:00Z",
+  "last_cursor_heartbeat_at": null,
+  "last_completed_assignment_id": null,
+  "lead_automation": {
+    "status": "scheduled_confirmed",
+    "title": "SwarmAI engineering check-in",
+    "cadence": "hourly",
+    "timezone": "America/New_York",
+    "scope": "GitHub review, messages and compact state; not local Cursor control"
+  },
+  "cursor_runner": {
+    "status": "not_installed_or_verified_by_lead",
+    "requested_cadence_seconds": 3600,
+    "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
+    "active_mechanism": null,
+    "last_verified_invocation_at": null,
+    "consecutive_verified_heartbeats": 0,
+    "lease": null,
+    "blocker": "Requires execution in an authorized Cursor/local environment or verified eligible native automation; no Cursor connector was found"
+  },
+  "latest_ci_at_audit": {
+    "run_id": 35529361557,
+    "job_id": 106127102217,
+    "head_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+    "conclusion": "failure",
+    "failed_step": "uv run ruff check .",
+    "ruff_findings": 33,
+    "mypy_executed": false,
+    "pytest_executed": false,
+    "full_suite_independently_rerun": false
+  },
+  "assignments": [
+    {"id":"FIX-001","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Reproduce and fix CI; run all applicable offline backend/frontend suites without weakening checks","source_branch":null,"source_sha":null,"review_status":"pending"},
+    {"id":"FIX-002","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Default-token, report/history project isolation and idempotency regressions and fixes","source_branch":null,"source_sha":null,"review_status":"pending"},
+    {"id":"FIX-003","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Separate structural/demo tests from evidence-backed product acceptance and correct misleading proofs","source_branch":null,"source_sha":null,"review_status":"pending"},
+    {"id":"FIX-004","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Platform login documentation, signed-out link handoff, and real hourly runner setup under no-extra-spend limits","source_branch":null,"source_sha":null,"review_status":"pending"}
+  ],
+  "context_policy": {
+    "memory_file": "docs/coordination/PROJECT_MEMORY.md",
+    "messages_file": "docs/coordination/AGENT_MESSAGES.md",
+    "normal_memory_word_limit": 1200,
+    "read_entire_history_by_default": false,
+    "secrets_in_git": false,
+    "private_identity_mapping_in_git": false
+  },
+  "open_blockers": [
+    "V1 audit release/security/core-behavior findings remain unrepaired at audited SHA",
+    "Cursor runner and browser-session recovery not verified",
+    "Live concurrent multi-provider mission, statistical task qualification and real host recovery not established by audited evidence"
+  ]
+}
