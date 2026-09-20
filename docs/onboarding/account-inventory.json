@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T15:36:00.925332+00:00",
+  "generated_at": "2026-09-20T15:37:12.837284+00:00",
   "spend_policy": "zero",
   "swarm_allow_paid": false,
   "browser": {
@@ -13,21 +13,35 @@
   "onboarding_branch": "cursor/v0.1-provider-onboarding",
   "verification": {
     "ollama_canary": "canaried_live_local_zero_cost",
-    "onboarding_tests": "10_passed",
-    "cloud_keys_present": false
+    "openrouter_auth": "ok_get_key_200",
+    "openrouter_canary": {
+      "route": "liquid/lfm-2.5-2.6b:free",
+      "cost": 0,
+      "usage_delta": 0.0,
+      "result": "zero_spend_confirmed"
+    },
+    "onboarding_tests": "pending_rerun_this_pass",
+    "cloud_keys_present": {
+      "OPENROUTER_API_KEY": true
+    }
   },
   "providers": {
     "openrouter": {
-      "outcome": "signed_in_awaiting_free_key",
-      "api_key_present": false
+      "outcome": "authenticated_zero_spend_canary_ok",
+      "api_key_present": true,
+      "auth_verified": true,
+      "zero_charge_route": "liquid/lfm-2.5-2.6b:free",
+      "inference_smoke": "ok_cost_0"
     },
     "groq": {
       "outcome": "browser_keys_ui_reachable",
-      "api_key_present": false
+      "api_key_present": false,
+      "next": "create_free_key_copy_reply_key_copied_GROQ_API_KEY"
     },
     "gemini": {
       "outcome": "browser_keys_ui_reachable",
-      "api_key_present": false
+      "api_key_present": false,
+      "next": "after_groq_create_free_key_copy_reply_key_copied_GEMINI_API_KEY"
     },
     "huggingface_inference": {
       "outcome": "browser_login_required",
@@ -63,9 +77,10 @@
     }
   },
   "handoffs": [
-    "OpenRouter: create free key, copy, reply 'key copied' (no paste in chat)",
-    "Optional: Groq/Gemini same pattern after OpenRouter",
-    "HF/Mistral/Cloudflare/Cohere: operator SSO in SwarmAI Chrome"
+    "NEXT: Groq \u2014 Create free key on console.groq.com/keys \u2192 Copy \u2192 reply 'key copied GROQ_API_KEY' (no paste)",
+    "Then Gemini \u2014 same pattern with GEMINI_API_KEY",
+    "Then SSO for HF / Mistral / Cloudflare / Cohere / NVIDIA as needed (free only)",
+    "OpenRouter DONE \u2014 auth + free canary liquid/lfm-2.5-2.6b:free cost=0"
   ],
   "v02": "not_started"
 }
