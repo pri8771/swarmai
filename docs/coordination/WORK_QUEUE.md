@@ -2,7 +2,7 @@
 
 Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
 
-Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 is now 15 commits ahead at `4021c2de32b040e0760e3f771820380e2581aa4e`. Current GitHub Actions run `35536709246` is red: console lint/test/build passed, Ruff passed, then mypy failed at `src/swarm/mission/runtime.py:46`; install/Alembic/offline pytest did not run on this exact tip. Lead review LEAD-20260920-007 also found remaining G10 defects in non-mission idempotency/auth ordering, bootstrap demo principals, evidence-file validation, provider readiness and the parser-specific normal mission runtime. Earlier green SHAs remain evidence only for those SHAs.
+Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 latest tip is `643e38bf3f08e998936aad21bff3cb9a10541f4e`; the newest commit adds G13 holdout evidence only and does not close G10. Current GitHub Actions run `35536776956` is red: console lint/test/build passed, Ruff passed, then mypy failed at `src/swarm/mission/runtime.py:46`; install/Alembic/offline pytest did not run on this exact tip. Lead review LEAD-20260920-007 also found remaining G10 defects in non-mission idempotency/auth ordering, bootstrap demo principals, evidence-file validation, provider readiness and the parser-specific normal mission runtime. Earlier green SHAs remain evidence only for those SHAs.
 
 ## Execution and ownership
 
