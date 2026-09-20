@@ -14,6 +14,10 @@
 | DB migrate | `uv run swarm db migrate` |
 | DB validate | `uv run swarm db validate` |
 | DB integration tests | `SWARM_DATABASE_URL=... uv run pytest tests/integration/db` |
+| Providers (mock) | `uv run swarm providers list --mode mock` |
+| Sandbox self-test | `uv run swarm sandbox self-test --network off` |
+| Capacity explain (mock) | `uv run swarm capacity explain --mode mock` |
+| Broker tests | `uv run pytest tests/broker` |
 
 PostgreSQL integration path (P02+; optional for P01):
 

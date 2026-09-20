@@ -10,6 +10,7 @@ from pathlib import Path
 
 import uvicorn
 
+from swarm.broker.explain import explain_capacity
 from swarm.db.engine import create_db_engine, database_url, ping
 from swarm.providers.catalog import list_providers
 from swarm.tools.sandbox_runner import self_test as sandbox_self_test
@@ -72,6 +73,17 @@ def main() -> None:
     st = sandbox_sub.add_parser("self-test", help="Run sandbox self-test")
     st.add_argument("--network", default="off", choices=["off"])
 
+    capacity = sub.add_parser("capacity", help="Capacity / broker explain")
+    capacity_sub = capacity.add_subparsers(dest="capacity_command", required=True)
+    cexp = capacity_sub.add_parser("explain", help="Explain admission capacity")
+    cexp.add_argument(
+        "--mode",
+        default="mock",
+        choices=["mock", "live"],
+        help="mock=offline fixtures; live requires configured accounts (not implemented as spend)",
+    )
+    cexp.add_argument("--purpose", default="mission")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -83,6 +95,16 @@ def main() -> None:
         cmd_providers_list(mode=args.mode)
     elif args.command == "sandbox" and args.sandbox_command == "self-test":
         print(json.dumps(sandbox_self_test(network=args.network), indent=2))
+    elif args.command == "capacity" and args.capacity_command == "explain":
+        import asyncio
+
+        print(
+            json.dumps(
+                asyncio.run(explain_capacity(mode=args.mode, purpose=args.purpose)),
+                indent=2,
+                default=str,
+            )
+        )
 
 
 if __name__ == "__main__":
