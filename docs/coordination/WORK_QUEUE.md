@@ -4,6 +4,15 @@ Updated 2026-09-20 by LEAD-20260920-012 after CURSOR-20260920-020. Owner authori
 
 Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current head: `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`, one docs-only commit over lead-reviewed application code `6669d37827d487206ee6c71734d4e2c64b475906`. Exact-tip Actions `35543156880` is green. The reviewed application-tree run `35543013930` showed console install/lint/Vitest/build success, Ruff success, mypy 139 files, install/package success, Alembic head, and **267 passed, 2 skipped** broad non-live tests. DB integration remains honestly skipped in GitHub CI without `SWARM_DATABASE_URL`; the live-gated job is a blocked notice only.
 
+## Lead-owned acceptance artifacts
+
+Cursor no longer needs to define its own acceptance targets. Use:
+- `V1_4_LEAD_ACCEPTANCE_PLAN.md` for exact G10-G14 exit criteria;
+- `EVAL_131_QUALIFICATION_PROTOCOL.md` for frozen G13 statistical rules;
+- `LIVE_142_CAMPAIGN_PROTOCOL.md` for the final 12-positive / six-negative / 24-hour campaign.
+
+These narrow ambiguity but do not override `V1_4_EXECUTION_CONTRACT.md`.
+
 ## Execution discipline
 
 Use `cursor/v1.4-live-integration-11e2` plus bounded worktrees. One owner integrates shared API/store/schema/lockfile changes. Preserve unrelated work. Status progression remains queued -> assigned -> in_progress -> implemented -> tests_verified -> live_verified where required -> lead_reviewed. Passing CI is necessary, not sufficient. Unknown/blocked is better than fake success. Current operational runtime may not silently use fixtures, supplied answers, fake readiness or admission bypasses.
@@ -106,15 +115,8 @@ Do not substitute this for the live gate. Required acceptance still needs multip
 
 ## LIVE-142 — final V1.4 acceptance
 
-Status: `not_started`.
-
-Requires integrated accepted G10-G14 plus the contract campaign: all applicable checks, 12 preregistered positive missions, six negative scenarios, real provider overlap/local fallback, real adaptive graph behavior, restart/reopen and an observed 24-hour protected live window. Keep all attempts. No time acceleration, cherry-picking or simulated live proof.
+Status: `campaign_preregistered_not_started`. `LIVE_142_CAMPAIGN_PROTOCOL.md` now freezes the campaign shape: 12 positive mission slots covering supported families/sizes, six negative scenarios, designated G14 adaptive XL mission, restart/reopen and a real 24-hour protected observation window. Exact held-out task payloads are selected only after candidate freeze so hidden answers are not exposed to workers. Runtime/security/routing changes restart affected campaign evidence.
 
 ## Immediate next action for Cursor
 
-1. Keep FIX-004 skip in place until a real successful Cursor CLI login.
-2. While login waits, execute the bounded **G11 current-tip revalidation** above; do not redesign architecture.
-3. Prepare G12 exact-route eligibility refresh/test plan without uncertain inference.
-4. Preregister G13 qualification/overhead rules before more trials.
-5. Keep G14 live and LIVE-142 unstarted until prerequisites are genuinely ready.
-6. Post the next CURSOR message with exact source SHA, commands/results, evidence mode, blockers and ACK of LEAD-20260920-012. No merge/spend/launch/V1.5+.
+Follow LEAD-20260920-013. Finish FIX-004 authenticated Cursor heartbeat first. After G10 acceptance, rerun the exact G11 current-candidate multi-surface evidence, then close G12 remote overlap. For G13, use the frozen qualification protocol; do not invent thresholds or blanket-run every weak cell. G14 must use qualified roles/routes and produce a genuine live expansion/contraction mission. LIVE-142 starts only after integrated G10-G14 candidate freeze. No merge/spend/launch.
