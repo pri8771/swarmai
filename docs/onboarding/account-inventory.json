@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T16:08:34.588044+00:00",
+  "generated_at": "2026-09-20T16:11:40.952716+00:00",
   "chrome_profile": {
     "directory": "Default",
     "name": "Priyansh",
@@ -28,8 +28,9 @@
       "evidence": "huggingface.co/settings/tokens"
     },
     "nvidia": {
-      "signed_in": false,
-      "evidence": "Try NVIDIA NIM APIs / login marketing \u2014 not keys console"
+      "signed_in": true,
+      "workspace": "primandir",
+      "evidence": "operator-confirmed workspace primandir open/signed-in; keys URL build.nvidia.com/settings/api-keys; no Google SSO redo"
     },
     "mistral": {
       "signed_in": true,
@@ -81,8 +82,8 @@
     "DEEPINFRA_API_KEY": false,
     "REPLICATE_API_TOKEN": false
   },
-  "blocked_key_automation": "Chrome AppleScript JS disabled + Accessibility denied; cannot Create/Copy keys in live tabs without one operator toggle",
-  "handoff": "In Chrome menu: View \u2192 Developer \u2192 Allow JavaScript from Apple Events. Reply `js apple events on`. Agent will then create/copy remaining keys in existing tabs (no closes). NVIDIA still needs Sign in with Google on its tab if not done.",
+  "blocked_key_automation": "Chrome AppleScript JS disabled + Accessibility denied; cannot Create/Copy keys in live tabs without JS Apple Events toggle",
+  "handoff": "In Chrome: View → Developer → Allow JavaScript from Apple Events. Reply: js apple events on. Agent will Generate/Copy free keys (incl. NVIDIA primandir) into gitignored .env. Do NOT redo NVIDIA Google SSO.",
   "mcp": {
     "added_to_cursor_mcp_json": [
       "openrouter",
@@ -108,5 +109,11 @@
     ]
   },
   "v02": "not_started",
-  "pr2_merged": false
+  "pr2_merged": false,
+  "nvidia_workspace": "primandir",
+  "notes_ops": [
+    "NVIDIA treated signed-in under workspace primandir per operator 2026-09-20",
+    "No automated Chrome for Google SSO; normal Priyansh/Default Chrome only",
+    "Zero spend; SWARM_ALLOW_PAID=false; no V0.2"
+  ]
 }
