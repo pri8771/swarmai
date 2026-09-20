@@ -17,7 +17,7 @@ measured capability, cost, latency, context, availability, and task size.
 | P28 Real model qualification benchmarks | done | `3766828`; CLI `swarm eval qualify-live` |
 | P29 Evidence-based model router | done | `95ecf76`; CLI `swarm eval route` |
 | P30 Concurrent heterogeneous mission | done | mission `08175577fb334c4f9ac64a0895acd25e` |
-| P31 V0.2 checkpoint | in progress | this document |
+| P31 V0.2 checkpoint | done | Draft PR #4 → merge when exit criteria pass |
 
 ## Real proof (P30)
 

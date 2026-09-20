@@ -18,7 +18,7 @@
 | Dimension | Result |
 |---|---|
 | V0.2 kit packets P27–P30 | **complete** (live Ollama proof) |
-| V0.2 P31 checkpoint | **in progress** |
+| V0.2 P31 checkpoint | **complete** (Draft PR #4) |
 | Provider capability registry | live — 14 auth_ok / paid blocks honored |
 | Model qualification | live provisional cells on `gemma3:4b` + `qwen3.5:4b` |
 | Evidence router | heterogeneous planner/worker assignment |
