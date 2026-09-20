@@ -56,9 +56,45 @@ def cmd_db_validate() -> None:
     print(f"ok database={database_url().split('@')[-1]}")
 
 
-def cmd_providers_list(*, mode: str) -> None:
+def cmd_providers_list(*, mode: str, show_account_status: bool = False) -> None:
+    if show_account_status:
+        from swarm.onboarding.service import OnboardingService
+
+        svc = OnboardingService(_repo_root() / "var" / "onboarding")
+        print(json.dumps(svc.list_with_account_status(mode=mode), indent=2, default=str))
+        return
     rows = list_providers(mode=mode)
     print(json.dumps({"mode": mode, "providers": rows}, indent=2))
+
+
+def cmd_providers_onboarding_report() -> None:
+    from swarm.onboarding.service import OnboardingService
+
+    svc = OnboardingService(_repo_root() / "var" / "onboarding")
+    print(json.dumps(svc.onboarding_report(), indent=2, default=str))
+
+
+def cmd_providers_inspect(*, provider: str, metadata_only: bool) -> None:
+    from swarm.onboarding.service import OnboardingService
+
+    svc = OnboardingService(_repo_root() / "var" / "onboarding")
+    print(json.dumps(svc.inspect_provider(provider, metadata_only=metadata_only), indent=2))
+
+
+def cmd_providers_canary(*, route_id: str, policy: str, mode: str) -> None:
+    import asyncio
+
+    from swarm.onboarding.canary import bounded_canary
+
+    print(
+        json.dumps(
+            asyncio.run(
+                bounded_canary(route_id=route_id, policy=policy, mode=mode)
+            ),
+            indent=2,
+            default=str,
+        )
+    )
 
 
 def main() -> None:
@@ -83,6 +119,27 @@ def main() -> None:
         choices=["mock", "live"],
         help="mock=offline catalog view; live still does not call providers here",
     )
+    plist.add_argument(
+        "--show-account-status",
+        action="store_true",
+        help="Include onboarding account/adapter/route layers (offline inventory)",
+    )
+    providers_sub.add_parser(
+        "onboarding-report",
+        help="Write offline onboarding report with essential next actions",
+    )
+    pins = providers_sub.add_parser("inspect", help="Inspect one provider (metadata)")
+    pins.add_argument("--provider", required=True)
+    pins.add_argument(
+        "--metadata-only",
+        action="store_true",
+        default=True,
+        help="Never call live inference (default)",
+    )
+    pcan = providers_sub.add_parser("canary", help="Bounded canary via broker")
+    pcan.add_argument("--route", required=True)
+    pcan.add_argument("--policy", default="bounded_probe", choices=["bounded_probe"])
+    pcan.add_argument("--mode", default="mock", choices=["mock", "live"])
 
     sandbox = sub.add_parser("sandbox", help="Sandbox operations")
     sandbox_sub = sandbox.add_subparsers(dest="sandbox_command", required=True)
@@ -145,7 +202,16 @@ def main() -> None:
     elif args.command == "db" and args.db_command == "validate":
         cmd_db_validate()
     elif args.command == "providers" and args.providers_command == "list":
-        cmd_providers_list(mode=args.mode)
+        cmd_providers_list(
+            mode=args.mode,
+            show_account_status=bool(getattr(args, "show_account_status", False)),
+        )
+    elif args.command == "providers" and args.providers_command == "onboarding-report":
+        cmd_providers_onboarding_report()
+    elif args.command == "providers" and args.providers_command == "inspect":
+        cmd_providers_inspect(provider=args.provider, metadata_only=args.metadata_only)
+    elif args.command == "providers" and args.providers_command == "canary":
+        cmd_providers_canary(route_id=args.route, policy=args.policy, mode=args.mode)
     elif args.command == "sandbox" and args.sandbox_command == "self-test":
         print(json.dumps(sandbox_self_test(network=args.network), indent=2))
     elif args.command == "capacity" and args.capacity_command == "explain":
@@ -183,7 +249,10 @@ def main() -> None:
             sys.path.insert(0, str(root))
         from examples.dynamic_demo.run_demo import run_parser_issue_demo
 
-        report_dir = Path(args.report_dir) if args.report_dir else (root / "var" / "reports" / "demo")
+        if args.report_dir:
+            report_dir = Path(args.report_dir)
+        else:
+            report_dir = root / "var" / "reports" / "demo"
         report = asyncio.run(
             run_parser_issue_demo(mode=args.mode, report_dir=report_dir.resolve())
         )
