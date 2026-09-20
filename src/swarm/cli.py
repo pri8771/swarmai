@@ -323,6 +323,15 @@ def main() -> None:
     release_sub.add_parser(
         "verify", help="Verify offline release-candidate readiness"
     )
+    release_sub.add_parser(
+        "install-check", help="V0.9 installability / packaging checks"
+    )
+    release_sub.add_parser(
+        "harden", help="V0.9 security + secret hardening scan"
+    )
+    release_sub.add_parser(
+        "demo-suite", help="V0.9 public demo + benchmark suite (zero-spend)"
+    )
 
     mission = sub.add_parser("mission", help="V0.1 real mission runtime")
     mission_sub = mission.add_subparsers(dest="mission_command", required=True)
@@ -665,6 +674,27 @@ def main() -> None:
         write_verify_report(release_report, _repo_root() / "var" / "reports" / "release")
         print(json.dumps(release_report.to_dict(), indent=2, default=str))
         if not release_report.passed:
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "install-check":
+        from swarm.release.install import run_install_check
+
+        inst = run_install_check(_repo_root())
+        print(json.dumps(inst.to_dict(), indent=2, default=str))
+        if not inst.ok:
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "harden":
+        from swarm.release.harden import run_security_harden
+
+        sec = run_security_harden(_repo_root())
+        print(json.dumps(sec.to_dict(), indent=2, default=str))
+        if not sec.ok:
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "demo-suite":
+        from swarm.release.demo_suite import run_public_demo_suite
+
+        demo = run_public_demo_suite(_repo_root())
+        print(json.dumps(demo, indent=2, default=str))
+        if not demo.get("ok"):
             raise SystemExit(2)
     elif args.command == "mission" and args.mission_command == "plan":
         from swarm.mission.planner import (

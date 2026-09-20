@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,10 @@ REQUIRED_DOCS = (
     "docs/release/RELEASE_CANDIDATE.md",
     "docs/RELEASE_CANDIDATE_STATUS.md",
     "docs/operator/START.md",
+    "docs/user/GUIDE.md",
+    "docs/security/HARDENING.md",
+    "docs/user/TROUBLESHOOTING.md",
+    "docs/user/ZERO_SPEND.md",
     ".env.example",
 )
 
@@ -56,8 +61,8 @@ class ReleaseVerifyReport:
             "mock_vs_live": self.mock_vs_live,
             "generated_at": utc_now().isoformat(),
             "note": (
-                "offline-verified release candidate — not cloud-operating; "
-                "live accounts still required for P15/P16 qualification claims"
+                "offline-verified release candidate — not public launch; "
+                "local .env may exist when gitignored; tracked secrets must be absent"
             ),
         }
 
@@ -66,9 +71,26 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
 
+def _git_tracked(repo: Path) -> set[str]:
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files"],
+            cwd=str(repo),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return set()
+    if proc.returncode != 0:
+        return set()
+    return {line.strip() for line in proc.stdout.splitlines() if line.strip()}
+
+
 def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
     root = repo_root or _repo_root()
     items: list[VerifyItem] = []
+    tracked = _git_tracked(root)
 
     for rel in REQUIRED_DOCS:
         path = root / rel
@@ -80,18 +102,17 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
             )
         )
 
-    # No secrets in tree as tracked files (best-effort path existence check).
+    # Secrets must not be git-tracked (local gitignored .env is OK).
     for name in FORBIDDEN_TRACKED:
-        path = root / name
+        is_tracked = name in tracked
         items.append(
             VerifyItem(
-                f"secret_absent:{name}",
-                not path.exists(),
-                "absent" if not path.exists() else "FOUND_DO_NOT_SHIP",
+                f"secret_untracked:{name}",
+                not is_tracked,
+                "untracked" if not is_tracked else "TRACKED_DO_NOT_SHIP",
             )
         )
 
-    # Manifest + lock
     items.append(
         VerifyItem(
             "uv_lock",
@@ -107,26 +128,34 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
         )
     )
 
-    # Deploy recovery sample
     backup = root / "deploy" / "backup" / "sample-backup-manifest.json"
     items.append(
         VerifyItem("recovery_sample", backup.is_file(), str(backup.relative_to(root)))
     )
 
-    # Console exists for operator UI path
     console = root / "apps" / "console" / "package.json"
     items.append(VerifyItem("console_app", console.is_file(), "apps/console"))
 
-    # Honest status matrix (not fake connected)
+    for profile in ("mock", "standalone"):
+        compose = root / "deploy" / "compose" / f"{profile}.yml"
+        items.append(
+            VerifyItem(
+                f"compose:{profile}",
+                compose.is_file(),
+                str(compose.relative_to(root)) if compose.is_file() else "missing",
+            )
+        )
+
     matrix = {
-        "implemented": "P01-P21 offline modules",
+        "implemented": "V0.1–V0.8 product modules (missions, routing, scale, memory, tools, selfdev, reliability, product UX)",
         "offline_tested": "yes",
-        "live_tested": "no",
-        "qualified": "no — mock profiles only",
+        "live_local_tested": "partial — Ollama/provider probes + journey proofs under zero-spend",
+        "cloud_live_tested": "no",
+        "qualified_statistical": "no — provisional profiles only",
         "deployed": "no — local artifacts only",
-        "unverified": "provider live canaries, multi-route qualification, cloud host",
+        "public_launch": "no",
+        "unverified": "paid cloud providers, multi-route statistical qualification, public hosting",
     }
-    # Ensure we never claim connected without evidence file.
     connected_claim = root / "var" / "FAKE_CONNECTED"
     items.append(
         VerifyItem(
@@ -155,4 +184,7 @@ def write_verify_report(report: ReleaseVerifyReport, out_dir: Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{report.run_id}.json"
     path.write_text(json.dumps(report.to_dict(), indent=2) + "\n")
+    (out_dir / "latest_verify.json").write_text(
+        json.dumps(report.to_dict(), indent=2) + "\n"
+    )
     return path
