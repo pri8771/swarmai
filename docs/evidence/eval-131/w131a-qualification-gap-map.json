@@ -3,8 +3,8 @@
   "gate": "EVAL-131",
   "protocol_ref": "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
   "protocol_version": "1.0",
-  "recorded_at": "2026-09-20T23:11:58.100039+00:00",
-  "candidate_docs_tip_sha": "724a324b77d60fff143674feecec9239062e9c3c",
+  "recorded_at": "2026-09-20T23:36:34.462325+00:00",
+  "candidate_docs_tip_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
   "feature_tip_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
   "source_matrix": "docs/evidence/eval-131/aggregated-provisional-matrix.json",
   "qualification_claimed": false,
@@ -30,7 +30,8 @@
     "qwen3.5:9b"
   ],
   "three_model_configs_present_on_S_M": true,
-  "three_model_configs_complete_on_L_XL": false,
+  "three_model_configs_complete_on_L_XL": true,
+  "third_model_L_XL_n5_screening_filled_at": "2026-09-20T23:36:34.462329+00:00",
   "screening_rule": {
     "held_out_min_n": 5,
     "state": "provisional_never_qualified"
@@ -40,7 +41,7 @@
     "max_n": 60,
     "batch_size": 5,
     "wilson": "one_sided_90_percent_lower_bound_ge_0.80",
-    "note": "Aligns to LEAD-013 / EVAL_131_QUALIFICATION_PROTOCOL.md; supersedes prior draft n>=30 / Wilson95>=0.70 wording in g13/QUALIFICATION_CRITERION.md"
+    "note": "LEAD-013 / EVAL_131_QUALIFICATION_PROTOCOL.md; screening matrix wilson_lower uses implementation default z=1.96 for continuity with prior cells"
   },
   "family_size_coverage": [
     {
@@ -130,6 +131,17 @@
       "size": "L",
       "screening_routes": [
         {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 6361.55,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
           "model": "qwen3.5:4b",
           "route_id": "rt_ollama_qwen3.5:4b",
           "sample_count": 5,
@@ -153,7 +165,7 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "coding",
@@ -171,6 +183,17 @@
           "qualification": false
         },
         {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 11956.04,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
           "model": "gemma3:4b",
           "route_id": "rt_ollama_gemma3:4b",
           "sample_count": 5,
@@ -183,7 +206,7 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "planning",
@@ -283,6 +306,17 @@
           "qualification": false
         },
         {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 6747.94,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
           "model": "qwen3.5:4b",
           "route_id": "rt_ollama_qwen3.5:4b",
           "sample_count": 5,
@@ -295,7 +329,7 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "planning",
@@ -322,10 +356,21 @@
           "latency_ms_p50": 12958.15,
           "state": "provisional",
           "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 19077.63,
+          "state": "provisional",
+          "qualification": false
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "reasoning",
@@ -414,6 +459,17 @@
       "size": "L",
       "screening_routes": [
         {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 11196.17,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
           "model": "qwen3.5:4b",
           "route_id": "rt_ollama_qwen3.5:4b",
           "sample_count": 5,
@@ -437,12 +493,23 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "reasoning",
       "size": "XL",
       "screening_routes": [
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 30246.89,
+          "state": "provisional",
+          "qualification": false
+        },
         {
           "model": "gemma3:4b",
           "route_id": "rt_ollama_gemma3:4b",
@@ -467,7 +534,7 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "extraction",
@@ -567,6 +634,17 @@
           "qualification": false
         },
         {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 2,
+          "pass_rate": 0.4,
+          "wilson_lower_onesided_90": 0.11761823115925325,
+          "latency_ms_p50": 8529.95,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
           "model": "gemma3:4b",
           "route_id": "rt_ollama_gemma3:4b",
           "sample_count": 5,
@@ -579,12 +657,23 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     },
     {
       "family": "extraction",
       "size": "XL",
       "screening_routes": [
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 3,
+          "pass_rate": 0.6,
+          "wilson_lower_onesided_90": 0.23071993220883702,
+          "latency_ms_p50": 12910.94,
+          "state": "provisional",
+          "qualification": false
+        },
         {
           "model": "qwen3.5:4b",
           "route_id": "rt_ollama_qwen3.5:4b",
@@ -609,7 +698,7 @@
         }
       ],
       "screening_n_ge_5_complete": true,
-      "third_model_screening_present": false
+      "third_model_screening_present": true
     }
   ],
   "strongest_candidate_per_family_size": [
@@ -640,12 +729,12 @@
     {
       "family": "coding",
       "size": "L",
-      "model": "qwen3.5:4b",
-      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "sample_count": 5,
-      "pass_count": 4,
-      "pass_rate": 0.8,
-      "wilson_lower_onesided_90": 0.37552826411853885,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
       "priority_for_qualification_batch": true,
       "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
     },
@@ -736,26 +825,26 @@
     {
       "family": "reasoning",
       "size": "L",
-      "model": "qwen3.5:4b",
-      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "sample_count": 5,
-      "pass_count": 4,
-      "pass_rate": 0.8,
-      "wilson_lower_onesided_90": 0.37552826411853885,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
       "priority_for_qualification_batch": true,
       "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
     },
     {
       "family": "reasoning",
       "size": "XL",
-      "model": "gemma3:4b",
-      "route_id": "rt_ollama_gemma3:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "sample_count": 5,
-      "pass_count": 0,
-      "pass_rate": 0.0,
-      "wilson_lower_onesided_90": 0.0,
-      "priority_for_qualification_batch": false,
-      "note": "weak screening \u2014 do not prioritize W-131B until alternate route/screening improves or lead selects"
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "wilson_lower_onesided_90": 0.37552826411853885,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
     },
     {
       "family": "extraction",
@@ -796,98 +885,17 @@
     {
       "family": "extraction",
       "size": "XL",
-      "model": "qwen3.5:4b",
-      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "sample_count": 5,
-      "pass_count": 0,
-      "pass_rate": 0.0,
-      "wilson_lower_onesided_90": 0.0,
+      "pass_count": 3,
+      "pass_rate": 0.6,
+      "wilson_lower_onesided_90": 0.23071993220883702,
       "priority_for_qualification_batch": false,
       "note": "weak screening \u2014 do not prioritize W-131B until alternate route/screening improves or lead selects"
     }
   ],
-  "missing_third_model_L_XL_screening": [
-    {
-      "family": "coding",
-      "size": "L",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "coding",
-      "size": "XL",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "planning",
-      "size": "L",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "planning",
-      "size": "XL",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "reasoning",
-      "size": "L",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "reasoning",
-      "size": "XL",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "extraction",
-      "size": "L",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    },
-    {
-      "family": "extraction",
-      "size": "XL",
-      "model": "qwen3.5:9b",
-      "route_id": "rt_ollama_qwen3.5:9b",
-      "gap": "missing_n5_screening",
-      "packet_class": "W-131A_followup_screening",
-      "status": "identified_not_executed",
-      "spend_usd_planned": 0.0
-    }
-  ],
+  "missing_third_model_L_XL_screening": [],
   "reviewer_role_gaps": [
     {
       "role": "reviewer",
@@ -961,8 +969,8 @@
       "packet_class": "W-131B",
       "family": "coding",
       "size": "L",
-      "model": "qwen3.5:4b",
-      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "batch_size": 5,
       "current_n": 5,
       "target_n_after_batch": 10,
@@ -1081,8 +1089,23 @@
       "packet_class": "W-131B",
       "family": "reasoning",
       "size": "L",
-      "model": "qwen3.5:4b",
-      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "reasoning",
+      "size": "XL",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
       "batch_size": 5,
       "current_n": 5,
       "target_n_after_batch": 10,
@@ -1147,9 +1170,14 @@
   "summary": {
     "required_family_size_cells": 16,
     "required_family_size_with_any_n5_screening": 16,
-    "strong_candidates_pass_rate_ge_0_8": 14,
-    "weak_family_size_cells": 2,
-    "missing_third_model_L_XL_cells": 8,
-    "planned_w131b_batches_not_executed": 14
+    "strong_candidates_pass_rate_ge_0_8": 15,
+    "weak_family_size_cells": 1,
+    "missing_third_model_L_XL_cells": 0,
+    "planned_w131b_batches_not_executed": 15,
+    "third_model_L_XL_screening_runs": [
+      "run_1cb9c7efc3bb4edab28948d9f22a285d",
+      "run_efee102bd9094c76ba97ee50d9de70c4"
+    ],
+    "third_model_L_XL_total_cost_usd": 0.0
   }
 }
