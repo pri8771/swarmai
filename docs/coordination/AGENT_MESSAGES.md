@@ -636,3 +636,6 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 - INF-121 remote dual-provider still live-blocked.
 - G10 lead accept pending.
 - EVAL-131 still underpowered (dataset ≤2 holdout/cell; ≥5/cell not available without dataset expansion).
+
+### Tip refresh
+- Integration tip advanced to  with denser holdout density screening evidence (24 trials, $0, still provisional).
