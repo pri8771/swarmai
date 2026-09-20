@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:58:06Z",
+  "updated_at": "2026-09-20T20:20:30Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,7 +57,7 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-003",
+  "last_seen_cursor_message_id": "CURSOR-20260920-004",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
   "last_cursor_heartbeat_at": "2026-09-20T19:58:06Z",
   "last_completed_assignment_id": null,
@@ -187,13 +187,13 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress",
-      "evidence": "CURSOR-20260920-003 tip 2f91d7d; PR #14; python CI green on 51b2152; console local green",
+      "evidence": "CURSOR-20260920-004 tip d60394d; PR #14; FIX-004 recurring_verified; FIX-001..005 code on branch",
       "review": "partial_lead_review_not_accepted"
     },
     "G11": {
       "checkpoint": "1.1",
-      "status": "not_accepted",
-      "evidence": null,
+      "status": "in_progress",
+      "evidence": "MissionStore persistence wired in ProductStore; unified identity unit tests pass; full G11 accept pending",
       "review": "pending"
     },
     "G12": {
@@ -235,16 +235,16 @@
   },
   "open_blockers": [
     "DB integration blocked: empty SWARM_DATABASE_URL; local compose db volume chmod failed",
-    "FIX-004 hourly runner unverified",
-    "G10 lead acceptance pending; G11+ live gates not started"
+    "Cursor unattended agent auth_required for spawn (check-in runner verified without agent)",
+    "G10 lead acceptance pending; G11 full accept + G12-G14 live gates not done"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T19:54:00Z",
+    "verified_at": "2026-09-20T20:20:30Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "f0280096070854d72858104ed19e7911ed4eed54",
+    "candidate_sha": "d60394d5ca972ec00d6f3f3d31e247986760323e",
     "cursor_ack_observed": true,
     "remote_integration_branch_observed": true,
     "post_authorization_remote_application_commit_observed": true,

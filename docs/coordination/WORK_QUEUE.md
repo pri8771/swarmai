@@ -40,7 +40,7 @@ Accept: missing/stale/failed evidence prevents the corresponding pass. Broken ru
 
 ### FIX-004 — platform sessions and real hourly worker
 
-Status: assigned; authorized local environment required. P1 parallel lane. Audit AUD-11.
+Status: `implemented_local_runner_verified_recurring` at `d60394d`; lead review pending. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; unattended cursor agent spawn still auth_required.
 
 Follow PLATFORM_ACCESS.md and CURSOR_HOURLY_PROMPT.md. Maintain per-platform aliases, login method/profile, private credential refs and actual session-check times. Preserve existing Google SSO restrictions. Restore the original protected destination after the essential human login step. The reported Apply URL itself is unavailable here; do not invent a reproduction. An authorized controlled expired-session test is distinct from reproducing that exact incident.
 
