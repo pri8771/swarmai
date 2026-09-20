@@ -211,6 +211,28 @@ def main() -> None:
     rv = recovery_sub.add_parser("verify", help="Verify recovery profile artifacts")
     rv.add_argument("--profile", default="recovery", choices=["recovery"])
 
+    load = sub.add_parser("load", help="Synthetic load scenarios (offline)")
+    load_sub = load.add_subparsers(dest="load_command", required=True)
+    lrun = load_sub.add_parser("run", help="Run a mock load scenario")
+    lrun.add_argument(
+        "--scenario", default="adaptive", choices=["adaptive", "fixed"]
+    )
+    lrun.add_argument("--mode", default="mock", choices=["mock", "live"])
+    lrun.add_argument("--sessions", type=int, default=100)
+    lrun.add_argument("--tasks", type=int, default=1000)
+    lrun.add_argument("--concurrency", type=int, default=8)
+    lrun.add_argument(
+        "--report-dir",
+        type=Path,
+        default=None,
+        help="Write load report JSON (default: var/reports/load)",
+    )
+
+    chaos = sub.add_parser("chaos", help="Fault-injection matrix (offline)")
+    chaos_sub = chaos.add_subparsers(dest="chaos_command", required=True)
+    crun = chaos_sub.add_parser("run", help="Run offline fault matrix")
+    crun.add_argument("--mode", default="mock", choices=["mock", "live"])
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -327,6 +349,46 @@ def main() -> None:
         from swarm.workers.registry import worker_self_test
 
         print(json.dumps(worker_self_test(mode=args.mode), indent=2))
+    elif args.command == "load" and args.load_command == "run":
+        import asyncio
+
+        from swarm.load.scenarios import LoadConfig, run_load_scenario
+
+        report_dir = args.report_dir or (_repo_root() / "var" / "reports" / "load")
+        try:
+            report = asyncio.run(
+                run_load_scenario(
+                    LoadConfig(
+                        scenario=args.scenario,
+                        mode=args.mode,
+                        logical_sessions=args.sessions,
+                        queued_tasks=args.tasks,
+                        actual_concurrency=args.concurrency,
+                    ),
+                    report_dir=Path(report_dir),
+                )
+            )
+        except PermissionError as exc:
+            print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
+            raise SystemExit(2) from exc
+        print(json.dumps(report.to_dict(), indent=2, default=str))
+    elif args.command == "chaos" and args.chaos_command == "run":
+        import asyncio
+
+        if args.mode == "live":
+            print(
+                json.dumps(
+                    {
+                        "error": "live_chaos_blocked: use mock until live capacity verified",
+                        "mode": args.mode,
+                    },
+                    indent=2,
+                )
+            )
+            raise SystemExit(2)
+        from swarm.chaos.faults import run_fault_matrix
+
+        print(json.dumps(asyncio.run(run_fault_matrix()), indent=2, default=str))
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
