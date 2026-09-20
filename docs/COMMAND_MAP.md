@@ -18,6 +18,9 @@
 | Sandbox self-test | `uv run swarm sandbox self-test --network off` |
 | Capacity explain (mock) | `uv run swarm capacity explain --mode mock` |
 | Broker tests | `uv run pytest tests/broker` |
+| Eval validate dataset | `uv run swarm eval validate-dataset benchmarks/starter.jsonl` |
+| Eval plan (mock) | `uv run swarm eval plan --suite starter --mode mock` |
+| Eval tests | `uv run pytest tests/evals` |
 
 PostgreSQL integration path (P02+; optional for P01):
 
