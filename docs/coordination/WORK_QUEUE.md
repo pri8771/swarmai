@@ -94,4 +94,4 @@ Accept: no known unresolved supported-V1.4 defects; no unexpected application er
 
 ## Immediate next action
 
-G10 remains **packaged for lead accept** (not invented). Integration tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` adds broader G13 S+M dual-model n=5 $0 screening (24 provisional cells); CI tip green retained on `3b0011f` run `35539303334`; confirm CI on `f75c6cb`. G13 still provisional/not qualified. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.
+G10 remains **packaged for lead accept** (not invented). Integration tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` adds broader G13 S+M dual-model n=5 $0 screening (24 provisional cells); CI tip green retained on `3b0011f` run `35539303334`; CI green on `f75c6cb` run `35539853498`. G13 still provisional/not qualified. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.

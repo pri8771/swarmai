@@ -965,6 +965,10 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - G12 remote dual only with verified zero-charge remote capacity; G14 live multi-planner only after capacity; LIVE-142 not started.
 - Operator: fresh `cursor agent login` with live waiter; only after `status`/`whoami` verify may SKIP clear + hourly proofs resume.
 
+### CI (post-push)
+- Tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` run `35539853498`: **success**
+  - https://github.com/pri8771/swarmai/actions/runs/35539853498
+
 ### Blockers
 - **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
 - G10 lead accept pending (packaged, not invented).
