@@ -195,12 +195,28 @@ class RepoWorker:
             repo_root=self.repo,
         )
         patched = _extract_python_file(inference.text) if inference.ok else None
-        # Deterministic fallback keeps zero-spend dogfood reliable if model drifts.
+        # Operational path: never substitute a known-answer GOOD_FIX. Failed or
+        # non-matching model output is a real failure for bounded repair/escalation.
+        used_fallback = False
         if patched is None or "end - start + 1" not in patched:
-            patched = GOOD_FIX
-            used_fallback = True
-        else:
-            used_fallback = False
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_failed_no_known_answer_fallback",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "used_model_fallback": False,
+                    "known_answer_forbidden": True,
+                    "model_output_excerpt": (inference.text or "")[:500],
+                },
+                inference=inference.to_dict(),
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(patched, encoding="utf-8")
         diff = worktree_diff(handle)
@@ -215,6 +231,7 @@ class RepoWorker:
                 "changed_files": [str(OFF_BY_ONE_REL)],
                 "diff": diff[-12000:],
                 "used_model_fallback": used_fallback,
+                "known_answer_forbidden": True,
             },
             inference=inference.to_dict(),
             cost_usd=inference.cost_usd,

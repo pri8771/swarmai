@@ -304,16 +304,9 @@ def run_scale_mission(
                 mission, inference_slots=max_concurrency, worker_slots=max_concurrency
             )
             if not dispatched:
-                # Nothing runnable — clear timeouts already counted; break if empty queue.
-                if sched.stats()["queue_depth"] == 0:
-                    break
-                # Force-progress: pop one without quota to avoid deadlock in tests.
-                item = None
-                if sched.queue:
-                    item = sched.queue.popleft()
-                if item is None:
-                    break
-                dispatched = [item]
+                # Nothing runnable under admission — stop without bypassing quota.
+                # Remaining work stays queued/blocked; report reflects incomplete drain.
+                break
             futures = []
             for item in dispatched:
                 trip = remaining.pop(item.task.id, None)

@@ -66,7 +66,8 @@ class ReleaseVerifyReport:
             "mock_vs_live": self.mock_vs_live,
             "generated_at": utc_now().isoformat(),
             "note": (
-                "offline-verified release candidate — not public launch; "
+                "packaging/presence verify — not public launch; "
+                "offline/live tested only when evidence files exist; "
                 "local .env may exist when gitignored; tracked secrets must be absent"
             ),
         }
@@ -151,18 +152,61 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
             )
         )
 
+    # Evidence files (optional). Presence of docs/lockfiles alone is packaging,
+    # not a behavioral test result. Do not claim offline/live tested from files.
+    ci_evidence = root / "var" / "evidence" / "offline_ci_pass.json"
+    live_evidence = root / "var" / "evidence" / "live_local_pass.json"
+    if ci_evidence.is_file():
+        offline_tested = "yes — var/evidence/offline_ci_pass.json present"
+    else:
+        offline_tested = (
+            "unknown — packaging/presence check only; "
+            "no offline_ci_pass evidence"
+        )
+    if live_evidence.is_file():
+        live_local = "yes — var/evidence/live_local_pass.json present"
+    else:
+        live_local = "unknown/not evidenced in this verify run"
+    items.append(
+        VerifyItem(
+            "offline_ci_evidence",
+            ci_evidence.is_file(),
+            (
+                str(ci_evidence.relative_to(root))
+                if ci_evidence.is_file()
+                else "missing — not a pass"
+            ),
+        )
+    )
+    items.append(
+        VerifyItem(
+            "live_local_evidence",
+            live_evidence.is_file(),
+            (
+                str(live_evidence.relative_to(root))
+                if live_evidence.is_file()
+                else "missing — not a pass"
+            ),
+        )
+    )
+
     matrix = {
         "implemented": (
             "V0.1–V0.8 product modules (missions, routing, scale, memory, "
             "tools, selfdev, reliability, product UX)"
         ),
-        "offline_tested": "yes",
-        "live_local_tested": "partial — Ollama/provider probes + journey proofs under zero-spend",
+        "packaging_presence": "checked — docs/lockfile/compose/console paths",
+        "offline_tested": offline_tested,
+        "live_local_tested": live_local,
         "cloud_live_tested": "no",
         "qualified_statistical": "no — provisional profiles only",
         "deployed": "no — local artifacts only",
         "public_launch": "no",
         "unverified": "paid cloud providers, multi-route statistical qualification, public hosting",
+        "note": (
+            "file presence is packaging evidence only; "
+            "behavioral acceptance requires CI/live artifacts"
+        ),
     }
     connected_claim = root / "var" / "FAKE_CONNECTED"
     items.append(
@@ -173,18 +217,30 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
         )
     )
 
-    passed = all(i.ok for i in items)
-    label = (
-        "offline-verified-release-candidate"
-        if passed
-        else "release-verify-failed"
+    packaging_ok = all(
+        i.ok
+        for i in items
+        if i.item_id
+        not in {"offline_ci_evidence", "live_local_evidence"}
     )
+    # Behavioral "passed" requires packaging AND offline evidence. Missing live
+    # evidence does not fail packaging, but must not be reported as live-tested.
+    passed = packaging_ok and ci_evidence.is_file()
+    if passed and live_evidence.is_file():
+        label = "offline-and-live-evidence-present"
+    elif passed:
+        label = "offline-evidence-present-packaging-ok"
+    elif packaging_ok:
+        label = "packaging-presence-ok-offline-evidence-missing"
+    else:
+        label = "release-verify-failed"
     return ReleaseVerifyReport(
         run_id=new_id("rel_"),
         label=label,
         items=items,
         matrix=matrix,
         passed=passed,
+        mock_vs_live="packaging_check_not_behavioral_proof",
     )
 
 

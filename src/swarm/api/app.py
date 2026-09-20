@@ -17,6 +17,7 @@ def create_app(
     *,
     require_auth: bool = True,
     seed_loopback_token: str | None = None,
+    seed_fixtures: bool = False,
     db_reachable: bool | None = None,
     repo_root: Path | None = None,
 ) -> FastAPI:
@@ -29,7 +30,8 @@ def create_app(
         root = Path(__file__).resolve().parents[3]
 
     store = ProductStore(db_reachable=db_reachable, repo_root=root)
-    store.seed_catalog()
+    if seed_fixtures:
+        store.seed_catalog()
     auth = AuthRegistry(require_auth=require_auth)
     if seed_loopback_token:
         auth.issue(

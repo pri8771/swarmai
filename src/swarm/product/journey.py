@@ -25,6 +25,7 @@ def _api_client(repo: Path) -> Any:
         db_reachable=True,
         repo_root=repo,
         seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
     )
     return TestClient(app)
 
