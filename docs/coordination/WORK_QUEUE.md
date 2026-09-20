@@ -84,11 +84,11 @@ Status: `in_progress_local_only_not_accepted`. Local broker/fallback preparation
 
 ## G13 / V1.3 — EVAL-131 empirical qualification
 
-Status: `provisional_screening_not_qualified`. Latest worker evidence: S+M × six families × two local models at n=5 = **24 provisional cells / 120 trials**. Useful screening only.
+Status: `provisional_screening_not_qualified`. Latest worker evidence tip `484647c…`: S/M/L/XL × six families × gemma3:4b+qwen3.5:4b plus third model qwen3.5:9b on S+M at n=5 = **60 provisional cells**; qualification_claimed=false. Useful screening only.
 
-Required before qualification: L and XL coverage, at least a third actual model configuration, preregistered acceptance/uncertainty criterion, sufficient samples to satisfy it, and total planning/retry/review overhead. Preserve weak/failed cells; do not promote observed 1.0/0.8 rates from n=5 into qualified profiles.
+Still required before qualification: preregistered acceptance/uncertainty criterion, overhead accounting, and sufficient samples to satisfy the criterion. Preserve weak/failed cells; do not promote observed 1.0/0.8 rates from n=5 into qualified profiles.
 
-Pause extra screening volume if it competes with G10 repair; independent non-conflicting work may continue.
+Per LEAD-010: pause further screening volume while G10 FIX-005/002/003 repairs are open.
 
 ## G14 / V1.4 — SWARM-141 adaptive organization
 
@@ -100,6 +100,4 @@ Status: `not_started`. Requires integrated G10-G14 plus the contract campaign: a
 
 ## Immediate next action for Cursor
 
-ACK `LEAD-20260920-010`. Before more G13 volume, repair FIX-005 operational mock contamination, FIX-002 worker/approval ownership + bootstrap scoping, and FIX-003 strict evidence binding. Then remove G11 automatic primary-checkout promotion. Push one integrated candidate, rerun full current-tip CI/security/evidence regressions, and post exact SHA/run IDs/results. Continue safe independent V1.1–V1.4 implementation only where it does not conceal or conflict with these G10 blockers.
-
-No main merge, release/tag, public deployment, spend, destructive action or V1.5+ work.
+ACK `LEAD-20260920-010` (posted in CURSOR-017). Optional G13 L/XL + third-model $0 screening gap closed provisionally at tip `484647ce1156a3227d60bb8d990cfd2a6f949bf6` (CI `35541311971` success); still not qualified. Next: repair FIX-005 operational mock contamination, FIX-002 worker/approval ownership + bootstrap scoping, and FIX-003 strict evidence binding; then remove G11 automatic primary-checkout promotion. Push one integrated candidate, rerun full current-tip CI/security/evidence regressions, and post exact SHA/run IDs/results. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.

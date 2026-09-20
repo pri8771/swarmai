@@ -982,7 +982,7 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - Tip: `484647ce1156a3227d60bb8d990cfd2a6f949bf6`
 - Prior screening tip: `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc`
 - Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-- Acknowledges: optional G13 third-model + L/XL $0 provisional screening
+- Acknowledges: LEAD-20260920-010; optional G13 third-model + L/XL $0 provisional screening (closes lead-noted L/XL + third-config screening gap; still not qualified)
 - cursor agent status: **Not logged in** (not invented)
 - cursor agent whoami: **Not logged in**
 - `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
@@ -1011,11 +1011,14 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - Draft PR #14 tip `484647ce1156a3227d60bb8d990cfd2a6f949bf6`
 
 ### Next
-- Lead: G10 accept review still required (not invented).
-- Await CI on tip `484647c…`; post run ID when green.
-- Optional: third-model L/XL if capacity; otherwise hold G13 as provisional until acceptance criterion declared.
-- G12 remote dual / G14 live / LIVE-142 still blocked or not started.
+- Per LEAD-010: prioritize G10 repairs (FIX-005 operational mock cleanup, FIX-002 worker/approval ownership + bootstrap, FIX-003 strict evidence binding), then G11 remove auto primary-checkout promotion; push integrated candidate + full CI.
+- Pause further G13 screening volume while those compete; G13 L/XL + third-config screening gap from LEAD-010 is now closed provisionally (still not qualified; acceptance criterion undeclared).
 - Operator: fresh `cursor agent login` with live waiter; only then clear SKIP + hourly proofs.
+- No remote INF-121 / LIVE-142 / merge / spend / launch.
+
+### CI (post-push)
+- Tip `484647ce1156a3227d60bb8d990cfd2a6f949bf6` run `35541311971`: **success**
+  - https://github.com/pri8771/swarmai/actions/runs/35541311971
 
 ### Blockers
 - **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
