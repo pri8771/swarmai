@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T21:39:25Z",
+  "updated_at": "2026-09-20T21:51:01Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
   "audit_date": "2026-09-20",
   "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_repair_in_progress_not_accepted",
+  "product_status": "v1_repair_in_progress_changes_required",
   "current_checkpoint": "1.0-repair",
   "roadmap_status": "owner_approved_direction_through_3.0",
   "next_checkpoint_after_gate_pass": "1.1",
@@ -16,13 +16,7 @@
     "source": "Owner approved the plan and instructed implementation now through V1.4 with real live behavior",
     "first_checkpoint": "1.0-repair",
     "ceiling": "1.4",
-    "approved_checkpoints": [
-      "1.0-repair",
-      "1.1",
-      "1.2",
-      "1.3",
-      "1.4"
-    ],
+    "approved_checkpoints": ["1.0-repair", "1.1", "1.2", "1.3", "1.4"],
     "repeat_operator_start_approval_required": false,
     "independent_evidence_review_required_for_acceptance": true,
     "ready_independent_branch_work_may_continue_while_review_pending": true,
@@ -56,11 +50,11 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-009",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-009.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-013",
-  "last_lead_heartbeat_at": "2026-09-20T20:50:43Z",
-  "last_cursor_heartbeat_at": "2026-09-20T21:11:49Z",
+  "last_lead_message_id": "LEAD-20260920-010",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-010.md",
+  "last_seen_cursor_message_id": "CURSOR-20260920-016",
+  "last_lead_heartbeat_at": "2026-09-20T21:51:01Z",
+  "last_cursor_heartbeat_at": "2026-09-20T21:50:02Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",
@@ -69,7 +63,7 @@
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
   },
   "cursor_runner": {
-    "status": "auth_required_not_logged_in",
+    "status": "scheduler_checkins_verified_agent_auth_blocked",
     "requested_cadence_seconds": 3600,
     "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
     "active_mechanism": "com.swarmai.hourly_probe_only_skip_cursor",
@@ -77,7 +71,7 @@
     "cursor_agent_authenticated": false,
     "consecutive_verified_heartbeats": 2,
     "lease": null,
-    "blocker": "cursor agent CLI still reports Not logged in / Waiting for browser authentication; scheduler currently skips Cursor agent probe",
+    "blocker": "cursor agent status and whoami report Not logged in; scheduler intentionally skips Cursor agent probe until fresh login verifies",
     "last_verified_invocation_at": null
   },
   "latest_ci_at_audit": {
@@ -95,30 +89,32 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "implemented_current_tip_ci_failed",
+      "status": "tests_verified_current_tip",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "changes_required",
-      "blocker": "GitHub Actions 35536776956 fails mypy at src/swarm/mission/runtime.py:46; packaging/Alembic/offline pytest did not execute on current tip"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "ci_scope_passed",
+      "evidence": "Actions 35539853498: console success; Ruff success; mypy 139 files; install success; Alembic head; 245 passed 2 skipped. CI DB integration honestly skipped without SWARM_DATABASE_URL."
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "partial_unscoped_idempotency_and_auth_order_remaining",
+      "status": "partial_core_isolation_fixed_worker_approval_ownership_open",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "changes_required"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "changes_required",
+      "blocker": "GET workers and approvals are unfiltered global views; approval ownership/resolve and worker ownership/heartbeat need durable project authorization. Operational bootstrap also grants hard-coded proj_demo/proj_other membership."
     },
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "partial_evidence_validation_and_readiness_remaining",
+      "status": "partial_provider_fail_closed_release_evidence_binding_open",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "changes_required"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "changes_required",
+      "blocker": "release evidence may pass without candidate SHA; command exit/result, timestamp freshness and relevant config/version binding are not mandatory. Current release test expects a no-SHA record to pass."
     },
     {
       "id": "FIX-004",
@@ -126,17 +122,19 @@
       "status": "scheduler_checkins_verified_cursor_worker_auth_blocked",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "partial"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "partial",
+      "blocker": "cursor agent status/whoami Not logged in; unattended worker spawning remains disabled"
     },
     {
       "id": "FIX-005",
       "owner": "Cursor",
-      "status": "partial_known_answer_bypass_fixed_generic_runtime_boundary_open",
+      "status": "partial_known_answer_fixed_operational_mock_contamination_open",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "changes_required"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "changes_required",
+      "blocker": "normal ProductStore/capacity/providers/routes and console live/error/default paths still use mock/fixture state; demo side-effect endpoint remains in normal router"
     },
     {
       "id": "RUN-111",
@@ -144,8 +142,9 @@
       "status": "in_progress_evidence_posted_not_accepted",
       "scope": "G11 unified generic mission runtime",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "pending_after_g10"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "pending_after_g10",
+      "blocker": "three unfamiliar tasks still need full console/API/CLI execution on same durable IDs; normal MissionRuntime auto-promotes accepted worktree files into primary checkout"
     },
     {
       "id": "INF-121",
@@ -153,17 +152,19 @@
       "status": "in_progress_local_only_remote_required",
       "scope": "G12 governed concurrent inference pool",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "not_accepted"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "not_accepted",
+      "blocker": "required concurrent two-remote-provider mission evidence absent"
     },
     {
       "id": "EVAL-131",
       "owner": "Cursor",
-      "status": "in_progress_provisional_underpowered",
+      "status": "provisional_24_cells_n5_not_qualified",
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "not_accepted"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "not_accepted",
+      "blocker": "S+M x six families x two local models at n=5 are screening only; L/XL, third actual config and preregistered acceptance/uncertainty criterion remain open"
     },
     {
       "id": "SWARM-141",
@@ -171,8 +172,9 @@
       "status": "prep_in_progress_offline_only",
       "scope": "G14 elastic evidence-driven task graph",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "not_accepted"
+      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "review_status": "not_accepted",
+      "blocker": "live multi-planner adaptive expansion/contraction evidence absent"
     },
     {
       "id": "LIVE-142",
@@ -187,32 +189,32 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "packaged_awaiting_lead_accept",
-      "evidence": "LEAD_ACCEPT_PACKAGE + CI prior green; tip 0ba091373e8995524c74e637149b1af71f0e0aea",
+      "status": "changes_required_after_lead_review",
+      "evidence": "Current-tip CI green 35539853498; source review recorded in LEAD-20260920-010",
       "review": "not_accepted"
     },
     "G11": {
       "checkpoint": "1.1",
       "status": "in_progress_not_accepted",
-      "evidence": "RUN-111 durable identity/restart/review controls posted; normal mission runtime still parser-specific and G10 open",
+      "evidence": "durable identity/restart/review controls posted; residual full unfamiliar-task execution and explicit apply boundary remain",
       "review": "pending_after_g10"
     },
     "G12": {
       "checkpoint": "1.2",
       "status": "in_progress_local_only_not_accepted",
-      "evidence": "local concurrent broker + kill-route fallback; required dual remote provider overlap not evidenced",
+      "evidence": "local broker/fallback preparation; required dual remote overlap not evidenced",
       "review": "not_accepted"
     },
     "G13": {
       "checkpoint": "1.3",
-      "status": "provisional_n5_path_opened_not_qualified",
-      "evidence": "5 holdouts/cell dataset + partial S n=5 $0 screening",
+      "status": "provisional_screening_not_qualified",
+      "evidence": "S+M x six families x two local models at n=5: 24 provisional cells / 120 trials; no L/XL or third config; no accepted qualification criterion",
       "review": "not_accepted"
     },
     "G14": {
       "checkpoint": "1.4",
       "status": "offline_prep_not_accepted",
-      "evidence": "offline graph/10-50-100/elastic-vs-fixed artifacts only; live multi-planner proof absent",
+      "evidence": "offline graph/load artifacts only; live adaptive multi-planner proof absent",
       "review": "not_accepted"
     }
   },
@@ -235,49 +237,54 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "G10 lead acceptance pending \u2014 package ready; CI green 35539303334 on tip 3b0011f0605573ab77318981691f588ac72f912f",
-    "Cursor agent CLI Not logged in; SKIP_CURSOR_PROBE not cleared",
-    "G12 remote dual-provider live-blocked; G13 not qualified; G14 live multi-planner absent; LIVE-142 not started"
+    "G10 not accepted: operational API/console still mix mock/fixture state into normal paths and expose a demo side-effect route",
+    "G10 not accepted: workers/approvals lack complete durable project ownership/filtering; operational bootstrap uses demo project IDs",
+    "G10 not accepted: release evidence can pass without mandatory exact candidate SHA/result/freshness binding",
+    "Cursor agent CLI Not logged in; scheduler worker probe remains intentionally disabled",
+    "G12 remote dual-provider live evidence absent; G13 not qualified; G14 live adaptive proof absent; LIVE-142 not started"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T21:39:25Z",
+    "verified_at": "2026-09-20T21:51:01Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "3b0011f0605573ab77318981691f588ac72f912f",
-    "candidate_commits": 16,
-    "candidate_changed_files": 76,
-    "latest_verified_ci_run_id": 35539303334,
+    "candidate_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+    "candidate_commits": 25,
+    "candidate_changed_files": 103,
+    "latest_verified_ci_run_id": 35539853498,
     "latest_verified_ci_conclusion": "success",
-    "console_job_id": 106151079805,
+    "console_job_id": 106155435060,
     "console_conclusion": "success",
-    "offline_job_id": 106151079780,
+    "offline_job_id": 106155435180,
     "offline_conclusion": "success",
+    "offline_pytest": "245 passed, 2 skipped",
     "ruff_passed": true,
     "mypy_passed": true,
-    "mypy_error": null,
+    "mypy_source_files": 139,
     "downstream_install_alembic_pytest_executed": true,
+    "integration_ci_status": "skipped_honestly_without_SWARM_DATABASE_URL",
+    "live_gated_job_id": 106155435140,
     "live_gated_job_conclusion": "success_blocked_notice_only",
     "live_acceptance_executed": false,
-    "note": "G10 package + G13 n=5 path; CI green 35539303334 on 3b0011f0605573ab77318981691f588ac72f912f"
+    "note": "CI is current-tip green but G10 source/integrity review found operational mock contamination, worker/approval ownership gaps and incomplete evidence binding"
   },
   "implementation_notes": {
-    "cursor_tip": "3b0011f0605573ab77318981691f588ac72f912f",
-    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed",
+    "cursor_tip": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "posted_not_lead_accepted",
-    "inf121": "local_concurrent_and_kill_fallback_remote_blocked",
-    "eval131": "holdout_n5_dataset_plus_partial_S_screening_provisional",
+    "inf121": "local_only_remote_dual_required",
+    "eval131": "24 provisional n5 S+M cells across two local models; screening only",
     "swarm141": "offline_prep_only",
     "lead_findings": [
-      "LEAD-009 #1\u20136 source closed at 108145ea (mypy, scoped idempotency, bootstrap split, release evidence, provider fail-closed, parser fixture-only)",
-      "Remote CI confirmation pending; G10 not lead-accepted",
-      "CLI login still Not logged in \u2014 do not clear SKIP_CURSOR_PROBE"
+      "FIX-001 current-tip CI is green at f75c6cb / run 35539853498",
+      "FIX-002 core mission/history/idempotency improved; worker/approval ownership and bootstrap project mapping still require repair",
+      "FIX-003 provider readiness is fail-closed; release evidence binding still insufficient",
+      "FIX-005 known-answer/parser force-progress issues improved; normal API/console still have runtime mock/fixture paths",
+      "CLI login remains Not logged in; do not clear SWARM_HOURLY_SKIP_CURSOR_PROBE"
     ],
-    "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes",
-    "lead_009": "items_1_to_6_source_closed_awaiting_remote_ci_and_lead_accept",
-    "ci_run": "35539303334_success",
-    "g10_package": "LEAD_ACCEPT_PACKAGE_ready_awaiting_lead"
+    "ci_run": "35539853498_success",
+    "g10_review": "LEAD-20260920-010_changes_required"
   }
 }
