@@ -1,8 +1,8 @@
 # V1.4 gate matrix (worker view — not lead acceptance)
 
-Updated: 2026-09-20T22:51:33Z
+Updated: 2026-09-20T22:52:15Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: pending push (FIX-003 identity + G12/G14 local $0)
+Candidate tip: `a17ae17e430831eb23d2fafc871244c096ca275d`
 Prior green tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
 LEAD-010 repairs tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
 LEAD-011 ACK pending: FIX-003 evidence-kind identity + G12/G14 local packaging

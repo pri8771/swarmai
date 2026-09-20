@@ -1,6 +1,6 @@
 # G14 / SWARM-141 evidence index
 
-**Tip binding:** pending push (bind after green CI)  
+**Tip binding:** `a17ae17e430831eb23d2fafc871244c096ca275d`  
 **Live multi-planner claimed:** **false**
 
 | Artifact | Claim | Not claimed |

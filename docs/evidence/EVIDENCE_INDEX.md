@@ -1,8 +1,8 @@
 # V1.4 evidence index (worker; not lead-accepted)
 
-**Candidate tip:** pending push (FIX-003 identity + G12/G14 local $0)  
+**Candidate tip:** `a17ae17e430831eb23d2fafc871244c096ca275d`  
 **Prior green tip:** `ca6d425553420cd9f1be2dd7434c110ec9912eef`  
-**Updated (UTC):** 2026-09-20T22:51:33Z  
+**Updated (UTC):** 2026-09-20T22:52:15Z
 **Login:** Not logged in · SKIP uncleared · no merge/spend/launch
 
 | Gate | Packet | Index / binder | Live claimed? |

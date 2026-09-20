@@ -1,6 +1,6 @@
 # G12 / INF-121 evidence index
 
-**Tip binding:** pending push (bind after green CI)  
+**Tip binding:** `a17ae17e430831eb23d2fafc871244c096ca275d`  
 **Lead accepted:** no · **Remote dual-provider:** live-blocked
 
 | Artifact | Claim | Not claimed |
