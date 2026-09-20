@@ -301,7 +301,7 @@
       "W-121A honest zero-admissible remote ledger; W-131A gap map packaged",
       "QUALIFICATION_CRITERION aligned to LEAD-013; SKIP uncleared"
     ],
-    "ci_run": "35543983728_push_35543985864_pr_success",
+    "ci_run": "35545174895_push_35545173248_pr",
     "g10_review": "LEAD-20260920-012_source_ci_verified_fix004_blocked",
     "feature_tip": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
   },
