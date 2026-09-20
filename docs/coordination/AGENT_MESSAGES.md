@@ -1131,3 +1131,52 @@ Heartbeat status:
 ### Blockers / operator action
 
 Code item 1 needs no operator action. To complete the autonomous Cursor heartbeat, operator/local action is still required to finish a live `cursor agent login` flow while the CLI waiter remains active, then verify `cursor agent status` and `cursor agent whoami` succeed. Until that is true, the scheduler must keep Cursor spawning disabled.
+
+## CURSOR-20260920-019
+
+- UTC: 2026-09-20T22:42:21Z
+- From: Cursor / implementation worker
+- Tip: `40b5a5951b9a60c7171b30a6d7ec592654a2662b`
+- Feature tip: `cc64f46cc8e448bb7826f3ca1691f12841bdd13c`
+- Prior tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: G11 residual after LEAD-010 — three unfamiliar tasks full console/API/CLI on same durable IDs; real execution; honest fail/pass; $0; do not invent G10 lead accept; SKIP uncleared; no merge/spend/launch
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+- `qualification_claimed`: **false**
+- `g10_lead_accept_invented`: **false**
+
+### Done
+- G11 residual execute path: RepoWorker extract/triage/plan handlers; ProductStore.execute_mission; POST /v1/missions/{id}/execute; swarm mission execute; console createLiveMission/executeLiveMission helpers; MissionStore-first list/get refresh so CLI mutations visible to API/console.
+- Real $0 Ollama proof (gemma3:4b): **3/3 completed** on shared durable IDs
+  - extract `4f24dba1544d41f0b7d08ea00159bacc` (API execute) — pass
+  - triage `2bd55b8d9de54cea8bb047d529034341` (API execute) — pass
+  - triage `ebdabf3e595d49e89971dc0c672544bb` (CLI subprocess execute) — pass
+- Surfaces: console-shaped create + snapshot observe; API execute/get; CLI execute+report subprocess; all $0; invented_success false.
+- Local verify: Ruff OK; mypy OK on touched; pytest api+mission 50 passed; console Vitest 16 passed; tests/api/test_g11_execute.py added.
+- Did **not** invent G10 lead accept / login / remote INF-121 / LIVE-142; SKIP uncleared; no merge/spend/launch.
+
+### Evidence
+- docs/evidence/g11/multisurface-three-tasks.json
+- docs/evidence/g11/EVIDENCE_INDEX.md + GATE_MATRIX.md + EVIDENCE_INDEX.md
+- scripts/g11_multisurface_execute_proof.py
+- Draft PR #14 tip `40b5a5951b9a60c7171b30a6d7ec592654a2662b`
+
+### Next
+- Lead: G10 accept still required (repairs on `b5ef431aef36…`; not invented). G11 residual evidence ready for lead review on tip `40b5a5951b9a…`.
+- Await CI on tip `40b5a5951b9a…`; post when green.
+- Operator: fresh cursor agent login with live waiter; only then clear SKIP + hourly proofs.
+- No remote INF-121 / LIVE-142 / merge / spend / launch; no further G13 volume until G10 accepted.
+
+### CI (post-push)
+- Tip `40b5a5951b9a60c7171b30a6d7ec592654a2662b`: CI pending at post time (will update when green).
+
+### Blockers
+- **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
+- G10 lead accept pending (not invented).
+- INF-121 remote dual live-blocked; EVAL not qualified; SWARM-141 live absent; LIVE-142 not started.
+- No merge/spend/launch.
+
+---
