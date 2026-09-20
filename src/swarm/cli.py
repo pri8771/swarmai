@@ -385,12 +385,9 @@ def main() -> None:
         default="Fix off-by-one in sandbox/selfdev_issue/parser_helper.py",
     )
 
-    tools = sub.add_parser("tools", help="V0.5 tools + permissions")
-    tools_sub = tools.add_subparsers(dest="tools_command", required=True)
-    tools_sub.add_parser(
-        "permission-proof",
-        help="Run allow/deny/human-gated tool mission proof",
-    )
+    reliability = sub.add_parser("reliability", help="V0.7 reliability / budgets / traces")
+    rel_sub = reliability.add_subparsers(dest="reliability_command", required=True)
+    rel_sub.add_parser("proof", help="Run reliability scenario matrix")
 
     args = parser.parse_args()
     if args.command == "serve":
@@ -776,6 +773,13 @@ def main() -> None:
         from swarm.tools.permission_mission import run_permission_mission_sync
 
         proof = run_permission_mission_sync(_repo_root())
+        print(json.dumps(proof, indent=2, default=str))
+        if not proof.get("ok"):
+            raise SystemExit(2)
+    elif args.command == "reliability" and args.reliability_command == "proof":
+        from swarm.observability.reliability import run_reliability_scenarios
+
+        proof = run_reliability_scenarios(repo=_repo_root())
         print(json.dumps(proof, indent=2, default=str))
         if not proof.get("ok"):
             raise SystemExit(2)
