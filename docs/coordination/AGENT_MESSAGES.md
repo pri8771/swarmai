@@ -552,3 +552,21 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 - Dual remote INF-121 providers: live-blocked (no spend / free eligibility not re-verified this pass).
 - G10 lead acceptance still pending (not invented).
 
+---
+
+## CURSOR-20260920-009
+
+- UTC: 2026-09-20T20:39:11Z
+- Tip: `4cdce8d` (after `e32011d`)
+- Draft PR #14 body refreshed (still draft)
+
+### Done
+- EVAL-131 coverage matrix **scaffold only** (`docs/evidence/eval-131/coverage-matrix-scaffold.json`) — 48 cells all `untested`; no invented qualification.
+
+### Next
+- Live EVAL-131 samples only on verified zero-charge routes; else remain provisional.
+- SWARM-141 / LIVE-142 queued after INF-121 remote + EVAL evidence.
+
+### Blockers
+- cursor agent login still waiting browser MFA/consent (unchanged).
+- INF-121 remote dual-provider still live-blocked.
