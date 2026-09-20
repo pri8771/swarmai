@@ -1,7 +1,9 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v0.7-evals-reliability-11e2`  
+**Active version branch:** `cursor/v0.8-product-experience-11e2`  
+**Interval commits:** IN FORCE  
+**V0.8:** product experience **dogfood passed** — see `docs/v0.8/STATUS.md`  
 **V0.7:** reliability **dogfood passed** — see `docs/v0.7/STATUS.md`  
 **V0.6:** self-dev **dogfood passed** — see `docs/v0.6/STATUS.md`  
 **V0.5:** tools/permissions **dogfood passed** — see `docs/v0.5/STATUS.md`  
@@ -15,25 +17,22 @@
 | Item | URL |
 |---|---|
 | Repo | https://github.com/pri8771/swarmai |
-| V0.2 branch | https://github.com/pri8771/swarmai/tree/cursor/v0.2-heterogeneous-routing |
-| Prior merged PRs | #1 (RC), #2 (V0.1 runtime), #3 (onboarding) |
+| V0.8 branch | https://github.com/pri8771/swarmai/tree/cursor/v0.8-product-experience-11e2 |
+| Prior merged PRs | #1–#9 |
 
 ## Status
 
 | Dimension | Result |
 |---|---|
-| V0.2 kit packets P27–P30 | **complete** (live Ollama proof) |
-| V0.2 P31 checkpoint | **complete** (Draft PR #4) |
-| Provider capability registry | live — 14 auth_ok / paid blocks honored |
-| Model qualification | live provisional cells on `gemma3:4b` + `qwen3.5:4b` |
-| Evidence router | heterogeneous planner/worker assignment |
-| Heterogeneous mission | **passed** mission `08175577fb334c4f9ac64a0895acd25e` cost `$0.00` |
+| V0.8 kit packets P57–P60 | **complete** (journey proof `$0.00`) |
+| V0.8 P61 checkpoint | **in progress** (Draft PR) |
+| Product contract | CLI + `/v1` aligned; internal fields stripped |
+| Projects config | durable under `var/projects/` (gitignored; no secrets) |
+| History / artifacts | searchable reopen via CLI + API + console |
+| Mission-control UI | Projects / History / Artifacts tabs |
 | Spend policy | **zero** (`SWARM_ALLOW_PAID=false`) |
-| OpenAI | deferred (payment-gated) |
-| Together / Fireworks | auth ok; inference blocked under zero-spend |
 
 ## Limitations
 
-- Cloud free-tier **generation** not used for benchmarks (metadata auth probes only).
-- Profiles remain provisional (starter archive; not statistical qualified).
-- `swarm release verify` matrix still labels historical P01–P21 offline modules; V0.2 live proof is documented in `docs/v0.2/STATUS.md`.
+- Full live Ollama mission remains optional for the product journey (plan + permission + API + history cover the UX contract).
+- OpenAI still deferred (payment-gated).
