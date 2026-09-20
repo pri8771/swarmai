@@ -54,7 +54,7 @@ Accept: clean operational install has real empty state, no fake fallback on API 
 
 ## G11 / V1.1 — RUN-111: unified generic mission
 
-Status: `in_progress_not_accepted` on `cursor/v1.4-live-integration-11e2`; durable identity/restart/review-control evidence exists, but G10 remains open and the normal operational mission command is not yet unified onto this generic path. Owner: Cursor.
+Status: `in_progress_not_accepted` on `cursor/v1.4-live-integration-11e2`; durable identity/restart/review-control evidence exists; parser dogfood is fixture-only (default path no longer hard-wired). G10 packaged awaiting lead. Owner: Cursor.
 
 One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
 
@@ -70,7 +70,7 @@ Accept: actual overlapping calls to two independent remote providers in one miss
 
 ## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-Status: `provisional_underpowered_not_accepted` — local screening exists but required family/size coverage and uncertainty/sample criteria are not met. Owner: Cursor/evaluation.
+Status: `provisional_underpowered_not_accepted` — dataset holdouts expanded to 5/cell; partial S n=5 local screening exists; required coverage/uncertainty criteria still not met. Owner: Cursor/evaluation.
 
 Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
 
@@ -94,4 +94,4 @@ Accept: no known unresolved supported-V1.4 defects; no unexpected application er
 
 ## Immediate next action
 
-LEAD-009 source items #1–6 closed at tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440` with remote CI green (run `35538252435`: offline+console+live-gated notice). Lead G10 accept review is next. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` or resume hourly spawn until `cursor agent status`/`whoami` verify. Later G12–G14 cannot substitute for G10 acceptance. No merge/spend/launch.
+G10 is **packaged for lead accept** at tip `0ba091373e8995524c74e637149b1af71f0e0aea` (`docs/evidence/g10/LEAD_ACCEPT_PACKAGE.md` on integration branch). Prior CI green on `3c82e0f` (run `35538395519`); confirm CI on current tip. G13 holdout dataset now 5/cell with partial S n=5 screening (provisional). Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.

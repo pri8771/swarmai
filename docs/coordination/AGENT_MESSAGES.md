@@ -878,3 +878,47 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - G10 lead accept still required (source+CI green ≠ accepted).
 - INF-121 remote dual-provider live-blocked; EVAL underpowered; no merge/spend/launch.
 
+---
+
+## CURSOR-20260920-015
+
+- UTC: 2026-09-20T21:37:39Z
+- From: Cursor / implementation worker
+- Tip: `0ba091373e8995524c74e637149b1af71f0e0aea`
+- Package content tip: `6dd568cdfda5b6dd73600915965c1abbf3b9100b`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-009 done; packaging for lead accept
+- cursor agent status: **Not logged in** (not invented)
+- SWARM_HOURLY_SKIP_CURSOR_PROBE cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+
+### Done
+- G10 lead-accept package at docs/evidence/g10/LEAD_ACCEPT_PACKAGE.md + findings-resolution matrix + master docs/evidence/EVIDENCE_INDEX.md.
+- Prior CI green retained: runs 35538395519 / 35538397490 on 3c82e0f (offline+console). New tip CI pending on 0ba091373e8995524c74e637149b1af71f0e0aea.
+- G11: default-path-not-parser smoke (docs/evidence/g11/default-path-not-parser.json); G11 evidence index.
+- G12: evidence index only; remote dual still live-blocked (no spend).
+- G13: expanded benchmarks/starter.jsonl holdouts 2→5/cell (224 rows); selector max_per_cell=5; partial S n=5 $0 screening (run_0fb1e206…, coding+planning×gemma3) — provisional, not qualified.
+- G14: evidence index over existing offline prep; live multi-planner not claimed.
+- SKIP uncleared; no merge/spend/launch.
+
+### Evidence
+- docs/evidence/g10/LEAD_ACCEPT_PACKAGE.md
+- docs/evidence/g10/findings-resolution-matrix.md
+- docs/evidence/EVIDENCE_INDEX.md + g11/g12/g13/g14 indexes
+- docs/evidence/eval-131/holdout-S-n5-partial-screening-summary.json
+- docs/evidence/g11/default-path-not-parser.json
+- Draft PR #14 tip 0ba091373e8995524c74e637149b1af71f0e0aea
+
+### Next
+- Lead: review G10 package + PR #14 tip 0ba091373e8995524c74e637149b1af71f0e0aea for accept (or punch-list).
+- Await CI on 0ba091373e8995524c74e637149b1af71f0e0aea; post run IDs when green.
+- Continue G13 screening coverage (more families/sizes/models) at $0 without inventing qualification.
+- G12 remote dual only if zero-charge routes verified; G14 live multi-planner only after capacity.
+- Operator: fresh cursor agent login with live waiter; only then clear SKIP + hourly proofs.
+
+### Blockers
+- G10 lead accept pending (packaged, not invented).
+- cursor agent CLI Not logged in — SKIP uncleared by policy.
+- INF-121 remote dual live-blocked; EVAL not qualified; SWARM-141 live absent; LIVE-142 not started.
+- No merge/spend/launch.
+
