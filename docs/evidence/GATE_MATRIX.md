@@ -1,12 +1,12 @@
 # V1.4 gate matrix (worker view — not lead acceptance)
 
-Updated: 2026-09-20T20:44:21Z
+Updated: 2026-09-20T20:48:12Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-cursor agent status: Not logged in
+cursor agent status: Not logged in (re-verified after operator claim; not invented)
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
-| G10 | FIX-001–005 | yes (CI) | FIX-004 recurring; check-in auth_required | **no** | Login MFA pending |
+| G10 | FIX-001–005 | yes (CI) | FIX-004 recurring; login verify still Not logged in | **no** | Complete loginDeepControl browser auth |
 | G11 | RUN-111 | yes | accept-controls + restart-reopen | **no** | |
 | G12 | INF-121 | partial | local concurrent + kill-fallback; brokered benchmarks | **no** | Remote dual-provider live-blocked |
 | G13 | EVAL-131 | screening | M provisional + holdout S provisional (underpowered) | **no** | Not qualified |

@@ -1,0 +1,196 @@
+{
+  "gate": "SWARM-141",
+  "scenario": "offline_elastic_vs_fixed_vs_single_prep",
+  "recorded_at": "2026-09-20T20:46:18.455700+00:00",
+  "live_claimed": false,
+  "note": "Offline controller comparison only: single/fixed-two/elastic-three planner sessions with duplicate-spawn merge, capacity expand, and STOP contract. No model calls; not live multi-planner concurrency proof.",
+  "modes": [
+    {
+      "mode": "single",
+      "n_planners": 1,
+      "n_unique_spawns": 8,
+      "inference_slots_start": 2,
+      "final_revision": 9,
+      "mission_status": "cancelled",
+      "task_count": 8,
+      "ready_before_expand": 2,
+      "ready_after_expand": 2,
+      "duplicate_merged": true,
+      "stop_revision": 9,
+      "wall_seconds": 0.000294,
+      "ops_total": 9,
+      "ops_sample": [
+        {
+          "i": 0,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 2,
+          "task": "task_single_0"
+        },
+        {
+          "i": 1,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 3,
+          "task": "task_single_1"
+        },
+        {
+          "i": 2,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 4,
+          "task": "task_single_2"
+        },
+        {
+          "i": 3,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 5,
+          "task": "task_single_3"
+        },
+        {
+          "i": 4,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 6,
+          "task": "task_single_4"
+        },
+        {
+          "i": 5,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 7,
+          "task": "task_single_5"
+        },
+        {
+          "truncated": 3
+        }
+      ]
+    },
+    {
+      "mode": "fixed_two",
+      "n_planners": 2,
+      "n_unique_spawns": 8,
+      "inference_slots_start": 2,
+      "final_revision": 9,
+      "mission_status": "cancelled",
+      "task_count": 8,
+      "ready_before_expand": 2,
+      "ready_after_expand": 2,
+      "duplicate_merged": true,
+      "stop_revision": 9,
+      "wall_seconds": 0.000178,
+      "ops_total": 9,
+      "ops_sample": [
+        {
+          "i": 0,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 2,
+          "task": "task_fixed_two_0"
+        },
+        {
+          "i": 1,
+          "planner": "as_planner_1",
+          "ok": true,
+          "revision": 3,
+          "task": "task_fixed_two_1"
+        },
+        {
+          "i": 2,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 4,
+          "task": "task_fixed_two_2"
+        },
+        {
+          "i": 3,
+          "planner": "as_planner_1",
+          "ok": true,
+          "revision": 5,
+          "task": "task_fixed_two_3"
+        },
+        {
+          "i": 4,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 6,
+          "task": "task_fixed_two_4"
+        },
+        {
+          "i": 5,
+          "planner": "as_planner_1",
+          "ok": true,
+          "revision": 7,
+          "task": "task_fixed_two_5"
+        },
+        {
+          "truncated": 3
+        }
+      ]
+    },
+    {
+      "mode": "elastic_three",
+      "n_planners": 3,
+      "n_unique_spawns": 12,
+      "inference_slots_start": 2,
+      "final_revision": 13,
+      "mission_status": "cancelled",
+      "task_count": 12,
+      "ready_before_expand": 2,
+      "ready_after_expand": 2,
+      "duplicate_merged": true,
+      "stop_revision": 13,
+      "wall_seconds": 0.000239,
+      "ops_total": 13,
+      "ops_sample": [
+        {
+          "i": 0,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 2,
+          "task": "task_elastic_three_0"
+        },
+        {
+          "i": 1,
+          "planner": "as_planner_1",
+          "ok": true,
+          "revision": 3,
+          "task": "task_elastic_three_1"
+        },
+        {
+          "i": 2,
+          "planner": "as_planner_2",
+          "ok": true,
+          "revision": 4,
+          "task": "task_elastic_three_2"
+        },
+        {
+          "i": 3,
+          "planner": "as_planner_0",
+          "ok": true,
+          "revision": 5,
+          "task": "task_elastic_three_3"
+        },
+        {
+          "i": 4,
+          "planner": "as_planner_1",
+          "ok": true,
+          "revision": 6,
+          "task": "task_elastic_three_4"
+        },
+        {
+          "i": 5,
+          "planner": "as_planner_2",
+          "ok": true,
+          "revision": 7,
+          "task": "task_elastic_three_5"
+        },
+        {
+          "truncated": 7
+        }
+      ]
+    }
+  ],
+  "spend": 0
+}

@@ -1,0 +1,36 @@
+{
+  "gate": "FIX-004",
+  "scenario": "cursor_agent_login_verify_after_operator_claim",
+  "recorded_at": "2026-09-20T20:48:12.453148+00:00",
+  "operator_claim": "i think its done",
+  "cursor_agent_status": "Not logged in",
+  "invented_success": false,
+  "checks": {
+    "cursor_agent_status": "Not logged in",
+    "cursor_agent_whoami": "Not logged in",
+    "login_probe": {
+      "no_open_browser": true,
+      "timed_out_seconds": 15,
+      "cli_state": "Waiting for browser authentication...",
+      "login_url_present": true,
+      "login_url": "https://cursor.com/loginDeepControl?challenge=mF5XEU7lHJw8uVLf7rUopD5BarVWHM-UNjuahP8TzJ8&uuid=16031906-6d11-4af3-b736-64a3fb4df180&mode=login&redirectTarget=cli"
+    },
+    "launchagent": {
+      "label": "com.swarmai.hourly",
+      "loaded": true,
+      "state": "not running",
+      "start_interval_seconds": 3600,
+      "skip_cursor_probe": true,
+      "skip_repo": true,
+      "note": "Hourly runner installed; cursor agent spawn remains blocked until agent login succeeds"
+    }
+  },
+  "remaining_operator_step": {
+    "action": "Complete Cursor CLI agent browser login (password/passkey/MFA/consent as needed)",
+    "cli": "cursor agent login",
+    "url": "https://cursor.com/loginDeepControl?challenge=mF5XEU7lHJw8uVLf7rUopD5BarVWHM-UNjuahP8TzJ8&uuid=16031906-6d11-4af3-b736-64a3fb4df180&mode=login&redirectTarget=cli",
+    "verify_after": "cursor agent status  # must print Logged in / authenticated, not 'Not logged in'",
+    "do_not": "Do not paste secrets into chat; do not invent success"
+  },
+  "hourly_unattended_resume": "deferred_until_agent_login_verified"
+}

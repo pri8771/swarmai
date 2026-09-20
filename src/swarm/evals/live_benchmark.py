@@ -195,12 +195,12 @@ def _select_cases(
         seen_cells[(case.family, case.size)] = 1
         if len(selected) >= max_cases:
             return selected
-    # Pass 2: fill remaining budget up to 1–2 per cell.
+    # Pass 2: fill remaining budget up to 2 holdout/calibration cases per cell.
     for case in cases:
         if case in selected:
             continue
         key = (case.family, case.size)
-        if seen_cells.get(key, 0) >= 1:
+        if seen_cells.get(key, 0) >= 2:
             continue
         selected.append(case)
         seen_cells[key] = seen_cells.get(key, 0) + 1

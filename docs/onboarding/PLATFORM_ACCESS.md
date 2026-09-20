@@ -39,7 +39,7 @@
 | deepinfra | deepinfra-primary | unknown | DEEPINFRA_API_KEY | unknown | authenticated_ui | models.list historically OK | 2026-09-20T17:04:46Z | Confirm zero-charge eligibility before call |
 | replicate | replicate-primary | unknown | REPLICATE_API_TOKEN | unknown | authenticated_ui | account auth historically OK | 2026-09-20T17:04:46Z | Zero-charge only |
 | github | github-project-access | unknown | gh auth / SSH | unknown | repo write observed via pushes | n/a | 2026-09-20 | Confirm correct org/user before privileged ops |
-| cursor | cursor-operator | IDE/CLI | CURSOR_API_KEY / agent login | IDE present | CLI installed; agent auth **required** | unattended agent unverified | 2026-09-20T19:45:00Z | Operator: `cursor agent login` or set CURSOR_API_KEY (no spend) |
+| cursor | cursor-operator | IDE/CLI | CURSOR_API_KEY / agent login | IDE present | CLI agent **Not logged in** (re-verified) | unattended agent blocked | 2026-09-20T20:48:00Z | Open loginDeepControl URL from `cursor agent login`; then re-run `cursor agent status` |
 | local-ollama | local-ollama | n/a | OLLAMA_BASE_URL | n/a | local endpoint | zero-cost canary historically OK | 2026-09-20T17:04:46Z | Ensure Ollama daemon running |
 
 ## Destination recovery procedure
