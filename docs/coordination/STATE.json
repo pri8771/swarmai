@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T22:38:21Z",
+  "updated_at": "2026-09-20T22:55:28Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
   "audit_date": "2026-09-20",
   "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_repair_near_acceptance_blocked_heartbeat_and_evidence_identity",
+  "product_status": "v1_repair_near_acceptance_blocked_authenticated_hourly_worker",
   "current_checkpoint": "1.0-repair",
   "roadmap_status": "owner_approved_direction_through_3.0",
   "next_checkpoint_after_gate_pass": "1.1",
@@ -58,9 +58,9 @@
   },
   "last_lead_message_id": "LEAD-20260920-011",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-010.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-018",
+  "last_seen_cursor_message_id": "CURSOR-20260920-020",
   "last_lead_heartbeat_at": "2026-09-20T22:38:21Z",
-  "last_cursor_heartbeat_at": "2026-09-20T22:30:05Z",
+  "last_cursor_heartbeat_at": "2026-09-20T22:55:28Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",
@@ -123,13 +123,13 @@
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "partial_version_identity_binding_remaining",
+      "status": "identity_binding_implemented_awaiting_lead_reverify",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-      "review_status": "changes_required",
-      "blocker": "repairs pushed on b5ef431; lead must re-verify mandatory SHA/exit/mode/freshness binding",
-      "evidence": "tests/release/test_fix003_evidence_binding.py"
+      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
+      "review_status": "awaiting_lead_reverify",
+      "blocker": "identity groups shipped on a17ae17; lead must re-verify; FIX-004 login still blocks G10 accept",
+      "evidence": "tests/release/test_fix003_evidence_binding.py; EVIDENCE_IDENTITY_GROUPS in verify.py; CI 35542951933"
     },
     {
       "id": "FIX-004",
@@ -155,22 +155,23 @@
     {
       "id": "RUN-111",
       "owner": "Cursor",
-      "status": "in_progress_no_auto_promote_source_fixed",
+      "status": "multisurface_residual_evidenced_not_accepted",
       "scope": "G11 unified generic mission runtime",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "source_sha": "ca6d425553420cd9f1be2dd7434c110ec9912eef",
       "review_status": "pending_after_g10",
-      "blocker": "auto primary-checkout promotion removed; three unfamiliar tasks full multi-surface execution still required"
+      "blocker": "G11 residual multisurface $0 evidenced; lead accept not invented; G10 still open"
     },
     {
       "id": "INF-121",
       "owner": "Cursor",
-      "status": "in_progress_local_only_remote_required",
+      "status": "in_progress_local_admission_reconcile_remote_required",
       "scope": "G12 governed concurrent inference pool",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
       "review_status": "not_accepted",
-      "blocker": "required concurrent two-remote-provider mission evidence absent"
+      "blocker": "required concurrent two-remote-provider mission evidence absent",
+      "evidence": "inf-121/local-admission-reconcile.json + concurrent/kill-fallback; remote dual still required"
     },
     {
       "id": "EVAL-131",
@@ -185,12 +186,13 @@
     {
       "id": "SWARM-141",
       "owner": "Cursor",
-      "status": "prep_in_progress_offline_only",
+      "status": "offline_admission_gated_expand_prep_not_accepted",
       "scope": "G14 elastic evidence-driven task graph",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
       "review_status": "not_accepted",
-      "blocker": "live multi-planner adaptive expansion/contraction evidence absent"
+      "blocker": "live multi-planner adaptive expansion/contraction evidence absent",
+      "evidence": "swarm-141/admission-gated-expand-offline.json + prior offline prep; live multi-planner absent"
     },
     {
       "id": "LIVE-142",
@@ -205,9 +207,9 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "near_acceptance_changes_required",
-      "evidence": "PR #14 tip b5ef431aef36212417693ca826024d67d0f19e4f; CI 35541873777 green; FIX-002/005 source repairs verified; FIX-003 version identity binding + FIX-004 authenticated hourly worker receipts remain",
-      "review": "changes_required"
+      "status": "near_acceptance_fix004_login_remaining",
+      "evidence": "PR #14 tip 6669d37827d487206ee6c71734d4e2c64b475906; feature a17ae17e430831eb23d2fafc871244c096ca275d; CI 35542951933+35543012288 green; FIX-003 identity binding implemented awaiting lead re-verify; FIX-004 authenticated hourly receipts remain",
+      "review": "changes_required_fix004"
     },
     "G11": {
       "checkpoint": "1.1",
@@ -218,7 +220,7 @@
     "G12": {
       "checkpoint": "1.2",
       "status": "in_progress_local_only_not_accepted",
-      "evidence": "local broker/fallback preparation; required dual remote overlap not evidenced",
+      "evidence": "local concurrent + kill-fallback + admission-reconcile; required dual remote overlap not evidenced",
       "review": "not_accepted"
     },
     "G13": {
@@ -230,7 +232,7 @@
     "G14": {
       "checkpoint": "1.4",
       "status": "offline_prep_not_accepted",
-      "evidence": "offline graph/load artifacts only; live adaptive multi-planner proof absent",
+      "evidence": "offline graph/load + admission-gated expand/contract; live adaptive multi-planner proof absent",
       "review": "not_accepted"
     }
   },
@@ -253,17 +255,17 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "FIX-003 behavioral evidence still lacks enforced evidence-kind-specific config/dataset/model/tool version identity",
-    "Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet",
-    "G11 residual full multi-surface unfamiliar-task acceptance remains; G12 remote dual-provider, G13 qualification, G14 live adaptive proof and LIVE-142 remain unaccepted"
+    "Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet (FIX-004)",
+    "FIX-003 identity binding implemented on tip a17ae17 \u2014 awaiting lead re-verify (not auto-accepted)",
+    "G12 remote dual-provider, G13 qualification, G14 live adaptive proof and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T22:38:21Z",
+    "verified_at": "2026-09-20T22:55:28Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-    "latest_verified_ci_run_id": 35541873777,
+    "candidate_sha": "6669d37827d487206ee6c71734d4e2c64b475906",
+    "latest_verified_ci_run_id": 35543012288,
     "latest_verified_ci_conclusion": "success",
     "offline_job_id": 106160887278,
     "offline_conclusion": "success",
@@ -272,23 +274,26 @@
     "live_gated_job_id": 106160887415,
     "live_gated_conclusion": "success_blocked_notice_only",
     "db_integration_ci": "skipped_honestly_without_SWARM_DATABASE_URL",
-    "live_acceptance_executed": false
+    "live_acceptance_executed": false,
+    "worker_reported_feature_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
+    "worker_reported_feature_ci_run_id": 35542951933
   },
   "implementation_notes": {
-    "cursor_tip": "b5ef431aef36212417693ca826024d67d0f19e4f",
+    "cursor_tip": "6669d37827d487206ee6c71734d4e2c64b475906",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "posted_not_lead_accepted",
-    "inf121": "local_only_remote_dual_required",
+    "inf121": "local_admission_reconcile_added_remote_dual_required",
     "eval131": "24 provisional n5 S+M cells across two local models; screening only",
-    "swarm141": "offline_prep_only",
+    "swarm141": "offline_admission_gated_expand_prep_only",
     "lead_findings": [
-      "LEAD-010 ACK: G13 volume paused",
-      "FIX-005/002/003 source repairs on b5ef431 awaiting lead re-review",
-      "G11 auto-promote removed; residual unfamiliar-task multi-surface evidence open",
-      "CLI login remains Not logged in; SKIP uncleared"
+      "LEAD-011 ACK: FIX-003 identity binding implemented; awaiting lead re-verify",
+      "G12/G14 local $0 packaging advanced; remote/live still unclaimed",
+      "CLI login remains Not logged in; SKIP uncleared",
+      "G10 accept not invented"
     ],
-    "ci_run": "35541870705_success",
-    "g10_review": "LEAD-20260920-010_changes_required"
+    "ci_run": "35542951933_and_35543012288_success",
+    "g10_review": "LEAD-20260920-011_identity_shipped_awaiting_reverify",
+    "feature_tip": "a17ae17e430831eb23d2fafc871244c096ca275d"
   }
 }

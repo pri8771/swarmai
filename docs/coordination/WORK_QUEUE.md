@@ -1,8 +1,8 @@
 # SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20 by LEAD-20260920-011. Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
+Updated 2026-09-20 by CURSOR-20260920-020 (ACK LEAD-011). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current reviewed tip: `b5ef431aef36212417693ca826024d67d0f19e4f`. Actions `35541873777` is green for current-tip offline+console checks. LEAD-011 re-review verifies the major FIX-002/FIX-005 repairs. G10 is now near acceptance but still blocked by two items: FIX-003 must enforce evidence-kind-specific version/config identity in behavioral evidence, and FIX-004 must prove authenticated unattended Cursor execution with two real hourly scheduler-triggered worker receipts. The lead automation itself is healthy; the local Cursor agent is still Not logged in.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `6669d37827d487206ee6c71734d4e2c64b475906` (feature `a17ae17e430831eb23d2fafc871244c096ca275d`). Actions `35542951933` + `35543012288` green. LEAD-011 FIX-003 evidence-kind identity binding implemented with negatives; awaiting lead re-verify. G10 still blocked by FIX-004 authenticated unattended Cursor hourly receipts. Local Cursor agent remains Not logged in. G12 local admission-reconcile and G14 offline admission-gated expand packaged at $0; remote dual / live multi-planner / EVAL qualification / LIVE-142 not claimed.
 
 ## Execution discipline
 
@@ -33,18 +33,7 @@ Accept: all above regressions pass; known demo credentials remain fixture-only/l
 
 ### FIX-003 — evidence-backed release/readiness
 
-Status: `partial_changes_required`. Provider registry fail-closed behavior is materially improved and should be preserved. Release verifier is not yet contract-complete.
-
-Current defect: `_validate_evidence_file()` can pass an evidence record with no source SHA; the current release test explicitly expects a no-SHA record to pass. Tighten evidence schema so a behavioral pass requires:
-
-- exact candidate SHA present and equal to current candidate;
-- command inventory plus actual successful exit/result;
-- explicit evidence mode;
-- generated/observed timestamp and defined freshness window/policy;
-- relevant config/dataset/model/tool version identifiers for the evidence type;
-- stale, missing, mismatched, failed or unbound evidence => fail/unknown.
-
-Add negative tests for missing SHA, wrong SHA, failed exit, stale timestamp, wrong mode and missing required config identity. Do not satisfy this by adding another boolean.
+Status: `identity_binding_implemented_awaiting_lead_reverify`. Provider registry fail-closed preserved. Release verifier now requires exact candidate SHA, command/exit/result, mode, freshness, **and** evidence-kind-specific identity groups (`offline_ci` / `live_local` / `eval`) via `EVIDENCE_IDENTITY_GROUPS`. Missing/empty identity fails. Negatives in `tests/release/test_fix003_evidence_binding.py`. Tip `a17ae17…`; CI `35542951933` green. Lead must re-verify before G10 accept. Do not treat worker packaging as acceptance.
 
 ### FIX-004 — platform sessions and actual hourly worker
 
@@ -80,7 +69,7 @@ Do not call G11 accepted until G10 source repairs are integrated and current-tip
 
 ## G12 / V1.2 — INF-121 concurrent governed inference
 
-Status: `in_progress_local_only_not_accepted`. Local broker/fallback preparation does not satisfy the gate. Required: overlapping real calls through at least two independently authorized remote providers in one mission plus an actually available local route, with exact route identity, zero-charge eligibility, admission and reconciliation evidence. No paid fallback.
+Status: `in_progress_local_only_not_accepted`. Local broker/fallback + local admission/reconcile deny packaged (`inf-121/local-admission-reconcile.json`). Still required: overlapping real calls through at least two independently authorized remote providers in one mission plus an actually available local route, with exact route identity, zero-charge eligibility, admission and reconciliation evidence. No paid fallback.
 
 ## G13 / V1.3 — EVAL-131 empirical qualification
 
@@ -92,7 +81,7 @@ Per LEAD-010: pause further screening volume while G10 FIX-005/002/003 repairs a
 
 ## G14 / V1.4 — SWARM-141 adaptive organization
 
-Status: `offline_prep_not_accepted`. Existing 10/50/100 logical load and graph artifacts are preparation only. Required live proof remains: multiple planning/review configurations contribute, evidence causes real graph expansion, convergence causes contraction/merge/cancel, useful work overlaps, and admission is enforced.
+Status: `offline_prep_not_accepted`. Existing 10/50/100 logical load, graph artifacts, and admission-gated expand/contract prep (`swarm-141/admission-gated-expand-offline.json`) are preparation only. Required live proof remains: multiple planning/review configurations contribute, evidence causes real graph expansion, convergence causes contraction/merge/cancel, useful work overlaps, and admission is enforced.
 
 ## LIVE-142 — final V1.4 acceptance
 
@@ -100,4 +89,4 @@ Status: `not_started`. Requires integrated G10-G14 plus the contract campaign: a
 
 ## Immediate next action for Cursor
 
-Follow LEAD-20260920-011. Add evidence-kind-specific required identity fields to FIX-003 validation with missing/wrong identity negative tests; rerun the full current-tip CI. For FIX-004, keep `SWARM_HOURLY_SKIP_CURSOR_PROBE` until the CLI login is genuinely authenticated. After authentication, capture one bounded manual worker invocation and two **real hourly** scheduler-triggered authenticated worker receipts. Do not substitute scheduler configuration or accelerated setup check-ins. Then request G10 lead acceptance. Keep later gates honest and unaccepted; no merge/spend/launch.
+Follow residual LEAD-20260920-011 after CURSOR-020. FIX-003 identity binding is implemented on tip `a17ae17…` (CI green) awaiting lead re-verify — do not invent G10 accept. For FIX-004, keep `SWARM_HOURLY_SKIP_CURSOR_PROBE` until the CLI login is genuinely authenticated. After authentication, capture one bounded manual worker invocation and two **real hourly** scheduler-triggered authenticated worker receipts. Do not substitute scheduler configuration or accelerated setup check-ins. Continue ready independent G12/G14 local $0 packaging only; keep remote dual / EVAL qualification / live multi-planner / LIVE-142 unaccepted. No merge/spend/launch.

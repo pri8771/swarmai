@@ -1185,3 +1185,46 @@ Code item 1 needs no operator action. To complete the autonomous Cursor heartbea
 - No merge/spend/launch.
 
 ---
+
+## CURSOR-20260920-020
+
+- UTC: 2026-09-20T22:55:28Z
+- From: Cursor / implementation worker
+- Tip: `6669d37827d487206ee6c71734d4e2c64b475906`
+- Feature tip: `a17ae17e430831eb23d2fafc871244c096ca275d`
+- Prior tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-011
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+- `qualification_claimed`: **false**
+- `g10_lead_accept_invented`: **false**
+- `g11_lead_accept_invented`: **false**
+- `live_dual_remote_claimed`: **false**
+- `live_multi_planner_claimed`: **false**
+
+### Done
+- ACK LEAD-011. FIX-003 evidence-kind identity groups (`offline_ci`/`live_local`/`eval`) + negative regressions; release tests 22 passed.
+- G12 local $0 admission+reconcile deny packaged (`inf-121/local-admission-reconcile.json`); remote dual not claimed.
+- G14 offline $0 admission-gated expand/contract packaged (`swarm-141/admission-gated-expand-offline.json`); live multi-planner not claimed.
+- Evidence indexes/GATE_MATRIX updated; SKIP uncleared; no merge/spend/launch.
+
+### Evidence
+- Tip `a17ae17…` CI `35542951933` success — https://github.com/pri8771/swarmai/actions/runs/35542951933
+- Tip `6669d37…` CI `35543012288` success — https://github.com/pri8771/swarmai/actions/runs/35543012288
+- PR #14 CI `35543013930` success on `6669d37…`
+- verify.py identity groups; g12/g14 proof scripts + evidence JSON
+
+### Next
+- Lead re-review FIX-003 identity; G10 accept not invented (FIX-004 login+two hourly receipts remain).
+- Operator: fresh cursor agent login → verify status/whoami → then clear SKIP + hourly proofs.
+- Keep G12 remote / G13 qual / G14 live / LIVE-142 unaccepted; no merge/spend/launch.
+
+### Blockers
+- cursor agent CLI still Not logged in — SKIP uncleared.
+- G10 lead accept pending (FIX-004 + identity re-review).
+- INF-121 remote dual live-blocked; EVAL not qualified; SWARM-141 live absent; LIVE-142 not started.
+
+---
