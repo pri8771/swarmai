@@ -1,0 +1,272 @@
+{
+  "schema_version": "1.0",
+  "started_at": "2026-09-20T23:07:47Z",
+  "purpose": "Prospective evidence-backed worker performance calibration by story-point size. Story points measure complexity/risk, not time.",
+  "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
+  "worker_types": [
+    "Cursor"
+  ],
+  "aggregation_policy": {
+    "minimum_completed_packets_for_stable_bucket_summary": 5,
+    "metrics": [
+      "completed_count",
+      "first_lead_review_acceptance_rate",
+      "first_pass_ci_rate_where_applicable",
+      "median_rework_cycles",
+      "reopened_defects",
+      "evidence_complete_first_submission_rate",
+      "blocker_distribution"
+    ],
+    "historical_pre_protocol_work_counts_for_calibration": false
+  },
+  "story_point_summary": {
+    "1": {
+      "completed": 0,
+      "stable": false
+    },
+    "2": {
+      "completed": 0,
+      "stable": false
+    },
+    "3": {
+      "completed": 0,
+      "stable": false
+    },
+    "4": {
+      "completed": 0,
+      "stable": false
+    },
+    "5": {
+      "completed": 0,
+      "stable": false
+    }
+  },
+  "packets": [
+    {
+      "packet_id": "W-041A",
+      "story_points": 1,
+      "gate": "G10",
+      "task_family": "infra/auth",
+      "status": "blocked_external_human_auth",
+      "worker": "Cursor",
+      "first_pass_ci": "not_applicable",
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-041B",
+      "story_points": 2,
+      "gate": "G10",
+      "task_family": "infra/live-evidence",
+      "status": "queued",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-041C",
+      "story_points": 2,
+      "gate": "G10",
+      "task_family": "infra/live-evidence",
+      "status": "queued",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-111A",
+      "story_points": 2,
+      "gate": "G11",
+      "task_family": "ui/integration",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-111B",
+      "story_points": 2,
+      "gate": "G11",
+      "task_family": "integration/live-evidence",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-121A",
+      "story_points": 2,
+      "gate": "G12",
+      "task_family": "provider/live-evidence",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-121B",
+      "story_points": 3,
+      "gate": "G12",
+      "task_family": "provider/integration",
+      "status": "blocked_on_W-121A",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-131A",
+      "story_points": 1,
+      "gate": "G13",
+      "task_family": "evaluation/data",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-131B",
+      "story_points": 2,
+      "gate": "G13",
+      "task_family": "evaluation/live-evidence",
+      "status": "blocked_on_W-131A",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-131C",
+      "story_points": 3,
+      "gate": "G13",
+      "task_family": "evaluation/integration",
+      "status": "ready_for_calibration_only",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141A",
+      "story_points": 1,
+      "gate": "G14",
+      "task_family": "orchestration/config",
+      "status": "blocked_on_G13",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141B1",
+      "story_points": 2,
+      "gate": "G14",
+      "task_family": "orchestration/instrumentation",
+      "status": "blocked_on_G13",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141B2",
+      "story_points": 3,
+      "gate": "G14",
+      "task_family": "orchestration/integration",
+      "status": "blocked_on_G13_G12",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141B3",
+      "story_points": 3,
+      "gate": "G14",
+      "task_family": "orchestration/live-evidence",
+      "status": "blocked_on_W-141B2",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141B4",
+      "story_points": 2,
+      "gate": "G14",
+      "task_family": "observability/live-evidence",
+      "status": "blocked_on_W-141B2",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "W-141C",
+      "story_points": 3,
+      "gate": "G14",
+      "task_family": "evaluation/integration",
+      "status": "blocked_on_G14",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    }
+  ],
+  "historical_context": [
+    {
+      "work": "FIX-001",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-002",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-003",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-005",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    }
+  ]
+}
