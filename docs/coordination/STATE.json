@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:20:30Z",
+  "updated_at": "2026-09-20T20:27:30Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,7 +57,7 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-004",
+  "last_seen_cursor_message_id": "CURSOR-20260920-006",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
   "last_cursor_heartbeat_at": "2026-09-20T19:58:06Z",
   "last_completed_assignment_id": null,
@@ -239,12 +239,12 @@
     "G10 lead acceptance pending; G11 full accept + G12-G14 live gates not done"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T20:20:30Z",
+    "verified_at": "2026-09-20T20:27:30Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "d60394d5ca972ec00d6f3f3d31e247986760323e",
+    "candidate_sha": "ece52ce09be521cbba9e8dc238d48ce459cb6c68",
     "cursor_ack_observed": true,
     "remote_integration_branch_observed": true,
     "post_authorization_remote_application_commit_observed": true,
