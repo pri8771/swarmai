@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T23:14:00Z",
+  "updated_at": "2026-09-20T23:16:30Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -269,17 +269,17 @@
     "G13 W-131A packaged; W-131B qualification / live G14 / LIVE-142 remain open"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T23:15:00Z",
+    "verified_at": "2026-09-20T23:16:30Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
-    "latest_verified_ci_run_id": null,
-    "latest_verified_ci_conclusion": "pending_on_docs_tip_19b91ba",
+    "latest_verified_ci_run_id": 35543983728,
+    "latest_verified_ci_conclusion": "success",
     "offline_job_id": null,
-    "offline_conclusion": "success_on_exact_tip_same_app_tree_as_6669d378; reviewed prior PR job 106163959614 showed 267_passed_2_skipped",
+    "offline_conclusion": "success",
     "console_job_id": null,
-    "console_conclusion": "success_on_exact_tip",
+    "console_conclusion": "success",
     "live_gated_job_id": null,
     "live_gated_conclusion": "success_blocked_notice_only",
     "db_integration_ci": "skipped_honestly_without_SWARM_DATABASE_URL",
@@ -301,7 +301,7 @@
       "W-121A honest zero-admissible remote ledger; W-131A gap map packaged",
       "QUALIFICATION_CRITERION aligned to LEAD-013; SKIP uncleared"
     ],
-    "ci_run": "35543599747_35543622029_success",
+    "ci_run": "35543983728_push_35543985864_pr_success",
     "g10_review": "LEAD-20260920-012_source_ci_verified_fix004_blocked",
     "feature_tip": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
   },
