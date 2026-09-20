@@ -2,7 +2,7 @@
 
 Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
 
-Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 now exposes `cursor/v1.4-live-integration-11e2` at `f0280096070854d72858104ed19e7911ed4eed54`. GitHub Actions run `35533664961` passed Ruff, mypy and broad Python offline pytest (211 passed, 2 skipped). DB integration remained skipped because `SWARM_DATABASE_URL` was absent; live gates were explicitly not run. The workflow still does not run the console's npm lint/test/build scripts. Packet statuses below distinguish this verified partial FIX-001 progress from G10 acceptance.
+Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 is now 15 commits ahead at `4021c2de32b040e0760e3f771820380e2581aa4e`. Current GitHub Actions run `35536709246` is red: console lint/test/build passed, Ruff passed, then mypy failed at `src/swarm/mission/runtime.py:46`; install/Alembic/offline pytest did not run on this exact tip. Lead review LEAD-20260920-007 also found remaining G10 defects in non-mission idempotency/auth ordering, bootstrap demo principals, evidence-file validation, provider readiness and the parser-specific normal mission runtime. Earlier green SHAs remain evidence only for those SHAs.
 
 ## Execution and ownership
 
@@ -14,17 +14,15 @@ Status: queued -> assigned -> in_progress -> implemented -> tests_verified -> li
 
 ### FIX-001 — comprehensive CI and honest baseline
 
-Status: `tests_verified_partial_remote`; candidate `f0280096`; lead partial review in LEAD-20260920-006. P0. Audit AUD-01/11.
+Status: `implemented_current_tip_ci_failed`; PR #14 tip `4021c2de32b040e0760e3f771820380e2581aa4e`; current CI `35536709246` fails mypy after Ruff, while console CI passes. P0. Audit AUD-01/11.
 
-Verified now: the original 33 Ruff findings are cleared; mypy passes 137 source files; remote Python offline suite runs broadly and reports 211 pass / 2 skipped; live/provider/browser checks are explicitly blocked rather than implied green.
+Required now: fix the broker typing regression and obtain a full green current-tip offline pipeline (Ruff, mypy, install, Alembic, broad offline pytest) plus console lint/test/build. Preserve DB/live blocks honestly.
 
-Still required: execute the console's real `npm ci`, lint, Vitest and production build; record exact output. Run package/install and migration checks. Run `tests/integration` against an existing authorized local/ephemeral PostgreSQL target without adding paid infrastructure. Preserve honest skip/blocked state if remote DB execution is not approved. Identify the two skipped Python tests and retain reasons. Do not weaken checks or delete failing tests.
-
-Accept: exact candidate SHA, backend/frontend test inventory, commands/results, install/migration/DB evidence and appropriate remote CI evidence. No blanket ignores, disabled security checks or skipped-green required suites.
+Accept: exact current candidate SHA, complete backend/frontend inventory, commands/results and current remote CI evidence. Earlier green SHAs do not certify a newer red tip.
 
 ### FIX-002 — auth, project isolation, idempotency
 
-Status: assigned_acknowledged; vulnerable behavior remains present at candidate `f0280096`. P0 security. Audit AUD-03/04/10.
+Status: `partial_changes_required`; mission isolation improved, but LEAD-20260920-007 found remaining bare-key idempotency and auth-after-cache paths on provider/evaluation/worker mutations at `4021c2de32b040e0760e3f771820380e2581aa4e`. P0 security. Audit AUD-03/04/10.
 
 Remove seeded installed-runtime identities; implement per-install auth and safe unconfigured startup. Authorize before cache/data/history access. Scope idempotency by actor/project/operation plus request digest and reject body mismatches. Validate ownership on reports, artifacts, history, approvals and workers. Coordinate API/store edits with FIX-005 and RUN-111.
 
@@ -32,7 +30,7 @@ Accept: negative regressions fail before the fix and pass afterward, including k
 
 ### FIX-003 — evidence-backed release/readiness
 
-Status: assigned_acknowledged; `src/swarm/release/verify.py` still hard-codes `offline_tested: yes` at candidate `f0280096`. P0 integrity. Audit AUD-02/08/09.
+Status: `partial_changes_required`; hard-coded yes is removed, but release verification still treats evidence-file presence as a behavioral pass and provider readiness still violates fail-closed requirements. P0 integrity. Audit AUD-02/08/09.
 
 Remove hard-coded verification/readiness flags. File existence is packaging evidence, not a test result. Key presence/public catalog access is not authenticated or zero-charge eligibility. Add exact-route observation provenance/expiry. Separate actual timeout/cancellation/recovery behavior from helper state transitions. Lock behavioral acceptance contracts before tests.
 
@@ -40,7 +38,7 @@ Accept: missing/stale/failed evidence prevents the corresponding pass. Broken ru
 
 ### FIX-004 — platform sessions and real hourly worker
 
-Status: `implemented_local_runner_verified_recurring`; lead review pending. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; **cursor agent status still Not logged in** after operator claim (loginDeepControl pending); unattended spawn not resumed.
+Status: `partial_scheduler_verified_worker_auth_blocked`; repeated scheduled check-ins are evidenced, but the scheduler currently skips the Cursor probe and `cursor agent status` remains Not logged in, so unattended worker spawning is not verified. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; **cursor agent status still Not logged in** after operator claim (loginDeepControl pending); unattended spawn not resumed.
 
 Follow PLATFORM_ACCESS.md and CURSOR_HOURLY_PROMPT.md. Maintain per-platform aliases, login method/profile, private credential refs and actual session-check times. Preserve existing Google SSO restrictions. Restore the original protected destination after the essential human login step. The reported Apply URL itself is unavailable here; do not invent a reproduction. An authorized controlled expired-session test is distinct from reproducing that exact incident.
 
@@ -48,7 +46,7 @@ Configure one permitted local/eligible runner with lock, bounded invocations, re
 
 ### FIX-005 — remove operational demo dependence
 
-Status: assigned_acknowledged; `GOOD_FIX` and parser-specific operational fallback remain present at candidate `f0280096`. P0 product truth. Audit AUD-05/06/07/10.
+Status: `partial_changes_required`; GOOD_FIX substitution and scale force-progress bypass are repaired, but normal `swarm mission run` still enters the parser-specific RepoWorker dogfood path. P0 product truth. Audit AUD-05/06/07/10.
 
 Inventory default/runtime fixture imports, synthetic users/providers/activity, GOOD_FIX, canned responses and force-progress quota bypasses. Remove them from the shipped operational path. Failed output must fail or use bounded real repair/escalation. No assumption that every task is the demo parser. Integrate useful existing modules; keep missing generic capability explicitly incomplete until RUN-111. Preserve isolated tests but do not count them as live proof.
 
@@ -56,7 +54,7 @@ Accept: clean operational install has real empty state, no fake fallback on API 
 
 ## G11 / V1.1 — RUN-111: unified generic mission
 
-Status: `in_progress` on `cursor/v1.4-live-integration-11e2` @ `e32011d`; durable MissionStore + live accept-controls evidence posted; lead accept pending. Owner: Cursor.
+Status: `in_progress_not_accepted` on `cursor/v1.4-live-integration-11e2`; durable identity/restart/review-control evidence exists, but G10 remains open and the normal operational mission command is not yet unified onto this generic path. Owner: Cursor.
 
 One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
 
@@ -64,7 +62,7 @@ Accept: three unfamiliar tasks across two families; same mission submitted/viewe
 
 ## G12 / V1.2 — INF-121: exact-route admission and concurrent pool
 
-Status: `in_progress` — local concurrent brokered pool evidenced; dual remote providers live-blocked (zero-spend). Owner: Cursor/inference.
+Status: `in_progress_local_only_not_accepted` — local concurrent broker/fallback evidence exists; required dual remote overlap remains blocked and provider readiness must be repaired first. Owner: Cursor/inference.
 
 Every model call/retry goes through the broker. Exact route/account identity, independently evidenced auth/eligibility/health/capabilities, atomic shared-quota reservations, deadlines/reset/cooldown and accounting. No always-true local route or unmetered hidden model calls. Reuse configured accounts; browser hand off only essential human steps.
 
@@ -72,7 +70,7 @@ Accept: actual overlapping calls to two independent remote providers in one miss
 
 ## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-Status: `in_progress` — M + holdout-S provisional (underpowered); denser 2/cell selector landed; qualification not claimed. Owner: Cursor/evaluation.
+Status: `provisional_underpowered_not_accepted` — local screening exists but required family/size coverage and uncertainty/sample criteria are not met. Owner: Cursor/evaluation.
 
 Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
 
@@ -80,7 +78,7 @@ Accept: routing uses observed matching profiles and handles failure via bounded 
 
 ## G14 / V1.4 — SWARM-141: adaptive graph and organization
 
-Status: `prep_in_progress` — offline graph/scale/elastic evidence only; live multi-planner not claimed. Owner: orchestration lane.
+Status: `offline_prep_not_accepted` — graph/10-50-100/elastic-vs-fixed artifacts are offline preparation only; live multi-planner adaptive proof is absent. Owner: orchestration lane.
 
 Validated graph revisions for spawn/split/merge/reassign/cancel/review and multiple planning approaches; independent investigations, evidence exchange, duplicate suppression and bounded delegation. Separate logical agents, active sessions, requests and processes. Preserve permission/resource checks on every expansion.
 
@@ -96,4 +94,4 @@ Accept: no known unresolved supported-V1.4 defects; no unexpected application er
 
 ## Immediate next action
 
-Follow LEAD-20260920-006. Complete the remaining FIX-001 frontend/install/migration/DB checks on PR #14 without paid infrastructure. In parallel preserve fail-before FIX-002 security regressions before implementing auth/project/idempotency fixes. Remove GOOD_FIX/force-progress operational behavior in a non-conflicting FIX-005 lane. Keep G11 queued until the integrated G10 security/integrity changes are remotely reviewable. FIX-004 local runner/session work stays parallel and requires actual invocation/scheduler evidence. Post the next CURSOR message with pushed SHA(s), exact commands/results, CI run IDs, fail-before/pass-after evidence and blockers.
+Follow LEAD-20260920-007. First restore a green **current-tip** PR by fixing the mypy regression and rerunning the complete offline + console CI. Then close G10 source gaps before acceptance: scope every operational idempotency call after authorization; remove fixed known principals from normal bootstrap; validate behavioral evidence by exact SHA/config/commands/results/freshness rather than file existence; make provider auth/price/health/qualification fail closed; and make the parser-specific dogfood runtime fixture-only or replace the normal `swarm mission run` path with RUN-111's generic durable execution. Post exact pushed SHA, CI run/jobs and fail-before/pass-after regressions. Later G12–G14 work may remain on the branch but cannot substitute for closing G10.
