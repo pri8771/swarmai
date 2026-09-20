@@ -359,6 +359,21 @@ def main() -> None:
     cost_sub = cost.add_subparsers(dest="cost_command", required=True)
     cost_sub.add_parser("show", help="Show aggregated mission spend (USD)")
 
+    scale = sub.add_parser("scale", help="V0.3 scale / swarm orchestration")
+    scale_sub = scale.add_subparsers(dest="scale_command", required=True)
+    srun = scale_sub.add_parser(
+        "run",
+        help="P34/P35: run lightweight multi-agent scale mission (zero-spend)",
+    )
+    srun.add_argument("--agents", type=int, default=48)
+    srun.add_argument("--concurrency", type=int, default=8)
+    srun.add_argument("--goal", default="Scale fingerprint swarm across python modules")
+    srun.add_argument(
+        "--no-supervisor-model",
+        action="store_true",
+        help="Skip live Ollama supervisor call (still real file work)",
+    )
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -690,6 +705,35 @@ def main() -> None:
 
         ledger = load_mission_costs(_repo_root() / "var" / "missions")
         print(json.dumps(format_cost_show(ledger), indent=2, default=str))
+    elif args.command == "scale" and args.scale_command == "run":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.runtime.scale import run_scale_mission
+
+        load_repo_dotenv(_repo_root())
+        report = run_scale_mission(
+            repo=_repo_root(),
+            goal=args.goal,
+            agent_count=args.agents,
+            max_concurrency=args.concurrency,
+            use_supervisor_model=not args.no_supervisor_model,
+        )
+        summary = {
+            "run_id": report.run_id,
+            "agent_count": report.agent_count,
+            "task_count": report.task_count,
+            "completed": report.completed,
+            "failed": report.failed,
+            "duplicates_suppressed": report.duplicates_suppressed,
+            "consensus": report.consensus,
+            "total_cost_usd": report.total_cost_usd,
+            "runtime_ms": report.runtime_ms,
+            "scheduler_stats": report.scheduler_stats,
+            "report_hash": report.report_hash,
+            "mock_vs_live": report.mock_vs_live,
+        }
+        print(json.dumps(summary, indent=2, default=str))
+        if report.consensus.get("decision") != "accept":
+            raise SystemExit(2)
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
