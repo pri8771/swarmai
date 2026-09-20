@@ -1,7 +1,8 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v0.5-tools-permissions-11e2`  
+**Active version branch:** `cursor/v0.6-self-development-11e2`  
+**V0.6:** self-dev **dogfood passed** — see `docs/v0.6/STATUS.md`  
 **V0.5:** tools/permissions **dogfood passed** — see `docs/v0.5/STATUS.md`  
 **V0.4:** memory/recovery **dogfood passed** — see `docs/v0.4/STATUS.md`  
 **V0.3:** swarm scaling **dogfood passed** (64 agents, cost `$0.00`) — see `docs/v0.3/STATUS.md`  

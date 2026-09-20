@@ -772,6 +772,13 @@ def main() -> None:
         print(json.dumps(proof, indent=2, default=str))
         if not proof.get("ok"):
             raise SystemExit(2)
+    elif args.command == "tools" and args.tools_command == "permission-proof":
+        from swarm.tools.permission_mission import run_permission_mission_sync
+
+        proof = run_permission_mission_sync(_repo_root())
+        print(json.dumps(proof, indent=2, default=str))
+        if not proof.get("ok"):
+            raise SystemExit(2)
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
