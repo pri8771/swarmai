@@ -3,6 +3,24 @@
 Updated: 2026-09-20
 This is an execution/decomposition aid. Gate contracts remain authoritative.
 
+## Artifact mapping
+
+Every packet below advances one primary artifact:
+- W-041A/B/C -> ART-V10-WORKER-HEARTBEAT
+- W-111A -> ART-V11-MULTISURFACE-EVIDENCE
+- W-111B -> ART-V11-CONTROL-EVIDENCE + ART-V11-RESTART-EVIDENCE
+- W-121A -> ART-V12-PROVIDER-ELIGIBILITY
+- W-121B -> ART-V12-REMOTE-OVERLAP
+- W-131A -> ART-V13-SCREENING-MATRIX / ART-V13-QUALIFIED-MATRIX planning
+- W-131B -> ART-V13-QUALIFIED-MATRIX
+- W-131C -> ART-V13-TASK-POOL + ART-V13-REVIEWER-QUALIFICATION
+- W-141A -> ART-V14-ROLE-MANIFEST
+- W-141B1-B4 -> ART-V14-LIVE-ADAPTIVE-PROOF
+- W-141C -> ART-V14-MODE-COMPARISON
+- W-142A-D -> ART-LIVE142-CAMPAIGN
+
+Packet completion does not automatically accept the artifact; independent artifact review still applies.
+
 ## Current V1.4 worker packets
 
 ### W-041A — Authenticate Cursor CLI
