@@ -288,7 +288,12 @@ def run_live_self_development(
         "Fix the off-by-one bug in sandbox/selfdev_issue/parser_helper.py so "
         "inclusive_range_count(start, end) counts integers inclusively"
     )
-    record = run_mission(goal, repo=REPO_ROOT, use_evidence_router=True)
+    record = run_mission(
+        goal,
+        repo=REPO_ROOT,
+        use_evidence_router=True,
+        parser_dogfood_fixture=True,
+    )
     tests_ok = False
     try:
         tests_ok, test_out = _run_unit(SAMPLE_DIR)

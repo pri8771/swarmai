@@ -116,7 +116,8 @@ def _validate_evidence_file(
     if not command:
         return VerifyItem(item_id, False, "missing_command_inventory")
     mode = str(data.get("mode") or data.get("mock_vs_live") or "")
-    if expected_kind == "offline_ci" and mode and "live" in mode.lower() and "offline" not in mode.lower():
+    live_mode = "live" in mode.lower() and "offline" not in mode.lower()
+    if expected_kind == "offline_ci" and mode and live_mode:
         return VerifyItem(item_id, False, f"mode_mismatch:{mode}")
     sha = data.get("candidate_sha") or data.get("git_sha") or data.get("sha")
     if candidate_sha and sha and str(sha) != str(candidate_sha):

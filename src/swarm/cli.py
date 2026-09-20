@@ -366,6 +366,14 @@ def main() -> None:
         default=None,
         help="Target repository (default: this SwarmAI checkout)",
     )
+    mrun.add_argument(
+        "--fixture-parser-dogfood",
+        action="store_true",
+        help=(
+            "Opt into the sandbox off-by-one parser dogfood path "
+            "(explicit fixture only; not the default generic mission path)"
+        ),
+    )
     mstatus = mission_sub.add_parser("status", help="Show live mission state")
     mstatus.add_argument("--mission-id", required=True)
     mlist = mission_sub.add_parser("list", help="List persisted missions")
@@ -785,6 +793,9 @@ def main() -> None:
             repo=repo,
             model=args.model,
             use_evidence_router=not getattr(args, "no_evidence_router", False),
+            parser_dogfood_fixture=bool(
+                getattr(args, "fixture_parser_dogfood", False)
+            ),
         )
         print(json.dumps(record.to_dict(), indent=2, default=str))
         if record.status != "completed":

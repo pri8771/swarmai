@@ -12,7 +12,9 @@ from swarm.mission.worker import GOOD_FIX, RepoWorker
 
 def test_implement_does_not_apply_good_fix_on_model_failure(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = RepoWorker(
+        repo=repo, worktree_root=tmp_path / "wt", parser_dogfood_fixture=True
+    )
     task = sample_task().model_copy(
         update={"task_family": "implement", "id": "tsk_no_goodfix"}
     )

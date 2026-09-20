@@ -2,6 +2,13 @@
 
 Joins static catalog + env key presence + optional auth health probes.
 Never logs secret values. Honors SWARM_ALLOW_PAID=false.
+
+Fail-closed readiness (LEAD-009 / AUD-08):
+- configured ≠ authenticated ≠ free-eligible ≠ inference-tested ≠ task-qualified
+- Unknown stays unknown; key presence alone cannot promote a provider
+- paid-mode=false alone never yields zero_spend_ok
+- unprobed never becomes healthy/auth_ok/available/routable
+- coding suitability stays unknown until measured qualification exists
 """
 
 from __future__ import annotations
@@ -22,6 +29,8 @@ from swarm.providers.catalog import DEFAULT_ENDPOINTS, RETIRED_PROVIDER_IDS, loa
 # Providers deferred / inference-blocked under zero-spend policy this pass.
 DEFERRED_PROVIDERS = frozenset({"openai"})
 PAID_INFERENCE_BLOCKED = frozenset({"together", "fireworks"})
+# Local runtime whose free eligibility is proven only after a healthy probe.
+LOCAL_FREE_PROVIDERS = frozenset({"ollama"})
 
 # Auth probe endpoints (models.list style) — metadata only, no generation.
 PROBE_SPECS: dict[str, dict[str, Any]] = {
@@ -107,12 +116,15 @@ class ProviderCapabilityRecord:
     env_refs: list[str] = field(default_factory=list)
     base_url: str | None = None
     modalities: list[str] = field(default_factory=lambda: ["chat"])
-    coding_suitability: str = "unknown"  # high|medium|low|unknown|deferred
-    cost_policy: str = "unknown"  # zero_spend_ok|paid_blocked|deferred|unknown
+    # high|medium|low|unknown|deferred — unknown until measured qualification
+    coding_suitability: str = "unknown"
+    # zero_spend_ok|paid_blocked|deferred|price_unverified|retired|unknown
+    cost_policy: str = "unknown"
     rate_limits: dict[str, Any] = field(default_factory=dict)
     latency_ms: float | None = None
     health: str = "unknown"  # healthy|unhealthy|unprobed|blocked|deferred
-    qualification_status: str = "unqualified"  # unqualified|auth_ok|benchmarked|routable
+    # unqualified|auth_ok|auth_ok_inference_blocked|benchmarked|routable|deferred
+    qualification_status: str = "unqualified"
     context_window: int | None = None
     model_count: int | None = None
     notes: str = ""
@@ -129,7 +141,6 @@ def _paid_allowed() -> bool:
 
 def _env_configured(env_vars: list[str]) -> bool:
     if not env_vars:
-        # ollama may only need base URL default
         return True
     return all(bool(os.environ.get(v, "").strip()) for v in env_vars)
 
@@ -187,6 +198,32 @@ def _probe(provider_id: str) -> tuple[str, float | None, int | None, str]:
         return "unhealthy", latency, None, type(exc).__name__
 
 
+def _resolve_cost_policy(
+    *,
+    pid: str,
+    retired: bool,
+    paid: bool,
+    health: str,
+) -> tuple[str, str]:
+    """Return (cost_policy, note_fragment). Never derives free from paid=false alone."""
+    if retired:
+        return "retired", "retired"
+    if pid in DEFERRED_PROVIDERS:
+        return "deferred", "payment-gated deferred"
+    if pid in PAID_INFERENCE_BLOCKED and not paid:
+        return (
+            "paid_blocked",
+            "key may exist; paid inference blocked under SWARM_ALLOW_PAID=false",
+        )
+    if paid:
+        return "paid_allowed", "SWARM_ALLOW_PAID=true; exact-route pricing still unverified"
+    # Local free only after a healthy probe proves the runtime is reachable.
+    if pid in LOCAL_FREE_PROVIDERS and health == "healthy":
+        return "zero_spend_ok", "local free route verified by healthy probe"
+    # Remote / unprobed / unhealthy: price and free-eligibility remain unknown.
+    return "price_unverified", "free eligibility not proven; paid-mode=false is not sufficient"
+
+
 def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -> dict[str, Any]:
     root = repo or _repo_root()
     load_repo_dotenv(root)
@@ -203,32 +240,23 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
             env_vars = ["OLLAMA_BASE_URL"]
         key_ok = False if retired else _env_configured(env_vars) if env_vars else True
         if pid == "ollama":
-            key_ok = True  # local default endpoint
+            key_ok = True  # local default endpoint; still requires healthy probe
 
-        cost_policy = "unknown"
-        coding = "unknown"
         health = "unprobed"
         notes = ""
         latency = None
         model_count = None
         qual = "unqualified"
+        # Never invent task suitability from provider identity.
+        coding = "unknown"
 
         if retired:
-            cost_policy = "retired"
             health = "blocked"
-            notes = "retired"
             key_ok = False
         elif pid in DEFERRED_PROVIDERS:
-            cost_policy = "deferred"
             health = "deferred"
             coding = "deferred"
-            notes = "payment-gated deferred"
             qual = "deferred"
-        elif pid in PAID_INFERENCE_BLOCKED and not paid:
-            cost_policy = "paid_blocked"
-            notes = "key may exist; paid inference blocked under SWARM_ALLOW_PAID=false"
-        else:
-            cost_policy = "zero_spend_ok" if not paid else "paid_allowed"
 
         if (
             key_ok
@@ -240,48 +268,42 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
             health, latency, model_count, notes2 = _probe(pid)
             notes = (notes + "; " if notes else "") + notes2
             if health == "healthy":
+                # Metadata/auth probe only — not inference permission or quality.
                 qual = "auth_ok"
-                coding_medium_ids = {
-                    "ollama",
-                    "groq",
-                    "openrouter",
-                    "gemini",
-                    "mistral",
-                    "cohere",
-                    "anthropic",
-                    "nvidia_nim",
-                    "huggingface_inference",
-                    "deepinfra",
-                    "replicate",
-                    "cloudflare_workers_ai",
-                }
-                if pid in coding_medium_ids:
-                    coding = "medium"
-                if pid == "ollama":
-                    coding = "high"  # local always preferred for zero-spend dogfood
+
+        cost_policy, cost_note = _resolve_cost_policy(
+            pid=pid, retired=retired, paid=paid, health=health
+        )
+        notes = (notes + "; " if notes else "") + cost_note
 
         if pid in PAID_INFERENCE_BLOCKED and not paid and health == "healthy":
             qual = "auth_ok_inference_blocked"
 
-        available = bool(
-            key_ok
-            and health in {"healthy", "unprobed"}
-            and pid not in DEFERRED_PROVIDERS
-            and not retired
-        )
-        if pid in PAID_INFERENCE_BLOCKED and not paid:
-            available = False  # not available for inference routing
+        # Cloudflare (and any provider without a live probe this pass) stays
+        # unprobed when not probed — never promote key presence to healthy/auth_ok.
+        if pid == "cloudflare_workers_ai" and health == "unprobed":
+            notes = (notes + "; " if notes else "") + (
+                "account+token may be configured; models.search deferred; "
+                "unprobed remains unqualified"
+            )
 
-        # Cloudflare needs both token + account; probe is heavier — mark key-only if configured
-        if pid == "cloudflare_workers_ai" and key_ok and probe:
-            # Prefer treating configured CF as auth_ok without generation
-            if health == "unprobed":
-                health = "healthy"
-                qual = "auth_ok"
-                coding = "medium"
-                notes = (notes + "; " if notes else "") + (
-                    "account+token configured; models.search deferred"
-                )
+        # Fail closed: unprobed/unknown/price-unverified never count as available.
+        if paid:
+            available = bool(
+                key_ok
+                and health == "healthy"
+                and pid not in DEFERRED_PROVIDERS
+                and not retired
+                and cost_policy not in {"paid_blocked", "deferred", "retired"}
+            )
+        else:
+            available = bool(
+                key_ok
+                and health == "healthy"
+                and cost_policy == "zero_spend_ok"
+                and pid not in DEFERRED_PROVIDERS
+                and not retired
+            )
 
         records.append(
             ProviderCapabilityRecord(
@@ -310,12 +332,8 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
         "generated_at": now,
         "swarm_allow_paid": paid,
         "provider_count": len(records),
-        "available_for_routing": sum(
-            1
-            for r in records
-            if r.available
-            or r.qualification_status in {"auth_ok", "auth_ok_inference_blocked"}
-        ),
+        # Only truly available rows — not inference-blocked auth_ok entries.
+        "available_for_routing": sum(1 for r in records if r.available),
         "auth_ok": sum(1 for r in records if r.qualification_status.startswith("auth_ok")),
         "providers": [asdict(r) for r in records],
     }
@@ -331,14 +349,18 @@ def save_capability_registry(report: dict[str, Any], *, repo: Path | None = None
 
 
 def routable_providers(report: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    """Providers safe for zero-spend routing. Fail closed on unknown/unprobed."""
     data = report or build_capability_registry(probe=False)
     rows = []
     for p in data.get("providers", []):
-        if (
-            p.get("qualification_status") in {"auth_ok", "benchmarked", "routable"}
-            and p.get("cost_policy") == "zero_spend_ok"
-        ):
-            rows.append(p)
-        elif p.get("provider_id") == "ollama" and p.get("health") in {"healthy", "unprobed"}:
-            rows.append(p)
+        health = p.get("health")
+        qual = p.get("qualification_status")
+        cost = p.get("cost_policy")
+        if health != "healthy":
+            continue
+        if cost != "zero_spend_ok":
+            continue
+        if qual not in {"auth_ok", "benchmarked", "routable"}:
+            continue
+        rows.append(p)
     return rows

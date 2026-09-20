@@ -90,18 +90,12 @@ def _repo_root() -> Path:
 
 
 def _ollama_routable(repo: Path | None = None) -> bool:
-    report = build_capability_registry(probe=False, repo=repo)
+    """Fail closed: local ollama is routable only after a healthy free-eligible probe."""
+    report = build_capability_registry(probe=True, repo=repo)
     for p in routable_providers(report):
         if p.get("provider_id") == "ollama":
             return True
-    # Probe-less build may still mark ollama healthy via defaults.
-    for p in report.get("providers") or []:
-        if p.get("provider_id") == "ollama" and p.get("cost_policy") in {
-            "zero_spend_ok",
-            "unknown",
-        }:
-            return True
-    return True  # local loopback is always the zero-spend fallback
+    return False
 
 
 def _cell_score(cell: dict[str, Any]) -> tuple[float, float]:

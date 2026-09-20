@@ -91,7 +91,13 @@ def _extract_python_file(text: str) -> str | None:
 
 
 class RepoWorker:
-    """Reads/searches/edits files and runs approved local commands in a worktree."""
+    """Reads/searches/edits files and runs approved local commands in a worktree.
+
+    The off-by-one parser sample is fixture-only (LEAD-009 #6). Normal mission
+    runs must opt in via ``parser_dogfood_fixture=True`` or supply task inputs
+    (``target_file`` / ``test_file``). Hard-wiring the dogfood path as the
+    default operational mission is forbidden.
+    """
 
     def __init__(
         self,
@@ -102,6 +108,7 @@ class RepoWorker:
         model_by_family: dict[str, str] | None = None,
         broker: Any | None = None,
         project_id: str = "proj_demo",
+        parser_dogfood_fixture: bool = False,
     ) -> None:
         self.repo = repo.resolve()
         self.model = model
@@ -110,9 +117,26 @@ class RepoWorker:
         self.worker_id = new_id("wrk_")
         self.broker = broker
         self.project_id = project_id
+        self.parser_dogfood_fixture = parser_dogfood_fixture
 
     def _model_for(self, task_family: str) -> str:
         return self.model_by_family.get(task_family) or self.model
+
+    def _resolve_target_rel(self, task: TaskSpec) -> Path | None:
+        raw = task.inputs.get("target_file") or task.inputs.get("target_path")
+        if isinstance(raw, str) and raw.strip():
+            return Path(raw.strip())
+        if self.parser_dogfood_fixture:
+            return OFF_BY_ONE_REL
+        return None
+
+    def _resolve_test_rel(self, task: TaskSpec) -> Path | None:
+        raw = task.inputs.get("test_file") or task.inputs.get("test_path")
+        if isinstance(raw, str) and raw.strip():
+            return Path(raw.strip())
+        if self.parser_dogfood_fixture:
+            return OFF_BY_ONE_TEST_REL
+        return None
 
     def _chat(
         self,
@@ -164,7 +188,9 @@ class RepoWorker:
         if family == "inspect":
             return self._inspect(task, mission_id=mission_id), shared_worktree
         if family == "implement":
-            return self._implement(task, mission_id=mission_id, shared=shared_worktree)
+            return self._implement(
+                task, mission_id=mission_id, shared=shared_worktree, prior=prior
+            )
         if family == "verify":
             assert shared_worktree is not None
             return self._verify(task, handle=shared_worktree), shared_worktree
@@ -187,19 +213,38 @@ class RepoWorker:
         return result, shared_worktree
 
     def _inspect(self, task: TaskSpec, *, mission_id: str) -> WorkerResult:
-        target = self.repo / OFF_BY_ONE_REL
         findings: dict[str, Any] = {
             "mission_id": mission_id,
             "goal": task.inputs.get("goal"),
             "candidate_files": [],
-            "strategy": "structured_scan",
+            "strategy": (
+                "parser_dogfood_fixture" if self.parser_dogfood_fixture else "task_provided_paths"
+            ),
+            "parser_dogfood_fixture": self.parser_dogfood_fixture,
         }
-        if target.exists():
-            text = target.read_text(encoding="utf-8")
-            findings["candidate_files"].append(str(OFF_BY_ONE_REL))
-            findings["off_by_one_suspected"] = "end - start" in text and "+ 1" not in text
-            findings["file_preview"] = text[:500]
-        # Also detect missing cost CLI as optional improvement signal.
+        target_rel = self._resolve_target_rel(task)
+        if target_rel is not None:
+            target = self.repo / target_rel
+            if target.exists():
+                text = target.read_text(encoding="utf-8")
+                findings["candidate_files"].append(str(target_rel))
+                findings["file_preview"] = text[:500]
+                if self.parser_dogfood_fixture:
+                    findings["off_by_one_suspected"] = (
+                        "end - start" in text and "+ 1" not in text
+                    )
+        elif not self.parser_dogfood_fixture:
+            # Generic path: accept explicit goal path mentions, never invent dogfood.
+            goal = str(task.inputs.get("goal") or "")
+            for match in re.findall(
+                r"(?:[\w.-]+/)+[\w.-]+\.py",
+                goal,
+            ):
+                cand = Path(match)
+                if (self.repo / cand).exists():
+                    findings["candidate_files"].append(str(cand))
+            findings["strategy"] = "goal_path_scan"
+        # Optional improvement signal (not a dogfood substitute).
         cost_cli_hint = not (self.repo / "src" / "swarm" / "cost" / "ledger.py").exists()
         findings["missing_cost_ledger"] = cost_cli_hint
         ok = bool(findings["candidate_files"]) or cost_cli_hint
@@ -208,13 +253,18 @@ class RepoWorker:
             task_id=task.id,
             task_family="inspect",
             ok=ok,
-            summary="inspection_complete",
+            summary="inspection_complete" if ok else "inspection_no_candidates",
             artifacts={"findings": findings},
             finished_at=utc_now().isoformat(),
         )
 
     def _implement(
-        self, task: TaskSpec, *, mission_id: str, shared: WorktreeHandle | None
+        self,
+        task: TaskSpec,
+        *,
+        mission_id: str,
+        shared: WorktreeHandle | None,
+        prior: dict[str, WorkerResult] | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle]:
         handle = shared or create_worktree(
             self.repo,
@@ -223,14 +273,55 @@ class RepoWorker:
             worker_id=self.worker_id,
             base_dir=self.worktree_root,
         )
-        target = handle.path / OFF_BY_ONE_REL
+        target_rel = self._resolve_target_rel(task)
+        if target_rel is None and prior:
+            for prev in prior.values():
+                if prev.task_family != "inspect":
+                    continue
+                cands = (prev.artifacts.get("findings") or {}).get("candidate_files") or []
+                if cands:
+                    target_rel = Path(str(cands[0]))
+                    break
+        if target_rel is None:
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_requires_target_or_fixture_parser_dogfood",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "hint": (
+                        "Pass --fixture-parser-dogfood for the sandbox off-by-one sample, "
+                        "or set task inputs target_file for a generic mission path."
+                    ),
+                },
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
+
+        target = handle.path / target_rel
         original = target.read_text(encoding="utf-8") if target.exists() else ""
-        prompt = (
-            "You are fixing a Python bug in SwarmAI. Return ONLY the full corrected "
-            "file contents for parser_helper.py. Function inclusive_range_count(start, end) "
-            "must count integers from start to end inclusive. Current file:\n\n"
-            f"{original}"
-        )
+        if self.parser_dogfood_fixture:
+            prompt = (
+                "You are fixing a Python bug in SwarmAI. Return ONLY the full corrected "
+                "file contents for parser_helper.py. Function inclusive_range_count(start, end) "
+                "must count integers from start to end inclusive. Current file:\n\n"
+                f"{original}"
+            )
+            require_inclusive = True
+        else:
+            goal = str(task.inputs.get("goal") or task.objective or "")
+            prompt = (
+                f"You are editing {target_rel} in a software mission. "
+                f"Goal: {goal}\n"
+                "Return ONLY the full corrected file contents.\n\n"
+                f"Current file:\n{original}"
+            )
+            require_inclusive = False
         inference = self._chat(
             messages=[
                 {"role": "system", "content": "Return only valid Python source for the file."},
@@ -242,7 +333,7 @@ class RepoWorker:
         # Operational path: never substitute a known-answer GOOD_FIX. Failed or
         # non-matching model output is a real failure for bounded repair/escalation.
         used_fallback = False
-        if patched is None or "end - start + 1" not in patched:
+        if patched is None or (require_inclusive and "end - start + 1" not in patched):
             result = WorkerResult(
                 worker_id=self.worker_id,
                 task_id=task.id,
@@ -255,6 +346,8 @@ class RepoWorker:
                     "diff": "",
                     "used_model_fallback": False,
                     "known_answer_forbidden": True,
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "target_file": str(target_rel),
                     "model_output_excerpt": (inference.text or "")[:500],
                 },
                 inference=inference.to_dict(),
@@ -272,10 +365,11 @@ class RepoWorker:
             summary="implement_applied",
             artifacts={
                 "worktree": handle.to_dict(),
-                "changed_files": [str(OFF_BY_ONE_REL)],
+                "changed_files": [str(target_rel)],
                 "diff": diff[-12000:],
                 "used_model_fallback": used_fallback,
                 "known_answer_forbidden": True,
+                "parser_dogfood_fixture": self.parser_dogfood_fixture,
             },
             inference=inference.to_dict(),
             cost_usd=inference.cost_usd,
@@ -285,16 +379,18 @@ class RepoWorker:
 
     def _verify(self, task: TaskSpec, *, handle: WorktreeHandle) -> WorkerResult:
         commands: list[dict[str, Any]] = []
-        # Unit test for the touched sample (no network).
-        test_file = handle.path / OFF_BY_ONE_TEST_REL
-        if test_file.exists():
-            commands.append(
-                _run_cmd(
-                    handle.path / "sandbox" / "selfdev_issue",
-                    ["python", "parser_helper_test.py"],
-                    timeout=30,
+        test_rel = self._resolve_test_rel(task)
+        if test_rel is not None:
+            test_file = handle.path / test_rel
+            if test_file.exists():
+                commands.append(
+                    _run_cmd(
+                        test_file.parent,
+                        ["python", test_file.name],
+                        timeout=30,
+                    )
                 )
-            )
+        # Generic path may still run mission unit tests when present.
         mission_tests = handle.path / "tests" / "mission"
         if mission_tests.is_dir() and (handle.path / "pyproject.toml").exists():
             commands.append(
@@ -304,6 +400,20 @@ class RepoWorker:
                     timeout=180,
                 )
             )
+        if not commands and not self.parser_dogfood_fixture and test_rel is None:
+            return WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="verify",
+                ok=False,
+                summary="verify_requires_test_file_or_fixture_parser_dogfood",
+                artifacts={
+                    "commands": [],
+                    "worktree": handle.to_dict(),
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                },
+                finished_at=utc_now().isoformat(),
+            )
         ok = all(c.get("ok") for c in commands) if commands else False
         return WorkerResult(
             worker_id=self.worker_id,
@@ -311,7 +421,11 @@ class RepoWorker:
             task_family="verify",
             ok=ok,
             summary="verify_complete" if ok else "verify_failed",
-            artifacts={"commands": commands, "worktree": handle.to_dict()},
+            artifacts={
+                "commands": commands,
+                "worktree": handle.to_dict(),
+                "parser_dogfood_fixture": self.parser_dogfood_fixture,
+            },
             finished_at=utc_now().isoformat(),
         )
 

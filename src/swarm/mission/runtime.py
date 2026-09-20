@@ -32,12 +32,14 @@ class MissionRuntime:
         model: str = "gemma3:4b",
         max_repair_rounds: int = 2,
         use_evidence_router: bool = True,
+        parser_dogfood_fixture: bool = False,
     ) -> None:
         self.repo = repo.resolve()
         self.store = MissionStore(store_dir or (self.repo / "var" / "missions"))
         self.model = model
         self.max_repair_rounds = max_repair_rounds
         self.use_evidence_router = use_evidence_router
+        self.parser_dogfood_fixture = parser_dogfood_fixture
         self.controller = MissionController(inference_slots=2, worker_slots=2)
         self._broker: SharedInferenceBroker | None = None
 
@@ -117,6 +119,7 @@ class MissionRuntime:
             model_by_family=model_by_family,
             broker=self._mission_broker(),
             project_id=mission.project_id,
+            parser_dogfood_fixture=self.parser_dogfood_fixture,
         )
         prior: dict[str, WorkerResult] = {}
         shared_wt: WorktreeHandle | None = None
@@ -291,11 +294,13 @@ def run_mission(
     model: str = "gemma3:4b",
     store_dir: Path | None = None,
     use_evidence_router: bool = True,
+    parser_dogfood_fixture: bool = False,
 ) -> MissionRecord:
     runtime = MissionRuntime(
         repo,
         store_dir=store_dir,
         model=model,
         use_evidence_router=use_evidence_router,
+        parser_dogfood_fixture=parser_dogfood_fixture,
     )
     return asyncio.run(runtime.run(goal))
