@@ -12,11 +12,16 @@ from swarm.contracts.common import new_id, utc_now
 
 REQUIRED_DOCS = (
     "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "docs/handoff/CURRENT.md",
     "docs/runbooks/DEPLOYMENT.md",
     "docs/reviews/P20_INDEPENDENT_REVIEW.md",
     "docs/release/RELEASE_CANDIDATE.md",
     "docs/RELEASE_CANDIDATE_STATUS.md",
+    "docs/release/KNOWN_LIMITATIONS.md",
+    "docs/release/V1_RELEASE_CHECKLIST.md",
     "docs/operator/START.md",
     "docs/user/GUIDE.md",
     "docs/security/HARDENING.md",

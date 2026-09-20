@@ -332,6 +332,15 @@ def main() -> None:
     release_sub.add_parser(
         "demo-suite", help="V0.9 public demo + benchmark suite (zero-spend)"
     )
+    release_sub.add_parser(
+        "freeze", help="V1.0 freeze public product contracts"
+    )
+    release_sub.add_parser(
+        "first-run", help="V1.0 guided first-run setup checks"
+    )
+    release_sub.add_parser(
+        "validate", help="V1.0 real-world validation matrix"
+    )
 
     mission = sub.add_parser("mission", help="V0.1 real mission runtime")
     mission_sub = mission.add_subparsers(dest="mission_command", required=True)
@@ -695,6 +704,27 @@ def main() -> None:
         demo = run_public_demo_suite(_repo_root())
         print(json.dumps(demo, indent=2, default=str))
         if not demo.get("ok"):
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "freeze":
+        from swarm.release.contract_freeze import freeze_public_contracts
+
+        freeze = freeze_public_contracts(_repo_root())
+        print(json.dumps(freeze.to_dict(), indent=2, default=str))
+        if not freeze.ok:
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "first-run":
+        from swarm.release.first_run import run_first_run
+
+        first = run_first_run(_repo_root())
+        print(json.dumps(first.to_dict(), indent=2, default=str))
+        if not first.ok:
+            raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "validate":
+        from swarm.release.v1_matrix import run_v1_validation_matrix
+
+        matrix = run_v1_validation_matrix(_repo_root())
+        print(json.dumps(matrix, indent=2, default=str))
+        if not matrix.get("ok"):
             raise SystemExit(2)
     elif args.command == "mission" and args.mission_command == "plan":
         from swarm.mission.planner import (

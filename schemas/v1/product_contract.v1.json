@@ -1,0 +1,95 @@
+{
+  "contract_version": "1.0.0",
+  "policy": "backward_compatible_additive_only",
+  "resources": [
+    "project",
+    "mission",
+    "task",
+    "agent",
+    "artifact",
+    "approval",
+    "provider",
+    "report"
+  ],
+  "product_contract": {
+    "schema_version": "0.8.0",
+    "resources": [
+      "project",
+      "mission",
+      "task",
+      "agent",
+      "artifact",
+      "approval",
+      "provider",
+      "report"
+    ],
+    "endpoints": {
+      "project": [
+        "POST /v1/projects",
+        "GET /v1/projects",
+        "GET /v1/projects/{id}"
+      ],
+      "mission": [
+        "POST /v1/missions",
+        "GET /v1/missions",
+        "GET /v1/missions/{id}",
+        "GET /v1/missions/{id}/graph",
+        "GET /v1/missions/{id}/report"
+      ],
+      "task": [
+        "GET /v1/missions/{id}/graph"
+      ],
+      "agent": [
+        "GET /v1/missions/{id}",
+        "GET /v1/workers"
+      ],
+      "artifact": [
+        "GET /v1/missions/{id}/artifacts",
+        "GET /v1/history/{mission_id}"
+      ],
+      "approval": [
+        "GET /v1/approvals",
+        "POST /v1/approvals/{id}/resolve"
+      ],
+      "provider": [
+        "GET /v1/providers",
+        "GET /v1/routes"
+      ],
+      "report": [
+        "GET /v1/missions/{id}/report",
+        "GET /v1/history"
+      ]
+    },
+    "cli": {
+      "project": [
+        "swarm projects create|list|show|update"
+      ],
+      "mission": [
+        "swarm mission plan|run|status|list|report"
+      ],
+      "history": [
+        "swarm product history|reopen"
+      ],
+      "journey": [
+        "swarm product journey"
+      ],
+      "contract": [
+        "swarm product contract"
+      ]
+    },
+    "internal_fields_stripped": [
+      "_workers",
+      "api_key",
+      "broker_internal",
+      "idempotency",
+      "lease_token_plain",
+      "membership_token_raw",
+      "runtime_client",
+      "secret_value"
+    ],
+    "secrets_policy": "never_persist_or_return_secret_values",
+    "spend_policy_default": "zero"
+  },
+  "frozen_at": "2026-09-20T18:21:25.256076+00:00",
+  "hash": "6891d2c0bf2c8372a9c71c4b5b7664f913584d62852cfbc462ccdde6f190724c"
+}
