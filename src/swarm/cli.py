@@ -385,6 +385,13 @@ def main() -> None:
         default="Fix off-by-one in sandbox/selfdev_issue/parser_helper.py",
     )
 
+    tools = sub.add_parser("tools", help="V0.5 tools + permissions")
+    tools_sub = tools.add_subparsers(dest="tools_command", required=True)
+    tools_sub.add_parser(
+        "permission-proof",
+        help="Run allow/deny/human-gated tool mission proof",
+    )
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
