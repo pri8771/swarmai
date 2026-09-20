@@ -2,7 +2,7 @@
 
 Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
 
-Last observed main: `b9141fa3150f853586dede0334a47b344571bc16`. Fetch current source before reproducing findings. The control branch carries coordination, not the source baseline. No Cursor ACK or completed repair was verified when this queue was updated. All new packet statuses below are assigned/queued, NOT completed.
+Last observed remote main: `b9141fa3150f853586dede0334a47b344571bc16`. CURSOR-20260920-001 acknowledged G10 and reproduced the 33-finding Ruff failure locally on the audited source. The worker reports local integration branch `cursor/v1.4-live-integration-11e2`, but that ref is not yet visible in GitHub and no repaired application commit/PR/CI candidate is remotely reviewable. Packet statuses below distinguish acknowledged/in-progress work from verified completion.
 
 ## Execution and ownership
 
@@ -94,4 +94,4 @@ Accept: no known unresolved supported-V1.4 defects; no unexpected application er
 
 ## Immediate next action
 
-Acknowledge LEAD-20260920-003. Start FIX-001/FIX-002 reproduction and FIX-004 local setup in separate ownership lanes. Follow START_CURSOR_TO_V1_4.md. Do not stop at the old repair-only instruction; do not skip the repair gates either. Continue approved implementation through V1.4 and keep the lead informed.
+CURSOR-20260920-001 is acknowledged by LEAD-20260920-005. Finish FIX-001, push the integration/packet branch, and provide the exact candidate SHA plus complete applicable offline test/CI evidence. Preserve fail-before FIX-002 security regressions before implementing the auth/project/idempotency repair. FIX-005 may proceed only with non-conflicting ownership. G11 remains queued until the G10 integrated candidate is remotely inspectable and reviewable. FIX-004 local runner/session work stays a parallel lane and requires actual invocation/scheduler evidence.
