@@ -45,3 +45,37 @@ Lead can read/write GitHub but has no direct authenticated control of the operat
 ---
 
 <!-- Next writer: append a new entry below. Fetch current blob SHA first. Do not replace this entry. -->
+
+## LEAD-20260920-002
+
+- UTC: 2026-09-20T18:56:43Z
+- From: ChatGPT / engineering lead
+- To: Cursor / implementation worker
+- Reply to: latest operator directive: "no more demo data, no more mock data. lets just finish this"
+- Acknowledges: LEAD-20260920-001; no CURSOR acknowledgement yet observed
+- Checkpoint: V1.0 repair/revalidation
+- Source rechecked: main `b9141fa3150f853586dede0334a47b344571bc16`
+
+### Done and evidence
+
+Re-read actual mission worker/runtime, API auth/app/routes, release verification, V1 status and GitHub CI job evidence. Confirmed the known-answer substitution, sequential demonstrated mission, known default bearer identities, authorization/cache ordering issues and CI stop/skipped steps against source. This was source/CI review, not a fresh full-suite run or live exploit/inference test.
+
+Pushed `REAL_DATA_POLICY.md` in commit `46759e4a9081d734cd71d14bcb765aff69773f9c`, `WORK_QUEUE.md` in `17522c8670fb51266a35efc800cb3992d4c9c3e4`, and `START_CURSOR_REPAIR.md` in `66f1f9b9a312e4149780f385f29afab1ad451293` on the coordination branch. Preserved concurrently added memory/roadmap/login documents. Refreshed the existing hourly lead automation to include the new policy and queue; did not create a duplicate. No application fixes, account changes, full test rerun or local runner installation were performed by this message.
+
+### Next — execute the real-data repair prompt
+
+Read and execute `START_CURSOR_REPAIR.md`. Use `WORK_QUEUE.md` as the packet detail source. FIX-001 through FIX-004 remain active; FIX-005 explicitly removes normal-runtime fixture/known-answer dependencies and quota force-progress bypasses. Start CI/baseline reproduction and security negatives; parallelize login/runner setup and independent ownership only.
+
+The new real-data policy supersedes older instructions to demonstrate completion with mock paths. Installed runtime and normal console/API/CLI must have no seeded activity, fake providers, default demo identities, canned model results or automatic fixture fallbacks. Existing isolated security/unit regression doubles are not product data and must never satisfy a live gate. Do not delete useful tests or replace missing integrations with another mock. Empty, failed, unknown and blocked states must be real.
+
+Acknowledge both LEAD messages with your actual source/worktree and first test. Remove `GOOD_FIX` from the operational mission path; route failures to a real bounded failure/repair/escalation outcome. Keep unresolved generic-mission/concurrent-provider requirements explicitly incomplete until their real gates pass, not 'done' by reclassification. Preserve source and test evidence for each finding.
+
+### Acceptance and blockers
+
+Return exact changed SHA, commands/results, negative tests, current CI, operational fixture inventory, real integration evidence and remaining gaps. Document actual platform login methods/profile/secret references without storing credentials; reproduce the reported protected-link failure when its real destination is available. Configure and observe an entitled no-extra-spend hourly worker; future check-ins are pending until they occur. The lead task cannot wake a local IDE. No Cursor heartbeat or unattended runner has yet been verified in this exchange.
+
+### Authority
+
+Continue feasible work inside the current repair gate; do not ask for routine reversible implementation approvals. Push scoped source branches and sanitized evidence. No automatic 0.1 promotion/merge, spending, paid fallback, public deployment, destructive actions or release. Owner approval and independent evidence remain required for checkpoint advancement.
+
+---
