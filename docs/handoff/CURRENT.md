@@ -1,9 +1,10 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T13:25:00Z  
+**Updated:** 2026-09-20T13:50:00Z  
 **Packets complete (offline):** P01–P21  
-**Label:** `offline-verified-release-candidate`  
-**Branch:** `main` (merged from `cursor/p01-foundation-contracts-11e2`)  
+**Live follow-up:** P15/P16 **partial** (loopback Ollama, spend=zero)  
+**Label:** `offline-verified-release-candidate` + partial local live  
+**Branch:** `cursor/p15-p16-live-zero-spend-11e2` (sync to `main` after review)  
 **Remote:** https://github.com/pri8771/swarmai  
 **PR:** https://github.com/pri8771/swarmai/pull/1 (**merged**)  
 **Pre-release:** https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1  
@@ -13,54 +14,36 @@
 
 | Packet | Live | Reason |
 |---|---|---|
-| P15 | blocked | no `.env` / no process provider keys |
-| P16 | blocked | no eligible live routes from P15 |
-| P18 | skipped | no keys; mock soak/chaos already offline_verified |
+| P15 | **partial pass** | Ollama `gemma3:4b` canaried; all cloud providers denied (no keys) |
+| P16 | **partial** | live provisional cells on `rt_ollama_gemma3:4b`; `wilson_lower` null |
+| P18 | skipped | optional; mock evidence retained; no cloud capacity |
 
-**Spend:** none. **Payment methods:** none added.
+**Spend:** zero. **Payment methods:** none added. **Cloud keys:** none found/invented.
 
-## Local launch (this pass)
-
-```sh
-uv run swarm deploy doctor --profile standalone
-uv run swarm release verify
-uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
-uv run swarm serve --host 127.0.0.1 --port 18765
-# health: curl -s http://127.0.0.1:18765/health/live
-# ready:  curl -s http://127.0.0.1:18765/health/ready
-```
-
-API was started locally in **mock** mode (`providers_network=false`, `allow_paid=false`).
-
-## What works (offline)
-
-| Packet | Status | Notes |
-|---|---|---|
-| P01–P14 | offline_verified | prior commits |
-| P15 | offline_verified / live blocked | catalog≠configured≠auth |
-| P16 | offline_verified / live blocked | mock qualify; live mode blocked |
-| P17 | offline_verified | deploy doctor + recovery local |
-| P18 | offline_verified / live skipped | mock load+chaos |
-| P19–P21 | offline_verified | self-dev, review, RC verify |
-
-## Exact commands
+## Exact commands (this pass)
 
 ```sh
 cd /path/to/swarm-ai
-uv run pytest tests/selfdev tests/regressions tests/release -q
-uv run swarm release verify
-uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
-uv run swarm deploy doctor --profile standalone
-uv run swarm serve --host 127.0.0.1 --port 8765
+export OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+export SWARM_ALLOW_PAID=false
+
+uv run swarm providers canary --route rt_ollama_default --policy bounded_probe \
+  --mode live --billing-known-zero
+uv run swarm eval plan --suite starter --mode live --max-cases 4 --purpose evaluation
+uv run swarm eval run --plan <plan_id> --mode live --route 'rt_ollama_gemma3:4b'
 ```
 
-## User actions for live (paused)
+## Evidence
 
-1. `cp .env.example .env` and add zero-charge-eligible keys only (never commit).
-2. Confirm spend policy = zero; keep `SWARM_ALLOW_PAID=false`.
-3. `uv run swarm providers onboarding-report` then live canary on free routes only.
-4. Then P16 live eval with eligible route IDs.
+- `var/onboarding/canaries/rt_ollama_gemma3_4b.json`
+- `var/reports/qualification/run_897bfae7212644acb51c8e1666ae5074.json`
+
+## Remaining user actions (cloud free tiers only)
+
+1. Complete provider MFA/CAPTCHA/signup yourself for any zero-charge cloud route.
+2. Put least-privilege keys in local `.env` only (never commit); keep `SWARM_ALLOW_PAID=false`.
+3. Re-run live canary per route with `--billing-known-zero` only after confirming billing=0.
 
 ## Mock vs live
 
-This completion pass: **offline/mock only**. No live provider calls.
+Offline kit remains verified. This pass adds **local live** Ollama canary + partial P16 only.

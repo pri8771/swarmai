@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T13:25:00Z",
+  "updated_at": "2026-09-20T13:50:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
-  "branch": "main",
+  "branch": "cursor/p15-p16-live-zero-spend-11e2",
   "current_packet": null,
   "packet_states": {
     "P01": {
@@ -16,12 +16,12 @@
     },
     "P03": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "partial_local_ollama",
       "integration_status": "offline_verified"
     },
     "P04": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "partial_local_ollama",
       "integration_status": "offline_verified"
     },
     "P05": {
@@ -78,17 +78,23 @@
     },
     "P15": {
       "state": "offline_verified",
-      "live_status": "blocked_no_keys",
+      "live_status": "partial_pass_local_ollama",
       "integration_status": "offline_verified",
       "commit": "7fcc4f8",
-      "block_reason": "no local .env or process provider keys; zero-spend live not attempted"
+      "live_route": "rt_ollama_gemma3:4b",
+      "evidence": "var/onboarding/canaries/rt_ollama_gemma3_4b.json",
+      "cloud_providers": "blocked_no_keys",
+      "spend": "zero"
     },
     "P16": {
       "state": "offline_verified",
-      "live_status": "blocked_no_keys",
+      "live_status": "partial_provisional_local_ollama",
       "integration_status": "offline_verified",
       "commit": "e8f4d2b",
-      "block_reason": "no local .env or process provider keys; zero-spend live not attempted"
+      "live_run": "run_897bfae7212644acb51c8e1666ae5074",
+      "evidence": "var/reports/qualification/run_897bfae7212644acb51c8e1666ae5074.json",
+      "wilson_lower": null,
+      "note": "provisional latency/fingerprint only; no invented rankings"
     },
     "P17": {
       "state": "offline_verified",
@@ -98,54 +104,39 @@
     },
     "P18": {
       "state": "offline_verified",
-      "live_status": "skipped_no_keys",
+      "live_status": "skipped_optional",
       "integration_status": "offline_verified",
       "commit": "c675f8f",
-      "skip_reason": "no local .env or process provider keys; mock evidence retained"
+      "skip_reason": "optional under spend=zero; mock evidence retained"
     },
     "P19": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {
-        "pytest_selfdev": "7 passed",
-        "demo_self_development": "ok"
-      },
-      "mock_vs_live": "simulated_selfdev_not_live; patch artifact only",
       "commit": "4b337af"
     },
     "P20": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {
-        "pytest_regressions": "5 passed",
-        "review_report": "ok"
-      },
-      "mock_vs_live": "review_offline_evidence_only; C10 skip_live",
       "commit": "816997a"
     },
     "P21": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "partial_local_live_followup",
       "integration_status": "offline_verified",
-      "checks": {
-        "pytest_release": "1 passed",
-        "release_verify": "passed offline-verified-release-candidate",
-        "fresh_install_demo": "parser-issue mock ok"
-      },
-      "mock_vs_live": "offline_release_candidate; not cloud-operating",
-      "label": "offline-verified-release-candidate"
+      "label": "offline-verified-release-candidate",
+      "claim": "partially-live-verified-local-ollama-only"
     }
   },
   "next_packets": [],
   "kit_offline_complete": true,
   "skipped_until_deps": {
-    "P15_live": [
-      "zero_charge_provider_keys"
+    "P15_cloud_live": [
+      "zero_charge_provider_keys_and_user_mfa"
     ],
-    "P16_live": [
-      "P15_zero_charge_routes"
+    "P16_ranked_live": [
+      "larger_live_samples_after_multi_route_p15"
     ],
     "P18_live": [
       "verified_account_capacity"
@@ -154,47 +145,38 @@
   "blockers": {
     "user_required": [
       {
-        "packet": "P15/P16_live",
-        "action": "Create .env from .env.example with zero-charge-eligible provider keys only; keep SWARM_ALLOW_PAID=false; never commit .env; then run providers onboarding-report and bounded live canary"
+        "packet": "P15_cloud",
+        "action": "Complete MFA/CAPTCHA/signup for any zero-charge cloud provider; store keys in local .env only; keep SWARM_ALLOW_PAID=false; then re-run live canary"
       }
     ],
     "live_only": [
-      "Provider API keys for P15\u2013P16 live canaries and multi-route qualification"
+      "Cloud API keys for multi-provider P15–P16 live canaries"
     ]
   },
   "release_captain": {
-    "status": "draft_pr_open",
+    "status": "merged_prerelease",
     "label": "offline-verified-release-candidate",
-    "branch_url": "https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2",
-    "draft_pr_url": "https://github.com/pri8771/swarmai/pull/1",
-    "latest_sha": "16c14f41c1a24775ce4e1d4c50c8ebd6e49c84b6",
-    "push": "ok",
-    "draft_pr": "open_do_not_merge",
-    "live_packets_paused": [
-      "P15",
-      "P16",
-      "P18"
-    ]
+    "pr_url": "https://github.com/pri8771/swarmai/pull/1",
+    "prerelease": "https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1",
+    "tag": "v0.1.0-rc.1",
+    "live_packets": {
+      "P15": "partial_pass_local_ollama",
+      "P16": "partial_provisional_local_ollama",
+      "P18": "skipped_optional"
+    }
   },
   "remote": "https://github.com/pri8771/swarmai.git",
   "completion_pass": {
     "keys_present": false,
-    "live_p15": "blocked_no_keys",
-    "live_p16": "blocked_no_keys",
-    "live_p18": "skipped_no_keys",
-    "spend": "none",
-    "merge_authorized_offline_rc": true,
-    "claim": "offline-verified-release-candidate-not-fully-live-verified",
+    "local_ollama_configured": true,
+    "live_p15": "partial_pass_local_ollama",
+    "live_p16": "partial_provisional_local_ollama",
+    "live_p18": "skipped_optional",
+    "spend": "zero",
+    "claim": "partially-live-verified-local-ollama-only-not-fully-live-verified",
     "pr_merged": "https://github.com/pri8771/swarmai/pull/1",
     "merge_commit": "827cb82c9aebc5f83741b215d025fcedf8ab16bd",
     "prerelease": "https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1",
-    "tag": "v0.1.0-rc.1",
-    "local_launch": {
-      "api": "http://127.0.0.1:18765",
-      "health_live": "ok",
-      "health_ready": "ready mock",
-      "mode": "mock",
-      "allow_paid": false
-    }
+    "tag": "v0.1.0-rc.1"
   }
 }
