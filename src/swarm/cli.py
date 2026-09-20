@@ -249,6 +249,10 @@ def main() -> None:
     crun = chaos_sub.add_parser("run", help="Run offline fault matrix")
     crun.add_argument("--mode", default="mock", choices=["mock", "live"])
 
+    review = sub.add_parser("review", help="Independent review (P20)")
+    review_sub = review.add_subparsers(dest="review_command", required=True)
+    review_sub.add_parser("report", help="Emit offline review checklist JSON")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -419,6 +423,10 @@ def main() -> None:
         from swarm.chaos.faults import run_fault_matrix
 
         print(json.dumps(asyncio.run(run_fault_matrix()), indent=2, default=str))
+    elif args.command == "review" and args.review_command == "report":
+        from swarm.review.checklist import build_offline_review
+
+        print(json.dumps(build_offline_review().to_dict(), indent=2, default=str))
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
