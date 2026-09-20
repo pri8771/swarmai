@@ -20,5 +20,7 @@ build/
 tmp/
 .uv-cache/
 var/
+benchmarks/live-plans/*.json
+!benchmarks/live-plans/.gitkeep
 apps/console/node_modules/
 apps/console/dist/

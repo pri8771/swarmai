@@ -15,7 +15,6 @@ from swarm.contracts.fixtures import sample_mission, sample_task
 from swarm.controller.mission import MissionController, spawn_proposal
 from swarm.db.engine import create_db_engine, database_url, ping
 from swarm.evals.dataset import validate_dataset
-from swarm.evals.plan import build_plan
 from swarm.providers.catalog import list_providers
 from swarm.tools.sandbox_runner import self_test as sandbox_self_test
 
@@ -166,6 +165,12 @@ def main() -> None:
     ep.add_argument("--mode", default="mock", choices=["mock", "live"])
     ep.add_argument("--max-cases", type=int, default=16)
     ep.add_argument("--dataset", default="benchmarks/starter.jsonl")
+    ep.add_argument("--purpose", default="evaluation")
+    erun = ev_sub.add_parser("run", help="Execute qualification plan (mock default)")
+    erun.add_argument("--plan", required=True, help="plan_id or path to plan JSON")
+    erun.add_argument("--mode", default="mock", choices=["mock", "live"])
+    erep = ev_sub.add_parser("report", help="Show a qualification run report")
+    erep.add_argument("--run", required=True, help="run_id")
 
     demo = sub.add_parser("demo", help="Mock demonstrations")
     demo_sub = demo.add_subparsers(dest="demo_command", required=True)
@@ -262,13 +267,42 @@ def main() -> None:
             path = _repo_root() / path
         print(json.dumps(validate_dataset(path), indent=2))
     elif args.command == "eval" and args.eval_command == "plan":
+        from swarm.evals.qualify import build_and_save_starter_plan
+
         path = Path(args.dataset)
         if not path.is_absolute():
             path = _repo_root() / path
-        plan = build_plan(
-            path, suite=args.suite, mode=args.mode, max_cases=args.max_cases
+        out = _repo_root() / "benchmarks" / "live-plans"
+        payload = build_and_save_starter_plan(
+            dataset=path,
+            purpose=args.purpose,
+            mode=args.mode,
+            out_dir=out,
+            max_cases=args.max_cases,
         )
-        print(json.dumps(plan.to_dict(), indent=2))
+        print(json.dumps(payload, indent=2))
+    elif args.command == "eval" and args.eval_command == "run":
+        from swarm.evals.qualify import run_qualification
+
+        plan_arg = Path(args.plan)
+        if plan_arg.exists():
+            plan_path = plan_arg
+        else:
+            plan_path = _repo_root() / "benchmarks" / "live-plans" / f"{args.plan}.json"
+        out = _repo_root() / "var" / "reports" / "qualification"
+        try:
+            run = run_qualification(plan_path, mode=args.mode, out_dir=out)
+        except PermissionError as exc:
+            print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
+            raise SystemExit(2) from exc
+        print(json.dumps(run.to_dict(), indent=2, default=str))
+    elif args.command == "eval" and args.eval_command == "report":
+        from swarm.evals.qualify import load_report
+
+        data = load_report(
+            args.run, _repo_root() / "var" / "reports" / "qualification"
+        )
+        print(json.dumps(data, indent=2))
     elif args.command == "demo" and args.demo_command == "dynamic":
         import asyncio
 
