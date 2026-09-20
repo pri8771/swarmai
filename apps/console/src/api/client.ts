@@ -30,6 +30,37 @@ function emptyLiveMission(): MissionGraph {
   }
 }
 
+/** Honest empty operational snapshot — no fixture routes/workers/profiles. */
+export function emptyLiveSnapshot(opts?: {
+  mission?: MissionGraph
+  history?: HistoryRow[]
+  capacity?: ConsoleSnapshot['capacity']
+  routes?: ConsoleSnapshot['routes']
+  workers?: ConsoleSnapshot['workers']
+  errors?: string[]
+  mockVsLive?: string
+}): ConsoleSnapshot {
+  return {
+    mode: 'live',
+    mockVsLive:
+      opts?.mockVsLive ??
+      'operational_empty_or_observed_from_api_not_fixture_catalog',
+    mission: opts?.mission ?? emptyLiveMission(),
+    routes: opts?.routes ?? [],
+    capacity: opts?.capacity ?? [],
+    capacityUnknown: !(opts?.capacity && opts.capacity.length),
+    workers: opts?.workers ?? [],
+    profiles: [],
+    approvals: [],
+    projects: [],
+    history: opts?.history ?? [],
+    artifacts: [],
+    events: [],
+    streamInterrupted: false,
+    errors: opts?.errors ?? [],
+  }
+}
+
 function missionFromApi(raw: Record<string, unknown>): MissionGraph {
   return {
     missionId: String(raw.id ?? raw.mission_id ?? '(unknown)'),
@@ -100,17 +131,33 @@ export async function loadSnapshot(opts: {
   baseUrl?: string
   token?: string
 }): Promise<ConsoleSnapshot> {
-  if (opts.mode === 'mock' || !opts.baseUrl) {
+  // Fixture UI is explicit mock mode only — never mixed into live/operational.
+  if (opts.mode === 'mock') {
     const snap = structuredClone(MOCK_SNAPSHOT)
     assertNoSecretsInBundle(snap)
     return snap
   }
+
+  if (!opts.baseUrl) {
+    // Live/operational without an API base: honest empty, not fixtures.
+    const snap = emptyLiveSnapshot({
+      errors: [
+        'Live mode with no baseUrl — showing empty operational state (not mock fixtures).',
+      ],
+      mockVsLive: 'operational_empty_no_api_base_not_fixture_catalog',
+    })
+    assertNoSecretsInBundle(snap)
+    return snap
+  }
+
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`
 
-  const [capacityRes, missionsRes] = await Promise.all([
+  const [capacityRes, missionsRes, routesRes, workersRes] = await Promise.all([
     fetch(`${opts.baseUrl}/v1/capacity`, { headers }),
     fetch(`${opts.baseUrl}/v1/missions`, { headers }),
+    fetch(`${opts.baseUrl}/v1/routes`, { headers }),
+    fetch(`${opts.baseUrl}/v1/workers`, { headers }),
   ])
   if (!capacityRes.ok) {
     throw new Error(`api_error_${capacityRes.status}`)
@@ -143,13 +190,49 @@ export async function loadSnapshot(opts: {
     }
   }
 
-  return {
-    ...MOCK_SNAPSHOT,
-    mode: 'live',
-    mockVsLive:
-      'live_missions_and_capacity_from_api; routes/workers/profiles still fixture-labeled until wired',
+  const routes: ConsoleSnapshot['routes'] = []
+  if (routesRes.ok) {
+    const routesPayload = await routesRes.json()
+    assertNoSecretsInBundle(routesPayload)
+    for (const row of (routesPayload.routes ?? []) as Array<Record<string, unknown>>) {
+      routes.push({
+        routeId: String(row.route_id ?? row.routeId ?? ''),
+        provider: String(row.provider ?? row.provider_id ?? 'unknown'),
+        modelId: (row.model_id as string | null) ?? null,
+        availability: String(row.availability_status ?? row.availability ?? 'unknown') as ConsoleSnapshot['routes'][0]['availability'],
+        status: String(row.status ?? 'unknown'),
+        capabilityClaims: Array.isArray(row.observed_capabilities)
+          ? (row.observed_capabilities as string[])
+          : Array.isArray(row.capabilityClaims)
+            ? (row.capabilityClaims as string[])
+            : [],
+      })
+    }
+  }
+
+  const workers: ConsoleSnapshot['workers'] = []
+  if (workersRes.ok) {
+    const workersPayload = await workersRes.json()
+    assertNoSecretsInBundle(workersPayload)
+    for (const row of (workersPayload.workers ?? []) as Array<Record<string, unknown>>) {
+      workers.push({
+        workerId: String(row.worker_id ?? row.workerId ?? ''),
+        status: String(row.status ?? 'unknown'),
+        generation: Number(row.generation ?? 0),
+        capacity: Number(row.capacity ?? 0),
+        privacy: Array.isArray(row.privacy) ? (row.privacy as string[]) : [],
+        claimed: (row.claimed as string | null) ?? null,
+        revoked: Boolean(row.revoked),
+        stale: Boolean(row.stale),
+      })
+    }
+  }
+
+  return emptyLiveSnapshot({
     mission,
     history: historyFromList(items),
+    routes,
+    workers,
     capacity: (capacity.buckets ?? []).map(
       (b: {
         bucket_id: string
@@ -163,25 +246,29 @@ export async function loadSnapshot(opts: {
         limit: b.limit,
       }),
     ),
-    capacityUnknown: !(capacity.buckets && capacity.buckets.length),
     errors: items.length
       ? []
       : ['No durable missions in MissionStore yet (honest empty live state).'],
-    events: [],
-  }
+    mockVsLive:
+      String(capacity.mock_vs_live ?? '') ||
+      'live_missions_capacity_routes_workers_from_api_not_fixtures',
+  })
 }
 
-/** Resolve console mode from query string (?mode=live&baseUrl=...). */
+/**
+ * Resolve console mode from query string.
+ * Default is live/operational empty — mock fixtures require explicit ?mode=mock.
+ */
 export function resolveConsoleLoadOpts(): {
   mode: 'mock' | 'live'
   baseUrl?: string
   token?: string
 } {
   if (typeof window === 'undefined') {
-    return { mode: 'mock' }
+    return { mode: 'live' }
   }
   const params = new URLSearchParams(window.location.search)
-  const mode = params.get('mode') === 'live' ? 'live' : 'mock'
+  const mode = params.get('mode') === 'mock' ? 'mock' : 'live'
   const baseUrl = params.get('baseUrl') || undefined
   const token = params.get('token') || undefined
   return { mode, baseUrl, token }

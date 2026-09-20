@@ -275,10 +275,15 @@ async def providers(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     _ = principal
+    mode = "mock" if store.fixture_mode else "catalog"
     return {
-        "providers": list_providers(mode="mock"),
+        "providers": list_providers(mode=mode),
         "accounts": store.public_accounts(),
-        "mock_vs_live": "catalog_and_fixtures_only",
+        "mock_vs_live": (
+            "fixture_catalog"
+            if store.fixture_mode
+            else "catalog_status_not_live_eligibility"
+        ),
     }
 
 
@@ -288,7 +293,14 @@ async def routes(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     _ = principal
-    return {"routes": store.public_routes(), "mock_vs_live": "fixtures_plus_retired_catalog"}
+    return {
+        "routes": store.public_routes(),
+        "mock_vs_live": (
+            "fixtures_plus_retired_catalog"
+            if store.fixture_mode
+            else "configured_routes_plus_retired_catalog"
+        ),
+    }
 
 
 @router.get("/capacity")
@@ -431,11 +443,30 @@ async def create_evaluation(
 
 @router.get("/workers")
 async def list_workers(
+    project_id: str | None = None,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
-    return store.workers.inspect()
+    if project_id:
+        auth.require_project(principal, project_id)
+        return store.workers.inspect(project_id=project_id)
+    if "admin" in principal.roles:
+        return store.workers.inspect()
+    # Non-admin: union of project-scoped workers only (no cross-project leakage).
+    workers: list[dict[str, Any]] = []
+    quarantine: set[str] = set()
+    total = 0.0
+    for pid in sorted(principal.project_ids):
+        view = store.workers.inspect(project_id=pid)
+        workers.extend(view.get("workers") or [])
+        quarantine.update(view.get("quarantine") or [])
+        total += float(view.get("total_capacity") or 0.0)
+    return {
+        "workers": workers,
+        "total_capacity": total,
+        "quarantine": sorted(quarantine),
+    }
 
 
 @router.post("/workers/enroll")
@@ -478,7 +509,7 @@ async def enroll_worker(
     )
     # Return membership token once; not a provider secret.
     result = {
-        "worker": lease.model_dump(mode="json"),
+        "worker": {**lease.model_dump(mode="json"), "project_id": body.project_id},
         "membership_token": token,
         "mock_vs_live": "membership_only_no_provider_secrets",
     }
@@ -498,20 +529,42 @@ async def worker_heartbeat(
     principal: Principal = Depends(get_principal),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
     lease = await store.workers.heartbeat(body.worker_id, body.generation, token=body.token)
-    return {"worker": lease.model_dump(mode="json")}
+    return {"worker": lease.model_dump(mode="json"), "project_id": rec.project_id}
 
 
 @router.get("/approvals")
 async def list_approvals(
+    project_id: str | None = None,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
-    return {
-        "approvals": [a.model_dump(mode="json") for a in store.approvals.values()],
-    }
+    if project_id:
+        auth.require_project(principal, project_id)
+        rows = [
+            a.model_dump(mode="json")
+            for a in store.approvals.values()
+            if a.project_id == project_id
+        ]
+    elif "admin" in principal.roles:
+        rows = [a.model_dump(mode="json") for a in store.approvals.values()]
+    else:
+        rows = [
+            a.model_dump(mode="json")
+            for a in store.approvals.values()
+            if a.project_id in principal.project_ids
+        ]
+    return {"approvals": rows}
 
 
 @router.post("/approvals/{approval_id}/resolve")
@@ -519,18 +572,16 @@ async def resolve_approval(
     approval_id: str,
     body: ApprovalResolveRequest,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
-    if approval_id not in store.approvals:
+    approval = store.approvals.get(approval_id)
+    if approval is None:
         raise ApiError("not_found", "approval not found", status_code=404)
-    if not principal.project_ids:
-        raise ApiError(
-            "policy_denied",
-            "approval resolve requires a project-scoped principal",
-            status_code=403,
-        )
-    project_id = sorted(principal.project_ids)[0]
+    # Authorize against durable approval ownership — not caller's first project.
+    auth.require_project(principal, approval.project_id)
+    project_id = approval.project_id
     key = body.idempotency_key or idempotency_key
     digest = payload_hash(
         {
@@ -554,6 +605,7 @@ async def resolve_approval(
         accept=body.accept,
         actor=principal.subject,
         payload=body.payload,
+        project_id=project_id,
     )
     result = {"approval": resolved.model_dump(mode="json"), "accepted": body.accept}
     return store.store_idempotent(
@@ -573,7 +625,13 @@ async def demo_side_effect(
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    """Test helper: attempt a side effect that cancel must block."""
+    """Fixture-only helper: attempt a side effect that cancel must block."""
+    if not store.fixture_mode:
+        raise ApiError(
+            "fixture_only",
+            "demo side-effect route is not available in operational mode",
+            status_code=404,
+        )
     mission = store.get_mission(mission_id)
     auth.require_project(principal, mission.project_id)
     store.record_side_effect(f"demo:{mission_id}", mission_id=mission_id)

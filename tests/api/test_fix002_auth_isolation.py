@@ -56,19 +56,25 @@ def test_operational_app_has_no_seeded_demo_tokens() -> None:
         assert denied.json()["code"] == "unauthorized"
 
 
-def test_bootstrap_token_does_not_seed_fixed_demo_principals() -> None:
+def test_bootstrap_token_does_not_seed_fixed_demo_principals(tmp_path: Path) -> None:
     """Private bootstrap issues only the provided token — not fixed demo identities."""
     app = create_app(
         require_auth=True,
         db_reachable=True,
         seed_loopback_token="atk_private_bootstrap",
         seed_fixtures=False,
+        repo_root=tmp_path,
+        install_project_id="proj_install_test",
     )
     auth: AuthRegistry = app.state.auth
     assert "atk_private_bootstrap" in auth.tokens
     assert "atk_policy_demo" not in auth.tokens
     assert "atk_other_project" not in auth.tokens
     assert "atk_loopback_demo" not in auth.tokens
+    principal = auth.tokens["atk_private_bootstrap"]
+    assert "proj_demo" not in principal.project_ids
+    assert "proj_other" not in principal.project_ids
+    assert principal.project_ids == frozenset({"proj_install_test"})
 
 
 def test_known_demo_token_rejected_from_non_loopback() -> None:

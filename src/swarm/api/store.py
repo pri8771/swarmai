@@ -9,7 +9,7 @@ from typing import Any
 
 from swarm.api.errors import ApiError
 from swarm.api.events import EventLog
-from swarm.broker.explain import build_mock_broker, explain_capacity
+from swarm.broker.explain import explain_capacity
 from swarm.contracts.common import new_id, payload_hash, utc_now
 from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.contracts.fixtures import sample_provider_account, sample_route, sample_route_beta
@@ -61,7 +61,9 @@ class ProductStore:
     cancelled_tasks: set[str] = field(default_factory=set)
     side_effects: list[str] = field(default_factory=list)
     db_reachable: bool | None = None  # None = not probed; False = down; True = up
-    execution_mode: str = "mock"
+    # Operational default is not mock — fixtures require explicit fixture_mode.
+    execution_mode: str = "operational"
+    fixture_mode: bool = False
     allow_paid: bool = False
     providers_network: bool = False
     repo_root: Path | None = None
@@ -265,6 +267,9 @@ class ProductStore:
         )
 
     def seed_catalog(self) -> None:
+        """Fixture-only catalog seed — marks store as fixture_mode."""
+        self.fixture_mode = True
+        self.execution_mode = "mock"
         acct = sample_provider_account()
         self.accounts[acct.id] = acct
         for route in (sample_route(), sample_route_beta()):
@@ -640,8 +645,8 @@ class ProductStore:
             if route.availability_status.value == "unknown":
                 data["availability_status"] = "unknown"
             rows.append(_scrub(data))
-        # Merge retired catalog entries so UI never invents "available".
-        for row in list_providers(mode="mock"):
+        # Catalog retired markers only — not mock eligibility fabrication.
+        for row in list_providers(mode="catalog"):
             if row.get("retired"):
                 rows.append(
                     {
@@ -657,9 +662,9 @@ class ProductStore:
         return rows
 
     async def capacity(self, *, purpose: str = "mission") -> dict[str, Any]:
-        # Offline mock broker explain — not live spend.
-        _ = build_mock_broker()
-        return await explain_capacity(mode="mock", purpose=purpose)
+        # Operational path: honest empty/unknown. Mock broker only in fixture_mode.
+        mode = "mock" if self.fixture_mode or self.execution_mode == "mock" else self.execution_mode
+        return await explain_capacity(mode=mode, purpose=purpose)
 
     def create_approval(
         self,
@@ -668,18 +673,27 @@ class ProductStore:
         destination: str,
         grantor: str,
         payload: dict[str, Any],
+        project_id: str | None = None,
         ttl_seconds: int = 600,
     ) -> Approval:
+        owned_project = project_id or str(payload.get("project_id") or "")
+        if not owned_project:
+            raise ApiError(
+                "invalid_request",
+                "approval requires project_id ownership",
+                status_code=400,
+            )
         approval = Approval(
             payload_hash=payload_hash(payload),
             permitted_operation=permitted_operation,
             destination=destination,
             grantor=grantor,
+            project_id=owned_project,
             expires_at=utc_now() + timedelta(seconds=ttl_seconds),
         )
         self.approvals[approval.id] = approval
         self.publish(
-            project_id=payload.get("project_id", "proj_unknown"),
+            project_id=owned_project,
             type="approval.requested",
             actor=grantor,
             payload={"approval_id": approval.id, "operation": permitted_operation},
@@ -694,10 +708,13 @@ class ProductStore:
         accept: bool,
         actor: str,
         payload: dict[str, Any] | None = None,
+        project_id: str | None = None,
     ) -> Approval:
         approval = self.approvals.get(approval_id)
         if approval is None:
             raise ApiError("not_found", "approval not found", status_code=404)
+        if project_id is not None and approval.project_id != project_id:
+            raise ApiError("forbidden_project", "approval not in project scope", status_code=403)
         if approval.revoked_at is not None:
             raise ApiError("approval_revoked", "approval already revoked", status_code=409)
         if approval.expires_at <= utc_now():
@@ -712,7 +729,7 @@ class ProductStore:
             approval = approval.model_copy(update={"revoked_at": utc_now()})
             self.approvals[approval_id] = approval
         self.publish(
-            project_id="proj_system",
+            project_id=approval.project_id,
             type="approval.resolved",
             actor=actor,
             payload={"approval_id": approval_id, "accepted": accept},
@@ -740,7 +757,9 @@ class ProductStore:
             capabilities=capabilities,
             labels=["api"],
         )
-        registered = await self.workers.register(lease, token=token)
+        registered = await self.workers.register(
+            lease, token=token, project_id=project_id
+        )
         rec = self.workers._workers[registered.worker_id]
         rec.privacy_classes = set(privacy_classes)
         rec.named_inference_urls = list(named_inference_urls or [])
@@ -770,9 +789,16 @@ class ProductStore:
         return {
             "status": "ready" if ready else "not_ready",
             "execution_mode": self.execution_mode,
+            "fixture_mode": self.fixture_mode,
             "providers_network": self.providers_network,
             "allow_paid": self.allow_paid,
             "database": db_status,
             "runtime": "ok" if runtime_ok else "down",
-            "mock_vs_live": "api_store_in_memory_not_live_providers",
+            "configured_accounts": len(self.accounts),
+            "configured_routes": len(self.routes),
+            "mock_vs_live": (
+                "fixture_mode_seeded"
+                if self.fixture_mode
+                else "operational_empty_or_observed_not_mock_broker"
+            ),
         }

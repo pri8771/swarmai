@@ -100,43 +100,51 @@ def build_mock_broker() -> SharedInferenceBroker:
 
 
 async def explain_capacity(*, mode: str, purpose: str = "mission") -> dict[str, Any]:
-    if mode != "mock":
-        return {
-            "mode": mode,
-            "error": "live_capacity_explain_requires_configured_accounts",
-            "mock_vs_live": "not_live",
-        }
-    broker = build_mock_broker()
-    request = InferenceRequest(
-        project_id="proj_demo",
-        attempt_id="att_capacity_explain",
-        route_id=None,
-        purpose=purpose,
-        messages=[{"role": "user", "content": "capacity explain"}],
-        estimated_input_tokens=40,
-        max_output_tokens=100,
-        secret_ref_names=[],
-    )
-    eligible = await broker.assess(request)
-    decision_id = broker.last_decision_id or ""
-    explanation = await broker.explain(decision_id)
-    bucket_views = []
-    for b in broker.ledger.snapshot():
-        bucket_views.append(
-            {
-                "bucket_id": b.bucket_id,
-                "dimension": b.dimension.value,
-                "remaining": b.remaining,
-                "limit": b.limit,
-                "window_type": b.window_type.value,
-            }
+    if mode == "mock":
+        broker = build_mock_broker()
+        request = InferenceRequest(
+            project_id="proj_demo",
+            attempt_id="att_capacity_explain",
+            route_id=None,
+            purpose=purpose,
+            messages=[{"role": "user", "content": "capacity explain"}],
+            estimated_input_tokens=40,
+            max_output_tokens=100,
+            secret_ref_names=[],
         )
+        eligible = await broker.assess(request)
+        decision_id = broker.last_decision_id or ""
+        explanation = await broker.explain(decision_id)
+        bucket_views = []
+        for b in broker.ledger.snapshot():
+            bucket_views.append(
+                {
+                    "bucket_id": b.bucket_id,
+                    "dimension": b.dimension.value,
+                    "remaining": b.remaining,
+                    "limit": b.limit,
+                    "window_type": b.window_type.value,
+                }
+            )
+        return {
+            "mode": "mock",
+            "mock_vs_live": "mock_fixtures_only",
+            "eligible_route_count": len(eligible),
+            "buckets": bucket_views,
+            "explanation": explanation,
+        }
+    # Operational / live: honest empty or unknown — never fabricate readiness.
     return {
-        "mode": "mock",
-        "mock_vs_live": "mock_fixtures_only",
-        "eligible_route_count": len(eligible),
-        "buckets": bucket_views,
-        "explanation": explanation,
+        "mode": mode,
+        "mock_vs_live": "observed_or_empty_not_mock_broker",
+        "eligible_route_count": 0,
+        "buckets": [],
+        "explanation": {
+            "status": "unknown",
+            "reason": "no_configured_observed_accounts",
+            "purpose": purpose,
+        },
+        "note": "capacity unknown until accounts are configured and probed",
     }
 
 

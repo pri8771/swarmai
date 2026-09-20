@@ -1,14 +1,27 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
-import { scrubSecrets, assertNoSecretsInBundle, loadSnapshot } from './api/client'
+import {
+  scrubSecrets,
+  assertNoSecretsInBundle,
+  loadSnapshot,
+  emptyLiveSnapshot,
+  resolveConsoleLoadOpts,
+} from './api/client'
 import { MOCK_SNAPSHOT, expandMission, contractMission, interruptStream } from './data/fixtures'
 
 afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
 })
+
+function stubMockMode() {
+  vi.stubGlobal('location', {
+    ...window.location,
+    search: '?mode=mock',
+  })
+}
 
 describe('console fixtures', () => {
   it('labels mock mode and never carries secret-shaped strings', () => {
@@ -36,7 +49,13 @@ describe('console fixtures', () => {
       vi.fn(async (input: RequestInfo) => {
         const url = String(input)
         if (url.endsWith('/v1/capacity')) {
-          return new Response(JSON.stringify({ buckets: [] }), { status: 200 })
+          return new Response(
+            JSON.stringify({
+              buckets: [],
+              mock_vs_live: 'observed_or_empty_not_mock_broker',
+            }),
+            { status: 200 },
+          )
         }
         if (url.endsWith('/v1/missions')) {
           return new Response(
@@ -68,6 +87,9 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
+        if (url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
+          return new Response(JSON.stringify({ routes: [], workers: [] }), { status: 200 })
+        }
         return new Response('missing', { status: 404 })
       }),
     )
@@ -76,11 +98,42 @@ describe('console fixtures', () => {
     expect(snap.mission.missionId).toBe('msn_live_shared')
     expect(snap.mission.objective).toBe('unfamiliar live goal')
     expect(snap.history[0]?.missionId).toBe('msn_live_shared')
+    expect(snap.routes).toEqual([])
+    expect(snap.workers).toEqual([])
+    expect(snap.profiles).toEqual([])
     expect(snap.mockVsLive).not.toContain('fixtures_only')
+    expect(snap.mockVsLive).not.toContain('fixture-labeled')
+  })
+
+  it('live mode without baseUrl is honest empty not mock fixtures', async () => {
+    const snap = await loadSnapshot({ mode: 'live' })
+    expect(snap.mode).toBe('live')
+    expect(snap.mission.missionId).toBe('(none)')
+    expect(snap.routes).toEqual([])
+    expect(snap.workers).toEqual([])
+    expect(snap.mockVsLive).not.toContain('fixtures_only')
+  })
+
+  it('default resolveConsoleLoadOpts is live not mock', () => {
+    vi.stubGlobal('location', { ...window.location, search: '' })
+    expect(resolveConsoleLoadOpts().mode).toBe('live')
+    vi.stubGlobal('location', { ...window.location, search: '?mode=mock' })
+    expect(resolveConsoleLoadOpts().mode).toBe('mock')
+  })
+
+  it('emptyLiveSnapshot never embeds MOCK_SNAPSHOT routes', () => {
+    const snap = emptyLiveSnapshot()
+    expect(snap.routes).toEqual([])
+    expect(snap.mode).toBe('live')
+    assertNoSecretsInBundle(snap)
   })
 })
 
-describe('operator console UI', () => {
+describe('operator console UI (fixture mode)', () => {
+  beforeEach(() => {
+    stubMockMode()
+  })
+
   it('shows mission waiting reasons and expand/contract', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -164,10 +217,20 @@ describe('operator console UI', () => {
     render(<App />)
     await screen.findByTestId('mission-panel')
     await user.tab()
-    // First focusable after load should be a tab or action; navigate to Routes via keyboard activation.
     const routes = screen.getByRole('button', { name: 'Routes' })
     routes.focus()
     await user.keyboard('{Enter}')
     expect(await screen.findByTestId('routes-panel')).toBeInTheDocument()
+  })
+})
+
+describe('operator console UI (live/operational default)', () => {
+  it('defaults to live empty state without mock recover path', async () => {
+    vi.stubGlobal('location', { ...window.location, search: '' })
+    render(<App />)
+    expect(await screen.findByTestId('mode-banner')).toHaveTextContent('LIVE')
+    expect(screen.getByTestId('live-no-fixture-mutate')).toBeInTheDocument()
+    expect(screen.queryByTestId('expand-mission')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Recover with mock fixtures/i)).not.toBeInTheDocument()
   })
 })

@@ -511,7 +511,9 @@ async def test_capacity_explain_mock_cli_helper() -> None:
     assert result["eligible_route_count"] >= 1
     assert result["buckets"]
     live = await explain_capacity(mode="live")
-    assert live["mock_vs_live"] == "not_live"
+    assert live["mock_vs_live"] == "observed_or_empty_not_mock_broker"
+    assert live["eligible_route_count"] == 0
+    assert live["buckets"] == []
 
 
 @pytest.mark.asyncio

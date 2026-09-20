@@ -258,9 +258,24 @@ class MissionRuntime:
             record.artifacts = {
                 "worker_results": {k: v.to_dict() for k, v in prior.items()},
             }
-            # Promote accepted worktree changes into the primary checkout for dogfood proof.
+            # G11: never auto-promote accepted worktree files into the primary
+            # checkout. Return isolated worktree diff/artifacts; apply requires
+            # an explicit reviewed action outside this path.
             if accepted and shared_wt is not None:
-                self._promote_changes(shared_wt, changed)
+                record.artifacts["pending_apply"] = {
+                    "status": "pending_explicit_apply",
+                    "changed_files": changed,
+                    "worktree": shared_wt.to_dict(),
+                    "note": (
+                        "accepted worktree changes are isolated; "
+                        "automatic primary-checkout promotion is disabled"
+                    ),
+                }
+                self.store.append_timeline(
+                    record,
+                    "apply_pending",
+                    {"changed_files": changed, "auto_promote": False},
+                )
             report_dir = self.repo / "var" / "reports" / "missions" / mission.id
             paths = write_reports(record, report_dir)
             record.artifacts["reports"] = paths
@@ -274,13 +289,25 @@ class MissionRuntime:
                 except Exception:  # noqa: BLE001
                     pass
 
-    def _promote_changes(self, handle: WorktreeHandle, changed_files: list[str]) -> None:
+    def apply_worktree_changes(
+        self,
+        handle: WorktreeHandle,
+        changed_files: list[str],
+        *,
+        approved: bool,
+    ) -> list[str]:
+        """Explicit reviewed apply into the primary checkout — never automatic."""
+        if not approved:
+            raise PermissionError("explicit_apply_requires_approved_true")
+        applied: list[str] = []
         for rel in changed_files:
             src = handle.path / rel
             dst = self.repo / rel
             if src.exists():
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+                applied.append(rel)
+        return applied
 
     def status(self, mission_id: str) -> dict[str, Any]:
         record = self.store.load(mission_id)

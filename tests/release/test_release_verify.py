@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 from swarm.release.harden import redact_mapping, run_security_harden
@@ -12,12 +14,22 @@ from swarm.release.verify import verify_release
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _tip_sha() -> str:
+    proc = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0
+    return proc.stdout.strip()
+
+
 def test_release_verify_packaging_without_ci_evidence_is_not_behavioral_pass(
     tmp_path: Path,
 ) -> None:
     """File presence alone must not claim offline_tested=yes / passed."""
-    # Copy minimal packaging surface into an empty tree is heavy; assert on
-    # the real repo without offline evidence file.
     evidence = ROOT / "var" / "evidence" / "offline_ci_pass.json"
     existed = evidence.is_file()
     backup = evidence.read_text() if existed else None
@@ -40,6 +52,8 @@ def test_release_verify_packaging_without_ci_evidence_is_not_behavioral_pass(
 
 
 def test_release_verify_passes_when_offline_evidence_present(tmp_path: Path) -> None:
+    """FIX-003: evidence must include candidate SHA, exit, mode, and freshness."""
+    tip = _tip_sha()
     evidence_dir = ROOT / "var" / "evidence"
     evidence_dir.mkdir(parents=True, exist_ok=True)
     path = evidence_dir / "offline_ci_pass.json"
@@ -50,6 +64,11 @@ def test_release_verify_passes_when_offline_evidence_present(tmp_path: Path) -> 
                 "schema_version": "1.0",
                 "status": "pass",
                 "command": "uv run pytest (offline suite)",
+                "exit_code": 0,
+                "mode": "offline_ci",
+                "candidate_sha": tip,
+                "generated_at": datetime.now(UTC).isoformat(),
+                "config_version": "1.0",
                 "note": "test fixture evidence — not a live campaign",
             }
         )

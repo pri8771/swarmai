@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,9 @@ FORBIDDEN_TRACKED = (
     "secrets.json",
     "credentials.json",
 )
+
+# Evidence older than this is stale and must fail (FIX-003 freshness rule).
+EVIDENCE_MAX_AGE = timedelta(days=7)
 
 
 @dataclass
@@ -93,13 +97,82 @@ def _git_tracked(repo: Path) -> set[str]:
     return {line.strip() for line in proc.stdout.splitlines() if line.strip()}
 
 
+def _parse_evidence_timestamp(data: dict[str, Any]) -> datetime | None:
+    raw = (
+        data.get("generated_at")
+        or data.get("observed_at")
+        or data.get("timestamp")
+        or data.get("created_at")
+    )
+    if raw is None:
+        return None
+    if isinstance(raw, (int, float)):
+        return datetime.fromtimestamp(float(raw), tz=UTC)
+    text = str(raw).strip()
+    if not text:
+        return None
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=UTC)
+    return dt
+
+
+def _exit_or_result_ok(data: dict[str, Any]) -> tuple[bool, str]:
+    """Require successful exit/result — status boolean alone is insufficient."""
+    if "exit_code" in data:
+        try:
+            code = int(data["exit_code"])
+        except (TypeError, ValueError):
+            return False, "exit_code_unreadable"
+        if code != 0:
+            return False, f"exit_code_nonzero:{code}"
+        return True, "exit_code_0"
+    result = data.get("result")
+    if isinstance(result, dict):
+        rstatus = str(result.get("status") or result.get("outcome") or "").lower()
+        if rstatus in {"pass", "passed", "ok", "green", "success", "succeeded"}:
+            return True, f"result_status:{rstatus}"
+        if rstatus:
+            return False, f"result_status_not_pass:{rstatus}"
+        if result.get("ok") is True or result.get("passed") is True:
+            return True, "result_ok_true"
+        if result.get("ok") is False or result.get("passed") is False:
+            return False, "result_ok_false"
+    if isinstance(result, str) and result.lower() in {
+        "pass",
+        "passed",
+        "ok",
+        "green",
+        "success",
+    }:
+        return True, f"result:{result}"
+    # No invent: missing exit/result fails (status field alone cannot bypass).
+    return False, "missing_exit_or_result"
+
+
 def _validate_evidence_file(
     path: Path,
     *,
     expected_kind: str,
     candidate_sha: str | None,
+    now: datetime | None = None,
+    max_age: timedelta = EVIDENCE_MAX_AGE,
 ) -> VerifyItem:
-    """Semantic evidence check — presence alone is not a pass."""
+    """Strict evidence binding — presence alone is not a pass (FIX-003).
+
+    Required:
+    - candidate_sha present and exact match to tip (when tip known)
+    - command inventory
+    - successful exit_code or result
+    - mode compatible with expected_kind
+    - generated/observed timestamp within freshness window
+    - status pass (cannot bypass other fields)
+    """
     item_id = f"{expected_kind}_evidence"
     if not path.is_file():
         return VerifyItem(item_id, False, "missing — not a pass")
@@ -109,22 +182,57 @@ def _validate_evidence_file(
         return VerifyItem(item_id, False, f"unreadable_or_invalid_json:{exc}")
     if not isinstance(data, dict):
         return VerifyItem(item_id, False, "evidence_not_object")
+
+    # Explicit failure markers always fail.
+    if data.get("stale") is True or data.get("failed") is True:
+        return VerifyItem(item_id, False, "stale_or_failed_marker")
+
     status = str(data.get("status") or "").lower()
     if status not in {"pass", "passed", "ok", "green"}:
         return VerifyItem(item_id, False, f"status_not_pass:{status or 'missing'}")
+
     command = data.get("command") or data.get("commands")
     if not command:
         return VerifyItem(item_id, False, "missing_command_inventory")
-    mode = str(data.get("mode") or data.get("mock_vs_live") or "")
-    live_mode = "live" in mode.lower() and "offline" not in mode.lower()
-    if expected_kind == "offline_ci" and mode and live_mode:
-        return VerifyItem(item_id, False, f"mode_mismatch:{mode}")
+
+    # Candidate SHA is mandatory — omitting it must fail.
     sha = data.get("candidate_sha") or data.get("git_sha") or data.get("sha")
-    if candidate_sha and sha and str(sha) != str(candidate_sha):
-        return VerifyItem(item_id, False, f"sha_mismatch:evidence={sha} tip={candidate_sha}")
-    # Freshness: reject explicitly failed/stale markers.
-    if data.get("stale") is True or data.get("failed") is True:
-        return VerifyItem(item_id, False, "stale_or_failed_marker")
+    if not sha:
+        return VerifyItem(item_id, False, "missing_candidate_sha")
+    if not candidate_sha:
+        return VerifyItem(item_id, False, "tip_sha_unknown_cannot_bind")
+    if str(sha) != str(candidate_sha):
+        return VerifyItem(
+            item_id, False, f"sha_mismatch:evidence={sha} tip={candidate_sha}"
+        )
+
+    exit_ok, exit_detail = _exit_or_result_ok(data)
+    if not exit_ok:
+        return VerifyItem(item_id, False, exit_detail)
+
+    mode = str(data.get("mode") or data.get("mock_vs_live") or "").strip()
+    if not mode:
+        return VerifyItem(item_id, False, "missing_mode")
+    live_mode = "live" in mode.lower() and "offline" not in mode.lower()
+    if expected_kind == "offline_ci":
+        if live_mode or "live" in mode.lower():
+            return VerifyItem(item_id, False, f"mode_mismatch:{mode}")
+        if "offline" not in mode.lower() and "ci" not in mode.lower():
+            return VerifyItem(item_id, False, f"mode_not_offline:{mode}")
+    if expected_kind == "live_local":
+        if "live" not in mode.lower():
+            return VerifyItem(item_id, False, f"mode_not_live:{mode}")
+
+    observed = _parse_evidence_timestamp(data)
+    if observed is None:
+        return VerifyItem(item_id, False, "missing_generated_at_or_observed_at")
+    clock = now or utc_now()
+    age = clock - observed
+    if age > max_age:
+        return VerifyItem(item_id, False, f"stale_evidence:age={age}")
+    if age < timedelta(0) and abs(age) > timedelta(minutes=5):
+        return VerifyItem(item_id, False, "evidence_timestamp_in_future")
+
     return VerifyItem(item_id, True, str(path.name))
 
 
