@@ -17,18 +17,19 @@ Account / adapter / route statuses are independent. Dashboard login ≠ API acce
 
 ## Agent / operator rule (authorized setup)
 
-**Standing rule (2026-09-20):** After initial OpenRouter/Groq setup, the agent uses SwarmAI Chrome to open provider consoles and create/copy API keys into gitignored `.env` itself. Do **not** ask the operator to copy/paste keys into chat. Escalate only for MFA, CAPTCHA, password, or consent the browser cannot complete.
+**Standing rule (2026-09-20, updated wrap-up):** Use **normal Priyansh / Default Chrome** only. Do **not** use Playwright, Selenium, CDP attach, or automated Chrome for Google SSO. The abandoned SwarmAI blank profile is not used.
 
+After OpenRouter/Groq bootstrap, the agent opens provider consoles in that Chrome profile and Create/Copy keys into gitignored `.env` itself (AppleScript JS when enabled; drop-file ingest preferred). Do **not** ask the operator to paste keys into chat. Escalate only for MFA, CAPTCHA, password, or consent the browser cannot complete.
 
 For authorized account or integration setup:
 
-1. Use a **local visible browser** with a dedicated SwarmAI profile (`~/Library/Application Support/SwarmAI/browser-profile`).
+1. Use **local visible Priyansh/Default Chrome** (not the abandoned SwarmAI blank profile).
 2. Navigate official provider URLs from the catalog; reuse existing accounts before creating new ones.
-3. Escalate to the operator **only** for a precise identity/verification/consent/security step (password, passkey, MFA, CAPTCHA, phone/IDV, or secure secret transfer).
+3. Escalate to the operator **only** for a precise identity/verification/consent/security step (password, passkey, MFA, CAPTCHA, phone/IDV, or secure secret transfer via clipboard/drop-file — never chat).
 4. Do **not** return a generic “go sign up and send me the key” checklist without attempting the browser path first.
 5. Never ask the operator to paste passwords, MFA codes, recovery codes, or API keys into chat.
 
-Paid browser services (e.g. Browserless) are **not** used under the no-spend policy.
+Paid browser services (e.g. Browserless) are **not** used under the no-spend policy. `SWARM_ALLOW_PAID=false`.
 
 ## Commands
 

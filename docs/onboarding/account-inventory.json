@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T17:04:46.817333+00:00",
+  "generated_at": "2026-09-20T17:15:00+00:00",
   "chrome_profile": {
     "directory": "Default",
     "name": "Priyansh",
@@ -83,8 +83,8 @@
     "REPLICATE_API_TOKEN": true,
     "OLLAMA_BASE_URL": true
   },
-  "blocked_key_automation": "Chrome AppleScript JS disabled + Accessibility denied; cannot Create/Copy keys in live tabs without JS Apple Events toggle",
-  "handoff": "none \u2014 OpenAI deferred; Fireworks+Together keys configured",
+  "blocked_key_automation": "resolved for this pass (JS Apple Events enabled); escalate only MFA/CAPTCHA/password/consent",
+  "handoff": "WRAP-UP COMPLETE \u2014 resume from private note ~/Library/Application Support/SwarmAI/account-inventory/HANDOFF_RESUME.md; OpenAI deferred; no V0.2; do not merge PR #2/#3 unless asked",
   "mcp": {
     "added_to_cursor_mcp_json": [
       "openrouter",
@@ -113,9 +113,11 @@
   "pr2_merged": false,
   "nvidia_workspace": "primandir",
   "notes_ops": [
-    "NVIDIA treated signed-in under workspace primandir per operator 2026-09-20",
-    "No automated Chrome for Google SSO; normal Priyansh/Default Chrome only",
-    "Zero spend; SWARM_ALLOW_PAID=false; no V0.2"
+    "NVIDIA workspace primandir operator-confirmed",
+    "Priyansh/Default Chrome only; no automated Chrome for Google SSO",
+    "Zero spend; SWARM_ALLOW_PAID=false; no V0.2",
+    "14 providers keyed+auth-verified; OpenAI deferred payment-gated",
+    "Together inference live-blocked under no-spend; Fireworks auth-only"
   ],
   "blocked": {
     "openai": "DEFERRED \u2014 payment-gated; Create secret key disabled / Add credits. Do not pursue this pass.",
@@ -138,5 +140,15 @@
     "openai": "deferred_payment_gated",
     "together": "yes_auth_models_list_inference_blocked_zero_spend",
     "fireworks": "yes_auth_models_list_no_inference"
-  }
+  },
+  "pass": "v0.1-provider-onboarding-wrapup",
+  "pr3": "https://github.com/pri8771/swarmai/pull/3",
+  "pr3_merged": false,
+  "zero_spend": true,
+  "SWARM_ALLOW_PAID": false,
+  "chrome_operating_rule": "Priyansh/Default Chrome only; no Playwright/Selenium/CDP for Google SSO; SwarmAI blank profile abandoned",
+  "keyed_auth_verified_count": 14,
+  "deferred": [
+    "openai"
+  ]
 }
