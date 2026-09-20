@@ -59,3 +59,26 @@ class PageMeta(StrictModel):
     limit: int
     cursor: str | None = None
     has_more: bool = False
+
+
+class ProjectCreateRequest(StrictModel):
+    name: str
+    repo_path: str
+    project_id: str | None = None
+    allowed_tools: list[str] | None = None
+    provider_policy: dict[str, Any] | None = None
+    budgets: dict[str, Any] | None = None
+    defaults: dict[str, Any] | None = None
+    env_refs: list[str] | None = None
+    safety: dict[str, Any] | None = None
+    idempotency_key: str | None = None
+
+
+class ProjectUpdateRequest(StrictModel):
+    name: str | None = None
+    allowed_tools: list[str] | None = None
+    provider_policy: dict[str, Any] | None = None
+    budgets: dict[str, Any] | None = None
+    defaults: dict[str, Any] | None = None
+    safety: dict[str, Any] | None = None
+    idempotency_key: str | None = None

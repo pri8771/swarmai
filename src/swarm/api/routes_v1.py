@@ -16,6 +16,8 @@ from swarm.api.schemas import (
     MissionCreateRequest,
     PageMeta,
     ProbeRequest,
+    ProjectCreateRequest,
+    ProjectUpdateRequest,
     WorkerEnrollRequest,
     WorkerHeartbeatRequest,
 )
@@ -350,3 +352,172 @@ async def demo_side_effect(
     auth.require_project(principal, mission.project_id)
     store.record_side_effect(f"demo:{mission_id}", mission_id=mission_id)
     return {"ok": True, "side_effects": list(store.side_effects)}
+
+
+@router.get("/missions")
+async def list_missions(
+    project_id: str | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    if project_id:
+        auth.require_project(principal, project_id)
+    rows = store.list_public_missions(project_id=project_id)
+    if project_id is None and "admin" not in principal.roles:
+        rows = [r for r in rows if r.get("project_id") in principal.project_ids]
+    return {"missions": rows, "mock_vs_live": "controller_plus_file_history"}
+
+
+@router.get("/missions/{mission_id}/report")
+async def mission_report(
+    mission_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    # Auth: if live mission, check project; history reopen uses proj_demo default.
+    try:
+        mission = store.get_mission(mission_id)
+        auth.require_project(principal, mission.project_id)
+    except ApiError:
+        # History-backed missions: allow if principal has any project (operator).
+        if not principal.project_ids and "admin" not in principal.roles:
+            raise
+    return store.mission_report(mission_id)
+
+
+@router.get("/missions/{mission_id}/artifacts")
+async def mission_artifacts(
+    mission_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        mission = store.get_mission(mission_id)
+        auth.require_project(principal, mission.project_id)
+    except ApiError:
+        if not principal.project_ids and "admin" not in principal.roles:
+            raise
+    return {"artifacts": store.mission_artifacts(mission_id)}
+
+
+@router.get("/projects")
+async def list_projects(
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rows = store.list_projects()
+    if "admin" not in principal.roles:
+        rows = [r for r in rows if r.get("project_id") in principal.project_ids]
+    return {"projects": rows}
+
+
+@router.post("/projects")
+async def create_project(
+    body: ProjectCreateRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    key = body.idempotency_key or idempotency_key
+    cached = store.recall_idempotent(key)
+    if cached is not None:
+        return cached
+    overrides: dict[str, Any] = {}
+    for field in (
+        "allowed_tools",
+        "provider_policy",
+        "budgets",
+        "defaults",
+        "env_refs",
+        "safety",
+    ):
+        val = getattr(body, field)
+        if val is not None:
+            overrides[field] = val
+    project_id = body.project_id
+    if project_id:
+        auth.require_project(principal, project_id)
+    else:
+        project_id = (
+            sorted(principal.project_ids)[0]
+            if principal.project_ids
+            else new_id("proj_")
+        )
+    cfg = store.create_project(
+        name=body.name,
+        repo_path=body.repo_path,
+        project_id=project_id,
+        **overrides,
+    )
+    result = {"project": cfg.to_dict()}
+    store.publish(
+        project_id=cfg.project_id,
+        type="project.created",
+        actor=principal.subject,
+        payload={"name": cfg.name},
+        dedupe_key=f"project.created:{cfg.project_id}",
+    )
+    return store.store_idempotent(key, result)
+
+
+@router.get("/projects/{project_id}")
+async def get_project(
+    project_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    auth.require_project(principal, project_id)
+    return {"project": store.get_project(project_id).to_dict()}
+
+
+@router.patch("/projects/{project_id}")
+async def update_project(
+    project_id: str,
+    body: ProjectUpdateRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    auth.require_project(principal, project_id)
+    patch = {k: v for k, v in body.model_dump().items() if v is not None and k != "idempotency_key"}
+    cfg = store.project_store().update(project_id, **patch)
+    return {"project": cfg.to_dict()}
+
+
+@router.get("/history")
+async def history_search(
+    q: str = "",
+    status: str | None = None,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    _ = principal
+    rows = store.history_index().search(q, status=status)
+    return {"entries": rows, "query": q, "status": status}
+
+
+@router.get("/history/{mission_id}")
+async def history_reopen(
+    mission_id: str,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    _ = principal
+    try:
+        return store.history_index().reopen(mission_id)
+    except (OSError, FileNotFoundError, TypeError, KeyError) as exc:
+        raise ApiError("not_found", "history mission not found", status_code=404) from exc
+
+
+@router.get("/product/contract")
+async def product_contract(
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    _ = principal
+    return store.public_contract()

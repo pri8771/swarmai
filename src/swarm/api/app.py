@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 
 from swarm import __version__
@@ -16,11 +18,17 @@ def create_app(
     require_auth: bool = True,
     seed_loopback_token: str | None = "atk_loopback_demo",
     db_reachable: bool | None = None,
+    repo_root: Path | None = None,
 ) -> FastAPI:
     app = FastAPI(title="SwarmAI", version=__version__)
     app.add_exception_handler(ApiError, api_error_handler)  # type: ignore[arg-type]
 
-    store = ProductStore(db_reachable=db_reachable)
+    root = repo_root
+    if root is None:
+        # Prefer package-adjacent repo root (…/swarm-ai).
+        root = Path(__file__).resolve().parents[3]
+
+    store = ProductStore(db_reachable=db_reachable, repo_root=root)
     store.seed_catalog()
     auth = AuthRegistry(require_auth=require_auth)
     if seed_loopback_token:
@@ -52,6 +60,7 @@ def create_app(
 
     app.state.store = store
     app.state.auth = auth
+    app.state.repo_root = root
 
     @app.get("/health/live")
     async def live() -> dict[str, str]:
