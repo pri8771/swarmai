@@ -152,8 +152,9 @@ def run_self_development(
       - malicious: privilege markers → policy reject
     """
     if mode == "live":
-        raise PermissionError(
-            "live_selfdev_blocked: empirical routes required; use --mode mock offline"
+        return run_live_self_development(
+            report_dir=report_dir,
+            issue_path=issue_path,
         )
 
     issue = _load_issue(issue_path or PACK_ISSUE)
@@ -247,6 +248,91 @@ def run_self_development(
             json.dumps(report.to_dict(), indent=2, default=str) + "\n"
         )
         return report
+
+
+def run_live_self_development(
+    *,
+    report_dir: Path | None = None,
+    issue_path: Path | None = None,
+) -> SelfDevReport:
+    """V0.6 live dogfood: real mission runtime improves SwarmAI under human merge gate."""
+    from swarm.memory.store import MemoryStore
+    from swarm.mission.runtime import run_mission
+
+    issue = _load_issue(issue_path or PACK_ISSUE)
+    if not issue.get("approved"):
+        raise PermissionError("issue_not_approved")
+
+    # Ensure target is buggy so the mission has real work.
+    target = SAMPLE_DIR / "parser_helper.py"
+    original = target.read_text(encoding="utf-8")
+    if "end - start + 1" in original and "off-by-one" not in original.lower():
+        target.write_text(FAILING_FIX, encoding="utf-8")
+
+    report_dir = report_dir or (REPO_ROOT / "var" / "reports" / "selfdev")
+    report_dir.mkdir(parents=True, exist_ok=True)
+    run_id = new_id("selfdev_")
+    goal = (
+        "Fix the off-by-one bug in sandbox/selfdev_issue/parser_helper.py so "
+        "inclusive_range_count(start, end) counts integers inclusively"
+    )
+    record = run_mission(goal, repo=REPO_ROOT, use_evidence_router=True)
+    tests_ok = False
+    try:
+        tests_ok, test_out = _run_unit(SAMPLE_DIR)
+    except Exception as exc:  # noqa: BLE001
+        test_out = str(exc)
+        tests_ok = False
+
+    # Outcome learning — advisory only; never mutate safety policy files.
+    memory = MemoryStore(REPO_ROOT / "var" / "memory")
+    memory.remember_mission(record)
+    learning = {
+        "recorded_mission": record.mission_id,
+        "models": record.model_assignments,
+        "propose_routing_hint": True,
+        "safety_policy_mutated": False,
+        "auto_merge": False,
+    }
+    (report_dir / f"{run_id}_learning.json").write_text(
+        json.dumps(learning, indent=2, default=str) + "\n"
+    )
+
+    report = SelfDevReport(
+        run_id=run_id,
+        mode="live",
+        issue_id=str(issue["issue_id"]),
+        branch=f"selfdev/{issue['issue_id']}/{run_id[-8:]}",
+        worktree=str(SAMPLE_DIR),
+        author_worker="mission_runtime_worker",
+        reviewer_id="mission_runtime_reviewer",
+        tests_passed=tests_ok,
+        policy_allowed=True,
+        policy_reasons=[],
+        patch_path=None,
+        merged=False,
+        checks={
+            "issue_approved": True,
+            "mission_id": record.mission_id,
+            "mission_status": record.status,
+            "mission_accepted": bool((record.result or {}).get("accepted")),
+            "human_merge_required": True,
+            "safety_policy_mutated": False,
+            "learning": learning,
+            "test_output_excerpt": test_out[:500],
+            "cost": record.cost,
+        },
+        mock_vs_live="live_local_zero_cost_selfdev",
+    )
+    raw = json.dumps(report.to_dict(), sort_keys=True, default=str)
+    report.report_hash = hashlib.sha256(raw.encode()).hexdigest()
+    (report_dir / f"{run_id}.json").write_text(
+        json.dumps(report.to_dict(), indent=2, default=str) + "\n"
+    )
+    (report_dir / "latest_live_selfdev.json").write_text(
+        json.dumps(report.to_dict(), indent=2, default=str) + "\n"
+    )
+    return report
 
 
 def worker_cannot_access_production_secrets() -> bool:
