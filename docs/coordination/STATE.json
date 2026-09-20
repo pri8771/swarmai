@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T22:30:05Z",
+  "updated_at": "2026-09-20T22:32:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -199,7 +199,7 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repairs_pushed_awaiting_lead_re_review",
-      "evidence": "tip b5ef431aef36212417693ca826024d67d0f19e4f; CI 35541870705 queued; FIX-005/002/003 + G11 no-promote source repairs",
+      "evidence": "tip b5ef431; CI 35541870705 success; FIX-005/002/003 + G11 no-promote source repairs awaiting lead re-review",
       "review": "not_accepted"
     },
     "G11": {
@@ -260,10 +260,10 @@
     "candidate_commits": 25,
     "candidate_changed_files": 103,
     "latest_verified_ci_run_id": 35541870705,
-    "latest_verified_ci_conclusion": "queued",
-    "console_job_id": 106155435060,
+    "latest_verified_ci_conclusion": "success",
+    "console_job_id": 106160879813,
     "console_conclusion": "success",
-    "offline_job_id": 106155435180,
+    "offline_job_id": 106160879711,
     "offline_conclusion": "success",
     "offline_pytest": "245 passed, 2 skipped",
     "ruff_passed": true,
@@ -271,10 +271,10 @@
     "mypy_source_files": 139,
     "downstream_install_alembic_pytest_executed": true,
     "integration_ci_status": "skipped_honestly_without_SWARM_DATABASE_URL",
-    "live_gated_job_id": 106155435140,
+    "live_gated_job_id": 106160879830,
     "live_gated_job_conclusion": "success_blocked_notice_only",
     "live_acceptance_executed": false,
-    "note": "LEAD-010 repairs pushed; lead re-review required; CI queued; login still Not logged in; SKIP uncleared"
+    "note": "LEAD-010 repairs on b5ef431; CI 35541870705 green; lead re-review required; login Not logged in; SKIP uncleared"
   },
   "implementation_notes": {
     "cursor_tip": "b5ef431aef36212417693ca826024d67d0f19e4f",
@@ -290,7 +290,7 @@
       "G11 auto-promote removed; residual unfamiliar-task multi-surface evidence open",
       "CLI login remains Not logged in; SKIP uncleared"
     ],
-    "ci_run": "35539853498_success",
+    "ci_run": "35541870705_success",
     "g10_review": "LEAD-20260920-010_changes_required"
   }
 }
