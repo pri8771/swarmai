@@ -29,20 +29,39 @@ class MissionRuntime:
         store_dir: Path | None = None,
         model: str = "gemma3:4b",
         max_repair_rounds: int = 2,
+        use_evidence_router: bool = True,
     ) -> None:
         self.repo = repo.resolve()
         self.store = MissionStore(store_dir or (self.repo / "var" / "missions"))
         self.model = model
         self.max_repair_rounds = max_repair_rounds
+        self.use_evidence_router = use_evidence_router
         self.controller = MissionController(inference_slots=2, worker_slots=2)
 
     async def run(self, goal: str) -> MissionRecord:
+        from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
+
         inspection = inspect_repo(self.repo)
         mission = build_software_mission(goal=goal)
         mission = await self.controller.submit_mission(mission)
         proposal = plan_task_graph(mission, inspection)
         await self.controller.propose_graph_change(proposal)
         revision = await self.controller.commit_validated_revision(proposal.proposal_id)
+
+        route_plan = None
+        model_by_family: dict[str, str] = {}
+        if self.use_evidence_router:
+            route_plan = build_mission_route_plan(repo=self.repo)
+            save_route_plan(route_plan, repo=self.repo)
+            model_by_family = {
+                fam: assignment.model
+                for fam, assignment in route_plan.assignments.items()
+            }
+        default_model = (
+            model_by_family.get("implement")
+            or model_by_family.get("inspect")
+            or self.model
+        )
 
         record = MissionRecord(
             mission_id=mission.id,
@@ -57,6 +76,7 @@ class MissionRuntime:
                 "rationale": proposal.rationale_summary,
                 "inspection": inspection.to_dict(),
                 "task_ids": [t.id for t in proposal.task_specs],
+                "route_plan": route_plan.to_dict() if route_plan else None,
             },
             tasks=[
                 {
@@ -66,17 +86,26 @@ class MissionRuntime:
                     "dependency_ids": t.dependency_ids,
                     "status": TaskStatus.READY.value,
                     "ok": None,
+                    "assigned_model": model_by_family.get(t.task_family, default_model),
                 }
                 for t in proposal.task_specs
             ],
             cost={"spend_policy": "zero", "allow_paid": False, "total_usd": 0.0, "requests": 0},
         )
         self.store.append_timeline(
-            record, "mission_started", {"revision": revision, "model": self.model}
+            record,
+            "mission_started",
+            {
+                "revision": revision,
+                "model": default_model,
+                "route_plan": route_plan.to_dict() if route_plan else None,
+            },
         )
         self.store.save(record)
 
-        worker = RepoWorker(self.repo, model=self.model)
+        worker = RepoWorker(
+            self.repo, model=default_model, model_by_family=model_by_family
+        )
         prior: dict[str, WorkerResult] = {}
         shared_wt: WorktreeHandle | None = None
         ledger = CostLedger(spend_policy="zero", allow_paid=False)
@@ -249,6 +278,12 @@ def run_mission(
     repo: Path,
     model: str = "gemma3:4b",
     store_dir: Path | None = None,
+    use_evidence_router: bool = True,
 ) -> MissionRecord:
-    runtime = MissionRuntime(repo, store_dir=store_dir, model=model)
+    runtime = MissionRuntime(
+        repo,
+        store_dir=store_dir,
+        model=model,
+        use_evidence_router=use_evidence_router,
+    )
     return asyncio.run(runtime.run(goal))

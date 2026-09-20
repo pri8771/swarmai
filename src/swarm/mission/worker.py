@@ -98,11 +98,16 @@ class RepoWorker:
         *,
         model: str = "gemma3:4b",
         worktree_root: Path | None = None,
+        model_by_family: dict[str, str] | None = None,
     ) -> None:
         self.repo = repo.resolve()
         self.model = model
+        self.model_by_family = model_by_family or {}
         self.worktree_root = worktree_root
         self.worker_id = new_id("wrk_")
+
+    def _model_for(self, task_family: str) -> str:
+        return self.model_by_family.get(task_family) or self.model
 
     def run_task(
         self,
@@ -186,7 +191,7 @@ class RepoWorker:
                 {"role": "system", "content": "Return only valid Python source for the file."},
                 {"role": "user", "content": prompt},
             ],
-            model=self.model,
+            model=self._model_for("implement"),
             repo_root=self.repo,
         )
         patched = _extract_python_file(inference.text) if inference.ok else None
@@ -290,7 +295,7 @@ class RepoWorker:
                         ),
                     }
                 ],
-                model=self.model,
+                model=self._model_for("review"),
                 max_tokens=120,
                 repo_root=self.repo,
             )

@@ -157,6 +157,20 @@ def main() -> None:
         action="store_true",
         help="Operator asserts route is known-zero cost (required for --mode live)",
     )
+    pcap = providers_sub.add_parser(
+        "capability-report",
+        help="Build live capability registry (auth probes; no paid inference)",
+    )
+    pcap.add_argument(
+        "--no-probe",
+        action="store_true",
+        help="Skip live auth probes; catalog + env presence only",
+    )
+    pcap.add_argument(
+        "--save",
+        action="store_true",
+        help="Persist to var/providers/capability-registry.json",
+    )
 
     sandbox = sub.add_parser("sandbox", help="Sandbox operations")
     sandbox_sub = sandbox.add_subparsers(dest="sandbox_command", required=True)
@@ -196,6 +210,32 @@ def main() -> None:
     )
     erep = ev_sub.add_parser("report", help="Show a qualification run report")
     erep.add_argument("--run", required=True, help="run_id")
+    eq = ev_sub.add_parser(
+        "qualify-live",
+        help="P28: run real multi-model qualification benchmarks (Ollama zero-spend)",
+    )
+    eq.add_argument("--dataset", default="benchmarks/starter.jsonl")
+    eq.add_argument("--max-cases", type=int, default=8)
+    eq.add_argument(
+        "--model",
+        action="append",
+        dest="models",
+        default=None,
+        help="Ollama model id (repeatable). Default: preferred local set.",
+    )
+    eq.add_argument("--max-tokens", type=int, default=600)
+    eq.add_argument("--purpose", default="v0.2_p28_model_qualification")
+    eroute = ev_sub.add_parser(
+        "route",
+        help="P29: build evidence-based mission route plan (planner/worker/verifier)",
+    )
+    eroute.add_argument(
+        "--model",
+        action="append",
+        dest="models",
+        default=None,
+        help="Constrain to these Ollama models (repeatable)",
+    )
 
     demo = sub.add_parser("demo", help="Mock demonstrations")
     demo_sub = demo.add_subparsers(dest="demo_command", required=True)
@@ -292,6 +332,11 @@ def main() -> None:
     mrun.add_argument("--goal", required=True)
     mrun.add_argument("--model", default="gemma3:4b")
     mrun.add_argument(
+        "--no-evidence-router",
+        action="store_true",
+        help="Disable P29 heterogeneous routing (single --model for all tasks)",
+    )
+    mrun.add_argument(
         "--repo",
         type=Path,
         default=None,
@@ -351,6 +396,17 @@ def main() -> None:
             mode=args.mode,
             billing_known_zero=bool(getattr(args, "billing_known_zero", False)),
         )
+    elif args.command == "providers" and args.providers_command == "capability-report":
+        from swarm.providers.capability_registry import (
+            build_capability_registry,
+            save_capability_registry,
+        )
+
+        report = build_capability_registry(probe=not args.no_probe, repo=_repo_root())
+        if args.save:
+            path = save_capability_registry(report, repo=_repo_root())
+            report = {**report, "saved_to": str(path)}
+        print(json.dumps(report, indent=2, default=str))
     elif args.command == "sandbox" and args.sandbox_command == "self-test":
         print(json.dumps(sandbox_self_test(network=args.network), indent=2))
     elif args.command == "capacity" and args.capacity_command == "explain":
@@ -412,6 +468,53 @@ def main() -> None:
             args.run, _repo_root() / "var" / "reports" / "qualification"
         )
         print(json.dumps(data, indent=2))
+    elif args.command == "eval" and args.eval_command == "qualify-live":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.evals.live_benchmark import run_live_benchmarks
+
+        load_repo_dotenv(_repo_root())
+        ds = Path(args.dataset)
+        if not ds.is_absolute():
+            ds = _repo_root() / ds
+        try:
+            report = run_live_benchmarks(
+                repo=_repo_root(),
+                dataset=ds,
+                models=getattr(args, "models", None),
+                max_cases=args.max_cases,
+                max_tokens=args.max_tokens,
+                purpose=args.purpose,
+            )
+        except RuntimeError as exc:
+            print(json.dumps({"error": str(exc)}, indent=2))
+            raise SystemExit(2) from exc
+        summary = {
+            "run_id": report.run_id,
+            "models": report.models,
+            "case_ids": report.case_ids,
+            "trial_count": len(report.trials),
+            "passed": sum(1 for t in report.trials if t.correct),
+            "failed": sum(1 for t in report.trials if not t.correct and not t.error),
+            "errors": sum(1 for t in report.trials if t.error),
+            "total_cost_usd": report.total_cost_usd,
+            "mock_vs_live": report.mock_vs_live,
+            "cells": report.cells,
+            "profiles_summary": report.profiles_summary,
+            "report_hash": report.report_hash,
+        }
+        print(json.dumps(summary, indent=2, default=str))
+    elif args.command == "eval" and args.eval_command == "route":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
+
+        load_repo_dotenv(_repo_root())
+        plan = build_mission_route_plan(
+            repo=_repo_root(), models=getattr(args, "models", None)
+        )
+        path = save_route_plan(plan, repo=_repo_root())
+        payload = plan.to_dict()
+        payload["saved_to"] = str(path)
+        print(json.dumps(payload, indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "dynamic":
         import asyncio
 
@@ -531,7 +634,12 @@ def main() -> None:
 
         load_repo_dotenv(_repo_root())
         repo = Path(args.repo).resolve() if args.repo else _repo_root()
-        record = run_mission(args.goal, repo=repo, model=args.model)
+        record = run_mission(
+            args.goal,
+            repo=repo,
+            model=args.model,
+            use_evidence_router=not getattr(args, "no_evidence_router", False),
+        )
         print(json.dumps(record.to_dict(), indent=2, default=str))
         if record.status != "completed":
             raise SystemExit(2)
