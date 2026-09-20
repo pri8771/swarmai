@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:50:00Z",
+  "updated_at": "2026-09-20T19:54:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -56,9 +56,9 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-005",
+  "last_lead_message_id": "LEAD-20260920-006",
   "last_seen_cursor_message_id": "CURSOR-20260920-001",
-  "last_lead_heartbeat_at": "2026-09-20T19:50:00Z",
+  "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
   "last_cursor_heartbeat_at": "2026-09-20T19:47:48Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -95,11 +95,11 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "in_progress",
+      "status": "tests_verified_partial_remote",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-      "review_status": "pending"
+      "source_sha": "f0280096070854d72858104ed19e7911ed4eed54",
+      "review_status": "lead_partial_review_followups_required"
     },
     {
       "id": "FIX-002",
@@ -187,8 +187,8 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress",
-      "evidence": "CURSOR-20260920-001 reports local ruff reproduction: exit 1 with 33 findings on b9141fa; corroborated by GitHub Actions run 35529361557. No repaired remote candidate yet.",
-      "review": "pending"
+      "evidence": "Draft PR #14 head f0280096 is remotely reviewable. GitHub Actions run 35533664961 passed Ruff, mypy and broad Python offline pytest (211 passed, 2 skipped); DB integration was skipped for missing SWARM_DATABASE_URL and live gates were explicitly not executed. Frontend npm lint/test/build and install/migration evidence remain pending; FIX-002/003/005 defects remain present.",
+      "review": "partial_lead_review_not_accepted"
     },
     "G11": {
       "checkpoint": "1.1",
@@ -234,25 +234,37 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "Worker-reported integration branch cursor/v1.4-live-integration-11e2 is not yet visible in GitHub; no post-authorization repair commit/PR is remotely reviewable",
-    "Current remote main remains b9141fa3150f853586dede0334a47b344571bc16; workflow run 35529361557 fails Ruff before mypy/pytest",
+    "G10 is not accepted: frontend npm lint/test/build and required install/migration/DB integration evidence are not yet complete",
+    "FIX-002 default auth/project/idempotency defects remain present on candidate f0280096",
+    "FIX-003 release verification still contains unsupported hard-coded evidence labels on candidate f0280096",
+    "FIX-005 parser GOOD_FIX/runtime demo dependence remains present on candidate f0280096",
     "Cursor hourly runner and protected-session recovery remain uninstalled/unverified by the lead",
     "Live concurrent provider, qualification, adaptive graph and 24-hour campaign gates remain pending after prerequisite repairs"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T19:50:00Z",
+    "verified_at": "2026-09-20T19:54:00Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-    "open_pr_count": 0,
+    "open_pr_count": 1,
+    "open_candidate_pr": 14,
+    "candidate_branch": "cursor/v1.4-live-integration-11e2",
+    "candidate_sha": "f0280096070854d72858104ed19e7911ed4eed54",
     "cursor_ack_observed": true,
-    "worker_reported_local_integration_branch": "cursor/v1.4-live-integration-11e2",
-    "remote_integration_branch_observed": false,
-    "post_authorization_remote_application_commit_observed": false,
-    "repaired_remote_ci_candidate_observed": false,
-    "latest_verified_ci_run_id": 35529361557,
-    "latest_verified_ci_job_id": 106127102217,
-    "latest_verified_ci_conclusion": "failure",
-    "failed_step": "uv run ruff check .",
-    "downstream_mypy_executed": false,
-    "downstream_pytest_executed": false
+    "remote_integration_branch_observed": true,
+    "post_authorization_remote_application_commit_observed": true,
+    "repaired_remote_ci_candidate_observed": true,
+    "latest_verified_ci_run_id": 35533664961,
+    "latest_verified_ci_offline_job_id": 106138722416,
+    "latest_verified_ci_live_gated_job_id": 106138722542,
+    "latest_verified_ci_conclusion": "success",
+    "ruff_executed": true,
+    "ruff_passed": true,
+    "mypy_executed": true,
+    "mypy_passed": true,
+    "python_offline_pytest_executed": true,
+    "python_offline_pytest_passed": 211,
+    "python_offline_pytest_skipped": 2,
+    "db_integration_executed": false,
+    "frontend_npm_checks_executed_in_remote_ci": false,
+    "live_acceptance_executed": false
   }
 }
