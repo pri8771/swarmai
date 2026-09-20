@@ -1,46 +1,38 @@
 # SwarmAI account inventory (sanitized)
 
-**Generated:** 2026-09-20T15:49:41.153707+00:00
-**Spend policy:** zero (`SWARM_ALLOW_PAID=false`)
-**Standing rule:** Agent uses SwarmAI Chrome to create/copy keys into gitignored `.env`. Escalate only MFA/CAPTCHA/password/consent.
-**V0.1:** `cursor/v0.1-real-mission-runtime` @ `0a0c7e4` (**not merged**)
-**Onboarding branch:** `cursor/v0.1-provider-onboarding`
-**Browser:** system Google Chrome + Playwright persistent profile  
-`~/Library/Application Support/SwarmAI/browser-profile`
+**Generated:** 2026-09-20T16:08:34.588044+00:00
+**Chrome profile:** Default / **Priyansh** (`priyansh.chordia@gmail.com`) — SwarmAI blank profile abandoned
+**Spend:** zero · **V0.2:** not started · **PR #2:** not merged
 
-## Operator claim vs verified
+## Live tab verification (Priyansh Chrome)
 
-Operator believed all accounts logged in. **Verified browser signed-in:** `groq` only.  
-**API keys working:** `openrouter`, `groq`. Remaining core providers require login/SSO.
-
-## Identity
-Observed login hint: `priyansh.chordia@gmail.com` (Cloudflare → Google OAuth). Confirm if this is the preferred SwarmAI identity.
-
-## Browser verification (Playwright, this pass)
-
-| Provider | Browser status | Key in `.env` | Auth / canary |
+| Provider | Signed in | Key in `.env` | Evidence |
 |---|---|---|---|
-| `openrouter` | Google SSO required again | yes | auth OK; free canary `liquid/lfm-2.5-2.6b:free` cost=0 |
-| `groq` | **signed in** (keys UI) | yes (clipboard ingest) | models OK; canary `openai/gpt-oss-20b` OK (no payment error) |
-| `gemini` | Google SSO required | no | blocked |
-| `cloudflare_workers_ai` | Google SSO / password gate | no | blocked |
-| `huggingface_inference` | login required | no | blocked |
-| `nvidia_nim` | login required (not signed in) | no | blocked |
-| `mistral` | login required | no | blocked |
-| `cohere` | login required | no | blocked |
-| `ollama` | n/a | n/a | local zero-spend canaried |
-| `cerebras` | n/a | n/a | payment_gated — leave disabled |
+| `openrouter` | True | True | API Keys | Settings | OpenRouter |
+| `groq` | True | True | API Keys - GroqCloud |
+| `gemini` | True | False | API keys | Google AI Studio |
+| `cloudflare` | True | False; ACCOUNT_ID=yes | dash.cloudflare.com/<account>/home |
+| `huggingface` | True | False | huggingface.co/settings/tokens |
+| `nvidia` | False | False | Try NVIDIA NIM APIs / login marketing — not keys console |
+| `mistral` | True | False | Your API keys - AI Studio - Mistral AI |
+| `cohere` | True | False | API Keys | Cohere |
+| `openai` | True | False | API keys - OpenAI API |
+| `anthropic` | True | False | API keys | Claude Platform |
+| `together` | True | False | together.ai .../api-keys project URL |
+| `fireworks` | partial | False | app.fireworks.ai/onboarding |
+| `deepinfra` | True | False | Dashboard - DeepInfra |
+| `replicate` | True | False | Account settings api-tokens |
 
-## Open handoff (one precise step)
+## Notes
+- `CLOUDFLARE_ACCOUNT_ID` ingested from dashboard URL (not a secret token).
+- OpenRouter + Groq keys already present from earlier clipboard ingest + canaries.
+- Key Create/Copy in live tabs blocked: Chrome **Allow JavaScript from Apple Events** is OFF and Accessibility is denied.
 
-**Complete Google sign-in** (password/MFA) in the SwarmAI Chrome window for `priyansh.chordia@gmail.com`.  
-When finished, reply **`google signed in`**. Agent will then create/copy remaining free keys itself — do not paste secrets in chat.
+## Open handoff (one)
+Enable Chrome **View → Developer → Allow JavaScript from Apple Events**, then reply **`js apple events on`**. Agent will create/copy remaining free keys in existing tabs without closing them. Complete NVIDIA Google sign-in on its tab if still on marketing/login.
 
-## Constraints
-- No V0.2
-- Do not merge PR #2
-- Draft PR #3 updates OK
-- Zero spend
-
-## Private evidence
-`~/Library/Application Support/SwarmAI/account-inventory/` (outside git)
+## MCP (Cursor `~/.cursor/mcp.json`)
+**Added:** openrouter, huggingface, cloudflare-api, cloudflare-docs, groq-compound (launcher).  
+**Preserved:** atlassian, clickup.  
+**Unavailable official:** Mistral/Cohere/NVIDIA/Gemini AI Studio dedicated MCPs.  
+**OAuth still needs operator approval** (OpenRouter may mint spend-capped MCP key — set $0 if prompted).
