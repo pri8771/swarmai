@@ -1,7 +1,7 @@
 # G10 / V1.0 repair — lead accept package
 
 **Status:** worker packages for independent lead review — **not** lead-accepted  
-**Candidate tip:** `6dd568cdfda5b6dd73600915965c1abbf3b9100b`  
+**Candidate tip:** `aa6865a74249e046bfe697532accb00390bb5873`  
 **Prior CI-green tip (docs):** `3c82e0feecb370a6c8cef363ef85cb363407d1d1`  
 **Code tip (LEAD-009 complete):** `108145ea06af8e0ba11a4617f0d21a8e1fea2440`  
 **Draft PR:** https://github.com/pri8771/swarmai/pull/14 (draft; **do not merge**)  
@@ -59,7 +59,7 @@ See [`findings-resolution-matrix.md`](./findings-resolution-matrix.md).
 
 ```bash
 git fetch origin cursor/v1.4-live-integration-11e2
-git checkout 6dd568cdfda5b6dd73600915965c1abbf3b9100b
+git checkout aa6865a74249e046bfe697532accb00390bb5873
 # or review PR https://github.com/pri8771/swarmai/pull/14
 gh run view 35538395519
 uv run ruff check . && uv run mypy src/swarm
