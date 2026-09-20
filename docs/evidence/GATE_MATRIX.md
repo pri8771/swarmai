@@ -2,10 +2,10 @@
 
 Updated: 2026-09-20T22:41:14Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: (pending push of G11 multisurface residual)
+Candidate tip: 
 LEAD-010 repairs tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
-CI: tip `b5ef431…` run `35541870705` **success** (prior); new tip CI pending
+CI: tip `b5ef431…` run `35541870705` **success** (prior); new tip CI pending post-push
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
