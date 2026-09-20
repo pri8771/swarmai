@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T21:17:46Z",
+  "updated_at": "2026-09-20T21:19:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -187,8 +187,8 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "source_closed_awaiting_remote_ci_and_lead",
-      "evidence": "LEAD-009 #1-6 at 108145ea; local CI green; remote pending",
+      "status": "ci_green_awaiting_lead_accept",
+      "evidence": "LEAD-009 #1-6 + CI 35538252435 green; lead accept pending",
       "review": "not_accepted"
     },
     "G11": {
@@ -235,13 +235,12 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "Await remote GitHub Actions green on PR #14 tip 108145ea06af8e0ba11a4617f0d21a8e1fea2440 (local CI mirror green)",
+    "G10 lead acceptance still pending at tip 108145ea06af8e0ba11a4617f0d21a8e1fea2440 despite LEAD-009 #1\u20136 + green CI 35538252435",
     "Cursor unattended agent CLI remains Not logged in; SKIP_CURSOR_PROBE not cleared; scheduler check-ins \u2260 verified worker spawn",
-    "G10 lead acceptance still pending despite LEAD-009 #1\u20136 source closed at tip 108145ea\u2026",
     "G12 remote dual-provider, G13 qualification, G14 live adaptive swarm and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T21:17:46Z",
+    "verified_at": "2026-09-20T21:19:00Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
@@ -249,19 +248,19 @@
     "candidate_sha": "108145ea06af8e0ba11a4617f0d21a8e1fea2440",
     "candidate_commits": 16,
     "candidate_changed_files": 76,
-    "latest_verified_ci_run_id": null,
-    "latest_verified_ci_conclusion": "pending_on_new_tip",
-    "console_job_id": 106147109326,
+    "latest_verified_ci_run_id": 35538252435,
+    "latest_verified_ci_conclusion": "success",
+    "console_job_id": 106151079805,
     "console_conclusion": "success",
-    "offline_job_id": 106147109367,
-    "offline_conclusion": "failure",
+    "offline_job_id": 106151079780,
+    "offline_conclusion": "success",
     "ruff_passed": true,
     "mypy_passed": true,
     "mypy_error": null,
     "downstream_install_alembic_pytest_executed": true,
     "live_gated_job_conclusion": "success_blocked_notice_only",
     "live_acceptance_executed": false,
-    "note": "Local mirror green at tip; remote Actions not yet confirmed for 108145ea"
+    "note": "Remote CI green at tip 108145ea; G10 not yet lead-accepted; CLI login still Not logged in"
   },
   "implementation_notes": {
     "cursor_tip": "108145ea06af8e0ba11a4617f0d21a8e1fea2440",
@@ -277,6 +276,7 @@
       "CLI login still Not logged in \u2014 do not clear SKIP_CURSOR_PROBE"
     ],
     "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes",
-    "lead_009": "items_1_to_6_source_closed_awaiting_remote_ci_and_lead_accept"
+    "lead_009": "items_1_to_6_source_closed_awaiting_remote_ci_and_lead_accept",
+    "ci_run": "35538252435_success"
   }
 }

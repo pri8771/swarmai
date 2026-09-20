@@ -867,8 +867,14 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - Operator: fresh `cursor agent login` with live waiter still running; only after `status`/`whoami` verify may SKIP clear + hourly proofs resume.
 - Lead G10 accept review. Later gates (INF-121 remote, EVAL ≥5/cell, SWARM-141 live, LIVE-142) remain unaccepted and must not substitute for G10.
 
+### CI (post-push)
+- Push run `35538252435` on tip `108145ea…`: **success**
+  - offline: ruff/mypy/packaging/alembic/pytest — success (integration skipped honestly without DSN)
+  - console: lint/test/build — success
+  - live-gated: blocked-notice success (not live product evidence)
+
 ### Blockers
 - **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
-- Remote CI confirmation pending on new tip (local mirror green only so far).
+- G10 lead accept still required (source+CI green ≠ accepted).
 - INF-121 remote dual-provider live-blocked; EVAL underpowered; no merge/spend/launch.
 
