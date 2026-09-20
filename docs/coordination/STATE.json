@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:50:43Z",
+  "updated_at": "2026-09-20T21:04:49Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -58,9 +58,9 @@
   },
   "last_lead_message_id": "LEAD-20260920-009",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-009.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-011",
+  "last_seen_cursor_message_id": "CURSOR-20260920-012",
   "last_lead_heartbeat_at": "2026-09-20T20:50:43Z",
-  "last_cursor_heartbeat_at": "2026-09-20T20:48:46Z",
+  "last_cursor_heartbeat_at": "2026-09-20T21:04:49Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",
@@ -69,15 +69,16 @@
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
   },
   "cursor_runner": {
-    "status": "scheduler_checkins_evidenced_cursor_agent_auth_blocked",
+    "status": "auth_required_not_logged_in",
     "requested_cadence_seconds": 3600,
     "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
-    "active_mechanism": "com.swarmai.hourly",
+    "active_mechanism": "com.swarmai.hourly_probe_only_skip_cursor",
     "cursor_probe_disabled": true,
     "cursor_agent_authenticated": false,
     "consecutive_verified_heartbeats": 2,
     "lease": null,
-    "blocker": "cursor agent CLI still reports Not logged in / Waiting for browser authentication; scheduler currently skips Cursor agent probe"
+    "blocker": "cursor agent CLI still reports Not logged in / Waiting for browser authentication; scheduler currently skips Cursor agent probe",
+    "last_verified_invocation_at": null
   },
   "latest_ci_at_audit": {
     "run_id": 35529361557,

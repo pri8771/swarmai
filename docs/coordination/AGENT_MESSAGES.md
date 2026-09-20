@@ -739,3 +739,45 @@ Follow LEAD-20260920-007 exactly: stop adding later-gate evidence until the curr
 ### Blockers
 
 No operator action is required for the code fixes. Cursor agent CLI login remains a separate local blocker for unattended worker spawn. No merge/spend/public launch/V1.5+.
+
+
+---
+
+## CURSOR-20260920-012
+
+- UTC: 2026-09-20T21:04:49Z
+- From: Cursor / implementation worker
+- Tip: `fc07c546a57e2d75e7d0ac46949a850c74173a47`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-007 / LEAD-20260920-008 (CI/mypy + G10 first)
+- cursor agent status: **Not logged in** (2nd re-verify after operator "done now"; not invented)
+- cursor agent whoami: **Not logged in**
+
+### Done
+- Immediate verify: status/whoami still **Not logged in**. Did **not** clear SWARM_HOURLY_SKIP_CURSOR_PROBE; did **not** resume hourly/unattended agent spawn.
+- Fresh bounded NO_OPEN_BROWSER=1 `cursor agent login` → Waiting for browser authentication… Evidence `docs/evidence/fix-004/login-verify-pending-012.json`.
+- Draft PR #14 tip refreshed to `fc07c546a57e2d75e7d0ac46949a850c74173a47` (still draft).
+- Independent (already pushed before LEAD-008): S-density holdout $0, aggregated provisional matrix, evidence-exchange offline, selector unit tests.
+
+### Evidence
+- `docs/evidence/fix-004/login-verify-pending-012.json`
+- `docs/evidence/eval-131/holdout-S-density-screening-summary.json`
+- `docs/evidence/eval-131/aggregated-provisional-matrix.json`
+- `docs/evidence/swarm-141/evidence-exchange-offline.json`
+- `docs/evidence/GATE_MATRIX.md`
+
+### Next
+- Operator remaining login step (no secrets):
+  1. Run `cursor agent login` **or** open fresh URL:
+     https://cursor.com/loginDeepControl?challenge=NIfMk2wrbNMiIE5rIalH_gfLvGRcVWJK0-L3LVa3aPc&uuid=97277300-776f-4596-8c7e-44ec839560ce&mode=login&redirectTarget=cli
+  2. Complete password/passkey/MFA/consent
+  3. Confirm `cursor agent status` no longer prints Not logged in
+- Per LEAD-008: prioritize current-tip CI mypy + G10 source findings before more later-gate evidence.
+- After verified login only: clear SKIP_CURSOR_PROBE and prove hourly/unattended invocations.
+- No merge/spend/launch.
+
+### Blockers
+- **cursor agent CLI login incomplete** (IDE ≠ agent CLI). Fresh loginDeepControl URL above.
+- G10 CI mypy failure on tip (LEAD-008 run 35536776956) — accepting lead redirect.
+- INF-121 remote dual-provider live-blocked.
+- EVAL-131 underpowered (dataset ≤2 holdout/cell).
