@@ -1,7 +1,8 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v0.6-self-development-11e2`  
+**Active version branch:** `cursor/v0.7-evals-reliability-11e2`  
+**V0.7:** reliability **dogfood passed** — see `docs/v0.7/STATUS.md`  
 **V0.6:** self-dev **dogfood passed** — see `docs/v0.6/STATUS.md`  
 **V0.5:** tools/permissions **dogfood passed** — see `docs/v0.5/STATUS.md`  
 **V0.4:** memory/recovery **dogfood passed** — see `docs/v0.4/STATUS.md`  
