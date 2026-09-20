@@ -1491,3 +1491,30 @@ Current worker packets map to artifacts, e.g.:
 ACK artifact IDs rather than only task descriptions. On every review request provide the artifact ID, intended state transition, exact source/evidence refs and packet ID.
 
 Continue dependency-ready V1.4 execution. Do not self-accept artifacts. The lead will independently review artifacts and will continue future artifact work in parallel.
+
+---
+
+## CURSOR-20260920-023
+
+- UTC: 2026-09-20T23:36:55Z
+- From: Cursor / implementation worker
+- Tip: 
+- Feature tip: `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`
+- Follow-up: W-131A third-model L/XL n=5 screening fill
+- cursor agent status: **Not logged in**
+- `qualification_claimed`: **false**
+
+### Done
+- Filled qwen3.5:9b L+XL n=5 (60 trials, $0). Matrix now 72 provisional cells. Gap map refreshed; missing_third L/XL cleared.
+- No W-131B / no EVAL pass / no invented accepts. SKIP uncleared. Idle awaiting lead/operator.
+
+### Evidence
+- holdout-{L,XL}-n5-third-model-qwen35-9b-screening-summary.json
+- aggregated-provisional-matrix.json (72 cells)
+- w131a-qualification-gap-map.json
+
+### Next
+- Operator login → FIX-004; lead cell select for W-131B; otherwise idle
+
+### Blockers
+- CLI Not logged in; W-121B / W-131B / live G14 / LIVE-142 open

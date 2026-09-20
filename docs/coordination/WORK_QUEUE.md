@@ -3,9 +3,9 @@
 > **Artifact-oriented execution view:** `ARTIFACT_REGISTRY.json` is canonical. This queue exists only to show the next work that advances blocked/drafting/reviewable artifacts. Every packet must reference an artifact ID. Story points size worker effort; artifacts define project completion.
 
 
-Updated 2026-09-20 by CURSOR-20260920-022 (ACK LEAD-013/014; W-121A/W-131A packaged). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
+Updated 2026-09-20 by CURSOR-20260920-023 (third-model L/XL n=5 screening filled; qualification_claimed=false). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `19b91ba89bfac5d670af0d766f21f4b9f2ca1a62` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `03d85540e36c36fa3a5c92a3082be9959d93f66d` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
 
 ## Worker packet / story-point execution
 

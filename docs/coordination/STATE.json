@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T23:28:00Z",
+  "updated_at": "2026-09-20T23:36:55Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -60,9 +60,9 @@
   },
   "last_lead_message_id": "LEAD-20260920-015",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-012.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-022",
+  "last_seen_cursor_message_id": "CURSOR-20260920-023",
   "last_lead_heartbeat_at": "2026-09-20T23:28:00Z",
-  "last_cursor_heartbeat_at": "2026-09-20T23:14:00Z",
+  "last_cursor_heartbeat_at": "2026-09-20T23:36:55Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",
@@ -179,13 +179,13 @@
     {
       "id": "EVAL-131",
       "owner": "Cursor",
-      "status": "criterion_aligned_w131a_gap_map_not_qualified",
+      "status": "third_model_L_XL_screening_filled_not_qualified",
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "484647ce1156a3227d60bb8d990cfd2a6f949bf6",
       "review_status": "not_accepted",
-      "blocker": "W-131A packaged; W-131B n>=15 batches not run; qualification_claimed=false",
-      "evidence": "EVAL_131 protocol + g13/QUALIFICATION_CRITERION.md (LEAD-013 aligned) + w131a-qualification-gap-map.json"
+      "blocker": "screening complete incl third-model L/XL; W-131B n>=15 not run; qualification_claimed=false",
+      "evidence": "72-cell aggregated matrix + w131a gap map; L/XL third-model summaries"
     },
     {
       "id": "SWARM-141",
@@ -230,8 +230,8 @@
     },
     "G13": {
       "checkpoint": "1.3",
-      "status": "criterion_aligned_gap_map_not_qualified",
-      "evidence": "LEAD-013 protocol; W-131A gap map; screening preserved; no qualification volume",
+      "status": "screening_complete_third_model_L_XL_not_qualified",
+      "evidence": "72 provisional n>=5 cells; third-model L/XL filled; qualification_claimed=false",
       "review": "not_accepted"
     },
     "G14": {
@@ -264,18 +264,18 @@
   },
   "open_blockers": [
     "Cursor agent CLI Not logged in; FIX-004 authenticated hourly receipts absent",
-    "G11 LEAD-012 evidence posted — awaiting lead revalidation (not auto-accepted)",
+    "G11 LEAD-012 evidence posted \u2014 awaiting lead revalidation (not auto-accepted)",
     "W-121A: 0 admissible remote routes; W-121B dual remote blocked",
-    "G13 W-131A packaged; W-131B qualification / live G14 / LIVE-142 remain open"
+    "G13 screening complete; W-131B qualification / live G14 / LIVE-142 remain open"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T23:16:30Z",
+    "verified_at": "2026-09-20T23:36:55Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
+    "candidate_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d",
     "latest_verified_ci_run_id": 35543983728,
-    "latest_verified_ci_conclusion": "success",
+    "latest_verified_ci_conclusion": "pending_on_docs_tip_03d8554",
     "offline_job_id": null,
     "offline_conclusion": "success",
     "console_job_id": null,
@@ -289,12 +289,12 @@
     "worker_reported_feature_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
   },
   "implementation_notes": {
-    "cursor_tip": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
+    "cursor_tip": "03d85540e36c36fa3a5c92a3082be9959d93f66d",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead; GitHub CI integration still honestly skipped",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "three real local tasks evidenced; actual browser console + current-tip operational revalidation still required",
     "inf121": "W-121A ledger: 0 admissible remotes; local leg ready; dual remote not claimed",
-    "eval131": "W-131A gap map; criterion LEAD-013 aligned; screening only; qualification_claimed=false",
+    "eval131": "72 provisional cells; third-model L/XL n5 filled; qualification_claimed=false; W-131B not run",
     "swarm141": "offline admission-gated expand/contract prep only",
     "lead_findings": [
       "LEAD-013/014 ACK via CURSOR-022",
