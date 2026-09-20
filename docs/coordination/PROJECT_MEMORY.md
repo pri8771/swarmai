@@ -1,49 +1,51 @@
 # SwarmAI compact project memory
 
-Curated 2026-09-20. Read this, STATE, the execution contract and unread AGENT_MESSAGES; do not reload whole chats. Target <=1,200 words. This stores accepted decisions and source observations, not secrets or proof of unperformed work.
+Curated 2026-09-20 after LEAD-20260920-010. Read this, STATE, V1_4_EXECUTION_CONTRACT and unread/new message pointers; do not reload whole chats. This stores accepted decisions and verified observations, not secrets or proof of unperformed work.
 
-## Current owner authorization
+## Owner authorization and product direction
 
-The owner approved the roadmap direction through V3.0 and authorized IMPLEMENTATION NOW through V1.4 inclusive, targeting real live operation with no known unresolved issues. Execute V1.0 repair -> V1.1 -> V1.2 -> V1.3 -> V1.4 without asking again to start each 0.1. Earlier repair-only/per-0.1 implementation stops are superseded within this tranche.
+Implementation is approved continuously through V1.4 inclusive: V1.0 repair -> V1.1 -> V1.2 -> V1.3 -> V1.4. Do not ask the operator to start each 0.1. Independent evidence review still gates acceptance. Main merge, release/tag/publication, public deployment, new billing/spend, destructive actions and V1.5+ implementation are not authorized. Stop feature work after V1.4.
 
-Read `V1_4_EXECUTION_CONTRACT.md`; start with `START_CURSOR_TO_V1_4.md`. Independent engineering/evidence review still applies. Ready branch work may continue while review waits, but missing review is not acceptance. Main merge, release/tag/publication, public deployment, new billing/spend, destructive actions and V1.5+ implementation are NOT authorized. Final candidate is submitted for lead review and operator merge approval. No new feature work beyond V1.4.
+SwarmAI is a reusable self-hostable elastic problem-solving runtime. Multiple capable planners/reviewers may coordinate smaller task-qualified workers. Approved inference routes should operate concurrently. Agents can propose specialists/splits/alternatives; software enforces permissions, dependencies and resource admission. Ordinary code/tools are first-class. CrewAI is not mandatory. Reuse sound libraries.
 
-Live means real data, inference and tools in a protected local/already-authorized private environment; not public hosting. The quality target is all mandatory gates passed, no known unresolved supported-V1.4 defects and no unexpected application errors in the accepted campaign. No finite test guarantees no future bugs. Expected denials/outages must be handled honestly, not hidden.
+No operational demo data, fake providers/activity, supplied answers, mock-success fallback or quota bypass. Test fixtures may exist only as isolated test/dev fixtures and never count as live proof. The operator prefers zero additional spend; bounded verified-zero-charge live validation is authorized by the V1.4 contract.
 
-## Product direction
+## Verified source and CI
 
-Reusable self-hostable elastic problem-solving swarm, separate from business/household projects. Multiple capable planners/reviewers may work with smaller task-qualified agents. All approved inference routes can run concurrently. Agents propose specialists/splits/alternative approaches; software controls permissions, dependencies and capacity. Dynamic expansion/contraction, not a permanently small fixed team. Ordinary code/tools are first-class. CrewAI is not mandatory.
+Audited main remains `b9141fa3150f853586dede0334a47b344571bc16` (`1.0.0rc1` historical baseline). Draft PR #14 current candidate is `cursor/v1.4-live-integration-11e2` at `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` (25 commits / 103 changed files versus main at lead review).
 
-Reuse good libraries instead of rebuilding execution, providers, storage or browser infrastructure. Empirically test standard task families/sizes; include total planning/repair/review overhead. Load scoped accepted evidence/context, not entire histories. No operational demo data, fake providers/activity, supplied answers or mock-success fallbacks. Keep isolated regression tests, never pass them off as live execution.
+GitHub Actions run `35539853498` is current-tip green for executed CI: console npm install/lint/Vitest/build passed; Ruff passed; mypy passed across 139 source files; package/install check passed; Alembic head `9eb193b10f4e`; broad offline pytest **245 passed, 2 skipped**. CI DB integration is explicitly skipped because `SWARM_DATABASE_URL` is absent; the live-gated job is only a blocked notice, not live acceptance.
 
-Operator preference: zero additional spend; free-cloud coordination where feasible, optional R730/T640/Mac workers/local inference, tested local recovery. Existing resource/model capacity must be verified. No cards/top-ups/paid fallback. Current tranche allows bounded actual free/local validation under the recorded contract envelopes, not unbounded model use or private-data transfer outside approved scopes. Cloud hosting/site recovery is V1.8, not claimed at V1.4.
+Source improvements independently confirmed: normal `create_app()` no longer seeds known demo tokens/fixture catalog by default; demo tokens are loopback-restricted; mission/history idempotency and project isolation improved; provider readiness is fail-closed; parser dogfood is opt-in; failed model output no longer installs GOOD_FIX; normal MissionRuntime supplies a broker; former force-progress scale path is absent from searched current source.
 
-## Verified baseline and current repair evidence
+## G10 review — NOT accepted
 
-Audited main remains `b9141fa3150f853586dede0334a47b344571bc16`, package `1.0.0rc1`. V1 RC PR #12 and status PR #13 were merged; version/merge status is not behavioral proof. The pinned audit `AUDIT_V1_2026-09-20.md` recorded failed CI plus auth, project-isolation, evidence, parser fallback, routing/scale and fixture/runtime gaps. No observed production breach or charge is claimed.
+LEAD-20260920-010 found remaining release blockers:
 
-Cursor has now pushed draft PR #14 through tip `643e38bf3f08e998936aad21bff3cb9a10541f4e`; the newest commit adds denser G13 holdout evidence with substantial repairs and later-gate preparation. Earlier SHAs showed green Python and console CI, local PostgreSQL integration, durable RUN-111 identity/restart/review controls, local broker concurrency/fallback, provisional local evaluation screening and offline swarm graph/load artifacts. However the **current tip is red**: Actions run `35536776956` passes console and Ruff, then fails mypy at `src/swarm/mission/runtime.py:46`, so install/Alembic/offline pytest did not execute on this exact candidate.
+1. **Operational mock contamination:** ProductStore still defaults to `execution_mode="mock"`; `/capacity` builds a mock broker; providers/routes use mock catalog paths; console live snapshot spreads `MOCK_SNAPSHOT`; console defaults to mock and offers “Recover with mock fixtures”; Expand/Contract mutate local fixture state; demo side-effect endpoint ships in normal router. Normal operation must show real empty/unknown/observed state only.
+2. **Worker/approval ownership:** worker and approval list routes expose global stores without project filtering. Approval resolve does not bind to durable approval ownership. Worker ownership/heartbeat must be project-scoped. Add two-project negative tests.
+3. **Release evidence binding:** verifier can pass evidence with no candidate SHA; current test expects that. Behavioral evidence must require exact SHA, command + successful result/exit, mode, timestamp/freshness and relevant config/version identity.
+4. **Bootstrap scoping:** a private bootstrap token no longer has a fixed value, but still gets hard-coded `proj_demo/proj_other` membership. Operational install identity/project mapping must be explicit or generated/persisted; demo project IDs stay fixture-only.
+5. **FIX-004:** scheduler check-ins are evidenced, but `cursor agent status` and `whoami` remain **Not logged in**; unattended Cursor worker spawning is disabled/skipped.
 
-Lead review LEAD-20260920-007 keeps G10 open. Mission auth/project isolation improved and known-answer/force-progress bypasses were removed, but non-mission mutation routes still use legacy bare idempotency and at least worker enrollment reads cache before project auth; optional loopback bootstrap still creates fixed known policy/project tokens; release verification still accepts evidence-file presence without validating SHA/freshness/results; provider registry still guesses zero-spend/readiness/suitability from config/policy/provider identity; and normal `swarm mission run` still invokes the parser-specific dogfood RepoWorker path. FIX-004 scheduled check-ins are evidenced, but actual unattended Cursor worker spawning remains blocked because the agent CLI is not logged in. G11–G14 evidence is implementation/prep only, not accepted.
+G10 remains `changes_required_after_lead_review`. Current CI green does not override these source/integrity blockers.
 
-## Immediate work and gates
+## Later gates
 
-Finish FIX-001 frontend/install/migration/DB checks. Then FIX-002 auth/project isolation/idempotency with fail-before/pass-after tests; FIX-003 truthful evidence/readiness; FIX-004 login/session records and actual hourly runner; FIX-005 remove runtime fixture/known-answer/bypass dependence. Parallelize only distinct ownership, especially overlapping API/store/runtime edits.
+G11/RUN-111: not accepted. Durable identity/restart/review evidence exists, but three unfamiliar tasks still need full execution across two families through console+API+CLI on same IDs. MissionRuntime also auto-copies accepted worktree changes into primary checkout; replace with explicit apply/review boundary.
 
-Then RUN-111/G11 unified generic durable console/API/CLI mission; INF-121/G12 real concurrent remote providers plus local path with broker admission; EVAL-131/G13 measured model/family/size qualification; SWARM-141/G14 real adaptive graph; LIVE-142 final live acceptance. Contract contains specific tests, bounded budgets and a 24-hour observed private operating campaign. Missing live access blocks acceptance, not independent coding. Failed evidence cannot be censored or reclassified to manufacture success.
+G12/INF-121: local-only preparation; required concurrent two-remote-provider mission evidence absent.
 
-Future: 1.5 distributed workers; 1.6 richer scoped knowledge; 1.7 integrated tools/session recovery; 1.8 cloud-first/local site recovery; 1.9 independent beta/self-development; 2.0 accepted elastic product. V3: ongoing multi-mission goals, governed learning and fleet/resource coordination.
+G13/EVAL-131: current screening is S+M × six families × two local models, n=5 = 24 provisional cells / 120 trials. Useful screening only; L/XL, third actual config and preregistered acceptance/uncertainty criterion remain open.
 
-## Coordination
+G14/SWARM-141: offline graph/load prep only; real adaptive multi-planner expansion/contraction absent. LIVE-142 final 12-positive/6-negative/24-hour campaign has not started.
 
-Stable transport: `coordination/swarm-control`, not necessarily latest app source. Work on scoped branches and a dedicated integration branch. ChatGPT leads/independently reviews; Cursor implements/tests. Fetch before reading; preserve dirty work; use current blob SHAs or fast-forward coordination worktrees. Append immutable IDs/ACKs and compact Done/Evidence/Next/Blocked messages. Never invent another agent's reply. Archive acknowledged history with pointers.
+## Immediate work
 
-Existing hourly ChatGPT review checks/writes GitHub but does not launch local Cursor. Cursor runner still requires actual local/entitlement verification; no paid runner is authorized. One scheduled worker with no-overlap lease, bounded resumable invocations and truthful host availability. A sleeping/offline host cannot guarantee hourly work. Actual scheduled heartbeats remain pending until observed.
+Cursor should ACK LEAD-010 and prioritize: remove operational mock/fixture paths; complete worker/approval ownership and install bootstrap scoping; tighten release evidence binding; remove automatic primary-worktree promotion; then push one integrated candidate and rerun full current-tip CI/security regressions. Independent non-conflicting V1.1–V1.4 work may continue, but no gate may be called accepted early.
 
-## Login/session context
+## Coordination and login
 
-Use `../onboarding/PLATFORM_ACCESS.md`. Existing local rule: normal Priyansh/Default Chrome; no Playwright/Selenium/CDP for Google SSO. Prior onboarding reports are historical, not current-session proof. Retain aliases, login methods, safe entry points, profile/secret references and last actual checks in Git. Keep real identities, keys, cookies/browser state, MFA/recovery material and sensitive redirect URLs outside Git.
+`coordination/swarm-control` is message/state transport, not source baseline. ChatGPT leads/reviews; Cursor implements/tests. Use fresh SHAs, isolated worktrees and conflict-safe writes. The lead review automation does not wake local Cursor.
 
-Restore the correct login and return to the intended Apply/dashboard page; ask only for the essential password/passkey/MFA/CAPTCHA/consent step. Wrong account, expired signed URL and IDE-local links differ from normal logout. Opening a form is not submitting it. The owner's exact failed Apply destination has not been reproduced here.
-
-Bots/Claude planning is being handed to a separate conversation; do not absorb those venture codebases into SwarmAI or start their implementation from this tranche.
+Use platform aliases/methods/profile references in Git; keep real identities, keys, cookies/browser state, MFA/recovery data and sensitive return URLs outside Git. Existing Chrome rule: normal Priyansh/Default profile; no Playwright/Selenium/CDP for Google SSO. For Cursor worker auth, the only current human step is completing the fresh `cursor agent login` browser/passkey/MFA/consent flow, then verifying `status` + `whoami` before clearing the skip. No paid cloud automation.
