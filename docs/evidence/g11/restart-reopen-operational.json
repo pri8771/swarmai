@@ -1,0 +1,45 @@
+{
+  "gate": "G11-RUN-111",
+  "scenario": "service_restart_reopen_operational",
+  "recorded_at": "2026-09-20T23:03:39.092554+00:00",
+  "mode": "live_local",
+  "status": "pass",
+  "command": "MissionStore durable reopen after new create_app",
+  "exit_code": 0,
+  "generated_at": "2026-09-20T23:03:39.092554+00:00",
+  "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+  "spend_usd": 0.0,
+  "execution_mode": "operational",
+  "identity": {
+    "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+    "model": "gemma3:4b",
+    "route_id": "rt_ollama_gemma3:4b",
+    "tool_versions": {
+      "swarm_cli": "uv-run",
+      "playwright": "1.x",
+      "pytest": "ci"
+    },
+    "config_version": "g11-lead012-v1",
+    "prompt_version": "lead012-hidden-acceptance-v1",
+    "dataset_version": "unfamiliar-local-only-v1"
+  },
+  "health_ready_live_api": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "reopened_mission_id": "ae48591618fb4157a25682de58f5a112",
+  "disk_status_before": "completed",
+  "reopen_http_status": 200,
+  "reopened_status": "completed",
+  "same_durable_id": true,
+  "g11_lead_accept_invented": false,
+  "note": "Replaces prior mock-mode restart artifact; bound to current tip."
+}

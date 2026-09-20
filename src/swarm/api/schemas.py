@@ -14,6 +14,8 @@ class MissionCreateRequest(StrictModel):
     mission: Mission
     task_family: str | None = None
     required_checks: dict[str, Any] | None = None
+    # Grader-only rules — never shown to workers. Stored on the mission plan.
+    hidden_acceptance: dict[str, Any] | None = None
     idempotency_key: str | None = None
 
 

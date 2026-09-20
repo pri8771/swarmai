@@ -83,6 +83,7 @@ async def create_mission(
         actor=principal.subject,
         task_family=body.task_family,
         required_checks=body.required_checks,
+        hidden_acceptance=body.hidden_acceptance,
     )
     result: dict[str, Any] = {"mission": mission.model_dump(mode="json")}
     if body.task_family:

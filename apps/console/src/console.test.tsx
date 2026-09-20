@@ -233,4 +233,33 @@ describe('operator console UI (live/operational default)', () => {
     expect(screen.queryByTestId('expand-mission')).not.toBeInTheDocument()
     expect(screen.queryByText(/Recover with mock fixtures/i)).not.toBeInTheDocument()
   })
+
+  it('shows live create form when baseUrl is present', async () => {
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '?baseUrl=http://127.0.0.1:18765&token=atk_test',
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        const url = String(input)
+        if (url.endsWith('/v1/capacity')) {
+          return new Response(
+            JSON.stringify({ buckets: [], mock_vs_live: 'operational_empty' }),
+            { status: 200 },
+          )
+        }
+        if (url.endsWith('/v1/missions')) {
+          return new Response(JSON.stringify({ missions: [] }), { status: 200 })
+        }
+        if (url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
+          return new Response(JSON.stringify({ routes: [], workers: [] }), { status: 200 })
+        }
+        return new Response('missing', { status: 404 })
+      }),
+    )
+    render(<App />)
+    expect(await screen.findByTestId('live-create-form')).toBeInTheDocument()
+    expect(screen.getByTestId('live-create-submit')).toBeInTheDocument()
+  })
 })

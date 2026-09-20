@@ -12,3 +12,5 @@
 **Script:** `scripts/g12_local_admission_reconcile_proof.py` (exit 0 locally).
 
 **Post–LEAD-009 #5:** provider registry fail-closed; `_ollama_routable` requires healthy free-eligible probe. Remote overlap waits on verified zero-charge remote auth+capacity (no spend).
+
+**LEAD-012:** [`DUAL_REMOTE_TEST_PLAN.md`](./DUAL_REMOTE_TEST_PLAN.md) prepared; remote dual **not** executed/claimed.

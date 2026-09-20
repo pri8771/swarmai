@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
-import { emptyLiveSnapshot, loadSnapshot, resolveConsoleLoadOpts, scrubSecrets } from './api/client'
+import {
+  createLiveMission,
+  emptyLiveSnapshot,
+  loadSnapshot,
+  resolveConsoleLoadOpts,
+  scrubSecrets,
+} from './api/client'
 import type { ConsoleSnapshot } from './api/types'
 import { Panel } from './components/Panel'
 import { StatusBadge } from './components/StatusBadge'
@@ -28,6 +34,12 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadOpts, setLoadOpts] = useState(() => resolveConsoleLoadOpts())
+  const [createObjective, setCreateObjective] = useState('')
+  const [createFamily, setCreateFamily] = useState('extract')
+  const [createProjectId, setCreateProjectId] = useState('')
+  const [createBusy, setCreateBusy] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [lastCreatedId, setLastCreatedId] = useState<string | null>(null)
 
   const reload = () => {
     const opts = resolveConsoleLoadOpts()
@@ -68,6 +80,40 @@ export default function App() {
       cancelled = true
     }
   }, [])
+
+  const onCreateLiveMission = () => {
+    if (!loadOpts.baseUrl || snap?.mode !== 'live') {
+      setCreateError('Live create requires baseUrl query param and live mode')
+      return
+    }
+    if (!createObjective.trim() || !createProjectId.trim()) {
+      setCreateError('objective and project_id are required')
+      return
+    }
+    setCreateBusy(true)
+    setCreateError(null)
+    createLiveMission({
+      baseUrl: loadOpts.baseUrl,
+      token: loadOpts.token,
+      objective: createObjective.trim(),
+      projectId: createProjectId.trim(),
+      taskFamily: createFamily,
+      requiredChecks: {
+        inference_ok: true,
+        nonempty_output: true,
+        no_known_answer_path: true,
+      },
+    })
+      .then((mission) => {
+        setLastCreatedId(mission.missionId)
+        setCreateObjective('')
+        reload()
+      })
+      .catch((e: unknown) => {
+        setCreateError(e instanceof Error ? e.message : 'create_failed')
+      })
+      .finally(() => setCreateBusy(false))
+  }
 
   if (loading) {
     return (
@@ -152,6 +198,65 @@ export default function App() {
           testId="mission-panel"
         >
           <p className="objective">{snap.mission.objective}</p>
+          {snap.mode === 'live' && loadOpts.baseUrl ? (
+            <div className="live-create" data-testid="live-create-form">
+              <h3>Create durable mission (live)</h3>
+              <label>
+                Project ID
+                <input
+                  data-testid="live-create-project"
+                  value={createProjectId}
+                  onChange={(e) => setCreateProjectId(e.target.value)}
+                  placeholder="proj_install_…"
+                />
+              </label>
+              <label>
+                Task family
+                <select
+                  data-testid="live-create-family"
+                  value={createFamily}
+                  onChange={(e) => setCreateFamily(e.target.value)}
+                >
+                  <option value="extract">extract</option>
+                  <option value="triage">triage</option>
+                  <option value="plan">plan</option>
+                </select>
+              </label>
+              <label>
+                Objective
+                <textarea
+                  data-testid="live-create-objective"
+                  value={createObjective}
+                  onChange={(e) => setCreateObjective(e.target.value)}
+                  rows={3}
+                  placeholder="Unfamiliar task objective…"
+                />
+              </label>
+              <button
+                type="button"
+                data-testid="live-create-submit"
+                disabled={createBusy}
+                onClick={onCreateLiveMission}
+              >
+                {createBusy ? 'Creating…' : 'Create mission'}
+              </button>
+              {createError ? (
+                <p className="muted" data-testid="live-create-error">
+                  {createError}
+                </p>
+              ) : null}
+              {lastCreatedId ? (
+                <p data-testid="live-create-mission-id">
+                  Created mission: <code>{lastCreatedId}</code>
+                </p>
+              ) : null}
+            </div>
+          ) : snap.mode === 'live' ? (
+            <p className="muted" data-testid="live-create-needs-baseurl">
+              Live create needs <code>?baseUrl=</code> (and usually <code>token=</code>) in the
+              console URL.
+            </p>
+          ) : null}
           <dl className="metrics">
             <div>
               <dt>Planning roles</dt>

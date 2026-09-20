@@ -1,20 +1,16 @@
 # G11 / RUN-111 evidence index
 
-**Tip binding:** `ca6d425553420cd9f1be2dd7434c110ec9912eef` (feature `cc64f46cc8e448bb7826f3ca1691f12841bdd13c`)  
+**Tip binding:** pending push (LEAD-012 rerun)  
 **Lead accepted:** no (do not invent)  
 **Spend:** $0 claimed in listed artifacts
 
 | Artifact | Claim | Not claimed |
 |----------|-------|-------------|
-| `run-111/durable-identity-proof.json` | API/CLI share MissionStore IDs | Console browser E2E as sole proof |
-| `run-111/three-missions.json` | 3 unfamiliar objectives across extract+triage; cancel | Full worker execution success (superseded by multisurface) |
-| `run-111/accept-controls.json` | unsupported + wrong-output reject + independent accept | All families through console UI click-path |
-| `run-111/restart-reopen.json` | Service restart reopens durable IDs | Process-kill mid-task recovery |
-| `run-111/local-ollama-mission.json` | Local mission attempt at $0 (may be failed honestly) | Fake success |
-| `run-111/private-console.json` | Loopback console start notes | Public URL |
-| `g11/default-path-not-parser.json` | Default inspect does not auto-select parser dogfood | — |
-| `g11/multisurface-three-tasks.json` | **Residual closed:** 3 unfamiliar extract+triage tasks; console-shaped create + API execute + CLI execute/report on same durable IDs; real Ollama; honest pass; $0 | G10 lead accept; browser Playwright E2E; paid providers |
+| `g11/browser-console-create.json` | **Actual Chromium console UI create** + API/CLI observe same durable ID | G11 lead accept |
+| `g11/hidden-acceptance-three-tasks.json` | 3 unfamiliar extract+triage with **hidden** deterministic acceptance; API+CLI; operational; $0 | Plausible-empty keyword pass |
+| `g11/controls-operational.json` | unsupported + wrong-output reject + cancel in operational mode | — |
+| `g11/restart-reopen-operational.json` | Durable reopen after new app instance; operational; tip-bound | Prior mock-mode restart artifact |
+| `g11/multisurface-three-tasks.json` | Prior residual console-shaped create (superseded for accept by browser+hidden) | Browser E2E (see browser-console-create) |
+| `run-111/*` | Historical prep; restart artifact was mock-mode — **not** final accept evidence | Final G11 accept |
 
-**Post–LEAD-009:** normal `swarm mission run` no longer hard-wires parser dogfood (`parser_dogfood_fixture` default false). Selfdev / `--fixture-parser-dogfood` remain explicit fixture paths.
-
-**Post–LEAD-010 residual:** three unfamiliar tasks fully executed across extract+triage via console create shape + API + CLI on same IDs — evidenced in `multisurface-three-tasks.json` (3/3 completed, $0, `invented_success: false`). G10 lead accept still **not** invented.
+**LEAD-012:** G11 still **not** lead-accepted by this worker packaging. Hidden acceptance grades `output_excerpt`; worker never receives grader answer strings.

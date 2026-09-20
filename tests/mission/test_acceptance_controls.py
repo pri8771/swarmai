@@ -46,6 +46,67 @@ def test_review_accepts_only_when_checks_match() -> None:
     assert decision.accepted is True
 
 
+def test_hidden_acceptance_rejects_plausible_wrong_output() -> None:
+    """LEAD-012: nonempty/keyword-looking output must fail without hidden facts."""
+    decision = review_attempt(
+        produced={
+            "checks": {
+                "inference_ok": True,
+                "nonempty_output": True,
+                "no_known_answer_path": True,
+            },
+            "output_excerpt": "Here is a plausible generic JSON: {\"note\": \"nothing useful\"}",
+        },
+        required_checks={
+            "inference_ok": True,
+            "nonempty_output": True,
+            "no_known_answer_path": True,
+        },
+        hidden_acceptance={
+            "must_contain_all": ["Acme Nordics", "SEK"],
+            "must_contain_any": ["450", "1200"],
+            "min_output_chars": 40,
+            "forbid_substrings": ["KNOWN_ANSWER_LEAK"],
+        },
+    )
+    assert decision.accepted is False
+    assert any(r.startswith("hidden_failed:") for r in decision.reasons)
+
+
+def test_hidden_acceptance_passes_when_output_contains_required_facts() -> None:
+    decision = review_attempt(
+        produced={
+            "checks": {"inference_ok": True, "nonempty_output": True},
+            "output_excerpt": (
+                '{"vendor":"Acme Nordics AB","currency":"SEK","line_totals":[450,1200]}'
+            ),
+        },
+        required_checks={"inference_ok": True, "nonempty_output": True},
+        hidden_acceptance={
+            "must_contain_all": ["Acme Nordics", "SEK"],
+            "must_contain_any": ["450", "1200"],
+            "required_json_keys": ["vendor", "currency"],
+            "min_output_chars": 20,
+        },
+    )
+    assert decision.accepted is True
+    assert decision.checks.get("hidden:must_contain_all") is True
+
+
+def test_worker_never_needs_hidden_keys_in_produced_checks() -> None:
+    """Hidden rules grade output_excerpt only — worker checks stay structural."""
+    decision = review_attempt(
+        produced={
+            "checks": {"inference_ok": True},
+            "output_excerpt": "Acme Nordics paid 450 SEK",
+        },
+        required_checks={"inference_ok": True},
+        hidden_acceptance={"must_contain_all": ["Acme Nordics", "SEK", "450"]},
+    )
+    assert decision.accepted is True
+    assert "Acme Nordics" not in str(decision.checks)  # facts not echoed as check ids
+
+
 @pytest.mark.asyncio
 async def test_unsupported_family_persists_failed_honest(tmp_path: Path) -> None:
     store = ProductStore(repo_root=tmp_path)

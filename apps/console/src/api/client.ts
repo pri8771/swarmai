@@ -95,6 +95,7 @@ export async function createLiveMission(opts: {
   projectId: string
   taskFamily?: string
   requiredChecks?: Record<string, boolean>
+  hiddenAcceptance?: Record<string, unknown>
 }): Promise<MissionGraph> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -117,6 +118,7 @@ export async function createLiveMission(opts: {
   }
   if (opts.taskFamily) body.task_family = opts.taskFamily
   if (opts.requiredChecks) body.required_checks = opts.requiredChecks
+  if (opts.hiddenAcceptance) body.hidden_acceptance = opts.hiddenAcceptance
   const res = await fetch(`${opts.baseUrl}/v1/missions`, {
     method: 'POST',
     headers,

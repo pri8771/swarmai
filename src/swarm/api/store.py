@@ -402,6 +402,7 @@ class ProductStore:
         actor: str,
         task_family: str | None = None,
         required_checks: dict[str, Any] | None = None,
+        hidden_acceptance: dict[str, Any] | None = None,
     ) -> Mission:
         from swarm.mission.acceptance import classify_task_support
 
@@ -420,6 +421,9 @@ class ProductStore:
             plan["support"] = support.to_dict()
         if required_checks:
             plan["required_checks"] = dict(required_checks)
+        if hidden_acceptance:
+            # Stored for independent review only — never returned to worker prompts.
+            plan["hidden_acceptance"] = dict(hidden_acceptance)
         record.plan = plan
         if task_family and not support.supported:
             record.result = {
@@ -468,10 +472,12 @@ class ProductStore:
         record = self.mission_store().load(mission_id)
         plan_checks = (record.plan or {}).get("required_checks")
         checks = required_checks if required_checks is not None else plan_checks
+        hidden = (record.plan or {}).get("hidden_acceptance")
         decision = review_attempt(
             produced=produced,
             required_checks=checks if isinstance(checks, dict) else None,
             force_wrong=force_wrong,
+            hidden_acceptance=hidden if isinstance(hidden, dict) else None,
         )
         record.validation = {
             **(record.validation or {}),
@@ -639,12 +645,15 @@ class ProductStore:
 
         checks = (result.artifacts or {}).get("checks") or {}
         required = (record.plan or {}).get("required_checks")
+        hidden = (record.plan or {}).get("hidden_acceptance")
         review = review_attempt(
             produced={
                 "checks": checks,
                 "unsupported": bool((result.artifacts or {}).get("unsupported")),
+                "output_excerpt": (result.artifacts or {}).get("output_excerpt") or "",
             },
             required_checks=required if isinstance(required, dict) else None,
+            hidden_acceptance=hidden if isinstance(hidden, dict) else None,
         )
 
         record.tasks = [

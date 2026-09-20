@@ -1,21 +1,20 @@
 # V1.4 gate matrix (worker view — not lead acceptance)
 
-Updated: 2026-09-20T22:52:15Z
+Updated: 2026-09-20T23:04:30Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: `a17ae17e430831eb23d2fafc871244c096ca275d`
-Prior green tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
-LEAD-010 repairs tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
-LEAD-011 ACK pending: FIX-003 evidence-kind identity + G12/G14 local packaging
+Candidate tip: pending push (LEAD-012 packaging)
+Prior tip: `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`
+LEAD-012: G10 source/CI lead-verified; FIX-004 login remains; G11 evidence revalidation in progress
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
-CI: tip `a17ae17…` run `35542951933` **success**; tip `6669d37…` run `35543012288` **success** (docs bind)
+CI: prior tip `c1ebf20…` run `35543156880` **success**; new tip CI pending
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
-| G10 | FIX-001–005 | LEAD-010 + LEAD-011 FIX-003 identity | [`g10/LEAD_ACCEPT_PACKAGE.md`](./g10/LEAD_ACCEPT_PACKAGE.md) | **no** | Identity groups + negatives; FIX-004 login still open |
-| G11 | RUN-111 | yes + residual execute path | [`g11/multisurface-three-tasks.json`](./g11/multisurface-three-tasks.json) | **no** | 3 unfamiliar extract+triage; console/API/CLI same IDs; $0 |
-| G12 | INF-121 | partial local | concurrent + kill-fallback + admission-reconcile | **no** | Remote dual live-blocked |
-| G13 | EVAL-131 | screening paused | S/M/L/XL dual + third model; 60 cells n≥5 $0 | **no** | Provisional; not qualified |
-| G14 | SWARM-141 | prep | offline graph/scale/elastic + admission-gated expand | **no** | Live multi-planner not claimed |
+| G10 | FIX-001–005 | yes (LEAD-012 verified source) | package + CI | **no** | Only FIX-004 authenticated hourly receipts remain |
+| G11 | RUN-111 | yes | browser create + hidden acceptance + controls + restart | **no** | LEAD-012 rerun; not invented accepted |
+| G12 | INF-121 | local + dual-remote **plan** | local admission artifacts | **no** | Remote dual not executed |
+| G13 | EVAL-131 | criterion preregistered | prior 60-cell screening preserved | **no** | Not qualified; no new volume |
+| G14 | SWARM-141 | offline prep | admission-gated expand offline | **no** | Live multi-planner not claimed |
 | G14f | LIVE-142 | not started | — | **no** | |
 
 Rules: no invented passes; missing live capacity = live-blocked.  
