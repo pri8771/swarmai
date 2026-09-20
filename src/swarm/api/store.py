@@ -18,6 +18,7 @@ from swarm.contracts.provider import ProviderAccount, RouteSnapshot
 from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
 from swarm.controller.mission import MissionController
 from swarm.evals.profiles import ProfileStore
+from swarm.mission.store import MissionRecord, MissionStore
 from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
 from swarm.product.history import HistoryIndex
 from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
@@ -65,6 +66,7 @@ class ProductStore:
     providers_network: bool = False
     repo_root: Path | None = None
     _project_store: ProjectStore | None = field(default=None, repr=False)
+    _mission_store: MissionStore | None = field(default=None, repr=False)
 
     def project_store(self) -> ProjectStore:
         if self._project_store is None:
@@ -72,14 +74,82 @@ class ProductStore:
             self._project_store = ProjectStore(root)
         return self._project_store
 
+    def mission_store(self) -> MissionStore:
+        """Durable mission identity shared by API / CLI / console reopen paths."""
+        if self._mission_store is None:
+            root = (self.repo_root or Path.cwd()) / "var" / "missions"
+            self._mission_store = MissionStore(root)
+        return self._mission_store
+
     def history_index(self) -> HistoryIndex:
         return HistoryIndex(self.repo_root or Path.cwd())
 
+    def _persist_mission_record(
+        self, mission: Mission, *, source: str = "api"
+    ) -> MissionRecord:
+        store = self.mission_store()
+        existing: MissionRecord | None = None
+        path = store._path(mission.id)
+        if path.exists():
+            try:
+                existing = store.load(mission.id)
+            except (OSError, TypeError, KeyError, ValueError):
+                existing = None
+        now = utc_now().isoformat()
+        record = MissionRecord(
+            mission_id=mission.id,
+            goal=mission.objective,
+            status=mission.status.value,
+            created_at=existing.created_at if existing else now,
+            updated_at=now,
+            revision=mission.revision,
+            project_id=mission.project_id,
+            source=source,
+            contract=mission.model_dump(mode="json"),
+            plan=existing.plan if existing else {"project_id": mission.project_id},
+            tasks=existing.tasks if existing else [],
+            timeline=existing.timeline if existing else [],
+            agents=existing.agents if existing else [],
+            artifacts=existing.artifacts if existing else {},
+            validation=existing.validation if existing else {},
+            retries=existing.retries if existing else [],
+            model_assignments=existing.model_assignments if existing else [],
+            cost=existing.cost if existing else {},
+            result=existing.result if existing else {},
+        )
+        if existing is None:
+            store.append_timeline(
+                record,
+                "mission.created",
+                {"source": source, "status": mission.status.value},
+            )
+        store.save(record)
+        return record
+
+    def _hydrate_mission_from_store(self, mission_id: str) -> Mission | None:
+        path = self.mission_store()._path(mission_id)
+        if not path.exists():
+            return None
+        try:
+            record = self.mission_store().load(mission_id)
+        except (OSError, TypeError, KeyError, ValueError):
+            return None
+        if record.contract:
+            try:
+                mission = Mission.model_validate(record.contract)
+            except (TypeError, ValueError, KeyError):
+                return None
+            self.controller.missions[mission.id] = mission
+            return mission
+        return None
+
     def list_public_missions(self, *, project_id: str | None = None) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
+        seen: set[str] = set()
         for mission in self.controller.missions.values():
             if project_id and mission.project_id != project_id:
                 continue
+            seen.add(mission.id)
             rows.append(
                 strip_internal(
                     scrub_config(
@@ -89,17 +159,50 @@ class ProductStore:
                             "status": mission.status.value,
                             "objective": mission.objective,
                             "revision": mission.revision,
+                            "source": "api_controller",
                         }
                     )
                 )
             )
-        # Merge file-backed history for reopenable missions.
+        # Durable MissionStore is the shared identity across API/CLI/console.
+        try:
+            for entry in self.mission_store().list_missions():
+                mid = str(entry.get("mission_id") or "")
+                if not mid or mid in seen:
+                    continue
+                try:
+                    record = self.mission_store().load(mid)
+                except (OSError, TypeError, KeyError, ValueError):
+                    continue
+                rec_project = record.project_id or (record.plan or {}).get("project_id")
+                if project_id and rec_project != project_id:
+                    continue
+                seen.add(mid)
+                rows.append(
+                    strip_internal(
+                        scrub_config(
+                            {
+                                "mission_id": mid,
+                                "project_id": rec_project,
+                                "status": record.status,
+                                "objective": record.goal,
+                                "revision": record.revision,
+                                "source": record.source or "mission_store",
+                            }
+                        )
+                    )
+                )
+        except OSError:
+            pass
+        # Merge history index for reopenable missions not already listed.
         try:
             for entry in self.history_index().load_index():
                 if project_id and entry.get("project_id") != project_id:
                     continue
-                if any(r["mission_id"] == entry.get("mission_id") for r in rows):
+                mid = str(entry.get("mission_id") or "")
+                if not mid or mid in seen:
                     continue
+                seen.add(mid)
                 rows.append(strip_internal(scrub_config(entry)))
         except OSError:
             pass
@@ -121,7 +224,9 @@ class ProductStore:
         return public_product_contract()
 
     def mission_report(self, mission_id: str) -> dict[str, Any]:
-        # Prefer live controller mission; fall back to history reopen.
+        # Prefer live controller mission; hydrate durable store; then history.
+        if mission_id not in self.controller.missions:
+            self._hydrate_mission_from_store(mission_id)
         if mission_id in self.controller.missions:
             mission = self.controller.missions[mission_id]
             graph = self.graph_view(mission_id)
@@ -266,6 +371,7 @@ class ProductStore:
 
     async def create_mission(self, mission: Mission, *, actor: str) -> Mission:
         created = await self.controller.submit_mission(mission)
+        self._persist_mission_record(created, source="api")
         self.publish(
             project_id=created.project_id,
             type="mission.created",
@@ -278,6 +384,8 @@ class ProductStore:
 
     def get_mission(self, mission_id: str) -> Mission:
         mission = self.controller.missions.get(mission_id)
+        if mission is None:
+            mission = self._hydrate_mission_from_store(mission_id)
         if mission is None:
             raise ApiError("not_found", "mission not found", status_code=404)
         return mission
@@ -300,6 +408,14 @@ class ProductStore:
             self.controller.tasks[mission_id][tid] = task.model_copy(
                 update={"status": TaskStatus.CANCELLED}
             )
+        self._persist_mission_record(updated, source="api")
+        cancelled_record = self.mission_store().load(mission_id)
+        self.mission_store().append_timeline(
+            cancelled_record,
+            "mission.cancelled",
+            {"actor": actor, "cancellation_generation": updated.cancellation_generation},
+        )
+        self.mission_store().save(cancelled_record)
         self.publish(
             project_id=updated.project_id,
             type="mission.cancelled",
