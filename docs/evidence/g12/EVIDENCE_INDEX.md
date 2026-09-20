@@ -14,3 +14,5 @@
 **Post–LEAD-009 #5:** provider registry fail-closed; `_ollama_routable` requires healthy free-eligible probe. Remote overlap waits on verified zero-charge remote auth+capacity (no spend).
 
 **LEAD-012:** [`DUAL_REMOTE_TEST_PLAN.md`](./DUAL_REMOTE_TEST_PLAN.md) prepared; remote dual **not** executed/claimed.
+
+**W-121A:** [`../inf-121/w121a-remote-eligibility-ledger.json`](../inf-121/w121a-remote-eligibility-ledger.json) — metadata-only inspect + stale historical canary review; **0 admissible remote routes**; local Ollama leg ready; W-121B dual-remote overlap remains blocked. No spend / no invented eligibility.

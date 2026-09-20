@@ -1,0 +1,1155 @@
+{
+  "packet_id": "W-131A",
+  "gate": "EVAL-131",
+  "protocol_ref": "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
+  "protocol_version": "1.0",
+  "recorded_at": "2026-09-20T23:11:58.100039+00:00",
+  "candidate_docs_tip_sha": "724a324b77d60fff143674feecec9239062e9c3c",
+  "feature_tip_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+  "source_matrix": "docs/evidence/eval-131/aggregated-provisional-matrix.json",
+  "qualification_claimed": false,
+  "qualification_volume_executed": false,
+  "n_ge_15_qualification_batches_executed": false,
+  "n_ge_30_invented": false,
+  "required_product_families": [
+    "coding",
+    "planning",
+    "reasoning",
+    "extraction"
+  ],
+  "required_sizes": [
+    "S",
+    "M",
+    "L",
+    "XL"
+  ],
+  "required_model_configurations_min": 3,
+  "models_observed_local": [
+    "gemma3:4b",
+    "qwen3.5:4b",
+    "qwen3.5:9b"
+  ],
+  "three_model_configs_present_on_S_M": true,
+  "three_model_configs_complete_on_L_XL": false,
+  "screening_rule": {
+    "held_out_min_n": 5,
+    "state": "provisional_never_qualified"
+  },
+  "qualification_rule": {
+    "min_n": 15,
+    "max_n": 60,
+    "batch_size": 5,
+    "wilson": "one_sided_90_percent_lower_bound_ge_0.80",
+    "note": "Aligns to LEAD-013 / EVAL_131_QUALIFICATION_PROTOCOL.md; supersedes prior draft n>=30 / Wilson95>=0.70 wording in g13/QUALIFICATION_CRITERION.md"
+  },
+  "family_size_coverage": [
+    {
+      "family": "coding",
+      "size": "S",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 4292.83,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 2,
+          "pass_rate": 0.4,
+          "wilson_lower_onesided_90": 0.11761823115925325,
+          "latency_ms_p50": 1334.11,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 2,
+          "pass_rate": 0.4,
+          "wilson_lower_onesided_90": 0.11761823115925325,
+          "latency_ms_p50": 2472.74,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "coding",
+      "size": "M",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 3824.15,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 5325.21,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 1,
+          "pass_rate": 0.2,
+          "wilson_lower_onesided_90": 0.036223160969787456,
+          "latency_ms_p50": 1548.25,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "coding",
+      "size": "L",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 4845.6,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 2255.45,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "coding",
+      "size": "XL",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 7528.85,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 4346.86,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "planning",
+      "size": "S",
+      "screening_routes": [
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 658.85,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 1162.54,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 1599.21,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "planning",
+      "size": "M",
+      "screening_routes": [
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 1403.58,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 2740.58,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 3929.3,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "planning",
+      "size": "L",
+      "screening_routes": [
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 3124.32,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 7150.35,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "planning",
+      "size": "XL",
+      "screening_routes": [
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 6656.28,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 12958.15,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "reasoning",
+      "size": "S",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 3391.93,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 4632.6,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 3,
+          "pass_rate": 0.6,
+          "wilson_lower_onesided_90": 0.23071993220883702,
+          "latency_ms_p50": 1558.3,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "reasoning",
+      "size": "M",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 6282.0,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 9074.18,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 2,
+          "pass_rate": 0.4,
+          "wilson_lower_onesided_90": 0.11761823115925325,
+          "latency_ms_p50": 2590.86,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "reasoning",
+      "size": "L",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 14527.42,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 9033.33,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "reasoning",
+      "size": "XL",
+      "screening_routes": [
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 12407.55,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 19802.55,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "extraction",
+      "size": "S",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 902.76,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 3,
+          "pass_rate": 0.6,
+          "wilson_lower_onesided_90": 0.23071993220883702,
+          "latency_ms_p50": 1438.2,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 1209.66,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "extraction",
+      "size": "M",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 4,
+          "pass_rate": 0.8,
+          "wilson_lower_onesided_90": 0.37552826411853885,
+          "latency_ms_p50": 2234.34,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "sample_count": 5,
+          "pass_count": 3,
+          "pass_rate": 0.6,
+          "wilson_lower_onesided_90": 0.23071993220883702,
+          "latency_ms_p50": 4811.37,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 2707.36,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": true
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 5,
+          "pass_rate": 1.0,
+          "wilson_lower_onesided_90": 0.565508505247919,
+          "latency_ms_p50": 4828.21,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 6703.56,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "screening_routes": [
+        {
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 8469.83,
+          "state": "provisional",
+          "qualification": false
+        },
+        {
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "sample_count": 5,
+          "pass_count": 0,
+          "pass_rate": 0.0,
+          "wilson_lower_onesided_90": 0.0,
+          "latency_ms_p50": 9988.84,
+          "state": "provisional",
+          "qualification": false
+        }
+      ],
+      "screening_n_ge_5_complete": true,
+      "third_model_screening_present": false
+    }
+  ],
+  "strongest_candidate_per_family_size": [
+    {
+      "family": "coding",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "coding",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "coding",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "wilson_lower_onesided_90": 0.37552826411853885,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "coding",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "planning",
+      "size": "S",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "planning",
+      "size": "M",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "planning",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "planning",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "reasoning",
+      "size": "S",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "reasoning",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "reasoning",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "wilson_lower_onesided_90": 0.37552826411853885,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "reasoning",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower_onesided_90": 0.0,
+      "priority_for_qualification_batch": false,
+      "note": "weak screening \u2014 do not prioritize W-131B until alternate route/screening improves or lead selects"
+    },
+    {
+      "family": "extraction",
+      "size": "S",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "wilson_lower_onesided_90": 0.37552826411853885,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "extraction",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "wilson_lower_onesided_90": 0.37552826411853885,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "wilson_lower_onesided_90": 0.565508505247919,
+      "priority_for_qualification_batch": true,
+      "note": "strongest provisional screening candidate; still underpowered for qualification (n=5 Wilson LB < 0.80)"
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower_onesided_90": 0.0,
+      "priority_for_qualification_batch": false,
+      "note": "weak screening \u2014 do not prioritize W-131B until alternate route/screening improves or lead selects"
+    }
+  ],
+  "missing_third_model_L_XL_screening": [
+    {
+      "family": "coding",
+      "size": "L",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "coding",
+      "size": "XL",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "planning",
+      "size": "L",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "planning",
+      "size": "XL",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "reasoning",
+      "size": "L",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "reasoning",
+      "size": "XL",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "gap": "missing_n5_screening",
+      "packet_class": "W-131A_followup_screening",
+      "status": "identified_not_executed",
+      "spend_usd_planned": 0.0
+    }
+  ],
+  "reviewer_role_gaps": [
+    {
+      "role": "reviewer",
+      "size": "S",
+      "screening_present": true,
+      "best_model": "qwen3.5:9b",
+      "best_pass_rate": 0.2,
+      "best_wilson_lower_onesided_90": 0.036223160969787456,
+      "assessment": "weak_review_screening_not_promotable; W-131C reviewer benchmark calibration required before held-out reviewer qualification"
+    },
+    {
+      "role": "reviewer",
+      "size": "M",
+      "screening_present": true,
+      "best_model": "gemma3:4b",
+      "best_pass_rate": 0.0,
+      "best_wilson_lower_onesided_90": 0.0,
+      "assessment": "weak_review_screening_not_promotable; W-131C reviewer benchmark calibration required before held-out reviewer qualification"
+    },
+    {
+      "role": "reviewer",
+      "size": "L",
+      "screening_present": true,
+      "best_model": "gemma3:4b",
+      "best_pass_rate": 0.0,
+      "best_wilson_lower_onesided_90": 0.0,
+      "assessment": "weak_review_screening_not_promotable; W-131C reviewer benchmark calibration required before held-out reviewer qualification"
+    },
+    {
+      "role": "reviewer",
+      "size": "XL",
+      "screening_present": true,
+      "best_model": "gemma3:4b",
+      "best_pass_rate": 0.0,
+      "best_wilson_lower_onesided_90": 0.0,
+      "assessment": "weak_review_screening_not_promotable; W-131C reviewer benchmark calibration required before held-out reviewer qualification"
+    }
+  ],
+  "next_sample_batches_under_frozen_protocol": [
+    {
+      "packet_class": "W-131B",
+      "family": "coding",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "coding",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "coding",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "coding",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "planning",
+      "size": "S",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "planning",
+      "size": "M",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "planning",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "planning",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "reasoning",
+      "size": "S",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "reasoning",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "reasoning",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "extraction",
+      "size": "S",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "extraction",
+      "size": "M",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    },
+    {
+      "packet_class": "W-131B",
+      "family": "extraction",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "batch_size": 5,
+      "current_n": 5,
+      "target_n_after_batch": 10,
+      "min_n_for_qualification": 15,
+      "criterion": "one_sided_wilson_90_lb_ge_0.80",
+      "status": "planned_not_executed",
+      "spend_usd_planned": 0.0,
+      "mode": "local_ollama_zero_cost"
+    }
+  ],
+  "explicitly_not_done": [
+    "W-131B qualification volume",
+    "n>=15 or n>=30 qualification claims",
+    "reviewer held-out qualification",
+    "G13 lead accept"
+  ],
+  "summary": {
+    "required_family_size_cells": 16,
+    "required_family_size_with_any_n5_screening": 16,
+    "strong_candidates_pass_rate_ge_0_8": 14,
+    "weak_family_size_cells": 2,
+    "missing_third_model_L_XL_cells": 8,
+    "planned_w131b_batches_not_executed": 14
+  }
+}
