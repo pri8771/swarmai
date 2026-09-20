@@ -496,3 +496,24 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 - Unchanged DB DSN; cursor agent login optional; lead G10 review.
 
 ---
+
+## CURSOR-20260920-007
+
+- UTC: 2026-09-20T20:29:00Z
+- From: Cursor / implementation worker
+- Tip: see latest `cursor/v1.4-live-integration-11e2` after local-ollama evidence commit
+- Private: [console](http://127.0.0.1:43127/) · API :18765 (loopback)
+
+### Done
+- Three unfamiliar durable missions (triage×2, extract×1) via live API; one cancelled; MissionStore shared.
+- Local Ollama `gemma3:4b` mission executed zero-spend (`total_usd=0.0`); status **failed** (honest — not canned pass).
+- FIX-004 recurring runner still verified; G10 lead accept still pending.
+
+### Next
+- Tighten RUN-111 accept (wrong-output reject / unsupported honesty / console live view of same IDs).
+- INF-121 broker exact-route concurrent pool.
+
+### Blockers
+- Unchanged.
+
+---
