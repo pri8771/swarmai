@@ -328,6 +328,12 @@ def main() -> None:
     mission_sub = mission.add_subparsers(dest="mission_command", required=True)
     mplan = mission_sub.add_parser("plan", help="Inspect repo and emit structured task graph")
     mplan.add_argument("--goal", required=True)
+    mplan.add_argument(
+        "--dynamic",
+        action="store_true",
+        help="P32: form dynamic subteams (supervisor/specialists/workers/reviewers)",
+    )
+    mplan.add_argument("--max-agents", type=int, default=32)
     mrun = mission_sub.add_parser("run", help="Execute a real software mission end-to-end")
     mrun.add_argument("--goal", required=True)
     mrun.add_argument("--model", default="gemma3:4b")
@@ -616,18 +622,39 @@ def main() -> None:
         repo = _repo_root()
         inspection = inspect_repo(repo)
         mission_obj = build_software_mission(goal=args.goal)
-        proposal = plan_task_graph(mission_obj, inspection)
-        print(
-            json.dumps(
-                {
-                    "mission_id": mission_obj.id,
-                    "inspection": inspection.to_dict(),
-                    "proposal": json.loads(serialize_plan(proposal)),
-                },
-                indent=2,
-                default=str,
+        if getattr(args, "dynamic", False):
+            from swarm.mission.teams import plan_dynamic_task_graph
+
+            proposal, team = plan_dynamic_task_graph(
+                mission_obj, inspection, max_agents=args.max_agents
             )
-        )
+            print(
+                json.dumps(
+                    {
+                        "mission_id": mission_obj.id,
+                        "mode": "dynamic_team",
+                        "team": team.to_dict(),
+                        "inspection": inspection.to_dict(),
+                        "proposal": json.loads(serialize_plan(proposal)),
+                    },
+                    indent=2,
+                    default=str,
+                )
+            )
+        else:
+            proposal = plan_task_graph(mission_obj, inspection)
+            print(
+                json.dumps(
+                    {
+                        "mission_id": mission_obj.id,
+                        "mode": "fixed_crew",
+                        "inspection": inspection.to_dict(),
+                        "proposal": json.loads(serialize_plan(proposal)),
+                    },
+                    indent=2,
+                    default=str,
+                )
+            )
     elif args.command == "mission" and args.mission_command == "run":
         from swarm.envfile import load_repo_dotenv
         from swarm.mission.runtime import run_mission
