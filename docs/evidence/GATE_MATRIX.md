@@ -7,7 +7,7 @@ Prior green tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
 LEAD-010 repairs tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
 LEAD-011 ACK pending: FIX-003 evidence-kind identity + G12/G14 local packaging
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
-CI: tip `ca6d425…` run `35542556517` **success** (prior); new tip CI pending
+CI: tip `a17ae17…` run `35542951933` **success**; tip `6669d37…` run `35543012288` **success** (docs bind)
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
