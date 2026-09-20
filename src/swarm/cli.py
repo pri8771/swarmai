@@ -12,6 +12,8 @@ import uvicorn
 
 from swarm.broker.explain import explain_capacity
 from swarm.db.engine import create_db_engine, database_url, ping
+from swarm.evals.dataset import validate_dataset
+from swarm.evals.plan import build_plan
 from swarm.providers.catalog import list_providers
 from swarm.tools.sandbox_runner import self_test as sandbox_self_test
 
@@ -84,6 +86,16 @@ def main() -> None:
     )
     cexp.add_argument("--purpose", default="mission")
 
+    ev = sub.add_parser("eval", help="Benchmark / qualification")
+    ev_sub = ev.add_subparsers(dest="eval_command", required=True)
+    vd = ev_sub.add_parser("validate-dataset", help="Validate a JSONL benchmark dataset")
+    vd.add_argument("path", nargs="?", default="benchmarks/starter.jsonl")
+    ep = ev_sub.add_parser("plan", help="Build a bounded evaluation plan")
+    ep.add_argument("--suite", default="starter")
+    ep.add_argument("--mode", default="mock", choices=["mock", "live"])
+    ep.add_argument("--max-cases", type=int, default=16)
+    ep.add_argument("--dataset", default="benchmarks/starter.jsonl")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -105,6 +117,19 @@ def main() -> None:
                 default=str,
             )
         )
+    elif args.command == "eval" and args.eval_command == "validate-dataset":
+        path = Path(args.path)
+        if not path.is_absolute():
+            path = _repo_root() / path
+        print(json.dumps(validate_dataset(path), indent=2))
+    elif args.command == "eval" and args.eval_command == "plan":
+        path = Path(args.dataset)
+        if not path.is_absolute():
+            path = _repo_root() / path
+        plan = build_plan(
+            path, suite=args.suite, mode=args.mode, max_cases=args.max_cases
+        )
+        print(json.dumps(plan.to_dict(), indent=2))
 
 
 if __name__ == "__main__":
