@@ -1,0 +1,77 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "operation_id": {
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "attempt_id": {
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "tool_version": {
+      "title": "Tool Version",
+      "type": "string"
+    },
+    "normalized_args": {
+      "additionalProperties": true,
+      "title": "Normalized Args",
+      "type": "object"
+    },
+    "payload_hash": {
+      "title": "Payload Hash",
+      "type": "string"
+    },
+    "scopes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Scopes",
+      "type": "array"
+    },
+    "approval_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Id"
+    },
+    "lease_generation": {
+      "title": "Lease Generation",
+      "type": "integer"
+    },
+    "timeout_seconds": {
+      "default": 30,
+      "title": "Timeout Seconds",
+      "type": "integer"
+    },
+    "resource_limits": {
+      "additionalProperties": true,
+      "title": "Resource Limits",
+      "type": "object"
+    }
+  },
+  "required": [
+    "task_id",
+    "attempt_id",
+    "tool_version",
+    "payload_hash",
+    "lease_generation"
+  ],
+  "title": "ToolCall",
+  "type": "object"
+}

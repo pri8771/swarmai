@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "Modality": {
+      "enum": [
+        "text",
+        "code",
+        "image",
+        "audio",
+        "multimodal",
+        "other"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "RiskLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "input_tokens_estimate": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Tokens Estimate"
+    },
+    "observed_input_tokens": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Observed Input Tokens"
+    },
+    "entity_count": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entity Count"
+    },
+    "file_count": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "File Count"
+    },
+    "required_output_items": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Required Output Items"
+    },
+    "dependency_depth": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dependency Depth"
+    },
+    "tool_steps_estimate": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Tool Steps Estimate"
+    },
+    "modality": {
+      "$ref": "#/$defs/Modality",
+      "default": "text"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "risk_level": {
+      "$ref": "#/$defs/RiskLevel",
+      "default": "medium"
+    },
+    "source_complexity": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Complexity"
+    }
+  },
+  "title": "SizeFeatures",
+  "type": "object"
+}

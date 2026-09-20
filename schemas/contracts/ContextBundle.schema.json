@@ -1,0 +1,77 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "mission_id": {
+      "title": "Mission Id",
+      "type": "string"
+    },
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "graph_revision": {
+      "title": "Graph Revision",
+      "type": "integer"
+    },
+    "excerpts": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Excerpts",
+      "type": "array"
+    },
+    "provenance": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Provenance",
+      "type": "array"
+    },
+    "omission_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Omission Notes",
+      "type": "array"
+    },
+    "token_estimate": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Token Estimate"
+    },
+    "policy_version": {
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "mission_id",
+    "task_id",
+    "graph_revision",
+    "policy_version"
+  ],
+  "title": "ContextBundle",
+  "type": "object"
+}

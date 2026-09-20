@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "AvailabilityStatus": {
+      "enum": [
+        "unknown",
+        "available",
+        "degraded",
+        "unavailable",
+        "disabled",
+        "retired"
+      ],
+      "title": "AvailabilityStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "route_id": {
+      "title": "Route Id",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "account_id": {
+      "title": "Account Id",
+      "type": "string"
+    },
+    "model_id": {
+      "title": "Model Id",
+      "type": "string"
+    },
+    "resolved_model_revision": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resolved Model Revision"
+    },
+    "endpoint": {
+      "title": "Endpoint",
+      "type": "string"
+    },
+    "region": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Region"
+    },
+    "hosted_by": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Hosted By"
+    },
+    "billing_origin": {
+      "title": "Billing Origin",
+      "type": "string"
+    },
+    "capability_claims": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Capability Claims",
+      "type": "array"
+    },
+    "observed_capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Observed Capabilities",
+      "type": "array"
+    },
+    "availability_status": {
+      "$ref": "#/$defs/AvailabilityStatus",
+      "default": "unknown"
+    },
+    "quota_bucket_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Quota Bucket Ids",
+      "type": "array"
+    },
+    "privacy_policy_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Privacy Policy Ref"
+    },
+    "model_terms_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Terms Ref"
+    },
+    "status": {
+      "default": "cataloged",
+      "title": "Status",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider",
+    "account_id",
+    "model_id",
+    "endpoint",
+    "billing_origin"
+  ],
+  "title": "RouteSnapshot",
+  "type": "object"
+}

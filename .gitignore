@@ -1,0 +1,26 @@
+# SwarmAI
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+.DS_Store
+.dbos/
+tmp/
+.uv-cache/
+var/
+benchmarks/live-plans/*.json
+!benchmarks/live-plans/.gitkeep
+apps/console/node_modules/
+apps/console/dist/

@@ -1,0 +1,144 @@
+{
+  "$defs": {
+    "AccountStatus": {
+      "enum": [
+        "unknown",
+        "cataloged",
+        "configured",
+        "authenticated",
+        "disabled",
+        "retired"
+      ],
+      "title": "AccountStatus",
+      "type": "string"
+    },
+    "BillingMode": {
+      "enum": [
+        "free",
+        "trial",
+        "paid",
+        "unknown",
+        "none"
+      ],
+      "title": "BillingMode",
+      "type": "string"
+    },
+    "PurposeEligibility": {
+      "enum": [
+        "prototype",
+        "internal",
+        "production",
+        "unknown"
+      ],
+      "title": "PurposeEligibility",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "service_id": {
+      "title": "Service Id",
+      "type": "string"
+    },
+    "account_alias": {
+      "title": "Account Alias",
+      "type": "string"
+    },
+    "secret_ref_names": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Secret Ref Names",
+      "type": "array"
+    },
+    "owner": {
+      "title": "Owner",
+      "type": "string"
+    },
+    "account_status": {
+      "$ref": "#/$defs/AccountStatus",
+      "default": "cataloged"
+    },
+    "purpose_eligibility": {
+      "$ref": "#/$defs/PurposeEligibility",
+      "default": "unknown"
+    },
+    "billing_mode": {
+      "$ref": "#/$defs/BillingMode",
+      "default": "unknown"
+    },
+    "billing_group_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Billing Group Id"
+    },
+    "shared_quota_group_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Shared Quota Group Ids",
+      "type": "array"
+    },
+    "charge_prevention_evidence_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Charge Prevention Evidence Ref"
+    },
+    "verified_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verified At"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expires At"
+    }
+  },
+  "required": [
+    "service_id",
+    "account_alias",
+    "owner"
+  ],
+  "title": "ProviderAccount",
+  "type": "object"
+}

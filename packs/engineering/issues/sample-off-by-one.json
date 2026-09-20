@@ -1,0 +1,20 @@
+{
+  "issue_id": "eng_sample_off_by_one",
+  "title": "Fix off-by-one in synthetic parser helper",
+  "approved": true,
+  "severity": "narrow",
+  "allowlisted_paths": [
+    "sandbox/selfdev_issue/parser_helper.py",
+    "sandbox/selfdev_issue/test_parser_helper.py"
+  ],
+  "forbidden_path_globs": [
+    "**/approval*",
+    "**/secrets*",
+    "**/release*",
+    "**/.env*",
+    "docs/release/**",
+    "src/swarm/deploy/**"
+  ],
+  "acceptance": ["unit tests pass for parser_helper"],
+  "notes": "Mock self-development sample only"
+}

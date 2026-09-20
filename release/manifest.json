@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "product": "SwarmAI",
+  "label": "offline-verified-release-candidate",
+  "python": "3.12",
+  "package_manager": "uv",
+  "includes": [
+    "src/swarm/",
+    "apps/console/",
+    "deploy/",
+    "migrations/",
+    "docs/",
+    "examples/dynamic_demo/",
+    "packs/engineering/"
+  ],
+  "excludes": [".env", ".venv/", "var/", "node_modules/"],
+  "demo_commands": [
+    "uv sync",
+    "uv run pytest tests/contracts -q",
+    "uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install",
+    "uv run swarm release verify"
+  ],
+  "live_unverified": [
+    "P15 zero-charge canaries",
+    "P16 live qualification",
+    "cloud deployment"
+  ],
+  "mock_vs_live": "offline_release_candidate"
+}

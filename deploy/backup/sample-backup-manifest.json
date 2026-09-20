@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "backup_id": "bak_sample_local_001",
+  "created_at": "2026-09-20T00:00:00Z",
+  "profile": "recovery",
+  "database": {
+    "engine": "postgresql",
+    "dump_file": "swarm.dump",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "artifacts": [
+    {
+      "path": "var/reports/demo/demo-report.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "note": "placeholder hash for sample manifest"
+    }
+  ],
+  "unresolved_reservations": [],
+  "action_receipts_pending": [],
+  "recovery_point": "2026-09-20T00:00:00Z",
+  "notice": "Sample local backup manifest — not a production backup"
+}

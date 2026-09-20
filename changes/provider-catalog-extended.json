@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Merge patch for integration owner — do not race P03 catalog enabled flags",
+  "adapter_status_updates": {
+    "together": "implemented_offline",
+    "fireworks": "implemented_offline",
+    "deepinfra": "implemented_offline",
+    "replicate": "implemented_offline",
+    "perplexity": "implemented_offline",
+    "openai": "implemented_offline",
+    "anthropic": "implemented_offline",
+    "aws_bedrock": "implemented_offline_shell",
+    "azure_ai_foundry": "implemented_offline",
+    "hyperbolic": "implemented_offline",
+    "sambanova": "implemented_offline",
+    "novita": "implemented_offline",
+    "requesty": "implemented_offline",
+    "vercel_ai_gateway": "implemented_offline",
+    "portkey_cloud": "implemented_offline",
+    "cloudflare_ai_gateway": "implemented_offline",
+    "huggingface_dedicated": "implemented_offline",
+    "vllm": "implemented_offline",
+    "mlx_lm": "implemented_offline",
+    "llama_cpp": "implemented_offline",
+    "llamafile": "implemented_offline"
+  },
+  "enabled": false,
+  "notes": [
+    "Gateways do not create free upstream quota",
+    "Dedicated HF endpoints are referenced only, never provisioned by P04",
+    "All entries remain disabled until P15/P16 evidence"
+  ]
+}

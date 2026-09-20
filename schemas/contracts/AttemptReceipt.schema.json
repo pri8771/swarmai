@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "ErrorClass": {
+      "enum": [
+        "rate_limit",
+        "authentication",
+        "quota_exhausted",
+        "transient",
+        "unsupported_capability",
+        "invalid_request",
+        "policy_denied",
+        "partial_stream",
+        "unknown_outcome"
+      ],
+      "title": "ErrorClass",
+      "type": "string"
+    },
+    "NormalizedUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Tokens"
+        },
+        "total_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Tokens"
+        },
+        "uncached_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncached Tokens"
+        },
+        "requests": {
+          "default": 1,
+          "title": "Requests",
+          "type": "integer"
+        },
+        "extras": {
+          "additionalProperties": true,
+          "title": "Extras",
+          "type": "object"
+        }
+      },
+      "title": "NormalizedUsage",
+      "type": "object"
+    },
+    "ReservationPhase": {
+      "enum": [
+        "reserved",
+        "sending",
+        "sent",
+        "unknown",
+        "settled"
+      ],
+      "title": "ReservationPhase",
+      "type": "string"
+    },
+    "SettlementState": {
+      "enum": [
+        "pending",
+        "settled",
+        "unknown",
+        "void"
+      ],
+      "title": "SettlementState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "logical_call_id": {
+      "title": "Logical Call Id",
+      "type": "string"
+    },
+    "network_attempt_id": {
+      "title": "Network Attempt Id",
+      "type": "string"
+    },
+    "idempotency_key": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Idempotency Key"
+    },
+    "provider_request_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Request Id"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "send_phase": {
+      "$ref": "#/$defs/ReservationPhase"
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finished At"
+    },
+    "usage_raw_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Usage Raw Ref"
+    },
+    "normalized_usage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NormalizedUsage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "pricing_snapshot_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pricing Snapshot Ref"
+    },
+    "actual_route": {
+      "title": "Actual Route",
+      "type": "string"
+    },
+    "error_class": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ErrorClass"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "settlement_state": {
+      "$ref": "#/$defs/SettlementState",
+      "default": "pending"
+    }
+  },
+  "required": [
+    "logical_call_id",
+    "send_phase",
+    "actual_route"
+  ],
+  "title": "AttemptReceipt",
+  "type": "object"
+}

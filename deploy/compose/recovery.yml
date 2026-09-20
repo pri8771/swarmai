@@ -1,0 +1,34 @@
+# Recovery drill — restore target with side-effect freeze (local only).
+services:
+  api:
+    image: swarm-ai:local
+    user: "1000:1000"
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      SWARM_EXECUTION_MODE: recovery
+      SWARM_SIDE_EFFECT_FREEZE: "true"
+      SWARM_FENCE_OLD_PRIMARY: "true"
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:swarm@db:5432/swarm
+    depends_on:
+      - db
+    networks:
+      - internal
+  db:
+    image: postgres:16-alpine
+    user: "999:999"
+    environment:
+      POSTGRES_USER: swarm
+      POSTGRES_PASSWORD: swarm
+      POSTGRES_DB: swarm
+    networks:
+      - internal
+    volumes:
+      - swarm_pg_restore:/var/lib/postgresql/data
+
+networks:
+  internal:
+    internal: true
+
+volumes:
+  swarm_pg_restore:
