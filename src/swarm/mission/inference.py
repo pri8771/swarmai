@@ -64,15 +64,20 @@ def local_chat(
             cost_usd=0.0,
             error="non_loopback_endpoint_denied_under_zero_spend",
         )
-    url = f"{base}/chat/completions"
+    # Env may point at OpenAI-compat (.../v1); native chat lives at host root.
+    native_base = base[:-3] if base.endswith("/v1") else base
+    # Native /api/chat with think=false — thinking models (e.g. qwen3.5) otherwise
+    # return empty content on the OpenAI-compatible path when tokens are spent on reasoning.
+    url = f"{native_base}/api/chat"
     body = {
         "model": model,
         "messages": messages,
         "stream": False,
-        "max_tokens": max_tokens,
+        "think": False,
+        "options": {"num_predict": max_tokens},
     }
     try:
-        with httpx.Client(timeout=120.0) as client:
+        with httpx.Client(timeout=180.0) as client:
             response = client.post(url, json=body)
         if response.status_code >= 400:
             return InferenceResult(
@@ -83,17 +88,20 @@ def local_chat(
                 error=f"http_{response.status_code}",
             )
         data = response.json()
-        choice = (data.get("choices") or [{}])[0]
-        text = ((choice.get("message") or {}).get("content")) or ""
-        usage = data.get("usage") or {}
+        message = data.get("message") or {}
+        text = str(message.get("content") or "").strip()
+        if not text:
+            # Fallback: some builds still put usable text in thinking/reasoning.
+            text = str(message.get("thinking") or message.get("reasoning") or "").strip()
         return InferenceResult(
-            ok=bool(text.strip()),
+            ok=bool(text),
             text=text,
             model=str(data.get("model") or model),
             route_id=f"rt_ollama_{model}",
-            prompt_tokens=usage.get("prompt_tokens"),
-            completion_tokens=usage.get("completion_tokens"),
+            prompt_tokens=data.get("prompt_eval_count"),
+            completion_tokens=data.get("eval_count"),
             cost_usd=0.0,
+            error=None if text else "empty_response",
         )
     except Exception as exc:  # noqa: BLE001 — surface as soft failure to mission
         return InferenceResult(

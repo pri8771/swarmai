@@ -210,6 +210,21 @@ def main() -> None:
     )
     erep = ev_sub.add_parser("report", help="Show a qualification run report")
     erep.add_argument("--run", required=True, help="run_id")
+    eq = ev_sub.add_parser(
+        "qualify-live",
+        help="P28: run real multi-model qualification benchmarks (Ollama zero-spend)",
+    )
+    eq.add_argument("--dataset", default="benchmarks/starter.jsonl")
+    eq.add_argument("--max-cases", type=int, default=8)
+    eq.add_argument(
+        "--model",
+        action="append",
+        dest="models",
+        default=None,
+        help="Ollama model id (repeatable). Default: preferred local set.",
+    )
+    eq.add_argument("--max-tokens", type=int, default=600)
+    eq.add_argument("--purpose", default="v0.2_p28_model_qualification")
 
     demo = sub.add_parser("demo", help="Mock demonstrations")
     demo_sub = demo.add_subparsers(dest="demo_command", required=True)
@@ -437,6 +452,41 @@ def main() -> None:
             args.run, _repo_root() / "var" / "reports" / "qualification"
         )
         print(json.dumps(data, indent=2))
+    elif args.command == "eval" and args.eval_command == "qualify-live":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.evals.live_benchmark import run_live_benchmarks
+
+        load_repo_dotenv(_repo_root())
+        ds = Path(args.dataset)
+        if not ds.is_absolute():
+            ds = _repo_root() / ds
+        try:
+            report = run_live_benchmarks(
+                repo=_repo_root(),
+                dataset=ds,
+                models=getattr(args, "models", None),
+                max_cases=args.max_cases,
+                max_tokens=args.max_tokens,
+                purpose=args.purpose,
+            )
+        except RuntimeError as exc:
+            print(json.dumps({"error": str(exc)}, indent=2))
+            raise SystemExit(2) from exc
+        summary = {
+            "run_id": report.run_id,
+            "models": report.models,
+            "case_ids": report.case_ids,
+            "trial_count": len(report.trials),
+            "passed": sum(1 for t in report.trials if t.correct),
+            "failed": sum(1 for t in report.trials if not t.correct and not t.error),
+            "errors": sum(1 for t in report.trials if t.error),
+            "total_cost_usd": report.total_cost_usd,
+            "mock_vs_live": report.mock_vs_live,
+            "cells": report.cells,
+            "profiles_summary": report.profiles_summary,
+            "report_hash": report.report_hash,
+        }
+        print(json.dumps(summary, indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "dynamic":
         import asyncio
 
