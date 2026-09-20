@@ -174,8 +174,14 @@ def _select_cases(
     families: list[str],
     sizes: list[str],
     max_cases: int,
+    max_per_cell: int = 5,
 ) -> list[BenchmarkCase]:
-    """Round-robin across families/sizes so planning→summarization are all covered."""
+    """Round-robin across families/sizes so planning→summarization are all covered.
+
+    Prefer holdout over calibration. Cap per (family, size) cell at
+    ``max_per_cell`` (default 5) so EVAL-131 screening can reach the
+    contract's held-out-per-cell floor once the dataset has enough cases.
+    """
     cases = load_dataset(dataset)
     cases = [c for c in cases if c.family in families and c.size in sizes]
     # Prefer holdout, then calibration; keep order stable within cell.
@@ -195,12 +201,12 @@ def _select_cases(
         seen_cells[(case.family, case.size)] = 1
         if len(selected) >= max_cases:
             return selected
-    # Pass 2: fill remaining budget up to 2 holdout/calibration cases per cell.
+    # Pass 2: fill remaining budget up to max_per_cell holdout/calibration cases.
     for case in cases:
         if case in selected:
             continue
         key = (case.family, case.size)
-        if seen_cells.get(key, 0) >= 2:
+        if seen_cells.get(key, 0) >= max_per_cell:
             continue
         selected.append(case)
         seen_cells[key] = seen_cells.get(key, 0) + 1

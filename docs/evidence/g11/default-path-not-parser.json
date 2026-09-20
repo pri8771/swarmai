@@ -1,0 +1,8 @@
+{
+  "gate": "G11",
+  "check": "default_inspect_not_parser_dogfood",
+  "ok": true,
+  "candidate_files": [],
+  "parser_dogfood_fixture": false,
+  "summary": "inspection_no_candidates"
+}

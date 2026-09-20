@@ -1,17 +1,19 @@
 # V1.4 gate matrix (worker view — not lead acceptance)
 
-Updated: 2026-09-20T21:19:00Z
+Updated: 2026-09-20T21:25:04Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+Candidate tip: `3c82e0feecb370a6c8cef363ef85cb363407d1d1` 
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
-CI: tip `108145ea` run `35538252435` **success** (offline+console)
+CI: tip `3c82e0f` runs `35538395519` / `35538397490` **success** (offline+console)
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
-| G10 | FIX-001–005 | LEAD-009 #1–6 + CI green | mypy; scoped idempotency; bootstrap split; release evidence; provider fail-closed; parser fixture-only; CI 35538252435 | **no** | Await lead accept; CLI login still Not logged in |
-| G11 | RUN-111 | yes | accept-controls + restart-reopen | **no** | |
-| G12 | INF-121 | partial | local concurrent + kill-fallback; brokered benchmarks | **no** | Remote dual-provider live-blocked |
-| G13 | EVAL-131 | screening | S-density + aggregated provisional (≤2/cell) | **no** | Not qualified; dataset caps n |
+| G10 | FIX-001–005 | LEAD-009 #1–6 + CI green | [`g10/LEAD_ACCEPT_PACKAGE.md`](./g10/LEAD_ACCEPT_PACKAGE.md) | **no** | Packaged for lead accept |
+| G11 | RUN-111 | yes | accept-controls + restart-reopen + default-path-not-parser | **no** | Parser no longer default |
+| G12 | INF-121 | partial | local concurrent + kill-fallback | **no** | Remote dual live-blocked |
+| G13 | EVAL-131 | screening | dataset 5 holdouts/cell; S n=5 partial $0 screening | **no** | Provisional; not qualified |
 | G14 | SWARM-141 | prep | offline graph/scale/elastic + evidence-exchange | **no** | Live multi-planner not claimed |
 | G14f | LIVE-142 | not started | — | **no** | |
 
-Rules: no invented passes; missing live capacity = live-blocked.
+Rules: no invented passes; missing live capacity = live-blocked.  
+Master index: [`EVIDENCE_INDEX.md`](./EVIDENCE_INDEX.md).
