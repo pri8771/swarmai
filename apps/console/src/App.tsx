@@ -13,6 +13,9 @@ import './App.css'
 
 type Tab =
   | 'mission'
+  | 'projects'
+  | 'history'
+  | 'artifacts'
   | 'routes'
   | 'capacity'
   | 'workers'
@@ -68,6 +71,9 @@ export default function App() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'mission', label: 'Mission' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'history', label: 'History' },
+    { id: 'artifacts', label: 'Artifacts' },
     { id: 'routes', label: 'Routes' },
     { id: 'capacity', label: 'Capacity' },
     { id: 'workers', label: 'Workers' },
@@ -189,6 +195,100 @@ export default function App() {
           {snap.mission.tasks.length === 0 ? (
             <p data-testid="empty-tasks">No tasks in graph.</p>
           ) : null}
+        </Panel>
+      ) : null}
+
+      {tab === 'projects' ? (
+        <Panel
+          title="Projects & configuration"
+          subtitle="Durable workspace settings — secrets never stored"
+          testId="projects-panel"
+        >
+          <table className="grid">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Repo</th>
+                <th>Paid</th>
+                <th>Tools</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {snap.projects.map((p) => (
+                <tr key={p.projectId} data-testid={`project-${p.projectId}`}>
+                  <td>
+                    <code>{p.projectId}</code>
+                    <div>{p.name}</div>
+                  </td>
+                  <td>
+                    <code>{p.repoPath}</code>
+                  </td>
+                  <td>{p.allowPaid ? 'yes' : 'no'}</td>
+                  <td>{p.allowedTools.join(', ')}</td>
+                  <td>{p.updatedAt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Panel>
+      ) : null}
+
+      {tab === 'history' ? (
+        <Panel
+          title="Mission history"
+          subtitle="Reopenable / searchable completed missions"
+          testId="history-panel"
+        >
+          <table className="grid">
+            <thead>
+              <tr>
+                <th>Mission</th>
+                <th>Status</th>
+                <th>Cost</th>
+                <th>Artifacts</th>
+                <th>Tags</th>
+              </tr>
+            </thead>
+            <tbody>
+              {snap.history.map((h) => (
+                <tr key={h.missionId} data-testid={`history-${h.missionId}`}>
+                  <td>
+                    <code>{h.missionId}</code>
+                    <div>{h.goal}</div>
+                  </td>
+                  <td>
+                    <StatusBadge kind="generic" value={h.status} />
+                  </td>
+                  <td>${h.costUsd.toFixed(2)}</td>
+                  <td>{h.artifactCount}</td>
+                  <td>{h.tags.join(', ')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Panel>
+      ) : null}
+
+      {tab === 'artifacts' ? (
+        <Panel
+          title="Artifacts"
+          subtitle="Reports, diffs, and mission outputs"
+          testId="artifacts-panel"
+        >
+          <ul className="timeline" data-testid="artifact-list">
+            {snap.artifacts.map((a) => (
+              <li key={a.artifactId} data-testid={`artifact-${a.artifactId}`}>
+                <code>{a.artifactId}</code> — {a.kind}
+                {a.summary ? <div className="muted">{a.summary}</div> : null}
+                {a.uri ? (
+                  <div className="muted">
+                    <code>{a.uri}</code>
+                  </div>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </Panel>
       ) : null}
 
