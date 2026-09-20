@@ -1,70 +1,57 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T01:20:00Z  
-**Packets complete (offline):** P01–P18  
+**Updated:** 2026-09-20T01:30:00Z  
+**Packets complete (offline):** P01–P21  
+**Label:** `offline-verified-release-candidate`  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`
 
 ## What works
 
-| Packet | Status | Evidence |
+| Packet | Status | Notes |
 |---|---|---|
-| P01–P14 | prior | through `93ed178` |
-| P15 | offline_verified | `7fcc4f8` onboarding layers + mock canaries |
-| P16 | offline_verified | `e8f4d2b` eval plan/run/report mock; live blocked |
-| P17 | offline_verified | `4310a87` deploy doctor + recovery local |
-| P18 | offline_verified | load 1000 tasks + chaos matrix mock |
+| P01–P18 | offline_verified | prior commits |
+| P19 | offline_verified | `4b337af` self-dev pack; patch artifact; no auto-merge |
+| P20 | offline_verified | `816997a` review checklist + regressions; live skip |
+| P21 | offline_verified | `release verify` → offline-verified-release-candidate |
 
-### P15–P17 (prior turn)
-- Cataloged ≠ implemented ≠ configured ≠ authenticated
-- Qualification nulls for untested; fingerprint demotion
-- Deploy profiles mock/standalone/hybrid/recovery — no production push
+### P19
+- Isolated worktree, independent reviewer ≠ worker
+- Variants: good / failing / malicious
+- Host secrets not forwarded into sandbox
 
-### P18 details
-- Adaptive + fixed strategies under same synthetic envelope
-- 100 logical sessions, 1000 queued tasks, bounded `actual_concurrency`
-- Expand **and** contract observed; no oversubscription / starvation
-- Faults: uncertain send, stale worker, outbox gap, cloud recovery fence
-- `--mode live` exits 2 until account capacity verified
+### P20
+- Checklist C01–C12 with evidence IDs; C10 = skip_live
+- Regressions: double-settle, stale worker, privilege expansion
+- Distinguishes software ready vs accounts/deploy unprovisioned
+
+### P21
+- `swarm release verify`, `docs/release/`, `docs/operator/START.md`
+- Fresh-install demo path exercised
+- Honest matrix: live_tested=no, deployed=no
 
 ## Exact commands
 
 ```sh
 cd /Users/pchordia/Downloads/swarm-ai
-
-# P15–P16 offline
-uv run pytest tests/onboarding tests/evals/test_qualify.py
-uv run swarm providers onboarding-report
-uv run swarm eval plan --suite starter --purpose evaluation --mode mock
-uv run swarm eval run --plan PLAN_ID --mode mock
-
-# P17 local
-uv run pytest tests/deployment
-uv run swarm deploy doctor --profile standalone
-uv run swarm recovery verify --profile recovery
-
-# P18
-uv run pytest tests/load tests/chaos
-uv run swarm load run --scenario adaptive --mode mock --tasks 1000 --sessions 100
-uv run swarm chaos run --mode mock
+uv run pytest tests/selfdev tests/regressions tests/release -q
+uv run swarm demo self-development --mode mock
+uv run swarm review report
+uv run swarm release verify
+uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
 ```
 
 ## Next
 
-**P19** — controlled self-development (deps P08, P14 already offline_verified).  
-Live P15/P16/P18 remain paused on keys.
+Kit offline packets **complete**. Remaining work is **live** (paused) or maintenance.
 
 ## User actions (live only — paused)
 
-1. Create provider accounts eligible for **zero-charge** canaries (no paid/card activation as workaround).
-2. Put keys in local `.env` only (never commit); confirm policy allows zero-spend probes.
-3. Re-run P15 live canary → P16 `--mode live` with eligible route IDs → optional P18 live comparisons.
-4. Do **not** push remotes or deploy production unless explicitly requested later.
+1. Zero-charge-eligible provider accounts (no paid/card workaround).
+2. Keys in local `.env` only; spend policy = zero.
+3. P15 live canary → P16 live qualification → optional P18 live.
+4. Explicit authorization required before push, production, or public launch.
 
 ## Mock vs live
 
-| Area | Evidence |
-|---|---|
-| P15–P18 | mock / local / simulated only |
-| Spend | none |
-| Push / production | none |
+All P01–P21 evidence this session is **mock/local/simulated**. No spend, no push, no production.

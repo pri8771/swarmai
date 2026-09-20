@@ -7,33 +7,44 @@ and preserve durable state. Small models are used where measured fitness support
 This repository is the product source. Planning/handoff files live separately in the
 Cursor execution kit and must not be overwritten by this tree.
 
+**Current label:** offline-verified release candidate (not cloud-operating / not live-qualified).
+
 ## Requirements
 
 - Python 3.12 (pinned; kit helper scripts also expect <3.14)
 - [uv](https://docs.astral.sh/uv/)
+- Node 20+ optional (operator console)
 
 ## Setup
 
 ```sh
 cd /path/to/swarm-ai
 uv sync
+cp .env.example .env   # optional; mock demos work without keys
 ```
 
-## Commands (P01)
+## Fresh-install / RC verify
 
 ```sh
-uv sync
-uv run pytest tests/contracts tests/spikes
-uv run ruff check .
-uv run mypy src/swarm
+uv run swarm release verify
+uv run pytest tests/contracts tests/selfdev tests/regressions tests/release -q
+uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
+```
+
+## Operator start
+
+See [`docs/operator/START.md`](docs/operator/START.md).
+
+## Useful commands
+
+```sh
 uv run swarm serve --port 8765
-```
-
-Health checks (with server running):
-
-```sh
-curl -s http://127.0.0.1:8765/health/live
-curl -s http://127.0.0.1:8765/health/ready
+uv run swarm providers onboarding-report
+uv run swarm demo self-development --mode mock
+uv run swarm load run --scenario adaptive --mode mock --tasks 200
+uv run swarm chaos run --mode mock
+uv run swarm review report
+uv run swarm deploy doctor --profile standalone
 ```
 
 ## Status vocabulary
@@ -45,3 +56,4 @@ are distinct. Missing credentials do not block offline mocks or contract work.
 
 - Kit path (read-only planning): set in `.swarm-build-state.json`
 - Live progress: `docs/handoff/CURRENT.md`
+- RC notes: `docs/release/RELEASE_CANDIDATE.md`

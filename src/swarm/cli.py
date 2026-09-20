@@ -253,6 +253,12 @@ def main() -> None:
     review_sub = review.add_subparsers(dest="review_command", required=True)
     review_sub.add_parser("report", help="Emit offline review checklist JSON")
 
+    release = sub.add_parser("release", help="Release candidate utilities")
+    release_sub = release.add_subparsers(dest="release_command", required=True)
+    release_sub.add_parser(
+        "verify", help="Verify offline release-candidate readiness"
+    )
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -427,6 +433,14 @@ def main() -> None:
         from swarm.review.checklist import build_offline_review
 
         print(json.dumps(build_offline_review().to_dict(), indent=2, default=str))
+    elif args.command == "release" and args.release_command == "verify":
+        from swarm.release.verify import verify_release, write_verify_report
+
+        report = verify_release(_repo_root())
+        write_verify_report(report, _repo_root() / "var" / "reports" / "release")
+        print(json.dumps(report.to_dict(), indent=2, default=str))
+        if not report.passed:
+            raise SystemExit(2)
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
