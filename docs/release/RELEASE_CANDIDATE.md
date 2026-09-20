@@ -1,37 +1,41 @@
 # SwarmAI Release Candidate (offline-verified)
 
-**Label:** `offline-verified-release-candidate`  
-**Not:** cloud-operating, live-qualified, or publicly launched.
+**Label:** `offline-verified-release-candidate` (V0.9)  
+**Not:** cloud-operating, statistically live-qualified, or publicly launched.
 
 ## What this RC includes
 
 - Pinned `uv.lock` + Python 3.12
 - Migrations (`alembic`)
-- Mock demos (parser-issue, self-development, load/chaos)
+- V0.1–V0.8 product modules (missions, routing, scale, memory, tools, selfdev, reliability, product UX)
+- V0.9 install-check / harden / demo-suite
 - Operator console (`apps/console`)
 - Local deploy profiles + recovery sample
-- License/notice: see repository root licensing notes; no paid Conductor required for mock path
+- User + security docs under `docs/user/` and `docs/security/`
 
 ## Fresh-install path
 
 ```sh
 cd /path/to/swarm-ai
 uv sync
-uv run pytest tests/contracts tests/selfdev tests/regressions -q
+uv run swarm release install-check
+uv run swarm release harden
 uv run swarm release verify
-uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
+uv run swarm release demo-suite
+# or: bash examples/v0_9/run_rc_demo.sh
 ```
 
 ## Matrix (honest)
 
 | Claim | Status |
 |---|---|
-| Implemented | P01–P21 offline modules |
+| Implemented | V0.1–V0.9 modules |
 | Offline-tested | yes |
-| Live-tested | **no** |
-| Qualified (live cells) | **no** |
+| Live-local tested | partial (Ollama / zero-spend proofs) |
+| Cloud live-tested | **no** |
+| Qualified (statistical) | **no** |
 | Deployed to cloud | **no** |
-| Still needed | provider zero-charge keys; optional cloud host auth |
+| Public launch | **no** |
 
 ## Non-goals of this RC
 
