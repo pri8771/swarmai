@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-09-20T17:15:00+00:00",
+  "chrome_profile": {
+    "directory": "Default",
+    "name": "Priyansh",
+    "email": "priyansh.chordia@gmail.com"
+  },
+  "abandoned_profile": "~/Library/Application Support/SwarmAI/browser-profile",
+  "live_signed_in": {
+    "openrouter": {
+      "signed_in": true,
+      "evidence": "API Keys | Settings | OpenRouter"
+    },
+    "groq": {
+      "signed_in": true,
+      "evidence": "API Keys - GroqCloud"
+    },
+    "gemini": {
+      "signed_in": true,
+      "evidence": "API keys | Google AI Studio"
+    },
+    "cloudflare": {
+      "signed_in": true,
+      "evidence": "dash.cloudflare.com/<account>/home"
+    },
+    "huggingface": {
+      "signed_in": true,
+      "evidence": "huggingface.co/settings/tokens"
+    },
+    "nvidia": {
+      "signed_in": true,
+      "workspace": "primandir",
+      "evidence": "operator-confirmed workspace primandir open/signed-in; keys URL build.nvidia.com/settings/api-keys; no Google SSO redo"
+    },
+    "mistral": {
+      "signed_in": true,
+      "evidence": "Your API keys - AI Studio - Mistral AI"
+    },
+    "cohere": {
+      "signed_in": true,
+      "evidence": "API Keys | Cohere"
+    },
+    "openai": {
+      "signed_in": true,
+      "evidence": "platform.openai.com/api-keys; DEFERRED payment-gated"
+    },
+    "anthropic": {
+      "signed_in": true,
+      "evidence": "API keys | Claude Platform"
+    },
+    "together": {
+      "signed_in": true,
+      "evidence": "api.together.ai project api-keys; key created + ingested"
+    },
+    "fireworks": {
+      "signed_in": true,
+      "evidence": "API Keys - Fireworks AI; key ingested from clipboard"
+    },
+    "deepinfra": {
+      "signed_in": true,
+      "evidence": "Dashboard - DeepInfra"
+    },
+    "replicate": {
+      "signed_in": true,
+      "evidence": "Account settings api-tokens"
+    }
+  },
+  "key_presence": {
+    "OPENROUTER_API_KEY": true,
+    "GROQ_API_KEY": true,
+    "GEMINI_API_KEY": true,
+    "HF_TOKEN": true,
+    "NVIDIA_API_KEY": true,
+    "MISTRAL_API_KEY": true,
+    "COHERE_API_KEY": true,
+    "CLOUDFLARE_API_TOKEN": true,
+    "CLOUDFLARE_ACCOUNT_ID": true,
+    "OPENAI_API_KEY": false,
+    "ANTHROPIC_API_KEY": true,
+    "TOGETHER_API_KEY": true,
+    "FIREWORKS_API_KEY": true,
+    "DEEPINFRA_API_KEY": true,
+    "REPLICATE_API_TOKEN": true,
+    "OLLAMA_BASE_URL": true
+  },
+  "blocked_key_automation": "resolved for this pass (JS Apple Events enabled); escalate only MFA/CAPTCHA/password/consent",
+  "handoff": "WRAP-UP COMPLETE \u2014 resume from private note ~/Library/Application Support/SwarmAI/account-inventory/HANDOFF_RESUME.md; OpenAI deferred; no V0.2; do not merge PR #2/#3 unless asked",
+  "mcp": {
+    "added_to_cursor_mcp_json": [
+      "openrouter",
+      "huggingface",
+      "cloudflare-api",
+      "cloudflare-docs",
+      "groq-compound"
+    ],
+    "preserved": [
+      "atlassian",
+      "clickup"
+    ],
+    "unavailable_official": [
+      "mistral (no official MCP client server)",
+      "cohere (community only \u2014 skipped)",
+      "nvidia nim (no official keys MCP)",
+      "google ai studio (no dedicated MCP)"
+    ],
+    "oauth_pending_operator": [
+      "openrouter (note: OAuth may mint spend-capped MCP key \u2014 set cap $0)",
+      "cloudflare-api",
+      "huggingface"
+    ]
+  },
+  "v02": "not_started",
+  "pr2_merged": false,
+  "nvidia_workspace": "primandir",
+  "notes_ops": [
+    "NVIDIA workspace primandir operator-confirmed",
+    "Priyansh/Default Chrome only; no automated Chrome for Google SSO",
+    "Zero spend; SWARM_ALLOW_PAID=false; no V0.2",
+    "14 providers keyed+auth-verified; OpenAI deferred payment-gated",
+    "Together inference live-blocked under no-spend; Fireworks auth-only"
+  ],
+  "blocked": {
+    "openai": "DEFERRED \u2014 payment-gated; Create secret key disabled / Add credits. Do not pursue this pass.",
+    "together_inference": "Key configured + auth OK; paid inference live-blocked under SWARM_ALLOW_PAID=false",
+    "fireworks_inference": "Key configured + auth OK; no paid inference run"
+  },
+  "canaries": {
+    "openrouter": "yes",
+    "groq": "yes",
+    "gemini": "yes",
+    "cloudflare": "yes",
+    "hf": "yes",
+    "nvidia": "yes",
+    "mistral": "yes",
+    "cohere": "yes",
+    "anthropic": "yes",
+    "deepinfra": "yes",
+    "ollama": "yes",
+    "replicate": "yes",
+    "openai": "deferred_payment_gated",
+    "together": "yes_auth_models_list_inference_blocked_zero_spend",
+    "fireworks": "yes_auth_models_list_no_inference"
+  },
+  "pass": "v0.1-provider-onboarding-wrapup",
+  "pr3": "https://github.com/pri8771/swarmai/pull/3",
+  "pr3_merged": false,
+  "zero_spend": true,
+  "SWARM_ALLOW_PAID": false,
+  "chrome_operating_rule": "Priyansh/Default Chrome only; no Playwright/Selenium/CDP for Google SSO; SwarmAI blank profile abandoned",
+  "keyed_auth_verified_count": 14,
+  "deferred": [
+    "openai"
+  ]
+}

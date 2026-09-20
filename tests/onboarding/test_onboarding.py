@@ -37,7 +37,11 @@ def test_retired_provider_skipped(tmp_path: Path) -> None:
     assert detail["blockers"][0]["resumable"] is False
 
 
-def test_auth_session_unavailable_is_resumable_blocker(tmp_path: Path) -> None:
+def test_auth_session_unavailable_is_resumable_blocker(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Isolate from operator gitignored .env keys so this asserts the no-key blocker.
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
     svc = OnboardingService(tmp_path / "onboarding")
     detail = svc.inspect_provider("groq")
     codes = {b["code"] for b in detail["blockers"]}
