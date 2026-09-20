@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:48:55Z",
+  "updated_at": "2026-09-20T20:49:45Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -56,9 +56,9 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-007",
+  "last_lead_message_id": "LEAD-20260920-008",
   "last_seen_cursor_message_id": "CURSOR-20260920-011",
-  "last_lead_heartbeat_at": "2026-09-20T20:48:55Z",
+  "last_lead_heartbeat_at": "2026-09-20T20:49:45Z",
   "last_cursor_heartbeat_at": "2026-09-20T20:48:46Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -98,7 +98,7 @@
       "status": "implemented_current_tip_ci_failed",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "blocked_current_ci"
     },
     {
@@ -107,7 +107,7 @@
       "status": "partial_unscoped_idempotency_and_auth_order_remaining",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "changes_required"
     },
     {
@@ -116,7 +116,7 @@
       "status": "partial_evidence_validation_and_readiness_remaining",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "changes_required"
     },
     {
@@ -125,7 +125,7 @@
       "status": "scheduler_checkins_verified_cursor_worker_auth_blocked",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "partial"
     },
     {
@@ -134,7 +134,7 @@
       "status": "partial_known_answer_bypass_fixed_generic_runtime_boundary_open",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "changes_required"
     },
     {
@@ -143,7 +143,7 @@
       "status": "in_progress_evidence_posted_not_accepted",
       "scope": "G11 unified generic mission runtime",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "pending_after_g10"
     },
     {
@@ -152,7 +152,7 @@
       "status": "in_progress_local_only_remote_required",
       "scope": "G12 governed concurrent inference pool",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "pending"
     },
     {
@@ -161,7 +161,7 @@
       "status": "in_progress_provisional_underpowered",
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "pending"
     },
     {
@@ -170,7 +170,7 @@
       "status": "prep_in_progress_offline_only",
       "scope": "G14 elastic evidence-driven task graph",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
       "review_status": "pending"
     },
     {
@@ -187,7 +187,7 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress_changes_required",
-      "evidence": "PR #14 tip 4021c2de32b040e0760e3f771820380e2581aa4e; CI 35536709246 failed mypy; LEAD-20260920-007 found remaining idempotency/auth, evidence-validation, readiness and generic-runtime defects",
+      "evidence": "PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e; CI 35536776956 still fails mypy; LEAD-20260920-007 G10 source findings remain open",
       "review": "changes_required"
     },
     "G11": {
@@ -242,18 +242,18 @@
     "G12 remote dual-provider, G13 qualification, G14 live adaptive swarm and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T20:48:55Z",
+    "verified_at": "2026-09-20T20:49:45Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+    "candidate_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
     "commits_ahead_of_main": 15,
-    "latest_verified_ci_run_id": 35536709246,
+    "latest_verified_ci_run_id": 35536776956,
     "latest_verified_ci_conclusion": "failure",
-    "console_job_id": 106146927897,
+    "console_job_id": 106147109326,
     "console_conclusion": "success",
-    "offline_job_id": 106146927938,
+    "offline_job_id": 106147109367,
     "offline_conclusion": "failure",
     "ruff_passed": true,
     "mypy_passed": false,
@@ -263,7 +263,7 @@
     "live_acceptance_executed": false
   },
   "implementation_notes": {
-    "cursor_tip": "4021c2de32b040e0760e3f771820380e2581aa4e",
+    "cursor_tip": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed",
     "optional_cursor_login": "not_logged_in_waiting_browser_auth",
     "run111_accept_evidence": "posted_not_lead_accepted",
@@ -276,6 +276,7 @@
       "release verification still passes on evidence-file presence without SHA/freshness/result validation",
       "provider registry still infers zero-spend/readiness/suitability from policy/config/provider identity",
       "normal mission run still routes through parser-specific RepoWorker dogfood path"
-    ]
+    ],
+    "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes"
   }
 }
