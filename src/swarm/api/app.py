@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from swarm import __version__
 from swarm.api.auth import AuthRegistry
@@ -23,6 +25,19 @@ def create_app(
 ) -> FastAPI:
     app = FastAPI(title="SwarmAI", version=__version__)
     app.add_exception_handler(ApiError, api_error_handler)  # type: ignore[arg-type]
+    # Private console on loopback only — not a public deployment surface.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://127.0.0.1:43127",
+            "http://localhost:43127",
+            "http://127.0.0.1:4177",
+            "http://localhost:4177",
+        ],
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "Accept"],
+    )
 
     root = repo_root
     if root is None:
@@ -76,4 +91,10 @@ def create_app(
     return app
 
 
-app = create_app(seed_loopback_token=None)
+def _env_loopback_token() -> str | None:
+    """Optional private install bootstrap. Empty/unset = no seeded identities."""
+    raw = (os.environ.get("SWARM_SEED_LOOPBACK_TOKEN") or "").strip()
+    return raw or None
+
+
+app = create_app(seed_loopback_token=_env_loopback_token(), seed_fixtures=False)
