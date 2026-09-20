@@ -389,6 +389,31 @@ def main() -> None:
     rel_sub = reliability.add_subparsers(dest="reliability_command", required=True)
     rel_sub.add_parser("proof", help="Run reliability scenario matrix")
 
+    projects = sub.add_parser("projects", help="V0.8 durable project configuration")
+    proj_sub = projects.add_subparsers(dest="projects_command", required=True)
+    pcreate = proj_sub.add_parser("create", help="Create a project workspace config")
+    pcreate.add_argument("--name", required=True)
+    pcreate.add_argument("--repo", default=None, help="Repo path (default: cwd repo)")
+    pcreate.add_argument("--project-id", default=None)
+    proj_sub.add_parser("list", help="List projects")
+    pshow = proj_sub.add_parser("show", help="Show one project")
+    pshow.add_argument("project_id")
+    pupd = proj_sub.add_parser("update", help="Patch project fields via JSON")
+    pupd.add_argument("project_id")
+    pupd.add_argument("--set", action="append", default=[], help="key=value (JSON value)")
+
+    product = sub.add_parser("product", help="V0.8 product experience")
+    prod_sub = product.add_subparsers(dest="product_command", required=True)
+    prod_sub.add_parser("contract", help="Print public CLI/API product contract")
+    prod_sub.add_parser("journey", help="Run full local product journey proof")
+    phist = prod_sub.add_parser("history", help="Search mission history")
+    phist.add_argument("--query", default="")
+    phist.add_argument("--status", default=None)
+    preopen = prod_sub.add_parser("reopen", help="Reopen a completed mission")
+    preopen.add_argument("mission_id")
+    part = prod_sub.add_parser("artifacts", help="List mission artifacts")
+    part.add_argument("mission_id")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -783,6 +808,82 @@ def main() -> None:
         print(json.dumps(proof, indent=2, default=str))
         if not proof.get("ok"):
             raise SystemExit(2)
+    elif args.command == "projects" and args.projects_command == "create":
+        from swarm.product.projects import ProjectStore
+
+        store = ProjectStore(_repo_root() / "var" / "projects")
+        cfg = store.create(
+            name=args.name,
+            repo_path=Path(args.repo).resolve() if args.repo else _repo_root(),
+            project_id=args.project_id,
+        )
+        print(json.dumps(cfg.to_dict(), indent=2, default=str))
+    elif args.command == "projects" and args.projects_command == "list":
+        from swarm.product.projects import ProjectStore
+
+        store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps({"projects": store.list_projects()}, indent=2, default=str))
+    elif args.command == "projects" and args.projects_command == "show":
+        from swarm.product.projects import ProjectStore
+
+        store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps(store.get(args.project_id).to_dict(), indent=2, default=str))
+    elif args.command == "projects" and args.projects_command == "update":
+        from swarm.product.projects import ProjectStore
+
+        store = ProjectStore(_repo_root() / "var" / "projects")
+        patch: dict[str, object] = {}
+        for item in args.set:
+            if "=" not in item:
+                continue
+            key, raw = item.split("=", 1)
+            try:
+                patch[key] = json.loads(raw)
+            except json.JSONDecodeError:
+                patch[key] = raw
+        print(json.dumps(store.update(args.project_id, **patch).to_dict(), indent=2, default=str))
+    elif args.command == "product" and args.product_command == "contract":
+        from swarm.product.contracts import public_product_contract
+
+        print(json.dumps(public_product_contract(), indent=2, default=str))
+    elif args.command == "product" and args.product_command == "journey":
+        from swarm.product.journey import run_product_journey
+
+        proof = run_product_journey(_repo_root())
+        print(json.dumps(proof, indent=2, default=str))
+        if not proof.get("ok"):
+            raise SystemExit(2)
+    elif args.command == "product" and args.product_command == "history":
+        from swarm.product.history import HistoryIndex
+
+        idx = HistoryIndex(_repo_root())
+        print(
+            json.dumps(
+                {"entries": idx.search(args.query, status=args.status)},
+                indent=2,
+                default=str,
+            )
+        )
+    elif args.command == "product" and args.product_command == "reopen":
+        from swarm.product.history import HistoryIndex
+
+        print(
+            json.dumps(
+                HistoryIndex(_repo_root()).reopen(args.mission_id),
+                indent=2,
+                default=str,
+            )
+        )
+    elif args.command == "product" and args.product_command == "artifacts":
+        from swarm.product.history import HistoryIndex
+
+        print(
+            json.dumps(
+                {"artifacts": HistoryIndex(_repo_root()).list_artifacts(args.mission_id)},
+                indent=2,
+                default=str,
+            )
+        )
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
 from swarm.api.errors import ApiError
@@ -17,6 +18,9 @@ from swarm.contracts.provider import ProviderAccount, RouteSnapshot
 from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
 from swarm.controller.mission import MissionController
 from swarm.evals.profiles import ProfileStore
+from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
+from swarm.product.history import HistoryIndex
+from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
 from swarm.providers.catalog import list_providers
 from swarm.workers.registry import WorkerRegistryService
 
@@ -59,6 +63,99 @@ class ProductStore:
     execution_mode: str = "mock"
     allow_paid: bool = False
     providers_network: bool = False
+    repo_root: Path | None = None
+    _project_store: ProjectStore | None = field(default=None, repr=False)
+
+    def project_store(self) -> ProjectStore:
+        if self._project_store is None:
+            root = (self.repo_root or Path.cwd()) / "var" / "projects"
+            self._project_store = ProjectStore(root)
+        return self._project_store
+
+    def history_index(self) -> HistoryIndex:
+        return HistoryIndex(self.repo_root or Path.cwd())
+
+    def list_public_missions(self, *, project_id: str | None = None) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for mission in self.controller.missions.values():
+            if project_id and mission.project_id != project_id:
+                continue
+            rows.append(
+                strip_internal(
+                    scrub_config(
+                        {
+                            "mission_id": mission.id,
+                            "project_id": mission.project_id,
+                            "status": mission.status.value,
+                            "objective": mission.objective,
+                            "revision": mission.revision,
+                        }
+                    )
+                )
+            )
+        # Merge file-backed history for reopenable missions.
+        try:
+            for entry in self.history_index().load_index():
+                if project_id and entry.get("project_id") != project_id:
+                    continue
+                if any(r["mission_id"] == entry.get("mission_id") for r in rows):
+                    continue
+                rows.append(strip_internal(scrub_config(entry)))
+        except OSError:
+            pass
+        return rows
+
+    def create_project(self, **kwargs: Any) -> ProjectConfig:
+        return self.project_store().create(**kwargs)
+
+    def get_project(self, project_id: str) -> ProjectConfig:
+        try:
+            return self.project_store().get(project_id)
+        except KeyError as exc:
+            raise ApiError("not_found", "project not found", status_code=404) from exc
+
+    def list_projects(self) -> list[dict[str, Any]]:
+        return self.project_store().list_projects()
+
+    def public_contract(self) -> dict[str, Any]:
+        return public_product_contract()
+
+    def mission_report(self, mission_id: str) -> dict[str, Any]:
+        # Prefer live controller mission; fall back to history reopen.
+        if mission_id in self.controller.missions:
+            mission = self.controller.missions[mission_id]
+            graph = self.graph_view(mission_id)
+            return strip_internal(
+                scrub_config(
+                    {
+                        "mission": mission.model_dump(mode="json"),
+                        "graph": graph,
+                        "source": "api_controller",
+                    }
+                )
+            )
+        try:
+            return self.history_index().reopen(mission_id)
+        except (OSError, KeyError, TypeError, FileNotFoundError) as exc:
+            raise ApiError("not_found", "mission report not found", status_code=404) from exc
+
+    def mission_artifacts(self, mission_id: str) -> list[dict[str, Any]]:
+        try:
+            return self.history_index().list_artifacts(mission_id)
+        except (OSError, FileNotFoundError, TypeError, KeyError):
+            return []
+
+    def public_mission_view(self, mission_id: str) -> dict[str, Any]:
+        mission = self.get_mission(mission_id)
+        graph = self.graph_view(mission_id)
+        return mission_public_view(
+            {
+                **mission.model_dump(mode="json"),
+                "mission_id": mission.id,
+                "goal": mission.objective,
+                "tasks": graph.get("tasks") or [],
+            }
+        )
 
     def seed_catalog(self) -> None:
         acct = sample_provider_account()

@@ -78,6 +78,33 @@ export interface ApprovalRow {
   revokedAt: string | null
 }
 
+export interface ProjectRow {
+  projectId: string
+  name: string
+  repoPath: string
+  allowPaid: boolean
+  allowedTools: string[]
+  updatedAt: string
+}
+
+export interface HistoryRow {
+  missionId: string
+  projectId: string | null
+  goal: string
+  status: string
+  costUsd: number
+  artifactCount: number
+  tags: string[]
+  updatedAt: string
+}
+
+export interface ArtifactRow {
+  artifactId: string
+  kind: string
+  uri?: string
+  summary?: string
+}
+
 export interface ConsoleSnapshot {
   mode: 'mock' | 'live'
   mockVsLive: string
@@ -88,6 +115,9 @@ export interface ConsoleSnapshot {
   workers: WorkerRow[]
   profiles: ProfileRow[]
   approvals: ApprovalRow[]
+  projects: ProjectRow[]
+  history: HistoryRow[]
+  artifacts: ArtifactRow[]
   events: { id: string; type: string; summary: string }[]
   streamInterrupted: boolean
   errors: string[]

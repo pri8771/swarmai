@@ -94,6 +94,21 @@ describe('operator console UI', () => {
     expect(screen.getByTestId('error-banner')).toBeInTheDocument()
   })
 
+  it('shows projects, history, and artifacts panels', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByTestId('mission-panel')
+    await user.click(screen.getByRole('button', { name: 'Projects' }))
+    expect(await screen.findByTestId('projects-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('project-proj_demo')).toHaveTextContent('Demo workspace')
+    await user.click(screen.getByRole('button', { name: 'History' }))
+    expect(await screen.findByTestId('history-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('history-mission_demo_001')).toHaveTextContent('zero_spend')
+    await user.click(screen.getByRole('button', { name: 'Artifacts' }))
+    expect(await screen.findByTestId('artifacts-panel')).toBeInTheDocument()
+    expect(screen.getByTestId('artifact-art_journey_note')).toHaveTextContent('markdown')
+  })
+
   it('supports keyboard tab navigation to sections', async () => {
     const user = userEvent.setup()
     render(<App />)

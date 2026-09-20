@@ -148,6 +148,42 @@ export const MOCK_SNAPSHOT: ConsoleSnapshot = {
       revokedAt: null,
     },
   ],
+  projects: [
+    {
+      projectId: 'proj_demo',
+      name: 'Demo workspace',
+      repoPath: '/Users/pchordia/Downloads/swarm-ai',
+      allowPaid: false,
+      allowedTools: ['repo.read', 'tests.run', 'calc'],
+      updatedAt: '2026-09-20T12:00:00Z',
+    },
+  ],
+  history: [
+    {
+      missionId: 'mission_demo_001',
+      projectId: 'proj_demo',
+      goal: 'Investigate failing parser and produce a verified patch',
+      status: 'completed',
+      costUsd: 0,
+      artifactCount: 2,
+      tags: ['completed', 'zero_spend'],
+      updatedAt: '2026-09-20T12:30:00Z',
+    },
+  ],
+  artifacts: [
+    {
+      artifactId: 'art_journey_note',
+      kind: 'markdown',
+      uri: 'var/artifacts/mission_demo_001/journey_note.md',
+      summary: 'V0.8 journey artifact',
+    },
+    {
+      artifactId: 'report:mission-report.json',
+      kind: 'report',
+      uri: 'var/reports/missions/mission_demo_001/mission-report.json',
+      summary: 'Machine mission report',
+    },
+  ],
   events: [
     { id: 'ev_1', type: 'mission.created', summary: 'mission_demo_001 created' },
     { id: 'ev_2', type: 'graph.committed', summary: 'revision 3 committed' },
