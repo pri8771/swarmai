@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "MissionStatus": {
+      "enum": [
+        "draft",
+        "planning",
+        "running",
+        "waiting_capacity",
+        "waiting_input",
+        "waiting_approval",
+        "verifying",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "title": "MissionStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "trace_id": {
+      "title": "Trace Id",
+      "type": "string"
+    },
+    "payload_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Payload Hash"
+    },
+    "objective": {
+      "title": "Objective",
+      "type": "string"
+    },
+    "acceptance_criteria": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Acceptance Criteria",
+      "type": "array"
+    },
+    "allowed_capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed Capabilities",
+      "type": "array"
+    },
+    "data_scope_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Data Scope Ids",
+      "type": "array"
+    },
+    "resource_policy_id": {
+      "title": "Resource Policy Id",
+      "type": "string"
+    },
+    "max_wall_time_seconds": {
+      "title": "Max Wall Time Seconds",
+      "type": "integer"
+    },
+    "max_graph_nodes": {
+      "title": "Max Graph Nodes",
+      "type": "integer"
+    },
+    "max_active_sessions": {
+      "title": "Max Active Sessions",
+      "type": "integer"
+    },
+    "max_model_calls": {
+      "title": "Max Model Calls",
+      "type": "integer"
+    },
+    "total_token_envelope": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Total Token Envelope"
+    },
+    "status": {
+      "$ref": "#/$defs/MissionStatus",
+      "default": "draft"
+    },
+    "revision": {
+      "default": 1,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "cancellation_generation": {
+      "default": 0,
+      "title": "Cancellation Generation",
+      "type": "integer"
+    },
+    "acceptance_receipt_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acceptance Receipt Id"
+    }
+  },
+  "required": [
+    "project_id",
+    "objective",
+    "resource_policy_id",
+    "max_wall_time_seconds",
+    "max_graph_nodes",
+    "max_active_sessions",
+    "max_model_calls"
+  ],
+  "title": "Mission",
+  "type": "object"
+}

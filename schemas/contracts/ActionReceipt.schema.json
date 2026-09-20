@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "ActionOutcome": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "unknown"
+      ],
+      "title": "ActionOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "operation_id": {
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "before_observation": {
+      "additionalProperties": true,
+      "title": "Before Observation",
+      "type": "object"
+    },
+    "after_observation": {
+      "additionalProperties": true,
+      "title": "After Observation",
+      "type": "object"
+    },
+    "external_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "External Id"
+    },
+    "outcome": {
+      "$ref": "#/$defs/ActionOutcome"
+    },
+    "reconciliation_steps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reconciliation Steps",
+      "type": "array"
+    },
+    "evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "operation_id",
+    "outcome"
+  ],
+  "title": "ActionReceipt",
+  "type": "object"
+}

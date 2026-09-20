@@ -1,0 +1,78 @@
+{
+  "$defs": {
+    "WorkerStatus": {
+      "enum": [
+        "online",
+        "draining",
+        "offline",
+        "quarantined"
+      ],
+      "title": "WorkerStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "worker_id": {
+      "title": "Worker Id",
+      "type": "string"
+    },
+    "node_identity": {
+      "title": "Node Identity",
+      "type": "string"
+    },
+    "architecture": {
+      "title": "Architecture",
+      "type": "string"
+    },
+    "labels": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "array"
+    },
+    "capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "runtime_version": {
+      "title": "Runtime Version",
+      "type": "string"
+    },
+    "capacity_units": {
+      "title": "Capacity Units",
+      "type": "number"
+    },
+    "lease_generation": {
+      "default": 1,
+      "title": "Lease Generation",
+      "type": "integer"
+    },
+    "heartbeat_at": {
+      "format": "date-time",
+      "title": "Heartbeat At",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/WorkerStatus",
+      "default": "online"
+    }
+  },
+  "required": [
+    "node_identity",
+    "architecture",
+    "runtime_version",
+    "capacity_units"
+  ],
+  "title": "WorkerLease",
+  "type": "object"
+}

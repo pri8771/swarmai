@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "uri": {
+      "title": "Uri",
+      "type": "string"
+    },
+    "media_type": {
+      "title": "Media Type",
+      "type": "string"
+    },
+    "byte_length": {
+      "title": "Byte Length",
+      "type": "integer"
+    },
+    "owner_scope": {
+      "title": "Owner Scope",
+      "type": "string"
+    },
+    "retention_class": {
+      "title": "Retention Class",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "content_hash",
+    "uri",
+    "media_type",
+    "byte_length",
+    "owner_scope",
+    "retention_class"
+  ],
+  "title": "ArtifactRef",
+  "type": "object"
+}

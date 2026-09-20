@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "role": {
+      "title": "Role",
+      "type": "string"
+    },
+    "instructions_version": {
+      "title": "Instructions Version",
+      "type": "string"
+    },
+    "tool_scope": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tool Scope",
+      "type": "array"
+    },
+    "context_policy": {
+      "title": "Context Policy",
+      "type": "string"
+    },
+    "delegation_policy": {
+      "title": "Delegation Policy",
+      "type": "string"
+    },
+    "quality_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Quality Requirements",
+      "type": "array"
+    }
+  },
+  "required": [
+    "role",
+    "instructions_version",
+    "context_policy",
+    "delegation_policy"
+  ],
+  "title": "AgentProfile",
+  "type": "object"
+}

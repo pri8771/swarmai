@@ -1,0 +1,114 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "distinct_case_id": {
+      "title": "Distinct Case Id",
+      "type": "string"
+    },
+    "split": {
+      "title": "Split",
+      "type": "string"
+    },
+    "route_fingerprint": {
+      "title": "Route Fingerprint",
+      "type": "string"
+    },
+    "model_fingerprint": {
+      "title": "Model Fingerprint",
+      "type": "string"
+    },
+    "exact_prompt_hash": {
+      "title": "Exact Prompt Hash",
+      "type": "string"
+    },
+    "run_seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Seed"
+    },
+    "outcome": {
+      "title": "Outcome",
+      "type": "string"
+    },
+    "grader_version": {
+      "title": "Grader Version",
+      "type": "string"
+    },
+    "score_components": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Score Components",
+      "type": "object"
+    },
+    "correctness": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correctness"
+    },
+    "policy_violation": {
+      "default": false,
+      "title": "Policy Violation",
+      "type": "boolean"
+    },
+    "latency_ms": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Latency Ms"
+    },
+    "usage": {
+      "additionalProperties": true,
+      "title": "Usage",
+      "type": "object"
+    },
+    "retry_count": {
+      "default": 0,
+      "title": "Retry Count",
+      "type": "integer"
+    },
+    "artifact_refs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Artifact Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "distinct_case_id",
+    "split",
+    "route_fingerprint",
+    "model_fingerprint",
+    "exact_prompt_hash",
+    "outcome",
+    "grader_version"
+  ],
+  "title": "EvalResult",
+  "type": "object"
+}

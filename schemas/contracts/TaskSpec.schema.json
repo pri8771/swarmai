@@ -1,0 +1,334 @@
+{
+  "$defs": {
+    "Modality": {
+      "enum": [
+        "text",
+        "code",
+        "image",
+        "audio",
+        "multimodal",
+        "other"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "RiskLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "SizeFeatures": {
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens_estimate": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Tokens Estimate"
+        },
+        "observed_input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Input Tokens"
+        },
+        "entity_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity Count"
+        },
+        "file_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "File Count"
+        },
+        "required_output_items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Output Items"
+        },
+        "dependency_depth": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dependency Depth"
+        },
+        "tool_steps_estimate": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool Steps Estimate"
+        },
+        "modality": {
+          "$ref": "#/$defs/Modality",
+          "default": "text"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "risk_level": {
+          "$ref": "#/$defs/RiskLevel",
+          "default": "medium"
+        },
+        "source_complexity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Complexity"
+        }
+      },
+      "title": "SizeFeatures",
+      "type": "object"
+    },
+    "TaskStatus": {
+      "enum": [
+        "proposed",
+        "ready",
+        "leased",
+        "running",
+        "waiting_children",
+        "waiting_capacity",
+        "waiting_approval",
+        "verifying",
+        "accepted",
+        "rejected",
+        "failed",
+        "cancelled",
+        "superseded"
+      ],
+      "title": "TaskStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "trace_id": {
+      "title": "Trace Id",
+      "type": "string"
+    },
+    "payload_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Payload Hash"
+    },
+    "mission_id": {
+      "title": "Mission Id",
+      "type": "string"
+    },
+    "parent_task_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Task Id"
+    },
+    "objective": {
+      "title": "Objective",
+      "type": "string"
+    },
+    "task_family": {
+      "title": "Task Family",
+      "type": "string"
+    },
+    "size_features": {
+      "$ref": "#/$defs/SizeFeatures"
+    },
+    "inputs": {
+      "additionalProperties": true,
+      "title": "Inputs",
+      "type": "object"
+    },
+    "artifact_refs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Artifact Refs",
+      "type": "array"
+    },
+    "output_schema_id": {
+      "title": "Output Schema Id",
+      "type": "string"
+    },
+    "acceptance_check_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Acceptance Check Ids",
+      "type": "array"
+    },
+    "dependency_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Dependency Ids",
+      "type": "array"
+    },
+    "role_hint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Role Hint"
+    },
+    "required_capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Capabilities",
+      "type": "array"
+    },
+    "scopes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Scopes",
+      "type": "array"
+    },
+    "quality_policy_id": {
+      "title": "Quality Policy Id",
+      "type": "string"
+    },
+    "priority": {
+      "default": 100,
+      "title": "Priority",
+      "type": "integer"
+    },
+    "deadline": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Deadline"
+    },
+    "attempt_limit": {
+      "default": 3,
+      "title": "Attempt Limit",
+      "type": "integer"
+    },
+    "graph_revision": {
+      "default": 1,
+      "title": "Graph Revision",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/TaskStatus",
+      "default": "proposed"
+    }
+  },
+  "required": [
+    "project_id",
+    "mission_id",
+    "objective",
+    "task_family",
+    "output_schema_id",
+    "quality_policy_id"
+  ],
+  "title": "TaskSpec",
+  "type": "object"
+}
