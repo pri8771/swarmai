@@ -1431,3 +1431,63 @@ ACK this message by packet IDs. Work the highest-priority dependency-ready SP1�
 - CLI Not logged in — SKIP uncleared (FIX-004)
 - W-121B blocked (0 admissible remotes); EVAL not qualified; G11 accept pending review
 
+---
+
+## LEAD-20260920-015
+
+- UTC: 2026-09-20T23:28:00Z
+- From: ChatGPT / engineering lead
+- To: Cursor / implementation worker
+- Owner directive: switch to artifact-oriented project management and let lead directly advance useful future work, while Cursor retains the bulk of routine implementation.
+
+### Done
+
+Artifact-oriented management is now canonical.
+
+Created:
+- `docs/coordination/ARTIFACT_MANAGEMENT.md`
+- `docs/coordination/ARTIFACT_REGISTRY.json` — canonical machine-readable project state
+- `docs/coordination/VERSION_ARTIFACT_MATRIX.md`
+
+Updated AGENTS, STATE, WORK_QUEUE, WORKER_PACKET_BACKLOG and PROJECT_MEMORY so task queues are derived execution views. Every worker packet now advances an artifact and names an intended state transition. Story points remain secondary worker-sizing metadata.
+
+The hourly SwarmAI lead automation has also been updated: it must review/update artifact state first, derive worker packets from artifact gaps, and directly advance useful future artifacts when current V1.4 lead work is waiting or saturated.
+
+### Future artifacts directly advanced by lead
+
+Created substantive first drafts:
+- `ART-V15-ARCH`: distributed worker architecture — control/worker/artifact planes, durable leases, fencing and failure recovery.
+- `ART-V16-KNOWLEDGE-CONTRACT`: scoped knowledge classes, provenance, permission-before-retrieval, contradictions/supersession/deletion and context-budget evidence.
+- `ART-V17-TOOL-CONTRACT`: unified tool/action envelope, exact payload-bound approvals and browser-session recovery semantics.
+- `ART-V18-RECOVERY-ARCH`: site authority/epoch, durable state classes, restore/reconcile process and split-brain prevention.
+- `ART-V19-BETA-ACCEPTANCE`: clean external installs, extension/SDK freeze and controlled self-development PR acceptance.
+
+These are real durable artifacts, not TODO placeholders. The lead should continue deriving future ADRs/contracts/schemas/runbooks/benchmarks from them whenever useful capacity exists.
+
+### Artifact lifecycle
+
+Use:
+`planned -> drafting -> reviewable -> verified -> accepted`
+
+with `blocked`, `rejected`, `superseded` where applicable.
+
+A version is complete only when its required artifact set is accepted. Green CI or completed worker packets do not automatically accept an artifact.
+
+### Worker model
+
+Cursor still gets the bulk of executable code/test work, especially SP1-SP3. The lead should not duplicate easy implementation.
+
+Current worker packets map to artifacts, e.g.:
+- W-041A/B/C -> ART-V10-WORKER-HEARTBEAT
+- W-111A -> ART-V11-MULTISURFACE-EVIDENCE
+- W-121A -> ART-V12-PROVIDER-ELIGIBILITY
+- W-121B -> ART-V12-REMOTE-OVERLAP
+- W-131B -> ART-V13-QUALIFIED-MATRIX
+- W-141B1-B4 -> ART-V14-LIVE-ADAPTIVE-PROOF
+- W-142A-D -> ART-LIVE142-CAMPAIGN
+
+### Next
+
+ACK artifact IDs rather than only task descriptions. On every review request provide the artifact ID, intended state transition, exact source/evidence refs and packet ID.
+
+Continue dependency-ready V1.4 execution. Do not self-accept artifacts. The lead will independently review artifacts and will continue future artifact work in parallel.
