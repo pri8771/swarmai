@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T23:08:00Z",
+  "updated_at": "2026-09-20T23:07:47Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -58,10 +58,10 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-012",
+  "last_lead_message_id": "LEAD-20260920-014",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-012.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-021",
-  "last_lead_heartbeat_at": "2026-09-20T23:02:47Z",
+  "last_lead_heartbeat_at": "2026-09-20T23:07:47Z",
   "last_cursor_heartbeat_at": "2026-09-20T23:08:00Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -263,7 +263,7 @@
   },
   "open_blockers": [
     "Cursor agent CLI Not logged in; FIX-004 authenticated hourly receipts absent",
-    "G11 LEAD-012 evidence posted \u2014 awaiting lead revalidation (not auto-accepted)",
+    "G11 LEAD-012 evidence posted — awaiting lead revalidation (not auto-accepted)",
     "G12 remote dual, G13 n>=30 qualification, G14 live, LIVE-142 remain open"
   ],
   "current_source_verification": {
@@ -302,5 +302,49 @@
     "ci_run": "35543599747_35543622029_success",
     "g10_review": "LEAD-20260920-012_source_ci_verified_fix004_blocked",
     "feature_tip": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+  },
+  "worker_management": {
+    "protocol": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
+    "backlog": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+    "performance_ledger": "docs/coordination/WORKER_PERFORMANCE.json",
+    "default_worker_packet_points": [
+      1,
+      2,
+      3
+    ],
+    "split_story_points_at_or_above": 4,
+    "target_ready_packets_when_practical": 3,
+    "bulk_easy_work_to_worker": true,
+    "lead_focus": [
+      "architecture",
+      "decomposition",
+      "hard_debugging",
+      "research",
+      "independent_review",
+      "acceptance",
+      "statistical_analysis"
+    ],
+    "current_ready_packets": [
+      "W-111A",
+      "W-111B",
+      "W-121A",
+      "W-131A"
+    ],
+    "external_blocked_packets": [
+      "W-041A"
+    ],
+    "future_prep_allowed_when_current_lead_work_exhausted": true,
+    "future_implementation_version_gated": true
+  },
+  "future_work_policy": {
+    "directive": "prepare/research/decompose future tasks when current useful lead work is exhausted",
+    "implementation_ceiling": "1.4 until next tranche explicitly activated",
+    "preparation_backlog": [
+      "FUT-151",
+      "FUT-161",
+      "FUT-171",
+      "FUT-181",
+      "FUT-191"
+    ]
   }
 }
