@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "id": "demo-parser-issue",
+  "project_id": "synthetic-demo",
+  "objective": "Investigate and fix a parser bug using two independent approaches; produce a tested reviewed patch.",
+  "acceptance_criteria": [
+    "Regression tests reproduce the initial bug",
+    "Patch passes existing and new tests",
+    "Independent review references test evidence",
+    "Final report includes unresolved risks and resource use"
+  ],
+  "allowed_capabilities": [
+    "workspace.read",
+    "workspace.write_isolated",
+    "sandbox.test",
+    "artifact.publish_internal"
+  ],
+  "data_scope_ids": [
+    "synthetic-demo"
+  ],
+  "resource_policy_id": "no_new_spend",
+  "max_wall_time_seconds": 3600,
+  "max_graph_nodes": 250,
+  "max_active_sessions": 32,
+  "max_model_calls": 120,
+  "total_token_envelope": 250000,
+  "initial_planning": {
+    "strategy": "independent_hypotheses",
+    "requested_planners": 2,
+    "model_selection": "task_qualified",
+    "worker_selection": "task_and_size_qualified"
+  },
+  "status": "draft",
+  "revision": 1,
+  "cancellation_generation": 0,
+  "note": "Synthetic demonstration spec; illustrative resource envelopes are not measured provider allowances. If eligible planner capacity is unavailable, wait or run the explicitly requested mock demonstration."
+}

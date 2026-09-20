@@ -114,6 +114,16 @@ def main() -> None:
     demo_sub = demo.add_subparsers(dest="demo_command", required=True)
     dyn = demo_sub.add_parser("dynamic", help="Dynamic swarm controller mock demo")
     dyn.add_argument("--mode", default="mock", choices=["mock"])
+    parser_issue = demo_sub.add_parser(
+        "parser-issue", help="P14 integrated parser-issue demo"
+    )
+    parser_issue.add_argument("--mode", default="mock", choices=["mock", "live"])
+    parser_issue.add_argument(
+        "--report-dir",
+        type=Path,
+        default=None,
+        help="Write demo artifacts (default: var/reports/demo)",
+    )
 
     worker = sub.add_parser("worker", help="Worker operations")
     worker_sub = worker.add_subparsers(dest="worker_command", required=True)
@@ -165,6 +175,19 @@ def main() -> None:
         import asyncio
 
         print(json.dumps(asyncio.run(_demo_dynamic_mock()), indent=2, default=str))
+    elif args.command == "demo" and args.demo_command == "parser-issue":
+        import asyncio
+
+        root = _repo_root()
+        if str(root) not in sys.path:
+            sys.path.insert(0, str(root))
+        from examples.dynamic_demo.run_demo import run_parser_issue_demo
+
+        report_dir = Path(args.report_dir) if args.report_dir else (root / "var" / "reports" / "demo")
+        report = asyncio.run(
+            run_parser_issue_demo(mode=args.mode, report_dir=report_dir.resolve())
+        )
+        print(json.dumps(report.to_dict(), indent=2, default=str))
     elif args.command == "worker" and args.worker_command == "self-test":
         from swarm.workers.registry import worker_self_test
 

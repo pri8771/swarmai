@@ -1,7 +1,7 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T01:50:00Z  
-**Packets complete:** P01–P13 (P09 after P13 gate)  
+**Updated:** 2026-09-20T02:10:00Z  
+**Packets complete:** P01–P14  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`
 
@@ -11,32 +11,30 @@
 |---|---|---|
 | P01–P08 | prior | earlier commits |
 | P09 | offline_verified | vitest 10 + build + pytest ui 3 |
-| P10–P12 | offline_verified | runtime/controller/workers |
-| P13 | offline_verified | 14 API tests + OpenAPI export |
+| P10–P13 | offline_verified | runtime/controller/workers/api |
+| P14 | offline_verified | e2e 2 + `swarm demo parser-issue --mode mock` |
 
-### P09 details
-- React/Vite operator console: mission graph expand/contract, routes, capacity, workers, profiles, approvals, events
-- Honest unknown/retired/gated/exhausted/provisional states; mock banner; no secrets in bundle
-- Evidence: **fixtures only**, not live API/providers
-
-### P13 details
-- Authenticated `/v1` API + SSE/event cursor; cancel fences; policy-gated probe/eval
+### P14 details
+- Synthetic parser repo; two planners; expand/contract; concurrent fairness mission
+- Fault inject: rate-limit + worker revoke/replace; wrong patch caught by tests
+- Acceptance from artifacts/checks, not model text
+- Evidence: **fake models**; real controller/broker/workers/pytest
 
 ## Exact commands
 
 ```sh
 cd /Users/pchordia/Downloads/swarm-ai
-npm --prefix apps/console test
-npm --prefix apps/console run build
-uv run pytest tests/ui tests/api
-uv run swarm api export-openapi
+uv run pytest tests/e2e
+uv run swarm demo parser-issue --mode mock --report-dir var/reports/demo
+npm --prefix apps/console test && npm --prefix apps/console run build
+uv run pytest tests/api tests/ui
 ```
 
 ## Next
 
-**P14** integrated dynamic demo (deps P09–P13 satisfied).  
-**P15** provider onboarding also ready offline (no spend).
+**P15** safe provider onboarding / bounded canaries (offline scaffolding ready; live needs keys).  
+Then P16 (after P15), P17 (deploy).
 
 ## User actions
 
-None offline. No push. No spend.
+None for offline. Live P15–P16 need provider keys (no spend without explicit allow). No push.
