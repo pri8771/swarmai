@@ -1,97 +1,105 @@
 # SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
+Updated 2026-09-20 by LEAD-20260920-010. Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440` closes LEAD-009 source items #1–6 locally (mypy, scoped idempotency, bootstrap split, release evidence semantics, provider fail-closed, parser fixture-only). Local CI mirror green (ruff/mypy/packaging/alembic/offline pytest 245/console). Await remote Actions on that tip for FIX-001 current-tip green. Cursor CLI still **Not logged in**; SKIP_CURSOR_PROBE not cleared.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current tip reviewed: `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc`. Actions `35539853498` is current-tip green for offline+console checks, but **G10 is not accepted** because source review found operational mock contamination, worker/approval ownership gaps, and insufficient release-evidence binding. Cursor agent CLI remains Not logged in; do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE`.
 
-## Execution and ownership
+## Execution discipline
 
-Use/reuse the dedicated integration branch `cursor/v1.4-live-integration-11e2`, with scoped task branches/worktrees. Claim a packet in AGENT_MESSAGES and STATE with base SHA and owned files. One integration owner controls shared schema, API/store conflicts, lockfiles and migration ordering. No simultaneous writers in the same worktree. Preserve unrelated work; no force-push.
-
-Status: queued -> assigned -> in_progress -> implemented -> tests_verified -> live_verified (where required) -> lead_reviewed. Acceptance is separate from merge/release. Continue ready independent implementation while a live prerequisite or review is pending; never fabricate that missing evidence. No known-answer or operational mock path is accepted. A fail/unknown/blocked state is preferable to fake success.
+Use `cursor/v1.4-live-integration-11e2` plus bounded worktrees. One owner integrates shared API/store/schema/lockfile changes. Preserve unrelated work. Status progression remains queued -> assigned -> in_progress -> implemented -> tests_verified -> live_verified where required -> lead_reviewed. Passing CI is necessary, not sufficient. Unknown/blocked is better than fake success.
 
 ## G10 / V1.0 repair
 
 ### FIX-001 — comprehensive CI and honest baseline
 
-Status: `implemented_awaiting_remote_ci`; PR #14 tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440`; local ruff/mypy/install/alembic/offline pytest/console green. P0. Audit AUD-01/11.
+Status: `tests_verified_current_tip` for CI scope. PR #14 tip `f75c6cb…`; Actions `35539853498`.
 
-Required now: confirm full green current-tip GitHub Actions (offline + console). Preserve DB/live blocks honestly.
+Verified by lead: console `npm ci`/lint/Vitest/build success; Ruff success; mypy **139 source files** success; install/package check success; Alembic head `9eb193b10f4e`; broad offline pytest **245 passed, 2 skipped**. CI integration tests are explicitly blocked/skipped because `SWARM_DATABASE_URL` is absent; this is not a pass. Prior local PostgreSQL integration evidence is worker-reported, not re-executed by lead.
 
-Accept: exact current candidate SHA, complete backend/frontend inventory, commands/results and current remote CI evidence. Earlier green SHAs do not certify a newer red tip.
+Next: rerun these same current-tip checks after the G10 source fixes below. Do not regress coverage.
 
-### FIX-002 — auth, project isolation, idempotency
+### FIX-002 — authentication, project boundaries, scoped ownership
 
-Status: `implemented_source_closed_awaiting_lead`; scoped idempotency + auth-before-cache + bootstrap≠demo principals at tip `108145ea…`. P0 security. Audit AUD-03/04/10.
+Status: `partial_changes_required`. Core mission/history authorization and scoped idempotency are materially improved; all inspected operational idempotency callers now use actor/project/operation/digest after authorization. Remaining release blockers:
 
-Remove seeded installed-runtime identities; implement per-install auth and safe unconfigured startup. Authorize before cache/data/history access. Scope idempotency by actor/project/operation plus request digest and reject body mismatches. Validate ownership on reports, artifacts, history, approvals and workers. Coordinate API/store edits with FIX-005 and RUN-111.
+1. Persist project ownership for workers and approvals.
+2. `GET /v1/workers` must filter by caller project(s) or admin authority; no global cross-project metadata view.
+3. `GET /v1/approvals` must filter by ownership; resolve/detail operations must authorize against the approval's durable owning project, not simply the caller's first project.
+4. Worker heartbeat/detail/control paths must bind to worker project ownership plus membership token as appropriate.
+5. Add two-project fail-before/pass-after tests proving no body/metadata leakage or cross-project resolve/heartbeat.
+6. Operational bootstrap token must not silently receive hard-coded `{proj_demo, proj_other}` membership. Require explicit install-local principal/project mapping or generated/persisted install identity. Fixed demo IDs remain fixture-only.
 
-Accept: negative regressions fail before the fix and pass afterward, including known demo bearer tokens in operational/non-loopback mode, two principals/projects, history-backed records, key reuse and request-body mismatches. No secret leakage. Keep application private/loopback until this is reviewed.
+Accept: all above regressions pass; known demo credentials remain fixture-only/loopback-only; no secret leakage.
 
 ### FIX-003 — evidence-backed release/readiness
 
-Status: `implemented_source_closed_awaiting_lead`; release evidence semantic validation + provider fail-closed at tip `108145ea…`. P0 integrity. Audit AUD-02/08/09.
+Status: `partial_changes_required`. Provider registry fail-closed behavior is materially improved and should be preserved. Release verifier is not yet contract-complete.
 
-Remove hard-coded verification/readiness flags. File existence is packaging evidence, not a test result. Key presence/public catalog access is not authenticated or zero-charge eligibility. Add exact-route observation provenance/expiry. Separate actual timeout/cancellation/recovery behavior from helper state transitions. Lock behavioral acceptance contracts before tests.
+Current defect: `_validate_evidence_file()` can pass an evidence record with no source SHA; the current release test explicitly expects a no-SHA record to pass. Tighten evidence schema so a behavioral pass requires:
 
-Accept: missing/stale/failed evidence prevents the corresponding pass. Broken runtime behavior fails acceptance even with all documents present. No guessed cost eligibility, success or task suitability.
+- exact candidate SHA present and equal to current candidate;
+- command inventory plus actual successful exit/result;
+- explicit evidence mode;
+- generated/observed timestamp and defined freshness window/policy;
+- relevant config/dataset/model/tool version identifiers for the evidence type;
+- stale, missing, mismatched, failed or unbound evidence => fail/unknown.
 
-### FIX-004 — platform sessions and real hourly worker
+Add negative tests for missing SHA, wrong SHA, failed exit, stale timestamp, wrong mode and missing required config identity. Do not satisfy this by adding another boolean.
 
-Status: `partial_scheduler_verified_worker_auth_blocked`; repeated scheduled check-ins are evidenced, but the scheduler currently skips the Cursor probe and `cursor agent status` remains Not logged in, so unattended worker spawning is not verified. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; **cursor agent status still Not logged in** after operator claim (loginDeepControl pending); unattended spawn not resumed.
+### FIX-004 — platform sessions and actual hourly worker
 
-Follow PLATFORM_ACCESS.md and CURSOR_HOURLY_PROMPT.md. Maintain per-platform aliases, login method/profile, private credential refs and actual session-check times. Preserve existing Google SSO restrictions. Restore the original protected destination after the essential human login step. The reported Apply URL itself is unavailable here; do not invent a reproduction. An authorized controlled expired-session test is distinct from reproducing that exact incident.
+Status: `partial_scheduler_verified_worker_auth_blocked`. Repeated scheduler check-ins exist, but unattended Cursor spawning is not verified because `cursor agent status` and `cursor agent whoami` report **Not logged in** and the scheduler intentionally skips the agent probe.
 
-Configure one permitted local/eligible runner with lock, bounded invocations, resumable state and sanitized evidence. No cloud-agent billing. Show an actual invocation and then two actual scheduler-triggered check-ins before marking recurring operation verified. Future observations stay pending. Missing profile/auth/entitlement affects that task, not all code work.
+Code work continues. Human action only when convenient for this lane: complete the active browser auth/passkey/MFA/consent from a fresh `cursor agent login`; then verify `status` + `whoami` before clearing the skip. No paid cloud automation.
 
-### FIX-005 — remove operational demo dependence
+### FIX-005 — remove operational demo/mock dependence
 
-Status: `implemented_source_closed_awaiting_lead`; parser dogfood is opt-in via `--fixture-parser-dogfood` / `parser_dogfood_fixture=True` (selfdev only); default mission path no longer hard-wires OFF_BY_ONE. P0 product truth. Audit AUD-05/06/07/10.
+Status: `partial_changes_required`. GOOD_FIX operational substitution is removed, parser dogfood is opt-in, and the scale force-progress bypass is no longer found in current searched source. However normal product surfaces still contain mock/fixture runtime behavior and this violates the current real-data policy.
 
-Inventory default/runtime fixture imports, synthetic users/providers/activity, GOOD_FIX, canned responses and force-progress quota bypasses. Remove them from the shipped operational path. Failed output must fail or use bounded real repair/escalation. No assumption that every task is the demo parser. Integrate useful existing modules; keep missing generic capability explicitly incomplete until RUN-111. Preserve isolated tests but do not count them as live proof.
+Required repair:
 
-Accept: clean operational install has real empty state, no fake fallback on API failure, no supplied-answer patch and no execution after denied admission. Store/console/API show actual observations. Unimplemented features are blocked, not renamed complete.
+1. `ProductStore` normal mode must not default to `execution_mode="mock"`.
+2. `/v1/capacity` must not build/explain a mock broker. Return actual observed broker state, or honest empty/unknown/unsupported state until wired.
+3. `/v1/providers` and `/v1/routes` must not present mock/fixture data as operational state. Catalog-only entries may be shown only as explicitly cataloged/unverified; connected/available state must come from actual observations.
+4. Normal console live loading must NOT spread `MOCK_SNAPSHOT` into routes/workers/profiles/etc. Build a true empty live snapshot and populate only real endpoint results.
+5. Default operational console must not silently choose mock mode. Mock fixture mode may exist only as an explicit dev/test surface.
+6. Remove **Recover with mock fixtures** from operational error handling; errors remain errors with retry/diagnostic actions.
+7. Expand/Contract UI must call the operational graph API/runtime when implemented; local fixture mutations cannot masquerade as a real swarm action.
+8. Remove or fixture-gate `/v1/missions/{mission_id}/side-effects/demo` so it is not shipped in the normal router.
+9. Add regression tests asserting a clean operational install/console contains no fixture routes/workers/profiles/missions and no mock fallback on API failure.
 
-## G11 / V1.1 — RUN-111: unified generic mission
+Accept: operational install is genuinely empty/unconfigured/unknown where appropriate, and test fixtures remain isolated.
 
-Status: `in_progress_not_accepted` on `cursor/v1.4-live-integration-11e2`; durable identity/restart/review-control evidence exists; parser dogfood is fixture-only (default path no longer hard-wired). G10 packaged awaiting lead. Owner: Cursor.
+## G11 / V1.1 — RUN-111 unified generic mission
 
-One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
+Status: `in_progress_not_accepted`. Current evidence shows durable identity/restart/review controls and default parser dogfood is no longer selected. Residual acceptance remains exactly what the G11 evidence index states: three unfamiliar tasks fully executed across two families via console+API+CLI on the same IDs.
 
-Accept: three unfamiliar tasks across two families; same mission submitted/viewed across interfaces; actual service restart/reopen; wrong output rejected; unsupported task honest; no known-answer path. See G11 contract for details.
+Additional lead finding: normal `MissionRuntime` still copies accepted worktree files into the primary checkout. Replace automatic promotion with an explicit apply/approval boundary or return diff/artifacts for review. No mission acceptance should silently modify an unrelated primary worktree.
 
-## G12 / V1.2 — INF-121: exact-route admission and concurrent pool
+Do not call G11 accepted until G10 source repairs are integrated and current-tip green.
 
-Status: `in_progress_local_only_not_accepted` — local concurrent broker/fallback evidence exists; required dual remote overlap remains blocked and provider readiness must be repaired first. Owner: Cursor/inference.
+## G12 / V1.2 — INF-121 concurrent governed inference
 
-Every model call/retry goes through the broker. Exact route/account identity, independently evidenced auth/eligibility/health/capabilities, atomic shared-quota reservations, deadlines/reset/cooldown and accounting. No always-true local route or unmetered hidden model calls. Reuse configured accounts; browser hand off only essential human steps.
+Status: `in_progress_local_only_not_accepted`. Local broker/fallback preparation does not satisfy the gate. Required: overlapping real calls through at least two independently authorized remote providers in one mission plus an actually available local route, with exact route identity, zero-charge eligibility, admission and reconciliation evidence. No paid fallback.
 
-Accept: actual overlapping calls to two independent remote providers in one mission, plus actual local inference/fallback; safe unavailable/quota behavior; failed/stale evidence denied; no double allocation. Live capacity missing = gate blocked, not simulated pass.
+## G13 / V1.3 — EVAL-131 empirical qualification
 
-## G13 / V1.3 — EVAL-131: task/size evidence and selection
+Status: `provisional_screening_not_qualified`. Latest worker evidence: S+M × six families × two local models at n=5 = **24 provisional cells / 120 trials**. Useful screening only.
 
-Status: `provisional_underpowered_not_accepted` — dataset holdouts 5/cell; S+M × 6 families × 2 models local $0 screening at n=5 (24 cells) recorded; L/XL + third config + acceptance criterion still open. Owner: Cursor/evaluation.
+Required before qualification: L and XL coverage, at least a third actual model configuration, preregistered acceptance/uncertainty criterion, sufficient samples to satisfy it, and total planning/retry/review overhead. Preserve weak/failed cells; do not promote observed 1.0/0.8 rates from n=5 into qualified profiles.
 
-Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
+Pause extra screening volume if it competes with G10 repair; independent non-conflicting work may continue.
 
-Accept: routing uses observed matching profiles and handles failure via bounded repair/subdivision/escalation; compare smaller-worker pipelines with direct execution including overhead. The contract's screening minimum is not automatic qualification. No forged model results or leaked reference answers.
+## G14 / V1.4 — SWARM-141 adaptive organization
 
-## G14 / V1.4 — SWARM-141: adaptive graph and organization
+Status: `offline_prep_not_accepted`. Existing 10/50/100 logical load and graph artifacts are preparation only. Required live proof remains: multiple planning/review configurations contribute, evidence causes real graph expansion, convergence causes contraction/merge/cancel, useful work overlaps, and admission is enforced.
 
-Status: `offline_prep_not_accepted` — graph/10-50-100/elastic-vs-fixed artifacts are offline preparation only; live multi-planner adaptive proof is absent. Owner: orchestration lane.
+## LIVE-142 — final V1.4 acceptance
 
-Validated graph revisions for spawn/split/merge/reassign/cancel/review and multiple planning approaches; independent investigations, evidence exchange, duplicate suppression and bounded delegation. Separate logical agents, active sessions, requests and processes. Preserve permission/resource checks on every expansion.
+Status: `not_started`. Requires integrated G10-G14 plus the contract campaign: all applicable checks, 12 preregistered positive missions, six negative scenarios, real provider overlap/local fallback, real graph adaptation, restart/reopen, and an observed 24-hour protected live window. Keep every attempt. No time acceleration or cherry-picking.
 
-Accept: real mission expands on discovered work and contracts on convergence; two capable planning/review configurations contribute; smaller qualified workers actually run concurrently. Separately exercise 10/50/100 logical assignments and measure permitted real inference concurrency. Compare elastic/single/fixed approaches fairly; no hash-only proof or fixed permanent team ceiling.
+## Immediate next action for Cursor
 
-## G14 final — LIVE-142: clean installation and live acceptance
+ACK `LEAD-20260920-010`. Before more G13 volume, repair FIX-005 operational mock contamination, FIX-002 worker/approval ownership + bootstrap scoping, and FIX-003 strict evidence binding. Then remove G11 automatic primary-checkout promotion. Push one integrated candidate, rerun full current-tip CI/security/evidence regressions, and post exact SHA/run IDs/results. Continue safe independent V1.1–V1.4 implementation only where it does not conceal or conflict with these G10 blockers.
 
-Status: queued; requires integrated G10-G14 behavior and current evidence. Owner: independent QA lane with lead review.
-
-Run the final campaign in V1_4_EXECUTION_CONTRACT.md: all applicable checks, 12 preregistered positive missions across supported work, at least six specified failure scenarios, real provider overlap/fallback, real graph adaptation, actual restart and an observed 24-hour private/live operating window. Keep all attempts and triage every error. Revalidate relevant changes; do not fabricate time or cherry-pick only successes.
-
-Accept: no known unresolved supported-V1.4 defects; no unexpected application errors in the accepted campaign; no unapproved spend/secret leakage/duplicate side effects; current independent review. Missing live prerequisite = implemented/live-blocked with precise action. Deliver candidate SHA/draft PR, actual startup commands/address, evidence index and known-issue matrix. Final main merge/release stays with operator.
-
-## Immediate next action
-
-G10 remains **packaged for lead accept** (not invented). Integration tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` adds broader G13 S+M dual-model n=5 $0 screening (24 provisional cells); CI tip green retained on `3b0011f` run `35539303334`; CI green on `f75c6cb` run `35539853498`. G13 still provisional/not qualified. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.
+No main merge, release/tag, public deployment, spend, destructive action or V1.5+ work.
