@@ -328,6 +328,12 @@ def main() -> None:
     mission_sub = mission.add_subparsers(dest="mission_command", required=True)
     mplan = mission_sub.add_parser("plan", help="Inspect repo and emit structured task graph")
     mplan.add_argument("--goal", required=True)
+    mplan.add_argument(
+        "--dynamic",
+        action="store_true",
+        help="P32: form dynamic subteams (supervisor/specialists/workers/reviewers)",
+    )
+    mplan.add_argument("--max-agents", type=int, default=32)
     mrun = mission_sub.add_parser("run", help="Execute a real software mission end-to-end")
     mrun.add_argument("--goal", required=True)
     mrun.add_argument("--model", default="gemma3:4b")
@@ -352,6 +358,21 @@ def main() -> None:
     cost = sub.add_parser("cost", help="Zero-spend cost ledger")
     cost_sub = cost.add_subparsers(dest="cost_command", required=True)
     cost_sub.add_parser("show", help="Show aggregated mission spend (USD)")
+
+    scale = sub.add_parser("scale", help="V0.3 scale / swarm orchestration")
+    scale_sub = scale.add_subparsers(dest="scale_command", required=True)
+    srun = scale_sub.add_parser(
+        "run",
+        help="P34/P35: run lightweight multi-agent scale mission (zero-spend)",
+    )
+    srun.add_argument("--agents", type=int, default=48)
+    srun.add_argument("--concurrency", type=int, default=8)
+    srun.add_argument("--goal", default="Scale fingerprint swarm across python modules")
+    srun.add_argument(
+        "--no-supervisor-model",
+        action="store_true",
+        help="Skip live Ollama supervisor call (still real file work)",
+    )
 
     args = parser.parse_args()
     if args.command == "serve":
@@ -616,18 +637,39 @@ def main() -> None:
         repo = _repo_root()
         inspection = inspect_repo(repo)
         mission_obj = build_software_mission(goal=args.goal)
-        proposal = plan_task_graph(mission_obj, inspection)
-        print(
-            json.dumps(
-                {
-                    "mission_id": mission_obj.id,
-                    "inspection": inspection.to_dict(),
-                    "proposal": json.loads(serialize_plan(proposal)),
-                },
-                indent=2,
-                default=str,
+        if getattr(args, "dynamic", False):
+            from swarm.mission.teams import plan_dynamic_task_graph
+
+            proposal, team = plan_dynamic_task_graph(
+                mission_obj, inspection, max_agents=args.max_agents
             )
-        )
+            print(
+                json.dumps(
+                    {
+                        "mission_id": mission_obj.id,
+                        "mode": "dynamic_team",
+                        "team": team.to_dict(),
+                        "inspection": inspection.to_dict(),
+                        "proposal": json.loads(serialize_plan(proposal)),
+                    },
+                    indent=2,
+                    default=str,
+                )
+            )
+        else:
+            proposal = plan_task_graph(mission_obj, inspection)
+            print(
+                json.dumps(
+                    {
+                        "mission_id": mission_obj.id,
+                        "mode": "fixed_crew",
+                        "inspection": inspection.to_dict(),
+                        "proposal": json.loads(serialize_plan(proposal)),
+                    },
+                    indent=2,
+                    default=str,
+                )
+            )
     elif args.command == "mission" and args.mission_command == "run":
         from swarm.envfile import load_repo_dotenv
         from swarm.mission.runtime import run_mission
@@ -663,6 +705,35 @@ def main() -> None:
 
         ledger = load_mission_costs(_repo_root() / "var" / "missions")
         print(json.dumps(format_cost_show(ledger), indent=2, default=str))
+    elif args.command == "scale" and args.scale_command == "run":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.runtime.scale import run_scale_mission
+
+        load_repo_dotenv(_repo_root())
+        report = run_scale_mission(
+            repo=_repo_root(),
+            goal=args.goal,
+            agent_count=args.agents,
+            max_concurrency=args.concurrency,
+            use_supervisor_model=not args.no_supervisor_model,
+        )
+        summary = {
+            "run_id": report.run_id,
+            "agent_count": report.agent_count,
+            "task_count": report.task_count,
+            "completed": report.completed,
+            "failed": report.failed,
+            "duplicates_suppressed": report.duplicates_suppressed,
+            "consensus": report.consensus,
+            "total_cost_usd": report.total_cost_usd,
+            "runtime_ms": report.runtime_ms,
+            "scheduler_stats": report.scheduler_stats,
+            "report_hash": report.report_hash,
+            "mock_vs_live": report.mock_vs_live,
+        }
+        print(json.dumps(summary, indent=2, default=str))
+        if report.consensus.get("decision") != "accept":
+            raise SystemExit(2)
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
