@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +11,7 @@ from pathlib import Path
 import uvicorn
 
 from swarm.db.engine import create_db_engine, database_url, ping
+from swarm.providers.catalog import list_providers
 
 
 def _repo_root() -> Path:
@@ -36,6 +38,11 @@ def cmd_db_validate() -> None:
     print(f"ok database={database_url().split('@')[-1]}")
 
 
+def cmd_providers_list(*, mode: str) -> None:
+    rows = list_providers(mode=mode)
+    print(json.dumps({"mode": mode, "providers": rows}, indent=2))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="swarm", description="SwarmAI local CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -49,6 +56,16 @@ def main() -> None:
     db_sub.add_parser("migrate", help="Apply Alembic migrations to head")
     db_sub.add_parser("validate", help="Ping configured database")
 
+    providers = sub.add_parser("providers", help="Provider catalog operations")
+    providers_sub = providers.add_subparsers(dest="providers_command", required=True)
+    plist = providers_sub.add_parser("list", help="List providers")
+    plist.add_argument(
+        "--mode",
+        default="mock",
+        choices=["mock", "live"],
+        help="mock=offline catalog view; live still does not call providers here",
+    )
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -56,6 +73,8 @@ def main() -> None:
         cmd_db_migrate()
     elif args.command == "db" and args.db_command == "validate":
         cmd_db_validate()
+    elif args.command == "providers" and args.providers_command == "list":
+        cmd_providers_list(mode=args.mode)
 
 
 if __name__ == "__main__":
