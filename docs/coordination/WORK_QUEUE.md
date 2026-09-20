@@ -1,8 +1,8 @@
 # SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20 by CURSOR-20260920-021 (ACK LEAD-012). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
+Updated 2026-09-20 by CURSOR-20260920-022 (ACK LEAD-013/014; W-121A/W-131A packaged). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `724a324b77d60fff143674feecec9239062e9c3c` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `19b91ba89bfac5d670af0d766f21f4b9f2ca1a62` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
 
 ## Worker packet / story-point execution
 
@@ -10,13 +10,12 @@ Use `WORKER_STORY_POINT_PROTOCOL.md`, `WORKER_PACKET_BACKLOG.md` and `WORKER_PER
 
 Worker bias: SP1–SP3 execution goes to Cursor. Split SP4–SP5 whenever practical. Lead handles architecture, hard debugging, acceptance, external research and review. Keep >=3 ready worker packets when practical.
 
-Current ready packets while FIX-004 auth waits:
-- W-111A (SP2): real browser console create/observe + API/CLI same durable ID.
-- W-111B (SP2): current-candidate restart/reopen/cancel/unsupported/wrong-output controls.
-- W-121A (SP2): exact-route remote-provider eligibility ledger.
-- W-131A (SP1): qualification gap map under frozen G13 protocol.
+Packaged while FIX-004 auth waits (CURSOR-022):
+- W-111A/B: evidenced under CURSOR-021 (not lead-accepted).
+- W-121A (SP2): eligibility ledger posted — **0 admissible remotes**; W-121B blocked.
+- W-131A (SP1): gap map posted; W-131B not started.
 
-FIX-004 W-041A is external-blocked on live CLI login. Do not idle; execute dependency-ready packets above. When auth succeeds, immediately perform W-041B/W-041C.
+FIX-004 W-041A remains external-blocked on live CLI login. Optional local $0: third-model L/XL n=5 screening gaps only. When auth succeeds, immediately perform W-041B/W-041C.
 
 ## Execution discipline
 
@@ -124,4 +123,4 @@ Status: `campaign_preregistered_not_started`. `LIVE_142_CAMPAIGN_PROTOCOL.md` no
 
 ## Immediate next action for Cursor
 
-ACK LEAD-20260920-014 by packet ID. While W-041A waits on human login, execute W-111A, W-111B, W-121A and W-131A in priority order as independent SP1–SP2 packets. Keep exact SHA/tests/evidence per packet. Once CLI auth verifies, switch to W-041B then W-041C to close G10. After that, continue the decomposed SP1–SP3 path in WORKER_PACKET_BACKLOG.md. Do not self-accept gates or start V1.5+ implementation. No merge/spend/launch.
+CURSOR-022 ACKed LEAD-013/014 and packaged W-121A + W-131A (W-111A/B already evidenced under CURSOR-021). While W-041A waits on human login: do **not** invent remote eligibility or EVAL qualification; optional local $0 only for missing third-model L/XL n=5 screening identified by the gap map. Once CLI auth verifies, switch to W-041B then W-041C to close G10. W-121B stays blocked until two fresh zero-charge remotes verify. Do not self-accept gates or start V1.5+ implementation. No merge/spend/launch.

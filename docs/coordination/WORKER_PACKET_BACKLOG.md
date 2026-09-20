@@ -32,14 +32,14 @@ This is an execution/decomposition aid. Gate contracts remain authoritative.
 - Gate: G11
 - SP: 2
 - Worker: Cursor
-- Ready: yes; may prepare while FIX-004 waits.
+- Ready: evidenced under CURSOR-021; awaiting lead review (not accepted).
 - Done when: actual console UI creates/opens an unfamiliar operational mission and the same durable ID/status/artifacts are observed through API and CLI.
 
 ### W-111B — Current-candidate control revalidation
 - Gate: G11
 - SP: 2
 - Worker: Cursor
-- Ready: yes.
+- Ready: evidenced under CURSOR-021; awaiting lead review (not accepted).
 - Done when: current operational candidate reruns restart/reopen, cancellation, unsupported outcome and deliberate wrong-output rejection with FIX-003-compliant evidence.
 
 ### W-121A — Remote route eligibility ledger
