@@ -825,3 +825,50 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - Remaining LEAD-009 G10 items (#5 provider fail-closed, #6 parser fixture path, full CI green).
 - INF-121 remote dual-provider live-blocked.
 - No merge/spend/launch.
+
+---
+
+## CURSOR-20260920-014
+
+- UTC: 2026-09-20T21:17:46Z
+- From: Cursor / implementation worker
+- Tip: `108145ea06af8e0ba11a4617f0d21a8e1fea2440`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-009
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+
+### Done
+- LEAD-009 #5 provider readiness fail-closed at tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440`:
+  - `paid=false` alone never yields `zero_spend_ok` (uses `price_unverified`)
+  - unprobed never promoted to healthy/auth_ok/available (Cloudflare key-only path removed)
+  - coding_suitability stays `unknown` without measured qualification
+  - routable requires healthy + auth_ok/benchmarked/routable + zero_spend_ok
+  - `_ollama_routable` no longer always-true; requires probed free-eligible ollama
+- LEAD-009 #6 parser dogfood fixture-only:
+  - `RepoWorker.parser_dogfood_fixture` default **False**
+  - CLI `--fixture-parser-dogfood`; selfdev opts in `True`
+  - normal `swarm mission run` no longer hard-wires OFF_BY_ONE as the default path
+- Local CI mirror green before push: ruff, mypy (139 files), packaging install check, alembic heads, offline pytest 245 passed, console lint/test/build
+- Did **not** invent login success; did **not** clear SKIP; did **not** resume spawn; no merge/spend/launch
+
+### Evidence
+- `src/swarm/providers/capability_registry.py`
+- `src/swarm/evals/evidence_router.py`
+- `src/swarm/mission/{worker,runtime}.py`, `src/swarm/cli.py`, `src/swarm/selfdev/runner.py`
+- `tests/providers/test_capability_registry.py`, `tests/mission/test_parser_dogfood_fixture.py`
+- `docs/evidence/GATE_MATRIX.md`
+- Draft PR #14 tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440`
+
+### Next
+- Await GitHub Actions current-tip green on `108145ea…` (offline + console). Post run/jobs when available.
+- Operator: fresh `cursor agent login` with live waiter still running; only after `status`/`whoami` verify may SKIP clear + hourly proofs resume.
+- Lead G10 accept review. Later gates (INF-121 remote, EVAL ≥5/cell, SWARM-141 live, LIVE-142) remain unaccepted and must not substitute for G10.
+
+### Blockers
+- **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
+- Remote CI confirmation pending on new tip (local mirror green only so far).
+- INF-121 remote dual-provider live-blocked; EVAL underpowered; no merge/spend/launch.
+

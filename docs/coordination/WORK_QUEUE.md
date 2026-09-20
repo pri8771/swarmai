@@ -2,7 +2,7 @@
 
 Updated 2026-09-20. The owner approved V1.0 repair -> V1.4 implementation inclusive. `V1_4_EXECUTION_CONTRACT.md` is authoritative for this tranche. No repeated operator implementation approval is required at each 0.1; evidence/independent review remain mandatory. Final main merge/release/public exposure is not authorized. Stop feature work at V1.4; V1.5-V3 remain roadmap direction.
 
-Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 latest tip is `643e38bf3f08e998936aad21bff3cb9a10541f4e`; the newest commit adds G13 holdout evidence only and does not close G10. Current GitHub Actions run `35536776956` is red: console lint/test/build passed, Ruff passed, then mypy failed at `src/swarm/mission/runtime.py:46`; install/Alembic/offline pytest did not run on this exact tip. Lead review LEAD-20260920-007 also found remaining G10 defects in non-mission idempotency/auth ordering, bootstrap demo principals, evidence-file validation, provider readiness and the parser-specific normal mission runtime. Earlier green SHAs remain evidence only for those SHAs.
+Remote main remains `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440` closes LEAD-009 source items #1–6 locally (mypy, scoped idempotency, bootstrap split, release evidence semantics, provider fail-closed, parser fixture-only). Local CI mirror green (ruff/mypy/packaging/alembic/offline pytest 245/console). Await remote Actions on that tip for FIX-001 current-tip green. Cursor CLI still **Not logged in**; SKIP_CURSOR_PROBE not cleared.
 
 ## Execution and ownership
 
@@ -14,15 +14,15 @@ Status: queued -> assigned -> in_progress -> implemented -> tests_verified -> li
 
 ### FIX-001 — comprehensive CI and honest baseline
 
-Status: `implemented_current_tip_ci_failed`; PR #14 tip `4021c2de32b040e0760e3f771820380e2581aa4e`; current CI `35536709246` fails mypy after Ruff, while console CI passes. P0. Audit AUD-01/11.
+Status: `implemented_awaiting_remote_ci`; PR #14 tip `108145ea06af8e0ba11a4617f0d21a8e1fea2440`; local ruff/mypy/install/alembic/offline pytest/console green. P0. Audit AUD-01/11.
 
-Required now: fix the broker typing regression and obtain a full green current-tip offline pipeline (Ruff, mypy, install, Alembic, broad offline pytest) plus console lint/test/build. Preserve DB/live blocks honestly.
+Required now: confirm full green current-tip GitHub Actions (offline + console). Preserve DB/live blocks honestly.
 
 Accept: exact current candidate SHA, complete backend/frontend inventory, commands/results and current remote CI evidence. Earlier green SHAs do not certify a newer red tip.
 
 ### FIX-002 — auth, project isolation, idempotency
 
-Status: `partial_changes_required`; mission isolation improved, but LEAD-20260920-007 found remaining bare-key idempotency and auth-after-cache paths on provider/evaluation/worker mutations at `4021c2de32b040e0760e3f771820380e2581aa4e`. P0 security. Audit AUD-03/04/10.
+Status: `implemented_source_closed_awaiting_lead`; scoped idempotency + auth-before-cache + bootstrap≠demo principals at tip `108145ea…`. P0 security. Audit AUD-03/04/10.
 
 Remove seeded installed-runtime identities; implement per-install auth and safe unconfigured startup. Authorize before cache/data/history access. Scope idempotency by actor/project/operation plus request digest and reject body mismatches. Validate ownership on reports, artifacts, history, approvals and workers. Coordinate API/store edits with FIX-005 and RUN-111.
 
@@ -30,7 +30,7 @@ Accept: negative regressions fail before the fix and pass afterward, including k
 
 ### FIX-003 — evidence-backed release/readiness
 
-Status: `partial_changes_required`; hard-coded yes is removed, but release verification still treats evidence-file presence as a behavioral pass and provider readiness still violates fail-closed requirements. P0 integrity. Audit AUD-02/08/09.
+Status: `implemented_source_closed_awaiting_lead`; release evidence semantic validation + provider fail-closed at tip `108145ea…`. P0 integrity. Audit AUD-02/08/09.
 
 Remove hard-coded verification/readiness flags. File existence is packaging evidence, not a test result. Key presence/public catalog access is not authenticated or zero-charge eligibility. Add exact-route observation provenance/expiry. Separate actual timeout/cancellation/recovery behavior from helper state transitions. Lock behavioral acceptance contracts before tests.
 
@@ -46,7 +46,7 @@ Configure one permitted local/eligible runner with lock, bounded invocations, re
 
 ### FIX-005 — remove operational demo dependence
 
-Status: `partial_changes_required`; GOOD_FIX substitution and scale force-progress bypass are repaired, but normal `swarm mission run` still enters the parser-specific RepoWorker dogfood path. P0 product truth. Audit AUD-05/06/07/10.
+Status: `implemented_source_closed_awaiting_lead`; parser dogfood is opt-in via `--fixture-parser-dogfood` / `parser_dogfood_fixture=True` (selfdev only); default mission path no longer hard-wires OFF_BY_ONE. P0 product truth. Audit AUD-05/06/07/10.
 
 Inventory default/runtime fixture imports, synthetic users/providers/activity, GOOD_FIX, canned responses and force-progress quota bypasses. Remove them from the shipped operational path. Failed output must fail or use bounded real repair/escalation. No assumption that every task is the demo parser. Integrate useful existing modules; keep missing generic capability explicitly incomplete until RUN-111. Preserve isolated tests but do not count them as live proof.
 

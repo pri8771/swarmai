@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T21:11:49Z",
+  "updated_at": "2026-09-20T21:17:46Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -187,8 +187,8 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "repair_in_progress_changes_required",
-      "evidence": "PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e; CI 35536776956 fails mypy; source review in LEAD-007/008/009",
+      "status": "source_closed_awaiting_remote_ci_and_lead",
+      "evidence": "LEAD-009 #1-6 at 108145ea; local CI green; remote pending",
       "review": "not_accepted"
     },
     "G11": {
@@ -235,50 +235,48 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "Current PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e fails CI run 35536776956 at mypy; downstream offline steps did not execute",
-    "G10 auth/idempotency contract incomplete on non-mission mutation routes and optional bootstrap demo principals",
-    "G10 evidence/readiness contract incomplete: evidence-file presence and provider readiness still fail closed-policy requirements",
-    "Normal mission run remains parser-specific; generic RUN-111 path is not yet the sole operational mission path",
-    "Cursor unattended agent CLI remains Not logged in; scheduler check-ins are not the same as a verified worker spawn",
+    "Await remote GitHub Actions green on PR #14 tip 108145ea06af8e0ba11a4617f0d21a8e1fea2440 (local CI mirror green)",
+    "Cursor unattended agent CLI remains Not logged in; SKIP_CURSOR_PROBE not cleared; scheduler check-ins \u2260 verified worker spawn",
+    "G10 lead acceptance still pending despite LEAD-009 #1\u20136 source closed at tip 108145ea\u2026",
     "G12 remote dual-provider, G13 qualification, G14 live adaptive swarm and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T20:50:43Z",
+    "verified_at": "2026-09-20T21:17:46Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
+    "candidate_sha": "108145ea06af8e0ba11a4617f0d21a8e1fea2440",
     "candidate_commits": 16,
     "candidate_changed_files": 76,
-    "latest_verified_ci_run_id": 35536776956,
-    "latest_verified_ci_conclusion": "failure",
+    "latest_verified_ci_run_id": null,
+    "latest_verified_ci_conclusion": "pending_on_new_tip",
     "console_job_id": 106147109326,
     "console_conclusion": "success",
     "offline_job_id": 106147109367,
     "offline_conclusion": "failure",
     "ruff_passed": true,
-    "mypy_passed": false,
-    "mypy_error": "src/swarm/mission/runtime.py:46 SharedInferenceBroker assigned to None-typed attribute",
-    "downstream_install_alembic_pytest_executed": false,
+    "mypy_passed": true,
+    "mypy_error": null,
+    "downstream_install_alembic_pytest_executed": true,
     "live_gated_job_conclusion": "success_blocked_notice_only",
-    "live_acceptance_executed": false
+    "live_acceptance_executed": false,
+    "note": "Local mirror green at tip; remote Actions not yet confirmed for 108145ea"
   },
   "implementation_notes": {
-    "cursor_tip": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
+    "cursor_tip": "108145ea06af8e0ba11a4617f0d21a8e1fea2440",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed",
-    "optional_cursor_login": "not_logged_in_waiting_browser_auth",
+    "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "posted_not_lead_accepted",
     "inf121": "local_concurrent_and_kill_fallback_remote_blocked",
     "eval131": "local_provisional_screening_underpowered",
     "swarm141": "offline_prep_only",
     "lead_findings": [
-      "unscoped idempotency remains on provider/evaluation/worker routes; worker enroll cache before project auth",
-      "optional operational bootstrap still seeds fixed known demo principals",
-      "release verification still passes on evidence-file presence without SHA/freshness/result validation",
-      "provider registry still infers zero-spend/readiness/suitability from policy/config/provider identity",
-      "normal mission run still routes through parser-specific RepoWorker dogfood path"
+      "LEAD-009 #1\u20136 source closed at 108145ea (mypy, scoped idempotency, bootstrap split, release evidence, provider fail-closed, parser fixture-only)",
+      "Remote CI confirmation pending; G10 not lead-accepted",
+      "CLI login still Not logged in \u2014 do not clear SKIP_CURSOR_PROBE"
     ],
-    "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes"
+    "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes",
+    "lead_009": "items_1_to_6_source_closed_awaiting_remote_ci_and_lead_accept"
   }
 }
