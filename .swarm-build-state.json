@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T00:50:00Z",
+  "updated_at": "2026-09-20T00:44:17Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
-  "current_packet": "P08",
+  "current_packet": "P05",
   "packet_states": {
     "P01": {"state": "offline_verified", "integration_status": "offline_verified"},
     "P02": {"state": "offline_verified", "integration_status": "integration_verified"},
@@ -17,8 +17,27 @@
         "swarm_providers_list_mock": "passed"
       },
       "mock_vs_live": "recorded fixtures only; all catalog entries disabled"
+    },
+    "P08": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified",
+      "checks": {
+        "pytest_tools": "passed (part of 40)",
+        "swarm_sandbox_self_test": "ok=true network=off"
+      },
+      "mock_vs_live": "local isolated runner; network off; no host secrets"
+    },
+    "P04": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified",
+      "checks": {
+        "pytest_providers_extended": "passed (part of 40)"
+      },
+      "mock_vs_live": "catalog/fixture adapters only; not live inference"
     }
   },
-  "next_packets": ["P08", "P04", "P05"],
+  "next_packets": ["P05", "P06", "P07"],
   "blockers": {"user_required": [], "live_only": ["Provider API keys for P15-P16"]}
 }

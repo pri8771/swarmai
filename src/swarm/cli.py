@@ -12,6 +12,7 @@ import uvicorn
 
 from swarm.db.engine import create_db_engine, database_url, ping
 from swarm.providers.catalog import list_providers
+from swarm.tools.sandbox_runner import self_test as sandbox_self_test
 
 
 def _repo_root() -> Path:
@@ -66,6 +67,11 @@ def main() -> None:
         help="mock=offline catalog view; live still does not call providers here",
     )
 
+    sandbox = sub.add_parser("sandbox", help="Sandbox operations")
+    sandbox_sub = sandbox.add_subparsers(dest="sandbox_command", required=True)
+    st = sandbox_sub.add_parser("self-test", help="Run sandbox self-test")
+    st.add_argument("--network", default="off", choices=["off"])
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -75,6 +81,8 @@ def main() -> None:
         cmd_db_validate()
     elif args.command == "providers" and args.providers_command == "list":
         cmd_providers_list(mode=args.mode)
+    elif args.command == "sandbox" and args.sandbox_command == "self-test":
+        print(json.dumps(sandbox_self_test(network=args.network), indent=2))
 
 
 if __name__ == "__main__":

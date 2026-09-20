@@ -1,7 +1,7 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T00:50:00Z  
-**Packets complete:** P01, P02, P03  
+**Updated:** 2026-09-20T00:44:17Z  
+**Packets complete:** P01, P02, P03, P08, P04  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`  
 **Handoff kit:** `/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19`
@@ -13,13 +13,13 @@
 | P01 | offline_verified | 14 contract/spike tests |
 | P02 | integration_verified | 8 Postgres integration tests; `swarm db migrate/validate` |
 | P03 | offline_verified | 23 provider fixture tests; `swarm providers list --mode mock` |
+| P08 | offline_verified | tools/sandbox tests; `swarm sandbox self-test --network off` |
+| P04 | offline_verified | extended provider fixture/catalog tests |
 
-### P03 details
-- Core adapters: OpenRouter, Groq, Gemini, Cloudflare Workers AI, HF Inference, NVIDIA NIM, Mistral, Cohere, Cerebras, Ollama
-- Shared OpenAI-compatible transport + Gemini/Cohere/Cloudflare styles; **no automatic retries**
-- Catalog entries remain **disabled**; GitHub Models **retired** and never registered
-- Secrets are refs only; inspect_account never echoes values
-- Evidence is **mock/replay fixtures**, not live inference
+### P08 / P04 notes
+- ToolGateway + IsolatedCodeRunner + action receipts; sandbox network forced off
+- Extended catalog adapters (aggregators/local runtimes) registered disabled; mocks ≠ live
+- Combined check: `uv run pytest tests/tools tests/providers/extended tests/providers/core` → **40 passed**
 
 ## Exact commands
 
@@ -27,14 +27,15 @@
 cd /Users/pchordia/Downloads/swarm-ai
 export SWARM_DATABASE_URL=postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm
 uv sync
-uv run pytest tests/contracts tests/spikes tests/integration/db tests/providers/core
+uv run pytest tests/contracts tests/spikes tests/integration/db tests/providers/core tests/providers/extended tests/tools
 uv run swarm providers list --mode mock
+uv run swarm sandbox self-test --network off
 uv run swarm db validate
 ```
 
 ## Next (kit order)
 
-Continuing without waiting: **P08** (tools/sandbox — integration-ready) and **P04** (extended providers — integration after P03), then **P05** (broker).
+**P05** inference broker (start_after P01; integration_after P02+P03 — both satisfied). Then P06/P07 when P05 gates clear.
 
 ## User actions
 
