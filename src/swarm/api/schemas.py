@@ -31,6 +31,13 @@ class MissionReviewRequest(StrictModel):
     idempotency_key: str | None = None
 
 
+class MissionExecuteRequest(StrictModel):
+    """Execute declared task_family via local zero-spend worker."""
+
+    model: str = "gemma3:4b"
+    idempotency_key: str | None = None
+
+
 class WorkerEnrollRequest(StrictModel):
     project_id: str
     capabilities: list[str] = Field(default_factory=lambda: ["chat", "tools"])

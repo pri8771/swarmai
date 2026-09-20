@@ -145,10 +145,61 @@ class ProductStore:
             return mission
         return None
 
+    def _refresh_mission_from_store(self, mission_id: str) -> Mission | None:
+        """Prefer durable MissionStore when CLI/console mutated the same ID."""
+        path = self.mission_store()._path(mission_id)
+        if not path.exists():
+            return self.controller.missions.get(mission_id)
+        try:
+            record = self.mission_store().load(mission_id)
+        except (OSError, TypeError, KeyError, ValueError):
+            return self.controller.missions.get(mission_id)
+        if not record.contract:
+            return self.controller.missions.get(mission_id)
+        try:
+            durable = Mission.model_validate(record.contract)
+        except (TypeError, ValueError, KeyError):
+            return self.controller.missions.get(mission_id)
+        cached = self.controller.missions.get(mission_id)
+        if cached is None or durable.revision >= cached.revision or durable.status != cached.status:
+            self.controller.missions[mission_id] = durable
+            return durable
+        return cached
+
     def list_public_missions(self, *, project_id: str | None = None) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
         seen: set[str] = set()
+        # Durable store first — CLI/console/API share IDs; controller may be stale.
+        try:
+            for entry in self.mission_store().list_missions():
+                mid = str(entry.get("mission_id") or "")
+                if not mid:
+                    continue
+                mission = self._refresh_mission_from_store(mid)
+                if mission is None:
+                    continue
+                if project_id and mission.project_id != project_id:
+                    continue
+                seen.add(mid)
+                rows.append(
+                    strip_internal(
+                        scrub_config(
+                            {
+                                "mission_id": mission.id,
+                                "project_id": mission.project_id,
+                                "status": mission.status.value,
+                                "objective": mission.objective,
+                                "revision": mission.revision,
+                                "source": "mission_store",
+                            }
+                        )
+                    )
+                )
+        except (OSError, TypeError, KeyError, ValueError):
+            pass
         for mission in self.controller.missions.values():
+            if mission.id in seen:
+                continue
             if project_id and mission.project_id != project_id:
                 continue
             seen.add(mission.id)
@@ -166,36 +217,6 @@ class ProductStore:
                     )
                 )
             )
-        # Durable MissionStore is the shared identity across API/CLI/console.
-        try:
-            for entry in self.mission_store().list_missions():
-                mid = str(entry.get("mission_id") or "")
-                if not mid or mid in seen:
-                    continue
-                try:
-                    record = self.mission_store().load(mid)
-                except (OSError, TypeError, KeyError, ValueError):
-                    continue
-                rec_project = record.project_id or (record.plan or {}).get("project_id")
-                if project_id and rec_project != project_id:
-                    continue
-                seen.add(mid)
-                rows.append(
-                    strip_internal(
-                        scrub_config(
-                            {
-                                "mission_id": mid,
-                                "project_id": rec_project,
-                                "status": record.status,
-                                "objective": record.goal,
-                                "revision": record.revision,
-                                "source": record.source or "mission_store",
-                            }
-                        )
-                    )
-                )
-        except OSError:
-            pass
         # Merge history index for reopenable missions not already listed.
         try:
             for entry in self.history_index().load_index():
@@ -552,8 +573,192 @@ class ProductStore:
             "mission": updated.model_dump(mode="json"),
         }
 
+    async def execute_mission(
+        self,
+        mission_id: str,
+        *,
+        actor: str,
+        model: str = "gemma3:4b",
+    ) -> dict[str, Any]:
+        """Execute the declared task_family for a durable mission via RepoWorker ($0 local)."""
+        from swarm.contracts.mission import SizeFeatures, TaskSpec
+        from swarm.cost.ledger import CostEntry, CostLedger
+        from swarm.mission.acceptance import review_attempt
+        from swarm.mission.worker import RepoWorker
+
+        mission = self.get_mission(mission_id)
+        if mission_id in self.cancelled_missions or mission.status == MissionStatus.CANCELLED:
+            raise ApiError("mission_cancelled", "mission cancelled", status_code=409)
+        record = self.mission_store().load(mission_id)
+        family = str((record.plan or {}).get("task_family") or "").strip().lower()
+        if not family:
+            raise ApiError(
+                "invalid_request",
+                "mission has no task_family to execute",
+                status_code=400,
+            )
+        support = (record.plan or {}).get("support") or {}
+        if support.get("supported") is False:
+            raise ApiError(
+                "unsupported_task",
+                str(support.get("reason") or "unsupported"),
+                status_code=400,
+            )
+
+        task = TaskSpec(
+            mission_id=mission_id,
+            project_id=mission.project_id,
+            objective=mission.objective,
+            task_family=family,
+            size_features=SizeFeatures(),
+            inputs={"goal": mission.objective},
+            output_schema_id="generic_json",
+            quality_policy_id="policy_default",
+            status=TaskStatus.READY,
+        )
+        worker = RepoWorker(self.repo_root or Path.cwd(), model=model)
+        result, _wt = worker.run_task(task, mission_id=mission_id, prior={})
+        ledger = CostLedger()
+        inf = result.inference or {}
+        if inf:
+            try:
+                ledger.add(
+                    CostEntry(
+                        source=task.id,
+                        route_id=str(inf.get("route_id") or f"rt_ollama_{model}"),
+                        model=str(inf.get("model") or model),
+                        requests=1,
+                        prompt_tokens=int(inf.get("prompt_tokens") or 0),
+                        completion_tokens=int(inf.get("completion_tokens") or 0),
+                        cost_usd=float(inf.get("cost_usd") or 0.0),
+                    )
+                )
+            except PermissionError:
+                # Paid attempt blocked — record zero and continue with honest failure.
+                pass
+
+        checks = (result.artifacts or {}).get("checks") or {}
+        required = (record.plan or {}).get("required_checks")
+        review = review_attempt(
+            produced={
+                "checks": checks,
+                "unsupported": bool((result.artifacts or {}).get("unsupported")),
+            },
+            required_checks=required if isinstance(required, dict) else None,
+        )
+
+        record.tasks = [
+            {
+                "id": task.id,
+                "task_family": family,
+                "objective": mission.objective,
+                "status": "completed" if result.ok else "failed",
+                "ok": result.ok,
+                "summary": result.summary,
+            }
+        ]
+        record.cost = {
+            **ledger.to_dict(),
+            "requests": len(ledger.entries),
+            "spend_policy": "zero",
+            "allow_paid": False,
+            "total_usd": float(ledger.to_dict().get("total_usd") or 0.0),
+        }
+        record.artifacts = {
+            **(record.artifacts or {}),
+            "worker_result": result.to_dict(),
+        }
+        record.validation = {
+            **(record.validation or {}),
+            "execution_review": review.to_dict(),
+            "executed_at": utc_now().isoformat(),
+            "executed_by": actor,
+        }
+        if review.accepted and result.ok:
+            receipt_id = new_id("acr_")
+            updated = mission.model_copy(
+                update={
+                    "status": MissionStatus.COMPLETED,
+                    "acceptance_receipt_id": receipt_id,
+                    "revision": mission.revision + 1,
+                }
+            )
+            record.status = updated.status.value
+            record.revision = updated.revision
+            record.result = {
+                "ok": True,
+                "accepted": True,
+                "acceptance_receipt_id": receipt_id,
+                "summary": result.summary,
+            }
+            self.controller.missions[mission_id] = updated
+            self.mission_store().append_timeline(
+                record,
+                "mission.executed_accepted",
+                {"acceptance_receipt_id": receipt_id, "family": family},
+            )
+        else:
+            updated = mission.model_copy(
+                update={
+                    "status": MissionStatus.FAILED,
+                    "acceptance_receipt_id": None,
+                    "revision": mission.revision + 1,
+                }
+            )
+            record.status = updated.status.value
+            record.revision = updated.revision
+            record.result = {
+                "ok": False,
+                "accepted": False,
+                "summary": result.summary,
+                "review_reasons": list(review.reasons),
+            }
+            self.controller.missions[mission_id] = updated
+            self.mission_store().append_timeline(
+                record,
+                "mission.executed_failed",
+                {"family": family, "summary": result.summary, "reasons": review.reasons},
+            )
+        self._persist_mission_record(updated, source="api")
+        # Re-apply execution fields after persist (persist may overwrite from contract).
+        saved = self.mission_store().load(mission_id)
+        saved.tasks = record.tasks
+        saved.cost = record.cost
+        saved.artifacts = record.artifacts
+        saved.validation = record.validation
+        saved.result = record.result
+        saved.status = record.status
+        self.mission_store().save(saved)
+        self.publish(
+            project_id=updated.project_id,
+            type="mission.executed",
+            actor=actor,
+            mission_id=mission_id,
+            payload={
+                "status": saved.status,
+                "family": family,
+                "ok": bool(result.ok and review.accepted),
+                "total_usd": saved.cost.get("total_usd"),
+            },
+            dedupe_key=f"mission.executed:{mission_id}:{saved.revision}",
+        )
+        return {
+            "mission_id": mission_id,
+            "task_family": family,
+            "worker_ok": result.ok,
+            "accepted": bool(result.ok and review.accepted),
+            "status": saved.status,
+            "summary": result.summary,
+            "cost": saved.cost,
+            "review": review.to_dict(),
+            "result": saved.result,
+            "mock_vs_live": "local_ollama_worker_execution_zero_spend",
+        }
+
     def get_mission(self, mission_id: str) -> Mission:
-        mission = self.controller.missions.get(mission_id)
+        mission = self._refresh_mission_from_store(mission_id)
+        if mission is None:
+            mission = self.controller.missions.get(mission_id)
         if mission is None:
             mission = self._hydrate_mission_from_store(mission_id)
         if mission is None:

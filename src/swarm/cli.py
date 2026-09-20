@@ -374,6 +374,12 @@ def main() -> None:
             "(explicit fixture only; not the default generic mission path)"
         ),
     )
+    mexec = mission_sub.add_parser(
+        "execute",
+        help="Execute declared task_family on a durable mission ($0 local worker)",
+    )
+    mexec.add_argument("--mission-id", required=True)
+    mexec.add_argument("--model", default="gemma3:4b")
     mstatus = mission_sub.add_parser("status", help="Show live mission state")
     mstatus.add_argument("--mission-id", required=True)
     mlist = mission_sub.add_parser("list", help="List persisted missions")
@@ -799,6 +805,39 @@ def main() -> None:
         )
         print(json.dumps(record.to_dict(), indent=2, default=str))
         if record.status != "completed":
+            raise SystemExit(2)
+    elif args.command == "mission" and args.mission_command == "execute":
+        import asyncio
+
+        from swarm.api.errors import ApiError
+        from swarm.api.store import ProductStore
+        from swarm.envfile import load_repo_dotenv
+
+        load_repo_dotenv(_repo_root())
+        product_store = ProductStore(repo_root=_repo_root())
+        try:
+            result = asyncio.run(
+                product_store.execute_mission(
+                    args.mission_id,
+                    actor="cli-operator",
+                    model=args.model,
+                )
+            )
+        except ApiError as exc:
+            print(
+                json.dumps(
+                    {
+                        "error": exc.code,
+                        "message": exc.message,
+                        "mission_id": args.mission_id,
+                    },
+                    indent=2,
+                    default=str,
+                )
+            )
+            raise SystemExit(2) from exc
+        print(json.dumps(result, indent=2, default=str))
+        if not result.get("accepted"):
             raise SystemExit(2)
     elif args.command == "mission" and args.mission_command == "status":
         from swarm.mission.runtime import MissionRuntime

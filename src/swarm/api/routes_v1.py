@@ -14,6 +14,7 @@ from swarm.api.schemas import (
     CancelRequest,
     EvaluationCreateRequest,
     MissionCreateRequest,
+    MissionExecuteRequest,
     MissionReviewRequest,
     PageMeta,
     ProbeRequest,
@@ -165,6 +166,49 @@ async def review_mission(
         actor=principal.subject,
         project_id=mission.project_id,
         operation="missions.review",
+        request_digest=digest,
+    )
+
+
+@router.post("/missions/{mission_id}/execute")
+async def execute_mission(
+    mission_id: str,
+    body: MissionExecuteRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    key = body.idempotency_key or idempotency_key
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    digest = payload_hash(
+        {
+            "mission_id": mission_id,
+            "model": body.model,
+            "operation": "missions.execute",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.execute",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    result = await store.execute_mission(
+        mission_id,
+        actor=principal.subject,
+        model=body.model,
+    )
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.execute",
         request_digest=digest,
     )
 

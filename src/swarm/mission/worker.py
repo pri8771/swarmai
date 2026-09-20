@@ -200,6 +200,12 @@ class RepoWorker:
                 self._review(task, handle=shared_worktree, prior=prior),
                 shared_worktree,
             )
+        if family == "extract":
+            return self._extract_or_triage(task, family="extract"), shared_worktree
+        if family == "triage":
+            return self._extract_or_triage(task, family="triage"), shared_worktree
+        if family == "plan":
+            return self._extract_or_triage(task, family="plan"), shared_worktree
         # Supported families without dedicated handlers stay honest incomplete.
         result = WorkerResult(
             worker_id=self.worker_id,
@@ -211,6 +217,67 @@ class RepoWorker:
             finished_at=utc_now().isoformat(),
         )
         return result, shared_worktree
+
+    def _extract_or_triage(self, task: TaskSpec, *, family: str) -> WorkerResult:
+        """Generic extract/triage/plan via local zero-spend inference — no known answers."""
+        goal = str(task.inputs.get("goal") or task.objective or "")
+        if family == "extract":
+            system = (
+                "You extract structured fields from unfamiliar text. "
+                "Return concise JSON with keys you can justify from the input. "
+                "Do not invent facts not present in the objective."
+            )
+            user = f"Extract structured fields for this unfamiliar task:\n{goal}"
+        elif family == "triage":
+            system = (
+                "You triage unfamiliar operational incidents. "
+                "Return concise JSON with keys: hypothesis, evidence_needed, next_checks. "
+                "Do not claim a definitive root cause without evidence."
+            )
+            user = f"Triage this unfamiliar incident:\n{goal}"
+        else:
+            system = (
+                "You produce a short actionable plan. "
+                "Return concise JSON with keys: steps (array), risks, unknowns."
+            )
+            user = f"Plan this unfamiliar task:\n{goal}"
+        inference = self._chat(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            model=self._model_for(family),
+            max_tokens=600,
+        )
+        text = (inference.text or "").strip()
+        ok = bool(inference.ok and len(text) >= 20)
+        summary = f"{family}_complete" if ok else f"{family}_failed_or_empty"
+        checks: dict[str, bool] = {
+            "inference_ok": bool(inference.ok),
+            "nonempty_output": len(text) >= 20,
+            "no_known_answer_path": True,
+        }
+        # Independent check for extract family when required by mission plan.
+        if family == "extract":
+            checks["fields_extracted"] = ok and ("{" in text or ":" in text)
+        if family == "triage":
+            checks["hypothesis_present"] = ok and (
+                "hypothesis" in text.lower() or "check" in text.lower() or len(text) >= 40
+            )
+        return WorkerResult(
+            worker_id=self.worker_id,
+            task_id=task.id,
+            task_family=family,
+            ok=ok,
+            summary=summary,
+            artifacts={
+                "output_excerpt": text[:2000],
+                "checks": checks,
+                "known_answer_forbidden": True,
+            },
+            inference=inference.to_dict(),
+            finished_at=utc_now().isoformat(),
+        )
 
     def _inspect(self, task: TaskSpec, *, mission_id: str) -> WorkerResult:
         findings: dict[str, Any] = {

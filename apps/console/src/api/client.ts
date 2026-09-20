@@ -93,13 +93,15 @@ export async function createLiveMission(opts: {
   token?: string
   objective: string
   projectId: string
+  taskFamily?: string
+  requiredChecks?: Record<string, boolean>
 }): Promise<MissionGraph> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   }
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`
-  const body = {
+  const body: Record<string, unknown> = {
     mission: {
       project_id: opts.projectId,
       objective: opts.objective,
@@ -113,6 +115,8 @@ export async function createLiveMission(opts: {
       max_model_calls: 50,
     },
   }
+  if (opts.taskFamily) body.task_family = opts.taskFamily
+  if (opts.requiredChecks) body.required_checks = opts.requiredChecks
   const res = await fetch(`${opts.baseUrl}/v1/missions`, {
     method: 'POST',
     headers,
@@ -124,6 +128,30 @@ export async function createLiveMission(opts: {
   const payload = await res.json()
   assertNoSecretsInBundle(payload)
   return missionFromApi((payload.mission ?? {}) as Record<string, unknown>)
+}
+
+export async function executeLiveMission(opts: {
+  baseUrl: string
+  token?: string
+  missionId: string
+  model?: string
+}): Promise<Record<string, unknown>> {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  }
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const res = await fetch(`${opts.baseUrl}/v1/missions/${opts.missionId}/execute`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ model: opts.model ?? 'gemma3:4b' }),
+  })
+  if (!res.ok) {
+    throw new Error(`api_error_${res.status}`)
+  }
+  const payload = (await res.json()) as Record<string, unknown>
+  assertNoSecretsInBundle(payload)
+  return payload
 }
 
 export async function loadSnapshot(opts: {
