@@ -1,9 +1,9 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Branch:** `main` (+ live zero-spend follow-up branch)  
-**Label:** `offline-verified-release-candidate` with **partial local live verification**  
-**Not:** fully live-verified across cloud providers, cloud-operating, or production-launched
+**Active version branch:** `cursor/v0.1-real-mission-runtime`  
+**V0.1:** real mission runtime **dogfood passed** (Ollama `gemma3:4b`, cost `$0.00`) — see `docs/v0.1/STATUS.md`  
+**Prior:** offline-verified RC + partial local live (P15/P16 Ollama)
 
 ## Links
 

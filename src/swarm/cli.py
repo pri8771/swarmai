@@ -284,6 +284,30 @@ def main() -> None:
         "verify", help="Verify offline release-candidate readiness"
     )
 
+    mission = sub.add_parser("mission", help="V0.1 real mission runtime")
+    mission_sub = mission.add_subparsers(dest="mission_command", required=True)
+    mplan = mission_sub.add_parser("plan", help="Inspect repo and emit structured task graph")
+    mplan.add_argument("--goal", required=True)
+    mrun = mission_sub.add_parser("run", help="Execute a real software mission end-to-end")
+    mrun.add_argument("--goal", required=True)
+    mrun.add_argument("--model", default="gemma3:4b")
+    mrun.add_argument(
+        "--repo",
+        type=Path,
+        default=None,
+        help="Target repository (default: this SwarmAI checkout)",
+    )
+    mstatus = mission_sub.add_parser("status", help="Show live mission state")
+    mstatus.add_argument("--mission-id", required=True)
+    mlist = mission_sub.add_parser("list", help="List persisted missions")
+    _ = mlist
+    mrep = mission_sub.add_parser("report", help="Print persisted mission report JSON")
+    mrep.add_argument("--mission-id", required=True)
+
+    cost = sub.add_parser("cost", help="Zero-spend cost ledger")
+    cost_sub = cost.add_subparsers(dest="cost_command", required=True)
+    cost_sub.add_parser("show", help="Show aggregated mission spend (USD)")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -478,6 +502,59 @@ def main() -> None:
         print(json.dumps(release_report.to_dict(), indent=2, default=str))
         if not release_report.passed:
             raise SystemExit(2)
+    elif args.command == "mission" and args.mission_command == "plan":
+        from swarm.mission.planner import (
+            build_software_mission,
+            inspect_repo,
+            plan_task_graph,
+            serialize_plan,
+        )
+
+        repo = _repo_root()
+        inspection = inspect_repo(repo)
+        mission_obj = build_software_mission(goal=args.goal)
+        proposal = plan_task_graph(mission_obj, inspection)
+        print(
+            json.dumps(
+                {
+                    "mission_id": mission_obj.id,
+                    "inspection": inspection.to_dict(),
+                    "proposal": json.loads(serialize_plan(proposal)),
+                },
+                indent=2,
+                default=str,
+            )
+        )
+    elif args.command == "mission" and args.mission_command == "run":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.mission.runtime import run_mission
+
+        load_repo_dotenv(_repo_root())
+        repo = Path(args.repo).resolve() if args.repo else _repo_root()
+        record = run_mission(args.goal, repo=repo, model=args.model)
+        print(json.dumps(record.to_dict(), indent=2, default=str))
+        if record.status != "completed":
+            raise SystemExit(2)
+    elif args.command == "mission" and args.mission_command == "status":
+        from swarm.mission.runtime import MissionRuntime
+
+        runtime = MissionRuntime(_repo_root())
+        print(json.dumps(runtime.status(args.mission_id), indent=2, default=str))
+    elif args.command == "mission" and args.mission_command == "list":
+        from swarm.mission.store import MissionStore
+
+        store = MissionStore(_repo_root() / "var" / "missions")
+        print(json.dumps({"missions": store.list_missions()}, indent=2, default=str))
+    elif args.command == "mission" and args.mission_command == "report":
+        from swarm.mission.store import MissionStore
+
+        store = MissionStore(_repo_root() / "var" / "missions")
+        print(json.dumps(store.load(args.mission_id).to_dict(), indent=2, default=str))
+    elif args.command == "cost" and args.cost_command == "show":
+        from swarm.cost.ledger import format_cost_show, load_mission_costs
+
+        ledger = load_mission_costs(_repo_root() / "var" / "missions")
+        print(json.dumps(format_cost_show(ledger), indent=2, default=str))
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:

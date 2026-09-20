@@ -4,8 +4,5 @@ from __future__ import annotations
 
 
 def inclusive_range_count(start: int, end: int) -> int:
-    """Count integers from start to end inclusive.
-
-    Bug (intentional for demo): uses exclusive end.
-    """
-    return end - start
+    """Count integers from start to end inclusive."""
+    return end - start + 1

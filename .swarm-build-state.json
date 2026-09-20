@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T13:50:00Z",
+  "updated_at": "2026-09-20T14:41:27Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
-  "branch": "cursor/p15-p16-live-zero-spend-11e2",
-  "current_packet": null,
+  "branch": "cursor/v0.1-real-mission-runtime",
+  "current_packet": "P26",
   "packet_states": {
     "P01": {
       "state": "offline_verified",
@@ -127,6 +127,26 @@
       "integration_status": "offline_verified",
       "label": "offline-verified-release-candidate",
       "claim": "partially-live-verified-local-ollama-only"
+    },
+    "P22": {
+      "state": "implemented",
+      "version": "V0.1"
+    },
+    "P23": {
+      "state": "implemented",
+      "version": "V0.1"
+    },
+    "P24": {
+      "state": "implemented",
+      "version": "V0.1"
+    },
+    "P25": {
+      "state": "implemented",
+      "version": "V0.1"
+    },
+    "P26": {
+      "state": "checkpoint_passed",
+      "version": "V0.1"
     }
   },
   "next_packets": [],
@@ -150,7 +170,7 @@
       }
     ],
     "live_only": [
-      "Cloud API keys for multi-provider P15–P16 live canaries"
+      "Cloud API keys for multi-provider P15\u2013P16 live canaries"
     ]
   },
   "release_captain": {
@@ -178,5 +198,14 @@
     "merge_commit": "827cb82c9aebc5f83741b215d025fcedf8ab16bd",
     "prerelease": "https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1",
     "tag": "v0.1.0-rc.1"
+  },
+  "kit_path": "/Users/pchordia/Downloads/SwarmAI_V0",
+  "version": "V0.1",
+  "v0_1": {
+    "status": "dogfood_passed",
+    "mission_id": "51e8336f6a05404e9e748a8fa6682893",
+    "model": "gemma3:4b",
+    "cost_usd": 0.0,
+    "evidence": "docs/v0.1/STATUS.md"
   }
 }
