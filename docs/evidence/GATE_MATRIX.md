@@ -2,11 +2,11 @@
 
 Updated: 2026-09-20T22:42:30Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: `40b5a5951b9a60c7171b30a6d7ec592654a2662b`
+Candidate tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
 Feature tip (multisurface): `cc64f46cc8e448bb7826f3ca1691f12841bdd13c`
 LEAD-010 repairs tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
-CI: tip `b5ef431…` run `35541870705` **success** (prior); tip `40b5a59…` CI pending post-push
+CI: tip `b5ef431…` run `35541870705` **success** (prior); tip `ca6d425…` run `35542556517` **success**
 
 | Gate | Packet | Implemented | Live evidence | Lead accepted | Notes |
 |------|--------|-------------|---------------|---------------|-------|
