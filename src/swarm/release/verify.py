@@ -40,6 +40,66 @@ FORBIDDEN_TRACKED = (
 # Evidence older than this is stale and must fail (FIX-003 freshness rule).
 EVIDENCE_MAX_AGE = timedelta(days=7)
 
+# Evidence-kind-specific identity groups (FIX-003 / LEAD-011).
+# A behavioral pass requires at least one complete group with non-empty values.
+# Groups are alternatives (any_of); keys within a group are all required (all_of).
+EVIDENCE_IDENTITY_GROUPS: dict[str, tuple[frozenset[str], ...]] = {
+    "offline_ci": (
+        frozenset({"config_version"}),
+        frozenset({"tool_versions"}),
+        frozenset({"test_suite_version"}),
+        frozenset({"python_version", "dependency_lock_id"}),
+    ),
+    "live_local": (
+        frozenset({"model", "route_id"}),
+        frozenset({"model", "dataset_version"}),
+        frozenset({"model", "prompt_version"}),
+        frozenset({"tool_versions", "route_id"}),
+    ),
+    "eval": (
+        frozenset({"model", "dataset_version", "suite"}),
+        frozenset({"model", "dataset_version", "prompt_version"}),
+    ),
+}
+
+
+def _identity_payload(data: dict[str, Any]) -> dict[str, Any]:
+    """Merge top-level and nested identity fields for kind-specific checks."""
+    out: dict[str, Any] = {}
+    nested = data.get("identity")
+    if isinstance(nested, dict):
+        out.update(nested)
+    for key, value in data.items():
+        if key == "identity":
+            continue
+        out[key] = value
+    return out
+
+
+def _identity_value_present(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (list, dict)):
+        return len(value) > 0
+    return True
+
+
+def _validate_evidence_identity(
+    data: dict[str, Any], *, expected_kind: str
+) -> tuple[bool, str]:
+    """Require evidence-kind-specific version/config identity (LEAD-011)."""
+    groups = EVIDENCE_IDENTITY_GROUPS.get(expected_kind)
+    if not groups:
+        return False, f"unknown_evidence_kind:{expected_kind}"
+    payload = _identity_payload(data)
+    for group in groups:
+        if all(_identity_value_present(payload.get(key)) for key in group):
+            return True, f"identity_ok:{'+'.join(sorted(group))}"
+    required = " | ".join("+".join(sorted(g)) for g in groups)
+    return False, f"missing_required_identity:need_one_of[{required}]"
+
 
 @dataclass
 class VerifyItem:
@@ -171,6 +231,7 @@ def _validate_evidence_file(
     - successful exit_code or result
     - mode compatible with expected_kind
     - generated/observed timestamp within freshness window
+    - evidence-kind-specific version/config/model/tool identity
     - status pass (cannot bypass other fields)
     """
     item_id = f"{expected_kind}_evidence"
@@ -233,7 +294,13 @@ def _validate_evidence_file(
     if age < timedelta(0) and abs(age) > timedelta(minutes=5):
         return VerifyItem(item_id, False, "evidence_timestamp_in_future")
 
-    return VerifyItem(item_id, True, str(path.name))
+    identity_ok, identity_detail = _validate_evidence_identity(
+        data, expected_kind=expected_kind
+    )
+    if not identity_ok:
+        return VerifyItem(item_id, False, identity_detail)
+
+    return VerifyItem(item_id, True, f"{path.name};{identity_detail}")
 
 
 def _git_head(repo: Path) -> str | None:

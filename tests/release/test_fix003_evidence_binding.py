@@ -43,6 +43,21 @@ def _valid_offline_fields(tip: str) -> dict[str, object]:
         "candidate_sha": tip,
         "generated_at": datetime.now(UTC).isoformat(),
         "config_version": "1.0",
+        "tool_versions": {"ruff": "ci", "mypy": "ci", "pytest": "ci"},
+    }
+
+
+def _valid_live_fields(tip: str) -> dict[str, object]:
+    return {
+        "schema_version": "1.0",
+        "status": "pass",
+        "command": "swarm mission execute --mission-id <id>",
+        "exit_code": 0,
+        "mode": "live_local",
+        "candidate_sha": tip,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "model": "gemma3:4b",
+        "route_id": "rt_ollama_gemma3:4b",
     }
 
 
@@ -116,6 +131,62 @@ def test_valid_bound_evidence_passes(tmp_path: Path) -> None:
     tip = _tip_sha()
     path = tmp_path / "offline_ci_pass.json"
     _write_evidence(path, **_valid_offline_fields(tip))
+    item = _validate_evidence_file(path, expected_kind="offline_ci", candidate_sha=tip)
+    assert item.ok is True
+
+
+def test_missing_offline_identity_fails(tmp_path: Path) -> None:
+    tip = _tip_sha()
+    path = tmp_path / "offline_ci_pass.json"
+    fields = _valid_offline_fields(tip)
+    del fields["config_version"]
+    del fields["tool_versions"]
+    _write_evidence(path, **fields)
+    item = _validate_evidence_file(path, expected_kind="offline_ci", candidate_sha=tip)
+    assert item.ok is False
+    assert "missing_required_identity" in item.detail
+
+
+def test_empty_offline_identity_fails(tmp_path: Path) -> None:
+    tip = _tip_sha()
+    path = tmp_path / "offline_ci_pass.json"
+    fields = _valid_offline_fields(tip)
+    fields["config_version"] = "   "
+    fields["tool_versions"] = {}
+    _write_evidence(path, **fields)
+    item = _validate_evidence_file(path, expected_kind="offline_ci", candidate_sha=tip)
+    assert item.ok is False
+    assert "missing_required_identity" in item.detail
+
+
+def test_missing_live_identity_fails(tmp_path: Path) -> None:
+    tip = _tip_sha()
+    path = tmp_path / "live_local_pass.json"
+    fields = _valid_live_fields(tip)
+    del fields["model"]
+    del fields["route_id"]
+    _write_evidence(path, **fields)
+    item = _validate_evidence_file(path, expected_kind="live_local", candidate_sha=tip)
+    assert item.ok is False
+    assert "missing_required_identity" in item.detail
+
+
+def test_valid_live_identity_passes(tmp_path: Path) -> None:
+    tip = _tip_sha()
+    path = tmp_path / "live_local_pass.json"
+    _write_evidence(path, **_valid_live_fields(tip))
+    item = _validate_evidence_file(path, expected_kind="live_local", candidate_sha=tip)
+    assert item.ok is True
+
+
+def test_nested_identity_object_accepted(tmp_path: Path) -> None:
+    tip = _tip_sha()
+    path = tmp_path / "offline_ci_pass.json"
+    fields = _valid_offline_fields(tip)
+    del fields["config_version"]
+    del fields["tool_versions"]
+    fields["identity"] = {"test_suite_version": "offline-pytest-v1"}
+    _write_evidence(path, **fields)
     item = _validate_evidence_file(path, expected_kind="offline_ci", candidate_sha=tip)
     assert item.ok is True
 

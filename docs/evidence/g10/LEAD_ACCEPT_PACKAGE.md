@@ -40,7 +40,7 @@ Live-gated: blocked-notice only (not live product evidence).
 |--------|-----------------|-------------|----------------|
 | FIX-001 | CI green on tip | `f028009`, `2f91d7d`, `2335471`, `108145ea` | Earlier mypy red tip superseded |
 | FIX-002 | Source closed | `d622f1d`, `2335471` | Scoped keys; no silent demo principals |
-| FIX-003 | Source closed | `51b2152`, `2335471`, `108145ea` | Semantic evidence + fail-closed readiness |
+| FIX-003 | Source closed + LEAD-011 identity | `51b2152`, `2335471`, `108145ea`, tip pending | SHA/exit/mode/freshness + evidence-kind identity groups |
 | FIX-004 | Parallel lane | `d60394d` | Hourly runner installed; CLI login still Not logged in |
 | FIX-005 | Source closed | `51b2152`, `108145ea` | No GOOD_FIX operational fallback; parser opt-in only |
 
