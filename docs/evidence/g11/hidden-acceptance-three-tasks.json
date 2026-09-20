@@ -7,12 +7,12 @@
   "command": "create_app operational + execute api/cli",
   "exit_code": 0,
   "generated_at": "2026-09-20T23:03:39.092554+00:00",
-  "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+  "candidate_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
   "spend_usd": 0.0,
   "execution_mode": "operational",
   "fixture_seeded": false,
   "identity": {
-    "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+    "candidate_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
     "model": "gemma3:4b",
     "route_id": "rt_ollama_gemma3:4b",
     "tool_versions": {

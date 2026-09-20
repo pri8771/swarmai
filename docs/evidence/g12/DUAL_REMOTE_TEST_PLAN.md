@@ -2,7 +2,7 @@
 
 **Status:** preparation only — **not executed**, **not claimed**  
 **Recorded (UTC):** 2026-09-20T23:04:00Z  
-**Tip binding:** pending push  
+**Tip binding:**   
 **Spend:** $0 planned; no paid/uncertain routes
 
 ## Required gate (contract)

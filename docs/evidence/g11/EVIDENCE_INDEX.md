@@ -1,6 +1,6 @@
 # G11 / RUN-111 evidence index
 
-**Tip binding:** pending push (LEAD-012 rerun)  
+**Tip binding:**   
 **Lead accepted:** no (do not invent)  
 **Spend:** $0 claimed in listed artifacts
 

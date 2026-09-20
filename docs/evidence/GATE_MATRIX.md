@@ -1,8 +1,8 @@
 # V1.4 gate matrix (worker view — not lead acceptance)
 
-Updated: 2026-09-20T23:04:30Z
+Updated: 2026-09-20T23:05:46Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: pending push (LEAD-012 packaging)
+Candidate tip: 
 Prior tip: `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`
 LEAD-012: G10 source/CI lead-verified; FIX-004 login remains; G11 evidence revalidation in progress
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
