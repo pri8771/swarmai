@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:47:48Z",
+  "updated_at": "2026-09-20T19:45:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -56,9 +56,9 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-003",
+  "last_lead_message_id": "LEAD-20260920-004",
   "last_seen_cursor_message_id": "CURSOR-20260920-001",
-  "last_lead_heartbeat_at": "2026-09-20T19:17:42Z",
+  "last_lead_heartbeat_at": "2026-09-20T19:45:00Z",
   "last_cursor_heartbeat_at": "2026-09-20T19:47:48Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -67,7 +67,7 @@
     "title": "SwarmAI engineering check-in",
     "cadence": "hourly",
     "timezone": "America/New_York",
-    "last_configuration_verified_at": "2026-09-20T19:17:23Z",
+    "last_configuration_verified_at": "2026-09-20T19:45:00Z",
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
   },
   "cursor_runner": {
@@ -95,19 +95,19 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "in_progress",
+      "status": "assigned_not_acknowledged",
       "scope": "Full CI and honest baseline",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+      "source_branch": null,
+      "source_sha": null,
       "review_status": "pending"
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "assigned_acknowledged",
+      "status": "assigned_not_acknowledged",
       "scope": "Authentication, project isolation and idempotency",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+      "source_branch": null,
+      "source_sha": null,
       "review_status": "pending"
     },
     {
@@ -186,8 +186,8 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "repair_in_progress",
-      "evidence": "CURSOR-20260920-001 reproduced ruff 33 errors on b9141fa",
+      "status": "repair_required",
+      "evidence": null,
       "review": "pending"
     },
     "G11": {
@@ -234,8 +234,23 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "G10 FIX-001\u2013005 in progress on cursor/v1.4-live-integration-11e2; CI not yet green",
-    "No verified Cursor hourly runner heartbeat yet",
-    "Live concurrent provider / qualification / adaptive graph / 24h campaign not started"
-  ]
+    "No post-authorization Cursor ACK, implementation branch/PR/commit or repaired CI candidate is verified",
+    "Current main remains b9141fa3150f853586dede0334a47b344571bc16 with workflow run 35529361557 failing Ruff before mypy/pytest",
+    "Cursor hourly runner and protected-session recovery remain uninstalled/unverified by the lead",
+    "Live concurrent provider mission, task-size qualification and adaptive graph acceptance remain future gates after G10/G11/G12 prerequisites"
+  ],
+  "current_source_verification": {
+    "verified_at": "2026-09-20T19:45:00Z",
+    "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+    "coordination_sha_before_lead_update": "c0128248e4fdfa112a7f16b09dddef96ec4da260",
+    "open_pr_count": 0,
+    "post_authorization_cursor_implementation_branch_observed": false,
+    "post_authorization_cursor_ack_observed": false,
+    "latest_verified_ci_run_id": 35529361557,
+    "latest_verified_ci_job_id": 106127102217,
+    "latest_verified_ci_conclusion": "failure",
+    "failed_step": "uv run ruff check .",
+    "downstream_mypy_executed": false,
+    "downstream_pytest_executed": false
+  }
 }
