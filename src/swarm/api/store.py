@@ -202,14 +202,66 @@ class ProductStore:
         )
         return self.events.append(event)
 
-    def recall_idempotent(self, key: str | None) -> dict[str, Any] | None:
+    def _idem_key(
+        self,
+        *,
+        actor: str,
+        project_id: str,
+        operation: str,
+        key: str,
+    ) -> str:
+        return f"{actor}|{project_id}|{operation}|{key}"
+
+    def recall_idempotent(
+        self,
+        key: str | None,
+        *,
+        actor: str | None = None,
+        project_id: str | None = None,
+        operation: str | None = None,
+        request_digest: str | None = None,
+    ) -> dict[str, Any] | None:
         if not key:
             return None
-        return self.idempotency.get(key)
+        # Backward-compatible bare-key lookup only when scope omitted (legacy callers).
+        if actor is None or project_id is None or operation is None:
+            return self.idempotency.get(key)
+        scoped = self._idem_key(
+            actor=actor, project_id=project_id, operation=operation, key=key
+        )
+        entry = self.idempotency.get(scoped)
+        if entry is None:
+            return None
+        if request_digest is not None and entry.get("request_digest") != request_digest:
+            raise ApiError(
+                "idempotency_payload_mismatch",
+                "idempotency key reused with a different request body",
+                status_code=409,
+            )
+        return entry.get("body")
 
-    def store_idempotent(self, key: str | None, body: dict[str, Any]) -> dict[str, Any]:
-        if key:
+    def store_idempotent(
+        self,
+        key: str | None,
+        body: dict[str, Any],
+        *,
+        actor: str | None = None,
+        project_id: str | None = None,
+        operation: str | None = None,
+        request_digest: str | None = None,
+    ) -> dict[str, Any]:
+        if not key:
+            return body
+        if actor is None or project_id is None or operation is None:
             self.idempotency[key] = body
+            return body
+        scoped = self._idem_key(
+            actor=actor, project_id=project_id, operation=operation, key=key
+        )
+        self.idempotency[scoped] = {
+            "request_digest": request_digest,
+            "body": body,
+        }
         return body
 
     async def create_mission(self, mission: Mission, *, actor: str) -> Mission:

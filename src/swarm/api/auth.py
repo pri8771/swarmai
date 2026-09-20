@@ -21,6 +21,12 @@ class Principal:
     allow_eval: bool = False
 
 
+# Well-known local test tokens — never accepted from non-loopback clients.
+DEMO_LOOPBACK_TOKENS = frozenset(
+    {"atk_loopback_demo", "atk_policy_demo", "atk_other_project"}
+)
+
+
 @dataclass
 class AuthRegistry:
     """In-memory token registry — tokens are opaque IDs, never provider secrets."""
@@ -28,6 +34,7 @@ class AuthRegistry:
     tokens: dict[str, Principal] = field(default_factory=dict)
     require_auth: bool = True
     loopback_mock_token: str | None = None
+    loopback_only_tokens: set[str] = field(default_factory=set)
 
     def issue(
         self,
@@ -54,18 +61,28 @@ class AuthRegistry:
             allow_canary=allow_canary,
             allow_eval=allow_eval,
         )
+        if token in DEMO_LOOPBACK_TOKENS:
+            self.loopback_only_tokens.add(token)
         return token
 
     def resolve(self, authorization: str | None, *, client_host: str | None) -> Principal:
+        is_loopback = client_host in {None, "127.0.0.1", "::1", "testclient", "localhost"}
         if authorization and authorization.lower().startswith("bearer "):
             raw = authorization.split(" ", 1)[1].strip()
+            if (
+                raw in DEMO_LOOPBACK_TOKENS or raw in self.loopback_only_tokens
+            ) and not is_loopback:
+                raise ApiError(
+                    "demo_token_forbidden",
+                    "loopback-only token rejected from non-loopback client",
+                    status_code=401,
+                )
             principal = self.tokens.get(raw)
             if principal is None:
                 raise ApiError("unauthorized", "invalid bearer token", status_code=401)
             return principal
         # Loopback-only mock mode may use a seeded token without Authorization
         # when require_auth is False (explicit test/demo). Non-loopback always requires auth.
-        is_loopback = client_host in {None, "127.0.0.1", "::1", "testclient", "localhost"}
         if not self.require_auth and is_loopback and self.loopback_mock_token:
             principal = self.tokens.get(self.loopback_mock_token)
             if principal is not None:

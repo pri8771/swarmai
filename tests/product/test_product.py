@@ -86,7 +86,7 @@ def test_history_search_and_reopen(repo: Path) -> None:
 
 
 def test_api_projects_and_contract(repo: Path) -> None:
-    app = create_app(require_auth=True, db_reachable=True, repo_root=repo)
+    app = create_app(require_auth=True, db_reachable=True, repo_root=repo, seed_loopback_token="atk_loopback_demo")
     client = TestClient(app)
     headers = {"Authorization": "Bearer atk_loopback_demo"}
     created = client.post(

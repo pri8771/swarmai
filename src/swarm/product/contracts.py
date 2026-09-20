@@ -51,7 +51,8 @@ def mission_public_view(record: dict[str, Any]) -> dict[str, Any]:
     raw = strip_internal(scrub_config(record))
     return {
         "mission_id": raw.get("mission_id") or raw.get("id"),
-        "project_id": raw.get("project_id"),
+        "project_id": raw.get("project_id")
+        or (raw.get("plan") or {}).get("project_id"),
         "goal": raw.get("goal") or raw.get("objective"),
         "status": raw.get("status"),
         "revision": raw.get("revision"),

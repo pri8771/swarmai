@@ -20,7 +20,12 @@ def _api_client(repo: Path) -> Any:
 
     from swarm.api.app import create_app
 
-    app = create_app(require_auth=True, db_reachable=True, repo_root=repo)
+    app = create_app(
+        require_auth=True,
+        db_reachable=True,
+        repo_root=repo,
+        seed_loopback_token="atk_loopback_demo",
+    )
     return TestClient(app)
 
 

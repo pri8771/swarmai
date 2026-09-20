@@ -16,7 +16,7 @@ from swarm.api.store import ProductStore
 def create_app(
     *,
     require_auth: bool = True,
-    seed_loopback_token: str | None = "atk_loopback_demo",
+    seed_loopback_token: str | None = None,
     db_reachable: bool | None = None,
     repo_root: Path | None = None,
 ) -> FastAPI:
@@ -74,4 +74,4 @@ def create_app(
     return app
 
 
-app = create_app()
+app = create_app(seed_loopback_token=None)

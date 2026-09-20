@@ -66,7 +66,9 @@ class MissionStore:
 
     def load(self, mission_id: str) -> MissionRecord:
         raw = json.loads(self._path(mission_id).read_text())
-        return MissionRecord(**raw)
+        known = set(MissionRecord.__dataclass_fields__.keys())
+        clean = {k: v for k, v in raw.items() if k in known}
+        return MissionRecord(**clean)
 
     def list_missions(self) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
