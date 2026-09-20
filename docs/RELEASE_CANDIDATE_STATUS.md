@@ -1,25 +1,26 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v1.0-release-candidate-11e2`  
+**Main SHA:** `152abdf`  
 **Package version:** `1.0.0rc1`  
+**V1.0:** **merged** via PR #12 — **public launch NOT done**  
 **Interval commits:** IN FORCE  
-**V1.0:** RC ready — **STOP before merge/tag/public launch** — see `docs/v1.0/STATUS.md`  
-**V0.9:** merged (PR #11) — see `docs/v0.9/STATUS.md`  
-**V0.8:** merged (PR #10) — see `docs/v0.8/STATUS.md`
 
-## Stop gate
+## Stop (build-to-1.0)
 
-| Action | Allowed now? |
+Build-to-1.0 complete on main. No post-1.0 work without new operator request.
+
+| Action | Status |
 |---|---|
-| Draft PR for V1 RC | yes |
-| Merge V1 to main | **no** (needs explicit launch authorization) |
-| Tag / publish release | **no** |
-| Public launch | **no** |
+| Merge V1 RC to main | **done** (PR #12) |
+| Public launch / marketing | **not done** |
+| Tag/publish launched release | **not done** |
+| OpenAI live | **deferred** (payment-gated) |
 
-## Links
+## Merged versions
 
-| Item | URL |
+| Version | PR |
 |---|---|
-| Repo | https://github.com/pri8771/swarmai |
-| V1 branch | https://github.com/pri8771/swarmai/tree/cursor/v1.0-release-candidate-11e2 |
+| Foundation | #1 |
+| V0.1–V0.9 | #2–#11 |
+| V1.0 RC | #12 |
