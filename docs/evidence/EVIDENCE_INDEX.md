@@ -1,7 +1,8 @@
 # V1.4 evidence index (worker; not lead-accepted)
 
-**Candidate tip:** pending G11 multisurface push (base `b5ef431…`)  
-**Updated (UTC):** 2026-09-20T22:41:14Z  
+**Candidate tip:** `40b5a5951b9a60c7171b30a6d7ec592654a2662b`  
+**Feature tip (G11 multisurface):** `cc64f46cc8e448bb7826f3ca1691f12841bdd13c`  
+**Updated (UTC):** 2026-09-20T22:42:30Z  
 **Login:** Not logged in · SKIP uncleared · no merge/spend/launch
 
 | Gate | Packet | Index / binder | Live claimed? |
