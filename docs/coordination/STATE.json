@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:45:00Z",
+  "updated_at": "2026-09-20T19:50:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
   "audit_date": "2026-09-20",
   "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_repair_required_not_stable_release",
+  "product_status": "v1_repair_in_progress_not_accepted",
   "current_checkpoint": "1.0-repair",
   "roadmap_status": "owner_approved_direction_through_3.0",
   "next_checkpoint_after_gate_pass": "1.1",
@@ -56,9 +56,9 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-004",
+  "last_lead_message_id": "LEAD-20260920-005",
   "last_seen_cursor_message_id": "CURSOR-20260920-001",
-  "last_lead_heartbeat_at": "2026-09-20T19:45:00Z",
+  "last_lead_heartbeat_at": "2026-09-20T19:50:00Z",
   "last_cursor_heartbeat_at": "2026-09-20T19:47:48Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -95,19 +95,19 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "assigned_not_acknowledged",
+      "status": "in_progress",
       "scope": "Full CI and honest baseline",
-      "source_branch": null,
-      "source_sha": null,
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
       "review_status": "pending"
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "assigned_not_acknowledged",
+      "status": "assigned_acknowledged",
       "scope": "Authentication, project isolation and idempotency",
-      "source_branch": null,
-      "source_sha": null,
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
       "review_status": "pending"
     },
     {
@@ -186,8 +186,8 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "repair_required",
-      "evidence": null,
+      "status": "repair_in_progress",
+      "evidence": "CURSOR-20260920-001 reports local ruff reproduction: exit 1 with 33 findings on b9141fa; corroborated by GitHub Actions run 35529361557. No repaired remote candidate yet.",
       "review": "pending"
     },
     "G11": {
@@ -234,18 +234,20 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "No post-authorization Cursor ACK, implementation branch/PR/commit or repaired CI candidate is verified",
-    "Current main remains b9141fa3150f853586dede0334a47b344571bc16 with workflow run 35529361557 failing Ruff before mypy/pytest",
+    "Worker-reported integration branch cursor/v1.4-live-integration-11e2 is not yet visible in GitHub; no post-authorization repair commit/PR is remotely reviewable",
+    "Current remote main remains b9141fa3150f853586dede0334a47b344571bc16; workflow run 35529361557 fails Ruff before mypy/pytest",
     "Cursor hourly runner and protected-session recovery remain uninstalled/unverified by the lead",
-    "Live concurrent provider mission, task-size qualification and adaptive graph acceptance remain future gates after G10/G11/G12 prerequisites"
+    "Live concurrent provider, qualification, adaptive graph and 24-hour campaign gates remain pending after prerequisite repairs"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T19:45:00Z",
+    "verified_at": "2026-09-20T19:50:00Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-    "coordination_sha_before_lead_update": "c0128248e4fdfa112a7f16b09dddef96ec4da260",
     "open_pr_count": 0,
-    "post_authorization_cursor_implementation_branch_observed": false,
-    "post_authorization_cursor_ack_observed": false,
+    "cursor_ack_observed": true,
+    "worker_reported_local_integration_branch": "cursor/v1.4-live-integration-11e2",
+    "remote_integration_branch_observed": false,
+    "post_authorization_remote_application_commit_observed": false,
+    "repaired_remote_ci_candidate_observed": false,
     "latest_verified_ci_run_id": 35529361557,
     "latest_verified_ci_job_id": 106127102217,
     "latest_verified_ci_conclusion": "failure",
