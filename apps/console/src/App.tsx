@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { loadSnapshot, scrubSecrets } from './api/client'
+import { loadSnapshot, resolveConsoleLoadOpts, scrubSecrets } from './api/client'
 import type { ConsoleSnapshot } from './api/types'
 import { Panel } from './components/Panel'
 import { StatusBadge } from './components/StatusBadge'
@@ -32,7 +32,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    loadSnapshot({ mode: 'mock' })
+    loadSnapshot(resolveConsoleLoadOpts())
       .then((s) => {
         if (!cancelled) {
           setSnap(s)

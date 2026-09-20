@@ -1,12 +1,13 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
-import { scrubSecrets, assertNoSecretsInBundle } from './api/client'
+import { scrubSecrets, assertNoSecretsInBundle, loadSnapshot } from './api/client'
 import { MOCK_SNAPSHOT, expandMission, contractMission, interruptStream } from './data/fixtures'
 
 afterEach(() => {
   cleanup()
+  vi.unstubAllGlobals()
 })
 
 describe('console fixtures', () => {
@@ -27,6 +28,55 @@ describe('console fixtures', () => {
     const interrupted = interruptStream(MOCK_SNAPSHOT)
     expect(interrupted.streamInterrupted).toBe(true)
     expect(interrupted.errors[0]).toMatch(/cursor/)
+  })
+
+  it('live mode uses durable API missions without fixture mission id', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        const url = String(input)
+        if (url.endsWith('/v1/capacity')) {
+          return new Response(JSON.stringify({ buckets: [] }), { status: 200 })
+        }
+        if (url.endsWith('/v1/missions')) {
+          return new Response(
+            JSON.stringify({
+              items: [
+                {
+                  mission_id: 'msn_live_shared',
+                  project_id: 'proj_a',
+                  objective: 'unfamiliar live goal',
+                  status: 'planning',
+                  source: 'mission_store',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/missions/msn_live_shared')) {
+          return new Response(
+            JSON.stringify({
+              mission: {
+                id: 'msn_live_shared',
+                project_id: 'proj_a',
+                objective: 'unfamiliar live goal',
+                status: 'planning',
+                revision: 2,
+              },
+            }),
+            { status: 200 },
+          )
+        }
+        return new Response('missing', { status: 404 })
+      }),
+    )
+    const snap = await loadSnapshot({ mode: 'live', baseUrl: 'http://127.0.0.1:9' })
+    expect(snap.mode).toBe('live')
+    expect(snap.mission.missionId).toBe('msn_live_shared')
+    expect(snap.mission.objective).toBe('unfamiliar live goal')
+    expect(snap.history[0]?.missionId).toBe('msn_live_shared')
+    expect(snap.mockVsLive).not.toContain('fixtures_only')
   })
 })
 
