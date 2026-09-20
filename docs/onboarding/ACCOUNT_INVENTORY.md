@@ -1,8 +1,8 @@
 # SwarmAI account inventory (sanitized)
 
-**Generated:** 2026-09-20T16:36:35.725123+00:00
+**Generated:** 2026-09-20T17:04:46.817333+00:00
 **Chrome profile:** Default / **Priyansh** (`priyansh.chordia@gmail.com`)
-**Spend:** zero · `SWARM_ALLOW_PAID=false` · **V0.2:** not started · **PR #2:** not merged
+**Spend:** zero · `SWARM_ALLOW_PAID=false` · **V0.2:** not started · **PR #2/#3:** not merged
 
 ## Live status
 
@@ -16,18 +16,18 @@
 | NVIDIA (primandir) | yes | yes | yes | models.list OK |
 | Mistral | yes | yes | yes | models.list OK |
 | Cohere | yes | yes | yes | models.list OK |
-| OpenAI | yes | no | blocked | Create disabled — Add credits |
+| OpenAI | yes | no | deferred | payment-gated; do not pursue this pass |
 | Anthropic | yes | yes | yes | models.list OK |
-| Together | yes | no | blocked | $5 deposit required |
-| Fireworks | yes | no | blocked | Create no-op at $0 credits |
+| Together | yes | yes | yes | key configured; models.list auth OK; inference live-blocked (no-spend) |
+| Fireworks | yes | yes | yes | clipboard ingest; models.list auth OK; no paid inference |
 | DeepInfra | yes | yes | yes | models.list OK |
-| Replicate | yes | yes | yes | account auth OK (occasional 403 flake) |
+| Replicate | yes | yes | yes | account auth OK |
 | Ollama | yes (local) | yes | yes | local zero-cost |
 
-## Blocked (zero-spend)
-- **Together:** deposit $5 to create key
-- **OpenAI:** Create secret key disabled (credits/billing)
-- **Fireworks:** Create API Key does not mint at Credits $0.00
+## Deferred / blocked
+- **OpenAI:** DEFERRED — payment-gated (Add credits / Create secret key disabled). Not pursuing further this pass.
+- **Together:** key present + auth OK; paid inference routes remain live-blocked under zero-spend.
+- **Fireworks:** key present + auth OK; no paid inference run.
 
 ## Operator action
 none — keep working

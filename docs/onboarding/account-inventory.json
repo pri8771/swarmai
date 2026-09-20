@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T16:36:35.725123+00:00",
+  "generated_at": "2026-09-20T17:04:46.817333+00:00",
   "chrome_profile": {
     "directory": "Default",
     "name": "Priyansh",
@@ -42,7 +42,7 @@
     },
     "openai": {
       "signed_in": true,
-      "evidence": "API keys - OpenAI API"
+      "evidence": "platform.openai.com/api-keys; DEFERRED payment-gated"
     },
     "anthropic": {
       "signed_in": true,
@@ -50,11 +50,11 @@
     },
     "together": {
       "signed_in": true,
-      "evidence": "together.ai .../api-keys project URL"
+      "evidence": "api.together.ai project api-keys; key created + ingested"
     },
     "fireworks": {
       "signed_in": true,
-      "evidence": "API Keys - Fireworks AI settings/users/api-keys"
+      "evidence": "API Keys - Fireworks AI; key ingested from clipboard"
     },
     "deepinfra": {
       "signed_in": true,
@@ -77,14 +77,14 @@
     "CLOUDFLARE_ACCOUNT_ID": true,
     "OPENAI_API_KEY": false,
     "ANTHROPIC_API_KEY": true,
-    "TOGETHER_API_KEY": false,
-    "FIREWORKS_API_KEY": false,
+    "TOGETHER_API_KEY": true,
+    "FIREWORKS_API_KEY": true,
     "DEEPINFRA_API_KEY": true,
     "REPLICATE_API_TOKEN": true,
     "OLLAMA_BASE_URL": true
   },
   "blocked_key_automation": "Chrome AppleScript JS disabled + Accessibility denied; cannot Create/Copy keys in live tabs without JS Apple Events toggle",
-  "handoff": "none \u2014 keep working",
+  "handoff": "none \u2014 OpenAI deferred; Fireworks+Together keys configured",
   "mcp": {
     "added_to_cursor_mcp_json": [
       "openrouter",
@@ -118,9 +118,9 @@
     "Zero spend; SWARM_ALLOW_PAID=false; no V0.2"
   ],
   "blocked": {
-    "together": "Create API key requires $5 deposit (zero-spend block)",
-    "openai": "Create secret key disabled; Add credits banner (zero-spend block)",
-    "fireworks": "Create API Key click no-ops at Credits $0.00; no key minted"
+    "openai": "DEFERRED \u2014 payment-gated; Create secret key disabled / Add credits. Do not pursue this pass.",
+    "together_inference": "Key configured + auth OK; paid inference live-blocked under SWARM_ALLOW_PAID=false",
+    "fireworks_inference": "Key configured + auth OK; no paid inference run"
   },
   "canaries": {
     "openrouter": "yes",
@@ -135,8 +135,8 @@
     "deepinfra": "yes",
     "ollama": "yes",
     "replicate": "yes",
-    "openai": "blocked_credits",
-    "together": "blocked_deposit",
-    "fireworks": "blocked_zero_credits"
+    "openai": "deferred_payment_gated",
+    "together": "yes_auth_models_list_inference_blocked_zero_spend",
+    "fireworks": "yes_auth_models_list_no_inference"
   }
 }
