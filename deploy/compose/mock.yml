@@ -1,0 +1,16 @@
+# Mock profile — API only on loopback; no DB container required.
+services:
+  api:
+    image: swarm-ai:local
+    user: "1000:1000"
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      SWARM_EXECUTION_MODE: mock
+      SWARM_ALLOW_PAID: "false"
+    networks:
+      - loopback
+
+networks:
+  loopback:
+    driver: bridge

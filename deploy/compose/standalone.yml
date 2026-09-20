@@ -1,0 +1,38 @@
+# SwarmAI standalone — local only, non-root, no public DB/inference admin.
+services:
+  api:
+    image: swarm-ai:local
+    user: "1000:1000"
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:swarm@db:5432/swarm
+      SWARM_BIND_HOST: "127.0.0.1"
+    depends_on:
+      - db
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+  db:
+    image: postgres:16-alpine
+    user: "999:999"
+    environment:
+      POSTGRES_USER: swarm
+      POSTGRES_PASSWORD: swarm
+      POSTGRES_DB: swarm
+    # No host port publish — internal network only.
+    networks:
+      - internal
+    volumes:
+      - swarm_pg:/var/lib/postgresql/data
+
+networks:
+  internal:
+    internal: true
+
+volumes:
+  swarm_pg:

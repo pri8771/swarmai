@@ -192,11 +192,43 @@ def main() -> None:
     exp = api_sub.add_parser("export-openapi", help="Write OpenAPI JSON to disk")
     exp.add_argument("--out", type=Path, default=None)
 
+    deploy = sub.add_parser("deploy", help="Deployment utilities (local)")
+    deploy_sub = deploy.add_subparsers(dest="deploy_command", required=True)
+    doc = deploy_sub.add_parser("doctor", help="Check deploy profile safety")
+    doc.add_argument(
+        "--profile",
+        default="standalone",
+        choices=["mock", "standalone", "hybrid", "recovery"],
+    )
+
+    recovery = sub.add_parser("recovery", help="Recovery drills (local)")
+    recovery_sub = recovery.add_subparsers(dest="recovery_command", required=True)
+    rv = recovery_sub.add_parser("verify", help="Verify recovery profile artifacts")
+    rv.add_argument("--profile", default="recovery", choices=["recovery"])
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
     elif args.command == "api" and args.api_command == "export-openapi":
         cmd_export_openapi(args.out)
+    elif args.command == "deploy" and args.deploy_command == "doctor":
+        from swarm.deploy.doctor import doctor
+
+        print(
+            json.dumps(
+                doctor(profile=args.profile, repo_root=_repo_root()).to_dict(),
+                indent=2,
+            )
+        )
+    elif args.command == "recovery" and args.recovery_command == "verify":
+        from swarm.deploy.doctor import recovery_verify
+
+        print(
+            json.dumps(
+                recovery_verify(profile=args.profile, repo_root=_repo_root()).to_dict(),
+                indent=2,
+            )
+        )
     elif args.command == "db" and args.db_command == "migrate":
         cmd_db_migrate()
     elif args.command == "db" and args.db_command == "validate":
