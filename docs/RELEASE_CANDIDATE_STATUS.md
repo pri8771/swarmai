@@ -1,83 +1,34 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v0.1-real-mission-runtime`  
-**V0.1:** real mission runtime **dogfood passed** (Ollama `gemma3:4b`, cost `$0.00`) — see `docs/v0.1/STATUS.md`  
-**Prior:** offline-verified RC + partial local live (P15/P16 Ollama)
+**Active version branch:** `cursor/v0.2-heterogeneous-routing`  
+**V0.2:** heterogeneous routing **dogfood passed** — see `docs/v0.2/STATUS.md`  
+**V0.1:** real mission runtime **dogfood passed** (merged via PR #2 / #3)
 
 ## Links
 
 | Item | URL |
 |---|---|
 | Repo | https://github.com/pri8771/swarmai |
-| PR (merged) | https://github.com/pri8771/swarmai/pull/1 |
-| Pre-release | https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1 |
-| Merge commit | `827cb82c9aebc5f83741b215d025fcedf8ab16bd` |
+| V0.2 branch | https://github.com/pri8771/swarmai/tree/cursor/v0.2-heterogeneous-routing |
+| Prior merged PRs | #1 (RC), #2 (V0.1 runtime), #3 (onboarding) |
 
 ## Status
 
 | Dimension | Result |
 |---|---|
-| Kit packets P01–P21 (offline) | complete |
-| `swarm release verify` | pass (prior) |
-| Live P15 canary | **partial pass** — loopback Ollama only (`gemma3:4b`) |
-| Live P16 qualification | **partial** — provisional cells on Ollama route; `wilson_lower` remains null |
-| Live P18 comparisons | **skipped** — optional; mock evidence retained |
-| Spend policy | **zero** (`SWARM_ALLOW_PAID=false`; no payment methods; no cloud credits) |
-| Cloud provider keys | **none found** (shell / known env files / `.env` empty for API keys) |
-| Cloud production infra | **not** provisioned |
+| V0.2 kit packets P27–P30 | **complete** (live Ollama proof) |
+| V0.2 P31 checkpoint | **in progress** |
+| Provider capability registry | live — 14 auth_ok / paid blocks honored |
+| Model qualification | live provisional cells on `gemma3:4b` + `qwen3.5:4b` |
+| Evidence router | heterogeneous planner/worker assignment |
+| Heterogeneous mission | **passed** mission `08175577fb334c4f9ac64a0895acd25e` cost `$0.00` |
+| Spend policy | **zero** (`SWARM_ALLOW_PAID=false`) |
+| OpenAI | deferred (payment-gated) |
+| Together / Fireworks | auth ok; inference blocked under zero-spend |
 
-## Live setup (2026-09-20)
+## Limitations
 
-| Check | Result |
-|---|---|
-| `.env` present | **yes** (from `.env.example`; gitignored) |
-| Cloud API keys populated | **no** |
-| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434/v1` (loopback) |
-| `MLX_LM_BASE_URL` | unset — `:8080` serves Open WebUI HTML, not OpenAI API |
-| `SWARM_ALLOW_PAID` | `false` |
-| `SWARM_ALLOW_PROVIDER_NETWORK` | `false` |
-
-### Provider matrix (honest)
-
-| Provider | Cataloged | Configured | Authenticated | Inference-tested | Notes |
-|---|---|---|---|---|---|
-| ollama | yes | yes (`OLLAMA_BASE_URL`) | yes (live canary) | **pass** `rt_ollama_gemma3:4b` | local zero-cost |
-| groq / openrouter / gemini / others | yes | no | no | **blocked** | no keys; live canary denied |
-| mlx_lm | yes | no | no | **blocked** | endpoint not chat API |
-| cerebras | yes | no | no | **blocked** | payment-gated; not pursued |
-
-## Evidence paths (local `var/`, gitignored)
-
-- P15 canary: `var/onboarding/canaries/rt_ollama_gemma3_4b.json`
-- P15 alias: `var/onboarding/canaries/rt_ollama_default.json`
-- P16 live run: `var/reports/qualification/run_897bfae7212644acb51c8e1666ae5074.json`
-- Onboarding report: `var/onboarding/onboarding-report.json`
-
-## Commands run (zero-spend)
-
-```sh
-cp .env.example .env   # already present; spend flags set false
-# OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 only — no invented cloud keys
-
-uv run swarm providers inspect --provider ollama --metadata-only
-uv run swarm providers onboarding-report
-uv run swarm providers canary --route rt_ollama_default --policy bounded_probe \
-  --mode live --billing-known-zero
-uv run swarm providers canary --route 'rt_ollama_gemma3:4b' --policy bounded_probe \
-  --mode live --billing-known-zero
-uv run swarm eval plan --suite starter --mode live --max-cases 4 --purpose evaluation
-uv run swarm eval run --plan <plan_id> --mode live --route 'rt_ollama_gemma3:4b'
-```
-
-## Pending / remaining blockers
-
-- [ ] Cloud zero-charge-eligible API keys (operator MFA/CAPTCHA/signup) — **paused for user**
-- [ ] Multi-provider live canaries beyond Ollama
-- [ ] P16 statistical qualification rankings (`wilson_lower`) — intentionally null until larger live samples
-- [ ] Optional P18 live soak under verified capacity
-- [ ] No cloud production hosting from this pass
-
-## Claim
-
-**Partially live-verified RC** (local Ollama only). Still **not** fully live-verified across catalog providers.
+- Cloud free-tier **generation** not used for benchmarks (metadata auth probes only).
+- Profiles remain provisional (starter archive; not statistical qualified).
+- `swarm release verify` matrix still labels historical P01–P21 offline modules; V0.2 live proof is documented in `docs/v0.2/STATUS.md`.
