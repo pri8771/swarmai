@@ -186,6 +186,22 @@ def main() -> None:
         default=None,
         help="Write demo artifacts (default: var/reports/demo)",
     )
+    selfdev = demo_sub.add_parser(
+        "self-development", help="P19 controlled self-development mock"
+    )
+    selfdev.add_argument("--mode", default="mock", choices=["mock", "live"])
+    selfdev.add_argument(
+        "--variant",
+        default="good",
+        choices=["good", "failing", "malicious"],
+        help="good=accepted patch; failing/malicious=rejected",
+    )
+    selfdev.add_argument(
+        "--report-dir",
+        type=Path,
+        default=None,
+        help="Write selfdev artifacts (default: var/reports/selfdev)",
+    )
 
     worker = sub.add_parser("worker", help="Worker operations")
     worker_sub = worker.add_subparsers(dest="worker_command", required=True)
@@ -344,6 +360,20 @@ def main() -> None:
         report = asyncio.run(
             run_parser_issue_demo(mode=args.mode, report_dir=report_dir.resolve())
         )
+        print(json.dumps(report.to_dict(), indent=2, default=str))
+    elif args.command == "demo" and args.demo_command == "self-development":
+        from swarm.selfdev.runner import run_self_development
+
+        report_dir = args.report_dir or (_repo_root() / "var" / "reports" / "selfdev")
+        try:
+            report = run_self_development(
+                mode=args.mode,
+                variant=args.variant,
+                report_dir=Path(report_dir),
+            )
+        except PermissionError as exc:
+            print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
+            raise SystemExit(2) from exc
         print(json.dumps(report.to_dict(), indent=2, default=str))
     elif args.command == "worker" and args.worker_command == "self-test":
         from swarm.workers.registry import worker_self_test
