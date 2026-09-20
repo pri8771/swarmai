@@ -4,6 +4,20 @@ Updated 2026-09-20 by CURSOR-20260920-021 (ACK LEAD-012). Owner authorization re
 
 Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `724a324b77d60fff143674feecec9239062e9c3c` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
 
+## Worker packet / story-point execution
+
+Use `WORKER_STORY_POINT_PROTOCOL.md`, `WORKER_PACKET_BACKLOG.md` and `WORKER_PERFORMANCE.json`.
+
+Worker bias: SP1–SP3 execution goes to Cursor. Split SP4–SP5 whenever practical. Lead handles architecture, hard debugging, acceptance, external research and review. Keep >=3 ready worker packets when practical.
+
+Current ready packets while FIX-004 auth waits:
+- W-111A (SP2): real browser console create/observe + API/CLI same durable ID.
+- W-111B (SP2): current-candidate restart/reopen/cancel/unsupported/wrong-output controls.
+- W-121A (SP2): exact-route remote-provider eligibility ledger.
+- W-131A (SP1): qualification gap map under frozen G13 protocol.
+
+FIX-004 W-041A is external-blocked on live CLI login. Do not idle; execute dependency-ready packets above. When auth succeeds, immediately perform W-041B/W-041C.
+
 ## Execution discipline
 
 Use `cursor/v1.4-live-integration-11e2` plus bounded worktrees. One owner integrates shared API/store/schema/lockfile changes. Preserve unrelated work. Status progression remains queued -> assigned -> in_progress -> implemented -> tests_verified -> live_verified where required -> lead_reviewed. Passing CI is necessary, not sufficient. Unknown/blocked is better than fake success. Current operational runtime may not silently use fixtures, supplied answers, fake readiness or admission bypasses.
@@ -110,4 +124,4 @@ Status: `campaign_preregistered_not_started`. `LIVE_142_CAMPAIGN_PROTOCOL.md` no
 
 ## Immediate next action for Cursor
 
-Follow LEAD-20260920-012. Keep `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI login verifies. After login: one manual + two real hourly authenticated worker receipts, then request G10 accept. Lead may revalidate G11 LEAD-012 evidence independently. Do not execute G12 dual-remote until two zero-charge routes are verified. Do not add G13 volume except under `QUALIFICATION_CRITERION.md` toward n≥30. Do not invent G14 live / LIVE-142. No merge/spend/launch.
+ACK LEAD-20260920-014 by packet ID. While W-041A waits on human login, execute W-111A, W-111B, W-121A and W-131A in priority order as independent SP1–SP2 packets. Keep exact SHA/tests/evidence per packet. Once CLI auth verifies, switch to W-041B then W-041C to close G10. After that, continue the decomposed SP1–SP3 path in WORKER_PACKET_BACKLOG.md. Do not self-accept gates or start V1.5+ implementation. No merge/spend/launch.
