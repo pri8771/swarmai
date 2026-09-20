@@ -1,6 +1,6 @@
 {
   "gate": "EVAL-131",
-  "recorded_at": "2026-09-20T21:49:19.605954+00:00",
+  "recorded_at": "2026-09-20T22:18:34.149036+00:00",
   "mode": "aggregated_local_zero_cost_provisional",
   "qualification_claimed": false,
   "underpowered": true,
@@ -11,22 +11,29 @@
     "run_18c05bfe12cc4a20b7ce7dc71de1ced5.json",
     "run_0fb1e20617db420baeeabef41d48f8ef.json",
     "run_cf7c9c9668d042da9882210ba5ff2ae8.json",
-    "run_1138a27910354d5a95618950152aaf71.json"
+    "run_1138a27910354d5a95618950152aaf71.json",
+    "run_fe1e7b79737c461da72e32a1476ef521.json",
+    "run_419c7f8435ad4930bc8faa7ec88a45f4.json",
+    "run_3f29d23f03f4404c87cff755d8ddd74d.json",
+    "run_73e9781f3fa348dea4fc843c8fe0e2d2.json"
   ],
   "aggregation_rule": "unique case_ids per cell; later generated_at overwrites earlier",
-  "note": "Aggregated unique case_ids across local $0 brokered screening including S+M n=5 all-families dual-model (gemma3:4b, qwen3.5:4b). Provisional only; L/XL + third model + acceptance criterion still open. No invented qualification.",
+  "note": "Aggregated unique case_ids across local $0 brokered screening: S/M/L/XL \u00d7 DEFAULT_FAMILIES with gemma3:4b+qwen3.5:4b, plus third model qwen3.5:9b on S+M. Provisional only; acceptance criterion not declared; no invented qualification.",
   "qualification_gap": {
     "required_held_out_per_cell": 5,
     "dataset_holdout_per_family_size": 5,
-    "cells_with_n_ge_5": 24,
-    "total_cells": 24,
+    "cells_with_n_ge_5": 60,
+    "total_cells": 60,
     "sizes_covered": [
+      "L",
       "M",
-      "S"
+      "S",
+      "XL"
     ],
     "models_covered": [
       "gemma3:4b",
-      "qwen3.5:4b"
+      "qwen3.5:4b",
+      "qwen3.5:9b"
     ],
     "families_covered": [
       "coding",
@@ -36,11 +43,54 @@
       "review",
       "summarization"
     ],
-    "still_missing_for_qualify": "L/XL sizes, third model config, predeclared acceptance criterion, uncertainty/resource rules",
+    "three_model_configs_present": true,
+    "still_missing_for_qualify": "predeclared acceptance criterion, uncertainty/resource rules, third-model L/XL coverage optional",
     "live_claimed": false
   },
-  "cell_count": 24,
+  "cell_count": 60,
   "cells": [
+    {
+      "family": "coding",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 2255.45,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_L_03",
+        "code_generation_L_04",
+        "code_generation_L_05",
+        "code_generation_L_06",
+        "code_generation_L_07"
+      ]
+    },
+    {
+      "family": "coding",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "error_count": 0,
+      "pass_rate": 0.8,
+      "wilson_lower": 0.37552826411853885,
+      "latency_ms_p50": 4845.6,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_L_03",
+        "code_generation_L_04",
+        "code_generation_L_05",
+        "code_generation_L_06",
+        "code_generation_L_07"
+      ]
+    },
     {
       "family": "coding",
       "size": "M",
@@ -73,6 +123,27 @@
       "pass_rate": 1.0,
       "wilson_lower": 0.565508505247919,
       "latency_ms_p50": 3824.15,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_M_03",
+        "code_generation_M_04",
+        "code_generation_M_05",
+        "code_generation_M_06",
+        "code_generation_M_07"
+      ]
+    },
+    {
+      "family": "coding",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 5325.21,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -126,6 +197,111 @@
       ]
     },
     {
+      "family": "coding",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 4292.83,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_S_03",
+        "code_generation_S_04",
+        "code_generation_S_05",
+        "code_generation_S_06",
+        "code_generation_S_07"
+      ]
+    },
+    {
+      "family": "coding",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 4346.86,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_XL_03",
+        "code_generation_XL_04",
+        "code_generation_XL_05",
+        "code_generation_XL_06",
+        "code_generation_XL_07"
+      ]
+    },
+    {
+      "family": "coding",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 7528.85,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "code_generation_XL_03",
+        "code_generation_XL_04",
+        "code_generation_XL_05",
+        "code_generation_XL_06",
+        "code_generation_XL_07"
+      ]
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 6703.56,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_L_03",
+        "extraction_L_04",
+        "extraction_L_05",
+        "extraction_L_06",
+        "extraction_L_07"
+      ]
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 4828.21,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_L_03",
+        "extraction_L_04",
+        "extraction_L_05",
+        "extraction_L_06",
+        "extraction_L_07"
+      ]
+    },
+    {
       "family": "extraction",
       "size": "M",
       "model": "gemma3:4b",
@@ -157,6 +333,27 @@
       "pass_rate": 0.8,
       "wilson_lower": 0.37552826411853885,
       "latency_ms_p50": 2234.34,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_M_03",
+        "extraction_M_04",
+        "extraction_M_05",
+        "extraction_M_06",
+        "extraction_M_07"
+      ]
+    },
+    {
+      "family": "extraction",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 3,
+      "error_count": 0,
+      "pass_rate": 0.6,
+      "wilson_lower": 0.23071993220883702,
+      "latency_ms_p50": 4811.37,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -210,6 +407,111 @@
       ]
     },
     {
+      "family": "extraction",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 3,
+      "error_count": 0,
+      "pass_rate": 0.6,
+      "wilson_lower": 0.23071993220883702,
+      "latency_ms_p50": 1438.2,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_S_03",
+        "extraction_S_04",
+        "extraction_S_05",
+        "extraction_S_06",
+        "extraction_S_07"
+      ]
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 9988.84,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_XL_03",
+        "extraction_XL_04",
+        "extraction_XL_05",
+        "extraction_XL_06",
+        "extraction_XL_07"
+      ]
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 8469.83,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "extraction_XL_03",
+        "extraction_XL_04",
+        "extraction_XL_05",
+        "extraction_XL_06",
+        "extraction_XL_07"
+      ]
+    },
+    {
+      "family": "planning",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 3124.32,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_L_03",
+        "dependency_planning_L_04",
+        "dependency_planning_L_05",
+        "dependency_planning_L_06",
+        "dependency_planning_L_07"
+      ]
+    },
+    {
+      "family": "planning",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "error_count": 0,
+      "pass_rate": 0.8,
+      "wilson_lower": 0.37552826411853885,
+      "latency_ms_p50": 7150.35,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_L_03",
+        "dependency_planning_L_04",
+        "dependency_planning_L_05",
+        "dependency_planning_L_06",
+        "dependency_planning_L_07"
+      ]
+    },
+    {
       "family": "planning",
       "size": "M",
       "model": "gemma3:4b",
@@ -241,6 +543,27 @@
       "pass_rate": 1.0,
       "wilson_lower": 0.565508505247919,
       "latency_ms_p50": 2740.58,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_M_03",
+        "dependency_planning_M_04",
+        "dependency_planning_M_05",
+        "dependency_planning_M_06",
+        "dependency_planning_M_07"
+      ]
+    },
+    {
+      "family": "planning",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 3929.3,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -294,6 +617,111 @@
       ]
     },
     {
+      "family": "planning",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 1599.21,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_S_03",
+        "dependency_planning_S_04",
+        "dependency_planning_S_05",
+        "dependency_planning_S_06",
+        "dependency_planning_S_07"
+      ]
+    },
+    {
+      "family": "planning",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 6656.28,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_XL_03",
+        "dependency_planning_XL_04",
+        "dependency_planning_XL_05",
+        "dependency_planning_XL_06",
+        "dependency_planning_XL_07"
+      ]
+    },
+    {
+      "family": "planning",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 12958.15,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "dependency_planning_XL_03",
+        "dependency_planning_XL_04",
+        "dependency_planning_XL_05",
+        "dependency_planning_XL_06",
+        "dependency_planning_XL_07"
+      ]
+    },
+    {
+      "family": "reasoning",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 9033.33,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_L_03",
+        "evidence_qa_L_04",
+        "evidence_qa_L_05",
+        "evidence_qa_L_06",
+        "evidence_qa_L_07"
+      ]
+    },
+    {
+      "family": "reasoning",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 4,
+      "error_count": 0,
+      "pass_rate": 0.8,
+      "wilson_lower": 0.37552826411853885,
+      "latency_ms_p50": 14527.42,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_L_03",
+        "evidence_qa_L_04",
+        "evidence_qa_L_05",
+        "evidence_qa_L_06",
+        "evidence_qa_L_07"
+      ]
+    },
+    {
       "family": "reasoning",
       "size": "M",
       "model": "gemma3:4b",
@@ -325,6 +753,27 @@
       "pass_rate": 1.0,
       "wilson_lower": 0.565508505247919,
       "latency_ms_p50": 6282.0,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_M_03",
+        "evidence_qa_M_04",
+        "evidence_qa_M_05",
+        "evidence_qa_M_06",
+        "evidence_qa_M_07"
+      ]
+    },
+    {
+      "family": "reasoning",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 9074.18,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -378,6 +827,111 @@
       ]
     },
     {
+      "family": "reasoning",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 5,
+      "error_count": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.565508505247919,
+      "latency_ms_p50": 4632.6,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_S_03",
+        "evidence_qa_S_04",
+        "evidence_qa_S_05",
+        "evidence_qa_S_06",
+        "evidence_qa_S_07"
+      ]
+    },
+    {
+      "family": "reasoning",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 12407.55,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_XL_03",
+        "evidence_qa_XL_04",
+        "evidence_qa_XL_05",
+        "evidence_qa_XL_06",
+        "evidence_qa_XL_07"
+      ]
+    },
+    {
+      "family": "reasoning",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 19802.55,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "evidence_qa_XL_03",
+        "evidence_qa_XL_04",
+        "evidence_qa_XL_05",
+        "evidence_qa_XL_06",
+        "evidence_qa_XL_07"
+      ]
+    },
+    {
+      "family": "review",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 9106.14,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_L_03",
+        "tool_selection_L_04",
+        "tool_selection_L_05",
+        "tool_selection_L_06",
+        "tool_selection_L_07"
+      ]
+    },
+    {
+      "family": "review",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 16058.46,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_L_03",
+        "tool_selection_L_04",
+        "tool_selection_L_05",
+        "tool_selection_L_06",
+        "tool_selection_L_07"
+      ]
+    },
+    {
       "family": "review",
       "size": "M",
       "model": "gemma3:4b",
@@ -409,6 +963,27 @@
       "pass_rate": 0.0,
       "wilson_lower": 0.0,
       "latency_ms_p50": 9002.01,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_M_03",
+        "tool_selection_M_04",
+        "tool_selection_M_05",
+        "tool_selection_M_06",
+        "tool_selection_M_07"
+      ]
+    },
+    {
+      "family": "review",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 12367.63,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -462,6 +1037,111 @@
       ]
     },
     {
+      "family": "review",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 1,
+      "error_count": 0,
+      "pass_rate": 0.2,
+      "wilson_lower": 0.036223160969787456,
+      "latency_ms_p50": 3055.23,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_S_03",
+        "tool_selection_S_04",
+        "tool_selection_S_05",
+        "tool_selection_S_06",
+        "tool_selection_S_07"
+      ]
+    },
+    {
+      "family": "review",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 9982.84,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_XL_03",
+        "tool_selection_XL_04",
+        "tool_selection_XL_05",
+        "tool_selection_XL_06",
+        "tool_selection_XL_07"
+      ]
+    },
+    {
+      "family": "review",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 16828.73,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "tool_selection_XL_03",
+        "tool_selection_XL_04",
+        "tool_selection_XL_05",
+        "tool_selection_XL_06",
+        "tool_selection_XL_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "L",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 8639.37,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_L_03",
+        "context_compaction_L_04",
+        "context_compaction_L_05",
+        "context_compaction_L_06",
+        "context_compaction_L_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "L",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 13123.19,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_L_03",
+        "context_compaction_L_04",
+        "context_compaction_L_05",
+        "context_compaction_L_06",
+        "context_compaction_L_07"
+      ]
+    },
+    {
       "family": "summarization",
       "size": "M",
       "model": "gemma3:4b",
@@ -493,6 +1173,27 @@
       "pass_rate": 0.0,
       "wilson_lower": 0.0,
       "latency_ms_p50": 5164.47,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_M_03",
+        "context_compaction_M_04",
+        "context_compaction_M_05",
+        "context_compaction_M_06",
+        "context_compaction_M_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "M",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 6503.04,
       "state": "provisional",
       "qualification": false,
       "case_ids": [
@@ -543,6 +1244,69 @@
         "context_compaction_S_05",
         "context_compaction_S_06",
         "context_compaction_S_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "S",
+      "model": "qwen3.5:9b",
+      "route_id": "rt_ollama_qwen3.5:9b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 2784.74,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_S_03",
+        "context_compaction_S_04",
+        "context_compaction_S_05",
+        "context_compaction_S_06",
+        "context_compaction_S_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "XL",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 10610.86,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_XL_03",
+        "context_compaction_XL_04",
+        "context_compaction_XL_05",
+        "context_compaction_XL_06",
+        "context_compaction_XL_07"
+      ]
+    },
+    {
+      "family": "summarization",
+      "size": "XL",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "sample_count": 5,
+      "pass_count": 0,
+      "error_count": 0,
+      "pass_rate": 0.0,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 17449.71,
+      "state": "provisional",
+      "qualification": false,
+      "case_ids": [
+        "context_compaction_XL_03",
+        "context_compaction_XL_04",
+        "context_compaction_XL_05",
+        "context_compaction_XL_06",
+        "context_compaction_XL_07"
       ]
     }
   ]
