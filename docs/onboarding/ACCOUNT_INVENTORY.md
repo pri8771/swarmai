@@ -1,6 +1,6 @@
 # SwarmAI account inventory (sanitized)
 
-**Generated:** 2026-09-20T16:35:30.202014+00:00
+**Generated:** 2026-09-20T16:36:35.725123+00:00
 **Chrome profile:** Default / **Priyansh** (`priyansh.chordia@gmail.com`)
 **Spend:** zero · `SWARM_ALLOW_PAID=false` · **V0.2:** not started · **PR #2:** not merged
 
@@ -21,19 +21,13 @@
 | Together | yes | no | blocked | $5 deposit required |
 | Fireworks | yes | no | blocked | Create no-op at $0 credits |
 | DeepInfra | yes | yes | yes | models.list OK |
-| Replicate | yes | yes | no | key present; API 403 |
+| Replicate | yes | yes | yes | account auth OK (occasional 403 flake) |
 | Ollama | yes (local) | yes | yes | local zero-cost |
-
-## NVIDIA
-- **Workspace:** `primandir`
-- **Signed in:** yes
-- **`.env`:** NVIDIA_API_KEY present + auth canary OK
 
 ## Blocked (zero-spend)
 - **Together:** deposit $5 to create key
 - **OpenAI:** Create secret key disabled (credits/billing)
 - **Fireworks:** Create API Key does not mint at Credits $0.00
-- **Replicate:** token in `.env` but API returns 403 — may need regenerate/scopes
 
 ## Operator action
 none — keep working
