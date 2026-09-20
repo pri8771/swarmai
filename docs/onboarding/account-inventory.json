@@ -1,86 +1,110 @@
 {
-  "generated_at": "2026-09-20T15:37:12.837284+00:00",
+  "generated_at": "2026-09-20T15:49:41.153707+00:00",
   "spend_policy": "zero",
   "swarm_allow_paid": false,
+  "standing_rule": "agent_creates_copies_keys_via_SwarmAI_Chrome; escalate only MFA/CAPTCHA/password/consent",
   "browser": {
-    "engine": "system_google_chrome",
+    "engine": "system_google_chrome_playwright_persistent",
     "profile": "~/Library/Application Support/SwarmAI/browser-profile",
     "not_cursor_in_app_browser": true
   },
-  "identity_email_or_sso": null,
+  "identity_email_or_sso": "priyansh.chordia@gmail.com (observed on Cloudflare/Google login_hint; operator-confirm if preferred)",
   "v01_branch": "cursor/v0.1-real-mission-runtime",
   "v01_sha": "0a0c7e4",
   "onboarding_branch": "cursor/v0.1-provider-onboarding",
   "verification": {
     "ollama_canary": "canaried_live_local_zero_cost",
-    "openrouter_auth": "ok_get_key_200",
-    "openrouter_canary": {
-      "route": "liquid/lfm-2.5-2.6b:free",
-      "cost": 0,
-      "usage_delta": 0.0,
-      "result": "zero_spend_confirmed"
+    "openrouter": {
+      "key_present": true,
+      "auth": "ok_get_key_200",
+      "canary": "liquid/lfm-2.5-2.6b:free cost=0 usage_delta=0",
+      "browser_session_now": "google_sso_required"
     },
-    "onboarding_tests": "pending_rerun_this_pass",
-    "cloud_keys_present": {
-      "OPENROUTER_API_KEY": true
-    }
+    "groq": {
+      "key_present": true,
+      "auth": "ok_models_200_browser_ua",
+      "canary": "openai/gpt-oss-20b http=200 no_payment_error",
+      "browser_session_now": "signed_in_keys_ui"
+    },
+    "onboarding_tests": "10_passed_prior"
   },
   "providers": {
     "openrouter": {
-      "outcome": "authenticated_zero_spend_canary_ok",
+      "browser_verified": "login_required_google_sso",
       "api_key_present": true,
       "auth_verified": true,
-      "zero_charge_route": "liquid/lfm-2.5-2.6b:free",
-      "inference_smoke": "ok_cost_0"
+      "inference_smoke": "ok_cost_0_free_route",
+      "outcome": "key_ok_browser_session_expired"
     },
     "groq": {
-      "outcome": "browser_keys_ui_reachable",
-      "api_key_present": false,
-      "next": "create_free_key_copy_reply_key_copied_GROQ_API_KEY"
+      "browser_verified": "signed_in_keys_ui",
+      "api_key_present": true,
+      "auth_verified": true,
+      "inference_smoke": "ok_openai_gpt_oss_20b",
+      "outcome": "authenticated_zero_spend_canary_ok"
     },
     "gemini": {
-      "outcome": "browser_keys_ui_reachable",
+      "browser_verified": "google_sso_required",
       "api_key_present": false,
-      "next": "after_groq_create_free_key_copy_reply_key_copied_GEMINI_API_KEY"
+      "outcome": "blocked_google_sso"
     },
     "huggingface_inference": {
-      "outcome": "browser_login_required",
-      "api_key_present": false
+      "browser_verified": "login_required",
+      "api_key_present": false,
+      "outcome": "blocked_login"
     },
     "nvidia_nim": {
-      "outcome": "browser_unverified",
-      "api_key_present": false
+      "browser_verified": "login_required_not_signed_in",
+      "api_key_present": false,
+      "outcome": "blocked_login"
     },
     "mistral": {
-      "outcome": "browser_login_required",
-      "api_key_present": false
+      "browser_verified": "login_required",
+      "api_key_present": false,
+      "outcome": "blocked_login"
     },
     "cohere": {
-      "outcome": "browser_signup_incomplete",
-      "api_key_present": false
+      "browser_verified": "login_required",
+      "api_key_present": false,
+      "outcome": "blocked_login"
     },
     "cloudflare_workers_ai": {
-      "outcome": "browser_login_required",
-      "api_key_present": false
+      "browser_verified": "google_sso_password_gate",
+      "api_key_present": false,
+      "outcome": "blocked_google_sso"
     },
     "ollama": {
-      "outcome": "inference_tested_local",
-      "api_key_present": false
+      "browser_verified": "n/a",
+      "outcome": "inference_tested_local"
     },
     "cerebras": {
-      "outcome": "payment_gated",
-      "api_key_present": false
+      "outcome": "payment_gated"
     },
     "github_models": {
-      "outcome": "unavailable_retired",
-      "api_key_present": false
+      "outcome": "unavailable_retired"
     }
   },
   "handoffs": [
-    "NEXT: Groq \u2014 Create free key on console.groq.com/keys \u2192 Copy \u2192 reply 'key copied GROQ_API_KEY' (no paste)",
-    "Then Gemini \u2014 same pattern with GEMINI_API_KEY",
-    "Then SSO for HF / Mistral / Cloudflare / Cohere / NVIDIA as needed (free only)",
-    "OpenRouter DONE \u2014 auth + free canary liquid/lfm-2.5-2.6b:free cost=0"
+    "ONE precise: In SwarmAI Chrome, complete Google sign-in (password/MFA) for the account hinted as priyansh.chordia@gmail.com. This unblocks Cloudflare + Gemini + OpenRouter browser session. Reply 'google signed in' when done \u2014 agent will then create/copy remaining keys without asking you to paste secrets."
   ],
+  "operator_claim_vs_verified": {
+    "operator_claimed": "ALL accounts logged in/created",
+    "verified_signed_in_browser": [
+      "groq"
+    ],
+    "verified_keys_api_working": [
+      "openrouter",
+      "groq"
+    ],
+    "not_signed_in_browser": [
+      "openrouter",
+      "gemini",
+      "huggingface_inference",
+      "nvidia_nim",
+      "mistral",
+      "cohere",
+      "cloudflare_workers_ai"
+    ]
+  },
   "v02": "not_started"
 }

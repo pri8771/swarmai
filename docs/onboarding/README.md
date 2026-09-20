@@ -17,6 +17,9 @@ Account / adapter / route statuses are independent. Dashboard login ≠ API acce
 
 ## Agent / operator rule (authorized setup)
 
+**Standing rule (2026-09-20):** After initial OpenRouter/Groq setup, the agent uses SwarmAI Chrome to open provider consoles and create/copy API keys into gitignored `.env` itself. Do **not** ask the operator to copy/paste keys into chat. Escalate only for MFA, CAPTCHA, password, or consent the browser cannot complete.
+
+
 For authorized account or integration setup:
 
 1. Use a **local visible browser** with a dedicated SwarmAI profile (`~/Library/Application Support/SwarmAI/browser-profile`).
