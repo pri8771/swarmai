@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T21:37:39Z",
+  "updated_at": "2026-09-20T21:39:25Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -235,21 +235,21 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "G10 lead acceptance pending \u2014 package ready at tip 0ba091373e8995524c74e637149b1af71f0e0aea (content 6dd568cdfda5b6dd73600915965c1abbf3b9100b)",
+    "G10 lead acceptance pending \u2014 package ready; CI green 35539303334 on tip 3b0011f0605573ab77318981691f588ac72f912f",
     "Cursor agent CLI Not logged in; SKIP_CURSOR_PROBE not cleared",
     "G12 remote dual-provider live-blocked; G13 not qualified; G14 live multi-planner absent; LIVE-142 not started"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T21:37:39Z",
+    "verified_at": "2026-09-20T21:39:25Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "0ba091373e8995524c74e637149b1af71f0e0aea",
+    "candidate_sha": "3b0011f0605573ab77318981691f588ac72f912f",
     "candidate_commits": 16,
     "candidate_changed_files": 76,
-    "latest_verified_ci_run_id": 35538252435,
-    "latest_verified_ci_conclusion": "prior_green_3c82e0f_new_tip_pending",
+    "latest_verified_ci_run_id": 35539303334,
+    "latest_verified_ci_conclusion": "success",
     "console_job_id": 106151079805,
     "console_conclusion": "success",
     "offline_job_id": 106151079780,
@@ -260,10 +260,10 @@
     "downstream_install_alembic_pytest_executed": true,
     "live_gated_job_conclusion": "success_blocked_notice_only",
     "live_acceptance_executed": false,
-    "note": "G10 package at 0ba091373e8995524c74e637149b1af71f0e0aea; prior CI success 35538395519 on 3c82e0f; await CI on new tip"
+    "note": "G10 package + G13 n=5 path; CI green 35539303334 on 3b0011f0605573ab77318981691f588ac72f912f"
   },
   "implementation_notes": {
-    "cursor_tip": "0ba091373e8995524c74e637149b1af71f0e0aea",
+    "cursor_tip": "3b0011f0605573ab77318981691f588ac72f912f",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "posted_not_lead_accepted",
@@ -277,7 +277,7 @@
     ],
     "latest_tip_change": "G13 denser holdout evidence only; does not address LEAD-20260920-007 G10 changes",
     "lead_009": "items_1_to_6_source_closed_awaiting_remote_ci_and_lead_accept",
-    "ci_run": "35538252435_success",
+    "ci_run": "35539303334_success",
     "g10_package": "LEAD_ACCEPT_PACKAGE_ready_awaiting_lead"
   }
 }

@@ -916,6 +916,10 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - G12 remote dual only if zero-charge routes verified; G14 live multi-planner only after capacity.
 - Operator: fresh cursor agent login with live waiter; only then clear SKIP + hourly proofs.
 
+### CI (post-push)
+- Tip `3b0011f0605573ab77318981691f588ac72f912f` run `35539303334`: **success** (offline+console+live-gated notice)
+- Intermediate tip failed on starter case_count 128→224 assertion; fixed in `3b0011f0605573ab77318981691f588ac72f912f`
+
 ### Blockers
 - G10 lead accept pending (packaged, not invented).
 - cursor agent CLI Not logged in — SKIP uncleared by policy.
