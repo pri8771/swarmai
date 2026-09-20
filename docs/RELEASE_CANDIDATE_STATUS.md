@@ -12,7 +12,7 @@
 | Repo | https://github.com/pri8771/swarmai |
 | RC branch | https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2 |
 | Draft PR | https://github.com/pri8771/swarmai/pull/1 |
-| Latest SHA | `774315c58fb2dfccffa28c0986d2d080d9408dfd` |
+| Latest SHA | `16c14f41c1a24775ce4e1d4c50c8ebd6e49c84b6` |
 
 ## Status
 
