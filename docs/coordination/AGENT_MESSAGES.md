@@ -113,3 +113,45 @@ Final live campaign: twelve preregistered positive missions, six specified negat
 No Cursor execution/heartbeat or live V1.4 result is yet verified. Accounts/browser/runner checks must occur on the authorized local environment. Bots/Claude planning is moving to a separate conversation; the lead found existing `pri8771/bots` and `pri8771/astra-bot-launch` records, but has not activated a bots scheduler or worker. Do not absorb those venture projects into this SwarmAI tranche.
 
 ---
+
+## CURSOR-20260920-001
+
+- UTC: 2026-09-20T19:47:48Z
+- From: Cursor / implementation worker
+- To: ChatGPT / engineering lead
+- Acknowledges: LEAD-20260920-001, LEAD-20260920-002, LEAD-20260920-003
+- Checkpoint: V1.0 repair (G10); authorized ceiling V1.4
+- Source verified: main `b9141fa3150f853586dede0334a47b344571bc16`
+- Coordination tip read: `c0128248e4fdfa112a7f16b09dddef96ec4da260`
+
+### Done
+
+Fetched `origin/main` and `origin/coordination/swarm-control` without resetting dirty trees. Read AGENTS, START_CURSOR_TO_V1_4, V1_4_EXECUTION_CONTRACT, PROJECT_MEMORY, STATE, WORK_QUEUE, AGENT_MESSAGES, REAL_DATA_POLICY and AUDIT_V1_2026-09-20. Created/reused isolated worktrees and claimed G10 FIX-001–005 on the integration branch. Reproduced the first failing regression for FIX-001.
+
+### Evidence
+
+- App source SHA: `b9141fa3150f853586dede0334a47b344571bc16` (matches audited main)
+- Integration branch: `cursor/v1.4-live-integration-11e2`
+- Integration worktree: `/Users/pchordia/Downloads/swarm-ai-v14`
+- Coordination worktree: `/Users/pchordia/Downloads/swarm-ai-coord-control` on `coordination/swarm-control`
+- Preserved unrelated worktree: `/Users/pchordia/Downloads/swarm-ai-onboarding` @ `847c194`
+- First regression command: `uv run ruff check .` in integration worktree
+- First regression result: exit 1; **33** findings (25 E501, 4 I001, 2 F841, 1 UP017, 1 B007) matching audit CI run `35529361557`
+- Concise inventory retained locally at `/tmp/swarm-ruff-concise.txt` (sanitized; no secrets)
+
+### Assignment claimed
+
+FIX-001 (in_progress) → then FIX-002/003/005 with shared-file coordination; FIX-004 parallel lane for platform sessions/hourly runner. G11–G14 remain queued after G10 evidence.
+
+### Next
+
+1. Repair all 33 ruff findings without silencing checks or deleting tests.
+2. Expand CI to discover applicable offline suites; isolate live-gated jobs with honest skip reasons.
+3. Write failing-first negative tests for FIX-002 (default tokens / cross-project / idempotency) and begin FIX-005 GOOD_FIX / fixture inventory.
+4. Post Done/Evidence/Next/Blockers at least hourly while active.
+
+### Blockers
+
+None blocking FIX-001 local reproduction. Live provider concurrency, 24h window and protected Apply-link reproduction remain pending prerequisites (not claimed). No main merge/tag/spend/V1.5+.
+
+---

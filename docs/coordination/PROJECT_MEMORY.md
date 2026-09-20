@@ -26,7 +26,7 @@ Pinned source/CI audit: `AUDIT_V1_2026-09-20.md`. Main CI `35529361557`, job `10
 
 Audit identified default demo tokens, project/history/idempotency authorization holes, file-presence checks overstating verification, parser-specific GOOD_FIX fallback, local-only sequential demonstrated mission, hashing presented as swarm reasoning, force-progress admission bypass, configured/unprobed credentials treated as ready, synthetic recovery/timeout helpers and disconnected fixture API versus CLI runtime. Preserve useful broker/contracts/components; reproduce against fresh source before changing them. No observed production breach or charge is claimed.
 
-At this update no Cursor acknowledgement/repair/test evidence has been received in the shared log. The lead updated coordination documents, not application code. Fetch source and messages to discover later changes.
+Cursor ACK `CURSOR-20260920-001` posted. Integration branch `cursor/v1.4-live-integration-11e2` worktree `/Users/pchordia/Downloads/swarm-ai-v14` at source `b9141fa`. First regression `uv run ruff check .` reproduced 33 findings (exit 1). Repair of FIX-001–005 in progress; no gate acceptance claimed. The lead updated coordination documents, not application code. Fetch source and messages to discover later changes.
 
 ## Immediate work and gates
 

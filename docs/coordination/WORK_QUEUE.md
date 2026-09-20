@@ -14,7 +14,7 @@ Status: queued -> assigned -> in_progress -> implemented -> tests_verified -> li
 
 ### FIX-001 — comprehensive CI and honest baseline
 
-Status: assigned; worker ACK/evidence pending. P0. Audit AUD-01/11.
+Status: in_progress; ACK CURSOR-20260920-001; baseline ruff 33 reproduced on b9141fa / cursor/v1.4-live-integration-11e2. P0. Audit AUD-01/11.
 
 Reproduce Ruff failure and repair causes. Execute actual lint, typing, backend, frontend/browser and migration/install checks appropriate to the code. CI must discover all applicable suites, not just contracts/spikes. Isolate live-gated jobs and give precise skipped/blocked reasons; do not imply they passed. Use permitted resources, avoiding unverified extra CI charges. Correct current status/handoffs without rewriting the immutable historical audit.
 
@@ -22,7 +22,7 @@ Accept: exact candidate SHA, test inventory, commands, exit results and actual r
 
 ### FIX-002 — auth, project isolation, idempotency
 
-Status: assigned; worker ACK/evidence pending. P0 security. Audit AUD-03/04/10.
+Status: assigned_acknowledged (CURSOR-20260920-001); work starting. P0 security. Audit AUD-03/04/10.
 
 Remove seeded installed-runtime identities; implement per-install auth and safe unconfigured startup. Authorize before cache/data/history access. Scope idempotency by actor/project/operation plus request digest and reject body mismatches. Validate ownership on reports, artifacts, history, approvals and workers. Coordinate API/store edits with FIX-005 and RUN-111.
 
@@ -30,7 +30,7 @@ Accept: negative regressions fail before the fix and pass afterward, including t
 
 ### FIX-003 — evidence-backed release/readiness
 
-Status: assigned; worker ACK/evidence pending. P0 integrity. Audit AUD-02/08/09.
+Status: assigned_acknowledged (CURSOR-20260920-001); work starting. P0 integrity. Audit AUD-02/08/09.
 
 Remove hard-coded verification/readiness flags. File existence is packaging evidence, not a test result. Key presence/public catalog access is not authenticated or zero-charge eligibility. Add exact-route observation provenance/expiry. Separate actual timeout/cancellation/recovery behavior from helper state transitions. Lock behavioral acceptance contracts before tests.
 
@@ -46,7 +46,7 @@ Configure one permitted local/eligible runner with lock, bounded invocations, re
 
 ### FIX-005 — remove operational demo dependence
 
-Status: assigned; worker ACK/evidence pending. P0 product truth. Audit AUD-05/06/07/10.
+Status: assigned_acknowledged (CURSOR-20260920-001); work starting. P0 product truth. Audit AUD-05/06/07/10.
 
 Inventory default/runtime fixture imports, synthetic users/providers/activity, GOOD_FIX, canned responses and force-progress quota bypasses. Remove them from the shipped operational path. Failed output must fail or use bounded real repair/escalation. No assumption that every task is the demo parser. Integrate useful existing modules; keep missing generic capability explicitly incomplete until RUN-111. Preserve isolated tests but do not count them as live proof.
 
