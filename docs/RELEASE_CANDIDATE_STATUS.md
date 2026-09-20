@@ -3,7 +3,7 @@
 **Date:** 2026-09-20  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Label:** `offline-verified-release-candidate`  
-**Not:** cloud-operating, live-qualified, publicly launched, or merge-ready without human review
+**Not:** fully live-verified, cloud-operating, or production-launched
 
 ## Links
 
@@ -11,8 +11,8 @@
 |---|---|
 | Repo | https://github.com/pri8771/swarmai |
 | RC branch | https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2 |
-| Draft PR | https://github.com/pri8771/swarmai/pull/1 |
-| Latest SHA | `16c14f41c1a24775ce4e1d4c50c8ebd6e49c84b6` |
+| PR | https://github.com/pri8771/swarmai/pull/1 |
+| Latest SHA (pre-merge docs) | see git / release tag |
 
 ## Status
 
@@ -23,24 +23,43 @@
 | Required RC pytest slice | pass |
 | Fresh-install mock demo | pass |
 | Ruff / mypy (CI-defined) | pass |
-| Live P15/P16/P18 | **not attempted** (paused — keys) |
-| Remote | `origin` → https://github.com/pri8771/swarmai.git |
-| Draft PR | open (draft) vs `main` — **do not merge** |
-| Merge / deploy / launch | **not authorized** |
+| Live P15 canary | **blocked** — no local `.env` / process keys |
+| Live P16 qualification | **blocked** — depends on P15 live routes |
+| Live P18 comparisons | **skipped** — no keys; mock evidence retained |
+| Spend policy | zero (no payment methods / paid credits used) |
+| Merge / GitHub pre-release | authorized for offline RC |
+| Cloud production infra | **not** provisioned |
+
+## Live setup (2026-09-20)
+
+| Check | Result |
+|---|---|
+| `.env` present | **no** |
+| Process env provider keys | **none** |
+| `SWARM_ALLOW_PAID` | unset (treat as deny) |
+| Zero-spend live canaries attempted | **no** |
+
+### Exact user actions for live (paused)
+
+1. Copy `.env.example` → `.env` (never commit `.env`).
+2. Add only provider keys for **zero-charge-eligible** routes; confirm account billing/spend = zero.
+3. Set `SWARM_ALLOW_PAID=false` and do not enable paid wrappers.
+4. Re-run: `uv run swarm providers onboarding-report` then bounded `providers canary --mode live` only on verified free routes.
+5. Then P16: `uv run swarm eval plan/run --mode live` only with eligible route IDs.
 
 ## Implemented by subsystem
 
-| Area | Packets | Notes |
-|---|---|---|
-| Contracts, fixtures, tooling | P01–P02 | typed contracts, pytest/ruff/mypy baseline |
-| Providers + broker | P03–P05 | adapters, catalog, durable inference broker |
-| Sandbox / workspace / runtime | P06–P08, P10 | isolation, context, agent sessions |
-| Console + API | P09, P13 | Vite console, FastAPI product API |
-| Controller + workers | P11–P12 | adaptive scheduling, membership |
-| Integrated demo | P14 | parser-issue mock mission |
-| Onboarding / qualify / deploy | P15–P17 | offline layers; live blocked |
-| Load / chaos | P18 | synthetic soak + fault matrix |
-| Self-dev / review / RC | P19–P21 | patch artifacts, checklist, release verify |
+| Area | Packets | Offline | Live |
+|---|---|---|---|
+| Contracts / tooling | P01–P02 | verified | n/a |
+| Providers + broker | P03–P05 | verified | not tested |
+| Sandbox / workspace / runtime | P06–P08, P10 | verified | n/a |
+| Console + API | P09, P13 | verified | local launch only |
+| Controller + workers | P11–P12 | verified | n/a |
+| Integrated demo | P14 | verified (mock models) | n/a |
+| Onboarding / qualify / deploy | P15–P17 | offline verified | P15/P16 live blocked |
+| Load / chaos | P18 | mock verified | live skipped |
+| Self-dev / review / RC | P19–P21 | verified | n/a |
 
 ## Verification (commands)
 
@@ -55,11 +74,11 @@ uv run mypy src/swarm
 
 ## Safety
 
-- `.env` gitignored; `.env.example` only in tree
-- No production secrets tracked; scrubbers refuse secret-shaped payloads in logs/API
-- Workers / sandbox do not receive host secrets
+- `.env` gitignored; no credentials committed
+- Scrubbers refuse secret-shaped payloads in logs/API
+- Workers/sandbox do not receive host secrets
 - Self-dev cannot auto-merge or expand approval/release rights
-- Release verify fails closed if secret files or required docs missing
+- No paid inference or unofficial wrappers used in this completion pass
 
 ## Pending live validation
 
@@ -68,18 +87,14 @@ uv run mypy src/swarm
 - [ ] P15 live canary on verified routes
 - [ ] P16 live qualification (multi-route if eligible)
 - [ ] Optional P18 live comparisons under verified capacity
-- [ ] Explicit auth before any push-to-production / public launch
 
 ## Known limitations
 
-- Live inference, qualification rankings, and cloud deploy are **unverified**
-- Single local branch today; no `origin` remote configured at RC checkpoint
-- Integration DB tests may require `SWARM_DATABASE_URL` (marked `integration`)
+- Live inference and qualification rankings are **unverified**
+- Integration DB tests may require `SWARM_DATABASE_URL`
 - Console and compose profiles are local/dev oriented
+- No cloud production hosting from this pass
 
-## Next milestone
+## Next (after keys — not started here)
 
-1. Create/configure GitHub remote + default `main` (human).
-2. Push this branch and open a **draft** PR for review (do not merge until approved).
-3. After keys: live P15 → P16 only under zero-spend policy.
-4. Do not begin live work from this captain run.
+Live P15 → P16 under zero-spend only. Do not treat this RC as fully live-verified.

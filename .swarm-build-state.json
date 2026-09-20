@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T13:15:00Z",
+  "updated_at": "2026-09-20T13:20:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
@@ -78,15 +78,17 @@
     },
     "P15": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "blocked_no_keys",
       "integration_status": "offline_verified",
-      "commit": "7fcc4f8"
+      "commit": "7fcc4f8",
+      "block_reason": "no local .env or process provider keys; zero-spend live not attempted"
     },
     "P16": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "blocked_no_keys",
       "integration_status": "offline_verified",
-      "commit": "e8f4d2b"
+      "commit": "e8f4d2b",
+      "block_reason": "no local .env or process provider keys; zero-spend live not attempted"
     },
     "P17": {
       "state": "offline_verified",
@@ -96,9 +98,10 @@
     },
     "P18": {
       "state": "offline_verified",
-      "live_status": "not_attempted",
+      "live_status": "skipped_no_keys",
       "integration_status": "offline_verified",
-      "commit": "c675f8f"
+      "commit": "c675f8f",
+      "skip_reason": "no local .env or process provider keys; mock evidence retained"
     },
     "P19": {
       "state": "offline_verified",
@@ -152,12 +155,11 @@
     "user_required": [
       {
         "packet": "P15/P16_live",
-        "action": "Create/verify provider accounts with zero-charge-eligible routes; place keys only in local .env (never commit); confirm spend policy = zero before any live canary"
+        "action": "Create .env from .env.example with zero-charge-eligible provider keys only; keep SWARM_ALLOW_PAID=false; never commit .env; then run providers onboarding-report and bounded live canary"
       }
     ],
     "live_only": [
-      "Provider API keys for P15\u2013P16 live canaries and multi-route qualification",
-      "Explicit authorization required before any push/production/public launch"
+      "Provider API keys for P15\u2013P16 live canaries and multi-route qualification"
     ]
   },
   "release_captain": {
@@ -174,5 +176,14 @@
       "P18"
     ]
   },
-  "remote": "https://github.com/pri8771/swarmai.git"
+  "remote": "https://github.com/pri8771/swarmai.git",
+  "completion_pass": {
+    "keys_present": false,
+    "live_p15": "blocked_no_keys",
+    "live_p16": "blocked_no_keys",
+    "live_p18": "skipped_no_keys",
+    "spend": "none",
+    "merge_authorized_offline_rc": true,
+    "claim": "offline-verified-release-candidate-not-fully-live-verified"
+  }
 }
