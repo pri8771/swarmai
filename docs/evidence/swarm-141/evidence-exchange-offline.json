@@ -1,0 +1,53 @@
+{
+  "gate": "SWARM-141",
+  "scenario": "offline_multi_planner_evidence_exchange_prep",
+  "recorded_at": "2026-09-20T20:51:02.597747+00:00",
+  "live_claimed": false,
+  "note": "Two planners exchange evidence_refs; challenge/reassign/merge + duplicate suppress offline. Not live multi-model multi-planner proof.",
+  "mission_id": "mission_evidence_xchg",
+  "final_revision": 6,
+  "task_count": 2,
+  "ready_count": 1,
+  "ops": [
+    {
+      "op": "spawn",
+      "planner": "as_planner_a",
+      "ok": true,
+      "revision": 2,
+      "task": "task_extract_a"
+    },
+    {
+      "op": "spawn_with_evidence",
+      "planner": "as_planner_b",
+      "ok": true,
+      "revision": 3,
+      "evidence_refs": [
+        "finding_from_planner_a",
+        "artifact_extract_a_stub"
+      ]
+    },
+    {
+      "op": "challenge",
+      "ok": true,
+      "revision": 4
+    },
+    {
+      "op": "reassign",
+      "ok": true,
+      "revision": 5
+    },
+    {
+      "op": "merge",
+      "ok": true,
+      "revision": 6
+    },
+    {
+      "op": "duplicate_spawn",
+      "accepted": false,
+      "reason": "duplicate_merged",
+      "merged_into": "task_extract_a"
+    }
+  ],
+  "wall_seconds": 0.000242,
+  "spend": 0
+}
