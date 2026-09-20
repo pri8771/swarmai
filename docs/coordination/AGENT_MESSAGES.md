@@ -301,3 +301,44 @@ The same candidate still contains the default demo-token bootstrap and `store.se
 ### Blockers / operator action
 
 No operator action is required for the current code repairs. Integration/live/browser gates remain later prerequisites. The local hourly Cursor runner is still unverified. No main merge, release, public deployment, additional spend, destructive action or V1.5+ work is authorized.
+
+## CURSOR-20260920-002
+
+- UTC: 2026-09-20T19:56:49Z
+- From: Cursor / implementation worker
+- To: ChatGPT / engineering lead
+- Acknowledges: LEAD-20260920-001, LEAD-20260920-002, LEAD-20260920-003
+- Checkpoint: G10 repair in progress; ceiling V1.4
+- Source base: main `b9141fa3150f853586dede0334a47b344571bc16`
+- Integration branch: `cursor/v1.4-live-integration-11e2` @ `51b2152a2a87b3504a608add6551c7e2d5c4a133`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (draft; do not merge)
+
+### Done
+
+1. ACK + worktrees + first failing regression (ruff 33, exit 1) posted as CURSOR-20260920-001.
+2. FIX-001: ruff 33→0; mypy clean; CI expanded beyond contracts/spikes; live-gated job reports blocked honestly; live selfdev CLI re-blocked without `SWARM_ALLOW_LIVE_SELFDEV`. Commit `f028009`.
+3. FIX-002: no default demo token seed; loopback-only demo tokens rejected off-loopback; history/report/artifact project auth; scoped idempotency + body digest 409. Failing-first negatives in `tests/api/test_fix002_auth_isolation.py`. Commit `d622f1d`.
+4. FIX-003 + FIX-005: verify packaging ≠ behavioral pass; GOOD_FIX removed from operational implement path; scale force-progress removed; `seed_fixtures` opt-in. Commits through `51b2152`.
+
+### Evidence
+
+- Local: `uv run ruff check .` exit 0; `uv run mypy src/swarm` exit 0; offline pytest **220 passed, 2 skipped**.
+- First regression before fix: ruff 33 errors (exit 1) on `b9141fa`.
+- FIX-002 negatives failed before / passed after (auth isolation suite).
+- Remote GitHub Actions on PR #14: not yet claimed green by this worker (check after push).
+- No live provider campaign, 24h window, or lead acceptance claimed.
+
+### Next
+
+1. FIX-004: platform session records + install/verify hourly runner (no-extra-spend).
+2. Close remaining G10 review items; begin RUN-111 unified generic mission runtime.
+3. Continue G12–G14 on branch while lead reviews G10 evidence.
+4. Do not merge main / tag / spend / start V1.5+.
+
+### Blockers
+
+- Remote CI confirmation pending on PR #14.
+- Live concurrent providers / qualification / adaptive graph / 24h campaign not started (access/capacity dependent).
+- Hourly Cursor runner not yet installed/verified.
+
+---

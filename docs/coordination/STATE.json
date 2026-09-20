@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:54:00Z",
+  "updated_at": "2026-09-20T19:56:49Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,9 +57,9 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-001",
+  "last_seen_cursor_message_id": "CURSOR-20260920-002",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
-  "last_cursor_heartbeat_at": "2026-09-20T19:47:48Z",
+  "last_cursor_heartbeat_at": "2026-09-20T19:56:49Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "id": "6ab02943e168819192c9c5672b2a6578",
@@ -95,47 +95,47 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "tests_verified_partial_remote",
+      "status": "implemented_tests_verified_local",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f0280096070854d72858104ed19e7911ed4eed54",
-      "review_status": "lead_partial_review_followups_required"
+      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
+      "review_status": "pending_lead"
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "assigned_acknowledged",
+      "status": "implemented_tests_verified_local",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-      "review_status": "pending"
+      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
+      "review_status": "pending_lead"
     },
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "assigned_acknowledged",
+      "status": "implemented_tests_verified_local",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-      "review_status": "pending"
+      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
+      "review_status": "pending_lead"
     },
     {
       "id": "FIX-004",
       "owner": "Cursor",
-      "status": "assigned_acknowledged",
+      "status": "in_progress",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
+      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
       "review_status": "pending"
     },
     {
       "id": "FIX-005",
       "owner": "Cursor",
-      "status": "assigned_acknowledged",
+      "status": "implemented_tests_verified_local",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-      "review_status": "pending"
+      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
+      "review_status": "pending_lead"
     },
     {
       "id": "RUN-111",
@@ -187,7 +187,7 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress",
-      "evidence": "Draft PR #14 head f0280096 is remotely reviewable. GitHub Actions run 35533664961 passed Ruff, mypy and broad Python offline pytest (211 passed, 2 skipped); DB integration was skipped for missing SWARM_DATABASE_URL and live gates were explicitly not executed. Frontend npm lint/test/build and install/migration evidence remain pending; FIX-002/003/005 defects remain present.",
+      "evidence": "CURSOR-20260920-002 local 220p/2s; PR #14 draft @ 51b2152",
       "review": "partial_lead_review_not_accepted"
     },
     "G11": {
@@ -234,12 +234,9 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "G10 is not accepted: frontend npm lint/test/build and required install/migration/DB integration evidence are not yet complete",
-    "FIX-002 default auth/project/idempotency defects remain present on candidate f0280096",
-    "FIX-003 release verification still contains unsupported hard-coded evidence labels on candidate f0280096",
-    "FIX-005 parser GOOD_FIX/runtime demo dependence remains present on candidate f0280096",
-    "Cursor hourly runner and protected-session recovery remain uninstalled/unverified by the lead",
-    "Live concurrent provider, qualification, adaptive graph and 24-hour campaign gates remain pending after prerequisite repairs"
+    "FIX-004 hourly runner + platform session verification pending",
+    "Remote CI on PR #14 not yet claimed green",
+    "G11\u2013G14 live gates and 24h campaign not started"
   ],
   "current_source_verification": {
     "verified_at": "2026-09-20T19:54:00Z",
