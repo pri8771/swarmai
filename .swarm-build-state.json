@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T01:16:00Z",
+  "updated_at": "2026-09-20T01:20:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
-  "current_packet": "P18",
+  "current_packet": "P19",
   "packet_states": {
     "P01": {"state": "offline_verified", "integration_status": "offline_verified"},
     "P02": {"state": "offline_verified", "integration_status": "integration_verified"},
@@ -36,32 +36,43 @@
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_onboarding": "passed", "cli_providers_list_report_inspect_canary_mock": "ok"},
-      "mock_vs_live": "catalog/implemented/configured layers; canaries mock-only; live auth paused",
+      "checks": {"pytest_onboarding": "passed", "cli_providers_mock": "ok"},
+      "mock_vs_live": "catalog/implemented/configured layers; canaries mock-only",
       "commit": "7fcc4f8"
     },
     "P16": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_qualify": "3 passed", "pytest_onboarding_deployment_qualify": "18 passed", "cli_eval_plan_run_report": "ok"},
-      "mock_vs_live": "simulated_qualification_not_live; untested cells null; --mode live blocked",
-      "skips": ["live routes / multi-source mission until P15 zero-charge keys"]
+      "checks": {"pytest_qualify": "3 passed", "cli_eval_plan_run_report": "ok"},
+      "mock_vs_live": "simulated_qualification_not_live; live blocked",
+      "commit": "e8f4d2b"
     },
     "P17": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_deployment": "passed", "cli_deploy_doctor": "ok", "cli_recovery_verify": "ok"},
-      "mock_vs_live": "local compose profiles + recovery artifacts only; no production push",
+      "checks": {"pytest_deployment": "passed", "cli_deploy_doctor": "ok"},
+      "mock_vs_live": "local compose + recovery only; no production push",
       "commit": "4310a87"
+    },
+    "P18": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified",
+      "checks": {
+        "pytest_load_chaos": "5 passed",
+        "cli_load_1000_tasks": "accepted=1000 gates=all true",
+        "cli_chaos_run": "all_passed"
+      },
+      "mock_vs_live": "simulated_load_not_live / simulated_chaos_not_live",
+      "skips": ["live provider concurrency comparisons"]
     }
   },
-  "next_packets": ["P18"],
+  "next_packets": ["P19"],
   "skipped_until_deps": {
     "P16_live": ["P15_zero_charge_routes"],
-    "P19": ["P08", "P14"],
-    "P20": ["see WORK_PACKAGES"]
+    "P18_live": ["verified_account_capacity"]
   },
   "blockers": {
     "user_required": [
