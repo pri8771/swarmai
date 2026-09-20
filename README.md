@@ -7,11 +7,11 @@ and preserve durable state. Small models are used where measured fitness support
 This repository is the product source. Planning/handoff files live separately in the
 Cursor execution kit and must not be overwritten by this tree.
 
-**Current label:** offline-verified release candidate (not cloud-operating / not live-qualified).
+**Current label:** offline-verified release candidate (V0.9 hardening) — **not** a public launch.
 
 ## Requirements
 
-- Python 3.12 (pinned; kit helper scripts also expect <3.14)
+- Python 3.12 (pinned; `<3.14`)
 - [uv](https://docs.astral.sh/uv/)
 - Node 20+ optional (operator console)
 
@@ -26,24 +26,28 @@ cp .env.example .env   # optional; mock demos work without keys
 ## Fresh-install / RC verify
 
 ```sh
+uv run swarm release install-check
+uv run swarm release harden
 uv run swarm release verify
-uv run pytest tests/contracts tests/selfdev tests/regressions tests/release -q
-uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
+uv run swarm release demo-suite
+uv run pytest tests/contracts tests/selfdev tests/regressions tests/release tests/product -q
 ```
+
+Or: `bash examples/v0_9/run_rc_demo.sh`
 
 ## Operator start
 
-See [`docs/operator/START.md`](docs/operator/START.md).
+See [`docs/operator/START.md`](docs/operator/START.md) and [`docs/user/GUIDE.md`](docs/user/GUIDE.md).
 
 ## Useful commands
 
 ```sh
 uv run swarm serve --port 8765
+uv run swarm product journey
+uv run swarm projects list
 uv run swarm providers onboarding-report
 uv run swarm demo self-development --mode mock
-uv run swarm load run --scenario adaptive --mode mock --tasks 200
-uv run swarm chaos run --mode mock
-uv run swarm review report
+uv run swarm reliability proof
 uv run swarm deploy doctor --profile standalone
 ```
 
@@ -52,8 +56,11 @@ uv run swarm deploy doctor --profile standalone
 cataloged / implemented / configured / authenticated / inference-tested / task-qualified
 are distinct. Missing credentials do not block offline mocks or contract work.
 
+Keep `SWARM_ALLOW_PAID=false` unless spend is explicitly authorized.
+
 ## Handoff
 
-- Kit path (read-only planning): set in `.swarm-build-state.json`
 - Live progress: `docs/handoff/CURRENT.md`
 - RC notes: `docs/release/RELEASE_CANDIDATE.md`
+- Zero-spend: `docs/user/ZERO_SPEND.md`
+- Security: `docs/security/HARDENING.md`
