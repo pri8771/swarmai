@@ -10,6 +10,7 @@ from typing import Any
 
 from swarm.contracts.common import new_id, utc_now
 from swarm.contracts.mission import TaskSpec
+from swarm.mission.acceptance import classify_task_support, review_attempt
 from swarm.mission.inference import InferenceResult, local_chat
 from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff
 
@@ -99,15 +100,45 @@ class RepoWorker:
         model: str = "gemma3:4b",
         worktree_root: Path | None = None,
         model_by_family: dict[str, str] | None = None,
+        broker: Any | None = None,
+        project_id: str = "proj_demo",
     ) -> None:
         self.repo = repo.resolve()
         self.model = model
         self.model_by_family = model_by_family or {}
         self.worktree_root = worktree_root
         self.worker_id = new_id("wrk_")
+        self.broker = broker
+        self.project_id = project_id
 
     def _model_for(self, task_family: str) -> str:
         return self.model_by_family.get(task_family) or self.model
+
+    def _chat(
+        self,
+        *,
+        messages: list[dict[str, str]],
+        model: str,
+        max_tokens: int = 800,
+    ) -> InferenceResult:
+        """Prefer brokered path; fall back to local_chat only when no broker wired."""
+        if self.broker is not None:
+            from swarm.mission.brokered_inference import brokered_local_chat_sync
+
+            return brokered_local_chat_sync(
+                broker=self.broker,
+                messages=messages,
+                model=model,
+                max_tokens=max_tokens,
+                project_id=self.project_id,
+                purpose="mission",
+            )
+        return local_chat(
+            messages=messages,
+            model=model,
+            max_tokens=max_tokens,
+            repo_root=self.repo,
+        )
 
     def run_task(
         self,
@@ -118,6 +149,18 @@ class RepoWorker:
         shared_worktree: WorktreeHandle | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle | None]:
         family = task.task_family
+        support = classify_task_support(family)
+        if not support.supported:
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family=family,
+                ok=False,
+                summary=support.reason,
+                artifacts={"support": support.to_dict(), "unsupported": True},
+                finished_at=utc_now().isoformat(),
+            )
+            return result, shared_worktree
         if family == "inspect":
             return self._inspect(task, mission_id=mission_id), shared_worktree
         if family == "implement":
@@ -131,12 +174,14 @@ class RepoWorker:
                 self._review(task, handle=shared_worktree, prior=prior),
                 shared_worktree,
             )
+        # Supported families without dedicated handlers stay honest incomplete.
         result = WorkerResult(
             worker_id=self.worker_id,
             task_id=task.id,
             task_family=family,
             ok=False,
-            summary=f"unsupported_task_family:{family}",
+            summary=f"handler_not_implemented:{family}",
+            artifacts={"support": support.to_dict(), "handler_missing": True},
             finished_at=utc_now().isoformat(),
         )
         return result, shared_worktree
@@ -186,13 +231,12 @@ class RepoWorker:
             "must count integers from start to end inclusive. Current file:\n\n"
             f"{original}"
         )
-        inference = local_chat(
+        inference = self._chat(
             messages=[
                 {"role": "system", "content": "Return only valid Python source for the file."},
                 {"role": "user", "content": prompt},
             ],
             model=self._model_for("implement"),
-            repo_root=self.repo,
         )
         patched = _extract_python_file(inference.text) if inference.ok else None
         # Operational path: never substitute a known-answer GOOD_FIX. Failed or
@@ -301,7 +345,7 @@ class RepoWorker:
 
         review_inference: InferenceResult | None = None
         if decision == "accept":
-            review_inference = local_chat(
+            review_inference = self._chat(
                 messages=[
                     {
                         "role": "user",
@@ -314,8 +358,28 @@ class RepoWorker:
                 ],
                 model=self._model_for("review"),
                 max_tokens=120,
-                repo_root=self.repo,
             )
+
+        # Independent checks control acceptance — not the worker claim alone.
+        produced = {
+            "checks": {
+                "verification_passed": verify is not None and bool(verify.ok),
+                "implementation_present": implement is not None and bool(implement.ok),
+                "diff_clean": not banned,
+            },
+            "intentionally_wrong": decision != "accept",
+        }
+        independent = review_attempt(
+            produced=produced,
+            required_checks={
+                "verification_passed": True,
+                "implementation_present": True,
+                "diff_clean": True,
+            },
+        )
+        if not independent.accepted:
+            decision = "reject"
+            reasons = list(dict.fromkeys([*reasons, *independent.reasons]))
 
         return WorkerResult(
             worker_id=self.worker_id,
@@ -334,6 +398,7 @@ class RepoWorker:
                     }
                 ],
                 "review_notes": review_inference.to_dict() if review_inference else None,
+                "independent_review": independent.to_dict(),
             },
             inference=review_inference.to_dict() if review_inference else None,
             cost_usd=(review_inference.cost_usd if review_inference else 0.0),

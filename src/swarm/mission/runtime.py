@@ -37,6 +37,14 @@ class MissionRuntime:
         self.max_repair_rounds = max_repair_rounds
         self.use_evidence_router = use_evidence_router
         self.controller = MissionController(inference_slots=2, worker_slots=2)
+        self._broker = None
+
+    def _mission_broker(self) -> Any:
+        if self._broker is None:
+            from swarm.mission.brokered_inference import build_local_mission_broker
+
+            self._broker = build_local_mission_broker(repo_root=self.repo)
+        return self._broker
 
     async def run(self, goal: str) -> MissionRecord:
         from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
@@ -104,7 +112,11 @@ class MissionRuntime:
         self.store.save(record)
 
         worker = RepoWorker(
-            self.repo, model=default_model, model_by_family=model_by_family
+            self.repo,
+            model=default_model,
+            model_by_family=model_by_family,
+            broker=self._mission_broker(),
+            project_id=mission.project_id,
         )
         prior: dict[str, WorkerResult] = {}
         shared_wt: WorktreeHandle | None = None

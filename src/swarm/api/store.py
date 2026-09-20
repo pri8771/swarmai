@@ -369,18 +369,183 @@ class ProductStore:
         }
         return body
 
-    async def create_mission(self, mission: Mission, *, actor: str) -> Mission:
+    async def create_mission(
+        self,
+        mission: Mission,
+        *,
+        actor: str,
+        task_family: str | None = None,
+        required_checks: dict[str, Any] | None = None,
+    ) -> Mission:
+        from swarm.mission.acceptance import classify_task_support
+
         created = await self.controller.submit_mission(mission)
+        support = classify_task_support(task_family or "")
+        if task_family and not support.supported:
+            # Honest unsupported outcome: durable ID exists, status failed.
+            created = created.model_copy(update={"status": MissionStatus.FAILED})
+            self.controller.missions[created.id] = created
         self._persist_mission_record(created, source="api")
+        record = self.mission_store().load(created.id)
+        plan = dict(record.plan or {})
+        plan["project_id"] = created.project_id
+        if task_family:
+            plan["task_family"] = task_family
+            plan["support"] = support.to_dict()
+        if required_checks:
+            plan["required_checks"] = dict(required_checks)
+        record.plan = plan
+        if task_family and not support.supported:
+            record.result = {
+                "ok": False,
+                "unsupported": True,
+                "support": support.to_dict(),
+                "summary": support.reason,
+            }
+            record.validation = {
+                "supported": False,
+                "reasons": [support.reason],
+            }
+            self.mission_store().append_timeline(
+                record,
+                "mission.unsupported",
+                {"task_family": task_family, "reason": support.reason},
+            )
+        self.mission_store().save(record)
         self.publish(
             project_id=created.project_id,
             type="mission.created",
             actor=actor,
             mission_id=created.id,
-            payload={"revision": created.revision, "status": created.status.value},
+            payload={
+                "revision": created.revision,
+                "status": created.status.value,
+                "task_family": task_family,
+                "supported": support.supported if task_family else None,
+            },
             dedupe_key=f"mission.created:{created.id}",
         )
         return created
+
+    async def review_mission_attempt(
+        self,
+        mission_id: str,
+        *,
+        actor: str,
+        produced: dict[str, Any],
+        required_checks: dict[str, Any] | None = None,
+        force_wrong: bool = False,
+    ) -> dict[str, Any]:
+        from swarm.mission.acceptance import review_attempt
+
+        mission = self.get_mission(mission_id)
+        record = self.mission_store().load(mission_id)
+        plan_checks = (record.plan or {}).get("required_checks")
+        checks = required_checks if required_checks is not None else plan_checks
+        decision = review_attempt(
+            produced=produced,
+            required_checks=checks if isinstance(checks, dict) else None,
+            force_wrong=force_wrong,
+        )
+        record.validation = {
+            **(record.validation or {}),
+            "review": decision.to_dict(),
+            "reviewed_at": utc_now().isoformat(),
+            "reviewed_by": actor,
+        }
+        if decision.accepted:
+            receipt_id = new_id("acr_")
+            updated = mission.model_copy(
+                update={
+                    "status": MissionStatus.COMPLETED,
+                    "acceptance_receipt_id": receipt_id,
+                    "revision": mission.revision + 1,
+                }
+            )
+            self.controller.missions[mission_id] = updated
+            record.status = updated.status.value
+            record.revision = updated.revision
+            record.result = {
+                **(record.result or {}),
+                "ok": True,
+                "accepted": True,
+                "acceptance_receipt_id": receipt_id,
+            }
+            self._persist_mission_record(updated, source="api")
+            record = self.mission_store().load(mission_id)
+            record.validation = {
+                **(record.validation or {}),
+                "review": decision.to_dict(),
+                "reviewed_at": utc_now().isoformat(),
+                "reviewed_by": actor,
+            }
+            self.mission_store().append_timeline(
+                record,
+                "mission.accepted",
+                {"acceptance_receipt_id": receipt_id, "reasons": decision.reasons},
+            )
+            self.mission_store().save(record)
+            self.publish(
+                project_id=updated.project_id,
+                type="mission.accepted",
+                actor=actor,
+                mission_id=mission_id,
+                payload={"acceptance_receipt_id": receipt_id},
+                dedupe_key=f"mission.accepted:{mission_id}:{receipt_id}",
+            )
+            return {
+                "mission_id": mission_id,
+                "accepted": True,
+                "acceptance_receipt_id": receipt_id,
+                "review": decision.to_dict(),
+                "mission": updated.model_dump(mode="json"),
+            }
+
+        updated = mission.model_copy(
+            update={
+                "status": MissionStatus.FAILED,
+                "acceptance_receipt_id": None,
+                "revision": mission.revision + 1,
+            }
+        )
+        self.controller.missions[mission_id] = updated
+        record.status = updated.status.value
+        record.revision = updated.revision
+        record.result = {
+            **(record.result or {}),
+            "ok": False,
+            "accepted": False,
+            "rejected_reasons": list(decision.reasons),
+        }
+        self._persist_mission_record(updated, source="api")
+        record = self.mission_store().load(mission_id)
+        record.validation = {
+            **(record.validation or {}),
+            "review": decision.to_dict(),
+            "reviewed_at": utc_now().isoformat(),
+            "reviewed_by": actor,
+        }
+        self.mission_store().append_timeline(
+            record,
+            "mission.rejected",
+            {"reasons": decision.reasons, "checks": decision.checks},
+        )
+        self.mission_store().save(record)
+        self.publish(
+            project_id=updated.project_id,
+            type="mission.rejected",
+            actor=actor,
+            mission_id=mission_id,
+            payload={"reasons": decision.reasons},
+            dedupe_key=f"mission.rejected:{mission_id}:{updated.revision}",
+        )
+        return {
+            "mission_id": mission_id,
+            "accepted": False,
+            "acceptance_receipt_id": None,
+            "review": decision.to_dict(),
+            "mission": updated.model_dump(mode="json"),
+        }
 
     def get_mission(self, mission_id: str) -> Mission:
         mission = self.controller.missions.get(mission_id)

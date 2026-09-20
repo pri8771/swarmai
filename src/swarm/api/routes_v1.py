@@ -14,6 +14,7 @@ from swarm.api.schemas import (
     CancelRequest,
     EvaluationCreateRequest,
     MissionCreateRequest,
+    MissionReviewRequest,
     PageMeta,
     ProbeRequest,
     ProjectCreateRequest,
@@ -76,8 +77,18 @@ async def create_mission(
     )
     if cached is not None:
         return cached
-    mission = await store.create_mission(body.mission, actor=principal.subject)
-    result = {"mission": mission.model_dump(mode="json")}
+    mission = await store.create_mission(
+        body.mission,
+        actor=principal.subject,
+        task_family=body.task_family,
+        required_checks=body.required_checks,
+    )
+    result: dict[str, Any] = {"mission": mission.model_dump(mode="json")}
+    if body.task_family:
+        from swarm.mission.acceptance import classify_task_support
+
+        result["task_family"] = body.task_family
+        result["support"] = classify_task_support(body.task_family).to_dict()
     return store.store_idempotent(
         key,
         result,
@@ -97,7 +108,65 @@ async def get_mission(
 ) -> dict[str, Any]:
     mission = store.get_mission(mission_id)
     auth.require_project(principal, mission.project_id)
-    return {"mission": mission.model_dump(mode="json")}
+    payload: dict[str, Any] = {"mission": mission.model_dump(mode="json")}
+    try:
+        record = store.mission_store().load(mission_id)
+        if record.plan:
+            payload["plan"] = record.plan
+        if record.validation:
+            payload["validation"] = record.validation
+        if record.result:
+            payload["result"] = record.result
+    except (OSError, TypeError, KeyError, ValueError, FileNotFoundError):
+        pass
+    return payload
+
+
+@router.post("/missions/{mission_id}/review")
+async def review_mission(
+    mission_id: str,
+    body: MissionReviewRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    key = body.idempotency_key or idempotency_key
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    digest = payload_hash(
+        {
+            "mission_id": mission_id,
+            "produced": body.produced,
+            "required_checks": body.required_checks,
+            "force_wrong": body.force_wrong,
+            "operation": "missions.review",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.review",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    result = await store.review_mission_attempt(
+        mission_id,
+        actor=principal.subject,
+        produced=body.produced,
+        required_checks=body.required_checks,
+        force_wrong=body.force_wrong,
+    )
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.review",
+        request_digest=digest,
+    )
 
 
 @router.post("/missions/{mission_id}/cancel")
