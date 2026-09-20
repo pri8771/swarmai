@@ -157,6 +157,20 @@ def main() -> None:
         action="store_true",
         help="Operator asserts route is known-zero cost (required for --mode live)",
     )
+    pcap = providers_sub.add_parser(
+        "capability-report",
+        help="Build live capability registry (auth probes; no paid inference)",
+    )
+    pcap.add_argument(
+        "--no-probe",
+        action="store_true",
+        help="Skip live auth probes; catalog + env presence only",
+    )
+    pcap.add_argument(
+        "--save",
+        action="store_true",
+        help="Persist to var/providers/capability-registry.json",
+    )
 
     sandbox = sub.add_parser("sandbox", help="Sandbox operations")
     sandbox_sub = sandbox.add_subparsers(dest="sandbox_command", required=True)
@@ -351,6 +365,17 @@ def main() -> None:
             mode=args.mode,
             billing_known_zero=bool(getattr(args, "billing_known_zero", False)),
         )
+    elif args.command == "providers" and args.providers_command == "capability-report":
+        from swarm.providers.capability_registry import (
+            build_capability_registry,
+            save_capability_registry,
+        )
+
+        report = build_capability_registry(probe=not args.no_probe, repo=_repo_root())
+        if args.save:
+            path = save_capability_registry(report, repo=_repo_root())
+            report = {**report, "saved_to": str(path)}
+        print(json.dumps(report, indent=2, default=str))
     elif args.command == "sandbox" and args.sandbox_command == "self-test":
         print(json.dumps(sandbox_self_test(network=args.network), indent=2))
     elif args.command == "capacity" and args.capacity_command == "explain":
