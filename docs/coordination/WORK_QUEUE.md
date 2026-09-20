@@ -56,7 +56,7 @@ Accept: clean operational install has real empty state, no fake fallback on API 
 
 ## G11 / V1.1 — RUN-111: unified generic mission
 
-Status: queued; implementation contracts can begin alongside independent G10 repairs, integrated acceptance depends on G10. Owner: runtime/API integration lead.
+Status: `in_progress` on `cursor/v1.4-live-integration-11e2` @ `d60394d`; durable MissionStore wired into ProductStore; full accept pending. Owner: Cursor.
 
 One durable mission identity across console/API/CLI; generic goals, permitted inputs/tools, graph, execution, cancellation/review and artifacts. No secondary demo executor. Reuse existing agent and persistence libraries after verifying compatibility.
 
