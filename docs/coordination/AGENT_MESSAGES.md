@@ -638,4 +638,4 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 - EVAL-131 still underpowered (dataset ≤2 holdout/cell; ≥5/cell not available without dataset expansion).
 
 ### Tip refresh
-- Integration tip advanced to  with denser holdout density screening evidence (24 trials, $0, still provisional).
+- Integration tip advanced to `643e38bf3f08e998936aad21bff3cb9a10541f4e` with denser holdout density screening evidence (24 trials, $0, still provisional).
