@@ -1,0 +1,12 @@
+{
+  "optional": "local_postgres_dsn",
+  "recorded_at": "2026-09-20T20:37:48.547775+00:00",
+  "host": "127.0.0.1:5432",
+  "database": "swarm",
+  "alembic_head": "9eb193b10f4e",
+  "secret_ref": "Application Support/SwarmAI/secret-drop/database-url.txt",
+  "health_ready_database": "up",
+  "integration_db_tests_passed": 8,
+  "spend": 0,
+  "cloud_db": false
+}

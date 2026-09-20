@@ -57,3 +57,19 @@ Machine helper: `scripts/hourly/destination_recover.py` (sanitized paths only; n
 - Fresh browser SSO verification was **not** completed in this FIX-004 pass for every provider.
 - Cursor unattended `cursor agent` spawn is **blocked** until operator login/API key entitlement is confirmed (zero-spend).
 - Apply-URL incident reproduction remains pending (URL unavailable to workers).
+
+## Local database (FIX / V1.4 optional)
+
+| field | value |
+|---|---|
+| engine | PostgreSQL 16 (Homebrew local) |
+| host | 127.0.0.1:5432 |
+| database | swarm |
+| role | swarm |
+| dsn_secret_ref | `~/Library/Application Support/SwarmAI/secret-drop/database-url.txt` (+ gitignored `.env` `SWARM_DATABASE_URL`) |
+| migration | alembic head `9eb193b10f4e` |
+| health_ready.database | `up` (API started with DSN) |
+| integration_tests | `tests/integration/db` 8 passed |
+| last_verified_at | 2026-09-20T20:37:48Z |
+| spend | 0 (local only; no cloud DB) |
+

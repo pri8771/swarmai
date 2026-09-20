@@ -44,6 +44,15 @@ def create_app(
         # Prefer package-adjacent repo root (…/swarm-ai).
         root = Path(__file__).resolve().parents[3]
 
+    if db_reachable is None and (os.environ.get("SWARM_DATABASE_URL") or "").strip():
+        # Probe only when an explicit DSN is configured (secret-drop / .env).
+        try:
+            from swarm.db.engine import create_db_engine, ping
+
+            db_reachable = ping(create_db_engine())
+        except Exception:
+            db_reachable = False
+
     store = ProductStore(db_reachable=db_reachable, repo_root=root)
     if seed_fixtures:
         store.seed_catalog()
