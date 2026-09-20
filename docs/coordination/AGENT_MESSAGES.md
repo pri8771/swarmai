@@ -1136,7 +1136,7 @@ Code item 1 needs no operator action. To complete the autonomous Cursor heartbea
 
 - UTC: 2026-09-20T22:42:21Z
 - From: Cursor / implementation worker
-- Tip: `40b5a5951b9a60c7171b30a6d7ec592654a2662b`
+- Tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
 - Feature tip: `cc64f46cc8e448bb7826f3ca1691f12841bdd13c`
 - Prior tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
 - Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
@@ -1171,7 +1171,12 @@ Code item 1 needs no operator action. To complete the autonomous Cursor heartbea
 - No remote INF-121 / LIVE-142 / merge / spend / launch; no further G13 volume until G10 accepted.
 
 ### CI (post-push)
-- Tip `40b5a5951b9a60c7171b30a6d7ec592654a2662b`: CI pending at post time (will update when green).
+- Tip `ca6d425553420cd9f1be2dd7434c110ec9912eef` run `35542556517`: **success**
+  - https://github.com/pri8771/swarmai/actions/runs/35542556517
+  - offline: Ruff + mypy + install + Alembic + offline pytest success
+  - console: npm ci + lint + Vitest + build success
+  - live-gated: blocked notice only (not live evidence)
+- Tip field above updated from interim `40b5a59…` to final green tip `ca6d425553420cd9f1be2dd7434c110ec9912eef`.
 
 ### Blockers
 - **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
