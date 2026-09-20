@@ -11,6 +11,8 @@ from pathlib import Path
 import uvicorn
 
 from swarm.broker.explain import explain_capacity
+from swarm.contracts.fixtures import sample_mission, sample_task
+from swarm.controller.mission import MissionController, spawn_proposal
 from swarm.db.engine import create_db_engine, database_url, ping
 from swarm.evals.dataset import validate_dataset
 from swarm.evals.plan import build_plan
@@ -96,6 +98,16 @@ def main() -> None:
     ep.add_argument("--max-cases", type=int, default=16)
     ep.add_argument("--dataset", default="benchmarks/starter.jsonl")
 
+    demo = sub.add_parser("demo", help="Mock demonstrations")
+    demo_sub = demo.add_subparsers(dest="demo_command", required=True)
+    dyn = demo_sub.add_parser("dynamic", help="Dynamic swarm controller mock demo")
+    dyn.add_argument("--mode", default="mock", choices=["mock"])
+
+    worker = sub.add_parser("worker", help="Worker operations")
+    worker_sub = worker.add_subparsers(dest="worker_command", required=True)
+    wst = worker_sub.add_parser("self-test", help="Worker membership self-test")
+    wst.add_argument("--mode", default="mock", choices=["mock"])
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -130,6 +142,35 @@ def main() -> None:
             path, suite=args.suite, mode=args.mode, max_cases=args.max_cases
         )
         print(json.dumps(plan.to_dict(), indent=2))
+    elif args.command == "demo" and args.demo_command == "dynamic":
+        import asyncio
+
+        print(json.dumps(asyncio.run(_demo_dynamic_mock()), indent=2, default=str))
+    elif args.command == "worker" and args.worker_command == "self-test":
+        from swarm.workers.registry import worker_self_test
+
+        print(json.dumps(worker_self_test(mode=args.mode), indent=2))
+
+
+async def _demo_dynamic_mock() -> dict[str, object]:
+    ctrl = MissionController(inference_slots=2, worker_slots=2)
+    mission = await ctrl.submit_mission(sample_mission())
+    children = [
+        sample_task().model_copy(update={"id": "demo_child_1", "objective": "extract"}),
+        sample_task().model_copy(update={"id": "demo_child_2", "objective": "classify"}),
+    ]
+    prop = spawn_proposal(mission, author_session_id="as_demo", parent=None, children=children)
+    await ctrl.propose_graph_change(prop)
+    rev = await ctrl.commit_validated_revision(prop.proposal_id)
+    ready = await ctrl.choose_ready_work(mission.id)
+    return {
+        "mode": "mock",
+        "mock_vs_live": "controller_fixtures_only",
+        "mission_id": mission.id,
+        "revision": rev,
+        "ready_count": len(ready),
+        "ready_ids": [t.id for t in ready],
+    }
 
 
 if __name__ == "__main__":
