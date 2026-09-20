@@ -1027,3 +1027,46 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - INF-121 remote dual live-blocked; SWARM-141 live absent; LIVE-142 not started.
 - No merge/spend/launch.
 
+
+## CURSOR-20260920-018
+
+- UTC: 2026-09-20T22:30:05Z
+- From: Cursor / implementation worker
+- Tip: `b5ef431aef36212417693ca826024d67d0f19e4f`
+- Prior tip: `484647ce1156a3227d60bb8d990cfd2a6f949bf6`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-010 exactly — pause G13 volume; repair G10 FIX-005/002/003; then G11 auto-promote removal; SKIP uncleared; no invent accept/remote INF-121/LIVE-142; no merge/spend/launch
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+- `qualification_claimed`: **false**
+
+### Done
+- **Paused** further G13 screening volume per LEAD-010.
+- **FIX-005:** ProductStore default `execution_mode=operational` + `fixture_mode`; capacity/providers/routes honest empty/catalog (no mock broker in operational); demo side-effect route fixture-gated 404; console default live/empty (no MOCK_SNAPSHOT merge, no Recover-with-mock, Expand/Contract fixture-only).
+- **FIX-002:** WorkerRecord/Approval durable `project_id`; list/detail/resolve/heartbeat project-scoped; operational bootstrap uses install-local `proj_install_*` (or `SWARM_INSTALL_PROJECT_ID`) — not `proj_demo`/`proj_other`.
+- **FIX-003:** `_validate_evidence_file` requires exact candidate SHA, exit/result, mode, generated_at freshness (7d); missing SHA fails; status alone cannot bypass.
+- **G11:** Removed `MissionRuntime._promote_changes` auto path; accepted worktree → `pending_apply` artifact; explicit `apply_worktree_changes(..., approved=True)` only.
+- Local verify: Ruff OK on touched paths; mypy OK on touched modules; offline pytest **263 passed**; console Vitest **16 passed**.
+- Did **not** invent G10 lead accept / login / remote INF-121 / LIVE-142; SKIP uncleared; no merge/spend/launch.
+
+### Evidence
+- Commit `b5ef431aef36212417693ca826024d67d0f19e4f` on `cursor/v1.4-live-integration-11e2`
+- Tests: `tests/api/test_fix002_ownership.py`, `tests/release/test_fix003_evidence_binding.py`, `tests/mission/test_no_auto_promote.py`, console `console.test.tsx`
+- Draft PR #14 tip `b5ef431aef36212417693ca826024d67d0f19e4f`
+- CI run `35541870705` queued at post time (update when green)
+
+### Next
+- Lead: re-review G10 punch-list repairs on tip `b5ef431…` for accept (not invented here).
+- Await CI `35541870705` green; post conclusion when available.
+- G11 residual: three unfamiliar tasks full console/API/CLI on same durable IDs still open after source no-promote.
+- Operator: fresh `cursor agent login` with live waiter; only then clear SKIP.
+- No remote INF-121 / LIVE-142 / merge / spend / launch; no further G13 volume until G10 accepted.
+
+### Blockers
+- **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
+- G10 lead accept pending (repairs pushed; not invented accepted).
+- INF-121 remote dual live-blocked; EVAL not qualified; SWARM-141 live absent; LIVE-142 not started.
+- No merge/spend/launch.
+
