@@ -1,6 +1,6 @@
 # SwarmAI account inventory (sanitized)
 
-**Generated:** 2026-09-20T15:19:24Z
+**Generated:** 2026-09-20T15:33:12Z
 **Spend policy:** zero — no cards, purchases, or paid endpoints
 **V0.1 remote:** `cursor/v0.1-real-mission-runtime` @ `0a0c7e4` (push complete)
 **Onboarding branch:** `cursor/v0.1-provider-onboarding`
@@ -13,7 +13,7 @@ Preferred SwarmAI account email/SSO: **pending operator answer (asked once)** �
 
 | Provider | Priority | Outcome | API / inference | Next action |
 |---|---|---|---|---|
-| `openrouter` | core | waiting_operator_signin | account_unverified_browser_open | Sign in on OpenRouter tab in SwarmAI Chrome profile; do not paste secrets in cha |
+| `openrouter` | core | signed_in_awaiting_free_key | account_signed_in_key_not_configured | Create free key on settings/keys; copy; reply `key copied` (never paste key in chat) |
 | `groq` | core | waiting_operator_or_browser | unknown | Browser tab queued or pending after identity choice; verify free eligibility bef |
 | `gemini` | core | waiting_operator_or_browser | unknown | Browser tab queued or pending after identity choice; verify free eligibility bef |
 | `cloudflare_workers_ai` | core | waiting_operator_or_browser | unknown | Browser tab queued or pending after identity choice; verify free eligibility bef |
@@ -57,11 +57,11 @@ Preferred SwarmAI account email/SSO: **pending operator answer (asked once)** �
 cataloged ≠ configured ≠ authenticated ≠ zero-charge-eligible ≠ inference-tested ≠ task-qualified
 
 ## Open handoffs
-1. **OpenRouter** — SwarmAI Chrome is on sign-in. One action: sign in (or create free account) with the SwarmAI identity. Do not paste password/API key into chat. Say “OpenRouter signed in” when the keys page is visible.
+1. **OpenRouter free key** — SwarmAI Chrome is on https://openrouter.ai/settings/keys. Create a free API key, **copy** it, reply **`key copied`**. Do not paste the key into chat. Agent will ingest into gitignored `.env` via clipboard and clear the clipboard.
+2. **Identity (optional)** — preferred SwarmAI email/SSO still unset; OpenRouter sign-in already done with whatever identity you used.
 
 ## Private local inventory
 Credential refs and identity live under `~/Library/Application Support/SwarmAI/account-inventory/` (outside git).
 
 ## V0.2
 **Not started.**
-

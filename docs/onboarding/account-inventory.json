@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-20T15:19:24Z",
+  "generated_at": "2026-09-20T15:33:12Z",
   "v0_1_checkpoint": {
     "branch": "cursor/v0.1-real-mission-runtime",
     "remote_sha": "0a0c7e4be47c249e014d3368e933bdc14bc96357",
@@ -45,16 +45,16 @@
       "offer_category": "renewing_free_model_routes",
       "adapter_core": true,
       "priority": "core",
-      "honest_outcome": "waiting_operator_signin",
-      "api_access": "account_unverified_browser_open",
+      "honest_outcome": "signed_in_awaiting_free_key",
+      "api_access": "account_signed_in_key_not_configured",
       "credential_ref_present": false,
       "auth_verified": false,
-      "zero_charge_eligibility": "unknown",
+      "zero_charge_eligibility": "unknown_pending_route_check",
       "inference_smoke": null,
       "task_qualification": null,
       "reused_vs_created": "unknown_pending_identity",
-      "next_action": "Sign in on OpenRouter tab in SwarmAI Chrome profile; do not paste secrets in chat",
-      "evidence": "Chrome SwarmAI profile opened https://openrouter.ai/settings/keys \u2192 redirect sign-in"
+      "next_action": "Create free OpenRouter API key on settings/keys; copy to clipboard; reply 'key copied' (do not paste key in chat). Agent will ingest into gitignored .env and clear clipboard.",
+      "evidence": "Operator confirmed OpenRouter signed in; SwarmAI Chrome opened https://openrouter.ai/settings/keys"
     },
     {
       "provider_id": "groq",
@@ -752,5 +752,17 @@
     "cataloged_unverified_offer": 16,
     "not_selected_dedicated_compute": 1,
     "no_account_needed": 5
-  }
+  },
+  "open_handoffs": [
+    {
+      "id": "openrouter_free_key",
+      "status": "waiting_operator",
+      "action": "Create a free key on OpenRouter settings/keys, copy it, reply 'key copied'. Do not paste the key into chat."
+    },
+    {
+      "id": "identity_email_sso",
+      "status": "optional_deferred",
+      "action": "Preferred SwarmAI email/SSO still unset; asked once earlier \u2014 continue without blocking other free providers if identity already used for OpenRouter."
+    }
+  ]
 }
