@@ -1,35 +1,28 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T00:49:48Z",
+  "updated_at": "2026-09-20T00:51:50Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
-  "current_packet": "P07",
+  "current_packet": "P10",
   "packet_states": {
     "P01": {"state": "offline_verified", "integration_status": "offline_verified"},
     "P02": {"state": "offline_verified", "integration_status": "integration_verified"},
     "P03": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P08": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
     "P04": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P05": {
+    "P05": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified", "checks": {"pytest_broker": "20 passed"}},
+    "P06": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified", "checks": {"pytest_evals": "11 passed"}},
+    "P07": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_broker": "20 passed", "swarm_capacity_explain_mock": "passed"},
-      "mock_vs_live": "in-memory ledger + fake adapter; not live spend"
+      "checks": {"pytest_workspace": "9 passed"},
+      "mock_vs_live": "in-memory text-only workspace; no remote embeddings"
     },
-    "P06": {
-      "state": "offline_verified",
-      "live_status": "not_attempted",
-      "integration_status": "offline_verified",
-      "checks": {
-        "pytest_evals": "11 passed",
-        "swarm_eval_validate_dataset": "ok case_count=128",
-        "swarm_eval_plan_mock": "passed"
-      },
-      "mock_vs_live": "starter fixtures + sandbox graders; no live model matrix"
-    }
+    "P08": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"}
   },
-  "next_packets": ["P07"],
-  "blockers": {"user_required": [], "live_only": ["Provider API keys for P15-P16"]}
+  "next_packets": ["P10", "P11", "P12"],
+  "skipped_until_deps": {"P09": ["P13"]},
+  "blockers": {"user_required": [], "live_only": ["Provider API keys for P15-P16"]},
+  "notes": "No remote push per SwarmAI kit constraint. P09 blocked on P13."
 }

@@ -21,6 +21,7 @@
 | Eval validate dataset | `uv run swarm eval validate-dataset benchmarks/starter.jsonl` |
 | Eval plan (mock) | `uv run swarm eval plan --suite starter --mode mock` |
 | Eval tests | `uv run pytest tests/evals` |
+| Workspace tests | `uv run pytest tests/workspace` |
 
 PostgreSQL integration path (P02+; optional for P01):
 
