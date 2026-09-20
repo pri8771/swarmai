@@ -17,7 +17,7 @@ CSV parser bug.
 ## Commands
 
 ```sh
-cd /Users/pchordia/Downloads/swarm-ai
+cd /path/to/swarm-ai
 uv run pytest tests/e2e
 uv run swarm demo parser-issue --mode mock --report-dir var/reports/demo
 ```

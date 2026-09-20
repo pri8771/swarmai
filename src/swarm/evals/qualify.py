@@ -149,7 +149,10 @@ def load_report(run_id: str, report_dir: Path) -> dict[str, Any]:
     path = report_dir / f"{run_id}.json"
     if not path.exists():
         raise FileNotFoundError(run_id)
-    data = json.loads(path.read_text())
+    raw: object = json.loads(path.read_text())
+    if not isinstance(raw, dict):
+        raise ValueError("report_not_object")
+    data: dict[str, Any] = raw
     if data.get("mode") == "live" and data.get("mock_vs_live", "").startswith("simulated"):
         raise ValueError("report_mode_inconsistent")
     return data

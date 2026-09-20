@@ -15,6 +15,7 @@ REQUIRED_DOCS = (
     "docs/runbooks/DEPLOYMENT.md",
     "docs/reviews/P20_INDEPENDENT_REVIEW.md",
     "docs/release/RELEASE_CANDIDATE.md",
+    "docs/RELEASE_CANDIDATE_STATUS.md",
     "docs/operator/START.md",
     ".env.example",
 )

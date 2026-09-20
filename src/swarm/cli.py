@@ -376,7 +376,7 @@ def main() -> None:
 
         report_dir = args.report_dir or (_repo_root() / "var" / "reports" / "selfdev")
         try:
-            report = run_self_development(
+            selfdev_report = run_self_development(
                 mode=args.mode,
                 variant=args.variant,
                 report_dir=Path(report_dir),
@@ -384,7 +384,7 @@ def main() -> None:
         except PermissionError as exc:
             print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
             raise SystemExit(2) from exc
-        print(json.dumps(report.to_dict(), indent=2, default=str))
+        print(json.dumps(selfdev_report.to_dict(), indent=2, default=str))
     elif args.command == "worker" and args.worker_command == "self-test":
         from swarm.workers.registry import worker_self_test
 
@@ -396,7 +396,7 @@ def main() -> None:
 
         report_dir = args.report_dir or (_repo_root() / "var" / "reports" / "load")
         try:
-            report = asyncio.run(
+            load_run_report = asyncio.run(
                 run_load_scenario(
                     LoadConfig(
                         scenario=args.scenario,
@@ -411,7 +411,7 @@ def main() -> None:
         except PermissionError as exc:
             print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
             raise SystemExit(2) from exc
-        print(json.dumps(report.to_dict(), indent=2, default=str))
+        print(json.dumps(load_run_report.to_dict(), indent=2, default=str))
     elif args.command == "chaos" and args.chaos_command == "run":
         import asyncio
 
@@ -436,10 +436,10 @@ def main() -> None:
     elif args.command == "release" and args.release_command == "verify":
         from swarm.release.verify import verify_release, write_verify_report
 
-        report = verify_release(_repo_root())
-        write_verify_report(report, _repo_root() / "var" / "reports" / "release")
-        print(json.dumps(report.to_dict(), indent=2, default=str))
-        if not report.passed:
+        release_report = verify_release(_repo_root())
+        write_verify_report(release_report, _repo_root() / "var" / "reports" / "release")
+        print(json.dumps(release_report.to_dict(), indent=2, default=str))
+        if not release_report.passed:
             raise SystemExit(2)
 
 

@@ -1,10 +1,11 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T01:30:00Z  
+**Updated:** 2026-09-20T13:10:00Z  
 **Packets complete (offline):** P01–P21  
 **Label:** `offline-verified-release-candidate`  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
-**Source:** `/Users/pchordia/Downloads/swarm-ai`
+**Source:** local clone of SwarmAI product repo (see `.swarm-build-state.json`)  
+**RC status doc:** `docs/RELEASE_CANDIDATE_STATUS.md`
 
 ## What works
 
@@ -33,7 +34,7 @@
 ## Exact commands
 
 ```sh
-cd /Users/pchordia/Downloads/swarm-ai
+cd /path/to/swarm-ai
 uv run pytest tests/selfdev tests/regressions tests/release -q
 uv run swarm demo self-development --mode mock
 uv run swarm review report

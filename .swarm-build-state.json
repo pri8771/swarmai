@@ -1,29 +1,75 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T01:30:00Z",
+  "updated_at": "2026-09-20T13:10:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
   "current_packet": null,
   "packet_states": {
-    "P01": {"state": "offline_verified", "integration_status": "offline_verified"},
-    "P02": {"state": "offline_verified", "integration_status": "integration_verified"},
-    "P03": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P04": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P05": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P06": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P07": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P08": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
+    "P01": {
+      "state": "offline_verified",
+      "integration_status": "offline_verified"
+    },
+    "P02": {
+      "state": "offline_verified",
+      "integration_status": "integration_verified"
+    },
+    "P03": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P04": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P05": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P06": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P07": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P08": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
     "P09": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
       "mock_vs_live": "console fixtures only"
     },
-    "P10": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P11": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P12": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
-    "P13": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
+    "P10": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P11": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P12": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
+    "P13": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified"
+    },
     "P14": {
       "state": "offline_verified",
       "live_status": "not_attempted",
@@ -58,7 +104,10 @@
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_selfdev": "7 passed", "demo_self_development": "ok"},
+      "checks": {
+        "pytest_selfdev": "7 passed",
+        "demo_self_development": "ok"
+      },
       "mock_vs_live": "simulated_selfdev_not_live; patch artifact only",
       "commit": "4b337af"
     },
@@ -66,7 +115,10 @@
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "checks": {"pytest_regressions": "5 passed", "review_report": "ok"},
+      "checks": {
+        "pytest_regressions": "5 passed",
+        "review_report": "ok"
+      },
       "mock_vs_live": "review_offline_evidence_only; C10 skip_live",
       "commit": "816997a"
     },
@@ -86,9 +138,15 @@
   "next_packets": [],
   "kit_offline_complete": true,
   "skipped_until_deps": {
-    "P15_live": ["zero_charge_provider_keys"],
-    "P16_live": ["P15_zero_charge_routes"],
-    "P18_live": ["verified_account_capacity"]
+    "P15_live": [
+      "zero_charge_provider_keys"
+    ],
+    "P16_live": [
+      "P15_zero_charge_routes"
+    ],
+    "P18_live": [
+      "verified_account_capacity"
+    ]
   },
   "blockers": {
     "user_required": [
@@ -98,8 +156,27 @@
       }
     ],
     "live_only": [
-      "Provider API keys for P15–P16 live canaries and multi-route qualification",
+      "Provider API keys for P15\u2013P16 live canaries and multi-route qualification",
       "Explicit authorization required before any push/production/public launch"
+    ]
+  },
+  "release_captain": {
+    "status": "offline_rc_checkpoint",
+    "label": "offline-verified-release-candidate",
+    "checks": {
+      "pytest_selfdev_regressions_release": "13 passed",
+      "release_verify": "passed",
+      "demo_parser_issue_mock": "accepted",
+      "ruff": "passed",
+      "mypy": "passed"
+    },
+    "remote": "not_configured",
+    "draft_pr": "blocked_no_remote",
+    "push": "blocked_no_remote",
+    "live_packets_paused": [
+      "P15",
+      "P16",
+      "P18"
     ]
   }
 }

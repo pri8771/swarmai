@@ -319,20 +319,31 @@ async def compare_strategies(
     report_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Fixed-team vs adaptive under the same synthetic envelope."""
-    shared = dict(
-        queued_tasks=queued_tasks,
-        logical_sessions=logical_sessions,
-        actual_concurrency=actual_concurrency,
-        simulated_provider_concurrency=8,
-        missions=2,
-        mode="mock",
-        seed=7,
-    )
     fixed = await run_load_scenario(
-        LoadConfig(scenario="fixed", **shared), report_dir=report_dir
+        LoadConfig(
+            scenario="fixed",
+            queued_tasks=queued_tasks,
+            logical_sessions=logical_sessions,
+            actual_concurrency=actual_concurrency,
+            simulated_provider_concurrency=8,
+            missions=2,
+            mode="mock",
+            seed=7,
+        ),
+        report_dir=report_dir,
     )
     adaptive = await run_load_scenario(
-        LoadConfig(scenario="adaptive", **shared), report_dir=report_dir
+        LoadConfig(
+            scenario="adaptive",
+            queued_tasks=queued_tasks,
+            logical_sessions=logical_sessions,
+            actual_concurrency=actual_concurrency,
+            simulated_provider_concurrency=8,
+            missions=2,
+            mode="mock",
+            seed=7,
+        ),
+        report_dir=report_dir,
     )
     return {
         "mode": "mock",

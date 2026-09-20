@@ -107,7 +107,7 @@ async def fault_outbox_gap() -> FaultResult:
     return FaultResult(
         name="outbox_gap",
         expected="recoverable pending enqueue after domain commit",
-        observed=gap["enqueue_status"],
+        observed=str(gap["enqueue_status"]),
         passed=passed,
         details=gap,
     )

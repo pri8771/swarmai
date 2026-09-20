@@ -215,7 +215,7 @@ class OnboardingService:
         rows = []
         for base in list_providers(mode=mode):
             detail = self.inspect_provider(base["id"])
-            rows.append({**base, **{k: detail[k] for k in (
+            overlay_keys = (
                 "layers",
                 "account_status",
                 "adapter_status",
@@ -224,7 +224,11 @@ class OnboardingService:
                 "secret_presence_is_not_auth",
                 "blockers",
                 "trial_expired",
-            ) if k in detail}})
+            )
+            overlay: dict[str, Any] = {
+                k: detail[k] for k in overlay_keys if k in detail
+            }
+            rows.append({**base, **overlay})
         return {
             "mode": mode,
             "mock_vs_live": "catalog_inventory_not_live",

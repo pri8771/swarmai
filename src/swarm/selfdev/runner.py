@@ -103,7 +103,10 @@ class SelfDevReport:
 
 
 def _load_issue(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text())
+    raw: object = json.loads(path.read_text())
+    if not isinstance(raw, dict):
+        raise ValueError("issue_not_object")
+    return raw
 
 
 def _prepare_worktree(base: Path) -> Path:
