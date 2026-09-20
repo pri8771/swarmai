@@ -41,7 +41,7 @@ describe('console fixtures', () => {
         if (url.endsWith('/v1/missions')) {
           return new Response(
             JSON.stringify({
-              items: [
+              missions: [
                 {
                   mission_id: 'msn_live_shared',
                   project_id: 'proj_a',

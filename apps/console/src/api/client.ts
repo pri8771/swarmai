@@ -123,9 +123,11 @@ export async function loadSnapshot(opts: {
   assertNoSecretsInBundle(capacity)
   assertNoSecretsInBundle(missionsPayload)
 
-  const items = Array.isArray(missionsPayload.items)
-    ? (missionsPayload.items as Array<Record<string, unknown>>)
-    : []
+  const items = Array.isArray(missionsPayload.missions)
+    ? (missionsPayload.missions as Array<Record<string, unknown>>)
+    : Array.isArray(missionsPayload.items)
+      ? (missionsPayload.items as Array<Record<string, unknown>>)
+      : []
   let mission = emptyLiveMission()
   if (items.length > 0) {
     const firstId = String(items[0].mission_id ?? '')
