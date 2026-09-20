@@ -1,47 +1,44 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T00:33:30Z",
+  "updated_at": "2026-09-20T00:40:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "workspace_note": "OpenMontage was open in Cursor but is unrelated; SwarmAI source created adjacent to handoff per P00.",
   "branch": "cursor/p01-foundation-contracts-11e2",
   "base_commit": "33b5e51de7774c0edba2edf40b5d4992d8696b42",
-  "current_packet": "P02",
+  "current_packet": "P03",
   "packet_states": {
     "P01": {
       "state": "offline_verified",
       "live_status": "not_attempted",
       "integration_status": "offline_verified",
-      "start_after": [],
-      "integration_after": [],
       "checks": {
-        "uv_sync": "passed",
         "pytest_contracts_spikes": "14 passed",
         "ruff": "passed",
         "mypy": "passed"
       },
-      "mock_vs_live": "all mocked / offline; no provider credentials used",
-      "completion_evidence": [
-        "tests/contracts/",
-        "tests/spikes/",
-        "docs/adr/0001-dependency-pins.md",
-        "schemas/contracts/",
-        ".github/workflows/ci.yml"
-      ],
       "commit": "33b5e51de7774c0edba2edf40b5d4992d8696b42"
     },
     "P02": {
-      "state": "in_progress",
+      "state": "offline_verified",
       "live_status": "not_attempted",
-      "integration_status": "not_started"
+      "integration_status": "integration_verified",
+      "checks": {
+        "swarm_db_migrate": "passed",
+        "swarm_db_validate": "passed",
+        "pytest_integration_db": "8 passed",
+        "ruff": "passed",
+        "mypy": "passed"
+      },
+      "database": "postgresql://swarm@127.0.0.1:5432/swarm (local Homebrew)",
+      "mock_vs_live": "real PostgreSQL transactions; no provider network"
     }
   },
   "kit_offline_checks": {
     "python": "3.12.13",
     "verify_kit.py": "passed",
-    "benchmark_tools.py validate": "passed (python3.12)",
-    "test_helpers.py": "12 passed (python3.12)",
-    "python3.14_note": "benchmark_tools.py and preview CLI fail on 3.14 argparse %i help strings; use 3.12"
+    "benchmark_tools.py validate": "passed",
+    "test_helpers.py": "12 passed"
   },
   "pinned_versions": {
     "python": "3.12",
@@ -49,21 +46,19 @@
     "pydantic-ai": "2.46.0",
     "dbos": "3.0.0",
     "fastapi": "0.141.1",
+    "alembic": "1.17.2",
     "psycopg": "3.3.6",
-    "sqlalchemy": "2.0.54",
-    "uvicorn": "0.53.0"
+    "sqlalchemy": "2.0.54"
   },
   "gates": {
-    "G0": "ready_to_close_after_commit",
-    "next_packets_start_ready": ["P02", "P03", "P04", "P05", "P06", "P07", "P08", "P09", "P10", "P15"]
+    "G0": "closed",
+    "G1_parallel_ready": ["P03", "P04", "P05", "P06", "P07", "P08", "P09", "P15"],
+    "note": "P03 and P08 share integration wave after P02; P05 integration_after needs P02+P03"
   },
   "blockers": {
     "user_required": [],
-    "live_only": [
-      "No provider API keys configured (expected for offline P01)",
-      "PostgreSQL integration tests deferred to P02"
-    ]
+    "live_only": ["Provider API keys for P15–P16"]
   },
-  "next_packet": "P02",
-  "resume": "PROMPT_RESUME.md in handoff; read docs/handoff/CURRENT.md first"
+  "next_packet": "P03",
+  "resume": "Read docs/handoff/CURRENT.md then P03_CORE_PROVIDER_ADAPTERS.md"
 }

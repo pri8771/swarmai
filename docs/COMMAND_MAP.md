@@ -11,6 +11,9 @@
 | Health live | `curl -s http://127.0.0.1:8765/health/live` |
 | Health ready | `curl -s http://127.0.0.1:8765/health/ready` |
 | Export JSON Schema | `uv run python -m swarm.contracts.export_schemas` |
+| DB migrate | `uv run swarm db migrate` |
+| DB validate | `uv run swarm db validate` |
+| DB integration tests | `SWARM_DATABASE_URL=... uv run pytest tests/integration/db` |
 
 PostgreSQL integration path (P02+; optional for P01):
 

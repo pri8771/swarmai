@@ -1,67 +1,48 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T00:33:30Z  
-**Packet:** P01 offline_verified  
+**Updated:** 2026-09-20T00:40:00Z  
+**Packets complete:** P01 offline_verified, P02 integration_verified  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`  
-**Handoff kit (read-only):** `/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19`
+**Handoff kit:** `/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19`
 
-## Inventory (keep / adapt / replace)
+## What works
 
-| Item | Decision |
-|---|---|
-| OpenMontage workspace | **keep untouched** — unrelated product |
-| Handoff kit files | **keep read-only** — never overwrite planning |
-| Prior SwarmAI source | **none existed** — created fresh `swarm-ai` adjacent to kit |
-| Stack | **adopt kit default** — Python/FastAPI + PydanticAI + DBOS + PostgreSQL client |
+### P01
+- Typed contracts, protocols, fakes, FastAPI health, PydanticAI+DBOSDurability spike
+- `uv run pytest tests/contracts tests/spikes` → 14 passed
 
-## What works (P01)
-
-- Typed contracts for all `CONTRACT_SEEDS.json` required types + JSON Schema export
-- Protocol interfaces with fake provider/broker/worker/clock/events
-- Secret refs only in envelopes; unknown fields rejected; unknown quota stays null
-- PydanticAI + `DBOSDurability` spike with two fake routes, structured output, tool, broker accounting
-- Health API `/health/live` and `/health/ready` (TestClient smoke)
-- `uv run pytest tests/contracts tests/spikes` → **14 passed**
-- `ruff check .` / `mypy src/swarm` → pass
+### P02
+- Alembic migration `9eb193b10f4e` — missions/tasks/graph/outbox/ledger/findings/artifacts/…
+- Optimistic graph versioning; unique receipt/outbox constraints; scoped findings
+- Transactional outbox (commit-before-enqueue + stable workflow id)
+- Real PostgreSQL: `uv run swarm db migrate` / `validate`; `pytest tests/integration/db` → **8 passed**
 
 ## Exact commands
 
 ```sh
 cd /Users/pchordia/Downloads/swarm-ai
+export SWARM_DATABASE_URL=postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm
 uv sync
-uv run pytest tests/contracts tests/spikes
-uv run ruff check .
+uv run swarm db migrate
+uv run swarm db validate
+uv run pytest tests/contracts tests/spikes tests/integration/db
+uv run ruff check src tests
 uv run mypy src/swarm
-uv run swarm serve --port 8765
 ```
 
-Kit checks (Python 3.12):
+## Next packet (kit order)
 
-```sh
-cd /Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19
-python3.12 verify_kit.py
-python3.12 benchmark_tools.py validate
-python3.12 test_helpers.py
-```
+**P03** — Core provider transports (`P03_CORE_PROVIDER_ADAPTERS.md`)  
+- `start_after`: P01 ✓  
+- `integration_after`: P02 ✓  
+
+Parallel-eligible after this commit (do not skip P03 if integration of P05 is needed): P04, P05 (start), P06–P09, P15 — respect each packet’s `integration_after`.
+
+## User actions
+
+None required for offline continuation. Local Postgres role/db `swarm`/`swarm` was created for tests.
 
 ## Live vs mock
 
-All P01 evidence is **mock/offline**. No credentials touched. Providers remain cataloged only.
-
-## Pending-work / replay note (spike)
-
-Completed DBOS steps are not re-executed on recovery. Broker `request_count` in the spike is process-local memory; durable route identity is carried in structured `SpikeAnswer`. Full ledger reconciliation is P02/P05.
-
-## Blockers requiring user
-
-None for offline work.
-
-Optional later (live packets only): provider API keys / authenticated sessions for P15–P16.
-
-## Next packet
-
-**P02** — Durable domain data, ledger tables and artifact metadata (`P02_PERSISTENCE_AND_OUTBOX.md`).  
-`start_after`/`integration_after`: P01 (satisfied once this commit lands).
-
-Integration owner for shared contracts/lockfiles: this implementation agent on `cursor/p01-foundation-contracts-11e2`.
+No provider credentials used. P02 used real local PostgreSQL only.
