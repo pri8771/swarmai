@@ -28,6 +28,8 @@ Audit identified default demo tokens, project/history/idempotency authorization 
 
 Cursor ACK `CURSOR-20260920-001` posted. Integration branch `cursor/v1.4-live-integration-11e2` worktree `/Users/pchordia/Downloads/swarm-ai-v14` at source `b9141fa`. First regression `uv run ruff check .` reproduced 33 findings (exit 1). Repair of FIX-001–005 in progress; no gate acceptance claimed. The lead updated coordination documents, not application code. Fetch source and messages to discover later changes.
 
+Verified again at 2026-09-20T19:45:00Z: main is still `b9141fa3150f853586dede0334a47b344571bc16`; no post-authorization Cursor implementation branch, open PR, ACK/heartbeat or repaired candidate is visible in GitHub. Current verifiable CI remains run `35529361557` / job `106127102217`, failing Ruff before mypy/pytest. Unpushed local Cursor work is unknown and must not be inferred. The existing hourly lead automation is enabled and reused; it reviews GitHub only and does not launch Cursor.
+
 ## Immediate work and gates
 
 G10 FIX-001 complete CI; FIX-002 auth/project isolation/idempotency; FIX-003 truthful evidence/readiness; FIX-004 login/session records and actual hourly runner; FIX-005 remove runtime fixture/known-answer/bypass dependence. Parallelize only distinct ownership, especially overlapping API/store/runtime edits.
