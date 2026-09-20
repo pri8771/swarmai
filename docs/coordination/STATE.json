@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T22:32:00Z",
+  "updated_at": "2026-09-20T22:38:21Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
   "audit_date": "2026-09-20",
   "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_repair_in_progress_changes_required",
+  "product_status": "v1_repair_near_acceptance_blocked_heartbeat_and_evidence_identity",
   "current_checkpoint": "1.0-repair",
   "roadmap_status": "owner_approved_direction_through_3.0",
   "next_checkpoint_after_gate_pass": "1.1",
@@ -56,17 +56,19 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-010",
+  "last_lead_message_id": "LEAD-20260920-011",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-010.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-018",
-  "last_lead_heartbeat_at": "2026-09-20T21:51:01Z",
+  "last_lead_heartbeat_at": "2026-09-20T22:38:21Z",
   "last_cursor_heartbeat_at": "2026-09-20T22:30:05Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",
     "title": "SwarmAI engineering check-in",
     "cadence": "hourly",
-    "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
+    "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution",
+    "last_run_at": "2026-09-20T22:00:40.452929Z",
+    "last_run_age_minutes_at_review": 38
   },
   "cursor_runner": {
     "status": "scheduler_checkins_verified_agent_auth_blocked",
@@ -77,8 +79,13 @@
     "cursor_agent_authenticated": false,
     "consecutive_verified_heartbeats": 2,
     "lease": null,
-    "blocker": "cursor agent status and whoami report Not logged in; scheduler intentionally skips Cursor agent probe until fresh login verifies",
-    "last_verified_invocation_at": null
+    "blocker": "cursor agent status/whoami remain Not logged in; agent spawn disabled until live CLI login verifies",
+    "last_verified_invocation_at": null,
+    "recurring_verified": true,
+    "scheduler_samples_verified": 6,
+    "last_committed_checkin_at": "2026-09-20T20:41:08Z",
+    "last_committed_checkin_trigger": "manual",
+    "authenticated_worker_hourly_receipts": 0
   },
   "latest_ci_at_audit": {
     "run_id": 35529361557,
@@ -98,50 +105,50 @@
       "status": "tests_verified_current_tip",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
-      "review_status": "ci_scope_passed",
+      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "review_status": "verified",
       "evidence": "Actions 35539853498: console success; Ruff success; mypy 139 files; install success; Alembic head; 245 passed 2 skipped. CI DB integration honestly skipped without SWARM_DATABASE_URL."
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "source_repaired_awaiting_lead_review",
+      "status": "source_repaired_lead_verified",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-      "review_status": "pending_re_review",
+      "review_status": "verified_pending_gate",
       "blocker": "repairs pushed on b5ef431; lead must re-verify worker/approval ownership + install-local bootstrap",
       "evidence": "tests/api/test_fix002_ownership.py + app resolve_install_project_id"
     },
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "source_repaired_awaiting_lead_review",
+      "status": "partial_version_identity_binding_remaining",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-      "review_status": "pending_re_review",
+      "review_status": "changes_required",
       "blocker": "repairs pushed on b5ef431; lead must re-verify mandatory SHA/exit/mode/freshness binding",
       "evidence": "tests/release/test_fix003_evidence_binding.py"
     },
     {
       "id": "FIX-004",
       "owner": "Cursor",
-      "status": "scheduler_checkins_verified_cursor_worker_auth_blocked",
+      "status": "scheduler_verified_authenticated_worker_blocked",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
-      "review_status": "partial",
+      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "review_status": "changes_required",
       "blocker": "cursor agent status/whoami Not logged in; unattended worker spawning remains disabled"
     },
     {
       "id": "FIX-005",
       "owner": "Cursor",
-      "status": "source_repaired_awaiting_lead_review",
+      "status": "source_repaired_lead_verified",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-      "review_status": "pending_re_review",
+      "review_status": "verified_pending_gate",
       "blocker": "repairs pushed on b5ef431; lead must re-verify operational console/API have no mock fallback",
       "evidence": "console emptyLiveSnapshot + store fixture_mode + demo route fixture-gated"
     },
@@ -198,9 +205,9 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "repairs_pushed_awaiting_lead_re_review",
-      "evidence": "tip b5ef431; CI 35541870705 success; FIX-005/002/003 + G11 no-promote source repairs awaiting lead re-review",
-      "review": "not_accepted"
+      "status": "near_acceptance_changes_required",
+      "evidence": "PR #14 tip b5ef431aef36212417693ca826024d67d0f19e4f; CI 35541873777 green; FIX-002/005 source repairs verified; FIX-003 version identity binding + FIX-004 authenticated hourly worker receipts remain",
+      "review": "changes_required"
     },
     "G11": {
       "checkpoint": "1.1",
@@ -246,35 +253,26 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "G10 repairs pushed on b5ef431 \u2014 lead re-review required (not accepted)",
-    "Cursor agent CLI Not logged in; scheduler worker probe remains intentionally disabled",
-    "G12 remote dual-provider live evidence absent; G13 not qualified; G14 live adaptive proof absent; LIVE-142 not started"
+    "FIX-003 behavioral evidence still lacks enforced evidence-kind-specific config/dataset/model/tool version identity",
+    "Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet",
+    "G11 residual full multi-surface unfamiliar-task acceptance remains; G12 remote dual-provider, G13 qualification, G14 live adaptive proof and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T22:30:05Z",
+    "verified_at": "2026-09-20T22:38:21Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-    "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
-    "candidate_commits": 25,
-    "candidate_changed_files": 103,
-    "latest_verified_ci_run_id": 35541870705,
+    "latest_verified_ci_run_id": 35541873777,
     "latest_verified_ci_conclusion": "success",
-    "console_job_id": 106160879813,
-    "console_conclusion": "success",
-    "offline_job_id": 106160879711,
+    "offline_job_id": 106160887278,
     "offline_conclusion": "success",
-    "offline_pytest": "245 passed, 2 skipped",
-    "ruff_passed": true,
-    "mypy_passed": true,
-    "mypy_source_files": 139,
-    "downstream_install_alembic_pytest_executed": true,
-    "integration_ci_status": "skipped_honestly_without_SWARM_DATABASE_URL",
-    "live_gated_job_id": 106160879830,
-    "live_gated_job_conclusion": "success_blocked_notice_only",
-    "live_acceptance_executed": false,
-    "note": "LEAD-010 repairs on b5ef431; CI 35541870705 green; lead re-review required; login Not logged in; SKIP uncleared"
+    "console_job_id": 106160887420,
+    "console_conclusion": "success",
+    "live_gated_job_id": 106160887415,
+    "live_gated_conclusion": "success_blocked_notice_only",
+    "db_integration_ci": "skipped_honestly_without_SWARM_DATABASE_URL",
+    "live_acceptance_executed": false
   },
   "implementation_notes": {
     "cursor_tip": "b5ef431aef36212417693ca826024d67d0f19e4f",
