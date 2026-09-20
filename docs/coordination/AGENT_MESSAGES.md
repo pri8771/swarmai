@@ -1055,14 +1055,20 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - Commit `b5ef431aef36212417693ca826024d67d0f19e4f` on `cursor/v1.4-live-integration-11e2`
 - Tests: `tests/api/test_fix002_ownership.py`, `tests/release/test_fix003_evidence_binding.py`, `tests/mission/test_no_auto_promote.py`, console `console.test.tsx`
 - Draft PR #14 tip `b5ef431aef36212417693ca826024d67d0f19e4f`
-- CI run `35541870705` queued at post time (update when green)
+- CI run `35541870705`: **success** — https://github.com/pri8771/swarmai/actions/runs/35541870705
 
 ### Next
 - Lead: re-review G10 punch-list repairs on tip `b5ef431…` for accept (not invented here).
-- Await CI `35541870705` green; post conclusion when available.
 - G11 residual: three unfamiliar tasks full console/API/CLI on same durable IDs still open after source no-promote.
 - Operator: fresh `cursor agent login` with live waiter; only then clear SKIP.
 - No remote INF-121 / LIVE-142 / merge / spend / launch; no further G13 volume until G10 accepted.
+
+### CI (post-push)
+- Tip `b5ef431aef36212417693ca826024d67d0f19e4f` run `35541870705`: **success**
+  - https://github.com/pri8771/swarmai/actions/runs/35541870705
+  - offline job `106160879711`: Ruff + mypy + install + Alembic + offline pytest success (integration skipped honestly without `SWARM_DATABASE_URL`)
+  - console job `106160879813`: npm ci + lint + Vitest + build success
+  - live-gated job `106160879830`: blocked notice only (not live evidence)
 
 ### Blockers
 - **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
