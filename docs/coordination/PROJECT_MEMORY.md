@@ -1,49 +1,51 @@
 # SwarmAI compact project memory
 
-Last curated: 2026-09-20. Read this plus STATE and unread AGENT_MESSAGES before loading other context. Target <=1,200 words. This is accepted project context, not a transcript, credential store or independent proof that execution occurred.
+Curated 2026-09-20. Read this, STATE, the execution contract and unread AGENT_MESSAGES; do not reload whole chats. Target <=1,200 words. This stores accepted decisions and source observations, not secrets or proof of unperformed work.
 
-## User direction
+## Current owner authorization
 
-SwarmAI is a reusable self-hostable product, distinct from the operator's personal portfolio. It should let an elastic swarm tackle a problem. Multiple capable planners/reviewers may supervise or collaborate with smaller task-qualified workers. Use all approved inference sources concurrently, not just a sequential fallback list. Swarm should create/retire/reorganize agents dynamically according to useful work, dependencies, measured model fitness and resource capacity. Ordinary code/tools are first-class; every action need not use AI. CrewAI was an idea, not mandatory.
+The owner approved the roadmap direction through V3.0 and authorized IMPLEMENTATION NOW through V1.4 inclusive, targeting real live operation with no known unresolved issues. Execute V1.0 repair -> V1.1 -> V1.2 -> V1.3 -> V1.4 without asking again to start each 0.1. Earlier repair-only/per-0.1 implementation stops are superseded within this tranche.
 
-Build around existing open-source libraries rather than duplicating infrastructure. Evaluate models on standard task families and sizes; count all delegation/repair/review overhead. Context should load relevant accepted knowledge and evidence, not entire histories. Distinguish actual execution from catalog entries, fixtures, simulated load and prewritten answers.
+Read `V1_4_EXECUTION_CONTRACT.md`; start with `START_CURSOR_TO_V1_4.md`. Independent engineering/evidence review still applies. Ready branch work may continue while review waits, but missing review is not acceptance. Main merge, release/tag/publication, public deployment, new billing/spend, destructive actions and V1.5+ implementation are NOT authorized. Final candidate is submitted for lead review and operator merge approval. No new feature work beyond V1.4.
 
-The operator's deployment preference is free cloud coordination where feasible, with optional local workers/inference and tested local recovery. R730/T640/Mac are optional resources, not a requirement that the home machine always be online. Free resources have limits. No additional spending, card attachment, paid fallback, top-ups or unapproved production exposure.
+Live means real data, inference and tools in a protected local/already-authorized private environment; not public hosting. The quality target is all mandatory gates passed, no known unresolved supported-V1.4 defects and no unexpected application errors in the accepted campaign. No finite test guarantees no future bugs. Expected denials/outages must be handled honestly, not hidden.
 
-## Governance
+## Product direction
 
-Operator: Priyansh. ChatGPT is engineering lead; Cursor is implementation worker. Both should check in at least hourly when their actual scheduled runners are available, describing completed work and next work. Lead reviews evidence and sets bounded assignments. Operator retains each 0.1 promotion/merge and consequential external-action approval. Roadmap is not blanket authorization to rush to V2.
+Reusable self-hostable elastic problem-solving swarm, separate from business/household projects. Multiple capable planners/reviewers may work with smaller task-qualified agents. All approved inference routes can run concurrently. Agents propose specialists/splits/alternative approaches; software controls permissions, dependencies and capacity. Dynamic expansion/contraction, not a permanently small fixed team. Ordinary code/tools are first-class. CrewAI is not mandatory.
 
-Coordination-only branch: `coordination/swarm-control` in `pri8771/swarmai`. Source branches remain separate. Read fresh refs, preserve unrelated local changes, use isolated worktrees and conflict-safe message appends. Never force-push. Keep messages concise with IDs/acknowledgements; archive acknowledged history with pointers.
+Reuse good libraries instead of rebuilding execution, providers, storage or browser infrastructure. Empirically test standard task families/sizes; include total planning/repair/review overhead. Load scoped accepted evidence/context, not entire histories. No operational demo data, fake providers/activity, supplied answers or mock-success fallbacks. Keep isolated regression tests, never pass them off as live execution.
 
-## Verified repository snapshot
+Operator preference: zero additional spend; free-cloud coordination where feasible, optional R730/T640/Mac workers/local inference, tested local recovery. Existing resource/model capacity must be verified. No cards/top-ups/paid fallback. Current tranche allows bounded actual free/local validation under the recorded contract envelopes, not unbounded model use or private-data transfer outside approved scopes. Cloud hosting/site recovery is V1.8, not claimed at V1.4.
 
-Source audit pinned at main `b9141fa3150f853586dede0334a47b344571bc16`, 2026-09-20. Repository package/status is `1.0.0rc1`, no public launch, not a verified stable V1 product. V1 RC PR #12 was merged, and a later status PR #13 produced this main snapshot. This history does not itself prove feature completion.
+## Verified baseline and limitations
 
-Main CI run `35529361557`, job `106127102217`, failed lint with 33 errors; mypy/pytest were skipped in that run. Workflow only scheduled contracts/spikes pytest, not the full product suite. Main metadata reported unprotected; full administrative ruleset settings were not audited.
+Last source observed: main `b9141fa3150f853586dede0334a47b344571bc16`, package `1.0.0rc1`. V1 RC PR #12 and status PR #13 were merged; version/merge status is not behavioral proof.
 
-Targeted source audit found: known demo tokens in default app; cross-project report/history and idempotency problems; file-presence release checks presenting broader verification; parser-specific mission with prewritten fallback answer; local-only sequential demonstrated mission routing; hash-oriented scale harness with force-progress admission bypass; registry treating configured/unprobed values as readiness; synthetic recovery/timeout helpers; disconnected in-memory API fixtures versus separate CLI mission execution. Do not assume every component is defective; integrate/reuse useful contracts, broker, tests and tooling.
+Pinned source/CI audit: `AUDIT_V1_2026-09-20.md`. Main CI `35529361557`, job `106127102217`, failed Ruff with 33 findings; mypy/pytest skipped; workflow scheduled only contracts/spikes. No independent full-suite execution or live credential/provider/browser/cloud test was performed by the lead. Main metadata reported unprotected, not a complete ruleset assessment.
 
-Audit scope: source and CI evidence, not a full local test rerun, live-provider audit, full security certification or browser reproduction. No provider keys/accounts were inspected or tested by the lead in this audit. Do not claim a measured production exploit or spend event.
+Audit identified default demo tokens, project/history/idempotency authorization holes, file-presence checks overstating verification, parser-specific GOOD_FIX fallback, local-only sequential demonstrated mission, hashing presented as swarm reasoning, force-progress admission bypass, configured/unprobed credentials treated as ready, synthetic recovery/timeout helpers and disconnected fixture API versus CLI runtime. Preserve useful broker/contracts/components; reproduce against fresh source before changing them. No observed production breach or charge is claimed.
 
-Details and pinned sources: `AUDIT_V1_2026-09-20.md`.
+At this update no Cursor acknowledgement/repair/test evidence has been received in the shared log. The lead updated coordination documents, not application code. Fetch source and messages to discover later changes.
 
-## Current execution priority
+## Immediate work and gates
 
-V1.0 repair gate before feature-version promotion. Cursor assignments: FIX-001 full truthful CI; FIX-002 auth/project isolation with negative tests; FIX-003 meaningful acceptance/evidence gates; FIX-004 platform login documentation/session recovery and verified hourly worker runner. Parallelize only independent file ownership. No public deployment while security blockers remain.
+G10 FIX-001 complete CI; FIX-002 auth/project isolation/idempotency; FIX-003 truthful evidence/readiness; FIX-004 login/session records and actual hourly runner; FIX-005 remove runtime fixture/known-answer/bypass dependence. Parallelize only distinct ownership, especially overlapping API/store/runtime edits.
 
-Roadmap after repair: 1.1 unified generic runtime; 1.2 concurrent inference pool; 1.3 task/size qualification; 1.4 elastic graph; 1.5 durable distributed workers; 1.6 scoped memory; 1.7 reliable tools/browser sessions; 1.8 cloud-first/local recovery; 1.9 independent beta/self-development; 2.0 accepted elastic product. V3 direction: ongoing goals across many missions with governed learning, fleet/resource coordination and controlled self-development.
+Then RUN-111/G11 unified generic durable console/API/CLI mission; INF-121/G12 real concurrent remote providers plus local path with broker admission; EVAL-131/G13 measured model/family/size qualification; SWARM-141/G14 real adaptive graph; LIVE-142 final live acceptance. Contract contains specific tests, bounded budgets and a 24-hour observed private operating campaign. Missing live access blocks acceptance, not independent coding. Failed evidence cannot be censored or reclassified to manufacture success.
 
-## Login and browser context
+Future: 1.5 distributed workers; 1.6 richer scoped knowledge; 1.7 integrated tools/session recovery; 1.8 cloud-first/local site recovery; 1.9 independent beta/self-development; 2.0 accepted elastic product. V3: ongoing multi-mission goals, governed learning and fleet/resource coordination.
 
-Existing onboarding docs require normal Priyansh/Default Chrome for interactive provider setup; do not automate Google SSO through Playwright/Selenium/CDP. Prior onboarding reports claim many accounts/keys were configured; those are historical reports, not a fresh session guarantee. User encountered an Apply link while logged out; the actual failed destination/browser session has not been reproduced here.
+## Coordination
 
-Record per-platform account aliases, login method, official entry points, browser-profile reference and last verification. Keep real email/username mappings, passwords, keys, cookies, auth state and sensitive return URLs outside Git in secure local storage. Existing inventory contains a personal email and stale status text; Cursor should sanitize current documents without rewriting history automatically. See `../onboarding/PLATFORM_ACCESS.md`.
+Stable transport: `coordination/swarm-control`, not necessarily latest app source. Work on scoped branches and a dedicated integration branch. ChatGPT leads/independently reviews; Cursor implements/tests. Fetch before reading; preserve dirty work; use current blob SHAs or fast-forward coordination worktrees. Append immutable IDs/ACKs and compact Done/Evidence/Next/Blocked messages. Never invent another agent's reply. Archive acknowledged history with pointers.
 
-Restore the right identity/session and resume the intended page; ask only for the essential MFA/passkey/password/CAPTCHA/consent step. Distinguish a normal protected HTTPS page from an IDE-specific or expired signed link. Opening a page is not applying/submitting/deploying.
+Existing hourly ChatGPT review checks/writes GitHub but does not launch local Cursor. Cursor runner still requires actual local/entitlement verification; no paid runner is authorized. One scheduled worker with no-overlap lease, bounded resumable invocations and truthful host availability. A sleeping/offline host cannot guarantee hourly work. Actual scheduled heartbeats remain pending until observed.
 
-## Automation state
+## Login/session context
 
-The ChatGPT lead review was successfully scheduled hourly in America/New_York on 2026-09-20. It checks GitHub and can append review messages; it does not control or wake Cursor locally. No available Cursor connector was found in the plugin search. Cursor's actual recurring runner is pending local setup/verification. Cursor native cloud automations exist but are billed; do not assume they fit zero-additional-spend. A local scheduled CLI is a candidate after verifying authentication, entitlements, permissions, no-overlap locking and host availability. Mark missing heartbeats explicitly.
+Use `../onboarding/PLATFORM_ACCESS.md`. Existing local rule: normal Priyansh/Default Chrome; no Playwright/Selenium/CDP for Google SSO. Prior onboarding reports are historical, not current-session proof. Retain aliases, login methods, safe entry points, profile/secret references and last actual checks in Git. Keep real identities, keys, cookies/browser state, MFA/recovery material and sensitive redirect URLs outside Git.
 
-Never place secrets, full conversations or private reasoning in this memory file. Supersede stale facts with dated evidence rather than silently carrying them forward.
+Restore the correct login and return to the intended Apply/dashboard page; ask only for the essential password/passkey/MFA/CAPTCHA/consent step. Wrong account, expired signed URL and IDE-local links differ from normal logout. Opening a form is not submitting it. The owner's exact failed Apply destination has not been reproduced here.
+
+Bots/Claude planning is being handed to a separate conversation; do not absorb those venture codebases into SwarmAI or start their implementation from this tranche.
