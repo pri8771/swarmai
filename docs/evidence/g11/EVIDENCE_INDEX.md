@@ -1,6 +1,6 @@
 # G11 / RUN-111 evidence index
 
-**Tip binding:**   
+**Tip binding:** `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`
 **Lead accepted:** no (do not invent)  
 **Spend:** $0 claimed in listed artifacts
 

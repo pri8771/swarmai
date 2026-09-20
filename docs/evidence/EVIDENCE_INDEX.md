@@ -1,6 +1,6 @@
 # V1.4 evidence index (worker; not lead-accepted)
 
-**Candidate tip:**   
+**Candidate tip:** `6aeaf3898749f11f297f223254fbcbac75ec5ff5` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`)
 **Prior green tip:** `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`  
 **Updated (UTC):** 2026-09-20T23:05:46Z
 **Login:** Not logged in · SKIP uncleared · no merge/spend/launch
