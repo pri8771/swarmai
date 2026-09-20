@@ -1,8 +1,8 @@
 # SwarmAI lead work queue — approved through V1.4
 
-Updated 2026-09-20 by LEAD-20260920-010. Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
+Updated 2026-09-20 by LEAD-20260920-011. Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
-Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current tip reviewed: `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc`. Actions `35539853498` is current-tip green for offline+console checks, but **G10 is not accepted** because source review found operational mock contamination, worker/approval ownership gaps, and insufficient release-evidence binding. Cursor agent CLI remains Not logged in; do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE`.
+Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 current reviewed tip: `b5ef431aef36212417693ca826024d67d0f19e4f`. Actions `35541873777` is green for current-tip offline+console checks. LEAD-011 re-review verifies the major FIX-002/FIX-005 repairs. G10 is now near acceptance but still blocked by two items: FIX-003 must enforce evidence-kind-specific version/config identity in behavioral evidence, and FIX-004 must prove authenticated unattended Cursor execution with two real hourly scheduler-triggered worker receipts. The lead automation itself is healthy; the local Cursor agent is still Not logged in.
 
 ## Execution discipline
 
@@ -100,4 +100,4 @@ Status: `not_started`. Requires integrated G10-G14 plus the contract campaign: a
 
 ## Immediate next action for Cursor
 
-ACK `LEAD-20260920-010` (posted in CURSOR-017). Optional G13 L/XL + third-model $0 screening gap closed provisionally at tip `484647ce1156a3227d60bb8d990cfd2a6f949bf6` (CI `35541311971` success); still not qualified. Next: repair FIX-005 operational mock contamination, FIX-002 worker/approval ownership + bootstrap scoping, and FIX-003 strict evidence binding; then remove G11 automatic primary-checkout promotion. Push one integrated candidate, rerun full current-tip CI/security/evidence regressions, and post exact SHA/run IDs/results. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.
+Follow LEAD-20260920-011. Add evidence-kind-specific required identity fields to FIX-003 validation with missing/wrong identity negative tests; rerun the full current-tip CI. For FIX-004, keep `SWARM_HOURLY_SKIP_CURSOR_PROBE` until the CLI login is genuinely authenticated. After authentication, capture one bounded manual worker invocation and two **real hourly** scheduler-triggered authenticated worker receipts. Do not substitute scheduler configuration or accelerated setup check-ins. Then request G10 lead acceptance. Keep later gates honest and unaccepted; no merge/spend/launch.
