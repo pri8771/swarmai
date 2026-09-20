@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:49:45Z",
+  "updated_at": "2026-09-20T20:50:43Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -56,29 +56,28 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-008",
+  "last_lead_message_id": "LEAD-20260920-009",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-009.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-011",
-  "last_lead_heartbeat_at": "2026-09-20T20:49:45Z",
+  "last_lead_heartbeat_at": "2026-09-20T20:50:43Z",
   "last_cursor_heartbeat_at": "2026-09-20T20:48:46Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
-    "id": "6ab02943e168819192c9c5672b2a6578",
     "status": "scheduled_confirmed",
     "title": "SwarmAI engineering check-in",
     "cadence": "hourly",
-    "timezone": "America/New_York",
-    "last_configuration_verified_at": "2026-09-20T19:45:00Z",
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
   },
   "cursor_runner": {
-    "status": "auth_required_not_logged_in",
+    "status": "scheduler_checkins_evidenced_cursor_agent_auth_blocked",
     "requested_cadence_seconds": 3600,
     "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
-    "active_mechanism": "com.swarmai.hourly_probe_only_skip_cursor",
-    "last_verified_invocation_at": null,
-    "consecutive_verified_heartbeats": 0,
+    "active_mechanism": "com.swarmai.hourly",
+    "cursor_probe_disabled": true,
+    "cursor_agent_authenticated": false,
+    "consecutive_verified_heartbeats": 2,
     "lease": null,
-    "blocker": "Requires execution/verification in an authorized local Cursor environment; a repository prompt does not wake the IDE"
+    "blocker": "cursor agent CLI still reports Not logged in / Waiting for browser authentication; scheduler currently skips Cursor agent probe"
   },
   "latest_ci_at_audit": {
     "run_id": 35529361557,
@@ -99,7 +98,8 @@
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "blocked_current_ci"
+      "review_status": "changes_required",
+      "blocker": "GitHub Actions 35536776956 fails mypy at src/swarm/mission/runtime.py:46; packaging/Alembic/offline pytest did not execute on current tip"
     },
     {
       "id": "FIX-002",
@@ -153,7 +153,7 @@
       "scope": "G12 governed concurrent inference pool",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "pending"
+      "review_status": "not_accepted"
     },
     {
       "id": "EVAL-131",
@@ -162,7 +162,7 @@
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "pending"
+      "review_status": "not_accepted"
     },
     {
       "id": "SWARM-141",
@@ -171,7 +171,7 @@
       "scope": "G14 elastic evidence-driven task graph",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-      "review_status": "pending"
+      "review_status": "not_accepted"
     },
     {
       "id": "LIVE-142",
@@ -187,8 +187,8 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress_changes_required",
-      "evidence": "PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e; CI 35536776956 still fails mypy; LEAD-20260920-007 G10 source findings remain open",
-      "review": "changes_required"
+      "evidence": "PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e; CI 35536776956 fails mypy; source review in LEAD-007/008/009",
+      "review": "not_accepted"
     },
     "G11": {
       "checkpoint": "1.1",
@@ -200,19 +200,19 @@
       "checkpoint": "1.2",
       "status": "in_progress_local_only_not_accepted",
       "evidence": "local concurrent broker + kill-route fallback; required dual remote provider overlap not evidenced",
-      "review": "pending"
+      "review": "not_accepted"
     },
     "G13": {
       "checkpoint": "1.3",
       "status": "provisional_underpowered_not_accepted",
-      "evidence": "local screening evidence exists; required coverage/sample confidence not met",
-      "review": "pending"
+      "evidence": "24-trial denser local screening exists; required coverage/sample confidence not met",
+      "review": "not_accepted"
     },
     "G14": {
       "checkpoint": "1.4",
       "status": "offline_prep_not_accepted",
       "evidence": "offline graph/10-50-100/elastic-vs-fixed artifacts only; live multi-planner proof absent",
-      "review": "pending"
+      "review": "not_accepted"
     }
   },
   "context_policy": {
@@ -234,21 +234,22 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "Current PR #14 tip 4021c2de32b040e0760e3f771820380e2581aa4e fails CI run 35536709246 at mypy; downstream offline steps did not execute",
+    "Current PR #14 tip 643e38bf3f08e998936aad21bff3cb9a10541f4e fails CI run 35536776956 at mypy; downstream offline steps did not execute",
     "G10 auth/idempotency contract incomplete on non-mission mutation routes and optional bootstrap demo principals",
     "G10 evidence/readiness contract incomplete: evidence-file presence and provider readiness still fail closed-policy requirements",
     "Normal mission run remains parser-specific; generic RUN-111 path is not yet the sole operational mission path",
-    "Cursor unattended agent CLI remains Not logged in; scheduled check-in probe is not the same as a verified worker spawn",
+    "Cursor unattended agent CLI remains Not logged in; scheduler check-ins are not the same as a verified worker spawn",
     "G12 remote dual-provider, G13 qualification, G14 live adaptive swarm and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T20:49:45Z",
+    "verified_at": "2026-09-20T20:50:43Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "643e38bf3f08e998936aad21bff3cb9a10541f4e",
-    "commits_ahead_of_main": 15,
+    "candidate_commits": 16,
+    "candidate_changed_files": 76,
     "latest_verified_ci_run_id": 35536776956,
     "latest_verified_ci_conclusion": "failure",
     "console_job_id": 106147109326,
