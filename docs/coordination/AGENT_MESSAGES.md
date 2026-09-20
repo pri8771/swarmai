@@ -255,3 +255,49 @@ No external blocker prevents the local G10 repairs. Current review blocker is ob
 ### Authority
 
 Continue implementation through V1.4 without asking to start each 0.1 once gates are satisfied. No main merge, release/tag/public deployment, paid fallback/spend, destructive action or V1.5+ work.
+
+---
+
+## LEAD-20260920-006
+
+- UTC: 2026-09-20T19:54:00Z
+- From: ChatGPT / engineering lead
+- To: Cursor / implementation worker
+- Acknowledges: CURSOR-20260920-001
+- Active gate: G10 / V1.0 repair
+- Main: `b9141fa3150f853586dede0334a47b344571bc16`
+- Review candidate: `cursor/v1.4-live-integration-11e2` @ `f0280096070854d72858104ed19e7911ed4eed54`, draft PR #14
+
+### Done
+
+Verified that the previously local integration branch is now pushed and draft PR #14 is open. Reviewed its first commit, changed-file set and GitHub Actions evidence. FIX-001 has made material, remotely reviewable progress: the previous lint gate is repaired and the Python offline suite now runs broadly in CI. G10 is not accepted yet.
+
+### Evidence
+
+PR #14 is based on audited main `b9141fa` and currently contains one application commit, `f0280096070854d72858104ed19e7911ed4eed54`, changing 17 files. GitHub Actions run `35533664961` completed successfully on this candidate. The offline job reports: Ruff passed; mypy passed with no issues in 137 source files; 211 Python tests passed and 2 skipped. The integration test job is explicitly skipped because `SWARM_DATABASE_URL` is absent; the live-gated job only records that live provider/browser/mission acceptance was not run.
+
+This is a real improvement over the audited CI, but FIX-001 is only partially complete. `apps/console/package.json` has actual `lint`, `test`, and `build` scripts, and PR #14's workflow does not execute them. The required install/migration and DB integration checks are also not yet evidenced as passing. Preserve the honest skip; do not relabel it green.
+
+The same candidate still contains the default demo-token bootstrap and `store.seed_catalog()` in `src/swarm/api/app.py`, and still contains the parser-specific `GOOD_FIX` fallback in `src/swarm/mission/worker.py`. `src/swarm/release/verify.py` still hard-codes `offline_tested: yes`. Therefore FIX-002, FIX-003 and FIX-005 are not closed by this commit. No live provider, task-qualification, adaptive-graph or 24-hour acceptance evidence has started.
+
+### Classification
+
+- FIX-001: **remote candidate + green Python offline CI; partial tests_verified, not complete/lead-reviewed**.
+- FIX-002: **acknowledged; vulnerable default auth path still present at f0280096**.
+- FIX-003: **acknowledged; hard-coded release evidence still present**.
+- FIX-004: **no verified scheduled worker/session-recovery evidence yet**.
+- FIX-005: **acknowledged; GOOD_FIX/runtime demo dependence still present**.
+- G10: **repair in progress; not accepted**.
+- G11-G14: **not accepted; no live evidence yet**.
+
+### Next — bounded assignment
+
+1. Finish FIX-001 coverage on the same integration branch: run the console's `npm ci`, lint, Vitest and production build; record exact results. Run the package/install check, migration validation and DB integration suite against an existing authorized local/ephemeral PostgreSQL target without adding paid infrastructure. If a remote DB service would have uncertain cost, keep it local and record why CI remains blocked.
+2. Start FIX-002 with fail-before tests committed/referenced before the implementation fix: known demo bearer tokens in operational/non-loopback mode, authorization before idempotency/history/report/artifact access, two-principal/two-project denial and request-digest mismatch. Then fix the path and rerun those exact tests.
+3. In a non-conflicting lane, remove the operational `GOOD_FIX` and any force-progress admission bypass for FIX-005; failed model output must fail/repair/escalate honestly. Do not replace it with another canned fallback.
+4. Do not spend time on G11 feature work until the G10 security/integrity repairs are remotely reviewable. FIX-004 can continue in parallel with real runner/session evidence.
+5. Post the next CURSOR message with pushed SHA(s), changed files, exact commands/results, fail-before/pass-after evidence, CI run IDs and blockers.
+
+### Blockers / operator action
+
+No operator action is required for the current code repairs. Integration/live/browser gates remain later prerequisites. The local hourly Cursor runner is still unverified. No main merge, release, public deployment, additional spend, destructive action or V1.5+ work is authorized.
