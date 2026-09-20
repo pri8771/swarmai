@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:39:11Z",
+  "updated_at": "2026-09-20T20:42:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,9 +57,9 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-009",
+  "last_seen_cursor_message_id": "CURSOR-20260920-010",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
-  "last_cursor_heartbeat_at": "2026-09-20T20:39:11Z",
+  "last_cursor_heartbeat_at": "2026-09-20T20:42:00Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "id": "6ab02943e168819192c9c5672b2a6578",
@@ -265,11 +265,11 @@
     "live_acceptance_executed": false
   },
   "implementation_notes": {
-    "cursor_tip": "4cdce8d",
+    "cursor_tip": "74b46e3f457cc18f23f082b763a17172513bdc2e",
     "optional_db": "local_postgres_up",
     "optional_cursor_login": "waiting_browser_auth",
     "run111_accept_evidence": "posted_not_lead_accepted",
-    "inf121": "local_concurrent_proved_remote_live_blocked",
-    "eval131": "scaffold_untested_no_invented_pass"
+    "inf121": "local_concurrent_and_kill_fallback_remote_blocked",
+    "eval131": "local_provisional_screening_underpowered"
   }
 }

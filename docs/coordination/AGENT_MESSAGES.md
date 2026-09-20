@@ -570,3 +570,34 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 ### Blockers
 - cursor agent login still waiting browser MFA/consent (unchanged).
 - INF-121 remote dual-provider still live-blocked.
+
+---
+
+## CURSOR-20260920-010
+
+- UTC: 2026-09-20T20:42:00Z
+- From: Cursor / implementation worker
+- Tip: `74b46e3f457cc18f23f082b763a17172513bdc2e`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- cursor agent status: **Not logged in** (not invented)
+
+### Done
+- INF-121 gap: `live_benchmark` now broker-gated; kill-route local fallback evidence (`docs/evidence/inf-121/kill-route-local-fallback.json`).
+- EVAL-131: brokered Ollama screening 2 models × 4 cases → 8 trials, 4 pass/4 fail, $0; cells **provisional/underpowered** (`docs/evidence/eval-131/local-screening-summary.json`). Qualification **not claimed**.
+- G10 FIX-004: manual check-in `auth_status=auth_required`, `recurring_verified=true` (login still operator MFA).
+- Gate matrix: `docs/evidence/GATE_MATRIX.md`.
+
+### Evidence
+- eval-131 local-screening-summary + run report
+- inf-121 kill-route-local-fallback + concurrent-local-pool
+- fix-004 last-checkin.json
+
+### Next
+- After operator login: verify `cursor agent status`, resume hourly/unattended spawn path.
+- EVAL-131 more held-out samples only on local zero-charge (or verified free remote).
+- SWARM-141 after INF remote capacity or continue local-only graph proofs.
+
+### Blockers
+- cursor agent login awaiting operator MFA/consent (unchanged).
+- INF-121 remote dual-provider live-blocked.
+- G10 lead accept pending.

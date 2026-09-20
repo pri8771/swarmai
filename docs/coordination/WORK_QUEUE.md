@@ -72,7 +72,7 @@ Accept: actual overlapping calls to two independent remote providers in one miss
 
 ## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-Status: queued; input/grade contracts may start early, integrated gate depends on G11/G12. Owner: evaluation lane.
+Status: `in_progress` — local provisional screening only (underpowered); remote/qualification not claimed. Owner: Cursor/evaluation.
 
 Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
 
