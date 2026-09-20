@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T16:11:40.952716+00:00",
+  "generated_at": "2026-09-20T16:35:30.202014+00:00",
   "chrome_profile": {
     "directory": "Default",
     "name": "Priyansh",
@@ -53,8 +53,8 @@
       "evidence": "together.ai .../api-keys project URL"
     },
     "fireworks": {
-      "signed_in": "partial",
-      "evidence": "app.fireworks.ai/onboarding"
+      "signed_in": true,
+      "evidence": "API Keys - Fireworks AI settings/users/api-keys"
     },
     "deepinfra": {
       "signed_in": true,
@@ -68,22 +68,23 @@
   "key_presence": {
     "OPENROUTER_API_KEY": true,
     "GROQ_API_KEY": true,
-    "GEMINI_API_KEY": false,
-    "HF_TOKEN": false,
-    "NVIDIA_API_KEY": false,
-    "MISTRAL_API_KEY": false,
-    "COHERE_API_KEY": false,
-    "CLOUDFLARE_API_TOKEN": false,
+    "GEMINI_API_KEY": true,
+    "HF_TOKEN": true,
+    "NVIDIA_API_KEY": true,
+    "MISTRAL_API_KEY": true,
+    "COHERE_API_KEY": true,
+    "CLOUDFLARE_API_TOKEN": true,
     "CLOUDFLARE_ACCOUNT_ID": true,
     "OPENAI_API_KEY": false,
-    "ANTHROPIC_API_KEY": false,
+    "ANTHROPIC_API_KEY": true,
     "TOGETHER_API_KEY": false,
     "FIREWORKS_API_KEY": false,
-    "DEEPINFRA_API_KEY": false,
-    "REPLICATE_API_TOKEN": false
+    "DEEPINFRA_API_KEY": true,
+    "REPLICATE_API_TOKEN": true,
+    "OLLAMA_BASE_URL": true
   },
   "blocked_key_automation": "Chrome AppleScript JS disabled + Accessibility denied; cannot Create/Copy keys in live tabs without JS Apple Events toggle",
-  "handoff": "In Chrome: View → Developer → Allow JavaScript from Apple Events. Reply: js apple events on. Agent will Generate/Copy free keys (incl. NVIDIA primandir) into gitignored .env. Do NOT redo NVIDIA Google SSO.",
+  "handoff": "none \u2014 keep working",
   "mcp": {
     "added_to_cursor_mcp_json": [
       "openrouter",
@@ -115,5 +116,27 @@
     "NVIDIA treated signed-in under workspace primandir per operator 2026-09-20",
     "No automated Chrome for Google SSO; normal Priyansh/Default Chrome only",
     "Zero spend; SWARM_ALLOW_PAID=false; no V0.2"
-  ]
+  ],
+  "blocked": {
+    "together": "Create API key requires $5 deposit (zero-spend block)",
+    "openai": "Create secret key disabled; Add credits banner (zero-spend block)",
+    "fireworks": "Create API Key click no-ops at Credits $0.00; no key minted"
+  },
+  "canaries": {
+    "openrouter": "yes",
+    "groq": "yes",
+    "gemini": "yes",
+    "cloudflare": "yes",
+    "hf": "yes",
+    "nvidia": "yes",
+    "mistral": "yes",
+    "cohere": "yes",
+    "anthropic": "yes",
+    "deepinfra": "yes",
+    "ollama": "yes",
+    "replicate": "fail_403",
+    "openai": "blocked_credits",
+    "together": "blocked_deposit",
+    "fireworks": "blocked_zero_credits"
+  }
 }
