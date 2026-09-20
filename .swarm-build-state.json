@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T13:20:00Z",
+  "updated_at": "2026-09-20T13:25:00Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
-  "branch": "cursor/p01-foundation-contracts-11e2",
+  "branch": "main",
   "current_packet": null,
   "packet_states": {
     "P01": {
@@ -184,6 +184,17 @@
     "live_p18": "skipped_no_keys",
     "spend": "none",
     "merge_authorized_offline_rc": true,
-    "claim": "offline-verified-release-candidate-not-fully-live-verified"
+    "claim": "offline-verified-release-candidate-not-fully-live-verified",
+    "pr_merged": "https://github.com/pri8771/swarmai/pull/1",
+    "merge_commit": "827cb82c9aebc5f83741b215d025fcedf8ab16bd",
+    "prerelease": "https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1",
+    "tag": "v0.1.0-rc.1",
+    "local_launch": {
+      "api": "http://127.0.0.1:18765",
+      "health_live": "ok",
+      "health_ready": "ready mock",
+      "mode": "mock",
+      "allow_paid": false
+    }
   }
 }

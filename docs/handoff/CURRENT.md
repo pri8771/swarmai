@@ -1,11 +1,12 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T13:20:00Z  
+**Updated:** 2026-09-20T13:25:00Z  
 **Packets complete (offline):** P01–P21  
 **Label:** `offline-verified-release-candidate`  
-**Branch:** `cursor/p01-foundation-contracts-11e2`  
+**Branch:** `main` (merged from `cursor/p01-foundation-contracts-11e2`)  
 **Remote:** https://github.com/pri8771/swarmai  
-**PR:** https://github.com/pri8771/swarmai/pull/1  
+**PR:** https://github.com/pri8771/swarmai/pull/1 (**merged**)  
+**Pre-release:** https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1  
 **RC status doc:** `docs/RELEASE_CANDIDATE_STATUS.md`
 
 ## Live status (honest)
@@ -17,6 +18,19 @@
 | P18 | skipped | no keys; mock soak/chaos already offline_verified |
 
 **Spend:** none. **Payment methods:** none added.
+
+## Local launch (this pass)
+
+```sh
+uv run swarm deploy doctor --profile standalone
+uv run swarm release verify
+uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
+uv run swarm serve --host 127.0.0.1 --port 18765
+# health: curl -s http://127.0.0.1:18765/health/live
+# ready:  curl -s http://127.0.0.1:18765/health/ready
+```
+
+API was started locally in **mock** mode (`providers_network=false`, `allow_paid=false`).
 
 ## What works (offline)
 

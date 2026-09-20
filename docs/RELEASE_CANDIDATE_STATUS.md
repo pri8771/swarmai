@@ -11,7 +11,9 @@
 |---|---|
 | Repo | https://github.com/pri8771/swarmai |
 | RC branch | https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2 |
-| PR | https://github.com/pri8771/swarmai/pull/1 |
+| PR (merged) | https://github.com/pri8771/swarmai/pull/1 |
+| Pre-release | https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1 |
+| Merge commit | `827cb82c9aebc5f83741b215d025fcedf8ab16bd` |
 | Latest SHA (pre-merge docs) | see git / release tag |
 
 ## Status
@@ -27,7 +29,8 @@
 | Live P16 qualification | **blocked** — depends on P15 live routes |
 | Live P18 comparisons | **skipped** — no keys; mock evidence retained |
 | Spend policy | zero (no payment methods / paid credits used) |
-| Merge / GitHub pre-release | authorized for offline RC |
+| Merge / GitHub pre-release | **done** (merged PR #1; tag `v0.1.0-rc.1` prerelease) |
+| Local launch | **done** — API on 127.0.0.1:18765 (mock mode) |
 | Cloud production infra | **not** provisioned |
 
 ## Live setup (2026-09-20)
