@@ -93,10 +93,61 @@ def _git_tracked(repo: Path) -> set[str]:
     return {line.strip() for line in proc.stdout.splitlines() if line.strip()}
 
 
+def _validate_evidence_file(
+    path: Path,
+    *,
+    expected_kind: str,
+    candidate_sha: str | None,
+) -> VerifyItem:
+    """Semantic evidence check — presence alone is not a pass."""
+    item_id = f"{expected_kind}_evidence"
+    if not path.is_file():
+        return VerifyItem(item_id, False, "missing — not a pass")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return VerifyItem(item_id, False, f"unreadable_or_invalid_json:{exc}")
+    if not isinstance(data, dict):
+        return VerifyItem(item_id, False, "evidence_not_object")
+    status = str(data.get("status") or "").lower()
+    if status not in {"pass", "passed", "ok", "green"}:
+        return VerifyItem(item_id, False, f"status_not_pass:{status or 'missing'}")
+    command = data.get("command") or data.get("commands")
+    if not command:
+        return VerifyItem(item_id, False, "missing_command_inventory")
+    mode = str(data.get("mode") or data.get("mock_vs_live") or "")
+    if expected_kind == "offline_ci" and mode and "live" in mode.lower() and "offline" not in mode.lower():
+        return VerifyItem(item_id, False, f"mode_mismatch:{mode}")
+    sha = data.get("candidate_sha") or data.get("git_sha") or data.get("sha")
+    if candidate_sha and sha and str(sha) != str(candidate_sha):
+        return VerifyItem(item_id, False, f"sha_mismatch:evidence={sha} tip={candidate_sha}")
+    # Freshness: reject explicitly failed/stale markers.
+    if data.get("stale") is True or data.get("failed") is True:
+        return VerifyItem(item_id, False, "stale_or_failed_marker")
+    return VerifyItem(item_id, True, str(path.name))
+
+
+def _git_head(repo: Path) -> str | None:
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(repo),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    return (proc.stdout or "").strip() or None
+
+
 def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
     root = repo_root or _repo_root()
     items: list[VerifyItem] = []
     tracked = _git_tracked(root)
+    tip_sha = _git_head(root)
 
     for rel in REQUIRED_DOCS:
         path = root / rel
@@ -152,43 +203,36 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
             )
         )
 
-    # Evidence files (optional). Presence of docs/lockfiles alone is packaging,
-    # not a behavioral test result. Do not claim offline/live tested from files.
+    # Evidence files require semantic validation (status/command/mode/sha/freshness).
     ci_evidence = root / "var" / "evidence" / "offline_ci_pass.json"
     live_evidence = root / "var" / "evidence" / "live_local_pass.json"
-    if ci_evidence.is_file():
-        offline_tested = "yes — var/evidence/offline_ci_pass.json present"
+    offline_item = _validate_evidence_file(
+        ci_evidence, expected_kind="offline_ci", candidate_sha=tip_sha
+    )
+    live_item = _validate_evidence_file(
+        live_evidence, expected_kind="live_local", candidate_sha=tip_sha
+    )
+    # Normalize item ids expected by existing tests.
+    offline_item = VerifyItem(
+        "offline_ci_evidence", offline_item.ok, offline_item.detail
+    )
+    live_item = VerifyItem(
+        "live_local_evidence", live_item.ok, live_item.detail
+    )
+    items.append(offline_item)
+    items.append(live_item)
+
+    if offline_item.ok:
+        offline_tested = "yes — validated offline_ci_pass.json"
     else:
         offline_tested = (
             "unknown — packaging/presence check only; "
-            "no offline_ci_pass evidence"
+            f"offline evidence {offline_item.detail}"
         )
-    if live_evidence.is_file():
-        live_local = "yes — var/evidence/live_local_pass.json present"
+    if live_item.ok:
+        live_local = "yes — validated live_local_pass.json"
     else:
-        live_local = "unknown/not evidenced in this verify run"
-    items.append(
-        VerifyItem(
-            "offline_ci_evidence",
-            ci_evidence.is_file(),
-            (
-                str(ci_evidence.relative_to(root))
-                if ci_evidence.is_file()
-                else "missing — not a pass"
-            ),
-        )
-    )
-    items.append(
-        VerifyItem(
-            "live_local_evidence",
-            live_evidence.is_file(),
-            (
-                str(live_evidence.relative_to(root))
-                if live_evidence.is_file()
-                else "missing — not a pass"
-            ),
-        )
-    )
+        live_local = f"unknown/not evidenced ({live_item.detail})"
 
     matrix = {
         "implemented": (
@@ -202,10 +246,11 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
         "qualified_statistical": "no — provisional profiles only",
         "deployed": "no — local artifacts only",
         "public_launch": "no",
+        "candidate_sha": tip_sha or "unknown",
         "unverified": "paid cloud providers, multi-route statistical qualification, public hosting",
         "note": (
             "file presence is packaging evidence only; "
-            "behavioral acceptance requires CI/live artifacts"
+            "behavioral acceptance requires validated CI/live artifacts"
         ),
     }
     connected_claim = root / "var" / "FAKE_CONNECTED"
@@ -223,17 +268,19 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
         if i.item_id
         not in {"offline_ci_evidence", "live_local_evidence"}
     )
-    # Behavioral "passed" requires packaging AND offline evidence. Missing live
-    # evidence does not fail packaging, but must not be reported as live-tested.
-    passed = packaging_ok and ci_evidence.is_file()
-    if passed and live_evidence.is_file():
-        label = "offline-and-live-evidence-present"
+    # Behavioral "passed" requires packaging AND validated offline evidence.
+    passed = packaging_ok and offline_item.ok
+    if passed and live_item.ok:
+        label = "offline-and-live-evidence-validated"
     elif passed:
-        label = "offline-evidence-present-packaging-ok"
+        label = "offline-evidence-validated-packaging-ok"
     elif packaging_ok:
         label = "packaging-presence-ok-offline-evidence-missing"
     else:
         label = "release-verify-failed"
+    # Keep legacy label substring for tests that match "offline-evidence-present"
+    if passed and "validated" in label:
+        label = label.replace("validated", "present-validated")
     return ReleaseVerifyReport(
         run_id=new_id("rel_"),
         label=label,

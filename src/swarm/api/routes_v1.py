@@ -317,8 +317,30 @@ async def probe_provider(
             status_code=403,
             details={"provider_id": provider_id},
         )
+    # Scope probes to an authorized project (first membership) before cache.
+    if not principal.project_ids:
+        raise ApiError(
+            "policy_denied",
+            "provider probe requires a project-scoped principal",
+            status_code=403,
+            details={"provider_id": provider_id},
+        )
+    project_id = sorted(principal.project_ids)[0]
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "provider_id": provider_id,
+            "purpose": body.purpose,
+            "operation": "providers.probe",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="providers.probe",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
     # Offline: never call network; return blocked/unknown honestly.
@@ -329,7 +351,14 @@ async def probe_provider(
         "mock_vs_live": "probe_not_live",
         "purpose": body.purpose,
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="providers.probe",
+        request_digest=digest,
+    )
 
 
 @router.get("/qualifications")
@@ -355,8 +384,29 @@ async def create_evaluation(
             "evaluations require explicit policy admission",
             status_code=403,
         )
+    if not principal.project_ids:
+        raise ApiError(
+            "policy_denied",
+            "evaluations require a project-scoped principal",
+            status_code=403,
+        )
+    project_id = sorted(principal.project_ids)[0]
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "suite": body.suite,
+            "mode": body.mode,
+            "max_cases": body.max_cases,
+            "operation": "evaluations.create",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="evaluations.create",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
     from pathlib import Path
@@ -369,7 +419,14 @@ async def create_evaluation(
         "status": "planned",
         "mock_vs_live": "plan_only_not_executed_live",
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="evaluations.create",
+        request_digest=digest,
+    )
 
 
 @router.get("/workers")
@@ -389,11 +446,28 @@ async def enroll_worker(
     store: ProductStore = Depends(get_store),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
+    # Authorize project ownership before any idempotency cache access.
+    auth.require_project(principal, body.project_id)
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "project_id": body.project_id,
+            "capabilities": body.capabilities,
+            "capacity_units": body.capacity_units,
+            "privacy_classes": body.privacy_classes,
+            "named_inference_urls": body.named_inference_urls,
+            "operation": "workers.enroll",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="workers.enroll",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
-    auth.require_project(principal, body.project_id)
     lease, token = await store.enroll_worker(
         capabilities=body.capabilities,
         capacity_units=body.capacity_units,
@@ -408,7 +482,14 @@ async def enroll_worker(
         "membership_token": token,
         "mock_vs_live": "membership_only_no_provider_secrets",
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="workers.enroll",
+        request_digest=digest,
+    )
 
 
 @router.post("/workers/heartbeat")
@@ -441,18 +522,48 @@ async def resolve_approval(
     store: ProductStore = Depends(get_store),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
+    if approval_id not in store.approvals:
+        raise ApiError("not_found", "approval not found", status_code=404)
+    if not principal.project_ids:
+        raise ApiError(
+            "policy_denied",
+            "approval resolve requires a project-scoped principal",
+            status_code=403,
+        )
+    project_id = sorted(principal.project_ids)[0]
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "approval_id": approval_id,
+            "accept": body.accept,
+            "payload": body.payload,
+            "operation": "approvals.resolve",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="approvals.resolve",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
-    approval = store.resolve_approval(
+    resolved = store.resolve_approval(
         approval_id,
         accept=body.accept,
         actor=principal.subject,
         payload=body.payload,
     )
-    result = {"approval": approval.model_dump(mode="json"), "accepted": body.accept}
-    return store.store_idempotent(key, result)
+    result = {"approval": resolved.model_dump(mode="json"), "accepted": body.accept}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="approvals.resolve",
+        request_digest=digest,
+    )
 
 
 @router.post("/missions/{mission_id}/side-effects/demo")

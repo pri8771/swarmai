@@ -58,6 +58,8 @@ def create_app(
         store.seed_catalog()
     auth = AuthRegistry(require_auth=require_auth)
     if seed_loopback_token:
+        # Operational bootstrap: only the provided private token is issued.
+        # Fixed known demo principals are NOT activated by bootstrap alone.
         auth.issue(
             subject="loopback-operator",
             project_ids={"proj_demo", "proj_other"},
@@ -67,7 +69,8 @@ def create_app(
             token=seed_loopback_token,
         )
         auth.loopback_mock_token = seed_loopback_token
-        # Elevated token for canary/eval policy tests (issued, not a default admin password).
+    if seed_fixtures:
+        # Explicit test/fixture seeding — separate from operational bootstrap.
         auth.issue(
             subject="policy-operator",
             project_ids={"proj_demo"},
@@ -76,13 +79,23 @@ def create_app(
             allow_eval=True,
             token="atk_policy_demo",
         )
-        # Isolated project principal for isolation tests.
         auth.issue(
             subject="other-project-user",
             project_ids={"proj_other"},
             roles={"operator"},
             token="atk_other_project",
         )
+        if seed_loopback_token is None:
+            # Tests that only set seed_fixtures still need a demo loopback principal.
+            auth.issue(
+                subject="loopback-operator",
+                project_ids={"proj_demo", "proj_other"},
+                roles={"operator"},
+                allow_canary=False,
+                allow_eval=False,
+                token="atk_loopback_demo",
+            )
+            auth.loopback_mock_token = "atk_loopback_demo"
 
     app.state.store = store
     app.state.auth = auth

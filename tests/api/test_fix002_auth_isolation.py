@@ -56,12 +56,28 @@ def test_operational_app_has_no_seeded_demo_tokens() -> None:
         assert denied.json()["code"] == "unauthorized"
 
 
+def test_bootstrap_token_does_not_seed_fixed_demo_principals() -> None:
+    """Private bootstrap issues only the provided token — not fixed demo identities."""
+    app = create_app(
+        require_auth=True,
+        db_reachable=True,
+        seed_loopback_token="atk_private_bootstrap",
+        seed_fixtures=False,
+    )
+    auth: AuthRegistry = app.state.auth
+    assert "atk_private_bootstrap" in auth.tokens
+    assert "atk_policy_demo" not in auth.tokens
+    assert "atk_other_project" not in auth.tokens
+    assert "atk_loopback_demo" not in auth.tokens
+
+
 def test_known_demo_token_rejected_from_non_loopback() -> None:
     """Even if a demo token exists for local tests, non-loopback must not use it."""
     app = create_app(
         require_auth=True,
         db_reachable=True,
         seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
     )
     auth: AuthRegistry = app.state.auth
     with pytest.raises(Exception) as excinfo:
@@ -101,6 +117,7 @@ def test_history_and_report_deny_cross_project(tmp_path: Path) -> None:
         require_auth=True,
         db_reachable=True,
         seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
         repo_root=repo,
     )
     with TestClient(app) as client:
@@ -134,6 +151,7 @@ def test_idempotency_scoped_and_rejects_body_mismatch() -> None:
         require_auth=True,
         db_reachable=True,
         seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
     )
     with TestClient(app) as client:
         mission_a = sample_mission().model_copy(
@@ -188,6 +206,7 @@ def test_history_search_filters_by_principal_projects(tmp_path: Path) -> None:
         require_auth=True,
         db_reachable=True,
         seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
         repo_root=repo,
     )
     with TestClient(app) as client:

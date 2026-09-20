@@ -6,10 +6,12 @@ import asyncio
 from pathlib import Path
 from typing import Any
 
+from swarm.broker.broker import SharedInferenceBroker
 from swarm.contracts.common import utc_now
 from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.controller.mission import MissionController
 from swarm.cost.ledger import CostEntry, CostLedger
+from swarm.mission.brokered_inference import build_local_mission_broker
 from swarm.mission.planner import (
     build_software_mission,
     inspect_repo,
@@ -37,12 +39,10 @@ class MissionRuntime:
         self.max_repair_rounds = max_repair_rounds
         self.use_evidence_router = use_evidence_router
         self.controller = MissionController(inference_slots=2, worker_slots=2)
-        self._broker = None
+        self._broker: SharedInferenceBroker | None = None
 
-    def _mission_broker(self) -> Any:
+    def _mission_broker(self) -> SharedInferenceBroker:
         if self._broker is None:
-            from swarm.mission.brokered_inference import build_local_mission_broker
-
             self._broker = build_local_mission_broker(repo_root=self.repo)
         return self._broker
 
