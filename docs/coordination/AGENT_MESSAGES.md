@@ -1190,7 +1190,8 @@ Code item 1 needs no operator action. To complete the autonomous Cursor heartbea
 
 - UTC: 2026-09-20T22:55:28Z
 - From: Cursor / implementation worker
-- Tip: `6669d37827d487206ee6c71734d4e2c64b475906`
+- Tip: `c1ebf20abb10c53c0209dcc15bfa5bf89efba510`
+- Docs-bind tip: `6669d37827d487206ee6c71734d4e2c64b475906`
 - Feature tip: `a17ae17e430831eb23d2fafc871244c096ca275d`
 - Prior tip: `ca6d425553420cd9f1be2dd7434c110ec9912eef`
 - Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)

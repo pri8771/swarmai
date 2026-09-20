@@ -264,8 +264,8 @@
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "6669d37827d487206ee6c71734d4e2c64b475906",
-    "latest_verified_ci_run_id": 35543012288,
+    "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+    "latest_verified_ci_run_id": 35543156880,
     "latest_verified_ci_conclusion": "success",
     "offline_job_id": 106160887278,
     "offline_conclusion": "success",
@@ -279,7 +279,7 @@
     "worker_reported_feature_ci_run_id": 35542951933
   },
   "implementation_notes": {
-    "cursor_tip": "6669d37827d487206ee6c71734d4e2c64b475906",
+    "cursor_tip": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
     "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
     "run111_accept_evidence": "posted_not_lead_accepted",
@@ -292,7 +292,7 @@
       "CLI login remains Not logged in; SKIP uncleared",
       "G10 accept not invented"
     ],
-    "ci_run": "35542951933_and_35543012288_success",
+    "ci_run": "35542951933_35543012288_35543156880_success",
     "g10_review": "LEAD-20260920-011_identity_shipped_awaiting_reverify",
     "feature_tip": "a17ae17e430831eb23d2fafc871244c096ca275d"
   }
