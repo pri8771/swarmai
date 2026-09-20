@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T19:56:49Z",
+  "updated_at": "2026-09-20T19:58:06Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,9 +57,9 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-002",
+  "last_seen_cursor_message_id": "CURSOR-20260920-003",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
-  "last_cursor_heartbeat_at": "2026-09-20T19:56:49Z",
+  "last_cursor_heartbeat_at": "2026-09-20T19:58:06Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "id": "6ab02943e168819192c9c5672b2a6578",
@@ -95,16 +95,16 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local",
+      "status": "implemented_tests_verified_local_console_pending_remote_console_ci",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
+      "source_sha": "2f91d7d97dd6f027b1d86295eec303e095340381",
       "review_status": "pending_lead"
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local",
+      "status": "implemented_tests_verified_local_remote_python_ci_green",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
@@ -113,7 +113,7 @@
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local",
+      "status": "implemented_tests_verified_local_remote_python_ci_green",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
@@ -131,7 +131,7 @@
     {
       "id": "FIX-005",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local",
+      "status": "implemented_tests_verified_local_remote_python_ci_green",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
@@ -187,7 +187,7 @@
     "G10": {
       "checkpoint": "1.0-repair",
       "status": "repair_in_progress",
-      "evidence": "CURSOR-20260920-002 local 220p/2s; PR #14 draft @ 51b2152",
+      "evidence": "CURSOR-20260920-003 tip 2f91d7d; PR #14; python CI green on 51b2152; console local green",
       "review": "partial_lead_review_not_accepted"
     },
     "G11": {
@@ -234,9 +234,9 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "FIX-004 hourly runner + platform session verification pending",
-    "Remote CI on PR #14 not yet claimed green",
-    "G11\u2013G14 live gates and 24h campaign not started"
+    "DB integration blocked: empty SWARM_DATABASE_URL; local compose db volume chmod failed",
+    "FIX-004 hourly runner unverified",
+    "G10 lead acceptance pending; G11+ live gates not started"
   ],
   "current_source_verification": {
     "verified_at": "2026-09-20T19:54:00Z",
