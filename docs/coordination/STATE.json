@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T18:49:00Z",
+  "updated_at": "2026-09-20T18:56:43Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -16,16 +16,18 @@
   "paid_fallback_authorized": false,
   "checkpoint_merge_authorized": false,
   "roles": {"lead": "ChatGPT", "implementation": "Cursor", "final_authority": "operator"},
-  "last_lead_message_id": "LEAD-20260920-001",
+  "last_lead_message_id": "LEAD-20260920-002",
   "last_seen_cursor_message_id": null,
-  "last_lead_heartbeat_at": "2026-09-20T18:49:00Z",
+  "last_lead_heartbeat_at": "2026-09-20T18:56:43Z",
   "last_cursor_heartbeat_at": null,
   "last_completed_assignment_id": null,
   "lead_automation": {
+    "id": "6ab02943e168819192c9c5672b2a6578",
     "status": "scheduled_confirmed",
     "title": "SwarmAI engineering check-in",
     "cadence": "hourly",
     "timezone": "America/New_York",
+    "last_configuration_verified_at": "2026-09-20T18:50:15Z",
     "scope": "GitHub review, messages and compact state; not local Cursor control"
   },
   "cursor_runner": {
@@ -52,16 +54,27 @@
   "assignments": [
     {"id":"FIX-001","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Reproduce and fix CI; run all applicable offline backend/frontend suites without weakening checks","source_branch":null,"source_sha":null,"review_status":"pending"},
     {"id":"FIX-002","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Default-token, report/history project isolation and idempotency regressions and fixes","source_branch":null,"source_sha":null,"review_status":"pending"},
-    {"id":"FIX-003","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Separate structural/demo tests from evidence-backed product acceptance and correct misleading proofs","source_branch":null,"source_sha":null,"review_status":"pending"},
-    {"id":"FIX-004","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Platform login documentation, signed-out link handoff, and real hourly runner setup under no-extra-spend limits","source_branch":null,"source_sha":null,"review_status":"pending"}
+    {"id":"FIX-003","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Separate structural checks from evidence-backed behavioral acceptance; remove unobserved readiness/success claims","source_branch":null,"source_sha":null,"review_status":"pending"},
+    {"id":"FIX-004","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Platform login documentation, signed-out link handoff, and real hourly runner setup under no-extra-spend limits","source_branch":null,"source_sha":null,"review_status":"pending"},
+    {"id":"FIX-005","owner":"Cursor","status":"assigned_not_acknowledged","scope":"Remove normal-runtime demo fixtures, seeded activity, known-answer substitution and force-progress quota bypass; keep missing capabilities explicitly unfinished","source_branch":null,"source_sha":null,"review_status":"pending"}
   ],
   "context_policy": {
     "memory_file": "docs/coordination/PROJECT_MEMORY.md",
     "messages_file": "docs/coordination/AGENT_MESSAGES.md",
+    "queue_file": "docs/coordination/WORK_QUEUE.md",
+    "real_data_policy_file": "docs/coordination/REAL_DATA_POLICY.md",
+    "cursor_start_file": "docs/coordination/START_CURSOR_REPAIR.md",
     "normal_memory_word_limit": 1200,
     "read_entire_history_by_default": false,
     "secrets_in_git": false,
     "private_identity_mapping_in_git": false
+  },
+  "data_policy": {
+    "runtime_demo_data_allowed": false,
+    "runtime_mock_fallback_allowed": false,
+    "known_answer_substitution_allowed": false,
+    "isolated_existing_regression_doubles_count_as_live_evidence": false,
+    "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
     "V1 audit release/security/core-behavior findings remain unrepaired at audited SHA",
