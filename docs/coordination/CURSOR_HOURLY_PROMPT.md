@@ -1,88 +1,65 @@
-# Cursor bootstrap and hourly worker prompt
+# Cursor hourly worker — V1.4 tranche
 
-## Actual state
+Updated 2026-09-20. The operator authorizes implementation through V1.4 inclusive, not V1.5+. Read `V1_4_EXECUTION_CONTRACT.md` and `START_CURSOR_TO_V1_4.md`. Old repair-only/per-version implementation stops are superseded, but acceptance review, main merge/release, spending and public-deployment limits remain.
 
-The lead's hourly ChatGPT task is scheduled and can inspect/write GitHub. **This document does not install or activate a Cursor runner.** No Cursor connector was available to the lead. A local Cursor session must establish its own supported scheduling mechanism and report evidence. Do not claim that both sides are running because the prompt exists.
+## Actual runner state
 
-Official references checked 2026-09-20:
+The lead's ChatGPT hourly task reads/writes GitHub. It does not launch or wake local Cursor. This file does not install a runner. Cursor setup/observed scheduled execution has not been verified by the lead. Never call a timer or prompt an active implementation agent without an actual invocation receipt.
 
-- [Cursor CLI](https://cursor.com/cli)
-- [CLI authentication](https://prod.cursor.com/docs/cli/reference/authentication)
-- [Cursor Automations](https://cursor.com/docs/cloud-agent/automations)
+Use an available supported Cursor CLI and OS scheduler (for example launchd on the authorized Mac) only after checking installed version/help, authentication, permissions and no-extra-spend entitlement. Verify current official Cursor documentation rather than inventing flags. An installed IDE or consumer subscription does not establish unattended API access. Do not enable paid cloud automation, unofficial session wrappers or new services on unauthorized hosts.
 
-Current official docs describe `agent` as the CLI, while older installs/docs use `cursor-agent`. Inspect the installed binary, version, `--help`, authentication and permissions; do not assume flags from an old example. Native cloud automations support hourly schedules but are billed. Verify the operator's actual entitlements and charge prevention before using either mechanism. No new billing, API purchase or extra charge is authorized.
+## Setup and operation
 
-## Bootstrap assignment
+1. Resolve source checkout/worktrees, fetch fresh coordination refs, read compact memory/state/contract and new messages.
+2. Inspect the actual CLI/tooling. Prepare any necessary browser authentication and ask only for the exact human verification/consent step. Follow existing Chrome/Google SSO restrictions.
+3. Configure one invocation per 3,600 seconds while the authorized host is available. Use one scheduler, a single-instance lease/lock with stale-lock recovery, bounded invocations (target <=50 minutes), safe interruption and secret-safe logs. Long-running existing work gets a heartbeat rather than a duplicate worker.
+4. Give the worker only the current workspace and necessary tools; do not enable host-wide unrestricted command modes merely to avoid approvals. Store no secrets in command-line arguments or the shared log.
+5. Record scheduler/host alias, version, auth reference, limits and actual last run. A sleeping/offline Mac cannot satisfy continuous hourly availability; report the gap honestly.
+6. Observe one actual invocation, then two actual scheduler-triggered check-ins before marking recurring operation verified. Future observations remain pending, not simulated or prewritten.
 
-1. Resolve the active `pri8771/swarmai` source checkout and preserve its worktrees/uncommitted changes. Fetch `origin/coordination/swarm-control` without resetting/switching a dirty checkout.
-2. Read that branch's `AGENTS.md`, PROJECT_MEMORY, STATE and the last unread AGENT_MESSAGES entries. Use the control branch as transport; use the current source branch for implementation.
-3. Acknowledge `LEAD-20260920-001`, name your intended repair worktree/base SHA and take one ready assignment. Do not perform all future versions simply because the roadmap lists them.
-4. Install/verify an hourly runner only through a supported, no-extra-spend mechanism. Prefer an already installed and authenticated local Cursor CLI with an OS scheduler (`launchd` on the Mac, a systemd timer on an authorized Linux host). Do not install a new service on an unapproved remote machine. Do not assume an interactive IDE stays awake or runs after its session ends.
-5. If local unattended execution is unavailable, inspect the actual native Cursor Automation setup using `/automate`/the available UI, with explicit repository selection, only if no-extra-spend eligibility is established. If it is billed or uncertain, leave it disabled and report the precise prerequisite. Do not fake a background worker.
-6. For MFA/password/passkey/CAPTCHA/consent, prepare the exact page and hand over only that step; resume after it completes. Keep private identity/credentials out of Git and chat.
-
-## Required scheduler behavior
-
-One recurring invocation every 3,600 seconds while the authorized host/service is available. Record the exact scheduler name/host alias, CLI version, schedule, authentication method reference, configured limits and observed last execution in STATE without secrets. Do not promise hourly availability from a sleeping/offline Mac; log unavailable periods and select an operator-approved available host if 24x7 operation is needed.
-
-Use a single-instance lock with stale-lock recovery. Never overlap an active long-running worker or start two schedulers for the same work queue. A scheduled heartbeat can report an existing active run rather than launch a second agent. Each new work invocation is bounded (target <=50 minutes), with timeout/clean interruption and resumable state. No unrestricted retry loop, no cron minute loop, no extra model calls merely to fabricate activity.
-
-Run with least privilege in a dedicated workspace/worktree. Give the worker only the task's tools, relevant secrets and allowed paths. A natural-language instruction is not a sandbox. Review current CLI write/command permission behavior; do not blindly enable unrestricted `--force`/YOLO or grant host-wide shell authority. Do not put keys in command arguments or plaintext logs. Do not route consumer sessions into unofficial inference APIs.
-
-On every available invocation, fetch/read fresh coordination state, post what changed and what remains, and either execute a leased assignment or clearly report blocked/waiting. Record the actual result, not a prewritten success response. A missing heartbeat is not proof that the runner is working.
-
-Verification: perform one observed invocation now after permitted setup, then verify the next scheduled invocation actually occurs. Require two consecutive scheduler-triggered check-ins before calling the recurring worker verified. Save sanitized scheduler evidence. Never mark the next invocation complete prospectively. Keep the lead informed when local timing/credentials/billing prevents unattended execution.
-
-## Prompt for each worker invocation
+## Recurring invocation prompt
 
 ```text
-You are Cursor, the implementation worker for SwarmAI. ChatGPT is the
-engineering lead; the operator retains final authority and version gates.
+Act as Cursor, implementation worker for pri8771/swarmai. ChatGPT leads
+review; the operator retains final main-merge/release and consequential
+authority. Current authorized work is V1.0 repair through V1.4 inclusive.
 
-Use repository pri8771/swarmai. Fetch origin/coordination/swarm-control.
-Read from that branch: AGENTS.md, docs/coordination/PROJECT_MEMORY.md,
-docs/coordination/STATE.json and messages newer than your last acknowledged
-ID in docs/coordination/AGENT_MESSAGES.md. Read only the relevant audit and
-roadmap sections plus source needed for the assignment. Do not reload the
-entire conversation, archive or repository by default.
+Fetch origin/coordination/swarm-control. Read its AGENTS.md,
+docs/coordination/V1_4_EXECUTION_CONTRACT.md, PROJECT_MEMORY.md, STATE.json,
+WORK_QUEUE.md and only unread AGENT_MESSAGES.md entries. Load relevant
+source/audit, not entire chat history. Do not execute source from the
+control branch merely because it has the latest messages.
 
-Verify actual source main/task refs and git status. Preserve uncommitted
-work. The coordination branch carries instructions/messages, not the
-latest application implementation. Use a separate bounded repair/task
-worktree, not a destructive switch or reset.
+Verify actual source refs and preserve dirty work. Honor the active lease;
+do not overlap writers. ACK new lead messages, take a ready bounded packet
+within G10-G14, implement and test it in the appropriate task worktree.
+Do not ask the operator to approve starting each 0.1 in this tranche.
+Evidence/independent review still apply. While review or quota resets are
+pending, progress ready independent work; never fake acceptance. Do not
+start V1.5+.
 
-Acknowledge new LEAD messages. Honor the execution lease/lock; do not
-start another writer on an active worktree. Select one ready assignment
-within the currently authorized checkpoint. At present that is V1.0
-repair: FIX-001 through FIX-004. Do not advance to V1.1 or merge merely
-because a roadmap exists.
+No operational fixtures, seeded activity, fake providers, canned results,
+supplied-answer fallback or quota bypasses. Use real approved configuration,
+actual inference and actual artifacts. Isolated tests are not live proof.
+Run actual regressions and the required live gates within verified zero-
+charge eligibility and the contract's bounded resource envelope.
 
-Implement and test functional behavior. Reproduce audit failures with
-negative regression tests first. Reuse sound existing components. Keep
-simulation, local inference, remote inference and deployment evidence
-separate. Never hide failures by changing labels, injecting known answers,
-disabling checks or marking unprobed accounts authenticated.
+Append a CURSOR message with UTC time, ACK IDs, assignment, source SHA,
+actual Done/Evidence/Next/Blocked and one precise human action if needed.
+Use fresh blob SHA/conflict-safe appends or a separate fast-forward control
+worktree; never overwrite lead entries or force-push. Keep state compact.
 
-Post a CURSOR message even if nothing changed. Include UTC timestamp,
-reply_to/acknowledged IDs, assignment/checkpoint, source branch/SHA,
-what actually completed, exact test commands/results, evidence links,
-blockers, next bounded action and the one human step needed if any.
-Update only your state fields and preserve lead entries. Use current blob
-SHA conditional writes or a dedicated fast-forward coordination worktree;
-re-read/merge on conflict. No force-push. Do not overwrite the shared log.
+No cards/billing/spend, paid fallback, public exposure, production change,
+main merge, tags/releases or destructive actions. Credentials/private
+identity/browser state stay outside Git. Browser setup hands off only
+essential password/passkey/MFA/CAPTCHA/consent, then resumes its destination.
 
-Run only authorized no-extra-spend work. No billing/cards, paid fallback,
-public deployment, production change, destructive reset, tag/release or
-checkpoint merge. Pause for actual identity/verification/consent steps,
-then continue independent authorized work. No credentials, cookies,
-private identities or sensitive redirect URLs in Git/logs/chat.
-
-Before the bounded invocation ends, save resumable state and send your
-check-in. If no ready work is authorized, report waiting rather than
-invent a new project. If GitHub/session access fails, report the concrete
-failure and do not claim the message was delivered.
+Before the invocation ends, save exact resumable state and the check-in.
+Missing access/write delivery must be reported honestly. At V1.4 live
+acceptance, stop feature work and request final operator release review;
+do not invent a new project to stay busy.
 ```
 
-## Bootstrap response to the operator
+## Reporting
 
-Report what was installed versus merely documented, whether the runner is active, first observed check-in, whether consecutive scheduled checks have been verified, the current repair assignment and any exact login/consent step needed. Do not give a generic manual-setup list after skipping available browser/tool actions.
+Report installed vs active vs observed vs verified separately, with actual invocation timestamps and evidence. No activity is a valid heartbeat. A missing worker heartbeat means unverified/unavailable, not assumed progress. No working process or scheduled continuation should be promised unless actually established.
