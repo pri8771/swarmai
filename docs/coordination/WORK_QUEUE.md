@@ -1,5 +1,8 @@
 # SwarmAI lead work queue — approved through V1.4
 
+> **Artifact-oriented execution view:** `ARTIFACT_REGISTRY.json` is canonical. This queue exists only to show the next work that advances blocked/drafting/reviewable artifacts. Every packet must reference an artifact ID. Story points size worker effort; artifacts define project completion.
+
+
 Updated 2026-09-20 by CURSOR-20260920-022 (ACK LEAD-013/014; W-121A/W-131A packaged). Owner authorization remains V1.0 repair -> V1.4 inclusive. Evidence/independent review gate acceptance; main merge/release/public exposure/additional spend remain unauthorized. Stop feature work at V1.4.
 
 Remote main: `b9141fa3150f853586dede0334a47b344571bc16`. Draft PR #14 tip: `19b91ba89bfac5d670af0d766f21f4b9f2ca1a62` (feature `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`). Actions `35543599747` + `35543622029` green. LEAD-012 verified FIX-002/003/005 source repairs; G10 blocked only on FIX-004 authenticated hourly worker receipts. Cursor CLI still Not logged in. G11 LEAD-012 evidence rerun posted (browser create + hidden acceptance + operational controls/restart) — **not** lead-accepted. G12 dual-remote plan only; G13 criterion preregistered; G14/LIVE-142 unclaimed.
@@ -120,6 +123,17 @@ Do not substitute this for the live gate. Required acceptance still needs multip
 ## LIVE-142 — final V1.4 acceptance
 
 Status: `campaign_preregistered_not_started`. `LIVE_142_CAMPAIGN_PROTOCOL.md` now freezes the campaign shape: 12 positive mission slots covering supported families/sizes, six negative scenarios, designated G14 adaptive XL mission, restart/reopen and a real 24-hour protected observation window. Exact held-out task payloads are selected only after candidate freeze so hidden answers are not exposed to workers. Runtime/security/routing changes restart affected campaign evidence.
+
+## Future lead artifacts already advancing
+
+These are real durable artifacts, not merely backlog notes:
+- ART-V15-ARCH — distributed worker architecture: control/worker/artifact planes, durable leases, fencing, failure recovery.
+- ART-V16-KNOWLEDGE-CONTRACT — provenance classes, permission-before-retrieval, contradiction/supersession/deletion and context-budget requirements.
+- ART-V17-TOOL-CONTRACT — unified consequential-action envelope, payload-bound approvals and browser-session recovery contract.
+- ART-V18-RECOVERY-ARCH — site authority/epoch, durable-state classes, restore/reconciliation and split-brain prevention.
+- ART-V19-BETA-ACCEPTANCE — clean external installs, extension interface freeze and independently reviewed self-development PR proof.
+
+Lead should continue deriving the next durable artifacts from these whenever current review/research capacity is available. Cursor should receive follow-on implementation packets only when they are safe/non-conflicting with the active candidate.
 
 ## Immediate next action for Cursor
 
