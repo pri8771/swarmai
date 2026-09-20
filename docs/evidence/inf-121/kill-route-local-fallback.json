@@ -1,0 +1,15 @@
+{
+  "gate": "INF-121",
+  "scenario": "kill_local_route_use_permitted_alternative",
+  "recorded_at": "2026-09-20T20:40:47.705297+00:00",
+  "killed_route": "rt_ollama_gemma3:4b",
+  "killed_availability": "unavailable",
+  "denied_ok": true,
+  "denied_error": "broker_denied:PolicyDeniedError:route_unavailable",
+  "alternative_route": "rt_ollama_qwen3.5:4b",
+  "alternative_ok": true,
+  "alternative_text": "fallback-ok",
+  "total_cost_usd": 0.0,
+  "remote_providers": "not_claimed",
+  "note": "Local kill/fallback only; dual remote providers still live-blocked."
+}

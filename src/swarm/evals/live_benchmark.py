@@ -23,7 +23,10 @@ from swarm.evals.dataset import BenchmarkCase, build_model_input, load_dataset
 from swarm.evals.graders import grade_case
 from swarm.evals.profiles import ProfileStore
 from swarm.evals.wilson import wilson_lower_bound
-from swarm.mission.inference import local_chat
+from swarm.mission.brokered_inference import (
+    brokered_local_chat_sync,
+    build_local_mission_broker,
+)
 
 # Kit task families → starter dataset families.
 FAMILY_MAP: dict[str, str] = {
@@ -276,17 +279,25 @@ def run_live_benchmarks(
 
     store = ProfileStore()
     trials: list[BenchmarkTrial] = []
+    # G12: every model call goes through the shared broker (local zero-spend).
+    broker = build_local_mission_broker(
+        repo_root=root,
+        models=list(selected_models),
+        request_limit=max(50, len(selected_models) * len(cases) + 10),
+    )
 
     for model in selected_models:
         route_id = f"rt_ollama_{model}"
         for case in cases:
             prompt = _case_prompt(case)
             started = time.perf_counter()
-            result = local_chat(
+            result = brokered_local_chat_sync(
+                broker=broker,
                 messages=[{"role": "user", "content": prompt}],
                 model=model,
                 max_tokens=max_tokens,
-                repo_root=root,
+                project_id="proj_eval",
+                purpose="evaluation",
             )
             elapsed_ms = (time.perf_counter() - started) * 1000.0
             if not result.ok:

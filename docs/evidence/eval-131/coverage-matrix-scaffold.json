@@ -41,22 +41,22 @@
       "family": "coding",
       "size": "M",
       "route_id": "rt_ollama_gemma3:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 1579.8829169943929,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "gemma3:4b"
     },
     {
       "family": "coding",
       "size": "M",
       "route_id": "rt_ollama_qwen3.5:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.20654329147389294,
+      "latency_ms_p50": 5588.721584004816,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "qwen3.5:4b"
     },
     {
@@ -173,22 +173,22 @@
       "family": "extract",
       "size": "M",
       "route_id": "rt_ollama_gemma3:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 2604.397415998392,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "gemma3:4b"
     },
     {
       "family": "extract",
       "size": "M",
       "route_id": "rt_ollama_qwen3.5:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.20654329147389294,
+      "latency_ms_p50": 5731.188624995411,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "qwen3.5:4b"
     },
     {
@@ -305,22 +305,22 @@
       "family": "plan",
       "size": "M",
       "route_id": "rt_ollama_gemma3:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.20654329147389294,
+      "latency_ms_p50": 1419.9415000039153,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "gemma3:4b"
     },
     {
       "family": "plan",
       "size": "M",
       "route_id": "rt_ollama_qwen3.5:4b",
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
+      "sample_count": 1,
+      "wilson_lower": 0.20654329147389294,
+      "latency_ms_p50": 2434.2552089947276,
+      "error_rate": 0.0,
+      "state": "provisional",
       "model_fingerprint": "qwen3.5:4b"
     },
     {
@@ -556,5 +556,11 @@
     "screening_min_held_out_per_supported_cell": 5,
     "acceptance_rule": "predeclared; do not change after looking at failures without new reviewed eval version"
   },
-  "status": "scaffold_not_qualified"
+  "status": "scaffold_with_local_provisional_screening",
+  "last_screening": {
+    "run_id": "run_74e8906ef61a46ce9285b04a6027fe32",
+    "updated_cells": 8,
+    "qualification_claimed": false,
+    "at": "2026-09-20T20:41:48.511265+00:00"
+  }
 }
