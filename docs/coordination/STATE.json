@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:48:46Z",
+  "updated_at": "2026-09-20T20:48:55Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -56,9 +56,9 @@
     "implementation": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-006",
+  "last_lead_message_id": "LEAD-20260920-007",
   "last_seen_cursor_message_id": "CURSOR-20260920-011",
-  "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
+  "last_lead_heartbeat_at": "2026-09-20T20:48:55Z",
   "last_cursor_heartbeat_at": "2026-09-20T20:48:46Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -95,82 +95,82 @@
     {
       "id": "FIX-001",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local_console_pending_remote_console_ci",
+      "status": "implemented_current_tip_ci_failed",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "2f91d7d97dd6f027b1d86295eec303e095340381",
-      "review_status": "pending_lead"
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "blocked_current_ci"
     },
     {
       "id": "FIX-002",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local_remote_python_ci_green",
+      "status": "partial_unscoped_idempotency_and_auth_order_remaining",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
-      "review_status": "pending_lead"
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "changes_required"
     },
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local_remote_python_ci_green",
+      "status": "partial_evidence_validation_and_readiness_remaining",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
-      "review_status": "pending_lead"
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "changes_required"
     },
     {
       "id": "FIX-004",
       "owner": "Cursor",
-      "status": "in_progress",
+      "status": "scheduler_checkins_verified_cursor_worker_auth_blocked",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
-      "review_status": "pending"
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "partial"
     },
     {
       "id": "FIX-005",
       "owner": "Cursor",
-      "status": "implemented_tests_verified_local_remote_python_ci_green",
+      "status": "partial_known_answer_bypass_fixed_generic_runtime_boundary_open",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "51b2152a2a87b3504a608add6551c7e2d5c4a133",
-      "review_status": "pending_lead"
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "changes_required"
     },
     {
       "id": "RUN-111",
       "owner": "Cursor",
-      "status": "queued",
+      "status": "in_progress_evidence_posted_not_accepted",
       "scope": "G11 unified generic mission runtime",
-      "source_branch": null,
-      "source_sha": null,
-      "review_status": "pending"
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+      "review_status": "pending_after_g10"
     },
     {
       "id": "INF-121",
       "owner": "Cursor",
-      "status": "queued",
+      "status": "in_progress_local_only_remote_required",
       "scope": "G12 governed concurrent inference pool",
-      "source_branch": null,
-      "source_sha": null,
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
       "review_status": "pending"
     },
     {
       "id": "EVAL-131",
       "owner": "Cursor",
-      "status": "queued",
+      "status": "in_progress_provisional_underpowered",
       "scope": "G13 measured model/family/size qualification",
-      "source_branch": null,
-      "source_sha": null,
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
       "review_status": "pending"
     },
     {
       "id": "SWARM-141",
       "owner": "Cursor",
-      "status": "queued",
+      "status": "prep_in_progress_offline_only",
       "scope": "G14 elastic evidence-driven task graph",
-      "source_branch": null,
-      "source_sha": null,
+      "source_branch": "cursor/v1.4-live-integration-11e2",
+      "source_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
       "review_status": "pending"
     },
     {
@@ -186,32 +186,32 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "repair_in_progress",
-      "evidence": "CURSOR-20260920-004 tip d60394d; PR #14; FIX-004 recurring_verified; FIX-001..005 code on branch",
-      "review": "partial_lead_review_not_accepted"
+      "status": "repair_in_progress_changes_required",
+      "evidence": "PR #14 tip 4021c2de32b040e0760e3f771820380e2581aa4e; CI 35536709246 failed mypy; LEAD-20260920-007 found remaining idempotency/auth, evidence-validation, readiness and generic-runtime defects",
+      "review": "changes_required"
     },
     "G11": {
       "checkpoint": "1.1",
-      "status": "in_progress",
-      "evidence": "MissionStore persistence wired in ProductStore; unified identity unit tests pass; full G11 accept pending",
-      "review": "pending"
+      "status": "in_progress_not_accepted",
+      "evidence": "RUN-111 durable identity/restart/review controls posted; normal mission runtime still parser-specific and G10 open",
+      "review": "pending_after_g10"
     },
     "G12": {
       "checkpoint": "1.2",
-      "status": "not_accepted",
-      "evidence": null,
+      "status": "in_progress_local_only_not_accepted",
+      "evidence": "local concurrent broker + kill-route fallback; required dual remote provider overlap not evidenced",
       "review": "pending"
     },
     "G13": {
       "checkpoint": "1.3",
-      "status": "not_accepted",
-      "evidence": null,
+      "status": "provisional_underpowered_not_accepted",
+      "evidence": "local screening evidence exists; required coverage/sample confidence not met",
       "review": "pending"
     },
     "G14": {
       "checkpoint": "1.4",
-      "status": "not_accepted",
-      "evidence": null,
+      "status": "offline_prep_not_accepted",
+      "evidence": "offline graph/10-50-100/elastic-vs-fixed artifacts only; live multi-planner proof absent",
       "review": "pending"
     }
   },
@@ -234,42 +234,48 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "DB integration blocked: empty SWARM_DATABASE_URL; local compose db volume chmod failed",
-    "Cursor unattended agent auth_required for spawn (check-in runner verified without agent)",
-    "G10 lead acceptance pending; G11 full accept + G12-G14 live gates not done"
+    "Current PR #14 tip 4021c2de32b040e0760e3f771820380e2581aa4e fails CI run 35536709246 at mypy; downstream offline steps did not execute",
+    "G10 auth/idempotency contract incomplete on non-mission mutation routes and optional bootstrap demo principals",
+    "G10 evidence/readiness contract incomplete: evidence-file presence and provider readiness still fail closed-policy requirements",
+    "Normal mission run remains parser-specific; generic RUN-111 path is not yet the sole operational mission path",
+    "Cursor unattended agent CLI remains Not logged in; scheduled check-in probe is not the same as a verified worker spawn",
+    "G12 remote dual-provider, G13 qualification, G14 live adaptive swarm and LIVE-142 remain unaccepted"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T20:27:30Z",
+    "verified_at": "2026-09-20T20:48:55Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_pr_count": 1,
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "ece52ce09be521cbba9e8dc238d48ce459cb6c68",
-    "cursor_ack_observed": true,
-    "remote_integration_branch_observed": true,
-    "post_authorization_remote_application_commit_observed": true,
-    "repaired_remote_ci_candidate_observed": true,
-    "latest_verified_ci_run_id": 35533664961,
-    "latest_verified_ci_offline_job_id": 106138722416,
-    "latest_verified_ci_live_gated_job_id": 106138722542,
-    "latest_verified_ci_conclusion": "success",
-    "ruff_executed": true,
+    "candidate_sha": "4021c2de32b040e0760e3f771820380e2581aa4e",
+    "commits_ahead_of_main": 15,
+    "latest_verified_ci_run_id": 35536709246,
+    "latest_verified_ci_conclusion": "failure",
+    "console_job_id": 106146927897,
+    "console_conclusion": "success",
+    "offline_job_id": 106146927938,
+    "offline_conclusion": "failure",
     "ruff_passed": true,
-    "mypy_executed": true,
-    "mypy_passed": true,
-    "python_offline_pytest_executed": true,
-    "python_offline_pytest_passed": 211,
-    "python_offline_pytest_skipped": 2,
-    "db_integration_executed": false,
-    "frontend_npm_checks_executed_in_remote_ci": false,
+    "mypy_passed": false,
+    "mypy_error": "src/swarm/mission/runtime.py:46 SharedInferenceBroker assigned to None-typed attribute",
+    "downstream_install_alembic_pytest_executed": false,
+    "live_gated_job_conclusion": "success_blocked_notice_only",
     "live_acceptance_executed": false
   },
   "implementation_notes": {
-    "cursor_tip": "74b46e3f457cc18f23f082b763a17172513bdc2e",
-    "optional_db": "local_postgres_up",
-    "optional_cursor_login": "waiting_browser_auth",
+    "cursor_tip": "4021c2de32b040e0760e3f771820380e2581aa4e",
+    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed",
+    "optional_cursor_login": "not_logged_in_waiting_browser_auth",
     "run111_accept_evidence": "posted_not_lead_accepted",
     "inf121": "local_concurrent_and_kill_fallback_remote_blocked",
-    "eval131": "local_provisional_screening_underpowered"
+    "eval131": "local_provisional_screening_underpowered",
+    "swarm141": "offline_prep_only",
+    "lead_findings": [
+      "unscoped idempotency remains on provider/evaluation/worker routes; worker enroll cache before project auth",
+      "optional operational bootstrap still seeds fixed known demo principals",
+      "release verification still passes on evidence-file presence without SHA/freshness/result validation",
+      "provider registry still infers zero-spend/readiness/suitability from policy/config/provider identity",
+      "normal mission run still routes through parser-specific RepoWorker dogfood path"
+    ]
   }
 }
