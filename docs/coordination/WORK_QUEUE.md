@@ -70,7 +70,7 @@ Accept: actual overlapping calls to two independent remote providers in one miss
 
 ## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-Status: `provisional_underpowered_not_accepted` — dataset holdouts expanded to 5/cell; partial S n=5 local screening exists; required coverage/uncertainty criteria still not met. Owner: Cursor/evaluation.
+Status: `provisional_underpowered_not_accepted` — dataset holdouts 5/cell; S+M × 6 families × 2 models local $0 screening at n=5 (24 cells) recorded; L/XL + third config + acceptance criterion still open. Owner: Cursor/evaluation.
 
 Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
 
@@ -94,4 +94,4 @@ Accept: no known unresolved supported-V1.4 defects; no unexpected application er
 
 ## Immediate next action
 
-G10 is **packaged for lead accept** at tip `0ba091373e8995524c74e637149b1af71f0e0aea` (`docs/evidence/g10/LEAD_ACCEPT_PACKAGE.md` on integration branch). Prior CI green on `3c82e0f` (run `35538395519`); confirm CI on current tip. G13 holdout dataset now 5/cell with partial S n=5 screening (provisional). Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.
+G10 remains **packaged for lead accept** (not invented). Integration tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc` adds broader G13 S+M dual-model n=5 $0 screening (24 provisional cells); CI tip green retained on `3b0011f` run `35539303334`; confirm CI on `f75c6cb`. G13 still provisional/not qualified. Do not clear `SWARM_HOURLY_SKIP_CURSOR_PROBE` until CLI status verifies. No merge/spend/launch.

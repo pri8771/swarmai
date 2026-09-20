@@ -926,3 +926,48 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - INF-121 remote dual live-blocked; EVAL not qualified; SWARM-141 live absent; LIVE-142 not started.
 - No merge/spend/launch.
 
+## CURSOR-20260920-016
+
+- UTC: 2026-09-20T21:50:02Z
+- From: Cursor / implementation worker
+- Tip: `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc`
+- Screening code tip: `3b0011f0605573ab77318981691f588ac72f912f`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: continue G13 $0 screening + ready V1.4 offline (no invent lead accept / login / remote INF-121 / LIVE-142)
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+- `SWARM_HOURLY_SKIP_CURSOR_PROBE` cleared: **no**
+- Hourly/unattended spawn resumed: **no**
+
+### Done
+- Broader G13 EVAL-131 local $0 screening completed (brokered Ollama; SWARM_ALLOW_PAID=false):
+  - S-band all 6 families × gemma3:4b+qwen3.5:4b, max_per_cell=5 → `run_cf7c9c9668d042da9882210ba5ff2ae8` (60 trials, $0)
+  - M-band all 6 families × gemma3:4b+qwen3.5:4b → `run_1138a27910354d5a95618950152aaf71` (60 trials, $0)
+  - Aggregated provisional matrix now **24 cells at n≥5** (S+M × 6 families × 2 models); qualification_claimed=false
+- Strong provisional cells (not qualified): planning S/M both models pass_rate=1.0; reasoning S/M qwen3.5=1.0; coding M qwen3.5=1.0; extraction S/M qwen3.5=0.8
+- Weak/zero provisional: review + summarization both models both sizes =0.0; gemma3 coding/extraction weak
+- G11 default-path-not-parser re-verified on tip; G11–G14 evidence indexes rebound to 3b0011f/f75c6cb
+- Did **not** invent G10 lead accept; did **not** clear SKIP; did **not** start remote INF-121 or LIVE-142; no merge/spend/launch
+
+### Evidence
+- `docs/evidence/eval-131/holdout-S-n5-all-families-dual-model-screening-summary.json`
+- `docs/evidence/eval-131/holdout-M-n5-all-families-dual-model-screening-summary.json`
+- `docs/evidence/eval-131/run_cf7c9c9668d042da9882210ba5ff2ae8.json`
+- `docs/evidence/eval-131/run_1138a27910354d5a95618950152aaf71.json`
+- `docs/evidence/eval-131/aggregated-provisional-matrix.json`
+- `docs/evidence/g13/EVIDENCE_INDEX.md` + `GATE_MATRIX.md` + master `EVIDENCE_INDEX.md`
+- Draft PR #14 tip `f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc`
+
+### Next
+- Lead: G10 accept review still required (package at prior tips; not invented here).
+- Await CI on tip `f75c6cb…` (push run `35539853498` in_progress at post time); post when green.
+- Continue G13: optional third local model and/or L/XL if dataset support exists — still provisional until acceptance criterion declared.
+- G12 remote dual only with verified zero-charge remote capacity; G14 live multi-planner only after capacity; LIVE-142 not started.
+- Operator: fresh `cursor agent login` with live waiter; only after `status`/`whoami` verify may SKIP clear + hourly proofs resume.
+
+### Blockers
+- **cursor agent CLI still Not logged in** — SKIP uncleared by policy.
+- G10 lead accept pending (packaged, not invented).
+- INF-121 remote dual live-blocked; EVAL not qualified (L/XL + third config + acceptance criterion open); SWARM-141 live absent; LIVE-142 not started.
+- No merge/spend/launch.
+
