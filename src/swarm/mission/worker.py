@@ -143,7 +143,7 @@ class RepoWorker:
 
     def _inspect(self, task: TaskSpec, *, mission_id: str) -> WorkerResult:
         target = self.repo / OFF_BY_ONE_REL
-        findings = {
+        findings: dict[str, Any] = {
             "mission_id": mission_id,
             "goal": task.inputs.get("goal"),
             "candidate_files": [],

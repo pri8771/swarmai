@@ -556,7 +556,7 @@ def main() -> None:
         if not ds.is_absolute():
             ds = _repo_root() / ds
         try:
-            report = run_live_benchmarks(
+            live_bench = run_live_benchmarks(
                 repo=_repo_root(),
                 dataset=ds,
                 models=getattr(args, "models", None),
@@ -568,18 +568,22 @@ def main() -> None:
             print(json.dumps({"error": str(exc)}, indent=2))
             raise SystemExit(2) from exc
         summary = {
-            "run_id": report.run_id,
-            "models": report.models,
-            "case_ids": report.case_ids,
-            "trial_count": len(report.trials),
-            "passed": sum(1 for t in report.trials if t.correct),
-            "failed": sum(1 for t in report.trials if not t.correct and not t.error),
-            "errors": sum(1 for t in report.trials if t.error),
-            "total_cost_usd": report.total_cost_usd,
-            "mock_vs_live": report.mock_vs_live,
-            "cells": report.cells,
-            "profiles_summary": report.profiles_summary,
-            "report_hash": report.report_hash,
+            "run_id": live_bench.run_id,
+            "models": live_bench.models,
+            "case_ids": live_bench.case_ids,
+            "trial_count": len(live_bench.trials),
+            "passed": sum(1 for trial in live_bench.trials if trial.correct),
+            "failed": sum(
+                1
+                for trial in live_bench.trials
+                if not trial.correct and not trial.error
+            ),
+            "errors": sum(1 for trial in live_bench.trials if trial.error),
+            "total_cost_usd": live_bench.total_cost_usd,
+            "mock_vs_live": live_bench.mock_vs_live,
+            "cells": live_bench.cells,
+            "profiles_summary": live_bench.profiles_summary,
+            "report_hash": live_bench.report_hash,
         }
         print(json.dumps(summary, indent=2, default=str))
     elif args.command == "eval" and args.eval_command == "route":
@@ -610,10 +614,10 @@ def main() -> None:
             report_dir = Path(args.report_dir)
         else:
             report_dir = root / "var" / "reports" / "demo"
-        report = asyncio.run(
+        demo_report = asyncio.run(
             run_parser_issue_demo(mode=args.mode, report_dir=report_dir.resolve())
         )
-        print(json.dumps(report.to_dict(), indent=2, default=str))
+        print(json.dumps(demo_report.to_dict(), indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "self-development":
         from swarm.selfdev.runner import run_self_development
 
@@ -701,9 +705,9 @@ def main() -> None:
     elif args.command == "release" and args.release_command == "demo-suite":
         from swarm.release.demo_suite import run_public_demo_suite
 
-        demo = run_public_demo_suite(_repo_root())
-        print(json.dumps(demo, indent=2, default=str))
-        if not demo.get("ok"):
+        demo_suite = run_public_demo_suite(_repo_root())
+        print(json.dumps(demo_suite, indent=2, default=str))
+        if not demo_suite.get("ok"):
             raise SystemExit(2)
     elif args.command == "release" and args.release_command == "freeze":
         from swarm.release.contract_freeze import freeze_public_contracts
@@ -810,7 +814,7 @@ def main() -> None:
         from swarm.runtime.scale import run_scale_mission
 
         load_repo_dotenv(_repo_root())
-        report = run_scale_mission(
+        scale_report = run_scale_mission(
             repo=_repo_root(),
             goal=args.goal,
             agent_count=args.agents,
@@ -818,30 +822,30 @@ def main() -> None:
             use_supervisor_model=not args.no_supervisor_model,
         )
         summary = {
-            "run_id": report.run_id,
-            "agent_count": report.agent_count,
-            "task_count": report.task_count,
-            "completed": report.completed,
-            "failed": report.failed,
-            "duplicates_suppressed": report.duplicates_suppressed,
-            "consensus": report.consensus,
-            "total_cost_usd": report.total_cost_usd,
-            "runtime_ms": report.runtime_ms,
-            "scheduler_stats": report.scheduler_stats,
-            "report_hash": report.report_hash,
-            "mock_vs_live": report.mock_vs_live,
+            "run_id": scale_report.run_id,
+            "agent_count": scale_report.agent_count,
+            "task_count": scale_report.task_count,
+            "completed": scale_report.completed,
+            "failed": scale_report.failed,
+            "duplicates_suppressed": scale_report.duplicates_suppressed,
+            "consensus": scale_report.consensus,
+            "total_cost_usd": scale_report.total_cost_usd,
+            "runtime_ms": scale_report.runtime_ms,
+            "scheduler_stats": scale_report.scheduler_stats,
+            "report_hash": scale_report.report_hash,
+            "mock_vs_live": scale_report.mock_vs_live,
         }
         print(json.dumps(summary, indent=2, default=str))
-        if report.consensus.get("decision") != "accept":
+        if scale_report.consensus.get("decision") != "accept":
             raise SystemExit(2)
     elif args.command == "memory" and args.memory_command == "retrieve":
         from swarm.memory.store import MemoryStore, retrieve_context
 
-        store = MemoryStore(_repo_root() / "var" / "memory")
+        mem_store = MemoryStore(_repo_root() / "var" / "memory")
         print(
             json.dumps(
                 retrieve_context(
-                    store, query=args.query, token_budget=args.token_budget
+                    mem_store, query=args.query, token_budget=args.token_budget
                 ),
                 indent=2,
                 default=str,
@@ -871,8 +875,8 @@ def main() -> None:
     elif args.command == "projects" and args.projects_command == "create":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        cfg = store.create(
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        cfg = proj_store.create(
             name=args.name,
             repo_path=Path(args.repo).resolve() if args.repo else _repo_root(),
             project_id=args.project_id,
@@ -881,17 +885,17 @@ def main() -> None:
     elif args.command == "projects" and args.projects_command == "list":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        print(json.dumps({"projects": store.list_projects()}, indent=2, default=str))
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps({"projects": proj_store.list_projects()}, indent=2, default=str))
     elif args.command == "projects" and args.projects_command == "show":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        print(json.dumps(store.get(args.project_id).to_dict(), indent=2, default=str))
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps(proj_store.get(args.project_id).to_dict(), indent=2, default=str))
     elif args.command == "projects" and args.projects_command == "update":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
         patch: dict[str, object] = {}
         for item in args.set:
             if "=" not in item:
@@ -901,7 +905,13 @@ def main() -> None:
                 patch[key] = json.loads(raw)
             except json.JSONDecodeError:
                 patch[key] = raw
-        print(json.dumps(store.update(args.project_id, **patch).to_dict(), indent=2, default=str))
+        print(
+            json.dumps(
+                proj_store.update(args.project_id, **patch).to_dict(),
+                indent=2,
+                default=str,
+            )
+        )
     elif args.command == "product" and args.product_command == "contract":
         from swarm.product.contracts import public_product_contract
 

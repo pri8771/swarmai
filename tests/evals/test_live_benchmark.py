@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from swarm.evals.live_benchmark import (
-    BenchmarkTrial,
     FAMILY_MAP,
+    BenchmarkTrial,
     _aggregate_cells,
     best_models_by_family,
     select_benchmark_models,

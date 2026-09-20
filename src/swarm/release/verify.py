@@ -152,7 +152,10 @@ def verify_release(repo_root: Path | None = None) -> ReleaseVerifyReport:
         )
 
     matrix = {
-        "implemented": "V0.1–V0.8 product modules (missions, routing, scale, memory, tools, selfdev, reliability, product UX)",
+        "implemented": (
+            "V0.1–V0.8 product modules (missions, routing, scale, memory, "
+            "tools, selfdev, reliability, product UX)"
+        ),
         "offline_tested": "yes",
         "live_local_tested": "partial — Ollama/provider probes + journey proofs under zero-spend",
         "cloud_live_tested": "no",

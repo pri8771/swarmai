@@ -125,7 +125,7 @@ class ProductStore:
         if mission_id in self.controller.missions:
             mission = self.controller.missions[mission_id]
             graph = self.graph_view(mission_id)
-            return strip_internal(
+            payload = strip_internal(
                 scrub_config(
                     {
                         "mission": mission.model_dump(mode="json"),
@@ -134,6 +134,8 @@ class ProductStore:
                     }
                 )
             )
+            assert isinstance(payload, dict)
+            return payload
         try:
             return self.history_index().reopen(mission_id)
         except (OSError, KeyError, TypeError, FileNotFoundError) as exc:

@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -25,19 +25,76 @@ PAID_INFERENCE_BLOCKED = frozenset({"together", "fireworks"})
 
 # Auth probe endpoints (models.list style) — metadata only, no generation.
 PROBE_SPECS: dict[str, dict[str, Any]] = {
-    "openrouter": {"url": "https://openrouter.ai/api/v1/models", "auth": "bearer", "env": "OPENROUTER_API_KEY"},
-    "groq": {"url": "https://api.groq.com/openai/v1/models", "auth": "bearer", "env": "GROQ_API_KEY"},
-    "gemini": {"url_env": "GEMINI_API_KEY", "url_fmt": "https://generativelanguage.googleapis.com/v1beta/models?key={key}&pageSize=1", "auth": "query", "env": "GEMINI_API_KEY"},
-    "mistral": {"url": "https://api.mistral.ai/v1/models", "auth": "bearer", "env": "MISTRAL_API_KEY"},
-    "cohere": {"url": "https://api.cohere.com/v1/models", "auth": "bearer", "env": "COHERE_API_KEY"},
-    "anthropic": {"url": "https://api.anthropic.com/v1/models", "auth": "anthropic", "env": "ANTHROPIC_API_KEY"},
-    "nvidia_nim": {"url": "https://integrate.api.nvidia.com/v1/models", "auth": "bearer", "env": "NVIDIA_API_KEY"},
-    "huggingface_inference": {"url": "https://huggingface.co/api/whoami-v2", "auth": "bearer", "env": "HF_TOKEN"},
-    "deepinfra": {"url": "https://api.deepinfra.com/v1/openai/models", "auth": "bearer", "env": "DEEPINFRA_API_KEY"},
-    "replicate": {"url": "https://api.replicate.com/v1/account", "auth": "token", "env": "REPLICATE_API_TOKEN"},
-    "fireworks": {"url": "https://api.fireworks.ai/inference/v1/models", "auth": "bearer", "env": "FIREWORKS_API_KEY"},
-    "together": {"url": "https://api.together.xyz/v1/models", "auth": "bearer", "env": "TOGETHER_API_KEY", "ua": True},
-    "ollama": {"url": "http://127.0.0.1:11434/api/tags", "auth": "none", "env": "OLLAMA_BASE_URL"},
+    "openrouter": {
+        "url": "https://openrouter.ai/api/v1/models",
+        "auth": "bearer",
+        "env": "OPENROUTER_API_KEY",
+    },
+    "groq": {
+        "url": "https://api.groq.com/openai/v1/models",
+        "auth": "bearer",
+        "env": "GROQ_API_KEY",
+    },
+    "gemini": {
+        "url_env": "GEMINI_API_KEY",
+        "url_fmt": (
+            "https://generativelanguage.googleapis.com/v1beta/models"
+            "?key={key}&pageSize=1"
+        ),
+        "auth": "query",
+        "env": "GEMINI_API_KEY",
+    },
+    "mistral": {
+        "url": "https://api.mistral.ai/v1/models",
+        "auth": "bearer",
+        "env": "MISTRAL_API_KEY",
+    },
+    "cohere": {
+        "url": "https://api.cohere.com/v1/models",
+        "auth": "bearer",
+        "env": "COHERE_API_KEY",
+    },
+    "anthropic": {
+        "url": "https://api.anthropic.com/v1/models",
+        "auth": "anthropic",
+        "env": "ANTHROPIC_API_KEY",
+    },
+    "nvidia_nim": {
+        "url": "https://integrate.api.nvidia.com/v1/models",
+        "auth": "bearer",
+        "env": "NVIDIA_API_KEY",
+    },
+    "huggingface_inference": {
+        "url": "https://huggingface.co/api/whoami-v2",
+        "auth": "bearer",
+        "env": "HF_TOKEN",
+    },
+    "deepinfra": {
+        "url": "https://api.deepinfra.com/v1/openai/models",
+        "auth": "bearer",
+        "env": "DEEPINFRA_API_KEY",
+    },
+    "replicate": {
+        "url": "https://api.replicate.com/v1/account",
+        "auth": "token",
+        "env": "REPLICATE_API_TOKEN",
+    },
+    "fireworks": {
+        "url": "https://api.fireworks.ai/inference/v1/models",
+        "auth": "bearer",
+        "env": "FIREWORKS_API_KEY",
+    },
+    "together": {
+        "url": "https://api.together.xyz/v1/models",
+        "auth": "bearer",
+        "env": "TOGETHER_API_KEY",
+        "ua": True,
+    },
+    "ollama": {
+        "url": "http://127.0.0.1:11434/api/tags",
+        "auth": "none",
+        "env": "OLLAMA_BASE_URL",
+    },
 }
 
 
@@ -136,7 +193,7 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
     catalog = load_catalog()
     paid = _paid_allowed()
     records: list[ProviderCapabilityRecord] = []
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     for entry in catalog.get("providers", []):
         pid = entry["id"]
@@ -173,12 +230,32 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
         else:
             cost_policy = "zero_spend_ok" if not paid else "paid_allowed"
 
-        if key_ok and not retired and pid not in DEFERRED_PROVIDERS and probe and pid in PROBE_SPECS:
+        if (
+            key_ok
+            and not retired
+            and pid not in DEFERRED_PROVIDERS
+            and probe
+            and pid in PROBE_SPECS
+        ):
             health, latency, model_count, notes2 = _probe(pid)
             notes = (notes + "; " if notes else "") + notes2
             if health == "healthy":
                 qual = "auth_ok"
-                if pid in {"ollama", "groq", "openrouter", "gemini", "mistral", "cohere", "anthropic", "nvidia_nim", "huggingface_inference", "deepinfra", "replicate", "cloudflare_workers_ai"}:
+                coding_medium_ids = {
+                    "ollama",
+                    "groq",
+                    "openrouter",
+                    "gemini",
+                    "mistral",
+                    "cohere",
+                    "anthropic",
+                    "nvidia_nim",
+                    "huggingface_inference",
+                    "deepinfra",
+                    "replicate",
+                    "cloudflare_workers_ai",
+                }
+                if pid in coding_medium_ids:
                     coding = "medium"
                 if pid == "ollama":
                     coding = "high"  # local always preferred for zero-spend dogfood
@@ -186,7 +263,12 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
         if pid in PAID_INFERENCE_BLOCKED and not paid and health == "healthy":
             qual = "auth_ok_inference_blocked"
 
-        available = bool(key_ok and health in {"healthy", "unprobed"} and pid not in DEFERRED_PROVIDERS and not retired)
+        available = bool(
+            key_ok
+            and health in {"healthy", "unprobed"}
+            and pid not in DEFERRED_PROVIDERS
+            and not retired
+        )
         if pid in PAID_INFERENCE_BLOCKED and not paid:
             available = False  # not available for inference routing
 
@@ -197,7 +279,9 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
                 health = "healthy"
                 qual = "auth_ok"
                 coding = "medium"
-                notes = (notes + "; " if notes else "") + "account+token configured; models.search deferred"
+                notes = (notes + "; " if notes else "") + (
+                    "account+token configured; models.search deferred"
+                )
 
         records.append(
             ProviderCapabilityRecord(
@@ -226,7 +310,12 @@ def build_capability_registry(*, probe: bool = True, repo: Path | None = None) -
         "generated_at": now,
         "swarm_allow_paid": paid,
         "provider_count": len(records),
-        "available_for_routing": sum(1 for r in records if r.available or r.qualification_status in {"auth_ok", "auth_ok_inference_blocked"}),
+        "available_for_routing": sum(
+            1
+            for r in records
+            if r.available
+            or r.qualification_status in {"auth_ok", "auth_ok_inference_blocked"}
+        ),
         "auth_ok": sum(1 for r in records if r.qualification_status.startswith("auth_ok")),
         "providers": [asdict(r) for r in records],
     }
@@ -245,7 +334,10 @@ def routable_providers(report: dict[str, Any] | None = None) -> list[dict[str, A
     data = report or build_capability_registry(probe=False)
     rows = []
     for p in data.get("providers", []):
-        if p.get("qualification_status") in {"auth_ok", "benchmarked", "routable"} and p.get("cost_policy") == "zero_spend_ok":
+        if (
+            p.get("qualification_status") in {"auth_ok", "benchmarked", "routable"}
+            and p.get("cost_policy") == "zero_spend_ok"
+        ):
             rows.append(p)
         elif p.get("provider_id") == "ollama" and p.get("health") in {"healthy", "unprobed"}:
             rows.append(p)

@@ -152,6 +152,18 @@ def run_self_development(
       - malicious: privilege markers → policy reject
     """
     if mode == "live":
+        # Default CLI/product path blocks live self-dev until an explicit
+        # qualified live gate is enabled. Call run_live_self_development()
+        # directly only from authorized local live campaigns.
+        import os
+
+        if os.environ.get("SWARM_ALLOW_LIVE_SELFDEV", "").strip() not in {
+            "1",
+            "true",
+            "TRUE",
+            "yes",
+        }:
+            raise PermissionError("live_selfdev_blocked")
         return run_live_self_development(
             report_dir=report_dir,
             issue_path=issue_path,
