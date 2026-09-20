@@ -29,6 +29,18 @@ Use existing libraries where they replace infrastructure. Preserve the elastic c
 
 Acceptance binds to exact source/config/route versions, commands, results and evidence mode. Never claim a test ran from a document/file name, a configured key, a fake success flag or a passing test count alone. Failed or unavailable live gates remain failed/blocked. Pre-register test outcomes and keep failed attempts. Review findings before changing a gate; do not redefine success after failure.
 
+## Artifact-oriented project management
+
+The owner selected artifact-oriented project management as the default operating model. Read `docs/coordination/ARTIFACT_MANAGEMENT.md` and `ARTIFACT_REGISTRY.json`.
+
+`ARTIFACT_REGISTRY.json` is the canonical project-state registry. Versions are accepted artifact sets, not task counts. `WORK_QUEUE.md` and `WORKER_PACKET_BACKLOG.md` are execution views derived from missing/blocked artifact state.
+
+Every meaningful task/packet must name the artifact it advances and intended artifact state transition. Story points are secondary worker-sizing metadata only.
+
+The lead should directly create durable current/future artifacts when that is the best use of lead capacity: architecture, contracts, ADRs, benchmark designs, threat models, migration/recovery plans, acceptance protocols, research/evaluation artifacts, runbooks and independent reviews. Do not wait for the active version to finish before producing useful non-conflicting future artifacts.
+
+Cursor remains the implementation workhorse. The lead should translate artifact gaps into bounded SP1-SP3 Cursor packets and avoid taking routine code/test execution away from the worker. Future implementation that could destabilize the active release candidate must be isolated/explicitly coordinated; future design/research artifacts may progress continuously.
+
 ## Lead/worker division and story points
 
 The owner directed the lead to keep useful work flowing: Cursor should receive the bulk of executable implementation, especially routine/easy work, while ChatGPT focuses on architecture, decomposition, hard debugging, evidence design and independent review. Use `docs/coordination/WORKER_STORY_POINT_PROTOCOL.md`, `WORKER_PACKET_BACKLOG.md` and `WORKER_PERFORMANCE.json`.
