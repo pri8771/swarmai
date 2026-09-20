@@ -1,6 +1,6 @@
 # G11 / RUN-111 evidence index
 
-**Tip binding:** package recorded against `3c82e0feecb370a6c8cef363ef85cb363407d1d1`  
+**Tip binding:** package recorded against `6dd568cdfda5b6dd73600915965c1abbf3b9100b`  
 **Lead accepted:** no  
 **Spend:** $0 claimed in listed artifacts
 

@@ -1,6 +1,6 @@
 # G13 / EVAL-131 evidence index
 
-**Tip binding:** `3c82e0feecb370a6c8cef363ef85cb363407d1d1`  
+**Tip binding:** `6dd568cdfda5b6dd73600915965c1abbf3b9100b`  
 **Qualification claimed:** **false** · underpowered until measured ≥5 held-out/cell with acceptance criterion
 
 | Artifact | Claim | Not claimed |

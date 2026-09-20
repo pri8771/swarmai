@@ -2,7 +2,8 @@
 
 Updated: 2026-09-20T21:25:04Z
 Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
-Candidate tip: `3c82e0feecb370a6c8cef363ef85cb363407d1d1` 
+Candidate tip: `6dd568cdfda5b6dd73600915965c1abbf3b9100b` 
+Prior CI-green docs tip: `3c82e0f…`; LEAD-009 code: `108145ea…`
 cursor agent status: Not logged in (SKIP_CURSOR_PROBE not cleared; spawn not resumed)
 CI: tip `3c82e0f` runs `35538395519` / `35538397490` **success** (offline+console)
 

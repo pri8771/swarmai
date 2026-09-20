@@ -1,6 +1,6 @@
 # G10 findings resolution matrix (AUD-01…11 → tip evidence)
 
-**Candidate tip:** `3c82e0feecb370a6c8cef363ef85cb363407d1d1`  
+**Candidate tip:** `6dd568cdfda5b6dd73600915965c1abbf3b9100b`  
 **Pinned audit:** `docs/coordination/AUDIT_V1_2026-09-20.md` (coordination branch; immutable)  
 **Worker view only — not lead acceptance**
 
