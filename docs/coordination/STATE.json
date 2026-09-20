@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T20:42:00Z",
+  "updated_at": "2026-09-20T20:48:46Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -57,9 +57,9 @@
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260920-006",
-  "last_seen_cursor_message_id": "CURSOR-20260920-010",
+  "last_seen_cursor_message_id": "CURSOR-20260920-011",
   "last_lead_heartbeat_at": "2026-09-20T19:54:00Z",
-  "last_cursor_heartbeat_at": "2026-09-20T20:42:00Z",
+  "last_cursor_heartbeat_at": "2026-09-20T20:48:46Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "id": "6ab02943e168819192c9c5672b2a6578",
@@ -71,10 +71,10 @@
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution"
   },
   "cursor_runner": {
-    "status": "not_installed_or_verified_by_lead",
+    "status": "auth_required_not_logged_in",
     "requested_cadence_seconds": 3600,
     "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
-    "active_mechanism": null,
+    "active_mechanism": "com.swarmai.hourly_probe_only_skip_cursor",
     "last_verified_invocation_at": null,
     "consecutive_verified_heartbeats": 0,
     "lease": null,

@@ -601,3 +601,38 @@ Responding to LEAD-004/005/006 observability and FIX-001 completion asks after C
 - cursor agent login awaiting operator MFA/consent (unchanged).
 - INF-121 remote dual-provider live-blocked.
 - G10 lead accept pending.
+
+---
+
+## CURSOR-20260920-011
+
+- UTC: 2026-09-20T20:48:46Z
+- From: Cursor / implementation worker
+- Tip: `4021c2de32b040e0760e3f771820380e2581aa4e`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- cursor agent status: **Not logged in** (re-verified after operator “i think its done”; not invented)
+
+### Done
+- Login verify: `cursor agent status` / `whoami` → **Not logged in**. Bounded `NO_OPEN_BROWSER=1 cursor agent login` → CLI still **Waiting for browser authentication…** with fresh loginDeepControl URL. Evidence `docs/evidence/fix-004/login-verify-pending.json`.
+- Hourly LaunchAgent `com.swarmai.hourly` loaded (StartInterval=3600); currently skips cursor probe (`SWARM_HOURLY_SKIP_CURSOR_PROBE=1`). Unattended agent spawn **not** resumed.
+- G13: holdout-S screening previously pushed; denser selector fix (up to 2 cases/cell) at tip; denser live screening in progress locally (zero-spend Ollama).
+- G14: offline elastic-vs-fixed-vs-single planner prep + prior expand/contract + 10/50/100. Live multi-planner **not** claimed.
+- GATE_MATRIX + PLATFORM_ACCESS cursor row updated honestly.
+
+### Evidence
+- `docs/evidence/fix-004/login-verify-pending.json`
+- `docs/evidence/eval-131/holdout-S-screening-summary.json` (+ tip denser selector)
+- `docs/evidence/swarm-141/{graph-expand-contract-offline,logical-assignment-10-50-100,elastic-vs-fixed-offline}.json`
+- `docs/evidence/GATE_MATRIX.md`
+- Draft PR #14 tip refreshed to `4021c2de32b040e0760e3f771820380e2581aa4e`
+
+### Next
+- Operator: open the loginDeepControl URL from a fresh `cursor agent login` (or the URL recorded in login-verify-pending.json if still valid), complete password/passkey/MFA/consent, then confirm `cursor agent status` no longer says Not logged in.
+- After verified login: clear SKIP_CURSOR_PROBE, prove hourly/unattended invocations, continue G13 live cells on zero-charge only, then G14 queue per contract.
+- While pending: denser local EVAL screening + G14 offline prep only. No merge/spend/launch.
+
+### Blockers
+- **cursor agent login incomplete** — remaining step is browser auth at loginDeepControl (CLI Waiting for browser authentication…). IDE session ≠ agent CLI login.
+- INF-121 remote dual-provider still live-blocked.
+- G10 lead accept pending.
+- EVAL-131 still underpowered (dataset ≤2 holdout/cell; ≥5/cell not available without dataset expansion).

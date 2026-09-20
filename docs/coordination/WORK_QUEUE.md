@@ -40,7 +40,7 @@ Accept: missing/stale/failed evidence prevents the corresponding pass. Broken ru
 
 ### FIX-004 — platform sessions and real hourly worker
 
-Status: `implemented_local_runner_verified_recurring` at `d60394d`; lead review pending. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; unattended cursor agent spawn still auth_required.
+Status: `implemented_local_runner_verified_recurring`; lead review pending. P1. Audit AUD-11. LaunchAgent installed; recurring_verified=true; **cursor agent status still Not logged in** after operator claim (loginDeepControl pending); unattended spawn not resumed.
 
 Follow PLATFORM_ACCESS.md and CURSOR_HOURLY_PROMPT.md. Maintain per-platform aliases, login method/profile, private credential refs and actual session-check times. Preserve existing Google SSO restrictions. Restore the original protected destination after the essential human login step. The reported Apply URL itself is unavailable here; do not invent a reproduction. An authorized controlled expired-session test is distinct from reproducing that exact incident.
 
@@ -72,7 +72,7 @@ Accept: actual overlapping calls to two independent remote providers in one miss
 
 ## G13 / V1.3 — EVAL-131: task/size evidence and selection
 
-Status: `in_progress` — local provisional screening only (underpowered); remote/qualification not claimed. Owner: Cursor/evaluation.
+Status: `in_progress` — M + holdout-S provisional (underpowered); denser 2/cell selector landed; qualification not claimed. Owner: Cursor/evaluation.
 
 Three actual model configurations; four task families and four sizes. Measured coverage matrix, calibration/held-out separation, predeclared quality/uncertainty and resource rules, exact prompt/tool/model versions, all outcomes and overhead. Invalid/unsupported cells remain explicit; qualify routes only where evidence supports them. Every required family/size needs at least one qualified route, not every model qualifying at every size.
 
@@ -80,7 +80,7 @@ Accept: routing uses observed matching profiles and handles failure via bounded 
 
 ## G14 / V1.4 — SWARM-141: adaptive graph and organization
 
-Status: queued; follows G11/G12 contracts and G13 qualification. Owner: orchestration lane.
+Status: `prep_in_progress` — offline graph/scale/elastic evidence only; live multi-planner not claimed. Owner: orchestration lane.
 
 Validated graph revisions for spawn/split/merge/reassign/cancel/review and multiple planning approaches; independent investigations, evidence exchange, duplicate suppression and bounded delegation. Separate logical agents, active sessions, requests and processes. Preserve permission/resource checks on every expansion.
 
