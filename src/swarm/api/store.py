@@ -1,0 +1,346 @@
+"""In-memory product API store — wires controller, workers, events, approvals."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import timedelta
+from typing import Any
+
+from swarm.api.errors import ApiError
+from swarm.api.events import EventLog
+from swarm.broker.explain import build_mock_broker, explain_capacity
+from swarm.contracts.common import new_id, payload_hash, utc_now
+from swarm.contracts.enums import MissionStatus, TaskStatus
+from swarm.contracts.fixtures import sample_provider_account, sample_route, sample_route_beta
+from swarm.contracts.mission import Mission
+from swarm.contracts.provider import ProviderAccount, RouteSnapshot
+from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
+from swarm.controller.mission import MissionController
+from swarm.evals.profiles import ProfileStore
+from swarm.providers.catalog import list_providers
+from swarm.workers.registry import WorkerRegistryService
+
+
+def _scrub(obj: dict[str, Any]) -> dict[str, Any]:
+    """Strip anything that looks like a secret value from API responses."""
+    banned = ("api_key", "secret", "password", "authorization", "token_value")
+    out: dict[str, Any] = {}
+    for k, v in obj.items():
+        lk = k.lower()
+        if any(b in lk for b in banned) and lk not in {
+            "token_id",
+            "secret_ref_names",
+            "idempotency_key",
+        }:
+            continue
+        if isinstance(v, dict):
+            out[k] = _scrub(v)
+        elif isinstance(v, str) and (v.startswith("sk-") or "api_key=" in v.lower()):
+            out[k] = "[redacted]"
+        else:
+            out[k] = v
+    return out
+
+
+@dataclass
+class ProductStore:
+    controller: MissionController = field(default_factory=lambda: MissionController())
+    workers: WorkerRegistryService = field(default_factory=WorkerRegistryService)
+    events: EventLog = field(default_factory=EventLog)
+    profiles: ProfileStore = field(default_factory=ProfileStore)
+    accounts: dict[str, ProviderAccount] = field(default_factory=dict)
+    routes: dict[str, RouteSnapshot] = field(default_factory=dict)
+    approvals: dict[str, Approval] = field(default_factory=dict)
+    idempotency: dict[str, dict[str, Any]] = field(default_factory=dict)
+    cancelled_missions: set[str] = field(default_factory=set)
+    cancelled_tasks: set[str] = field(default_factory=set)
+    side_effects: list[str] = field(default_factory=list)
+    db_reachable: bool | None = None  # None = not probed; False = down; True = up
+    execution_mode: str = "mock"
+    allow_paid: bool = False
+    providers_network: bool = False
+
+    def seed_catalog(self) -> None:
+        acct = sample_provider_account()
+        self.accounts[acct.id] = acct
+        for route in (sample_route(), sample_route_beta()):
+            self.routes[route.route_id] = route
+        # Explicit unknown route so APIs never invent readiness.
+        from swarm.contracts.enums import AvailabilityStatus
+
+        unknown = sample_route().model_copy(
+            update={
+                "route_id": "rt_fake_unknown",
+                "model_id": "fake-unknown-v0",
+                "availability_status": AvailabilityStatus.UNKNOWN,
+                "status": "cataloged",
+                "observed_capabilities": [],
+            }
+        )
+        self.routes[unknown.route_id] = unknown
+
+    def publish(
+        self,
+        *,
+        project_id: str,
+        type: str,
+        actor: str,
+        mission_id: str | None = None,
+        task_id: str | None = None,
+        payload: dict[str, Any] | None = None,
+        dedupe_key: str | None = None,
+        correlation_id: str | None = None,
+    ) -> EventEnvelope:
+        event = EventEnvelope(
+            project_id=project_id,
+            type=type,
+            actor=actor,
+            mission_id=mission_id,
+            task_id=task_id,
+            payload=_scrub(payload or {}),
+            dedupe_key=dedupe_key,
+            correlation_id=correlation_id,
+        )
+        return self.events.append(event)
+
+    def recall_idempotent(self, key: str | None) -> dict[str, Any] | None:
+        if not key:
+            return None
+        return self.idempotency.get(key)
+
+    def store_idempotent(self, key: str | None, body: dict[str, Any]) -> dict[str, Any]:
+        if key:
+            self.idempotency[key] = body
+        return body
+
+    async def create_mission(self, mission: Mission, *, actor: str) -> Mission:
+        created = await self.controller.submit_mission(mission)
+        self.publish(
+            project_id=created.project_id,
+            type="mission.created",
+            actor=actor,
+            mission_id=created.id,
+            payload={"revision": created.revision, "status": created.status.value},
+            dedupe_key=f"mission.created:{created.id}",
+        )
+        return created
+
+    def get_mission(self, mission_id: str) -> Mission:
+        mission = self.controller.missions.get(mission_id)
+        if mission is None:
+            raise ApiError("not_found", "mission not found", status_code=404)
+        return mission
+
+    async def cancel_mission(self, mission_id: str, *, actor: str) -> Mission:
+        mission = self.get_mission(mission_id)
+        if mission_id in self.cancelled_missions:
+            return mission
+        updated = mission.model_copy(
+            update={
+                "status": MissionStatus.CANCELLED,
+                "cancellation_generation": mission.cancellation_generation + 1,
+            }
+        )
+        self.controller.missions[mission_id] = updated
+        self.cancelled_missions.add(mission_id)
+        # Mark all tasks cancelled so no new side effects.
+        for tid, task in list(self.controller.tasks.get(mission_id, {}).items()):
+            self.cancelled_tasks.add(tid)
+            self.controller.tasks[mission_id][tid] = task.model_copy(
+                update={"status": TaskStatus.CANCELLED}
+            )
+        self.publish(
+            project_id=updated.project_id,
+            type="mission.cancelled",
+            actor=actor,
+            mission_id=mission_id,
+            payload={"cancellation_generation": updated.cancellation_generation},
+            dedupe_key=f"mission.cancelled:{mission_id}:{updated.cancellation_generation}",
+        )
+        return updated
+
+    def assert_not_cancelled(
+        self, mission_id: str | None = None, task_id: str | None = None
+    ) -> None:
+        if mission_id and mission_id in self.cancelled_missions:
+            raise ApiError(
+                "mission_cancelled",
+                "mission cancelled; new side effects blocked",
+                status_code=409,
+            )
+        if task_id and task_id in self.cancelled_tasks:
+            raise ApiError(
+                "task_cancelled",
+                "task cancelled; new side effects blocked",
+                status_code=409,
+            )
+
+    def record_side_effect(
+        self, label: str, *, mission_id: str | None = None, task_id: str | None = None
+    ) -> None:
+        self.assert_not_cancelled(mission_id=mission_id, task_id=task_id)
+        self.side_effects.append(label)
+
+    def graph_view(self, mission_id: str) -> dict[str, Any]:
+        mission = self.get_mission(mission_id)
+        tasks = list(self.controller.tasks.get(mission_id, {}).values())
+        return {
+            "mission_id": mission_id,
+            "revision": mission.revision,
+            "status": mission.status.value,
+            "tasks": [t.model_dump(mode="json") for t in tasks],
+            "explanations": list(self.controller.graph_explanations),
+        }
+
+    def public_accounts(self) -> list[dict[str, Any]]:
+        rows = []
+        for acct in self.accounts.values():
+            data = acct.model_dump(mode="json")
+            # secret_ref_names stay; never invent secret values.
+            rows.append(_scrub(data))
+        return rows
+
+    def public_routes(self) -> list[dict[str, Any]]:
+        rows = []
+        for route in self.routes.values():
+            data = route.model_dump(mode="json")
+            # Accurate unknown/retired statuses from catalog + route.
+            if route.availability_status.value == "unknown":
+                data["availability_status"] = "unknown"
+            rows.append(_scrub(data))
+        # Merge retired catalog entries so UI never invents "available".
+        for row in list_providers(mode="mock"):
+            if row.get("retired"):
+                rows.append(
+                    {
+                        "route_id": f"retired_{row['id']}",
+                        "provider": row["id"],
+                        "account_id": None,
+                        "model_id": None,
+                        "availability_status": "retired",
+                        "status": "retired",
+                        "capability_claims": [],
+                    }
+                )
+        return rows
+
+    async def capacity(self, *, purpose: str = "mission") -> dict[str, Any]:
+        # Offline mock broker explain — not live spend.
+        _ = build_mock_broker()
+        return await explain_capacity(mode="mock", purpose=purpose)
+
+    def create_approval(
+        self,
+        *,
+        permitted_operation: str,
+        destination: str,
+        grantor: str,
+        payload: dict[str, Any],
+        ttl_seconds: int = 600,
+    ) -> Approval:
+        approval = Approval(
+            payload_hash=payload_hash(payload),
+            permitted_operation=permitted_operation,
+            destination=destination,
+            grantor=grantor,
+            expires_at=utc_now() + timedelta(seconds=ttl_seconds),
+        )
+        self.approvals[approval.id] = approval
+        self.publish(
+            project_id=payload.get("project_id", "proj_unknown"),
+            type="approval.requested",
+            actor=grantor,
+            payload={"approval_id": approval.id, "operation": permitted_operation},
+            dedupe_key=f"approval.requested:{approval.id}",
+        )
+        return approval
+
+    def resolve_approval(
+        self,
+        approval_id: str,
+        *,
+        accept: bool,
+        actor: str,
+        payload: dict[str, Any] | None = None,
+    ) -> Approval:
+        approval = self.approvals.get(approval_id)
+        if approval is None:
+            raise ApiError("not_found", "approval not found", status_code=404)
+        if approval.revoked_at is not None:
+            raise ApiError("approval_revoked", "approval already revoked", status_code=409)
+        if approval.expires_at <= utc_now():
+            raise ApiError("approval_expired", "approval expired", status_code=409)
+        if payload is not None and payload_hash(payload) != approval.payload_hash:
+            raise ApiError(
+                "approval_payload_mismatch",
+                "payload changed since approval",
+                status_code=409,
+            )
+        if not accept:
+            approval = approval.model_copy(update={"revoked_at": utc_now()})
+            self.approvals[approval_id] = approval
+        self.publish(
+            project_id="proj_system",
+            type="approval.resolved",
+            actor=actor,
+            payload={"approval_id": approval_id, "accepted": accept},
+            dedupe_key=f"approval.resolved:{approval_id}:{accept}",
+        )
+        return approval
+
+    async def enroll_worker(
+        self,
+        *,
+        capabilities: list[str],
+        capacity_units: float,
+        privacy_classes: list[str],
+        named_inference_urls: list[str] | None = None,
+        project_id: str,
+        actor: str,
+    ) -> tuple[WorkerLease, str]:
+        token = new_id("wt_")
+        lease = WorkerLease(
+            worker_id=new_id("wk_"),
+            node_identity=f"api-{new_id('node_')[:8]}",
+            architecture="api",
+            runtime_version="0.1.0",
+            capacity_units=capacity_units,
+            capabilities=capabilities,
+            labels=["api"],
+        )
+        registered = await self.workers.register(lease, token=token)
+        rec = self.workers._workers[registered.worker_id]
+        rec.privacy_classes = set(privacy_classes)
+        rec.named_inference_urls = list(named_inference_urls or [])
+        self.publish(
+            project_id=project_id,
+            type="worker.joined",
+            actor=actor,
+            payload={
+                "worker_id": registered.worker_id,
+                "capacity": capacity_units,
+                "privacy": privacy_classes,
+            },
+            dedupe_key=f"worker.joined:{registered.worker_id}",
+        )
+        return registered, token
+
+    def health_ready(self) -> dict[str, Any]:
+        runtime_ok = self.controller is not None and self.workers is not None
+        db_status: str
+        if self.db_reachable is True:
+            db_status = "up"
+        elif self.db_reachable is False:
+            db_status = "down"
+        else:
+            db_status = "unprobed"
+        ready = runtime_ok and self.db_reachable is not False
+        return {
+            "status": "ready" if ready else "not_ready",
+            "execution_mode": self.execution_mode,
+            "providers_network": self.providers_network,
+            "allow_paid": self.allow_paid,
+            "database": db_status,
+            "runtime": "ok" if runtime_ok else "down",
+            "mock_vs_live": "api_store_in_memory_not_live_providers",
+        }

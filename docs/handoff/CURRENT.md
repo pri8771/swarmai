@@ -1,7 +1,7 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T01:05:00Z  
-**Packets complete:** P01–P08, P10–P12 (P09 skipped until P13)  
+**Updated:** 2026-09-20T01:30:00Z  
+**Packets complete:** P01–P08, P10–P13 (P09 next; was gated on P13)  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`
 
@@ -9,34 +9,32 @@
 
 | Packet | Status | Evidence |
 |---|---|---|
-| P01–P08 | prior | see earlier commits |
-| P10 | offline_verified | 12 runtime tests |
-| P11 | offline_verified | 8 controller tests + `swarm demo dynamic --mode mock` |
-| P12 | offline_verified | 8 worker tests + `swarm worker self-test --mode mock` |
+| P01–P08 | prior | earlier commits |
+| P10–P12 | offline_verified | runtime/controller/workers |
+| P13 | offline_verified | 14 API tests + `swarm api export-openapi` |
 
-### P11 details
-- MissionController: propose/commit graph, spawn/split/merge/stop, cycle rejection
-- AdaptiveScheduler: ready work, inference/worker slots, fairness, no oscillation
-- Evidence: **mock fixtures**, not live models
-
-### P12 details
-- WorkerRegistryService: enroll/heartbeat/claim/drain/revoke/fence
-- Stale generation rejected; revoked token blocked; no provider secrets on workers
-- Evidence: **membership mock**, not live remote workers
+### P13 details
+- Bearer auth + project isolation; non-loopback requires Authorization
+- `/v1` missions, graph, events (+SSE cursor), providers, routes, capacity, workers, approvals, qualifications, evaluations
+- Idempotent mutations; cancel blocks side effects; approval payload verification
+- Probe/eval require explicit policy admission; secrets never in responses
+- Health ready reflects database/runtime (not process-only)
+- Evidence: **in-memory store + mock broker**, not live providers
 
 ## Exact commands
 
 ```sh
 cd /Users/pchordia/Downloads/swarm-ai
-uv run pytest tests/controller tests/workers tests/runtime
-uv run swarm demo dynamic --mode mock
-uv run swarm worker self-test --mode mock
+uv run pytest tests/api
+uv run swarm api export-openapi
+uv run pytest tests/api tests/controller tests/workers tests/runtime
 ```
 
 ## Next
 
-**P13** authenticated product API + streaming events (integration_after P02,P05–P07,P10–P12 — ready).  
-P09 still blocked until P13 complete. P14 waits on P09+P13.
+**P09** operator console (integration_after P13 — now ready).  
+**P15** also dependency-ready offline (onboarding; no spend).  
+P14 waits on P09.
 
 ## User actions
 

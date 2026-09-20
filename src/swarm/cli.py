@@ -28,6 +28,18 @@ def cmd_serve(host: str, port: int) -> None:
     uvicorn.run("swarm.api.app:app", host=host, port=port, reload=False)
 
 
+def cmd_export_openapi(path: Path | None = None) -> None:
+    from swarm.api.app import create_app
+
+    app = create_app()
+    spec = app.openapi()
+    target = path or (_repo_root() / "var" / "openapi.json")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(spec, indent=2) + "\n")
+    print(str(target))
+
+
+
 def cmd_db_migrate() -> None:
     root = _repo_root()
     result = subprocess.run(
@@ -108,9 +120,16 @@ def main() -> None:
     wst = worker_sub.add_parser("self-test", help="Worker membership self-test")
     wst.add_argument("--mode", default="mock", choices=["mock"])
 
+    api = sub.add_parser("api", help="API utilities")
+    api_sub = api.add_subparsers(dest="api_command", required=True)
+    exp = api_sub.add_parser("export-openapi", help="Write OpenAPI JSON to disk")
+    exp.add_argument("--out", type=Path, default=None)
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
+    elif args.command == "api" and args.api_command == "export-openapi":
+        cmd_export_openapi(args.out)
     elif args.command == "db" and args.db_command == "migrate":
         cmd_db_migrate()
     elif args.command == "db" and args.db_command == "validate":
