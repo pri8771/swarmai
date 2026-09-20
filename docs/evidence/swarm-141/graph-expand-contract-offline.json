@@ -1,0 +1,70 @@
+{
+  "gate": "SWARM-141",
+  "scenario": "offline_graph_expand_contract_prep",
+  "recorded_at": "2026-09-20T20:44:21.919834+00:00",
+  "live_claimed": false,
+  "note": "Two planner sessions spawn; duplicate extract merged/deduped by controller; ops exercised offline. Not live multi-model proof.",
+  "mission_id": "mission_demo_001",
+  "revisions": {
+    "after_spawn": 2,
+    "after_dup_spawn": 2
+  },
+  "planners": [
+    "as_planner_a",
+    "as_planner_b"
+  ],
+  "ops_exercised": [
+    {
+      "op": "merge",
+      "ok": true,
+      "revision": 3
+    },
+    {
+      "op": "split",
+      "ok": true,
+      "revision": 4
+    },
+    {
+      "op": "reassign",
+      "ok": true,
+      "revision": 5
+    },
+    {
+      "op": "stop",
+      "ok": true,
+      "revision": 5
+    },
+    {
+      "op": "challenge",
+      "ok": true,
+      "revision": 6
+    }
+  ],
+  "retired_task_id": "52568ff1e6d64a6b9e4d3970d253a268",
+  "task_count": 3,
+  "active_non_cancelled": 2,
+  "tasks": [
+    {
+      "id": "task_demo_001",
+      "family": "triage",
+      "status": "running",
+      "parent": null,
+      "objective": "root unfamiliar triage"
+    },
+    {
+      "id": "1df9b54e64fe4a469453c642aa7ae373",
+      "family": "extract",
+      "status": "ready",
+      "parent": "task_demo_001",
+      "objective": "extract evidence from unfamiliar logs"
+    },
+    {
+      "id": "52568ff1e6d64a6b9e4d3970d253a268",
+      "family": "plan",
+      "status": "cancelled",
+      "parent": "task_demo_001",
+      "objective": "plan bounded repair steps"
+    }
+  ],
+  "spend": 0
+}
