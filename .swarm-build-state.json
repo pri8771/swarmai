@@ -5,8 +5,8 @@
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "workspace_note": "OpenMontage was open in Cursor but is unrelated; SwarmAI source created adjacent to handoff per P00.",
   "branch": "cursor/p01-foundation-contracts-11e2",
-  "base_commit": null,
-  "current_packet": "P01",
+  "base_commit": "33b5e51de7774c0edba2edf40b5d4992d8696b42",
+  "current_packet": "P02",
   "packet_states": {
     "P01": {
       "state": "offline_verified",
@@ -27,7 +27,13 @@
         "docs/adr/0001-dependency-pins.md",
         "schemas/contracts/",
         ".github/workflows/ci.yml"
-      ]
+      ],
+      "commit": "33b5e51de7774c0edba2edf40b5d4992d8696b42"
+    },
+    "P02": {
+      "state": "in_progress",
+      "live_status": "not_attempted",
+      "integration_status": "not_started"
     }
   },
   "kit_offline_checks": {
