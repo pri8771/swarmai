@@ -1,7 +1,7 @@
 # SwarmAI handoff — CURRENT
 
-**Updated:** 2026-09-20T01:30:00Z  
-**Packets complete:** P01–P08, P10–P13 (P09 next; was gated on P13)  
+**Updated:** 2026-09-20T01:50:00Z  
+**Packets complete:** P01–P13 (P09 after P13 gate)  
 **Branch:** `cursor/p01-foundation-contracts-11e2`  
 **Source:** `/Users/pchordia/Downloads/swarm-ai`
 
@@ -10,31 +10,32 @@
 | Packet | Status | Evidence |
 |---|---|---|
 | P01–P08 | prior | earlier commits |
+| P09 | offline_verified | vitest 10 + build + pytest ui 3 |
 | P10–P12 | offline_verified | runtime/controller/workers |
-| P13 | offline_verified | 14 API tests + `swarm api export-openapi` |
+| P13 | offline_verified | 14 API tests + OpenAPI export |
+
+### P09 details
+- React/Vite operator console: mission graph expand/contract, routes, capacity, workers, profiles, approvals, events
+- Honest unknown/retired/gated/exhausted/provisional states; mock banner; no secrets in bundle
+- Evidence: **fixtures only**, not live API/providers
 
 ### P13 details
-- Bearer auth + project isolation; non-loopback requires Authorization
-- `/v1` missions, graph, events (+SSE cursor), providers, routes, capacity, workers, approvals, qualifications, evaluations
-- Idempotent mutations; cancel blocks side effects; approval payload verification
-- Probe/eval require explicit policy admission; secrets never in responses
-- Health ready reflects database/runtime (not process-only)
-- Evidence: **in-memory store + mock broker**, not live providers
+- Authenticated `/v1` API + SSE/event cursor; cancel fences; policy-gated probe/eval
 
 ## Exact commands
 
 ```sh
 cd /Users/pchordia/Downloads/swarm-ai
-uv run pytest tests/api
+npm --prefix apps/console test
+npm --prefix apps/console run build
+uv run pytest tests/ui tests/api
 uv run swarm api export-openapi
-uv run pytest tests/api tests/controller tests/workers tests/runtime
 ```
 
 ## Next
 
-**P09** operator console (integration_after P13 — now ready).  
-**P15** also dependency-ready offline (onboarding; no spend).  
-P14 waits on P09.
+**P14** integrated dynamic demo (deps P09–P13 satisfied).  
+**P15** provider onboarding also ready offline (no spend).
 
 ## User actions
 

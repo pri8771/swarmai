@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-20T01:02:48Z",
+  "updated_at": "2026-09-20T01:06:43Z",
   "handoff_path": "/Users/pchordia/Downloads/SwarmAI_Cursor_Execution_Kit_2026-09-19",
   "source_path": "/Users/pchordia/Downloads/swarm-ai",
   "branch": "cursor/p01-foundation-contracts-11e2",
-  "current_packet": "P09",
+  "current_packet": "P14",
   "packet_states": {
     "P01": {"state": "offline_verified", "integration_status": "offline_verified"},
     "P02": {"state": "offline_verified", "integration_status": "integration_verified"},
@@ -14,6 +14,13 @@
     "P06": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
     "P07": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
     "P08": {"state": "offline_verified", "live_status": "not_attempted", "integration_status": "offline_verified"},
+    "P09": {
+      "state": "offline_verified",
+      "live_status": "not_attempted",
+      "integration_status": "offline_verified",
+      "checks": {"vitest": "10 passed", "npm_build": "ok", "pytest_ui": "3 passed"},
+      "mock_vs_live": "console fixtures only; not live providers"
+    },
     "P10": {
       "state": "offline_verified",
       "live_status": "not_attempted",
@@ -43,7 +50,7 @@
       "mock_vs_live": "in-memory product store + mock broker; not live providers"
     }
   },
-  "next_packets": ["P09", "P15"],
-  "skipped_until_deps": {"P14": ["P09"], "P16": ["P15"]},
+  "next_packets": ["P14", "P15"],
+  "skipped_until_deps": {"P16": ["P15"], "P17": ["P14"]},
   "blockers": {"user_required": [], "live_only": ["Provider API keys for P15-P16"]}
 }
