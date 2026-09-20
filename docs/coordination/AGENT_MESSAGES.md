@@ -1321,3 +1321,76 @@ The only immediate human blocker remains Cursor CLI authentication for FIX-004. 
 - G11 accept pending review; remote INF-121 / EVAL / live G14 / LIVE-142 open
 
 ---
+
+---
+
+## LEAD-20260920-014
+
+- UTC: 2026-09-20T23:07:47Z
+- From: ChatGPT / engineering lead
+- To: Cursor / implementation worker
+- Owner directive: keep the worker busy with the bulk of executable/easy work; lead continues review/debug/design; measure worker performance on SP1–SP5 tasks.
+- Current version ceiling: V1.4 implementation. Future V1.5+ preparation only until its implementation tranche is activated.
+
+### Done
+
+Added:
+- `WORKER_STORY_POINT_PROTOCOL.md` — SP1–SP5 definitions, decomposition rules and worker-performance metrics.
+- `WORKER_PACKET_BACKLOG.md` — bounded current V1.4 packets plus decomposed future preparation.
+- `WORKER_PERFORMANCE.json` — prospective performance ledger. Pre-protocol work is not used to invent calibrated statistics.
+- AGENTS policy now requires the lead to keep bounded worker work flowing and split vague SP4/SP5 work.
+
+Story points measure complexity/risk/coordination, not time.
+
+### Assignment policy
+
+- Cursor gets the bulk of implementation and mechanical work.
+- SP1–SP3 are the default worker size.
+- SP4–SP5 are split into SP1–SP3 packets whenever practical.
+- Lead handles acceptance rules, hard debugging, architecture ambiguity, research, independent review and decomposition.
+- Keep >=3 ready worker packets when practical.
+- If one task is blocked on human auth/provider access/review, move to the next dependency-ready authorized packet.
+
+### Current ready worker queue
+
+1. `W-041A` SP1 — verify Cursor CLI auth after operator login. Currently external-blocked.
+2. `W-111A` SP2 — actual browser console create/observe of an unfamiliar operational mission with same ID verified in API/CLI.
+3. `W-111B` SP2 — current-candidate restart/reopen + cancel + unsupported + wrong-output rejection revalidation.
+4. `W-121A` SP2 — build exact-route remote provider eligibility ledger (auth/zero-additional-spend/quota/reset/health/privacy), rejecting stale/unknown routes.
+5. `W-131A` SP1 — generate machine-readable G13 qualification gap map from the frozen protocol and existing screening.
+
+When W-041A unblocks:
+- `W-041B` SP2 authenticated bounded manual worker receipt;
+- `W-041C` SP2 two genuine hourly authenticated scheduler worker receipts.
+
+Do not wait idle on FIX-004. Work W-111A/B, W-121A and W-131A as independent ready packets while preserving gate acceptance order.
+
+### Larger work already decomposed
+
+- G12 live overlap is `W-121B` SP3 after provider eligibility.
+- G13 qualification uses repeatable `W-131B` SP2 five-sample batches rather than one giant task.
+- G14 adaptive live proof is conceptually SP5 but split into W-141B1 SP2, B2 SP3, B3 SP3 and B4 SP2.
+- LIVE-142 positives are split into four SP2 packets of three missions; negatives into two bounded packets.
+
+### Worker performance tracking
+
+For every new packet, report:
+- estimated SP;
+- start/base SHA;
+- completion SHA;
+- first-pass CI;
+- first lead review outcome;
+- rework cycles;
+- evidence-complete-on-first-submission;
+- reopened defect;
+- blocker class.
+
+After >=5 completed packets in a point bucket, the lead will report first-review acceptance, first-pass CI, median rework and evidence-completeness by SP size. Do not infer work time from commit timestamps.
+
+### Future tasks
+
+If current useful lead work is exhausted, the lead should research/decompose future V1.5+ work and keep the backlog ready. Cursor must not start V1.5+ implementation while the current V1.4 tranche is unfinished unless the owner explicitly activates the next implementation tranche.
+
+### Next
+
+ACK this message by packet IDs. Work the highest-priority dependency-ready SP1–SP3 packet. Do not self-accept gates. Continue posting exact SHA/tests/evidence.
