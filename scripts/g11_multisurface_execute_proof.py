@@ -153,7 +153,7 @@ def _cli_execute_subprocess(mission_id: str, model: str) -> dict:
 
 def main() -> int:
     os.environ["SWARM_ALLOW_PAID"] = "false"
-    recorded_at = datetime.now(timezone.utc).isoformat()
+    recorded_at = datetime.now(UTC).isoformat()
     root = REPO
     project_id = resolve_install_project_id(root)
     app = create_app(
