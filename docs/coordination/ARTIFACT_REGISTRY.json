@@ -1,0 +1,884 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-09-20T23:20:00Z",
+  "canonical": true,
+  "management_model": "artifact_oriented",
+  "governance": {
+    "owner_directive": "Artifacts are the primary unit of project management. Lead should proactively advance future artifacts as well as current work; Cursor remains implementation workhorse.",
+    "policy": "docs/coordination/ARTIFACT_MANAGEMENT.md",
+    "human_view": "docs/coordination/VERSION_ARTIFACT_MATRIX.md",
+    "worker_backlog": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+    "worker_performance": "docs/coordination/WORKER_PERFORMANCE.json"
+  },
+  "artifact_statuses": [
+    "planned",
+    "drafting",
+    "reviewable",
+    "verified",
+    "accepted",
+    "blocked",
+    "superseded",
+    "rejected"
+  ],
+  "versions": {
+    "1.0-repair": {
+      "required": [
+        "ART-V10-CANDIDATE",
+        "ART-V10-SECURITY",
+        "ART-V10-EVIDENCE-CONTRACT",
+        "ART-V10-RUNTIME-TRUTH",
+        "ART-V10-WORKER-HEARTBEAT"
+      ]
+    },
+    "1.1": {
+      "required": [
+        "ART-V11-MISSION-PATH",
+        "ART-V11-MULTISURFACE-EVIDENCE",
+        "ART-V11-CONTROL-EVIDENCE",
+        "ART-V11-RESTART-EVIDENCE",
+        "ART-V11-APPLY-BOUNDARY"
+      ]
+    },
+    "1.2": {
+      "required": [
+        "ART-V12-BROKER-CONTRACT",
+        "ART-V12-PROVIDER-ELIGIBILITY",
+        "ART-V12-REMOTE-OVERLAP",
+        "ART-V12-LOCAL-FALLBACK",
+        "ART-V12-ADMISSION-RECONCILIATION"
+      ]
+    },
+    "1.3": {
+      "required": [
+        "ART-V13-QUAL-PROTOCOL",
+        "ART-V13-TASK-POOL",
+        "ART-V13-SCREENING-MATRIX",
+        "ART-V13-QUALIFIED-MATRIX",
+        "ART-V13-OVERHEAD-REPORT",
+        "ART-V13-REVIEWER-QUALIFICATION"
+      ]
+    },
+    "1.4": {
+      "required": [
+        "ART-V14-GRAPH-CONTRACT",
+        "ART-V14-ROLE-MANIFEST",
+        "ART-V14-LIVE-ADAPTIVE-PROOF",
+        "ART-V14-LOAD-10-50-100",
+        "ART-V14-MODE-COMPARISON",
+        "ART-LIVE142-PROTOCOL",
+        "ART-LIVE142-CAMPAIGN",
+        "ART-LIVE142-FINAL-REPORT"
+      ]
+    },
+    "1.5": {
+      "future_required": [
+        "ART-V15-ARCH",
+        "ART-V15-WORKER-PROTOCOL",
+        "ART-V15-LEASE-FENCING",
+        "ART-V15-MULTIHOST-EVIDENCE",
+        "ART-V15-RECOVERY-EVIDENCE"
+      ]
+    },
+    "1.6": {
+      "future_required": [
+        "ART-V16-KNOWLEDGE-CONTRACT",
+        "ART-V16-PROVENANCE",
+        "ART-V16-PERMISSION-RETRIEVAL",
+        "ART-V16-SUPERSESSION",
+        "ART-V16-CONTEXT-BUDGET-EVIDENCE"
+      ]
+    },
+    "1.7": {
+      "future_required": [
+        "ART-V17-TOOL-CONTRACT",
+        "ART-V17-APPROVAL-BINDING",
+        "ART-V17-INTEGRATION-MANIFEST",
+        "ART-V17-SESSION-RECOVERY",
+        "ART-V17-PERMISSION-NEGATIVES"
+      ]
+    },
+    "1.8": {
+      "future_required": [
+        "ART-V18-RECOVERY-ARCH",
+        "ART-V18-DEPLOYMENT-MANIFEST",
+        "ART-V18-BACKUP-RESTORE",
+        "ART-V18-SPLIT-BRAIN-SAFETY",
+        "ART-V18-OUTAGE-DRILL"
+      ]
+    },
+    "1.9": {
+      "future_required": [
+        "ART-V19-BETA-ACCEPTANCE",
+        "ART-V19-INSTALL-UPGRADE",
+        "ART-V19-EXTENSION-CONTRACT",
+        "ART-V19-EXTERNAL-INSTALLS",
+        "ART-V19-SELFDEV-PR-EVIDENCE"
+      ]
+    }
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-OPS-PM",
+      "name": "Artifact-oriented project management contract",
+      "target_version": "cross-version",
+      "kind": "governance",
+      "owner": "ChatGPT lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/coordination/ARTIFACT_MANAGEMENT.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "owner directive 2026-09-20"
+      ],
+      "evidence_refs": [
+        "docs/coordination/VERSION_ARTIFACT_MATRIX.md"
+      ],
+      "worker_packets": [],
+      "next_action": "maintain registry and derive work from artifact gaps",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V10-CANDIDATE",
+      "name": "Repaired V1 baseline candidate",
+      "target_version": "1.0-repair",
+      "kind": "source-candidate",
+      "owner": "Cursor",
+      "status": "verified",
+      "path_or_source_ref": "cursor/v1.4-live-integration-11e2 @ 19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
+      "dependencies": [],
+      "acceptance_refs": [
+        "V1_4_EXECUTION_CONTRACT.md G10",
+        "V1_4_LEAD_ACCEPTANCE_PLAN.md"
+      ],
+      "evidence_refs": [
+        "GitHub Actions 35543983728"
+      ],
+      "worker_packets": [],
+      "next_action": "preserve green CI while remaining artifacts close",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V10-SECURITY",
+      "name": "Auth/project/idempotency security closure",
+      "target_version": "1.0-repair",
+      "kind": "test-and-source-evidence",
+      "owner": "Cursor",
+      "status": "verified",
+      "path_or_source_ref": "tests/api + current candidate source",
+      "dependencies": [
+        "ART-V10-CANDIDATE"
+      ],
+      "acceptance_refs": [
+        "FIX-002"
+      ],
+      "evidence_refs": [
+        "tests/api/test_fix002_ownership.py",
+        "LEAD-012 review"
+      ],
+      "worker_packets": [],
+      "next_action": "retain regression coverage",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V10-EVIDENCE-CONTRACT",
+      "name": "Evidence/readiness truth contract",
+      "target_version": "1.0-repair",
+      "kind": "source-and-regressions",
+      "owner": "Cursor",
+      "status": "verified",
+      "path_or_source_ref": "src/swarm/release/verify.py + regressions",
+      "dependencies": [
+        "ART-V10-CANDIDATE"
+      ],
+      "acceptance_refs": [
+        "FIX-003",
+        "EVAL_131_QUALIFICATION_PROTOCOL.md"
+      ],
+      "evidence_refs": [
+        "tests/release/test_fix003_evidence_binding.py",
+        "LEAD-012 review"
+      ],
+      "worker_packets": [],
+      "next_action": "reuse for all later evidence artifacts",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V10-RUNTIME-TRUTH",
+      "name": "Operational runtime free of mock-success/known-answer fallback",
+      "target_version": "1.0-repair",
+      "kind": "source-and-regressions",
+      "owner": "Cursor",
+      "status": "verified",
+      "path_or_source_ref": "ProductStore/API/console/mission runtime current candidate",
+      "dependencies": [
+        "ART-V10-CANDIDATE"
+      ],
+      "acceptance_refs": [
+        "FIX-005",
+        "REAL_DATA_POLICY.md"
+      ],
+      "evidence_refs": [
+        "LEAD-012 review"
+      ],
+      "worker_packets": [],
+      "next_action": "preserve boundary in later work",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V10-WORKER-HEARTBEAT",
+      "name": "Authenticated unattended Cursor worker heartbeat",
+      "target_version": "1.0-repair",
+      "kind": "operational-evidence",
+      "owner": "Cursor",
+      "status": "blocked",
+      "path_or_source_ref": "docs/evidence/fix-004/",
+      "dependencies": [],
+      "acceptance_refs": [
+        "FIX-004",
+        "V1_4_LEAD_ACCEPTANCE_PLAN.md"
+      ],
+      "evidence_refs": [
+        "probe-only scheduler evidence exists"
+      ],
+      "worker_packets": [
+        "W-041A",
+        "W-041B",
+        "W-041C"
+      ],
+      "story_points_next": 1,
+      "next_action": "complete live CLI authentication, then manual + two real hourly receipts",
+      "blockers": [
+        "human CLI login not complete"
+      ]
+    },
+    {
+      "artifact_id": "ART-V11-MISSION-PATH",
+      "name": "One generic durable operational mission path",
+      "target_version": "1.1",
+      "kind": "source-runtime",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "current candidate + RUN-111 changes",
+      "dependencies": [
+        "ART-V10-CANDIDATE"
+      ],
+      "acceptance_refs": [
+        "RUN-111",
+        "V1_4_LEAD_ACCEPTANCE_PLAN.md"
+      ],
+      "evidence_refs": [
+        "CURSOR-021 G11 bundle"
+      ],
+      "worker_packets": [
+        "W-111A",
+        "W-111B"
+      ],
+      "next_action": "lead revalidate current-candidate bundle",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE",
+      "name": "Actual console/API/CLI same-ID evidence",
+      "target_version": "1.1",
+      "kind": "live-local-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/g11/",
+      "dependencies": [
+        "ART-V11-MISSION-PATH"
+      ],
+      "acceptance_refs": [
+        "RUN-111"
+      ],
+      "evidence_refs": [
+        "browser-console-create.json",
+        "hidden-acceptance-three-tasks.json"
+      ],
+      "worker_packets": [
+        "W-111A"
+      ],
+      "next_action": "lead independent review",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V11-CONTROL-EVIDENCE",
+      "name": "Cancel/unsupported/wrong-output acceptance controls",
+      "target_version": "1.1",
+      "kind": "live-local-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/g11/controls-operational.json",
+      "dependencies": [
+        "ART-V11-MISSION-PATH"
+      ],
+      "acceptance_refs": [
+        "RUN-111"
+      ],
+      "evidence_refs": [
+        "controls-operational.json"
+      ],
+      "worker_packets": [
+        "W-111B"
+      ],
+      "next_action": "lead independent review",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V11-RESTART-EVIDENCE",
+      "name": "Operational restart/reopen evidence",
+      "target_version": "1.1",
+      "kind": "live-local-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/g11/restart-reopen-operational.json",
+      "dependencies": [
+        "ART-V11-MISSION-PATH"
+      ],
+      "acceptance_refs": [
+        "RUN-111"
+      ],
+      "evidence_refs": [
+        "restart-reopen-operational.json"
+      ],
+      "worker_packets": [
+        "W-111B"
+      ],
+      "next_action": "lead independent review",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V11-APPLY-BOUNDARY",
+      "name": "Explicit reviewed apply boundary",
+      "target_version": "1.1",
+      "kind": "source-contract",
+      "owner": "Cursor",
+      "status": "verified",
+      "path_or_source_ref": "MissionRuntime pending_apply/apply_worktree_changes",
+      "dependencies": [
+        "ART-V11-MISSION-PATH"
+      ],
+      "acceptance_refs": [
+        "RUN-111"
+      ],
+      "evidence_refs": [
+        "tests/mission/test_no_auto_promote.py",
+        "LEAD-011/012 source review"
+      ],
+      "worker_packets": [],
+      "next_action": "preserve in later orchestration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
+      "name": "Exact-route remote provider eligibility ledger",
+      "target_version": "1.2",
+      "kind": "provider-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/inf-121/w121a-remote-eligibility-ledger.json",
+      "dependencies": [
+        "ART-V10-EVIDENCE-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "INF-121"
+      ],
+      "evidence_refs": [
+        "W-121A ledger; currently 0 admissible remotes"
+      ],
+      "worker_packets": [
+        "W-121A"
+      ],
+      "next_action": "lead review and research routes that can establish charge-prevention evidence",
+      "blockers": [
+        "zero admissible remote routes currently"
+      ]
+    },
+    {
+      "artifact_id": "ART-V12-REMOTE-OVERLAP",
+      "name": "Two-remote-provider overlapping live mission",
+      "target_version": "1.2",
+      "kind": "live-remote-evidence",
+      "owner": "Cursor",
+      "status": "blocked",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V12-PROVIDER-ELIGIBILITY",
+        "ART-V12-BROKER-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "INF-121"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-121B"
+      ],
+      "story_points_next": 3,
+      "next_action": "run only after two routes become admissible",
+      "blockers": [
+        "provider eligibility artifact currently has 0 admissible remote routes"
+      ]
+    },
+    {
+      "artifact_id": "ART-V12-BROKER-CONTRACT",
+      "name": "Governed broker/admission boundary",
+      "target_version": "1.2",
+      "kind": "source-contract",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "brokered inference/admission source on candidate",
+      "dependencies": [
+        "ART-V10-EVIDENCE-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "INF-121"
+      ],
+      "evidence_refs": [
+        "local admission/reconcile artifact"
+      ],
+      "worker_packets": [],
+      "next_action": "lead source/evidence review before remote overlap",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V12-LOCAL-FALLBACK",
+      "name": "Actually available local route and route-loss fallback",
+      "target_version": "1.2",
+      "kind": "live-local-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/inf-121/",
+      "dependencies": [
+        "ART-V12-BROKER-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "INF-121"
+      ],
+      "evidence_refs": [
+        "concurrent-local-pool.json",
+        "kill-route-local-fallback.json"
+      ],
+      "worker_packets": [],
+      "next_action": "rebind/confirm on eventual G12 candidate",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V12-ADMISSION-RECONCILIATION",
+      "name": "Atomic reservation/reconciliation evidence",
+      "target_version": "1.2",
+      "kind": "test-and-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/inf-121/local-admission-reconcile.json",
+      "dependencies": [
+        "ART-V12-BROKER-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "INF-121"
+      ],
+      "evidence_refs": [
+        "local admission/reconcile"
+      ],
+      "worker_packets": [],
+      "next_action": "extend/rebind during live remote mission",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V13-QUAL-PROTOCOL",
+      "name": "Frozen statistical qualification protocol",
+      "target_version": "1.3",
+      "kind": "acceptance-protocol",
+      "owner": "ChatGPT lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "V1_4_EXECUTION_CONTRACT.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "enforce without post-hoc threshold changes",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V13-SCREENING-MATRIX",
+      "name": "Provisional screening matrix",
+      "target_version": "1.3",
+      "kind": "evaluation-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/eval-131/aggregated-provisional-matrix.json",
+      "dependencies": [
+        "ART-V13-QUAL-PROTOCOL"
+      ],
+      "acceptance_refs": [
+        "EVAL_131_QUALIFICATION_PROTOCOL.md"
+      ],
+      "evidence_refs": [
+        "existing n=5 screening"
+      ],
+      "worker_packets": [
+        "W-131A"
+      ],
+      "next_action": "lead use gap map to select candidate qualification cells",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V13-QUALIFIED-MATRIX",
+      "name": "Qualified family/size route matrix",
+      "target_version": "1.3",
+      "kind": "evaluation-evidence",
+      "owner": "Cursor",
+      "status": "drafting",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V13-QUAL-PROTOCOL",
+        "ART-V13-TASK-POOL",
+        "ART-V13-SCREENING-MATRIX"
+      ],
+      "acceptance_refs": [
+        "EVAL_131_QUALIFICATION_PROTOCOL.md"
+      ],
+      "evidence_refs": [
+        "W-131A gap map"
+      ],
+      "worker_packets": [
+        "W-131B"
+      ],
+      "story_points_next": 2,
+      "next_action": "lead chooses candidate cells; worker runs five-sample held-out batches",
+      "blockers": [
+        "qualification batches not yet run"
+      ]
+    },
+    {
+      "artifact_id": "ART-V13-TASK-POOL",
+      "name": "Versioned calibration and held-out task pools",
+      "target_version": "1.3",
+      "kind": "benchmark",
+      "owner": "ChatGPT lead + Cursor",
+      "status": "drafting",
+      "path_or_source_ref": "benchmarks/ + evidence manifests",
+      "dependencies": [
+        "ART-V13-QUAL-PROTOCOL"
+      ],
+      "acceptance_refs": [
+        "EVAL_131_QUALIFICATION_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-131C"
+      ],
+      "next_action": "separate calibration/held-out refs and freeze reviewer benchmark",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V13-OVERHEAD-REPORT",
+      "name": "End-to-end routing/pipeline overhead report",
+      "target_version": "1.3",
+      "kind": "analysis-evidence",
+      "owner": "Cursor",
+      "status": "planned",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V13-QUALIFIED-MATRIX"
+      ],
+      "acceptance_refs": [
+        "EVAL_131_QUALIFICATION_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "collect planning/retry/recombination/review overhead during qualification",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "name": "Reviewer-role benchmark and qualified reviewer routes",
+      "target_version": "1.3",
+      "kind": "benchmark-and-evidence",
+      "owner": "ChatGPT lead + Cursor",
+      "status": "drafting",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V13-QUAL-PROTOCOL",
+        "ART-V13-TASK-POOL"
+      ],
+      "acceptance_refs": [
+        "EVAL_131_QUALIFICATION_PROTOCOL.md reviewer role"
+      ],
+      "evidence_refs": [
+        "current weak screening retained as calibration signal"
+      ],
+      "worker_packets": [
+        "W-131C"
+      ],
+      "next_action": "lead freeze revised benchmark after calibration; worker run held-out qualification",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V14-GRAPH-CONTRACT",
+      "name": "Validated adaptive graph operations contract",
+      "target_version": "1.4",
+      "kind": "source-contract",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "graph/runtime source + offline evidence",
+      "dependencies": [
+        "ART-V12-BROKER-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "SWARM-141"
+      ],
+      "evidence_refs": [
+        "offline admission-gated expand/contract"
+      ],
+      "worker_packets": [],
+      "next_action": "lead source review; preserve for live proof",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V14-ROLE-MANIFEST",
+      "name": "Qualified planner/reviewer/worker route manifest",
+      "target_version": "1.4",
+      "kind": "configuration",
+      "owner": "Cursor",
+      "status": "blocked",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V13-QUALIFIED-MATRIX",
+        "ART-V13-REVIEWER-QUALIFICATION"
+      ],
+      "acceptance_refs": [
+        "SWARM-141"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-141A"
+      ],
+      "next_action": "build after qualification",
+      "blockers": [
+        "G13 qualification incomplete"
+      ]
+    },
+    {
+      "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "name": "Live evidence-driven swarm expansion/contraction proof",
+      "target_version": "1.4",
+      "kind": "live-evidence",
+      "owner": "Cursor",
+      "status": "blocked",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V14-ROLE-MANIFEST",
+        "ART-V12-REMOTE-OVERLAP"
+      ],
+      "acceptance_refs": [
+        "SWARM-141"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-141B1",
+        "W-141B2",
+        "W-141B3",
+        "W-141B4"
+      ],
+      "next_action": "execute decomposed proof after G12/G13",
+      "blockers": [
+        "remote overlap and qualified roles incomplete"
+      ]
+    },
+    {
+      "artifact_id": "ART-V14-LOAD-10-50-100",
+      "name": "Logical assignment scheduler load evidence",
+      "target_version": "1.4",
+      "kind": "load-evidence",
+      "owner": "Cursor",
+      "status": "reviewable",
+      "path_or_source_ref": "docs/evidence/swarm-141/logical-assignment-10-50-100.json",
+      "dependencies": [
+        "ART-V14-GRAPH-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "SWARM-141"
+      ],
+      "evidence_refs": [
+        "offline logical load"
+      ],
+      "worker_packets": [],
+      "next_action": "lead review and retain as separate from live model concurrency",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V14-MODE-COMPARISON",
+      "name": "Single vs fixed vs elastic comparison",
+      "target_version": "1.4",
+      "kind": "analysis-evidence",
+      "owner": "Cursor",
+      "status": "planned",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V14-LIVE-ADAPTIVE-PROOF"
+      ],
+      "acceptance_refs": [
+        "SWARM-141"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-141C"
+      ],
+      "next_action": "run same task set after live adaptive mode is valid",
+      "blockers": [
+        "live adaptive proof incomplete"
+      ]
+    },
+    {
+      "artifact_id": "ART-LIVE142-PROTOCOL",
+      "name": "Preregistered final V1.4 campaign protocol",
+      "target_version": "1.4",
+      "kind": "acceptance-protocol",
+      "owner": "ChatGPT lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/coordination/LIVE_142_CAMPAIGN_PROTOCOL.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "V1_4_EXECUTION_CONTRACT.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "select hidden payloads after candidate freeze",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-LIVE142-CAMPAIGN",
+      "name": "12-positive/6-negative/24-hour campaign evidence",
+      "target_version": "1.4",
+      "kind": "live-acceptance-evidence",
+      "owner": "Cursor",
+      "status": "blocked",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-V10-WORKER-HEARTBEAT",
+        "ART-V11-MULTISURFACE-EVIDENCE",
+        "ART-V12-REMOTE-OVERLAP",
+        "ART-V13-QUALIFIED-MATRIX",
+        "ART-V14-LIVE-ADAPTIVE-PROOF"
+      ],
+      "acceptance_refs": [
+        "LIVE_142_CAMPAIGN_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "W-142A",
+        "W-142B",
+        "W-142C",
+        "W-142D"
+      ],
+      "next_action": "start only after integrated candidate freeze",
+      "blockers": [
+        "G10-G14 artifact dependencies incomplete"
+      ]
+    },
+    {
+      "artifact_id": "ART-LIVE142-FINAL-REPORT",
+      "name": "Final V1.4 acceptance report",
+      "target_version": "1.4",
+      "kind": "acceptance-report",
+      "owner": "ChatGPT lead",
+      "status": "planned",
+      "path_or_source_ref": null,
+      "dependencies": [
+        "ART-LIVE142-CAMPAIGN"
+      ],
+      "acceptance_refs": [
+        "LIVE_142_CAMPAIGN_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "lead compiles and independently reviews after campaign",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V15-ARCH",
+      "name": "Distributed worker architecture",
+      "target_version": "1.5",
+      "kind": "architecture",
+      "owner": "ChatGPT lead",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V15-ARCH_DISTRIBUTED_WORKERS.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "ROADMAP_V1_TO_V3.md V1.5"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "derive worker protocol + lease/fencing ADRs",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V16-KNOWLEDGE-CONTRACT",
+      "name": "Scoped reusable knowledge contract",
+      "target_version": "1.6",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V16-KNOWLEDGE_CONTRACT.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "ROADMAP_V1_TO_V3.md V1.6"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "derive provenance schema and retrieval permission contract",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V17-TOOL-CONTRACT",
+      "name": "Unified tool/browser permission contract",
+      "target_version": "1.7",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V17-TOOL_PERMISSION_CONTRACT.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "ROADMAP_V1_TO_V3.md V1.7"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "derive payload-bound approval schema + adapter contract",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V18-RECOVERY-ARCH",
+      "name": "Cloud/local recovery architecture",
+      "target_version": "1.8",
+      "kind": "architecture",
+      "owner": "ChatGPT lead",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V18-RECOVERY_ARCHITECTURE.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "ROADMAP_V1_TO_V3.md V1.8"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "derive site-epoch/backup manifest and recovery runbook",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V19-BETA-ACCEPTANCE",
+      "name": "Independent beta and controlled self-development acceptance",
+      "target_version": "1.9",
+      "kind": "acceptance-design",
+      "owner": "ChatGPT lead",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V19-BETA_SELFDEV_ACCEPTANCE.md",
+      "dependencies": [],
+      "acceptance_refs": [
+        "ROADMAP_V1_TO_V3.md V1.9"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [],
+      "next_action": "derive clean-install checklist + extension contract",
+      "blockers": []
+    }
+  ]
+}
