@@ -1,0 +1,37 @@
+{
+  "created": [
+    {
+      "family": "triage",
+      "mission_id": "8d5420eb583c42e2a4a5edaceba1cda2",
+      "status": "planning",
+      "objective": "diagnose unfamiliar intermittent TLS handshake stalls under load"
+    },
+    {
+      "family": "extract",
+      "mission_id": "fea9f25cdbec4a25b03c06e011cc66c4",
+      "status": "planning",
+      "objective": "extract line-item fields from unfamiliar multilingual receipt text"
+    },
+    {
+      "family": "triage",
+      "mission_id": "4573c403300d4fe8ac10d9f4df2b8139",
+      "status": "planning",
+      "objective": "localize unfamiliar race in shared queue drain under backpressure"
+    }
+  ],
+  "cancelled": {
+    "mission_id": "4573c403300d4fe8ac10d9f4df2b8139",
+    "status": "cancelled"
+  },
+  "listed_count": 11,
+  "listed_statuses": [
+    "cancelled",
+    "planning"
+  ],
+  "families": [
+    "extract",
+    "triage"
+  ],
+  "api_cli_shared_store": true,
+  "spend": 0
+}
