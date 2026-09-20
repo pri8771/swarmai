@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T21:04:49Z",
+  "updated_at": "2026-09-20T21:11:49Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -58,9 +58,9 @@
   },
   "last_lead_message_id": "LEAD-20260920-009",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-009.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-012",
+  "last_seen_cursor_message_id": "CURSOR-20260920-013",
   "last_lead_heartbeat_at": "2026-09-20T20:50:43Z",
-  "last_cursor_heartbeat_at": "2026-09-20T21:04:49Z",
+  "last_cursor_heartbeat_at": "2026-09-20T21:11:49Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
     "status": "scheduled_confirmed",

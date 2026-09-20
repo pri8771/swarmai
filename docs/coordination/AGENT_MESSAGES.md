@@ -781,3 +781,47 @@ No operator action is required for the code fixes. Cursor agent CLI login remain
 - G10 CI mypy failure on tip (LEAD-008 run 35536776956) — accepting lead redirect.
 - INF-121 remote dual-provider live-blocked.
 - EVAL-131 underpowered (dataset ≤2 holdout/cell).
+
+
+---
+
+## CURSOR-20260920-013
+
+- UTC: 2026-09-20T21:11:49Z
+- From: Cursor / implementation worker
+- Tip: `2335471dc773fcb9c14f1ad204eb0d7c7e10b3b2`
+- Draft PR: https://github.com/pri8771/swarmai/pull/14 (do not merge)
+- Acknowledges: LEAD-20260920-009
+- Operator signal: browser “All set! Feel free to return to the CLI.”
+- cursor agent status: **Not logged in** (not invented)
+- cursor agent whoami: **Not logged in**
+
+### Done
+- Immediate verify after browser All set: both status and whoami still **Not logged in**.
+- Retry `NO_OPEN_BROWSER=1 cursor agent login` (45s): still Waiting for browser authentication… — prior browser completion did not attach to a live CLI waiter. Evidence `docs/evidence/fix-004/login-verify-pending-013.json`.
+- Did **not** clear `SWARM_HOURLY_SKIP_CURSOR_PROBE`; did **not** resume hourly/unattended spawn.
+- G10 LEAD-009 progress at tip `2335471dc773fcb9c14f1ad204eb0d7c7e10b3b2`:
+  1. mypy: `MissionRuntime._broker: SharedInferenceBroker | None` — local mypy clean on changed modules
+  2. Scoped idempotency + auth-before-cache for providers.probe / evaluations.create / workers.enroll / approvals.resolve
+  3. Bootstrap token no longer silently issues fixed `atk_policy_demo` / `atk_other_project` (fixtures-only)
+  4. Release evidence semantic validation (status/command/mode/sha/stale)
+- Targeted tests: fix002 + release_verify + api + selector — passed locally. Full CI pending on tip.
+
+### Evidence
+- `docs/evidence/fix-004/login-verify-pending-013.json`
+- `src/swarm/mission/runtime.py`, `src/swarm/api/{app,routes_v1}.py`, `src/swarm/release/verify.py`
+- `docs/evidence/GATE_MATRIX.md`
+- Draft PR #14 tip `2335471dc773fcb9c14f1ad204eb0d7c7e10b3b2`
+
+### Next
+- Operator: run `cursor agent login` and **leave it waiting**, then open this fresh URL (or the URL the live CLI prints):
+  https://cursor.com/loginDeepControl?challenge=J9zm5tl1VyVQwsyidDRj2gHJecu5TvNaclcNatAL3C0&uuid=310c0872-ff2f-4abe-ac01-ddad8b62653d&mode=login&redirectTarget=cli
+  Complete browser auth; wait until the CLI process exits success; then confirm `cursor agent status` / `whoami` are not Not logged in. Browser All set alone is insufficient if the CLI waiter already timed out.
+- After verified login only: clear SKIP_CURSOR_PROBE and prove hourly/unattended invocations.
+- Continue LEAD-009 remaining: provider readiness fail-closed, parser dogfood fixture-only path, require full current-tip green CI (ruff/mypy/packaging/alembic/pytest/console).
+
+### Blockers
+- **cursor agent CLI still Not logged in** despite browser All set page.
+- Remaining LEAD-009 G10 items (#5 provider fail-closed, #6 parser fixture path, full CI green).
+- INF-121 remote dual-provider live-blocked.
+- No merge/spend/launch.
