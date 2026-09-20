@@ -114,3 +114,14 @@ def test_onboarding_report_written(tmp_path: Path) -> None:
     assert (tmp_path / "onboarding" / "onboarding-report.json").exists()
     assert report["counts"]["cataloged"] >= 1
     assert report["essential_next_actions"]
+
+
+@pytest.mark.asyncio
+async def test_live_non_local_still_denied_even_with_billing_flag() -> None:
+    denied = await bounded_canary(
+        route_id="rt_groq_default",
+        mode="live",
+        billing_known_zero=True,
+    )
+    assert denied["denied"] is True
+    assert denied["mock_vs_live"] == "not_live"

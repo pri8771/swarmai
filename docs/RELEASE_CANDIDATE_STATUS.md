@@ -1,103 +1,83 @@
-# SwarmAI — Offline Release Candidate Status
+# SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Branch:** `cursor/p01-foundation-contracts-11e2`  
-**Label:** `offline-verified-release-candidate`  
-**Not:** fully live-verified, cloud-operating, or production-launched
+**Active version branch:** `cursor/v0.1-real-mission-runtime`  
+**V0.1:** real mission runtime **dogfood passed** (Ollama `gemma3:4b`, cost `$0.00`) — see `docs/v0.1/STATUS.md`  
+**Prior:** offline-verified RC + partial local live (P15/P16 Ollama)
 
 ## Links
 
 | Item | URL |
 |---|---|
 | Repo | https://github.com/pri8771/swarmai |
-| RC branch | https://github.com/pri8771/swarmai/tree/cursor/p01-foundation-contracts-11e2 |
 | PR (merged) | https://github.com/pri8771/swarmai/pull/1 |
 | Pre-release | https://github.com/pri8771/swarmai/releases/tag/v0.1.0-rc.1 |
 | Merge commit | `827cb82c9aebc5f83741b215d025fcedf8ab16bd` |
-| Latest SHA (pre-merge docs) | see git / release tag |
 
 ## Status
 
 | Dimension | Result |
 |---|---|
 | Kit packets P01–P21 (offline) | complete |
-| `swarm release verify` | pass |
-| Required RC pytest slice | pass |
-| Fresh-install mock demo | pass |
-| Ruff / mypy (CI-defined) | pass |
-| Live P15 canary | **blocked** — no local `.env` / process keys |
-| Live P16 qualification | **blocked** — depends on P15 live routes |
-| Live P18 comparisons | **skipped** — no keys; mock evidence retained |
-| Spend policy | zero (no payment methods / paid credits used) |
-| Merge / GitHub pre-release | **done** (merged PR #1; tag `v0.1.0-rc.1` prerelease) |
-| Local launch | **done** — API on 127.0.0.1:18765 (mock mode) |
+| `swarm release verify` | pass (prior) |
+| Live P15 canary | **partial pass** — loopback Ollama only (`gemma3:4b`) |
+| Live P16 qualification | **partial** — provisional cells on Ollama route; `wilson_lower` remains null |
+| Live P18 comparisons | **skipped** — optional; mock evidence retained |
+| Spend policy | **zero** (`SWARM_ALLOW_PAID=false`; no payment methods; no cloud credits) |
+| Cloud provider keys | **none found** (shell / known env files / `.env` empty for API keys) |
 | Cloud production infra | **not** provisioned |
 
 ## Live setup (2026-09-20)
 
 | Check | Result |
 |---|---|
-| `.env` present | **no** |
-| Process env provider keys | **none** |
-| `SWARM_ALLOW_PAID` | unset (treat as deny) |
-| Zero-spend live canaries attempted | **no** |
+| `.env` present | **yes** (from `.env.example`; gitignored) |
+| Cloud API keys populated | **no** |
+| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434/v1` (loopback) |
+| `MLX_LM_BASE_URL` | unset — `:8080` serves Open WebUI HTML, not OpenAI API |
+| `SWARM_ALLOW_PAID` | `false` |
+| `SWARM_ALLOW_PROVIDER_NETWORK` | `false` |
 
-### Exact user actions for live (paused)
+### Provider matrix (honest)
 
-1. Copy `.env.example` → `.env` (never commit `.env`).
-2. Add only provider keys for **zero-charge-eligible** routes; confirm account billing/spend = zero.
-3. Set `SWARM_ALLOW_PAID=false` and do not enable paid wrappers.
-4. Re-run: `uv run swarm providers onboarding-report` then bounded `providers canary --mode live` only on verified free routes.
-5. Then P16: `uv run swarm eval plan/run --mode live` only with eligible route IDs.
+| Provider | Cataloged | Configured | Authenticated | Inference-tested | Notes |
+|---|---|---|---|---|---|
+| ollama | yes | yes (`OLLAMA_BASE_URL`) | yes (live canary) | **pass** `rt_ollama_gemma3:4b` | local zero-cost |
+| groq / openrouter / gemini / others | yes | no | no | **blocked** | no keys; live canary denied |
+| mlx_lm | yes | no | no | **blocked** | endpoint not chat API |
+| cerebras | yes | no | no | **blocked** | payment-gated; not pursued |
 
-## Implemented by subsystem
+## Evidence paths (local `var/`, gitignored)
 
-| Area | Packets | Offline | Live |
-|---|---|---|---|
-| Contracts / tooling | P01–P02 | verified | n/a |
-| Providers + broker | P03–P05 | verified | not tested |
-| Sandbox / workspace / runtime | P06–P08, P10 | verified | n/a |
-| Console + API | P09, P13 | verified | local launch only |
-| Controller + workers | P11–P12 | verified | n/a |
-| Integrated demo | P14 | verified (mock models) | n/a |
-| Onboarding / qualify / deploy | P15–P17 | offline verified | P15/P16 live blocked |
-| Load / chaos | P18 | mock verified | live skipped |
-| Self-dev / review / RC | P19–P21 | verified | n/a |
+- P15 canary: `var/onboarding/canaries/rt_ollama_gemma3_4b.json`
+- P15 alias: `var/onboarding/canaries/rt_ollama_default.json`
+- P16 live run: `var/reports/qualification/run_897bfae7212644acb51c8e1666ae5074.json`
+- Onboarding report: `var/onboarding/onboarding-report.json`
 
-## Verification (commands)
+## Commands run (zero-spend)
 
 ```sh
-cd /path/to/swarm-ai
-uv run pytest tests/selfdev tests/regressions tests/release -q
-uv run swarm release verify
-uv run swarm demo parser-issue --mode mock --report-dir var/reports/fresh-install
-uv run ruff check .
-uv run mypy src/swarm
+cp .env.example .env   # already present; spend flags set false
+# OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 only — no invented cloud keys
+
+uv run swarm providers inspect --provider ollama --metadata-only
+uv run swarm providers onboarding-report
+uv run swarm providers canary --route rt_ollama_default --policy bounded_probe \
+  --mode live --billing-known-zero
+uv run swarm providers canary --route 'rt_ollama_gemma3:4b' --policy bounded_probe \
+  --mode live --billing-known-zero
+uv run swarm eval plan --suite starter --mode live --max-cases 4 --purpose evaluation
+uv run swarm eval run --plan <plan_id> --mode live --route 'rt_ollama_gemma3:4b'
 ```
 
-## Safety
+## Pending / remaining blockers
 
-- `.env` gitignored; no credentials committed
-- Scrubbers refuse secret-shaped payloads in logs/API
-- Workers/sandbox do not receive host secrets
-- Self-dev cannot auto-merge or expand approval/release rights
-- No paid inference or unofficial wrappers used in this completion pass
+- [ ] Cloud zero-charge-eligible API keys (operator MFA/CAPTCHA/signup) — **paused for user**
+- [ ] Multi-provider live canaries beyond Ollama
+- [ ] P16 statistical qualification rankings (`wilson_lower`) — intentionally null until larger live samples
+- [ ] Optional P18 live soak under verified capacity
+- [ ] No cloud production hosting from this pass
 
-## Pending live validation
+## Claim
 
-- [ ] Provider accounts with **zero-charge**-eligible routes
-- [ ] Keys only in local `.env` (never commit); spend policy = zero
-- [ ] P15 live canary on verified routes
-- [ ] P16 live qualification (multi-route if eligible)
-- [ ] Optional P18 live comparisons under verified capacity
-
-## Known limitations
-
-- Live inference and qualification rankings are **unverified**
-- Integration DB tests may require `SWARM_DATABASE_URL`
-- Console and compose profiles are local/dev oriented
-- No cloud production hosting from this pass
-
-## Next (after keys — not started here)
-
-Live P15 → P16 under zero-spend only. Do not treat this RC as fully live-verified.
+**Partially live-verified RC** (local Ollama only). Still **not** fully live-verified across catalog providers.

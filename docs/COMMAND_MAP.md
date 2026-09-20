@@ -22,6 +22,11 @@
 | Eval plan (mock) | `uv run swarm eval plan --suite starter --mode mock` |
 | Eval tests | `uv run pytest tests/evals` |
 | Workspace tests | `uv run pytest tests/workspace` |
+| Mission plan (V0.1) | `uv run swarm mission plan --goal "…"` |
+| Mission run (V0.1 real) | `OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 uv run swarm mission run --goal "…" --model gemma3:4b` |
+| Mission status / list / report | `uv run swarm mission status\|list\|report …` |
+| Cost show (zero-spend) | `uv run swarm cost show` |
+| Mission unit tests | `uv run pytest tests/mission` |
 
 PostgreSQL integration path (P02+; optional for P01):
 

@@ -80,15 +80,28 @@ def cmd_providers_inspect(*, provider: str, metadata_only: bool) -> None:
     print(json.dumps(svc.inspect_provider(provider, metadata_only=metadata_only), indent=2))
 
 
-def cmd_providers_canary(*, route_id: str, policy: str, mode: str) -> None:
+def cmd_providers_canary(
+    *,
+    route_id: str,
+    policy: str,
+    mode: str,
+    billing_known_zero: bool = False,
+) -> None:
     import asyncio
 
+    from swarm.envfile import load_repo_dotenv
     from swarm.onboarding.canary import bounded_canary
 
+    load_repo_dotenv(_repo_root())
     print(
         json.dumps(
             asyncio.run(
-                bounded_canary(route_id=route_id, policy=policy, mode=mode)
+                bounded_canary(
+                    route_id=route_id,
+                    policy=policy,
+                    mode=mode,
+                    billing_known_zero=billing_known_zero,
+                )
             ),
             indent=2,
             default=str,
@@ -139,6 +152,11 @@ def main() -> None:
     pcan.add_argument("--route", required=True)
     pcan.add_argument("--policy", default="bounded_probe", choices=["bounded_probe"])
     pcan.add_argument("--mode", default="mock", choices=["mock", "live"])
+    pcan.add_argument(
+        "--billing-known-zero",
+        action="store_true",
+        help="Operator asserts route is known-zero cost (required for --mode live)",
+    )
 
     sandbox = sub.add_parser("sandbox", help="Sandbox operations")
     sandbox_sub = sandbox.add_subparsers(dest="sandbox_command", required=True)
@@ -169,6 +187,13 @@ def main() -> None:
     erun = ev_sub.add_parser("run", help="Execute qualification plan (mock default)")
     erun.add_argument("--plan", required=True, help="plan_id or path to plan JSON")
     erun.add_argument("--mode", default="mock", choices=["mock", "live"])
+    erun.add_argument(
+        "--route",
+        action="append",
+        dest="routes",
+        default=None,
+        help="Eligible route id (repeatable). Required for --mode live after P15 canary.",
+    )
     erep = ev_sub.add_parser("report", help="Show a qualification run report")
     erep.add_argument("--run", required=True, help="run_id")
 
@@ -259,6 +284,30 @@ def main() -> None:
         "verify", help="Verify offline release-candidate readiness"
     )
 
+    mission = sub.add_parser("mission", help="V0.1 real mission runtime")
+    mission_sub = mission.add_subparsers(dest="mission_command", required=True)
+    mplan = mission_sub.add_parser("plan", help="Inspect repo and emit structured task graph")
+    mplan.add_argument("--goal", required=True)
+    mrun = mission_sub.add_parser("run", help="Execute a real software mission end-to-end")
+    mrun.add_argument("--goal", required=True)
+    mrun.add_argument("--model", default="gemma3:4b")
+    mrun.add_argument(
+        "--repo",
+        type=Path,
+        default=None,
+        help="Target repository (default: this SwarmAI checkout)",
+    )
+    mstatus = mission_sub.add_parser("status", help="Show live mission state")
+    mstatus.add_argument("--mission-id", required=True)
+    mlist = mission_sub.add_parser("list", help="List persisted missions")
+    _ = mlist
+    mrep = mission_sub.add_parser("report", help="Print persisted mission report JSON")
+    mrep.add_argument("--mission-id", required=True)
+
+    cost = sub.add_parser("cost", help="Zero-spend cost ledger")
+    cost_sub = cost.add_subparsers(dest="cost_command", required=True)
+    cost_sub.add_parser("show", help="Show aggregated mission spend (USD)")
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -296,7 +345,12 @@ def main() -> None:
     elif args.command == "providers" and args.providers_command == "inspect":
         cmd_providers_inspect(provider=args.provider, metadata_only=args.metadata_only)
     elif args.command == "providers" and args.providers_command == "canary":
-        cmd_providers_canary(route_id=args.route, policy=args.policy, mode=args.mode)
+        cmd_providers_canary(
+            route_id=args.route,
+            policy=args.policy,
+            mode=args.mode,
+            billing_known_zero=bool(getattr(args, "billing_known_zero", False)),
+        )
     elif args.command == "sandbox" and args.sandbox_command == "self-test":
         print(json.dumps(sandbox_self_test(network=args.network), indent=2))
     elif args.command == "capacity" and args.capacity_command == "explain":
@@ -330,8 +384,10 @@ def main() -> None:
         )
         print(json.dumps(payload, indent=2))
     elif args.command == "eval" and args.eval_command == "run":
+        from swarm.envfile import load_repo_dotenv
         from swarm.evals.qualify import run_qualification
 
+        load_repo_dotenv(_repo_root())
         plan_arg = Path(args.plan)
         if plan_arg.exists():
             plan_path = plan_arg
@@ -339,7 +395,12 @@ def main() -> None:
             plan_path = _repo_root() / "benchmarks" / "live-plans" / f"{args.plan}.json"
         out = _repo_root() / "var" / "reports" / "qualification"
         try:
-            run = run_qualification(plan_path, mode=args.mode, out_dir=out)
+            run = run_qualification(
+                plan_path,
+                mode=args.mode,
+                out_dir=out,
+                routes=getattr(args, "routes", None),
+            )
         except PermissionError as exc:
             print(json.dumps({"error": str(exc), "mode": args.mode}, indent=2))
             raise SystemExit(2) from exc
@@ -441,6 +502,59 @@ def main() -> None:
         print(json.dumps(release_report.to_dict(), indent=2, default=str))
         if not release_report.passed:
             raise SystemExit(2)
+    elif args.command == "mission" and args.mission_command == "plan":
+        from swarm.mission.planner import (
+            build_software_mission,
+            inspect_repo,
+            plan_task_graph,
+            serialize_plan,
+        )
+
+        repo = _repo_root()
+        inspection = inspect_repo(repo)
+        mission_obj = build_software_mission(goal=args.goal)
+        proposal = plan_task_graph(mission_obj, inspection)
+        print(
+            json.dumps(
+                {
+                    "mission_id": mission_obj.id,
+                    "inspection": inspection.to_dict(),
+                    "proposal": json.loads(serialize_plan(proposal)),
+                },
+                indent=2,
+                default=str,
+            )
+        )
+    elif args.command == "mission" and args.mission_command == "run":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.mission.runtime import run_mission
+
+        load_repo_dotenv(_repo_root())
+        repo = Path(args.repo).resolve() if args.repo else _repo_root()
+        record = run_mission(args.goal, repo=repo, model=args.model)
+        print(json.dumps(record.to_dict(), indent=2, default=str))
+        if record.status != "completed":
+            raise SystemExit(2)
+    elif args.command == "mission" and args.mission_command == "status":
+        from swarm.mission.runtime import MissionRuntime
+
+        runtime = MissionRuntime(_repo_root())
+        print(json.dumps(runtime.status(args.mission_id), indent=2, default=str))
+    elif args.command == "mission" and args.mission_command == "list":
+        from swarm.mission.store import MissionStore
+
+        store = MissionStore(_repo_root() / "var" / "missions")
+        print(json.dumps({"missions": store.list_missions()}, indent=2, default=str))
+    elif args.command == "mission" and args.mission_command == "report":
+        from swarm.mission.store import MissionStore
+
+        store = MissionStore(_repo_root() / "var" / "missions")
+        print(json.dumps(store.load(args.mission_id).to_dict(), indent=2, default=str))
+    elif args.command == "cost" and args.cost_command == "show":
+        from swarm.cost.ledger import format_cost_show, load_mission_costs
+
+        ledger = load_mission_costs(_repo_root() / "var" / "missions")
+        print(json.dumps(format_cost_show(ledger), indent=2, default=str))
 
 
 async def _demo_dynamic_mock() -> dict[str, object]:
