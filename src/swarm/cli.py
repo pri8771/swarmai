@@ -374,6 +374,17 @@ def main() -> None:
         help="Skip live Ollama supervisor call (still real file work)",
     )
 
+    mem = sub.add_parser("memory", help="V0.4 memory + recovery")
+    mem_sub = mem.add_subparsers(dest="memory_command", required=True)
+    mret = mem_sub.add_parser("retrieve", help="Retrieve bounded context for a query")
+    mret.add_argument("--query", required=True)
+    mret.add_argument("--token-budget", type=int, default=256)
+    mrec = mem_sub.add_parser("recovery-proof", help="Interrupt/resume real mission proof")
+    mrec.add_argument(
+        "--goal",
+        default="Fix off-by-one in sandbox/selfdev_issue/parser_helper.py",
+    )
+
     args = parser.parse_args()
     if args.command == "serve":
         cmd_serve(args.host, args.port)
@@ -733,6 +744,26 @@ def main() -> None:
         }
         print(json.dumps(summary, indent=2, default=str))
         if report.consensus.get("decision") != "accept":
+            raise SystemExit(2)
+    elif args.command == "memory" and args.memory_command == "retrieve":
+        from swarm.memory.store import MemoryStore, retrieve_context
+
+        store = MemoryStore(_repo_root() / "var" / "memory")
+        print(
+            json.dumps(
+                retrieve_context(
+                    store, query=args.query, token_budget=args.token_budget
+                ),
+                indent=2,
+                default=str,
+            )
+        )
+    elif args.command == "memory" and args.memory_command == "recovery-proof":
+        from swarm.memory.store import run_interrupt_resume_proof
+
+        proof = run_interrupt_resume_proof(repo=_repo_root(), goal=args.goal)
+        print(json.dumps(proof, indent=2, default=str))
+        if not proof.get("ok"):
             raise SystemExit(2)
 
 

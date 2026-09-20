@@ -1,7 +1,8 @@
 # SwarmAI — Release Candidate Status
 
 **Date:** 2026-09-20  
-**Active version branch:** `cursor/v0.3-scale-orchestration-11e2`  
+**Active version branch:** `cursor/v0.4-memory-recovery-11e2`  
+**V0.4:** memory/recovery **dogfood passed** — see `docs/v0.4/STATUS.md`  
 **V0.3:** swarm scaling **dogfood passed** (64 agents, cost `$0.00`) — see `docs/v0.3/STATUS.md`  
 **V0.2:** heterogeneous routing **merged** (PR #4) — see `docs/v0.2/STATUS.md`  
 **V0.1:** real mission runtime **dogfood passed** (merged via PR #2 / #3)
