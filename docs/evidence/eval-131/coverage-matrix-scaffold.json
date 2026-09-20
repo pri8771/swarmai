@@ -8,9 +8,9 @@
       "family": "coding",
       "size": "S",
       "route_id": "rt_ollama_gemma3:4b",
-      "sample_count": 1,
-      "wilson_lower": 0.20654329147389294,
-      "latency_ms_p50": 3217.525416999706,
+      "sample_count": 2,
+      "wilson_lower": 0.09452865480086611,
+      "latency_ms_p50": 2942.708415997913,
       "error_rate": 0.0,
       "state": "provisional",
       "model_fingerprint": "gemma3:4b"
@@ -19,9 +19,9 @@
       "family": "coding",
       "size": "S",
       "route_id": "rt_ollama_qwen3.5:4b",
-      "sample_count": 1,
-      "wilson_lower": 0.0,
-      "latency_ms_p50": 2526.8701250024606,
+      "sample_count": 2,
+      "wilson_lower": 0.09452865480086611,
+      "latency_ms_p50": 3240.5166669923346,
       "error_rate": 0.0,
       "state": "provisional",
       "model_fingerprint": "qwen3.5:4b"
@@ -29,21 +29,21 @@
     {
       "family": "coding",
       "size": "S",
-      "route_id": null,
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
-      "model_fingerprint": null
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 2,
+      "wilson_lower": 0.09452865480086611,
+      "latency_ms_p50": 2942.708415997913,
+      "error_rate": 0.0,
+      "state": "provisional",
+      "model_fingerprint": "gemma3:4b"
     },
     {
       "family": "coding",
       "size": "M",
       "route_id": "rt_ollama_gemma3:4b",
-      "sample_count": 1,
+      "sample_count": 2,
       "wilson_lower": 0.0,
-      "latency_ms_p50": 1579.8829169943929,
+      "latency_ms_p50": 1859.0872080094414,
       "error_rate": 0.0,
       "state": "provisional",
       "model_fingerprint": "gemma3:4b"
@@ -52,9 +52,9 @@
       "family": "coding",
       "size": "M",
       "route_id": "rt_ollama_qwen3.5:4b",
-      "sample_count": 1,
-      "wilson_lower": 0.20654329147389294,
-      "latency_ms_p50": 5588.721584004816,
+      "sample_count": 2,
+      "wilson_lower": 0.3423719528896193,
+      "latency_ms_p50": 3496.071083995048,
       "error_rate": 0.0,
       "state": "provisional",
       "model_fingerprint": "qwen3.5:4b"
@@ -62,13 +62,13 @@
     {
       "family": "coding",
       "size": "M",
-      "route_id": null,
-      "sample_count": null,
-      "wilson_lower": null,
-      "latency_ms_p50": null,
-      "error_rate": null,
-      "state": "untested",
-      "model_fingerprint": null
+      "route_id": "rt_ollama_gemma3:4b",
+      "sample_count": 2,
+      "wilson_lower": 0.0,
+      "latency_ms_p50": 1859.0872080094414,
+      "error_rate": 0.0,
+      "state": "provisional",
+      "model_fingerprint": "gemma3:4b"
     },
     {
       "family": "coding",
@@ -538,7 +538,7 @@
   "mock_vs_live": "scaffold_only_no_live_scores",
   "generated_at": "2026-09-20T20:39:01.859394+00:00",
   "live_routes_used": [],
-  "note": "All cells untested. No invented qualification. Live samples require verified zero-charge routes.",
+  "note": "Scaffold with provisional local screening cells; no qualification claimed.",
   "required_coverage": {
     "families": [
       "coding",
@@ -568,5 +568,6 @@
     "updated_cells": 8,
     "qualification_claimed": false,
     "at": "2026-09-20T20:44:21.956208+00:00"
-  }
+  },
+  "updated_at": "2026-09-20T20:49:31.543499+00:00"
 }
