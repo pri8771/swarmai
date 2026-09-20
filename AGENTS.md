@@ -29,6 +29,16 @@ Use existing libraries where they replace infrastructure. Preserve the elastic c
 
 Acceptance binds to exact source/config/route versions, commands, results and evidence mode. Never claim a test ran from a document/file name, a configured key, a fake success flag or a passing test count alone. Failed or unavailable live gates remain failed/blocked. Pre-register test outcomes and keep failed attempts. Review findings before changing a gate; do not redefine success after failure.
 
+## Lead/worker division and story points
+
+The owner directed the lead to keep useful work flowing: Cursor should receive the bulk of executable implementation, especially routine/easy work, while ChatGPT focuses on architecture, decomposition, hard debugging, evidence design and independent review. Use `docs/coordination/WORKER_STORY_POINT_PROTOCOL.md`, `WORKER_PACKET_BACKLOG.md` and `WORKER_PERFORMANCE.json`.
+
+Estimate new worker packets at SP1–SP5. Prefer SP1–SP3 assignments. Split SP4–SP5 into independent SP1–SP3 packets whenever reasonably possible; do not hand the worker a vague system-sized task. Keep at least three ready bounded packets when practical, and move to the next dependency-ready V1.4 packet when one is blocked on human login/provider access/review.
+
+Track worker outcomes prospectively by point size: first-pass CI, first lead review, rework cycles, evidence completeness, reopened defects and blocker class. Never invent timing or performance data. Lead acceptance/research/review work should continue in parallel rather than waiting idly for the worker.
+
+The owner also asked the lead to prepare future tasks when current useful lead work is exhausted. Future V1.5+ research/decomposition/backlog preparation is allowed, but current implementation remains version-gated: do not start V1.5+ code while the authorized V1.4 tranche is unfinished unless the owner explicitly activates that implementation tranche.
+
 ## Hourly collaboration
 
 ChatGPT's hourly GitHub review is scheduled; it does not wake a local Cursor process. Cursor's unattended runner must be independently installed/verified through a supported no-extra-spend path. Follow `CURSOR_HOURLY_PROMPT.md` and the current V1.4 contract. One runner, no-overlap lease, scoped permissions, bounded sessions, secret-safe logs and resumable state.
