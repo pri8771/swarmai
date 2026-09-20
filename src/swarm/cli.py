@@ -225,6 +225,17 @@ def main() -> None:
     )
     eq.add_argument("--max-tokens", type=int, default=600)
     eq.add_argument("--purpose", default="v0.2_p28_model_qualification")
+    eroute = ev_sub.add_parser(
+        "route",
+        help="P29: build evidence-based mission route plan (planner/worker/verifier)",
+    )
+    eroute.add_argument(
+        "--model",
+        action="append",
+        dest="models",
+        default=None,
+        help="Constrain to these Ollama models (repeatable)",
+    )
 
     demo = sub.add_parser("demo", help="Mock demonstrations")
     demo_sub = demo.add_subparsers(dest="demo_command", required=True)
@@ -320,6 +331,11 @@ def main() -> None:
     mrun = mission_sub.add_parser("run", help="Execute a real software mission end-to-end")
     mrun.add_argument("--goal", required=True)
     mrun.add_argument("--model", default="gemma3:4b")
+    mrun.add_argument(
+        "--no-evidence-router",
+        action="store_true",
+        help="Disable P29 heterogeneous routing (single --model for all tasks)",
+    )
     mrun.add_argument(
         "--repo",
         type=Path,
@@ -487,6 +503,18 @@ def main() -> None:
             "report_hash": report.report_hash,
         }
         print(json.dumps(summary, indent=2, default=str))
+    elif args.command == "eval" and args.eval_command == "route":
+        from swarm.envfile import load_repo_dotenv
+        from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
+
+        load_repo_dotenv(_repo_root())
+        plan = build_mission_route_plan(
+            repo=_repo_root(), models=getattr(args, "models", None)
+        )
+        path = save_route_plan(plan, repo=_repo_root())
+        payload = plan.to_dict()
+        payload["saved_to"] = str(path)
+        print(json.dumps(payload, indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "dynamic":
         import asyncio
 
@@ -606,7 +634,12 @@ def main() -> None:
 
         load_repo_dotenv(_repo_root())
         repo = Path(args.repo).resolve() if args.repo else _repo_root()
-        record = run_mission(args.goal, repo=repo, model=args.model)
+        record = run_mission(
+            args.goal,
+            repo=repo,
+            model=args.model,
+            use_evidence_router=not getattr(args, "no_evidence_router", False),
+        )
         print(json.dumps(record.to_dict(), indent=2, default=str))
         if record.status != "completed":
             raise SystemExit(2)
