@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T22:57:51Z",
+  "updated_at": "2026-09-20T23:02:47Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
@@ -16,7 +16,13 @@
     "source": "Owner approved the plan and instructed implementation now through V1.4 with real live behavior",
     "first_checkpoint": "1.0-repair",
     "ceiling": "1.4",
-    "approved_checkpoints": ["1.0-repair", "1.1", "1.2", "1.3", "1.4"],
+    "approved_checkpoints": [
+      "1.0-repair",
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4"
+    ],
     "repeat_operator_start_approval_required": false,
     "independent_evidence_review_required_for_acceptance": true,
     "ready_independent_branch_work_may_continue_while_review_pending": true,
@@ -41,15 +47,21 @@
     "final_positive_missions_required": 12,
     "final_negative_scenarios_required": 6,
     "final_observed_window_hours": 24,
-    "campaign_status": "not_started_or_verified_by_lead",
+    "campaign_status": "preregistered_not_started",
     "supported_scope_open_defect_target": 0,
-    "universal_bug_free_guarantee": false
+    "universal_bug_free_guarantee": false,
+    "campaign_protocol": "docs/coordination/LIVE_142_CAMPAIGN_PROTOCOL.md",
+    "campaign_preregistered": true
   },
-  "roles": {"lead": "ChatGPT", "implementation": "Cursor", "final_authority": "operator"},
-  "last_lead_message_id": "LEAD-20260920-012",
+  "roles": {
+    "lead": "ChatGPT",
+    "implementation": "Cursor",
+    "final_authority": "operator"
+  },
+  "last_lead_message_id": "LEAD-20260920-013",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-012.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-020",
-  "last_lead_heartbeat_at": "2026-09-20T22:57:51Z",
+  "last_lead_heartbeat_at": "2026-09-20T23:02:47Z",
   "last_cursor_heartbeat_at": "2026-09-20T22:55:28Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -167,12 +179,12 @@
     {
       "id": "EVAL-131",
       "owner": "Cursor",
-      "status": "provisional_60_cells_n5_not_qualified",
+      "status": "protocol_preregistered_screening_not_qualified",
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
       "source_sha": "484647ce1156a3227d60bb8d990cfd2a6f949bf6",
       "review_status": "not_accepted",
-      "blocker": "S/M/L/XL screening spans six families and three local model configs, but preregistered acceptance/uncertainty criterion, total-overhead accounting and sufficient qualification samples remain open."
+      "blocker": "Qualification protocol is now frozen; required next: complete missing required screening cells, candidate-cell held-out sampling to Wilson criterion, reviewer-role qualification, and overhead accounting."
     },
     {
       "id": "SWARM-141",
@@ -188,11 +200,12 @@
     {
       "id": "LIVE-142",
       "owner": "Cursor",
-      "status": "queued",
+      "status": "campaign_preregistered_not_started",
       "scope": "Final actual V1.4 live campaign and review",
       "source_branch": null,
       "source_sha": null,
-      "review_status": "pending"
+      "review_status": "pending",
+      "blocker": "Starts only after integrated G10-G14 and candidate freeze."
     }
   ],
   "gates": {
@@ -216,8 +229,8 @@
     },
     "G13": {
       "checkpoint": "1.3",
-      "status": "provisional_screening_not_qualified",
-      "evidence": "60 provisional n>=5 cells across S/M/L/XL, six families and three local model configurations; no accepted preregistered qualification/uncertainty rule or adequate samples",
+      "status": "protocol_preregistered_screening_not_qualified",
+      "evidence": "EVAL_131_QUALIFICATION_PROTOCOL.md frozen; existing n=5 screening remains provisional; qualification sampling/overhead/reviewer-role proof remain",
       "review": "not_accepted"
     },
     "G14": {
@@ -236,7 +249,10 @@
     "normal_memory_word_limit": 1200,
     "read_entire_history_by_default": false,
     "secrets_in_git": false,
-    "private_identity_mapping_in_git": false
+    "private_identity_mapping_in_git": false,
+    "lead_acceptance_plan": "docs/coordination/V1_4_LEAD_ACCEPTANCE_PLAN.md",
+    "eval131_protocol": "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
+    "live142_protocol": "docs/coordination/LIVE_142_CAMPAIGN_PROTOCOL.md"
   },
   "data_policy": {
     "runtime_demo_data_allowed": false,
@@ -249,9 +265,9 @@
     "FIX-004: Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet",
     "G11: actual browser console create/observe plus current operational-mode/bound restart-reopen, cancel, unsupported and wrong-output evidence required",
     "G12: concurrent two-remote-provider live mission evidence absent",
-    "G13: preregistered qualification/uncertainty criterion, overhead accounting and sufficient qualification samples absent",
+    "G13: qualification protocol now frozen; qualification samples/overhead/reviewer-role proof remain",
     "G14: live adaptive multi-planner expansion/contraction evidence absent",
-    "LIVE-142 final 12-positive/6-negative/24-hour live campaign not started"
+    "LIVE-142 campaign is preregistered but starts only after integrated G10-G14 candidate freeze"
   ],
   "current_source_verification": {
     "verified_at": "2026-09-20T22:57:51Z",
