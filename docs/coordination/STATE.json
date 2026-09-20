@@ -1,13 +1,13 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-20T22:55:28Z",
+  "updated_at": "2026-09-20T22:57:51Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
   "audit_date": "2026-09-20",
   "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_repair_near_acceptance_blocked_authenticated_hourly_worker",
+  "product_status": "v1_repair_source_reviewed_blocked_authenticated_hourly_worker",
   "current_checkpoint": "1.0-repair",
   "roadmap_status": "owner_approved_direction_through_3.0",
   "next_checkpoint_after_gate_pass": "1.1",
@@ -16,13 +16,7 @@
     "source": "Owner approved the plan and instructed implementation now through V1.4 with real live behavior",
     "first_checkpoint": "1.0-repair",
     "ceiling": "1.4",
-    "approved_checkpoints": [
-      "1.0-repair",
-      "1.1",
-      "1.2",
-      "1.3",
-      "1.4"
-    ],
+    "approved_checkpoints": ["1.0-repair", "1.1", "1.2", "1.3", "1.4"],
     "repeat_operator_start_approval_required": false,
     "independent_evidence_review_required_for_acceptance": true,
     "ready_independent_branch_work_may_continue_while_review_pending": true,
@@ -51,15 +45,11 @@
     "supported_scope_open_defect_target": 0,
     "universal_bug_free_guarantee": false
   },
-  "roles": {
-    "lead": "ChatGPT",
-    "implementation": "Cursor",
-    "final_authority": "operator"
-  },
-  "last_lead_message_id": "LEAD-20260920-011",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-010.md",
+  "roles": {"lead": "ChatGPT", "implementation": "Cursor", "final_authority": "operator"},
+  "last_lead_message_id": "LEAD-20260920-012",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-012.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-020",
-  "last_lead_heartbeat_at": "2026-09-20T22:38:21Z",
+  "last_lead_heartbeat_at": "2026-09-20T22:57:51Z",
   "last_cursor_heartbeat_at": "2026-09-20T22:55:28Z",
   "last_completed_assignment_id": null,
   "lead_automation": {
@@ -67,8 +57,8 @@
     "title": "SwarmAI engineering check-in",
     "cadence": "hourly",
     "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution",
-    "last_run_at": "2026-09-20T22:00:40.452929Z",
-    "last_run_age_minutes_at_review": 38
+    "last_run_at": "2026-09-20T22:57:51Z",
+    "last_run_age_minutes_at_review": 0
   },
   "cursor_runner": {
     "status": "scheduler_checkins_verified_agent_auth_blocked",
@@ -105,9 +95,9 @@
       "status": "tests_verified_current_tip",
       "scope": "Full CI and honest baseline",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "verified",
-      "evidence": "Actions 35539853498: console success; Ruff success; mypy 139 files; install success; Alembic head; 245 passed 2 skipped. CI DB integration honestly skipped without SWARM_DATABASE_URL."
+      "evidence": "Actions 35543156880 success on docs-only tip; same application tree as 6669d378 where PR CI 35543013930 showed console install/lint/test/build success, Ruff success, mypy 139 files, install success, Alembic head, 267 passed 2 skipped. CI DB integration honestly skipped without SWARM_DATABASE_URL."
     },
     {
       "id": "FIX-002",
@@ -115,21 +105,21 @@
       "status": "source_repaired_lead_verified",
       "scope": "Authentication, project isolation and idempotency",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "verified_pending_gate",
-      "blocker": "repairs pushed on b5ef431; lead must re-verify worker/approval ownership + install-local bootstrap",
-      "evidence": "tests/api/test_fix002_ownership.py + app resolve_install_project_id"
+      "blocker": null,
+      "evidence": "Operational bootstrap install-local project; project-scoped worker/approval operations; scoped idempotency/auth-before-cache reviewed. c1ebf20 is docs-only over reviewed code tip 6669d378."
     },
     {
       "id": "FIX-003",
       "owner": "Cursor",
-      "status": "identity_binding_implemented_awaiting_lead_reverify",
+      "status": "source_repaired_lead_verified",
       "scope": "Actual behavioral evidence and readiness",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
-      "review_status": "awaiting_lead_reverify",
-      "blocker": "identity groups shipped on a17ae17; lead must re-verify; FIX-004 login still blocks G10 accept",
-      "evidence": "tests/release/test_fix003_evidence_binding.py; EVIDENCE_IDENTITY_GROUPS in verify.py; CI 35542951933"
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+      "review_status": "verified_pending_gate",
+      "blocker": null,
+      "evidence": "Exact candidate SHA + command/result + mode + freshness + evidence-kind identity requirements and negative regressions reviewed in verify.py/test_fix003_evidence_binding.py; current exact-tip CI 35543156880 green."
     },
     {
       "id": "FIX-004",
@@ -137,9 +127,9 @@
       "status": "scheduler_verified_authenticated_worker_blocked",
       "scope": "Login/session records and verified hourly worker",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "changes_required",
-      "blocker": "cursor agent status/whoami Not logged in; unattended worker spawning remains disabled"
+      "blocker": "cursor agent status/whoami Not logged in; no authenticated manual invocation or two genuine hourly worker receipts"
     },
     {
       "id": "FIX-005",
@@ -147,20 +137,21 @@
       "status": "source_repaired_lead_verified",
       "scope": "Remove operational fixtures, known answers and admission bypasses",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "b5ef431aef36212417693ca826024d67d0f19e4f",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "verified_pending_gate",
-      "blocker": "repairs pushed on b5ef431; lead must re-verify operational console/API have no mock fallback",
-      "evidence": "console emptyLiveSnapshot + store fixture_mode + demo route fixture-gated"
+      "blocker": null,
+      "evidence": "Operational ProductStore/capacity/API/console are honest live/empty; fixtures explicit; demo route fixture-gated; parser dogfood opt-in; no mock fallback reviewed."
     },
     {
       "id": "RUN-111",
       "owner": "Cursor",
-      "status": "multisurface_residual_evidenced_not_accepted",
+      "status": "local_multisurface_evidence_advanced_revalidation_required_not_accepted",
       "scope": "G11 unified generic mission runtime",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "ca6d425553420cd9f1be2dd7434c110ec9912eef",
-      "review_status": "pending_after_g10",
-      "blocker": "G11 residual multisurface $0 evidenced; lead accept not invented; G10 still open"
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+      "review_status": "changes_required_after_g10",
+      "blocker": "Current evidence proves console-shaped create rather than actual console UI create; older restart/accept-control evidence predates operational-mode/evidence-binding repairs and must be rerun/bound to current candidate.",
+      "evidence": "Three real $0 Ollama tasks across extract+triage share durable IDs across API/CLI and console-shaped snapshot; no automatic primary worktree promotion."
     },
     {
       "id": "INF-121",
@@ -168,20 +159,20 @@
       "status": "in_progress_local_admission_reconcile_remote_required",
       "scope": "G12 governed concurrent inference pool",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "not_accepted",
       "blocker": "required concurrent two-remote-provider mission evidence absent",
-      "evidence": "inf-121/local-admission-reconcile.json + concurrent/kill-fallback; remote dual still required"
+      "evidence": "Local dual-route admission/settle/exhaustion denial verified as preparation; artifact explicitly live_dual_remote_claimed=false."
     },
     {
       "id": "EVAL-131",
       "owner": "Cursor",
-      "status": "provisional_24_cells_n5_not_qualified",
+      "status": "provisional_60_cells_n5_not_qualified",
       "scope": "G13 measured model/family/size qualification",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "f75c6cb5bb8e0d2d2d2c0c6e4061fe2909f11efc",
+      "source_sha": "484647ce1156a3227d60bb8d990cfd2a6f949bf6",
       "review_status": "not_accepted",
-      "blocker": "S+M x six families x two local models at n=5 are screening only; L/XL, third actual config and preregistered acceptance/uncertainty criterion remain open"
+      "blocker": "S/M/L/XL screening spans six families and three local model configs, but preregistered acceptance/uncertainty criterion, total-overhead accounting and sufficient qualification samples remain open."
     },
     {
       "id": "SWARM-141",
@@ -189,10 +180,10 @@
       "status": "offline_admission_gated_expand_prep_not_accepted",
       "scope": "G14 elastic evidence-driven task graph",
       "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
+      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
       "review_status": "not_accepted",
       "blocker": "live multi-planner adaptive expansion/contraction evidence absent",
-      "evidence": "swarm-141/admission-gated-expand-offline.json + prior offline prep; live multi-planner absent"
+      "evidence": "Offline expand -> max_graph_nodes deny -> contract -> expand proof is preparation only and explicitly live_claimed=false."
     },
     {
       "id": "LIVE-142",
@@ -207,32 +198,32 @@
   "gates": {
     "G10": {
       "checkpoint": "1.0-repair",
-      "status": "near_acceptance_fix004_login_remaining",
-      "evidence": "PR #14 tip 6669d37827d487206ee6c71734d4e2c64b475906; feature a17ae17e430831eb23d2fafc871244c096ca275d; CI 35542951933+35543012288 green; FIX-003 identity binding implemented awaiting lead re-verify; FIX-004 authenticated hourly receipts remain",
+      "status": "source_ci_reviewed_blocked_fix004_authenticated_worker",
+      "evidence": "PR #14 current head c1ebf20abb10c53c0209dcc15bfa5bf89efba510 (docs-only over reviewed code tip 6669d378); CI 35543156880 green; FIX-001/002/003/005 source/CI reviewed; FIX-004 authenticated manual + two hourly worker receipts remain",
       "review": "changes_required_fix004"
     },
     "G11": {
       "checkpoint": "1.1",
-      "status": "in_progress_no_auto_promote_source_fixed_not_accepted",
-      "evidence": "durable identity/restart/review controls posted; residual full unfamiliar-task execution and explicit apply boundary remain",
-      "review": "pending_after_g10"
+      "status": "evidence_advanced_current_tip_revalidation_required_not_accepted",
+      "evidence": "Three real $0 unfamiliar extract/triage missions share durable IDs via API/CLI and console-shaped snapshot. Actual browser console create/observe plus current operational-mode restart/reject/cancel evidence binding remain.",
+      "review": "changes_required_after_g10"
     },
     "G12": {
       "checkpoint": "1.2",
       "status": "in_progress_local_only_not_accepted",
-      "evidence": "local concurrent + kill-fallback + admission-reconcile; required dual remote overlap not evidenced",
+      "evidence": "Local admission/reconcile and prior local concurrency/fallback preparation; required dual remote overlap not evidenced",
       "review": "not_accepted"
     },
     "G13": {
       "checkpoint": "1.3",
       "status": "provisional_screening_not_qualified",
-      "evidence": "S+M x six families x two local models at n=5: 24 provisional cells / 120 trials; no L/XL or third config; no accepted qualification criterion",
+      "evidence": "60 provisional n>=5 cells across S/M/L/XL, six families and three local model configurations; no accepted preregistered qualification/uncertainty rule or adequate samples",
       "review": "not_accepted"
     },
     "G14": {
       "checkpoint": "1.4",
       "status": "offline_prep_not_accepted",
-      "evidence": "offline graph/load + admission-gated expand/contract; live adaptive multi-planner proof absent",
+      "evidence": "Offline graph/load + admission-gated expand/contract only; live adaptive multi-planner proof absent",
       "review": "not_accepted"
     }
   },
@@ -255,45 +246,49 @@
     "unknown_observations_must_remain_unknown": true
   },
   "open_blockers": [
-    "Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet (FIX-004)",
-    "FIX-003 identity binding implemented on tip a17ae17 \u2014 awaiting lead re-verify (not auto-accepted)",
-    "G12 remote dual-provider, G13 qualification, G14 live adaptive proof and LIVE-142 remain unaccepted"
+    "FIX-004: Cursor agent CLI remains Not logged in; no authenticated unattended hourly worker receipts yet",
+    "G11: actual browser console create/observe plus current operational-mode/bound restart-reopen, cancel, unsupported and wrong-output evidence required",
+    "G12: concurrent two-remote-provider live mission evidence absent",
+    "G13: preregistered qualification/uncertainty criterion, overhead accounting and sufficient qualification samples absent",
+    "G14: live adaptive multi-planner expansion/contraction evidence absent",
+    "LIVE-142 final 12-positive/6-negative/24-hour live campaign not started"
   ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T22:55:28Z",
+    "verified_at": "2026-09-20T22:57:51Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "open_candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
     "latest_verified_ci_run_id": 35543156880,
     "latest_verified_ci_conclusion": "success",
-    "offline_job_id": 106160887278,
-    "offline_conclusion": "success",
-    "console_job_id": 106160887420,
-    "console_conclusion": "success",
-    "live_gated_job_id": 106160887415,
+    "offline_job_id": null,
+    "offline_conclusion": "success_on_exact_tip_same_app_tree_as_6669d378; reviewed prior PR job 106163959614 showed 267_passed_2_skipped",
+    "console_job_id": null,
+    "console_conclusion": "success_on_exact_tip",
+    "live_gated_job_id": null,
     "live_gated_conclusion": "success_blocked_notice_only",
     "db_integration_ci": "skipped_honestly_without_SWARM_DATABASE_URL",
     "live_acceptance_executed": false,
-    "worker_reported_feature_sha": "a17ae17e430831eb23d2fafc871244c096ca275d",
-    "worker_reported_feature_ci_run_id": 35542951933
+    "lead_reviewed_code_sha": "6669d37827d487206ee6c71734d4e2c64b475906",
+    "candidate_docs_only_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510"
   },
   "implementation_notes": {
     "cursor_tip": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead",
+    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead; GitHub CI integration still honestly skipped",
     "optional_cursor_login": "not_logged_in_skip_uncleared",
-    "run111_accept_evidence": "posted_not_lead_accepted",
-    "inf121": "local_admission_reconcile_added_remote_dual_required",
-    "eval131": "24 provisional n5 S+M cells across two local models; screening only",
-    "swarm141": "offline_admission_gated_expand_prep_only",
+    "run111_accept_evidence": "three real local tasks evidenced; actual browser console + current-tip operational revalidation still required",
+    "inf121": "local admission/reconcile added; remote dual required",
+    "eval131": "60 provisional n5 cells across S/M/L/XL, six families, three local models; screening only",
+    "swarm141": "offline admission-gated expand/contract prep only",
     "lead_findings": [
-      "LEAD-011 ACK: FIX-003 identity binding implemented; awaiting lead re-verify",
-      "G12/G14 local $0 packaging advanced; remote/live still unclaimed",
-      "CLI login remains Not logged in; SKIP uncleared",
-      "G10 accept not invented"
+      "LEAD-012 lead-verified FIX-003 identity binding and current G10 source/CI; c1ebf20 is docs-only over reviewed code",
+      "G10 overall remains blocked on FIX-004 authenticated worker receipts",
+      "G11 evidence is real-local but console-shaped and older restart/control artifacts are stale after operational-mode repairs",
+      "G12 local and G14 offline prep correctly remain unaccepted",
+      "CLI login remains Not logged in; SKIP uncleared"
     ],
-    "ci_run": "35542951933_35543012288_35543156880_success",
-    "g10_review": "LEAD-20260920-011_identity_shipped_awaiting_reverify",
-    "feature_tip": "a17ae17e430831eb23d2fafc871244c096ca275d"
+    "ci_run": "35543156880_success",
+    "g10_review": "LEAD-20260920-012_source_ci_verified_fix004_blocked",
+    "feature_tip": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510"
   }
 }
