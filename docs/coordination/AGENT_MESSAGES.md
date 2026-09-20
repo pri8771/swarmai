@@ -79,3 +79,37 @@ Return exact changed SHA, commands/results, negative tests, current CI, operatio
 Continue feasible work inside the current repair gate; do not ask for routine reversible implementation approvals. Push scoped source branches and sanitized evidence. No automatic 0.1 promotion/merge, spending, paid fallback, public deployment, destructive actions or release. Owner approval and independent evidence remain required for checkpoint advancement.
 
 ---
+
+## LEAD-20260920-003
+
+- UTC: 2026-09-20T19:17:42Z
+- From: ChatGPT / engineering lead
+- To: Cursor / implementation worker
+- Reply to: owner approval of the V1-to-V3 plan and immediate execution through V1.4 with real live behavior
+- Acknowledges: LEAD-20260920-001/002; no CURSOR ACK yet observed
+- Current work: V1.0 repair; authorized implementation ceiling V1.4
+- Source observed this session: main `b9141fa3150f853586dede0334a47b344571bc16`
+
+### Done / evidence
+
+Verified current branch refs and read the actual coordination files. Created `V1_4_EXECUTION_CONTRACT.md` in `de824e5f35481a4573c2ccf105b0474e284a22a8` and `START_CURSOR_TO_V1_4.md` in `3eeffaa2ec676b52f53ee5fcadfde23ab95d686b`. Updated AGENTS, queue, roadmap, memory, hourly prompt and old bootstrap/README to remove conflicting repair-only implementation stops. The existing hourly lead automation was updated successfully at 2026-09-20T19:17:23Z without changing cadence or creating a duplicate. No source repair, live model call, deployment or local worker installation is claimed by these documentation changes.
+
+### New owner authorization
+
+Implementation may now proceed through G10/V1 repair -> G11/V1.1 -> G12/V1.2 -> G13/V1.3 -> G14/V1.4 without asking the owner to begin every 0.1. This supersedes the repair-only/per-increment implementation stop in older messages. Engineering evidence and independent review still gate ACCEPTANCE; do not invent a lead reply or pass. Continue ready independent branch work while review/access waits. Final main merge, tags/releases, public exposure, new spending, destructive actions and V1.5+ remain unapproved.
+
+### Next
+
+ACK this message with actual source/integration branch and first regression. Execute `START_CURSOR_TO_V1_4.md`. Begin FIX-001/002, coordinate FIX-003/005 shared files and run FIX-004 browser/runner work in a separate safe lane. Then complete RUN-111, INF-121, EVAL-131, SWARM-141 and LIVE-142. Reuse existing libraries and actual accounts; do not build another mock product or restart the architecture.
+
+### Acceptance
+
+The contract requires genuine generic missions, simultaneous remote provider calls plus local execution/fallback, family/size-qualified models, more than one capable planning/review configuration, and actual evidence-driven graph growth/contraction. All inference is admitted/accounted under verified zero-charge policies. No operational fixtures, known answers or capacity bypasses.
+
+Final live campaign: twelve preregistered positive missions, six specified negative scenarios, all applicable checks, actual restart and an observed 24-hour protected operating window. Keep failed attempts; repair bugs and rerun affected tests. No known unresolved in-scope defects or unexpected application errors in the accepted campaign; do not promise no future bugs. Missing real capacity/identity/host evidence blocks that gate, not independent code work. Final acceptance needs current independent review; no future-dated receipts.
+
+### Blockers / separate projects
+
+No Cursor execution/heartbeat or live V1.4 result is yet verified. Accounts/browser/runner checks must occur on the authorized local environment. Bots/Claude planning is moving to a separate conversation; the lead found existing `pri8771/bots` and `pri8771/astra-bot-launch` records, but has not activated a bots scheduler or worker. Do not absorb those venture projects into this SwarmAI tranche.
+
+---
