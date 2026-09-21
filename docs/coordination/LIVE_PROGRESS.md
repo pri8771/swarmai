@@ -1,6 +1,6 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21T19:55:00Z
+Updated: 2026-09-21T21:11:40Z
 
 ## Current operating model
 
@@ -11,56 +11,74 @@ Updated: 2026-09-21T19:55:00Z
 | Operator | owner | Final authority |
 | ChatGPT | planning / coordination / independent review | No competing implementation lane |
 
-Implementation branch: `cursor/v17-single-session` @ `dbac43017e3773ed600249b329a9ba9a3a0c56f8` at lead closeout observation.
-Legacy A/B assignments remain generation 7, disabled, with empty queues. Repository owner directive continues to supersede older two-lane reset text.
+Implementation branch: `cursor/v17-single-session` @ `f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
+Legacy A/B assignment JSONs remain generation 7, disabled, with empty queues. Repository owner directive continues to supersede older two-lane reset text.
 
 ## Heartbeat
 
 - Protocol: `SINGLE_SESSION_HEARTBEAT.md`; epoch `single-v17-20260921-01`; producer registered.
-- Post-registration scheduler receipts observed at `19:24:47Z`, `19:29:53Z`, `19:34:59Z`, `19:40:04Z`, and `19:45:09Z`, all at healthy approximately five-minute cadence.
-- Latest observed manual progress receipt is `19:51:50Z`; session remains fresh/working.
+- Latest counted scheduler heartbeat observed: `2026-09-21T21:11:40Z` at branch SHA `f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
+- Status: `working`; current packet `R27`; current artifact `ART-V17-APPROVAL-BINDING`.
+- Session remains fresh under the 12-minute stale threshold.
 - Heartbeat is liveness/progress only and does not accept artifacts.
 
-## Latest independent review — ART-V14-REAL-E2E
+## Current review decisions
 
-Decision: **CHANGES REQUIRED** for `v14-real-007` / evidence commit `46461a39b4903b1bdc0735fb526d0cd38c6cd8f5`.
+### ART-V14-REAL-E2E
 
-The run is useful operational evidence: real mission `609fc23e9cb04117a032eb3d50a0104b`, actual brokered local `qwen2.5-coder:14b` work at reported `$0`, isolated material diff, target-relevant `tests/workspace` verification, grounded reviewer path, and no automatic primary-checkout apply.
+`v14-real-007` remains **CHANGES REQUIRED**. The run proved real brokered local inference, material isolated-worktree output and no auto-apply, but did not demonstrate a defensible pre-patch correctness/reliability/security defect or a target regression proving repair. `ART-V14-REAL-E2E` stays `drafting`. Next attempt must be newly preregistered on a different bounded subsystem and prove an actual failing invariant/check before repair.
 
-It does **not** verify ART-V14-REAL-E2E. The proposed patch is mostly typing modernization and changes provenance from order-preserving list de-duplication to unordered `set` accumulation. That behavioral change was not shown to repair any real defect and can destabilize observable provenance ordering. The run's own manifest also records that its reviewer explanation about `typing.Set` was incorrect and flags provenance-order risk. No targeted regression demonstrates a pre-patch defect fixed by the patch.
+### V1.5 durable worker path
 
-Canonical review: `docs/coordination/reviews/ART-V14-REAL-E2E-V14-REAL-007-LEAD-REVIEW.md` (`08b6520347effe67b4fbceb986957a02680cefcb`). Preserve `v14-real-007` unchanged as failed independent-review evidence. Required next step is a **new preregistered real mission** on another bounded subsystem with an objectively defensible defect and a target regression/check.
+New current-tip recovery/verification evidence is useful but not self-accepting:
 
-`ART-V14-REAL-E2E` remains `drafting`; no artifact lifecycle promotion occurred.
+- R15 result-acceptance fence: `d3e1cd4035067abf30ce07093e7b0663f7f13ba9`; focused result-acceptance suite reports 10 passed.
+- R16 durable worker protocol: `b683ed7a3ab755181fb0ffc69833c7b34638dab7`, bound by `f322672c24db3aae513c1b3301b005d4673419b6`; receipt reports byte-identical service/client/envelopes/transport versus reviewed V2A-004 donor and 18 focused tests passed.
+- R17 recovery CP3: `cea12c622a44196b57bb8abe76b0ed83da1d97b6`, bound by `f5503d7d409096b773e8f86c7fe5cebba2c99800`; separate OS processes sharing Postgres demonstrated victim kill, expiry/reassignment, one accepted survivor result, and stale-result rejection; focused harness reports 1 passed.
+- R18 honestly records that actual multi-host proof is still blocked on a second physical host at `37fd070cf466127a194acd3e406fc8954a37868b`.
 
-## G13 progress
+Canonical artifact lifecycle is unchanged this run: `ART-V15-LEASE-FENCING` and `ART-V15-WORKER-PROTOCOL` remain `drafting`; `ART-V15-MULTIHOST-EVIDENCE` remains blocked. Local receipts do not substitute for independent executable acceptance or multi-host proof.
 
-- R03 selectively transplanted the G13 v3 pool implementation from donor `534476393257794c4e8ebf8d65f44fd090ab28eb` without the retired coordination topology.
-- R04 Mac verification reported 240 held-out inputs, 15 semantic archetypes per required cell, digest match, Ruff/mypy clean, and 11 focused tests green. This is useful current-environment evidence, but the canonical registry still requires actual HOST-WIN-DEV executable verification before lead freeze; Mac verification does not impersonate Windows.
-- R05 reviewer-calibration implementation is pushed: evidence tip `6529f408b4aefd23a8129aa84a66a2d5ecb27ec7`, descendant lineage on the current branch; receipt claims 10/10 calibration cases and negatives green. No held-out qualification started and no qualification acceptance is claimed.
-- Real sealed-reference content digest remains unbound. Counted qualification remains prohibited until canonical prerequisites are legitimately satisfied.
+### V1.6 / V1.7 implementation evidence
 
-## V1.5 / recovery progress
+The single session has advanced materially beyond the last dashboard tip:
 
-- R13 confirmed the durable lease schema/token-hash foundation is already present without downgrading later V2A-003b/c or V17 effect work. Evidence at `a0e1a882a2da6980ac03a513a97bb1f28e787a01` reports 11 focused lease-foundation tests passed against the local operator DB and Alembic head `a17effect004a0001`.
-- R14 confirmed claim/renew/expire behavior is already present as a later superset. Evidence tip `297e6aeb0ee448a3b680e3ba2bb984b5199c2437` reports 17 focused integration tests passed; branch descendant `dbac43017e3773ed600249b329a9ba9a3a0c56f8` only rebinds evidence after summary repair.
-- These are verification/recovery advances only; `ART-V15-LEASE-FENCING` is not self-accepted and live Mac+Windows multi-host evidence remains incomplete.
+- R19 provenance contracts `45f4203029b8f6ba1ade61b7b2f7138ef4e7ef84` — 25 focused tests reported.
+- R20 durable project-scoped knowledge repository `d6e033c5202d4404364ac5a766e20dbf24778c9a` — 7 focused tests reported.
+- R21 permission-first retrieval `fa26563821eed20d8ccf97e8ea19fe3e7cbfff01`, with later permitted-only ranking/retrieval verification `beb81c8159882bae719d6c10c0d5994edf2acf60`.
+- R24 MemoryStore adapter verification `b6c781eab6d6de9b36650777e409e58793ae0374`.
+- R25 context-budget evidence `a39378007273903bbda20c4c5f5ce3c08901dcf4`; task quality remains explicitly `UNKNOWN`.
+- R26 V1.7 action-contract verification `0bb3a2bd97a5bec3be9473e02faaf702196992e4`.
+- R27 durable effect/approval-negative verification `c3a249882664f39afe0794229b03360d390f815a`.
+- Current evidence-binding tip: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
+
+These are implementation/local-verification advances, not automatic artifact acceptance.
+
+## G13
+
+- Canonical `ART-V13-TASK-POOL` remains `reviewable`, not verified/frozen.
+- Actual HOST-WIN-DEV executable verification remains unsatisfied; Darwin/macOS verification cannot impersonate it.
+- Real sealed-reference content digest remains unbound; counted qualification remains prohibited and qualified cells remain zero.
+- worker-pc task `swarmai-v13-task-pool-v3-audit-01` completed read-only successfully, but the Claude sandbox could not run project Python/pytest/Ruff/mypy or inspect CI. It is static support only and causes no artifact transition.
+- No new worker-pc dispatch under the current single-session owner directive.
 
 ## CI / blockers
 
-- GitHub Actions is externally blocked before job execution. CP0 classified the annotation as account billing/spending-limit related: jobs do not start, record zero steps, and therefore are not source-test failures or executable CI evidence.
-- Operator action required: restore GitHub Actions billing / spending-limit availability under GitHub **Billing & plans**. Do not spam reruns until that is fixed.
-- `ART-V13-TASK-POOL` remains canonical `reviewable`, not verified/frozen; actual HOST-WIN-DEV executable verification and sealed-reference binding remain unresolved.
-- G12 remote overlap remains blocked at 0 admitted remote routes.
-- `ART-V14-REAL-E2E` remains drafting / changes required after v14-real-007.
-- V1.5 live multi-host evidence remains incomplete.
+- Exact-tip GitHub Actions run `35648897892` is marked failure, but `offline`, `console`, and `live-gated` jobs have zero recorded steps and no runner execution. Treat this as external Actions availability/billing non-evidence, not a source/test pass or failure.
+- Human action: restore GitHub Actions availability only within the existing/no-additional-spend entitlement. Do not authorize new charges or raise a paid spending limit without separate approval.
+- `ART-V14-REAL-E2E` remains drafting / changes required.
+- G13 Windows executable verification + sealed-reference binding remain unresolved.
+- G12 remote overlap remains at 0 admitted routes pending exact zero-charge admission and bounded canaries.
+- V1.5 actual multi-host evidence still needs a second physical host.
 
 ## Top next actions
 
-1. Run a new preregistered V14 real mission on a different bounded operational subsystem and require a demonstrated pre-patch defect/invariant failure plus a correct targeted regression/check.
-2. Continue G13 implementation/reviewer machinery without counted held-out qualification; preserve the explicit Windows-verification and sealed-reference blockers until legitimately resolved.
-3. Continue dependency-independent V1.5/V1.7 verification/recovery work while GitHub Actions is unavailable; retain truthful local test receipts and do not infer CI success.
+1. Continue R28 ToolGateway migration/verification or other dependency-independent single-session work while external blockers remain; do not create parallel implementation lanes.
+2. Run a newly preregistered V14 real mission only after selecting a bounded subsystem with an objectively demonstrable pre-patch defect/invariant failure and target regression.
+3. Preserve G13 counted qualification prohibition until the canonical Windows-verification and sealed-reference gates are legitimately satisfied.
 
 ## Human action
 
-Restore GitHub Actions billing/spending-limit availability so exact-tip CI jobs can actually start. No main merge, public release/deploy, force push, or additional spend is authorized.
+Restore GitHub Actions billing/spending-limit availability under existing/no-additional-spend entitlement. No main merge, public release/deploy, force push, or additional spend is authorized.
+
+Latest lead record: `docs/coordination/messages/LEAD-20260921-040.md`.
