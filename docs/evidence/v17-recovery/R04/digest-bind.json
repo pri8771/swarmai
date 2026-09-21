@@ -62,5 +62,6 @@
   "counted_qualification_ready": false,
   "sealed_bundle_content_digest_bound": false,
   "self_accept": false,
-  "note": "Mac current-topology verification OK. Do not invent-accept; sealed-reference content digest still unbound (R06)."
+  "note": "Mac current-topology verification OK. Do not invent-accept; sealed-reference content digest still unbound (R06).",
+  "evidence_tip_sha": "94f70a6ab1d14ae8bde1dbc40fd2a780354c6299"
 }
