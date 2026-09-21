@@ -120,6 +120,7 @@ class MissionRuntime:
             broker=self._mission_broker(),
             project_id=mission.project_id,
             parser_dogfood_fixture=self.parser_dogfood_fixture,
+            require_broker=True,
         )
         prior: dict[str, WorkerResult] = {}
         shared_wt: WorktreeHandle | None = None

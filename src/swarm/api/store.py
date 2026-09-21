@@ -69,6 +69,8 @@ class ProductStore:
     repo_root: Path | None = None
     _project_store: ProjectStore | None = field(default=None, repr=False)
     _mission_store: MissionStore | None = field(default=None, repr=False)
+    # Governed local zero-spend broker for operational generic execute path.
+    _mission_broker: Any | None = field(default=None, repr=False)
 
     def project_store(self) -> ProjectStore:
         if self._project_store is None:
@@ -82,6 +84,22 @@ class ProductStore:
             root = (self.repo_root or Path.cwd()) / "var" / "missions"
             self._mission_store = MissionStore(root)
         return self._mission_store
+
+    def operational_mission_broker(
+        self, *, models: list[str] | None = None
+    ) -> Any:
+        """Reuse the existing governed local mission broker (no second broker)."""
+        from swarm.mission.brokered_inference import build_local_mission_broker
+
+        wanted = tuple(models) if models is not None else ("gemma3:4b", "qwen3.5:4b")
+        cached_key = getattr(self, "_mission_broker_models", None)
+        if self._mission_broker is None or cached_key != wanted:
+            self._mission_broker = build_local_mission_broker(
+                repo_root=self.repo_root or Path.cwd(),
+                models=list(wanted),
+            )
+            self._mission_broker_models = wanted
+        return self._mission_broker
 
     def history_index(self) -> HistoryIndex:
         return HistoryIndex(self.repo_root or Path.cwd())
@@ -622,7 +640,16 @@ class ProductStore:
             quality_policy_id="policy_default",
             status=TaskStatus.READY,
         )
-        worker = RepoWorker(self.repo_root or Path.cwd(), model=model)
+        # ART-V12 / V2A-001: operational generic execution must use the governed
+        # project-scoped broker — never construct RepoWorker without one.
+        broker = self.operational_mission_broker(models=[model])
+        worker = RepoWorker(
+            self.repo_root or Path.cwd(),
+            model=model,
+            broker=broker,
+            project_id=mission.project_id,
+            require_broker=True,
+        )
         result, _wt = worker.run_task(task, mission_id=mission_id, prior={})
         ledger = CostLedger()
         inf = result.inference or {}
@@ -676,6 +703,13 @@ class ProductStore:
         record.artifacts = {
             **(record.artifacts or {}),
             "worker_result": result.to_dict(),
+            "broker_contract": {
+                "governed": True,
+                "project_id": mission.project_id,
+                "route_id": (inf.get("route_id") if inf else None),
+                "broker_error": (inf.get("error") if inf else None),
+                "require_broker": True,
+            },
         }
         record.validation = {
             **(record.validation or {}),
@@ -761,6 +795,15 @@ class ProductStore:
             "cost": saved.cost,
             "review": review.to_dict(),
             "result": saved.result,
+            "broker": {
+                "governed": True,
+                "project_id": mission.project_id,
+                "route_id": (inf.get("route_id") if inf else None),
+                "error": (inf.get("error") if inf else None),
+                "prompt_tokens": (inf.get("prompt_tokens") if inf else None),
+                "completion_tokens": (inf.get("completion_tokens") if inf else None),
+                "cost_usd": (inf.get("cost_usd") if inf else None),
+            },
             "mock_vs_live": "local_ollama_worker_execution_zero_spend",
         }
 

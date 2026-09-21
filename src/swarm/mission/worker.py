@@ -109,6 +109,7 @@ class RepoWorker:
         broker: Any | None = None,
         project_id: str = "proj_demo",
         parser_dogfood_fixture: bool = False,
+        require_broker: bool = False,
     ) -> None:
         self.repo = repo.resolve()
         self.model = model
@@ -118,6 +119,9 @@ class RepoWorker:
         self.broker = broker
         self.project_id = project_id
         self.parser_dogfood_fixture = parser_dogfood_fixture
+        # Operational API/CLI paths must set this so model calls cannot bypass
+        # the governed project-scoped broker via direct local_chat.
+        self.require_broker = require_broker
 
     def _model_for(self, task_family: str) -> str:
         return self.model_by_family.get(task_family) or self.model
@@ -145,7 +149,7 @@ class RepoWorker:
         model: str,
         max_tokens: int = 800,
     ) -> InferenceResult:
-        """Prefer brokered path; fall back to local_chat only when no broker wired."""
+        """Prefer brokered path; fail closed when broker is required but missing."""
         if self.broker is not None:
             from swarm.mission.brokered_inference import brokered_local_chat_sync
 
@@ -156,6 +160,14 @@ class RepoWorker:
                 max_tokens=max_tokens,
                 project_id=self.project_id,
                 purpose="mission",
+            )
+        if self.require_broker:
+            return InferenceResult(
+                ok=False,
+                text="",
+                model=model,
+                route_id=f"rt_ollama_{model}",
+                error="broker_required_but_missing",
             )
         return local_chat(
             messages=messages,
