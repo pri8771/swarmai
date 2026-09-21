@@ -1,6 +1,6 @@
 # SwarmAI compact project memory
 
-Curated 2026-09-21 after `LEAD-20260921-027`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
+Curated 2026-09-21 after `LEAD-20260921-029`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
 
 ## Authority and team
 
@@ -19,10 +19,10 @@ Artifacts are primary; packets advance artifact state. Cursor gets routine SP1-S
 
 Main `b9141fa3150f853586dede0334a47b344571bc16`.
 A runtime `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`, Actions `35558067148` red offline Ruff on shared autonomous-runner source.
-B product `6b0e1277051ae90fe1d56825d3e771b042380755`, prior exact-tip CI red from the same shared source.
+B product `6b0e1277051ae90fe1d56825d3e771b042380755`, Actions `35558073323` red from the same shared source.
 Reviewed integration baseline `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
 
-No A/B source implementation commit advanced in LEAD-027. `OPS-AUTO-001-R` remains the immediate local implementation blocker.
+No A/B source implementation commit advanced in LEAD-029. `OPS-AUTO-001-R` remains the immediate local implementation blocker.
 
 ## Heartbeat / autonomy truth
 
@@ -30,8 +30,8 @@ Only `trigger=scheduler` counts. Need 3 consecutive receipts 10-25 minutes apart
 
 Current verified scheduler state:
 - A: `03:47:19Z -> 04:02:22Z`, **2/3 and stale**; no later receipt observed.
-- B: valid sequence through `05:29:17Z`, **8 consecutive**, individually complete/fresh.
-- Global mode remains `bootstrap_15m` because A has not met the requirement.
+- B: `07:29:17Z -> 07:44:17Z`, **2/3 and fresh**. The prior chain was broken by the `06:29:17Z -> 07:29:17Z` 60-minute gap.
+- Global mode remains `bootstrap_15m` because neither lane currently has a qualifying 3/3 chain.
 
 Coordination heartbeat does not satisfy `ART-V10-WORKER-HEARTBEAT`. Neither host has proven a repo-assigned autonomous self-launch plus attributable source push, so `ART-OPS-AUTONOMOUS-WORKERS` remains drafting.
 
@@ -53,7 +53,9 @@ Lead created `docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.md` and d
 - packet `EXT-WORKER-PC-V2B-001-R1`
 - base `worker/swarmai-v13-task-pool-freeze-02`
 - remote-workers commit `cbdaaab46142e2165084a15157f1aabd8180483d`
-- workflow `35566726945` was in progress when last checked.
+- workflow `35566726945`, job `106229937621`.
+
+At LEAD-029 review time the job remained in `Execute submitted tasks`; no sanitized result JSON and no `worker/swarmai-v13-task-pool-freeze-03` branch existed yet. Capacity remains occupied; do not dispatch another remote task until this attempt terminates.
 
 Repair 03 must create a new v2 freeze: worker-visible held-out inputs contain no hidden references; grader references are sealed/opaque; all 16 required family×size cells have >=15 independent held-out inputs; duplicate/isomorphic contamination is rejected; identities are frozen; and exact-commit verification actually runs. No counted qualification is part of this repair.
 
@@ -66,7 +68,7 @@ Repair 03 must create a new v2 freeze: worker-visible held-out inputs contain no
 - Current-tip local G12 proof accepted: actual Ollama inventory, two brokered local models, route-disable alternate, quota settlement/deny, $0. No remote claim.
 - G12 remote admission remains 0 routes: metadata/auth does not prove exact-account free-tier/zero-charge eligibility.
 - G13 screening has 72 provisional n=5 cells; zero qualified cells.
-- External retry 02/SP2 was changes-required and is now recorded in `WORKER_PERFORMANCE.json`; repair 03 is active.
+- External retry 02/SP2 was changes-required and is recorded in `WORKER_PERFORMANCE.json`; repair 03 is active.
 
 ## Immediate queues
 
@@ -86,7 +88,9 @@ B:
 
 V1.0 still blocked on separate authenticated Cursor-agent evidence. V1.1 required artifacts are verified. V1.2 broker/local admission are verified but dual-remote overlap is blocked at 0 admitted remotes. V1.3 has zero qualified cells and task-pool repair 03 is active. V1.4 first real E2E failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 result acceptance remains. V1.6/V1.7 are queued behind B critical-path work. V2.0 integration/hardening remain drafting; its 168-hour reliability campaign has not started.
 
-Lead-owned critical artifact added this run: `ART-V13-TASK_POOL_REPAIR_CONTRACT.md`, binding hidden-reference isolation, independent held-out depth and freeze-v2 verification before any counted qualification can start.
+Lead-owned critical G13 artifact remains `ART-V13-TASK_POOL_REPAIR_CONTRACT.md`, binding hidden-reference isolation, independent held-out depth and freeze-v2 verification before any counted qualification can start.
+
+`ART-V20-SECURITY-REVIEW` was advanced in coordination commit `c1cd213d33fcda8916ce3f0c0f65972f6a849d57`. Its draft now defines evaluation hidden-reference boundaries, install/support secret handling, a negative-threat matrix, exact-candidate source/test/evidence worksheet requirements and blocker/high-finding acceptance rules. This is review architecture only, not security acceptance evidence.
 
 `ART-V20-RELIABILITY-PROTOCOL` remains drafting with campaign identity/reset matrix, immutable checkpoints, monitoring-gap handling and no-splicing/no-backfill. No elapsed reliability evidence is claimed.
 
