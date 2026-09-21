@@ -46,3 +46,10 @@ Never backfill wall-clock evidence.
 
 ## Long-term target
 Continue through V3.0 using the repo's packet DAGs and live checkpoint protocols, but do not skip dependencies or acceptance gates to advance a version label.
+
+
+## Governance boundary
+- Workers may not author lead-review/approval decisions for their own work.
+- Workers may not use commit prefixes or language such as `lead:`, `approved`, `verified`, or `accepted` to imply ChatGPT lead authority.
+- Planning workers must not promote/merge their own planning branch into canonical coordination unless the operator or ChatGPT lead explicitly instructs that exact promotion after independent review.
+- A worker may only mark its own planning/output `READY_FOR_LEAD_REVIEW`, `impl_complete`, `live_checkpointed`, or `review_pending` as appropriate.
