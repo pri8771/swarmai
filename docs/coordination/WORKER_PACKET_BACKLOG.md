@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated: 2026-09-21T04:50:04Z after `LEAD-20260921-026`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
+Updated: 2026-09-21T04:59:00Z after `LEAD-20260921-026`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
 
 ## Shared local execution blocker
 
@@ -27,15 +27,17 @@ Only `trigger=scheduler` counts. Coordination liveness is separate from autonomo
 
 ## External worker-pc / G13 task-pool
 
-The first V2B-001 external task attempt is **not complete**:
-- task: `swarmai-v13-task-pool-freeze-01`;
-- artifact: `ART-V13-TASK-POOL`;
-- dispatch: `7e17163e7fc85455a8eb0180d3cb2173711dc978`;
-- Actions run `35559390335`: `cancelled`;
-- result JSON: absent;
-- expected worker branch: absent.
+Attempt 01 `swarmai-v13-task-pool-freeze-01` is closed as non-evidence: dispatch `7e17163e7fc85455a8eb0180d3cb2173711dc978`, run `35559390335` cancelled, no result JSON and no worker branch.
 
-No artifact transition or worker performance credit is allowed. `worker-pc` is online/capacity 1, but unrelated remote-worker run `35560103791` was observed `in_progress`, so **do not dispatch a competing retry**. Once idle, create a new unique branch-mode task for the same V2B-001 contract. While that retry is active, local Cursor B must not duplicate V2B-001.
+After remote capacity freed, lead dispatched **retry 02**:
+- task: `swarmai-v13-task-pool-freeze-02`;
+- artifact: `ART-V13-TASK-POOL`;
+- packet: `V2B-001`;
+- remote-workers commit: `4c5fe82f227fc80038a3ce9b1643305be48f09d9`;
+- Actions run: `35562827710`, currently `in_progress`;
+- expected branch: `worker/swarmai-v13-task-pool-freeze-02`.
+
+Running is not reviewable completion. When result appears, lead must inspect the structured result, branch/commit, diff ownership, manifest and tests before any artifact transition. Local B must not duplicate V2B-001 while retry 02 is active. Counted qualification remains prohibited until lead freezes the artifact.
 
 ## Retained lead review dispositions
 
@@ -81,8 +83,8 @@ Autonomous product execution remains held until A0 is reviewed/propagated. Keep 
 ### LOCAL B0 — V2B-000 / ART-V20-INTEGRATED-CANDIDATE / SP1
 Sync only reviewed `cursor/v2-integration@9ce727842446b98cfa55c28c7e70808f57f17d7b`, preserve host/session files, run Windows Python+console baseline, return exact evidence.
 
-### EXTERNAL B1 — V2B-001 / ART-V13-TASK-POOL / SP2
-Retry through worker-pc only after capacity is idle. Freeze calibration vs held-out IDs/hashes for family x S/M/L/XL plus source/license, size classifier, scorer/grader, prompt, tool and exact model config versions. Hidden answers remain worker-invisible. No counted qualification before lead freeze.
+### EXTERNAL B1 — V2B-001 / ART-V13-TASK-POOL / SP2 — ACTIVE
+Retry 02 is executing on worker-pc. Freeze calibration vs held-out IDs/hashes for family x S/M/L/XL plus source/license, size classifier, scorer/grader, prompt, tool and exact model config versions. Hidden answers remain worker-invisible. No counted qualification before lead freeze.
 
 ### LOCAL B2 — V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3
 Calibration-only reviewer benchmark/scorer repair/freeze. May proceed after local B0 while external B1 runs if file ownership is independent. No held-out contamination or qualification claim.
@@ -105,7 +107,7 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - remote overlap = 0 admitted routes.
-- `ART-V13-TASK-POOL`: first external task cancelled before result/branch; not frozen.
+- `ART-V13-TASK-POOL`: retry 02 running/unreviewed.
 - G13 reviewer not frozen; zero qualified cells.
 - V14 real E2E first attempt failed; repair/rerun queued after autonomous source repair.
 - G14 live adaptation blocked on G12/G13.
