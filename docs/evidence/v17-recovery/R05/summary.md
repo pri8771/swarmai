@@ -11,3 +11,5 @@ Negatives covered in unit tests: wrong-result accept, forbidden action, stale id
 Positive control: correct accept.
 
 No held-out reviewer qualification started. No invent-accept.
+
+Tip rebound after dual-writer rebase onto 46f7a24 bootstrap: `6529f408b4aefd23a8129aa84a66a2d5ecb27ec7`.

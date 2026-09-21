@@ -11,5 +11,7 @@
   "passed": 10,
   "failed": 0,
   "ok": true,
-  "evidence_tip_sha": "e44d523379db557c3842f8b89531b95f06f87e60"
+  "evidence_tip_sha": "6529f408b4aefd23a8129aa84a66a2d5ecb27ec7",
+  "rebase_note": "Rebased onto AGENTS/CLAUDE bootstrap tip 46f7a24; tip rebound after push.",
+  "rebound_at": "2026-09-21T19:51:29Z"
 }
