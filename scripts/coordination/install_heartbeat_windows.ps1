@@ -36,7 +36,7 @@ Set-Content -Path $RunnerPs -Value $runnerLines -Encoding UTF8
 $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument (
     '-NoProfile -ExecutionPolicy Bypass -File "' + $RunnerPs + '"'
 )
-$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 15) -RepetitionDuration (New-TimeSpan -Days 3650)
+$Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 5) -RepetitionDuration (New-TimeSpan -Days 3650)
 Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Force | Out-Null
 
 $env:SWARM_GH_PATH = $Gh
@@ -47,4 +47,4 @@ Write-Host "Installed SwarmAI coordination heartbeat B."
 Write-Host ("Task state: " + $Task.State)
 Write-Host ("Next run: " + $Info.NextRunTime)
 Write-Host ("Scheduler log: " + $SchedulerLog)
-Write-Host "Scheduler wakes every 15m; client self-throttles after lead graduation."
+Write-Host "Scheduler wakes every 5m; client self-throttles to the cadence in HEARTBEAT_STATE.json."
