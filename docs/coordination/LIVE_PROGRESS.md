@@ -1,34 +1,49 @@
 # SwarmAI live progress
 
-This page is the human-readable project dashboard. Worker heartbeat pages update on every scheduler heartbeat; the lead refreshes this summary on each lead review.
+Updated by lead: 2026-09-21T15:05:00Z
 
-## Current execution topology
+## Execution topology
 
-| Lane | Owner | Scope | Status |
+| Lane | Owner | Current queue | State |
 |---|---|---|---|
-| A | HOST-MAC-DEV / Cursor | runtime, real V1.4 proof, durable worker/result fencing, integration | reset / fresh-session start |
-| B | HOST-WIN-DEV / Cursor | product/evaluation, reviewer qualification, knowledge/tools | reset / fresh-session start |
-| C | worker-pc / Claude via remote-workers | independent G13 corpus/evidence work and bounded review/fix tasks | remote-worker controlled |
-| Lead | ChatGPT | architecture, independent review, assignment, acceptance, integration decisions | active |
+| A | Mac / Cursor | V14-REAL-001-R -> V2A-003c | fresh generation 4; waiting fresh session/autonomous self-launch proof |
+| B | Windows / Cursor | runner sync -> integration sync -> G13 remint/freeze | fresh generation 4; waiting fresh session/autonomous self-launch proof |
+| C | worker-pc / Claude | V14 materialization read-only audit | dispatched through remote-workers |
+| Lead | ChatGPT | review / assignment / acceptance / dashboard | active |
 
-## Heartbeat stress test
+## Heartbeat
 
-Phase 1: 5-minute effective cadence, 3 consecutive scheduler heartbeats required from A and B.  
-Phase 2: 15-minute cadence for 24 real hours.  
-After verified soak: hourly cadence.
+Current mode: **5-minute stress Phase 1**.
 
-See:
+Target:
+- A: 3 consecutive scheduler heartbeats, 3–8m gaps.
+- B: 3 consecutive scheduler heartbeats, 3–8m gaps.
+- then 15m cadence for 24 real hours.
+
+Host live pages:
 - `docs/coordination/status/HOST-MAC-DEV.md`
 - `docs/coordination/status/HOST-WIN-DEV.md`
-- `docs/coordination/HEARTBEAT_STATE.json`
 
-## Current critical path
+## Project position
 
-1. Prove autonomous repo-driven execution on A and B.
-2. Pass one genuine V1.4 real end-to-end mission.
-3. Freeze G13 task pool with real independent semantic depth, then qualify models/reviewers.
-4. Finish V1.5 durable result acceptance + worker service.
-5. Admit two zero-charge remote inference routes for G12 remote overlap.
-6. Continue V1.6/V1.7, then V1.8/V1.9/V2.0 integration and acceptance.
+- V1.1 verified.
+- V1.2 local/broker behavior verified; remote overlap blocked.
+- V1.3 protocol/screening verified; task pool and qualification incomplete.
+- V1.4 real mission attempted honestly but failed materialization; repair/rerun is Lane A priority.
+- V1.5 claim/renew/expire fencing accepted; result acceptance and durable worker service remain.
+- V1.6/V1.7 source work follows G13/V1.5 critical path.
+- V2.0 architecture is ahead; integrated candidate and real acceptance campaigns remain incomplete.
 
-No main merge, public release/deploy or additional spend is authorized.
+## Latest important evidence
+
+- Mac autonomous-runner repair accepted: `0d71520...`, CI-bearing descendant `39bba630...`, CI 35609579398 success.
+- worker-pc retry06: `worker/swarmai-v13-task-pool-freeze-06@f780033...`; key finding = only 5 genuine semantic archetypes per required G13 cell, not 15.
+- reviewed integration remains `cursor/v2-integration@9ce727842...`.
+
+## Top next actions
+
+1. Start fresh A/B sessions; reinstall 5m heartbeat + autonomous daemon.
+2. A repairs/reruns real V1.4 mission while B synchronizes runner/integration and re-mints G13 pool.
+3. Lead reviews first autonomous pushes and begins 24h heartbeat soak once A+B reach 3/3.
+
+Human action: start the two fresh Cursor sessions with the lane prompts supplied by the lead.
