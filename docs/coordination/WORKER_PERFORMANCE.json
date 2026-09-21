@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-21T01:10:40Z",
+  "updated_at": "2026-09-21T01:20:00Z",
   "history": {
-    "previous_blob_sha": "ab34b97b9ceb5bb058d32816c7190d77f961ca13",
-    "note": "Compacted to reviewed packet evidence plus current calibration. Full earlier packet inventory remains in Git history; active work is canonical in WORKER_PACKET_BACKLOG.md."
+    "previous_blob_sha": "50097dec0ccd02f6f88f5fd2c0229b46c590ef3b",
+    "note": "Adds V2A-003b independent review; earlier packet details remain in Git history."
   },
   "purpose": "Evidence-backed worker calibration by story-point complexity. Story points are not hours.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
@@ -15,152 +15,22 @@
     "first_lead_review_acceptance_requires_no_changes_requested": true
   },
   "story_point_summary": {
-    "1": {
-      "completed_lead_verified": 2,
-      "reviewed_packets": 2,
-      "first_lead_review_acceptance_rate": 1.0,
-      "stable": false,
-      "reviewed_packet_ids": [
-        "W-131A",
-        "V2A-002"
-      ]
-    },
-    "2": {
-      "completed_lead_verified": 3,
-      "reviewed_packets": 5,
-      "first_lead_review_acceptance_rate": 0.6,
-      "stable": false,
-      "reviewed_packet_ids": [
-        "W-111A",
-        "W-111B",
-        "W-121A",
-        "V2A-001",
-        "V2A-003a"
-      ]
-    },
-    "3": {
-      "completed_lead_verified": 0,
-      "reviewed_packets": 0,
-      "stable": false
-    },
-    "4": {
-      "completed_lead_verified": 0,
-      "reviewed_packets": 0,
-      "stable": false
-    },
-    "5": {
-      "completed_lead_verified": 0,
-      "reviewed_packets": 0,
-      "stable": false
-    }
+    "1": {"completed_lead_verified":2,"reviewed_packets":2,"first_lead_review_acceptance_rate":1.0,"stable":false,"reviewed_packet_ids":["W-131A","V2A-002"]},
+    "2": {"completed_lead_verified":3,"reviewed_packets":6,"first_lead_review_acceptance_rate":0.5,"stable":false,"reviewed_packet_ids":["W-111A","W-111B","W-121A","V2A-001","V2A-003a","V2A-003b"]},
+    "3": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false},
+    "4": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false},
+    "5": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false}
   },
   "reviewed_packets": [
-    {
-      "packet_id": "W-111A",
-      "story_points": 2,
-      "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE",
-      "worker": "Cursor",
-      "first_pass_ci": "success_current_descendant_35545174895",
-      "first_lead_review": "accepted",
-      "rework_cycles": 0,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
-    },
-    {
-      "packet_id": "W-111B",
-      "story_points": 2,
-      "artifact_id": "ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE",
-      "worker": "Cursor",
-      "first_pass_ci": "success_current_descendant_35545174895",
-      "first_lead_review": "changes_required",
-      "rework_cycles": 1,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
-      "note": "Control evidence accepted; restart portion required real OS process restart and was later superseded by V2A-002."
-    },
-    {
-      "packet_id": "W-121A",
-      "story_points": 2,
-      "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
-      "worker": "Cursor",
-      "first_pass_ci": "success_35545174895",
-      "first_lead_review": "accepted",
-      "rework_cycles": 0,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
-      "note": "Truthful blocked result: zero admissible remote routes."
-    },
-    {
-      "packet_id": "W-131A",
-      "story_points": 1,
-      "artifact_id": "ART-V13-SCREENING-MATRIX",
-      "worker": "Cursor",
-      "first_pass_ci": "success_35545174895",
-      "first_lead_review": "accepted",
-      "rework_cycles": 0,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d"
-    },
-    {
-      "packet_id": "V2A-001",
-      "story_points": 2,
-      "artifact_id": "ART-V12-BROKER-CONTRACT",
-      "worker": "Cursor Session A",
-      "first_pass_ci": "success_35548643473",
-      "first_lead_review": "accepted",
-      "rework_cycles": 0,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
-      "note": "Generic ProductStore execution now injects governed project-scoped broker; direct local_chat bypass is fail-closed under broker-required operation."
-    },
-    {
-      "packet_id": "V2A-002",
-      "story_points": 1,
-      "artifact_id": "ART-V11-RESTART-EVIDENCE",
-      "worker": "Cursor Session A",
-      "first_pass_ci": "success_35549111809",
-      "first_lead_review": "accepted",
-      "rework_cycles": 0,
-      "evidence_complete_first_submission": true,
-      "completion_sha": "48a02e3daae13f8fb569225e2d030097229f4780",
-      "evidence_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
-      "note": "Actual uvicorn PID stop/start plus same durable mission/disk hash reopened through HTTP and separate CLI."
-    },
-    {
-      "packet_id": "V2A-003a",
-      "story_points": 2,
-      "artifact_id": "ART-V15-LEASE-FENCING",
-      "worker": "Cursor Session A",
-      "first_pass_ci": "success_35549624046",
-      "first_lead_review": "changes_required",
-      "rework_cycles": 1,
-      "evidence_complete_first_submission": false,
-      "completion_sha": "630ab780ab45858c5dad4075be143cfa145e975f",
-      "evidence_sha": "37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b",
-      "positive_findings": [
-        "extends existing worker/task-attempt schema rather than creating a competing authority",
-        "adds task_leases and worker_results repositories",
-        "raw membership token has no database column and current hash/roundtrip tests pass",
-        "current-tip CI is green"
-      ],
-      "changes_required": [
-        "ART-V15-DURABLE-SCHEMA requires migration-up evidence with representative rows created under the previous schema. Current test_migration_preserves_legacy_worker_and_attempt_rows creates current Base metadata first and inserts legacy-shaped nullable rows; it does not exercise Alembic upgrade from down_revision with populated legacy rows.",
-        "V2A-H2 requires revocation/rotation evidence. Current submission verifies hash/mismatch and raw-token absence but has no durable revoke/rotate lifecycle test.",
-        "Add a bounded regression for raw-token-like fields nested inside metadata or replace free-form token-sensitive metadata with a typed/sanitized boundary; current _assert_no_raw_token_fields checks only top-level resource_payload keys."
-      ],
-      "artifact_status_after_review": "drafting",
-      "next_packet": "V2A-003a-R"
-    }
+    {"packet_id":"W-111A","story_points":2,"artifact_id":"ART-V11-MULTISURFACE-EVIDENCE","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"},
+    {"packet_id":"W-111B","story_points":2,"artifact_id":"ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":true,"completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce","note":"Control evidence accepted; restart portion required real OS process restart and was later superseded by V2A-002."},
+    {"packet_id":"W-121A","story_points":2,"artifact_id":"ART-V12-PROVIDER-ELIGIBILITY","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"19b91ba89bfac5d670af0d766f21f4b9f2ca1a62","note":"Truthful blocked result: zero admissible remote routes."},
+    {"packet_id":"W-131A","story_points":1,"artifact_id":"ART-V13-SCREENING-MATRIX","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"03d85540e36c36fa3a5c92a3082be9959d93f66d"},
+    {"packet_id":"V2A-001","story_points":2,"artifact_id":"ART-V12-BROKER-CONTRACT","worker":"Cursor Session A","first_pass_ci":"success_35548643473","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"c3df96ef074568e7a92dd2f6c6bfd070fe5374f3","note":"Generic ProductStore execution injects governed project-scoped broker; direct local fallback is fail-closed under broker-required operation."},
+    {"packet_id":"V2A-002","story_points":1,"artifact_id":"ART-V11-RESTART-EVIDENCE","worker":"Cursor Session A","first_pass_ci":"success_35549111809","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"48a02e3daae13f8fb569225e2d030097229f4780","evidence_sha":"ee5a06612aa2e4409fa8bbfd1969225c16887615","note":"Actual uvicorn PID stop/start plus same durable mission/disk hash reopened through HTTP and separate CLI."},
+    {"packet_id":"V2A-003a","story_points":2,"artifact_id":"ART-V15-LEASE-FENCING","worker":"Cursor Session A","first_pass_ci":"success_35549624046","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":false,"completion_sha":"630ab780ab45858c5dad4075be143cfa145e975f","evidence_sha":"37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b","changes_required":["true Alembic upgrade from populated previous schema","durable token rotate/revoke lifecycle","recursive/typed token-sensitive metadata boundary"],"artifact_status_after_review":"drafting","next_packet":"V2A-003a-R"},
+    {"packet_id":"V2A-003b","story_points":2,"artifact_id":"ART-V15-LEASE-FENCING","worker":"Cursor Session A","first_pass_ci":"failure_35549994050_ruff","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":false,"completion_sha":"7dcefe4c72ae9ada2ff512adeaf65eefa28632e2","evidence_sha":"f55f8078b73597892b6dcddc2e41ac947d3c904e","positive_findings":["uses SELECT FOR UPDATE SKIP LOCKED for durable ready-task claim","race test targets exactly one lease winner","renew/expire survives new SQLAlchemy sessions","in-memory/head-of-line test intent is explicit"],"changes_required":["current exact-tip CI is red at Ruff import ordering in tests/integration/db/test_lease_claim_renew_expire.py; downstream mypy/package/pytest did not run","claim path does not verify mission cancellation/status/source authority before creating attempt/lease as required by accepted durable schema contract","renew path verifies worker identity/generation but not current worker project against lease project; worker registration project change could renew an old-project lease","candidate scan is capped at 32 rows, so >32 incompatible higher-priority tasks can still head-of-line block a later eligible task; paginate/filter until eligible or exhausted","V2A-003b is based on V2A-003a foundation that still has outstanding lead changes and cannot make the artifact reviewable until those are repaired"],"artifact_status_after_review":"drafting","next_packet":"V2A-003b-R"}
   ],
-  "superseded_duplicate_intents": [
-    {
-      "packet_id": "W-111C",
-      "superseded_by": "V2A-002"
-    },
-    {
-      "packet_id": "W-122A",
-      "superseded_by": "V2A-001"
-    }
-  ],
+  "superseded_duplicate_intents": [{"packet_id":"W-111C","superseded_by":"V2A-002"},{"packet_id":"W-122A","superseded_by":"V2A-001"}],
   "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md"
 }
