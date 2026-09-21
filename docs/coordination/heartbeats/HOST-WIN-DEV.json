@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:14:02+00:00",
-    "trigger": "manual",
+    "observed_at": "2026-09-21T16:14:17+00:00",
+    "trigger": "scheduler",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-    "coordination_sha": "b0623cf98a954f9f7092fe8971c788cf363de3f7",
+    "coordination_sha": "9e708901161f6db3d1024c83abfdc311d43a7c28",
     "effective_cadence_minutes": 5,
-    "packet_id": "B-OPS-AUTO-SYNC-02",
-    "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-    "status": "review_requested",
-    "last_agent_activity_at": "2026-09-21T16:14:01+00:00",
-    "note": "B-OPS-AUTO-SYNC-02 pushed 2693bb5; ruff/pytest 9 passed; CI 35624109265; Linux tmux swarm-heartbeat-b 5m. Parent drafting. Next V2B-000."
+    "packet_id": null,
+    "artifact_id": null,
+    "status": "bootstrap",
+    "last_agent_activity_at": null,
+    "note": null
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T13:29:18+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "6b0e1277051ae90fe1d56825d3e771b042380755",
-      "coordination_sha": "b9a4348e4c8a6b42d791d18c070ea5774ad43a51",
-      "effective_cadence_minutes": 15,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T13:44:19+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "review_requested",
       "last_agent_activity_at": "2026-09-21T16:14:01+00:00",
       "note": "B-OPS-AUTO-SYNC-02 pushed 2693bb5; ruff/pytest 9 passed; CI 35624109265; Linux tmux swarm-heartbeat-b 5m. Parent drafting. Next V2B-000."
+    },
+    {
+      "observed_at": "2026-09-21T16:14:17+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
+      "coordination_sha": "9e708901161f6db3d1024c83abfdc311d43a7c28",
+      "effective_cadence_minutes": 5,
+      "packet_id": null,
+      "artifact_id": null,
+      "status": "bootstrap",
+      "last_agent_activity_at": null,
+      "note": null
     }
   ],
-  "status": "review_requested"
+  "status": "bootstrap"
 }
