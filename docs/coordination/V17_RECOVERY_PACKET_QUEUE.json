@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "status": "proposed_by_fable_planning_pass_pending_lead_review",
+  "status": "lead_approved_active_recovery_plan",
   "generated_at": "2026-09-21T20:30:00Z",
   "branch": "cursor/v17-single-session",
   "session": "CURSOR-V17-SINGLE",
@@ -1081,5 +1081,6 @@
         "V1.7 working claim"
       ]
     }
-  ]
+  ],
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
 }
