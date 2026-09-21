@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:43:13+00:00",
+    "observed_at": "2026-09-21T16:44:18+00:00",
     "trigger": "scheduler",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "2d9b1990c57869c1c2cb3cc5955345dd31fb338b",
+    "coordination_sha": "19fc82ec8c163b26cfa83363d4c4693766405e6e",
     "effective_cadence_minutes": 5,
-    "packet_id": "V2B-001-R4",
-    "artifact_id": "ART-V13-TASK-POOL",
-    "status": "review_requested",
-    "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
-    "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
+    "packet_id": null,
+    "artifact_id": null,
+    "status": "bootstrap",
+    "last_agent_activity_at": null,
+    "note": null
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:15:53+00:00",
-      "trigger": "manual",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-      "coordination_sha": "ba43af7ed834abf8626eb4b5d80062faa4033488",
-      "effective_cadence_minutes": 5,
-      "packet_id": "V2B-000",
-      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-      "status": "blocked",
-      "last_agent_activity_at": "2026-09-21T16:15:51+00:00",
-      "note": "autonomous_runner_dirty_worktree"
-    },
     {
       "observed_at": "2026-09-21T16:16:54+00:00",
       "trigger": "manual",
@@ -198,7 +183,22 @@
       "status": "review_requested",
       "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
       "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
+    },
+    {
+      "observed_at": "2026-09-21T16:44:18+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "19fc82ec8c163b26cfa83363d4c4693766405e6e",
+      "effective_cadence_minutes": 5,
+      "packet_id": null,
+      "artifact_id": null,
+      "status": "bootstrap",
+      "last_agent_activity_at": null,
+      "note": null
     }
   ],
-  "status": "review_requested"
+  "status": "bootstrap"
 }
