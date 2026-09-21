@@ -11,5 +11,6 @@
     "ApprovalGrant",
     "ActionReceiptV17"
   ],
-  "note": "V1.7 action/approval/receipt contracts present. No invent-accept."
+  "note": "V1.7 action/approval/receipt contracts present. No invent-accept.",
+  "evidence_tip_sha": "0bb3a2bd97a5bec3be9473e02faaf702196992e4"
 }

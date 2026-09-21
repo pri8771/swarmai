@@ -11,5 +11,6 @@
     "command": "pytest -q tests/memory/test_memory.py",
     "result": "3 passed"
   },
-  "note": "Conservative MemoryStore adapter; never auto-promotes to accepted_fact."
+  "note": "Conservative MemoryStore adapter; never auto-promotes to accepted_fact.",
+  "evidence_tip_sha": "0bb3a2bd97a5bec3be9473e02faaf702196992e4"
 }
