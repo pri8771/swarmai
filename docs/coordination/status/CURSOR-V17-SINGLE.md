@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a`
-- Coordination SHA: `822d97306f79b07748f028b01964462b6f6e0299`
-- Updated: `2026-09-21T20:05:30Z`
-- Trigger: `scheduler`
+- Branch SHA: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`
+- Coordination SHA: `d3af4816ae75c1bde58ee3557187d6d1a120dee8`
+- Updated: `2026-09-21T20:05:51Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `R26`
+- Current packet: `R27`
 - Current artifact: `ART-V17-APPROVAL-BINDING`
-- Last meaningful activity: `2026-09-21T20:04:37Z`
+- Last meaningful activity: `2026-09-21T20:05:50Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: Actions billing; ART-V14 new mission required; R06 sealed digest; R18 2nd host; R09 zero-charge canaries ≥2 remotes
+- Blocker: USER_ACTION: Actions billing; ART-V14 new preregistered mission; R06 sealed digest; R18 2nd physical host; R09 ≥2 zero-charge remote canaries
 
 ## Update
 
-R16-R24+R26 verify progressed; R17 CP3 live; R09/R18 USER_ACTION blockers. Tip=aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a. ART-V14 CHANGES REQUIRED preserved (no invent-accept).
+Session advanced R16-R27 (verify+CP3). Real blockers: Actions billing; ART-V14 new mission (007 CHANGES REQUIRED); R06 sealed digest; R09 zero-charge canaries; R18 2nd host. Tip=f2b8d5f7dfd65530e73c63438c229b9fa428f922.
 
 ## Next
 
-R25 CP4 knowledge checkpoint or R27 durable approvals
+Paused on external USER_ACTION blockers; R28 ToolGateway migrate verify when continuing
