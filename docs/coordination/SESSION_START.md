@@ -1,107 +1,54 @@
-# SwarmAI session start router
+# SwarmAI session start — delivery mode
 
-This is the compact entry point for every Claude/Fable/agent session.
+Repository: `pri8771/swarmai`.
+Coordination: `coordination/swarm-control`.
+Application source: current `origin/cursor/v17-single-session`.
+ChatGPT is lead/reviewer. Fable is the worker for the newly requested delivery run.
+The old Cursor process must relinquish ownership before Fable takes over; this document does not prove that local handoff occurred.
 
-## 1. Current execution truth
+## Read once
 
-Repository: `pri8771/swarmai`
+1. `docs/coordination/FABLE_DELIVERY_CONTRACT.md` — active execution assignment through V3.0, priority real V1.7 closure.
+2. `docs/coordination/EXECUTION_CONTROL.json` — additive dependency/gate corrections over existing queues.
+3. Current `status/CURSOR-V17-SINGLE.md`, latest heartbeat record in `heartbeats/CURSOR-V17-SINGLE.json`, and latest relevant lead review.
+4. Only the selected packet card and the interface/source files it consumes. Use `DOC_ROUTER.md` for on-demand references.
 
-Canonical coordination branch:
-`coordination/swarm-control`
+The earlier `FABLE_51_PLANNING_PROMPT.md` was for the completed planning pass. Do not follow its planning-only instruction for this newly authorized delivery run.
 
-Current implementation branch:
-`cursor/v17-single-session`
+## Do not mix source and coordination
 
-Current implementation worker/session:
-`CURSOR-V17-SINGLE`
+Fetch without resetting dirty work. Read coordination via `git show` or a separate coordination worktree. Do NOT merge the coordination/planning branch's stale application snapshot into current implementation.
+Maintain one implementation owner and one five-minute local heartbeat producer. The historical CURSOR-V17-SINGLE stream may be reused with an explicit Fable takeover receipt and new epoch; do not create an overlapping stream.
+A fresh daemon tick is not evidence of active coding. Inspect last meaningful activity and the actual worker/long-job process.
 
-Current topology:
-- ONE implementation session
-- ONE heartbeat producer
-- ChatGPT lead/reviewer
-- operator final authority
+## Select work
 
-Current target:
-Reach a V1.7 implementation-complete, live-checkpointed candidate first. Then follow the already-prepared V1.8 -> V2.3 -> V3.0 DAGs.
+Existing packet graphs remain canonical:
+- V1.7: `V17_RECOVERY_PACKET_QUEUE.json`.
+- V1.8–V2.3: `V17_TO_V23_PACKET_QUEUE.json`.
+- V3: `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json` → `v30_packets`.
 
-## 2. Always read these small live files
+From a coordination worktree:
 
-Current status:
-`docs/coordination/status/CURSOR-V17-SINGLE.md`
+```sh
+python3 docs/coordination/tools/validate_plan.py --json
+python3 docs/coordination/tools/execution_guard.py --phase v17 --json
+python3 -m unittest discover -s docs/coordination/tools -p test_execution_guard.py -v
+```
 
-Heartbeat:
-`docs/coordination/heartbeats/CURSOR-V17-SINGLE.json`
+The original validator checks structural coverage. The execution guard additionally applies lead dependencies, holds and live prerequisites; neither grants permissions or accepts artifacts. Read `EXECUTION_CONTROL.json` and actual packet evidence if the outputs differ.
 
-Current V1.7 queue:
-`docs/coordination/V17_RECOVERY_PACKET_QUEUE.json`
+Resume genuinely active work first. Otherwise select one dependency-ready packet. A `preflight_only` result permits a read-only prerequisite check, not mutation. Do not mark evidence_only or review_pending as a passed live checkpoint. Independent review and lead-owned decisions may be prepared as evidence bundles but cannot be decided by the worker.
 
-Canonical artifact truth:
-`docs/coordination/ARTIFACT_REGISTRY.json`
+## Delivery order
 
-The heartbeat/status is freshest for worker liveness/current packet.
-The artifact registry is authoritative for artifact state.
-If they conflict, do not guess: report the discrepancy.
+Repair CI/heartbeat churn and durable action correctness first. Finish actual mission/worker/knowledge/action wiring, then CP1/CP3/CP4/CP5, the real GitHub R33c checkpoint and integrated CP6. Continue through V1.8/V1.9/V2.0/V2.3/V3.0 as their hard dependencies and review/freeze gates become satisfied; do not ask routine version-start questions.
 
-## 3. Current recovery contract
+Do not wait on an unrelated external blocker while an independent packet is executable. Preserve all failed evidence, exact tested source identities and full diffs before cleanup. Keep no-main-merge, no-public-release, no-extra-spend, no-secret-in-Git and no-self-acceptance boundaries.
 
-Detailed current plan:
-`docs/coordination/V17_RECOVERY_PLAN_ARTIFACT_FIRST.md`
+## Status authority
 
-Live checkpoint protocol:
-`docs/coordination/V17_LIVE_CHECKPOINT_PROTOCOL.md`
+`ARTIFACT_REGISTRY.json` controls artifact acceptance; fresh source, executed commands and receipts support claims. Queue statuses are engineering progress, not acceptance. Old branch labels or memories cannot establish current version truth.
+Relevant memory/history explains intent only. Claude may not have ChatGPT conversation access; use repo memory/decisions when it does not.
 
-Latest serious code audit:
-`docs/coordination/V17_CODE_AUDIT_20260921_2030_FABLE.md`
-(finding IDs `W*`/`E*`/`A*`/`I*`/`V*`/`O*` are cited by packet specs; the 14:32 audit is history)
-
-Read these only when the current packet needs them; do not reread all three every turn.
-
-## 4. Active packet routing
-
-From `V17_RECOVERY_PACKET_QUEUE.json` (schema 1.1):
-1. run `python3 docs/coordination/tools/validate_plan.py --ready` (or apply the file's `selection_rule`) and take the first ready packet;
-2. read `docs/coordination/packets/README.md` once per session, then ONLY that packet's `spec` file;
-3. use `docs/coordination/DOC_ROUTER.md` for anything the spec points to;
-4. inspect live source before coding.
-
-Truth about what V1.5–V1.7 really is today: libraries not yet on the mission path. Do not report "V1.7 implementation-complete" before `R34b`.
-
-Packet execution rule:
-one small packet -> focused tests -> commit -> push -> heartbeat -> next ready packet.
-
-## 5. Future routing
-
-After the V1.7 authorized handoff:
-- V1.8–V2.3: `docs/coordination/V17_TO_V23_PACKET_QUEUE.json`
-- V1.8–V2.3 architecture: `docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md`
-- V3 preparation/execution DAG: `docs/coordination/FUTURE_EXECUTION_GRAPH_V18_TO_V30.json` (`v30_packets`, `v3_invariants`)
-- whole-program summary, claim ladder, critical paths, model routing: `docs/coordination/MASTER_PLAN_V17_TO_V30_20260921.md` section 0
-- future prep index: `docs/coordination/FUTURE_PREP_INDEX_20260921.md`
-
-Do NOT open all future planning files at startup.
-
-## 6. Current known blockers / caveats
-
-External and wall-clock gates are machine-readable: the `gates` arrays in the three DAG files (summary table: `MASTER_PLAN_V17_TO_V30_20260921.md` section 0.4).
-
-Always verify live before repeating:
-- GitHub Actions billing/startup has been a USER_ACTION blocker. Land `OPS-CI-01` BEFORE billing is restored: heartbeat commits were triggering about 1,000 workflow runs per day.
-- External provider credentials/entitlements may block remote evidence.
-- Some physical multi-host/Windows/wall-clock evidence may remain externally gated.
-- Blocked external evidence must not idle dependency-independent implementation.
-
-## 7. Memory/context
-
-Check relevant past conversation/memory when available to recover product intent and prior decisions.
-Never use memory as proof of current implementation or acceptance.
-
-## 8. End-of-packet update
-
-Every packet handoff should be concise:
-- packet/artifact
-- source SHA
-- files changed
-- tests/evidence
-- blockers
-- next packet
-- no acceptance claim unless independently reviewed
+Return one pushed candidate and a concise checkpoint/evidence/blocker report, not another broad roadmap. See `FABLE_DELIVERY_CONTRACT.md` for exact finish conditions.
