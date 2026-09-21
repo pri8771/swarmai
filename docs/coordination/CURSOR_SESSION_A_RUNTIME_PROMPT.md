@@ -71,6 +71,24 @@ Session B should give you integration notes/commits rather than edit these concu
 
 At artifact review boundaries, integrate reviewed Session B commits into `cursor/v2-integration`, then run full CI. Do not treat green lane CI as integrated proof.
 
+
+## New lead hardening findings — read before V1.5/V1.8 work
+
+Also read:
+- `docs/artifacts/current/ART-V20-FOUNDATION_HARDENING.md`
+- `docs/artifacts/future/ART-V20-INTEGRATION_CONTRACT.md`
+- `docs/artifacts/future/ART-V15-DBOS_REUSE_DECISION.md`
+- `docs/coordination/V2_FOUNDATION_HARDENING_PACKETS.md`
+
+Fold these into your packets where applicable:
+- V2A-H2 SP1: durable worker credentials must be hash/ref only, never raw token rows.
+- V2A-H3 SP2: durable eligible-task claim must avoid current head-of-line blocking.
+- V2A-H6A SP2: remove fixed compose DB password, make container bind behavior explicit/private, operational empty default.
+- V2A-H8 SP3: replace declarative/sample recovery with real backup/restore/epoch evidence.
+- V2A-003X SP2: after durable repository foundation, spike DBOS queue/workflow reuse; DBOS may own execution transport/recovery, but SwarmAI lease/generation/cancellation/result acceptance remains authoritative.
+
+Do not create a second queue/lease authority if DBOS can transport attempts behind the existing contract.
+
 ## Rules
 
 - artifact-first; every commit names artifact + packet;
