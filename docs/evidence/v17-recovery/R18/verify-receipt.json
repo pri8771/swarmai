@@ -1,0 +1,41 @@
+{
+  "packet_id": "R18",
+  "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
+  "status": "blocked_no_second_physical_host",
+  "self_accept": false,
+  "tip_sha_at_verify": "f5503d7d409096b773e8f86c7fe5cebba2c99800",
+  "blocker": {
+    "code": "USER_ACTION",
+    "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
+    "packet_id": "R18",
+    "summary": "No second physical host accessible for live Mac+Windows (or Mac+Mac) worker proof",
+    "required": [
+      "Provide an actual second host with gh+git access to pri8771/swarmai",
+      "Install/runtime Python+Postgres on that host OR share operator DSN",
+      "Set SWARM_SECOND_HOST=<hostname> and run the same CP3 worker protocol across hosts",
+      "Do not accept localhost aliases, containers-on-same-Mac, or simulated hosts as multi-host"
+    ],
+    "observed": {
+      "swam_second_host_env": null,
+      "local_hosts_only": [
+        {
+          "hostname": "Apple-M5-Pro-87",
+          "system": "Darwin",
+          "machine": "arm64",
+          "node": "Apple-M5-Pro-87",
+          "role": "CURSOR-V17-SINGLE_impl_host"
+        }
+      ],
+      "same_machine_worktrees": [
+        "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+        "/Users/pchordia/Downloads/swarm-ai-coord-control",
+        "/Users/pchordia/Downloads/swarm-ai-v14"
+      ],
+      "platform": "Darwin-arm64"
+    },
+    "self_accept_forbidden": true,
+    "recorded_at": "2026-09-21T20:01:49Z"
+  },
+  "note": "Exact external blocker emitted per recovery plan; continue dependency-independent packets.",
+  "evidence_tip_sha": "f5503d7d409096b773e8f86c7fe5cebba2c99800"
+}
