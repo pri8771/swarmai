@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`
-- Coordination SHA: `d3af4816ae75c1bde58ee3557187d6d1a120dee8`
-- Updated: `2026-09-21T20:05:51Z`
-- Trigger: `manual`
+- Coordination SHA: `77612b6b582b46b0ad148fc910593a0a2ce30e39`
+- Updated: `2026-09-21T20:10:35Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R27`
 - Current artifact: `ART-V17-APPROVAL-BINDING`
