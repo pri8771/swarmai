@@ -3,7 +3,37 @@
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
-  "last_heartbeat": null,
-  "history": [],
-  "status": "not_started"
+  "last_heartbeat": {
+    "observed_at": "2026-09-21T02:29:19+00:00",
+    "trigger": "install",
+    "host_alias": "HOST-WIN-DEV",
+    "session_id": "B",
+    "branch": "cursor/v2-product-lane",
+    "branch_sha": "770c80b6ccbcef8f442696508ab95f3696aa3176",
+    "coordination_sha": "f56fbcc94e29157dee0a883c907fa8075ba7d593",
+    "effective_cadence_minutes": 15,
+    "packet_id": null,
+    "artifact_id": null,
+    "status": "bootstrap",
+    "last_agent_activity_at": null,
+    "note": null
+  },
+  "history": [
+    {
+      "observed_at": "2026-09-21T02:29:19+00:00",
+      "trigger": "install",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "770c80b6ccbcef8f442696508ab95f3696aa3176",
+      "coordination_sha": "f56fbcc94e29157dee0a883c907fa8075ba7d593",
+      "effective_cadence_minutes": 15,
+      "packet_id": null,
+      "artifact_id": null,
+      "status": "bootstrap",
+      "last_agent_activity_at": null,
+      "note": null
+    }
+  ],
+  "status": "bootstrap"
 }
