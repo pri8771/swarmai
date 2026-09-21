@@ -1,3 +1,23 @@
+## Physical host mapping
+
+### HOST-MAC-DEV — Cursor Session A
+- Existing configured Mac development environment.
+- Branch: `cursor/v2-runtime-lane`.
+- Owns `cursor/v2-integration`.
+- Runtime/control-plane/distributed/recovery.
+- Current reviewed progress includes broker closure, process restart proof and reviewed integration baseline.
+
+### HOST-WIN-DEV — Cursor Session B
+- Brand-new Windows instance; no existing Git/repo/toolchain assumptions.
+- Branch: `cursor/v2-product-lane`.
+- Product/evals/knowledge/tools/extensions.
+- Bootstrap prompt: `CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md`.
+- This setup run is also useful V1.9 clean-install/Windows portability evidence.
+- Later, after the durable worker protocol is reviewable, this host should become the first real second-host SwarmAI worker for V1.5 multi-host evidence.
+
+Never share one working directory between the hosts. Each clones/fetches from GitHub and pushes its own lane.
+
+
 # Two-Cursor-session execution contract
 
 ## Session A — Runtime & Integration
