@@ -1,0 +1,30 @@
+{
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "packet_id": "V2A-003b-R2",
+  "scenario": "terminal_renew_fence_and_lease_stamp_expiry",
+  "status": "pass",
+  "recorded_at": "2026-09-21T02:33:13Z",
+  "candidate_sha": "685810cc84d17594fa54a168c1d23b8463dc0871",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "public_deploy_claimed": false,
+  "main_merge": false,
+  "commands": [
+    "PYTHONPATH=src python -m mypy src/swarm/db/lease_fencing.py",
+    "PYTHONPATH=src python -m pytest tests/integration/db/test_lease_claim_renew_expire.py tests/integration/db/test_lease_fencing_schema.py tests/db/test_token_hash.py tests/workers/test_workers.py tests/deployment/test_deployment.py tests/integration/db/test_persistence.py -q",
+    "ruff check src/swarm/db/lease_fencing.py tests/integration/db/test_lease_claim_renew_expire.py"
+  ],
+  "results": {
+    "mypy_lease_fencing": "Success: no issues found",
+    "focused_suite": "56 passed",
+    "ruff": "All checks passed",
+    "renew_rejects_terminal_task_status": true,
+    "renew_rejects_accepted_attempt": true,
+    "expire_source_drift_via_lease_stamp_never_requeues": true,
+    "expire_cancellation_generation_drift_never_requeues": true,
+    "prior_003b_r_behaviors_preserved": true,
+    "api_routes_wired": false,
+    "accept_fencing_implemented": false,
+    "note": "V2A-003b-R2 final claim/renew/expire repair; V2A-003c still required; not self-accepted"
+  }
+}
