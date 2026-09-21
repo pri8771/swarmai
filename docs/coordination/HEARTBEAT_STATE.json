@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T02:42:00Z",
+  "updated_at": "2026-09-21T02:58:00Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -16,7 +16,8 @@
       "B"
     ],
     "all_workers_verified": false,
-    "graduated_at": null
+    "graduated_at": null,
+    "counted_trigger": "scheduler_only"
   },
   "sessions": {
     "A": {
@@ -27,17 +28,15 @@
       "verified_timestamps": [
         "2026-09-21T02:31:49+00:00"
       ],
-      "status": "bootstrap_heartbeat_1_of_3"
+      "status": "scheduler_heartbeat_1_of_3_then_manual_updates_suppressed_old_scheduler_clock_bug_fixed_reinstall_required"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
       "last_heartbeat_at": "2026-09-21T02:29:19+00:00",
-      "consecutive_valid_15m": 1,
-      "verified_timestamps": [
-        "2026-09-21T02:29:19+00:00"
-      ],
-      "status": "bootstrap_heartbeat_1_of_3"
+      "consecutive_valid_15m": 0,
+      "verified_timestamps": [],
+      "status": "install_heartbeat_only_no_scheduler_heartbeat_observed_reinstall_with_diagnostics_required"
     }
   },
   "lead": {
@@ -48,7 +47,7 @@
       "A": "e764834a69315d1c2c85f00322c3392aa5037fd9",
       "B": null
     },
-    "note": "Lead cannot be scheduled every 15 minutes; it validates complete worker heartbeat history hourly."
+    "note": "Only trigger=scheduler counts toward 15m proof. Manual/install heartbeats are coordination notifications only. Cadence bug fixed in branch heartbeat clients; workers must pull/reinstall."
   },
   "stale_threshold_minutes": {
     "bootstrap_15m": 35,
