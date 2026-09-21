@@ -18,7 +18,10 @@ Session A owns shared runtime/API/DB migration/integration surfaces.
 Fresh owner-directed heartbeat test supersedes older cadence text.
 
 After pulling:
-1. rerun `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`;
+1. rerun the host-native installer:
+   - Windows: `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`
+   - Linux: `bash scripts/coordination/install_heartbeat_linux.sh`
+   Do not emulate Windows Task Scheduler on Linux.
 2. OS scheduler wakes every 5 minutes;
 3. Phase 1 requires 3 consecutive scheduler heartbeats with 3–8 minute gaps for BOTH A and B;
 4. after lead verifies both, canonical cadence becomes 15 minutes for a real 24-hour soak;
@@ -31,14 +34,15 @@ Only `trigger=scheduler` counts. Manual/install/work/review heartbeats never adv
 The heartbeat client was corrected so manual/forced packet updates no longer reset or suppress the scheduler's 15-minute proof clock. Windows scheduler diagnostics were also added.
 
 After pulling this revision, rerun once:
-`powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`
+- Linux: `bash scripts/coordination/install_heartbeat_linux.sh`
 
-Record the printed Task state / Next run. If the scheduled heartbeat fails, inspect the printed scheduler.log path and report the sanitized error. Manual packet heartbeats may continue, but only scheduler heartbeats count toward the 3-consecutive 15-minute bootstrap proof.
+Record the printed Task state / Next run / tmux session. If the scheduled heartbeat fails, inspect the printed scheduler.log path and report the sanitized error. Manual packet heartbeats may continue, but only scheduler heartbeats count toward the 3-consecutive 15-minute bootstrap proof.
 
 ## Heartbeat — required
-Install/verify once: `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`.
+Install/verify once using the host-native installer (Windows `.ps1` or Linux `.sh`).
 Before a packet publish context:
-`python scripts\coordination\heartbeat.py --host HOST-WIN-DEV --session B --branch cursor/v2-product-lane --packet <PACKET> --artifact <ARTIFACT> --status working --force`
+`python3 scripts/coordination/heartbeat.py --host HOST-WIN-DEV --session B --branch cursor/v2-product-lane --packet <PACKET> --artifact <ARTIFACT> --status working --force`
 After push/review request publish again with `--status review_requested`.
 The scheduler wakes every 15 minutes during bootstrap; the client self-throttles to hourly only after lead verification of three consecutive valid 15-minute heartbeats for BOTH A and B.
 Heartbeat is liveness/coordination only, not implementation acceptance.
@@ -83,8 +87,9 @@ This branch now includes a self-waking Cursor CLI daemon. After pulling this rev
 
 1. Verify Cursor CLI exists: `agent --version`.
 2. If CLI auth is missing, run the normal human login once: `agent login`.
-3. Install the daemon:
-   `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_autonomous_worker_windows.ps1`
+3. Install the daemon with the host-native installer:
+   - Windows: `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_autonomous_worker_windows.ps1`
+   - Linux: `bash scripts/coordination/install_autonomous_worker_linux.sh`
 
 The daemon polls `docs/coordination/assignments/HOST-WIN-DEV.json` through GitHub every minute, executes exactly one bounded assigned packet with `agent -p`, and stops after pushing that packet. Safe dependency-ready packets may be preloaded so it can continue without waiting for the hourly lead review. It never self-accepts or selects project priorities.
 

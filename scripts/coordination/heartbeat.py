@@ -62,6 +62,45 @@ def gh_api(endpoint: str, *, method: str = "GET", payload: dict | None = None) -
     return data
 
 
+def is_contents_sha_conflict(exc: RuntimeError) -> bool:
+    return "HTTP 409" in str(exc)
+
+
+def put_contents(
+    repo: str,
+    path: str,
+    *,
+    message: str,
+    content: str,
+    sha: str,
+    attempts: int = 4,
+) -> None:
+    current_sha = sha
+    last_error: RuntimeError | None = None
+    for attempt in range(attempts):
+        try:
+            gh_api(
+                contents_endpoint(repo, path),
+                method="PUT",
+                payload={
+                    "message": message,
+                    "content": content,
+                    "branch": COORD_BRANCH,
+                    "sha": current_sha,
+                },
+            )
+            return
+        except RuntimeError as exc:
+            last_error = exc
+            if not is_contents_sha_conflict(exc) or attempt == attempts - 1:
+                raise
+            time.sleep(1 + attempt)
+            fresh = gh_api(contents_endpoint(repo, path, ref=COORD_BRANCH))
+            current_sha = str(fresh["sha"])
+    if last_error is not None:
+        raise last_error
+
+
 def contents_endpoint(repo: str, path: str, *, ref: str | None = None) -> str:
     ep = f"repos/{repo}/contents/{quote(path, safe='/')}"
     if ref:
@@ -115,15 +154,12 @@ Last agent activity: {activity}
 {note}
 """
     encoded = base64.b64encode(body.encode()).decode()
-    gh_api(
-        contents_endpoint(repo, path),
-        method="PUT",
-        payload={
-            "message": f"status({entry['host_alias']}): {entry['observed_at']}",
-            "content": encoded,
-            "branch": COORD_BRANCH,
-            "sha": str(current["sha"]),
-        },
+    put_contents(
+        repo,
+        path,
+        message=f"status({entry['host_alias']}): {entry['observed_at']}",
+        content=encoded,
+        sha=str(current["sha"]),
     )
 
 
@@ -210,7 +246,6 @@ def main() -> int:
         {"last_sent_epoch": 0.0, "last_scheduler_sent_epoch": 0.0},
     )
     now_epoch = time.time()
-    last_sent = float(local_state.get("last_sent_epoch") or 0.0)
     last_scheduler_sent = float(local_state.get("last_scheduler_sent_epoch") or 0.0)
     if (
         args.trigger == "scheduler"
@@ -265,13 +300,13 @@ def main() -> int:
     encoded = base64.b64encode(
         (json.dumps(document, indent=2) + "\n").encode()
     ).decode()
-    body = {
-        "message": f"heartbeat({args.host}): {observed_at}",
-        "content": encoded,
-        "branch": COORD_BRANCH,
-        "sha": blob_sha,
-    }
-    gh_api(contents_endpoint(args.repo_slug, path), method="PUT", payload=body)
+    put_contents(
+        args.repo_slug,
+        path,
+        message=f"heartbeat({args.host}): {observed_at}",
+        content=encoded,
+        sha=blob_sha,
+    )
     publish_human_status(args.repo_slug, entry)
 
     local_state.update(

@@ -10,6 +10,7 @@ $Source = Join-Path $Root "scripts\coordination\heartbeat.py"
 $Base = Join-Path $env:LOCALAPPDATA "SwarmAI\coord-heartbeat-$HostAlias"
 $HeartbeatCopy = Join-Path $Base "heartbeat.py"
 $RunnerPs = Join-Path $Base "run-heartbeat.ps1"
+$SchedulerLog = Join-Path $Base "scheduler.log"
 
 $Gh = (Get-Command gh -ErrorAction Stop).Source
 $PythonCmd = Get-Command python -ErrorAction SilentlyContinue
@@ -27,9 +28,15 @@ Copy-Item -Force $Source $HeartbeatCopy
 $runnerLines = @(
     '$ErrorActionPreference = "Stop"',
     '$env:SWARM_GH_PATH = ' + "'" + $Gh.Replace("'","''") + "'",
-    '& ' + "'" + $PythonPath.Replace("'","''") + "'" + ' ' +
+    '$log = ' + "'" + $SchedulerLog.Replace("'","''") + "'",
+    'try {',
+    '  & ' + "'" + $PythonPath.Replace("'","''") + "'" + ' ' +
         "'" + $HeartbeatCopy.Replace("'","''") + "'" +
-        ' --host HOST-WIN-DEV --session B --branch cursor/v2-product-lane --trigger scheduler'
+        ' --host HOST-WIN-DEV --session B --branch cursor/v2-product-lane --trigger scheduler *>> $log',
+    '} catch {',
+    '  ("ERROR " + (Get-Date).ToString("o") + " " + $_.Exception.Message) | Add-Content -Path $log',
+    '  exit 1',
+    '}'
 )
 Set-Content -Path $RunnerPs -Value $runnerLines -Encoding UTF8
 
