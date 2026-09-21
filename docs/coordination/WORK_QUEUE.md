@@ -1,4 +1,7 @@
-# SwarmAI lead work queue — artifact-derived execution view
+# SwarmAI lead work queue — **OPERATOR ABRUPT STOP**
+
+> **STOP (UTC 2026-09-21T00:12:38Z):** Operator directed abrupt halt of V1.4 implementation. Cursor must not continue G10–G14 engineering. See `V1_4_ABRUPT_STOP.md` and `CURSOR-20260920-024`. LEAD-016 packets below are **frozen / not to be started** until an explicit resume directive. Incomplete gates remain open; do not invent completions.
+
 
 Updated 2026-09-20T23:51:30Z after LEAD-20260920-016. `ARTIFACT_REGISTRY.json` is canonical. This file is only the current execution view; packet detail lives in `WORKER_PACKET_BACKLOG.md`, performance in `WORKER_PERFORMANCE.json`.
 

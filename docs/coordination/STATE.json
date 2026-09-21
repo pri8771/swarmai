@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-20T23:51:30Z",
+  "updated_at": "2026-09-21T00:12:38Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -12,18 +12,22 @@
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
-  "roles": {"lead":"ChatGPT","implementation_workhorse":"Cursor","final_authority":"operator"},
+  "roles": {
+    "lead": "ChatGPT",
+    "implementation_workhorse": "Cursor",
+    "final_authority": "operator"
+  },
   "last_lead_message_id": "LEAD-20260920-016",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-016.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-023",
+  "last_seen_cursor_message_id": "CURSOR-20260920-024",
   "last_lead_heartbeat_at": "2026-09-20T23:51:30Z",
-  "last_cursor_heartbeat_at": "2026-09-20T23:36:55Z",
+  "last_cursor_heartbeat_at": "2026-09-21T00:12:38Z",
   "current_source_verification": {
     "verified_at": "2026-09-20T23:47:44Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
-    "candidate_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d",
+    "candidate_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
     "application_tree_last_changed_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
     "ci_run_id": 35545174895,
     "ci_conclusion": "success",
@@ -35,12 +39,22 @@
   "version_state": {
     "1.0-repair": {
       "status": "not_accepted",
-      "verified_artifacts": ["ART-V10-CANDIDATE","ART-V10-SECURITY","ART-V10-EVIDENCE-CONTRACT","ART-V10-RUNTIME-TRUTH"],
+      "verified_artifacts": [
+        "ART-V10-CANDIDATE",
+        "ART-V10-SECURITY",
+        "ART-V10-EVIDENCE-CONTRACT",
+        "ART-V10-RUNTIME-TRUTH"
+      ],
       "blocker": "ART-V10-WORKER-HEARTBEAT: Cursor CLI not authenticated; zero authenticated unattended worker receipts"
     },
     "1.1": {
       "status": "not_accepted_one_artifact_drafting",
-      "verified_artifacts": ["ART-V11-MISSION-PATH","ART-V11-MULTISURFACE-EVIDENCE","ART-V11-CONTROL-EVIDENCE","ART-V11-APPLY-BOUNDARY"],
+      "verified_artifacts": [
+        "ART-V11-MISSION-PATH",
+        "ART-V11-MULTISURFACE-EVIDENCE",
+        "ART-V11-CONTROL-EVIDENCE",
+        "ART-V11-APPLY-BOUNDARY"
+      ],
       "drafting_artifact": "ART-V11-RESTART-EVIDENCE",
       "next_packet": "W-111C"
     },
@@ -59,7 +73,10 @@
       "task_pool": "drafting_not_frozen",
       "qualified_cells": 0,
       "reviewer_qualification": "drafting_current_screening_weak",
-      "next_packets": ["W-131C1","W-131C2"],
+      "next_packets": [
+        "W-131C1",
+        "W-131C2"
+      ],
       "qualification_packet": "W-131B_blocked_until_W-131C1_review"
     },
     "1.4": {
@@ -71,19 +88,14 @@
       "final_campaign": "preregistered_not_started"
     }
   },
-  "ready_worker_packets": [
-    {"id":"W-111C","sp":1,"artifact":"ART-V11-RESTART-EVIDENCE","transition":"drafting_to_reviewable"},
-    {"id":"W-122A","sp":2,"artifact":"ART-V12-BROKER-CONTRACT","transition":"drafting_to_reviewable"},
-    {"id":"W-131C1","sp":2,"artifact":"ART-V13-TASK-POOL","transition":"drafting_to_reviewable"},
-    {"id":"W-131C2","sp":3,"artifact":"ART-V13-REVIEWER-QUALIFICATION","transition":"drafting_to_reviewable_benchmark_only"}
-  ],
+  "ready_worker_packets": [],
   "blocked_worker_packets": {
-    "W-041A":"human Cursor CLI login required",
-    "W-121B":"0 admissible remote routes plus broker contract drafting",
-    "W-131B":"qualification task/scorer/prompt/tool/model manifest not frozen",
-    "W-141A":"G13 not qualified",
-    "W-141B":"G12/G13 not ready",
-    "W-142A-D":"G10-G14 required artifacts incomplete"
+    "W-041A": "human Cursor CLI login required",
+    "W-121B": "0 admissible remote routes plus broker contract drafting",
+    "W-131B": "qualification task/scorer/prompt/tool/model manifest not frozen",
+    "W-141A": "G13 not qualified",
+    "W-141B": "G12/G13 not ready",
+    "W-142A-D": "G10-G14 required artifacts incomplete"
   },
   "cursor_runner": {
     "scheduler_checkins_verified": true,
@@ -98,13 +110,12 @@
     "docs/artifacts/future/ART-V15-WORKER_PROTOCOL.md"
   ],
   "open_blockers": [
+    "OPERATOR ABRUPT STOP \u2014 no further V1.4 engineering until explicit resume",
     "Cursor CLI authentication blocks ART-V10-WORKER-HEARTBEAT",
-    "Actual process-level restart proof missing for ART-V11-RESTART-EVIDENCE",
-    "ProductStore.execute_mission bypasses governed broker; W-122A required",
-    "Zero currently admissible remote routes; G12 dual-remote overlap blocked",
-    "G13 qualification held-out pool/version manifest not frozen and no qualified cells",
-    "Reviewer screening is weak and requires calibration/freeze before held-out qualification",
-    "G14 live adaptive proof and LIVE-142 campaign remain upstream-blocked"
+    "G11 not lead-accepted; process restart evidence incomplete",
+    "Zero admissible remote routes; G12 dual-remote overlap blocked",
+    "G13 qualification_claimed=false; no qualified cells",
+    "G14 live adaptive proof and LIVE-142 campaign remain open"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
@@ -113,5 +124,22 @@
     "isolated_tests_count_as_live": false,
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
+  },
+  "product_status": "v1_4_abrupt_stop_mid_gate",
+  "implementation_stop": {
+    "status": "abrupt_operator_stop",
+    "recorded_at": "2026-09-21T00:12:38Z",
+    "message_id": "CURSOR-20260920-024",
+    "note_file": "docs/coordination/V1_4_ABRUPT_STOP.md",
+    "new_engineering_authorized": false,
+    "lead_016_packets_started_after_stop": false,
+    "incomplete_gates": [
+      "G10_FIX004_cli_login",
+      "G11_lead_accept",
+      "G12_remote_INF121",
+      "G13_EVAL_qualification",
+      "G14_live",
+      "LIVE-142"
+    ]
   }
 }

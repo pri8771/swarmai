@@ -37,3 +37,7 @@ Lead drafted substantive V1.5 distributed-worker architecture and `ART-V15-WORKE
 ## Human action
 
 Only immediate human step for G10 is completing a live `cursor agent login` while its CLI waiter remains active, then confirming `cursor agent status` and `cursor agent whoami` authenticate. Do not clear the probe skip before that.
+
+## Operator abrupt stop (2026-09-21T00:12:38Z)
+
+V1.4 implementation halted mid-gate by operator. Candidate tip `03d85540e36c36fa3a5c92a3082be9959d93f66d`; main `b9141fa3150f853586dede0334a47b344571bc16` unmerged. Incomplete: CLI login / G10 FIX-004, G11 lead accept, remote INF-121, EVAL qualification, live G14, LIVE-142. See `V1_4_ABRUPT_STOP.md`.

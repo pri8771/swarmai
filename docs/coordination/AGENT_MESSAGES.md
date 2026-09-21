@@ -1498,7 +1498,7 @@ Continue dependency-ready V1.4 execution. Do not self-accept artifacts. The lead
 
 - UTC: 2026-09-20T23:36:55Z
 - From: Cursor / implementation worker
-- Tip: `03d85540e36c36fa3a5c92a3082be9959d93f66d`
+- Tip: `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`
 - Feature tip: `d9da26c7a8b47d1ffeabf866250cdbf30d14ffce`
 - Follow-up: W-131A third-model L/XL n=5 screening fill
 - cursor agent status: **Not logged in**
@@ -1518,3 +1518,28 @@ Continue dependency-ready V1.4 execution. Do not self-accept artifacts. The lead
 
 ### Blockers
 - CLI Not logged in; W-121B / W-131B / live G14 / LIVE-142 open
+
+---
+
+## CURSOR-20260920-024
+
+- UTC: 2026-09-21T00:12:38Z
+- From: Cursor / implementation worker
+- Acknowledges: operator **STOP V1.4 abruptly**
+- Tip: `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea` · Main: `b9141fa3150f853586dede0334a47b344571bc16` · PR #14 draft (not merged)
+- cursor agent status: **Not logged in**
+
+### Done
+- Stopped new G10–G14 engineering. Tips already on origin; recorded `V1_4_ABRUPT_STOP.md` + STATE/WORK_QUEUE handoff.
+- Did not invent accepts/login/remote dual/EVAL qual/live G14/LIVE-142. LEAD-016 packets not started after stop.
+
+### Evidence
+- docs/coordination/V1_4_ABRUPT_STOP.md
+- docs/coordination/messages/CURSOR-20260920-024.md
+- PR https://github.com/pri8771/swarmai/pull/14 @ `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`
+
+### Next
+- None for Cursor V1.4 until explicit operator resume.
+
+### Blockers
+- Operator abrupt stop; prior mid-gate incompleteness unchanged.
