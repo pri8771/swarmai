@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T04:50:04Z",
+  "updated_at": "2026-09-21T04:59:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -78,14 +78,14 @@
     "autonomous_self_launch_proven_a": false,
     "autonomous_self_launch_proven_b": false,
     "worker_performance_updated": false,
-    "remote_worker_task": "swarmai-v13-task-pool-freeze-01 dispatch run 35559390335 cancelled before result or worker branch creation",
-    "remote_worker_capacity": "worker-pc online capacity=1; unrelated dispatch run 35560103791 observed in_progress, so SwarmAI retry deferred"
+    "remote_worker_attempt_01": "swarmai-v13-task-pool-freeze-01 dispatch run 35559390335 cancelled before result or worker branch creation",
+    "remote_worker_attempt_02": "swarmai-v13-task-pool-freeze-02 dispatched after capacity freed; dispatch commit 4c5fe82f227fc80038a3ce9b1643305be48f09d9; run 35562827710 in_progress"
   },
   "version_state": {
     "1.0-repair": {"status": "not_accepted", "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"},
     "1.1": {"status": "required_artifacts_verified_set_not_promoted"},
     "1.2": {"status": "not_accepted", "broker_contract": "verified", "provider_eligibility": "verified_zero_admissible_remotes", "local_fallback": "verified", "admission_reconciliation": "verified", "admissible_remote_routes": 0, "remote_overlap": "blocked"},
-    "1.3": {"status": "not_accepted_critical_path", "protocol": "accepted_frozen", "screening": "verified_72_provisional_n5_cells", "task_pool": "drafting_external_attempt_cancelled_before_execution", "qualified_cells": 0, "reviewer_qualification": "drafting"},
+    "1.3": {"status": "not_accepted_critical_path", "protocol": "accepted_frozen", "screening": "verified_72_provisional_n5_cells", "task_pool": "drafting_external_retry_02_running_unreviewed", "qualified_cells": 0, "reviewer_qualification": "drafting"},
     "1.4": {"status": "not_accepted", "real_e2e": "first_real_attempt_failed_usefully_repair_waiting_after_autonomy_runner_repair", "role_manifest": "blocked_on_G13", "live_adaptive": "blocked_on_G12_G13", "LIVE142": "not_started"},
     "1.5": {"status": "implementation_active", "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_waiting_after_autonomy_runner_repair", "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"},
     "1.6": {"status": "implementation_ready_waiting_session_b"},
@@ -101,7 +101,7 @@
   ],
   "session_b_next": [
     "keep current autonomous assignment disabled until shared runner repair is independently reviewed and propagated",
-    "after new generation: V2B-000 locally; V2B-002 locally while external worker handles retried V2B-001 to avoid duplicate ownership",
+    "after new generation: V2B-000 locally; V2B-002 locally while external worker handles V2B-001 retry 02 to avoid duplicate ownership",
     "counted qualification waits for lead freeze of ART-V13-TASK-POOL"
   ],
   "lead_parallel": [
@@ -114,8 +114,7 @@
     "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
     "ART-V10 authenticated Cursor-agent evidence blocked on cursor agent authentication/receipts",
     "G12 remote overlap: zero admitted routes; account-specific free tier/zero-charge admission missing",
-    "G13 task pool external task was cancelled before execution; no frozen task pool; reviewer design not frozen; counted qualification not started",
-    "worker-pc currently occupied by unrelated remote-worker dispatch; retry V2B-001 only after capacity is idle",
+    "G13 task pool retry 02 is running and unreviewed; reviewer design not frozen; counted qualification not started",
     "V1.4 real E2E repair/rerun waiting behind runner source repair",
     "G14 live adaptive proof and LIVE-142 remain blocked/not started",
     "V2.0 integrated artifact set incomplete; 7-day reliability wall-clock campaign has not started"
@@ -143,20 +142,30 @@
     "infrastructure_repo": "pri8771/remote-workers",
     "project_authority": false,
     "worker": "worker-pc",
-    "worker_status": "online_capacity_1_but_dispatch_lane_observed_busy",
-    "task_attempt": {
-      "task_id": "swarmai-v13-task-pool-freeze-01",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "packet_id": "V2B-001",
-      "dispatch_commit": "7e17163e7fc85455a8eb0180d3cb2173711dc978",
-      "dispatch_run": 35559390335,
-      "status": "cancelled_before_result_or_worker_branch",
-      "result_present": false,
-      "worker_branch_present": false,
-      "merge_authorized": false
-    },
-    "capacity_blocker": "unrelated remote-workers run 35560103791 observed in_progress; defer new unique SwarmAI retry until worker-pc is idle",
-    "next_action": "when idle, dispatch new unique V2B-001 retry task; independently review result branch before any SwarmAI artifact transition",
+    "worker_status": "online_capacity_1_active_retry",
+    "attempts": [
+      {
+        "task_id": "swarmai-v13-task-pool-freeze-01",
+        "artifact_id": "ART-V13-TASK-POOL",
+        "packet_id": "V2B-001",
+        "dispatch_commit": "7e17163e7fc85455a8eb0180d3cb2173711dc978",
+        "dispatch_run": 35559390335,
+        "status": "cancelled_before_result_or_worker_branch",
+        "result_present": false,
+        "worker_branch_present": false
+      },
+      {
+        "task_id": "swarmai-v13-task-pool-freeze-02",
+        "artifact_id": "ART-V13-TASK-POOL",
+        "packet_id": "V2B-001",
+        "dispatch_commit": "4c5fe82f227fc80038a3ce9b1643305be48f09d9",
+        "dispatch_run": 35562827710,
+        "status": "in_progress_unreviewed",
+        "expected_worker_branch": "worker/swarmai-v13-task-pool-freeze-02",
+        "merge_authorized": false
+      }
+    ],
+    "next_action": "when retry 02 completes, inspect structured result, branch, diff scope and tests; update ARTIFACT_REGISTRY first and never auto-merge",
     "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
   }
 }
