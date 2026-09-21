@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:14:17+00:00",
-    "trigger": "scheduler",
+    "observed_at": "2026-09-21T16:14:49+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-    "coordination_sha": "9e708901161f6db3d1024c83abfdc311d43a7c28",
+    "coordination_sha": "4b980071b2630e52d3afbbb319ff815e11310eba",
     "effective_cadence_minutes": 5,
-    "packet_id": null,
-    "artifact_id": null,
-    "status": "bootstrap",
-    "last_agent_activity_at": null,
-    "note": null
+    "packet_id": "V2B-000",
+    "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+    "status": "blocked",
+    "last_agent_activity_at": "2026-09-21T16:14:48+00:00",
+    "note": "autonomous_runner_dirty_worktree"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T13:44:19+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "6b0e1277051ae90fe1d56825d3e771b042380755",
-      "coordination_sha": "a9a9c6885efd3abcbe31ecebd499a688b2b22498",
-      "effective_cadence_minutes": 15,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T14:44:17+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "bootstrap",
       "last_agent_activity_at": null,
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T16:14:49+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
+      "coordination_sha": "4b980071b2630e52d3afbbb319ff815e11310eba",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-000",
+      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+      "status": "blocked",
+      "last_agent_activity_at": "2026-09-21T16:14:48+00:00",
+      "note": "autonomous_runner_dirty_worktree"
     }
   ],
-  "status": "bootstrap"
+  "status": "blocked"
 }
