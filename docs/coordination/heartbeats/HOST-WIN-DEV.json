@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:44:18+00:00",
+    "observed_at": "2026-09-21T16:48:17+00:00",
     "trigger": "scheduler",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "19fc82ec8c163b26cfa83363d4c4693766405e6e",
+    "coordination_sha": "addc515667320632614336b5800bf354ac9c9dfb",
     "effective_cadence_minutes": 5,
-    "packet_id": null,
-    "artifact_id": null,
-    "status": "bootstrap",
-    "last_agent_activity_at": null,
-    "note": null
+    "packet_id": "V2B-001-R4",
+    "artifact_id": "ART-V13-TASK-POOL",
+    "status": "review_requested",
+    "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
+    "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:16:54+00:00",
-      "trigger": "manual",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
-      "coordination_sha": "57017a76ef3786986f98aabea8994591e33cdada",
-      "effective_cadence_minutes": 5,
-      "packet_id": "V2B-000",
-      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-      "status": "review_requested",
-      "last_agent_activity_at": "2026-09-21T16:16:53+00:00",
-      "note": "V2B-000 merged reviewed 9ce7278; tip 3de9688; Linux ruff/mypy/287 pytest/console green; 8 integration DB errors no postgres. Not accepted."
-    },
     {
       "observed_at": "2026-09-21T16:16:58+00:00",
       "trigger": "manual",
@@ -198,7 +183,22 @@
       "status": "bootstrap",
       "last_agent_activity_at": null,
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T16:48:17+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "addc515667320632614336b5800bf354ac9c9dfb",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-001-R4",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
+      "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
     }
   ],
-  "status": "bootstrap"
+  "status": "review_requested"
 }
