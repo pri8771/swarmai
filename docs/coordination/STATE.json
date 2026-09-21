@@ -1,17 +1,13 @@
 {
-  "schema_version": "1.4",
-  "updated_at": "2026-09-21T03:20:00Z",
+  "schema_version": "1.5",
+  "updated_at": "2026-09-21T03:48:22Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "implementation_authorized_through": "3.0",
   "active_execution_target": "2.0_implementation_artifact_complete_candidate",
-  "major_milestones": [
-    "1.7",
-    "2.3",
-    "3.0"
-  ],
+  "major_milestones": ["1.7", "2.3", "3.0"],
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -21,20 +17,20 @@
     "session_b": "Cursor B / HOST-WIN-DEV / product+evaluation",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260921-024",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-024.md",
+  "last_lead_message_id": "LEAD-20260921-025",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-025.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-013",
-  "last_lead_heartbeat_at": "2026-09-21T03:12:24Z",
+  "last_lead_heartbeat_at": "2026-09-21T03:48:22Z",
   "source_refs": {
     "main": "b9141fa3150f853586dede0334a47b344571bc16",
     "runtime_branch": "cursor/v2-runtime-lane",
-    "runtime_tip": "f393f7fa0ed62d5233350740515ed77069fd4eef",
-    "runtime_ci_run": 35555605844,
-    "runtime_ci": "success",
+    "runtime_tip": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
+    "runtime_ci_run": 35558067148,
+    "runtime_ci": "failure_offline_ruff_32_coordination_script_findings_console_green",
     "product_branch": "cursor/v2-product-lane",
-    "product_tip": "5ede4bf39734462bbaff6dc9e13a5255f58af80d",
-    "product_ci_run": 35554834325,
-    "product_ci": "success_coordination_only_no_product_source_packet",
+    "product_tip": "6b0e1277051ae90fe1d56825d3e771b042380755",
+    "product_ci_run": 35558073323,
+    "product_ci": "failure_offline_ruff_shared_coordination_source_console_green",
     "integration_branch": "cursor/v2-integration",
     "integration_tip": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
     "integration_code_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
@@ -51,72 +47,50 @@
       "host": "HOST-MAC-DEV",
       "streak": 1,
       "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T02:31:49Z",
+      "last_counted_scheduler_at": "2026-09-21T03:47:19Z",
       "verified": false,
-      "stale": true,
-      "status": "corrected heartbeat client must be pulled/reinstalled; later manual updates do not count"
+      "stale": false,
+      "status": "first fresh post-reinstall scheduler receipt; prior 02:31 receipt outside 10-25m window so streak restarted"
     },
     "b": {
       "host": "HOST-WIN-DEV",
-      "streak": 0,
+      "streak": 1,
       "required": 3,
-      "last_install_event_at": "2026-09-21T02:29:19Z",
-      "last_counted_scheduler_at": null,
+      "last_counted_scheduler_at": "2026-09-21T03:43:40Z",
       "verified": false,
-      "stale": true,
-      "status": "install only; no scheduler heartbeat; reinstall with diagnostics required"
+      "stale": false,
+      "status": "first fresh post-reinstall scheduler receipt"
     },
     "graduated_to_hourly": false,
-    "note": "At 03:12:24Z both worker scheduler proofs are stale under the >35m bootstrap rule. Manual/install events do not count. Coordination heartbeat is not ART-V10 authenticated Cursor-agent evidence."
+    "note": "Both workers are fresh at this lead run but only 1/3. Only future scheduler receipts 10-25m apart advance proof. Lead platform cadence remains hourly."
   },
-  "reviews_this_heartbeat": {
-    "V2A-003b-R2": {
-      "decision": "accepted_packet",
-      "source": "685810cc84d17594fa54a168c1d23b8463dc0871",
-      "evidence": "391e8ea217c792cca19de4a2409d06e427c15866",
-      "parent_artifact": "ART-V15-LEASE-FENCING",
-      "parent_status": "drafting_pending_V2A-003c"
-    },
-    "V2A-H6A-R": {
-      "decision": "accepted_packet",
-      "source": "d40c1fd420cd489e30c9ef567691c9fc0d1638e5",
-      "evidence": "b1a8eeeaf2235c02c12750a7a93a7dd713eabe92",
-      "parent_artifact": "ART-V20-FOUNDATION-HARDENING",
-      "parent_status": "drafting_other_hardening_remaining"
-    },
-    "V2A-003X": {
-      "decision": "accepted_spike_packet",
-      "source": "0fe0831a642039feae48e63076b6889a195f6036",
-      "recommendation": "partial_reuse_DBOS_for_worker_execution_only_after_Swarm_fencing"
-    },
-    "V14-REAL-001": {
-      "decision": "changes_required_failed_real_mission_preserved",
-      "mission_id": "d9379d80277644998353a9ca3614eba7",
-      "evidence": "57afbd6ce19dee694621be21898d25a40cd066db",
-      "failure": "model implementation text produced empty worktree diff; review correctly rejected",
-      "next_packet": "V14-REAL-001-R"
-    },
-    "A5-LOCAL-G12-CURRENT-TIP": {
-      "decision": "accepted_live_local_packet",
-      "execution_sha": "84df040b6ac5981856ab7f32b66966cc0cf38894",
-      "evidence_sha": "f393f7fa0ed62d5233350740515ed77069fd4eef",
-      "proof": "actual Ollama inventory + brokered two-model calls + route-disable alternate + quota deny at $0",
-      "remote_claim": false
-    }
+  "review_decisions_retained": {
+    "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
+    "V2A-H6A-R": "accepted_packet_parent_ART-V20-FOUNDATION-HARDENING_still_drafting",
+    "V2A-003X": "accepted_spike_partial_DBOS_reuse_only",
+    "V14-REAL-001": "changes_required_real_mission_failed_usefully_empty_material_diff",
+    "A5-LOCAL-G12-CURRENT-TIP": "accepted_live_local_only_no_remote_claim"
   },
-  "verified_artifact_transitions_this_heartbeat": [
-    "ART-V12-LOCAL-FALLBACK drafting->verified",
-    "ART-V12-ADMISSION-RECONCILIATION drafting->verified",
-    "ART-V15-DBOS-REUSE drafting->verified"
-  ],
+  "verified_artifact_transitions_this_heartbeat": [],
+  "coordination_findings_this_heartbeat": {
+    "messages": "no new CURSOR message file since LEAD-024",
+    "autonomous_runner_source": "new source present on A/B but exact-tip offline CI red at Ruff",
+    "runtime_ruff_job": 106205483700,
+    "runtime_ruff_findings": 32,
+    "shared_failure_classes": [
+      "E501 in scripts/coordination/autonomous_worker.py",
+      "F841 unused last_sent in scripts/coordination/heartbeat.py"
+    ],
+    "autonomous_self_launch_proven_a": false,
+    "autonomous_self_launch_proven_b": false,
+    "worker_performance_updated": false
+  },
   "version_state": {
     "1.0-repair": {
       "status": "not_accepted",
       "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"
     },
-    "1.1": {
-      "status": "required_artifacts_verified_set_not_promoted"
-    },
+    "1.1": {"status": "required_artifacts_verified_set_not_promoted"},
     "1.2": {
       "status": "not_accepted",
       "broker_contract": "verified",
@@ -136,59 +110,50 @@
     },
     "1.4": {
       "status": "not_accepted",
-      "real_e2e": "first_real_attempt_failed_usefully_repair_assigned",
-      "real_e2e_packet": "V14-REAL-001-R",
+      "real_e2e": "first_real_attempt_failed_usefully_repair_waiting_after_autonomy_runner_repair",
       "role_manifest": "blocked_on_G13",
       "live_adaptive": "blocked_on_G12_G13",
       "LIVE142": "not_started"
     },
     "1.5": {
       "status": "implementation_active",
-      "lease_fencing": "claim_renew_expire_R2_packet_accepted_result_acceptance_V2A-003c_ready",
+      "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_waiting_after_autonomy_runner_repair",
       "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"
     },
-    "1.6": {
-      "status": "implementation_ready_waiting_session_b"
-    },
-    "1.7": {
-      "status": "implementation_ready_waiting_session_b"
-    },
+    "1.6": {"status": "implementation_ready_waiting_session_b"},
+    "1.7": {"status": "implementation_ready_waiting_session_b"},
     "2.0": {
       "status": "implementation_target_active",
       "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
       "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
-      "reliability_protocol": "drafting_advanced_no_elapsed_time_claimed"
+      "reliability_protocol": "drafting_no_elapsed_time_claimed"
     },
-    "2.3": {
-      "status": "lead_architecture_drafting"
-    },
-    "3.0": {
-      "status": "lead_architecture_drafting"
-    }
+    "2.3": {"status": "lead_architecture_drafting_multimission_fairness_contract_advanced"},
+    "3.0": {"status": "lead_architecture_drafting"}
   },
   "session_a_next": [
-    "V14-REAL-001-R / ART-V14-REAL-E2E / SP2",
-    "V2A-003c / ART-V15-LEASE-FENCING / SP2",
-    "reviewed-slice integration receipt after V2A-003c lead review"
+    "OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1",
+    "after lead review/new generation: V14-REAL-001-R / ART-V14-REAL-E2E / SP2",
+    "then V2A-003c / ART-V15-LEASE-FENCING / SP2"
   ],
   "session_b_next": [
-    "pull/reinstall corrected Windows scheduler and produce scheduler-triggered heartbeats",
-    "V2B-000 / sync reviewed integration baseline / SP1",
-    "V2B-001 / freeze G13 task+version pool / SP2",
-    "V2B-002 / reviewer calibration+freeze / SP3"
+    "keep scheduler heartbeat active; autonomous assignment held behind shared runner repair",
+    "after repair propagation/new enabled generation: V2B-000 / integration sync / SP1",
+    "then V2B-001 / task+version pool freeze / SP2",
+    "then V2B-002 / reviewer calibration+freeze / SP3"
   ],
   "lead_parallel": [
-    "ART-V20-RELIABILITY-PROTOCOL advanced with candidate freeze/invalidation, 7-day wall-clock, drills and safety invariants",
-    "continue V2.3/V3 architecture without stealing routine worker implementation"
+    "ART-V23-OPS-PLATFORM advanced with weighted-deficit fairness, SchedulerDecisionReceipt, anti-amplification/restart/drain/fleet/portability acceptance contract",
+    "continue V2 security/recovery and V3 architecture without taking routine SP1-SP3 implementation from Cursor"
   ],
   "open_blockers": [
-    "ART-OPS-AUTONOMOUS-WORKERS requires one-time Cursor CLI auth/install of daemon on Mac A and Windows B",
-    "A coordination scheduler proof stale at 1/3; corrected client reinstall required",
-    "B coordination scheduler proof stale at 0/3; no scheduler receipt; reinstall/diagnostics required",
-    "ART-V10 authenticated Cursor-agent evidence blocked on cursor agent authentication",
+    "A/B active lane exact-tip offline CI red due new autonomous-runner coordination scripts",
+    "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
+    "heartbeat cadence proof A 1/3 and B 1/3; no hourly graduation",
+    "ART-V10 authenticated Cursor-agent evidence blocked on cursor agent authentication/receipts",
     "G12 remote overlap: zero admitted routes; account-specific free tier/zero-charge admission missing",
     "G13 held-out task/version pool and reviewer design not frozen; counted qualification not started",
-    "V1.4 real E2E first run failed on empty material diff; repair/rerun required",
+    "V1.4 real E2E repair/rerun waiting behind runner source repair",
     "G14 live adaptive proof and LIVE-142 remain blocked/not started",
     "V2.0 integrated artifact set incomplete; reliability wall-clock campaign has not started"
   ],
@@ -202,34 +167,31 @@
   },
   "autonomous_workers": {
     "protocol": "docs/coordination/AUTONOMOUS_WORKER_PROTOCOL.md",
-    "status": "repo_implementation_ready_host_install_pending",
+    "status": "source_present_ci_repair_required_no_self_launch_proof",
     "poll_seconds": 60,
     "active_hosts": {
       "A": {
         "host": "HOST-MAC-DEV",
         "branch": "cursor/v2-runtime-lane",
         "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
-        "queued_packets": [
-          "V14-REAL-001-R",
-          "V2A-003c"
-        ],
-        "daemon_install": "scripts/coordination/install_autonomous_worker_macos.sh",
+        "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02",
+        "generation": 2,
+        "enabled": true,
+        "queued_packets": ["OPS-AUTO-001-R"],
         "proven": false
       },
       "B": {
         "host": "HOST-WIN-DEV",
         "branch": "cursor/v2-product-lane",
         "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "queued_packets": [
-          "V2B-000",
-          "V2B-001",
-          "V2B-002"
-        ],
-        "daemon_install": "scripts/coordination/install_autonomous_worker_windows.ps1",
+        "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
+        "generation": 2,
+        "enabled": false,
+        "queued_packets_after_reenable": ["V2B-000", "V2B-001", "V2B-002"],
         "proven": false
       }
     },
-    "lead_behavior": "After every independent review, update canonical artifacts first, then advance assignment file generation/queue so workers can self-wake and continue.",
+    "lead_behavior": "Review runner repair first, then publish new non-replay assignment generations. Artifact verifies only after both hosts self-launch one repo-assigned packet and push exact evidence.",
     "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
   }
 }
