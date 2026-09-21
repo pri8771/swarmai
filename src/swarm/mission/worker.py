@@ -642,19 +642,69 @@ class RepoWorker:
     def _verify(self, task: TaskSpec, *, handle: WorktreeHandle) -> WorkerResult:
         commands: list[dict[str, Any]] = []
         test_rel = self._resolve_test_rel(task)
+        goal = str(task.inputs.get("goal") or "")
+        if test_rel is None and goal:
+            for match in re.findall(r"(?:[\w.-]+/)+[\w.-]+\.py", goal):
+                cand = Path(match)
+                name = cand.name.lower()
+                if (
+                    "test" in name or cand.parts[0] == "tests"
+                ) and (handle.path / cand).exists():
+                    test_rel = cand
+                    break
         if test_rel is not None:
             test_file = handle.path / test_rel
             if test_file.exists():
-                commands.append(
-                    _run_cmd(
-                        test_file.parent,
-                        ["python", test_file.name],
-                        timeout=30,
+                if test_rel.parts[:1] == ("tests",) and (handle.path / "pyproject.toml").exists():
+                    commands.append(
+                        _run_cmd(
+                            handle.path,
+                            [
+                                "uv",
+                                "run",
+                                "pytest",
+                                str(test_rel),
+                                "-q",
+                                "--tb=line",
+                            ],
+                            timeout=180,
+                        )
                     )
-                )
-        # Generic path may still run mission unit tests when present.
+                else:
+                    commands.append(
+                        _run_cmd(
+                            test_file.parent,
+                            ["python", test_file.name],
+                            timeout=30,
+                        )
+                    )
+        # Prefer package-focused suite when goal names src/swarm/<pkg>/...
+        if (handle.path / "pyproject.toml").exists():
+            for match in re.findall(r"src/swarm/([\w-]+)/", goal):
+                pkg_tests = handle.path / "tests" / match
+                if pkg_tests.is_dir():
+                    commands.append(
+                        _run_cmd(
+                            handle.path,
+                            [
+                                "uv",
+                                "run",
+                                "pytest",
+                                f"tests/{match}",
+                                "-q",
+                                "--tb=line",
+                            ],
+                            timeout=180,
+                        )
+                    )
+                    break
+        # Dogfood / fallback: mission unit tests when present.
         mission_tests = handle.path / "tests" / "mission"
-        if mission_tests.is_dir() and (handle.path / "pyproject.toml").exists():
+        if (
+            mission_tests.is_dir()
+            and (handle.path / "pyproject.toml").exists()
+            and (self.parser_dogfood_fixture or not commands)
+        ):
             commands.append(
                 _run_cmd(
                     handle.path,
@@ -687,6 +737,9 @@ class RepoWorker:
                 "commands": commands,
                 "worktree": handle.to_dict(),
                 "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                "focused_check_paths": (
+                    [str(test_rel)] if test_rel is not None else []
+                ),
             },
             finished_at=utc_now().isoformat(),
         )
@@ -741,6 +794,20 @@ class RepoWorker:
             focused_paths = [str(x) for x in focused_raw if str(x).strip()]
         elif isinstance(focused_raw, str) and focused_raw.strip():
             focused_paths = [focused_raw.strip()]
+        if verify is not None:
+            for item in (verify.artifacts or {}).get("focused_check_paths") or []:
+                path = str(item)
+                if path and path not in focused_paths:
+                    focused_paths.append(path)
+            for cmd in verify_commands:
+                if not isinstance(cmd, dict):
+                    continue
+                argv = cmd.get("cmd") or cmd.get("argv") or []
+                if isinstance(argv, list):
+                    for token in argv:
+                        text = str(token)
+                        if text.startswith("tests/") and text not in focused_paths:
+                            focused_paths.append(text)
 
         review_inference: InferenceResult | None = None
         if decision == "accept":

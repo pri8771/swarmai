@@ -1,0 +1,28 @@
+{
+  "packet_id": "R02",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-006",
+  "frozen_at": "2026-09-21T19:35:35Z",
+  "candidate_sha": "bb54517cd7b5f12a39adb91954a8c8e0ac5a83ce",
+  "checkpoint": "CP1",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <workspace artifacts audit> --model qwen2.5-coder:14b --no-evidence-router --repo <checkout>",
+  "selected_model": "qwen2.5-coder:14b",
+  "evidence_router": false,
+  "zero_spend": true,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "target_subsystem": "src/swarm/workspace/artifacts.py",
+  "focused_check": "tests/workspace/test_workspace.py",
+  "prior_failed_or_changes_required_run_ids": ["v14-real-001","v14-real-002","v14-real-003","v14-real-004","v14-real-005"],
+  "goal": ,
+  "note": "R02 after R01 grounding guard; different subsystem from ledger; focused workspace tests required",
+  "pass_criteria_frozen": [
+    "brokered_local_inference",
+    "cost_zero",
+    "material_diff",
+    "focused_verify",
+    "review_grounded",
+    "no_primary_apply",
+    "independent_lead_review_separate"
+  ]
+}
