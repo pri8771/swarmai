@@ -14,6 +14,24 @@ Canonical lifecycle: `ARTIFACT_REGISTRY.json`. This is a derived execution view.
 
 The new autonomous-runner source is the immediate shared blocker: Ruff reports 32 findings on A, primarily E501 in `scripts/coordination/autonomous_worker.py` plus F841 in `scripts/coordination/heartbeat.py`; B contains the same shared source. Later offline checks are skipped on both tips.
 
+## External worker-pc — independent G13 stream
+
+Infrastructure: `pri8771/remote-workers` (transport only; not project authority).
+
+Active task:
+- `swarmai-v13-task-pool-freeze-01`
+- worker: `worker-pc`
+- executor: Claude Code
+- mode: branch
+- base: reviewed `cursor/v2-integration`
+- output branch: `worker/swarmai-v13-task-pool-freeze-01`
+- artifact: `ART-V13-TASK-POOL`
+- packet: `V2B-001`
+- status: dispatched; awaiting structured result/worker branch
+- no automatic merge
+
+This stream is intentionally independent of Mac A's runtime/autonomy repair. When it completes, lead must verify the branch, diff, tests and structured result before promoting the artifact. Counted G13 qualification still cannot start until the task-pool artifact is independently frozen.
+
 ## Session A — current assignment generation 2
 
 ### A0 — OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1 — immediate
