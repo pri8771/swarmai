@@ -4,6 +4,10 @@ Use this file as the authoritative short launch prompt.
 
 Work in `pri8771/swarmai`.
 
+PLANNING BRANCH: `fable/v3-planning`
+
+Do all planning/consolidation commits on `fable/v3-planning`. Treat `coordination/swarm-control` as read-mostly live truth during this pass because the active implementation worker is still heartbeating there. Do NOT edit the active Cursor implementation branch or its heartbeat/status files. At finish, leave the planning branch ready for ChatGPT lead review; do not merge it yourself.
+
 Follow the root `CLAUDE.md` and the canonical coordination branch. First recover relevant past Claude/Fable/ChatGPT conversation memory for SwarmAI intent, then verify every current-status claim against live Git. Check the active heartbeat, latest lead review, artifact registry, and current packet before planning.
 
 ## Assignment
@@ -25,7 +29,7 @@ Priorities:
 - Every packet needs: artifact, dependencies, likely code surfaces, exact behavior, negative tests, evidence/live gate, exit condition.
 - Separate implementation-complete, live-checkpointed, verified, accepted, external-pending, and wall-clock-pending.
 - Start time-bound campaigns as early as dependencies permit; never backfill time.
-- Preserve one-worker/one-heartbeat topology unless operator changes it.
+- Preserve one IMPLEMENTATION-worker/one-heartbeat topology unless operator changes it. This Fable pass is planning-only and may run while Cursor implements because Fable must not touch product implementation or the active heartbeat.
 - Use donor branches selectively; never wholesale-merge legacy coordination.
 - Default zero spend; no main merge/public release/destructive production action.
 - No second scheduler/authority DB/permission system unless a documented gap proves it necessary.
@@ -41,7 +45,7 @@ Priorities:
 
 ## Deliverables in Git
 
-Update/consolidate the canonical coordination system so it contains:
+On the isolated planning branch, update/consolidate the proposed canonical coordination system so it contains:
 - concise current-state/handoff truth;
 - artifact DAG through V3.0;
 - detailed next ~20 micro-packets;
@@ -58,8 +62,8 @@ Do not create duplicate plan files when an existing canonical file can be update
 
 ## Finish
 
-When the repo planning system is coherent, stop broad planning work and return only:
-- exact Git SHA(s);
+When the planning branch is coherent, stop broad planning work and return only:
+- planning branch name and exact Git SHA(s);
 - audited current version position;
 - files updated/consolidated;
 - packet/artifact counts;
