@@ -2181,3 +2181,73 @@ Two implementation sessions on separate physical hosts remain the current optima
 Start Windows Cursor with the fresh-machine bootstrap prompt. Mac Cursor can resume with the Mac runtime prompt if it is currently stopped.
 
 No additional operator action is required for the code lanes. Existing live acceptance blockers (Cursor-agent login, remote provider admission, wall-clock campaigns) remain honest acceptance blockers and do not stop source implementation.
+
+---
+
+## LEAD-20260921-021
+
+- UTC: 2026-09-21T01:48:00Z
+- From: ChatGPT / engineering lead
+- To: Cursor A (Mac runtime), Cursor B (Windows product), Cursor C (Mac verification)
+- Active target: V2.0 implementation/artifact-complete candidate.
+
+## Team expansion
+
+Created `cursor/v2-verification-lane` from the reviewed `cursor/v2-integration` baseline and added `CURSOR_MAC_VERIFICATION_PROMPT.md`.
+
+Session C is a verification/reliability/spike worker only:
+- tests/scripts/spikes/evidence by default;
+- no general production-source ownership;
+- production defects are handed to Session A or B;
+- separate Mac worktree required.
+
+This is the only additional Mac session recommended right now. Do not start a fourth general implementation lane yet.
+
+## Session C queue
+
+1. **V2C-001 / SP2** — revalidate ART-V12 local fallback + admission/reconciliation against current integration.
+   - Lead demoted both historical local artifacts from reviewable to drafting.
+   - Reason: historical evidence uses stubbed broker adapter execution, is bound to older source and cannot establish actual local-model execution.
+   - C1 must inventory exact local Ollama models and, if available, run real local inference through the governed broker, actual controlled route-disable -> permitted alternative execution, quota reservation/settlement/deny, exact candidate/config/model identity.
+   - Existing stub harness remains deterministic regression prep only.
+2. **V2C-002 / SP2** — isolated DBOS reuse spike; no production queue changes.
+3. **V2C-003 / SP2** — security-negative harness against currently integrated capabilities.
+4. **V2C-004 / SP2** — V2 reliability/performance runner scaffold.
+
+## Session A audit update
+
+Current remote WIP `5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6` contains useful V2A-003b-R repairs, but the packet is not reviewable yet.
+
+Additional mandatory repair:
+- `renew_lease()` must revalidate current mission/task/project/revision/source/cancellation authority before extension.
+- `expire_leases()` must not return cancelled/superseded/stale-authority work to ready/dispatchable state.
+
+These requirements are now canonical in WORKER_PACKET_BACKLOG and the Mac resume prompt.
+
+## Session B
+
+Windows product branch still has no remote source change at the time of this message. That is not treated as failure; the host is brand new and may still be bootstrapping. First meaningful Windows checkpoint should include toolchain/clone/baseline evidence plus the start of the highest-priority B packet.
+
+## Lead review — G12 local evidence
+
+`ART-V12-LOCAL-FALLBACK` and `ART-V12-ADMISSION-RECONCILIATION`:
+- reviewable -> **drafting**
+- no G12 acceptance effect
+- historical stubbed evidence preserved, not deleted/relabelled as live
+- V2C-001 owns current-tip revalidation.
+
+Remote dual-provider overlap remains separately blocked at 0 admissible routes.
+
+## Parallelism ceiling
+
+Current recommended active execution topology:
+- Mac A: production runtime/integration
+- Windows B: production product/evals/knowledge/tools
+- Mac C: verification/security/reliability/spikes
+- ChatGPT: lead/reviewer/architecture
+
+This is the current practical maximum while keeping lead review ahead. Add a fourth worker only after artifact review backlog stays near zero and all three lanes have clean independent work.
+
+## Boundaries
+
+No main merge, public release/deploy, paid fallback or additional spend. Do not self-accept artifacts. Preserve failed evidence and exact mode labels.
