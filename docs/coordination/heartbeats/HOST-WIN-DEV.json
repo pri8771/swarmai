@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:12:52+00:00",
-    "trigger": "install",
+    "observed_at": "2026-09-21T16:14:02+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-    "coordination_sha": "a1c3c227c12ebbd2c5b32f443b1cecda757bfa1f",
+    "coordination_sha": "b0623cf98a954f9f7092fe8971c788cf363de3f7",
     "effective_cadence_minutes": 5,
     "packet_id": "B-OPS-AUTO-SYNC-02",
     "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-    "status": "working",
-    "last_agent_activity_at": "2026-09-21T16:11:05+00:00",
-    "note": "Linux Lane B executing B-OPS-AUTO-SYNC-02; 5m tmux swarm-heartbeat-b installed (not Windows Task Scheduler)."
+    "status": "review_requested",
+    "last_agent_activity_at": "2026-09-21T16:14:01+00:00",
+    "note": "B-OPS-AUTO-SYNC-02 pushed 2693bb5; ruff/pytest 9 passed; CI 35624109265; Linux tmux swarm-heartbeat-b 5m. Parent drafting. Next V2B-000."
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T13:14:17+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "6b0e1277051ae90fe1d56825d3e771b042380755",
-      "coordination_sha": "f7a997d375727ddde83dacf516ab8a3708df0cc0",
-      "effective_cadence_minutes": 15,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T13:29:18+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "working",
       "last_agent_activity_at": "2026-09-21T16:11:05+00:00",
       "note": "Linux Lane B executing B-OPS-AUTO-SYNC-02; 5m tmux swarm-heartbeat-b installed (not Windows Task Scheduler)."
+    },
+    {
+      "observed_at": "2026-09-21T16:14:02+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
+      "coordination_sha": "b0623cf98a954f9f7092fe8971c788cf363de3f7",
+      "effective_cadence_minutes": 5,
+      "packet_id": "B-OPS-AUTO-SYNC-02",
+      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T16:14:01+00:00",
+      "note": "B-OPS-AUTO-SYNC-02 pushed 2693bb5; ruff/pytest 9 passed; CI 35624109265; Linux tmux swarm-heartbeat-b 5m. Parent drafting. Next V2B-000."
     }
   ],
-  "status": "working"
+  "status": "review_requested"
 }
