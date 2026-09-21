@@ -10,7 +10,12 @@ from typing import Any
 
 from swarm.contracts.common import new_id, utc_now
 from swarm.contracts.mission import TaskSpec
-from swarm.mission.acceptance import classify_task_support, review_attempt
+from swarm.mission.acceptance import (
+    changed_paths_from_diff,
+    classify_task_support,
+    ground_semantic_review,
+    review_attempt,
+)
 from swarm.mission.inference import InferenceResult, local_chat
 from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff
 
@@ -717,6 +722,26 @@ class RepoWorker:
         if decision == "accept":
             reasons.append("verification_passed_and_diff_clean")
 
+        changed_paths = changed_paths_from_diff(diff)
+        if implement is not None:
+            impl_files = implement.artifacts.get("changed_files") or []
+            for item in impl_files:
+                path = str(item)
+                if path and path not in changed_paths:
+                    changed_paths.append(path)
+        target_hint = ", ".join(changed_paths[:5]) if changed_paths else "the changed file"
+        verify_commands = (
+            list((verify.artifacts or {}).get("commands") or []) if verify else []
+        )
+        focused_raw = task.inputs.get("focused_check_paths") or task.inputs.get(
+            "test_file"
+        )
+        focused_paths: list[str] = []
+        if isinstance(focused_raw, list):
+            focused_paths = [str(x) for x in focused_raw if str(x).strip()]
+        elif isinstance(focused_raw, str) and focused_raw.strip():
+            focused_paths = [focused_raw.strip()]
+
         review_inference: InferenceResult | None = None
         if decision == "accept":
             review_inference = self._chat(
@@ -724,15 +749,33 @@ class RepoWorker:
                     {
                         "role": "user",
                         "content": (
-                            "Summarize in 2 sentences whether this inclusive_range_count "
-                            "fix is correct. Diff:\n"
-                            f"{diff[:3000]}"
+                            "Summarize in 2 sentences whether the patch to "
+                            f"{target_hint} is correct for THIS diff only. "
+                            "Name the changed file(s) and the defect being fixed. "
+                            "Do not discuss unrelated modules or prior missions.\n"
+                            f"Diff:\n{diff[:3000]}"
                         ),
                     }
                 ],
                 model=self._model_for("review"),
-                max_tokens=120,
+                max_tokens=160,
             )
+
+        review_text = ""
+        if review_inference is not None:
+            review_text = str(review_inference.text or "")
+
+        grounding = ground_semantic_review(
+            review_text=review_text,
+            diff_text=diff,
+            target_paths=changed_paths or None,
+            verify_commands=verify_commands,
+            focused_check_paths=focused_paths or None,
+            allow_dogfood_symbols=bool(self.parser_dogfood_fixture),
+        )
+        if decision == "accept" and not grounding.grounded:
+            decision = "reject"
+            reasons = list(dict.fromkeys([*reasons, *grounding.reasons]))
 
         # Independent checks control acceptance — not the worker claim alone.
         produced = {
@@ -740,6 +783,7 @@ class RepoWorker:
                 "verification_passed": verify is not None and bool(verify.ok),
                 "implementation_present": implement is not None and bool(implement.ok),
                 "diff_clean": not banned,
+                "review_grounded": grounding.grounded,
             },
             "intentionally_wrong": decision != "accept",
         }
@@ -749,6 +793,7 @@ class RepoWorker:
                 "verification_passed": True,
                 "implementation_present": True,
                 "diff_clean": True,
+                "review_grounded": True,
             },
         )
         if not independent.accepted:
@@ -765,6 +810,7 @@ class RepoWorker:
                 "decision": decision,
                 "reasons": reasons,
                 "diff_excerpt": diff[:4000],
+                "changed_paths": changed_paths,
                 "competing_solutions": [
                     {
                         "worker_id": implement.worker_id if implement else None,
@@ -773,6 +819,7 @@ class RepoWorker:
                 ],
                 "review_notes": review_inference.to_dict() if review_inference else None,
                 "independent_review": independent.to_dict(),
+                "review_grounding": grounding.to_dict(),
             },
             inference=review_inference.to_dict() if review_inference else None,
             cost_usd=(review_inference.cost_usd if review_inference else 0.0),
