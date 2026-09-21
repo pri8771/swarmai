@@ -26,7 +26,9 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
   1. Before creating an attempt/lease, validate current mission exists, is runnable/not cancelled, and task mission/project/graph/source/cancellation authority is still current. Failing any check must leave task/attempt/lease state unmutated.
   2. `renew_lease` must require the durable worker's current project to equal the lease project as well as matching worker ID, generation and token; project reassignment cannot renew an old-project lease.
   3. Remove the `_CLAIM_CANDIDATE_BATCH=32` head-of-line correctness limit. Safely paginate/filter until an eligible row is found or the current eligible set is exhausted; add a regression with >32 incompatible higher-priority rows followed by an eligible row.
-  4. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
+  4. Renewal must re-check current task/mission authority before extension: mission still runnable/not cancelled, task/mission/project/revision/source/cancellation generation still match the lease/attempt. A lease must not be extended merely because worker/project/generation/token still match.
+5. Expiry/requeue must not revive a cancelled/superseded/stale-authority task as runnable work. Reconcile the task to an honest terminal/superseded/cancelled state or otherwise keep it non-dispatchable when mission/task authority is no longer current.
+6. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
 - Acceptance: direct negative tests for cancellation/source/project staleness, >32 HOL regression, focused DB tests, and full exact-tip CI green. No result acceptance fence or API route wiring is silently folded in.
 
 ### READY A1 — V2A-H6A-R — secret-file and overwrite-safety repair
