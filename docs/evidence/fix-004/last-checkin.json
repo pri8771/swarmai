@@ -1,0 +1,10 @@
+{
+  "at": "2026-09-20T20:41:08+00:00",
+  "trigger": "manual",
+  "cursor": {
+    "auth_status": "auth_required",
+    "version_stdout": "3.21.16\n8ae78e8eee1e63479c7e0504b664bc0a80c68000\narm64\n"
+  },
+  "bounded_ok": true,
+  "host_alias": "mac-local"
+}

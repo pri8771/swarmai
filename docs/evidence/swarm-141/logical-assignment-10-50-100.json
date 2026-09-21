@@ -1,0 +1,315 @@
+{
+  "gate": "SWARM-141",
+  "scenario": "offline_logical_assignment_scale_prep",
+  "recorded_at": "2026-09-20T20:43:55.074769+00:00",
+  "live_claimed": false,
+  "note": "10/50/100 logical assignments via load mock + scale --no-supervisor-model (file fingerprint agents only; zero model spend). Not proof of 100 reasoning agents or live multi-provider concurrency.",
+  "levels": [
+    {
+      "logical_assignments": 10,
+      "load": {
+        "run_id": "load_92bd3708e8bd4fd280764da7b5412a03",
+        "scenario": "adaptive",
+        "mode": "mock",
+        "seed": 42,
+        "config": {
+          "logical_sessions": 10,
+          "queued_tasks": 100,
+          "actual_concurrency": 8,
+          "simulated_provider_concurrency": 16,
+          "missions": 2,
+          "scenario": "adaptive"
+        },
+        "metrics": {
+          "accepted_tasks": 100,
+          "queued_tasks_target": 100,
+          "wall_seconds": 0.0012,
+          "accepted_per_second": 81908.47,
+          "dispatch_ms_p50": 8.399365469813347e-05,
+          "dispatch_ms_p95": 0.00020800507627427578,
+          "queue_age_ticks_p50": 4.0,
+          "queue_age_ticks_p95": 7.0,
+          "rss_mb_peak": 80.64,
+          "max_in_flight": 1,
+          "oversubscription_rejects": 0,
+          "logical_sessions": 10,
+          "ticks": 8
+        },
+        "scaling": {
+          "expand_peak_inference_slots": 12,
+          "contract_floor_inference_slots": 4,
+          "expanded_then_contracted": true,
+          "strategy": "adaptive"
+        },
+        "fairness": {
+          "mission_served": {
+            "msn_load_0": 50,
+            "msn_load_1": 50
+          },
+          "no_starvation": true
+        },
+        "gates": {
+          "no_oversubscription": true,
+          "no_runaway_spawn": true,
+          "no_starvation": true,
+          "expand_and_contract_observed": true,
+          "thousand_task_envelope": false
+        },
+        "mock_vs_live": "simulated_load_not_live",
+        "report_hash": "37edc4c4c70bbae3f6ee5d5961d9c5607e44234c49368a70eb9b88c8d914f1e3",
+        "generated_at": "2026-09-20T20:43:35.831190+00:00",
+        "note": "logical_sessions \u2260 production capacity; simulated_provider_concurrency \u2260 real provider QPS"
+      },
+      "scale": {
+        "run_id": "scale_0ae3ea388614403980eb0d323876a8e2",
+        "agent_count": 10,
+        "task_count": 10,
+        "completed": 10,
+        "failed": 0,
+        "duplicates_suppressed": 1,
+        "consensus": {
+          "decision": "accept",
+          "votes_accept": 10,
+          "votes_reject": 0,
+          "critics": 0,
+          "isolated": 0,
+          "reason": "majority_ok"
+        },
+        "total_cost_usd": 0.0,
+        "runtime_ms": 3.5284579935250804,
+        "scheduler_stats": {
+          "queue_depth": 0,
+          "rejected_backpressure": 0,
+          "timed_out": 0,
+          "cancelled": 0,
+          "completed": 10,
+          "max_queue": 500,
+          "default_timeout_s": 120.0,
+          "inner_max_concurrency": 8,
+          "waves": 2
+        },
+        "report_hash": "f3fb6c520b2b74596079c5638a4001646f973a9f35482cfa7fc494253f645d2b",
+        "mock_vs_live": "live_local_zero_cost_scale"
+      },
+      "scale_raw_keys": [
+        "run_id",
+        "agent_count",
+        "task_count",
+        "completed",
+        "failed",
+        "duplicates_suppressed",
+        "consensus",
+        "total_cost_usd",
+        "runtime_ms",
+        "scheduler_stats",
+        "report_hash",
+        "mock_vs_live"
+      ]
+    },
+    {
+      "logical_assignments": 50,
+      "load": {
+        "run_id": "load_0708ac720f9d443b8a2a0b0ff40e65b0",
+        "scenario": "adaptive",
+        "mode": "mock",
+        "seed": 42,
+        "config": {
+          "logical_sessions": 50,
+          "queued_tasks": 500,
+          "actual_concurrency": 8,
+          "simulated_provider_concurrency": 16,
+          "missions": 2,
+          "scenario": "adaptive"
+        },
+        "metrics": {
+          "accepted_tasks": 500,
+          "queued_tasks_target": 500,
+          "wall_seconds": 0.0113,
+          "accepted_per_second": 44090.25,
+          "dispatch_ms_p50": 8.300412446260452e-05,
+          "dispatch_ms_p95": 0.00012500095181167126,
+          "queue_age_ticks_p50": 18.0,
+          "queue_age_ticks_p95": 34.0,
+          "rss_mb_peak": 83.42,
+          "max_in_flight": 1,
+          "oversubscription_rejects": 0,
+          "logical_sessions": 50,
+          "ticks": 36
+        },
+        "scaling": {
+          "expand_peak_inference_slots": 12,
+          "contract_floor_inference_slots": 4,
+          "expanded_then_contracted": true,
+          "strategy": "adaptive"
+        },
+        "fairness": {
+          "mission_served": {
+            "msn_load_0": 250,
+            "msn_load_1": 250
+          },
+          "no_starvation": true
+        },
+        "gates": {
+          "no_oversubscription": true,
+          "no_runaway_spawn": true,
+          "no_starvation": true,
+          "expand_and_contract_observed": true,
+          "thousand_task_envelope": false
+        },
+        "mock_vs_live": "simulated_load_not_live",
+        "report_hash": "b17125746cef9dd62cb4d61ca0a6977300edc02877908391fe36dc766be546fb",
+        "generated_at": "2026-09-20T20:43:36.142515+00:00",
+        "note": "logical_sessions \u2260 production capacity; simulated_provider_concurrency \u2260 real provider QPS"
+      },
+      "scale": {
+        "run_id": "scale_f048dd55570d44429d1beb0a72dc13e1",
+        "agent_count": 50,
+        "task_count": 50,
+        "completed": 50,
+        "failed": 0,
+        "duplicates_suppressed": 1,
+        "consensus": {
+          "decision": "accept",
+          "votes_accept": 50,
+          "votes_reject": 0,
+          "critics": 0,
+          "isolated": 0,
+          "reason": "majority_ok"
+        },
+        "total_cost_usd": 0.0,
+        "runtime_ms": 7.146459000068717,
+        "scheduler_stats": {
+          "queue_depth": 0,
+          "rejected_backpressure": 0,
+          "timed_out": 0,
+          "cancelled": 0,
+          "completed": 50,
+          "max_queue": 500,
+          "default_timeout_s": 120.0,
+          "inner_max_concurrency": 8,
+          "waves": 8
+        },
+        "report_hash": "a6386be237c0beb0333bf493aedc0c4b5e1caf4a75be3861211249fa9b961b41",
+        "mock_vs_live": "live_local_zero_cost_scale"
+      },
+      "scale_raw_keys": [
+        "run_id",
+        "agent_count",
+        "task_count",
+        "completed",
+        "failed",
+        "duplicates_suppressed",
+        "consensus",
+        "total_cost_usd",
+        "runtime_ms",
+        "scheduler_stats",
+        "report_hash",
+        "mock_vs_live"
+      ]
+    },
+    {
+      "logical_assignments": 100,
+      "load": {
+        "run_id": "load_957919318e8b4e28ae8162fa0b978c00",
+        "scenario": "adaptive",
+        "mode": "mock",
+        "seed": 42,
+        "config": {
+          "logical_sessions": 100,
+          "queued_tasks": 1000,
+          "actual_concurrency": 8,
+          "simulated_provider_concurrency": 16,
+          "missions": 2,
+          "scenario": "adaptive"
+        },
+        "metrics": {
+          "accepted_tasks": 1000,
+          "queued_tasks_target": 1000,
+          "wall_seconds": 0.0551,
+          "accepted_per_second": 18139.08,
+          "dispatch_ms_p50": 8.300412446260452e-05,
+          "dispatch_ms_p95": 0.00012500095181167126,
+          "queue_age_ticks_p50": 36.0,
+          "queue_age_ticks_p95": 68.0,
+          "rss_mb_peak": 86.91,
+          "max_in_flight": 1,
+          "oversubscription_rejects": 0,
+          "logical_sessions": 100,
+          "ticks": 72
+        },
+        "scaling": {
+          "expand_peak_inference_slots": 12,
+          "contract_floor_inference_slots": 4,
+          "expanded_then_contracted": true,
+          "strategy": "adaptive"
+        },
+        "fairness": {
+          "mission_served": {
+            "msn_load_0": 500,
+            "msn_load_1": 500
+          },
+          "no_starvation": true
+        },
+        "gates": {
+          "no_oversubscription": true,
+          "no_runaway_spawn": true,
+          "no_starvation": true,
+          "expand_and_contract_observed": true,
+          "thousand_task_envelope": true
+        },
+        "mock_vs_live": "simulated_load_not_live",
+        "report_hash": "8e0338719b67c2dc643b3e9c51c4b5c1faeeeb0d9c39ccc54cf036b85d199937",
+        "generated_at": "2026-09-20T20:43:36.536484+00:00",
+        "note": "logical_sessions \u2260 production capacity; simulated_provider_concurrency \u2260 real provider QPS"
+      },
+      "scale": {
+        "run_id": "scale_ae682a7e803b41c9858f7310eda7ec99",
+        "agent_count": 100,
+        "task_count": 100,
+        "completed": 100,
+        "failed": 0,
+        "duplicates_suppressed": 1,
+        "consensus": {
+          "decision": "accept",
+          "votes_accept": 100,
+          "votes_reject": 0,
+          "critics": 0,
+          "isolated": 0,
+          "reason": "majority_ok"
+        },
+        "total_cost_usd": 0.0,
+        "runtime_ms": 12.910624995129183,
+        "scheduler_stats": {
+          "queue_depth": 0,
+          "rejected_backpressure": 0,
+          "timed_out": 0,
+          "cancelled": 0,
+          "completed": 100,
+          "max_queue": 500,
+          "default_timeout_s": 120.0,
+          "inner_max_concurrency": 8,
+          "waves": 15
+        },
+        "report_hash": "22b0ce3abf5dc8edc76257d246f10ee786aafb41d202d55a83f8530f526a6099",
+        "mock_vs_live": "live_local_zero_cost_scale"
+      },
+      "scale_raw_keys": [
+        "run_id",
+        "agent_count",
+        "task_count",
+        "completed",
+        "failed",
+        "duplicates_suppressed",
+        "consensus",
+        "total_cost_usd",
+        "runtime_ms",
+        "scheduler_stats",
+        "report_hash",
+        "mock_vs_live"
+      ]
+    }
+  ],
+  "spend": 0,
+  "supervisor_model": false,
+  "inference_calls": 0
+}

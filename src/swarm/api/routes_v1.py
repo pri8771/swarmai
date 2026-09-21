@@ -14,6 +14,8 @@ from swarm.api.schemas import (
     CancelRequest,
     EvaluationCreateRequest,
     MissionCreateRequest,
+    MissionExecuteRequest,
+    MissionReviewRequest,
     PageMeta,
     ProbeRequest,
     ProjectCreateRequest,
@@ -22,7 +24,7 @@ from swarm.api.schemas import (
     WorkerHeartbeatRequest,
 )
 from swarm.api.store import ProductStore
-from swarm.contracts.common import new_id
+from swarm.contracts.common import new_id, payload_hash
 from swarm.evals.plan import build_plan
 from swarm.providers.catalog import list_providers
 
@@ -31,6 +33,22 @@ router = APIRouter(prefix="/v1")
 
 def get_store(request: Request) -> ProductStore:
     return request.app.state.store  # type: ignore[no-any-return]
+
+def _history_project_id(store: ProductStore, mission_id: str) -> str | None:
+    try:
+        opened = store.history_index().reopen(mission_id)
+    except (OSError, FileNotFoundError, TypeError, KeyError):
+        return None
+    mission = opened.get("mission") or {}
+    if isinstance(mission, dict) and mission.get("project_id"):
+        return str(mission["project_id"])
+    # Fall back to index row
+    for row in store.history_index().search(""):
+        if row.get("mission_id") == mission_id and row.get("project_id"):
+            return str(row["project_id"])
+    return None
+
+
 
 
 def _page(items: list[Any], *, limit: int, cursor: str | None) -> dict[str, Any]:
@@ -49,13 +67,38 @@ async def create_mission(
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    auth.require_project(principal, body.mission.project_id)
+    digest = payload_hash(body.mission.model_dump(mode="json"))
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=body.mission.project_id,
+        operation="missions.create",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
-    auth.require_project(principal, body.mission.project_id)
-    mission = await store.create_mission(body.mission, actor=principal.subject)
-    result = {"mission": mission.model_dump(mode="json")}
-    return store.store_idempotent(key, result)
+    mission = await store.create_mission(
+        body.mission,
+        actor=principal.subject,
+        task_family=body.task_family,
+        required_checks=body.required_checks,
+        hidden_acceptance=body.hidden_acceptance,
+    )
+    result: dict[str, Any] = {"mission": mission.model_dump(mode="json")}
+    if body.task_family:
+        from swarm.mission.acceptance import classify_task_support
+
+        result["task_family"] = body.task_family
+        result["support"] = classify_task_support(body.task_family).to_dict()
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=body.mission.project_id,
+        operation="missions.create",
+        request_digest=digest,
+    )
 
 
 @router.get("/missions/{mission_id}")
@@ -67,7 +110,108 @@ async def get_mission(
 ) -> dict[str, Any]:
     mission = store.get_mission(mission_id)
     auth.require_project(principal, mission.project_id)
-    return {"mission": mission.model_dump(mode="json")}
+    payload: dict[str, Any] = {"mission": mission.model_dump(mode="json")}
+    try:
+        record = store.mission_store().load(mission_id)
+        if record.plan:
+            payload["plan"] = record.plan
+        if record.validation:
+            payload["validation"] = record.validation
+        if record.result:
+            payload["result"] = record.result
+    except (OSError, TypeError, KeyError, ValueError, FileNotFoundError):
+        pass
+    return payload
+
+
+@router.post("/missions/{mission_id}/review")
+async def review_mission(
+    mission_id: str,
+    body: MissionReviewRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    key = body.idempotency_key or idempotency_key
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    digest = payload_hash(
+        {
+            "mission_id": mission_id,
+            "produced": body.produced,
+            "required_checks": body.required_checks,
+            "force_wrong": body.force_wrong,
+            "operation": "missions.review",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.review",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    result = await store.review_mission_attempt(
+        mission_id,
+        actor=principal.subject,
+        produced=body.produced,
+        required_checks=body.required_checks,
+        force_wrong=body.force_wrong,
+    )
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.review",
+        request_digest=digest,
+    )
+
+
+@router.post("/missions/{mission_id}/execute")
+async def execute_mission(
+    mission_id: str,
+    body: MissionExecuteRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    key = body.idempotency_key or idempotency_key
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    digest = payload_hash(
+        {
+            "mission_id": mission_id,
+            "model": body.model,
+            "operation": "missions.execute",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.execute",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    result = await store.execute_mission(
+        mission_id,
+        actor=principal.subject,
+        model=body.model,
+    )
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.execute",
+        request_digest=digest,
+    )
 
 
 @router.post("/missions/{mission_id}/cancel")
@@ -81,14 +225,30 @@ async def cancel_mission(
 ) -> dict[str, Any]:
     body = body or CancelRequest()
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
-    if cached is not None:
-        return cached
     mission = store.get_mission(mission_id)
     auth.require_project(principal, mission.project_id)
+    digest = payload_hash(
+        {"mission_id": mission_id, "reason": body.reason, "operation": "missions.cancel"}
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.cancel",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
     cancelled = await store.cancel_mission(mission_id, actor=principal.subject)
     result = {"mission": cancelled.model_dump(mode="json")}
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.cancel",
+        request_digest=digest,
+    )
 
 
 @router.get("/missions/{mission_id}/graph")
@@ -160,10 +320,15 @@ async def providers(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     _ = principal
+    mode = "mock" if store.fixture_mode else "catalog"
     return {
-        "providers": list_providers(mode="mock"),
+        "providers": list_providers(mode=mode),
         "accounts": store.public_accounts(),
-        "mock_vs_live": "catalog_and_fixtures_only",
+        "mock_vs_live": (
+            "fixture_catalog"
+            if store.fixture_mode
+            else "catalog_status_not_live_eligibility"
+        ),
     }
 
 
@@ -173,7 +338,14 @@ async def routes(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     _ = principal
-    return {"routes": store.public_routes(), "mock_vs_live": "fixtures_plus_retired_catalog"}
+    return {
+        "routes": store.public_routes(),
+        "mock_vs_live": (
+            "fixtures_plus_retired_catalog"
+            if store.fixture_mode
+            else "configured_routes_plus_retired_catalog"
+        ),
+    }
 
 
 @router.get("/capacity")
@@ -202,8 +374,30 @@ async def probe_provider(
             status_code=403,
             details={"provider_id": provider_id},
         )
+    # Scope probes to an authorized project (first membership) before cache.
+    if not principal.project_ids:
+        raise ApiError(
+            "policy_denied",
+            "provider probe requires a project-scoped principal",
+            status_code=403,
+            details={"provider_id": provider_id},
+        )
+    project_id = sorted(principal.project_ids)[0]
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "provider_id": provider_id,
+            "purpose": body.purpose,
+            "operation": "providers.probe",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="providers.probe",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
     # Offline: never call network; return blocked/unknown honestly.
@@ -214,7 +408,14 @@ async def probe_provider(
         "mock_vs_live": "probe_not_live",
         "purpose": body.purpose,
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="providers.probe",
+        request_digest=digest,
+    )
 
 
 @router.get("/qualifications")
@@ -240,8 +441,29 @@ async def create_evaluation(
             "evaluations require explicit policy admission",
             status_code=403,
         )
+    if not principal.project_ids:
+        raise ApiError(
+            "policy_denied",
+            "evaluations require a project-scoped principal",
+            status_code=403,
+        )
+    project_id = sorted(principal.project_ids)[0]
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "suite": body.suite,
+            "mode": body.mode,
+            "max_cases": body.max_cases,
+            "operation": "evaluations.create",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="evaluations.create",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
     from pathlib import Path
@@ -254,16 +476,42 @@ async def create_evaluation(
         "status": "planned",
         "mock_vs_live": "plan_only_not_executed_live",
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="evaluations.create",
+        request_digest=digest,
+    )
 
 
 @router.get("/workers")
 async def list_workers(
+    project_id: str | None = None,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
-    return store.workers.inspect()
+    if project_id:
+        auth.require_project(principal, project_id)
+        return store.workers.inspect(project_id=project_id)
+    if "admin" in principal.roles:
+        return store.workers.inspect()
+    # Non-admin: union of project-scoped workers only (no cross-project leakage).
+    workers: list[dict[str, Any]] = []
+    quarantine: set[str] = set()
+    total = 0.0
+    for pid in sorted(principal.project_ids):
+        view = store.workers.inspect(project_id=pid)
+        workers.extend(view.get("workers") or [])
+        quarantine.update(view.get("quarantine") or [])
+        total += float(view.get("total_capacity") or 0.0)
+    return {
+        "workers": workers,
+        "total_capacity": total,
+        "quarantine": sorted(quarantine),
+    }
 
 
 @router.post("/workers/enroll")
@@ -274,11 +522,28 @@ async def enroll_worker(
     store: ProductStore = Depends(get_store),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
+    # Authorize project ownership before any idempotency cache access.
+    auth.require_project(principal, body.project_id)
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "project_id": body.project_id,
+            "capabilities": body.capabilities,
+            "capacity_units": body.capacity_units,
+            "privacy_classes": body.privacy_classes,
+            "named_inference_urls": body.named_inference_urls,
+            "operation": "workers.enroll",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="workers.enroll",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
-    auth.require_project(principal, body.project_id)
     lease, token = await store.enroll_worker(
         capabilities=body.capabilities,
         capacity_units=body.capacity_units,
@@ -289,11 +554,18 @@ async def enroll_worker(
     )
     # Return membership token once; not a provider secret.
     result = {
-        "worker": lease.model_dump(mode="json"),
+        "worker": {**lease.model_dump(mode="json"), "project_id": body.project_id},
         "membership_token": token,
         "mock_vs_live": "membership_only_no_provider_secrets",
     }
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="workers.enroll",
+        request_digest=digest,
+    )
 
 
 @router.post("/workers/heartbeat")
@@ -302,20 +574,42 @@ async def worker_heartbeat(
     principal: Principal = Depends(get_principal),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
     lease = await store.workers.heartbeat(body.worker_id, body.generation, token=body.token)
-    return {"worker": lease.model_dump(mode="json")}
+    return {"worker": lease.model_dump(mode="json"), "project_id": rec.project_id}
 
 
 @router.get("/approvals")
 async def list_approvals(
+    project_id: str | None = None,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
-    return {
-        "approvals": [a.model_dump(mode="json") for a in store.approvals.values()],
-    }
+    if project_id:
+        auth.require_project(principal, project_id)
+        rows = [
+            a.model_dump(mode="json")
+            for a in store.approvals.values()
+            if a.project_id == project_id
+        ]
+    elif "admin" in principal.roles:
+        rows = [a.model_dump(mode="json") for a in store.approvals.values()]
+    else:
+        rows = [
+            a.model_dump(mode="json")
+            for a in store.approvals.values()
+            if a.project_id in principal.project_ids
+        ]
+    return {"approvals": rows}
 
 
 @router.post("/approvals/{approval_id}/resolve")
@@ -323,21 +617,50 @@ async def resolve_approval(
     approval_id: str,
     body: ApprovalResolveRequest,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
+    approval = store.approvals.get(approval_id)
+    if approval is None:
+        raise ApiError("not_found", "approval not found", status_code=404)
+    # Authorize against durable approval ownership — not caller's first project.
+    auth.require_project(principal, approval.project_id)
+    project_id = approval.project_id
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
+    digest = payload_hash(
+        {
+            "approval_id": approval_id,
+            "accept": body.accept,
+            "payload": body.payload,
+            "operation": "approvals.resolve",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="approvals.resolve",
+        request_digest=digest,
+    )
     if cached is not None:
         return cached
-    approval = store.resolve_approval(
+    resolved = store.resolve_approval(
         approval_id,
         accept=body.accept,
         actor=principal.subject,
         payload=body.payload,
+        project_id=project_id,
     )
-    result = {"approval": approval.model_dump(mode="json"), "accepted": body.accept}
-    return store.store_idempotent(key, result)
+    result = {"approval": resolved.model_dump(mode="json"), "accepted": body.accept}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="approvals.resolve",
+        request_digest=digest,
+    )
 
 
 @router.post("/missions/{mission_id}/side-effects/demo")
@@ -347,7 +670,13 @@ async def demo_side_effect(
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    """Test helper: attempt a side effect that cancel must block."""
+    """Fixture-only helper: attempt a side effect that cancel must block."""
+    if not store.fixture_mode:
+        raise ApiError(
+            "fixture_only",
+            "demo side-effect route is not available in operational mode",
+            status_code=404,
+        )
     mission = store.get_mission(mission_id)
     auth.require_project(principal, mission.project_id)
     store.record_side_effect(f"demo:{mission_id}", mission_id=mission_id)
@@ -376,14 +705,16 @@ async def mission_report(
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    # Auth: if live mission, check project; history reopen uses proj_demo default.
     try:
         mission = store.get_mission(mission_id)
         auth.require_project(principal, mission.project_id)
-    except ApiError:
-        # History-backed missions: allow if principal has any project (operator).
-        if not principal.project_ids and "admin" not in principal.roles:
+    except ApiError as exc:
+        if getattr(exc, "code", None) == "forbidden_project":
             raise
+        project_id = _history_project_id(store, mission_id)
+        if project_id is None:
+            raise ApiError("not_found", "mission report not found", status_code=404) from exc
+        auth.require_project(principal, project_id)
     return store.mission_report(mission_id)
 
 
@@ -397,9 +728,13 @@ async def mission_artifacts(
     try:
         mission = store.get_mission(mission_id)
         auth.require_project(principal, mission.project_id)
-    except ApiError:
-        if not principal.project_ids and "admin" not in principal.roles:
+    except ApiError as exc:
+        if getattr(exc, "code", None) == "forbidden_project":
             raise
+        project_id = _history_project_id(store, mission_id)
+        if project_id is None:
+            raise ApiError("not_found", "mission artifacts not found", status_code=404) from exc
+        auth.require_project(principal, project_id)
     return {"artifacts": store.mission_artifacts(mission_id)}
 
 
@@ -423,9 +758,6 @@ async def create_project(
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
     key = body.idempotency_key or idempotency_key
-    cached = store.recall_idempotent(key)
-    if cached is not None:
-        return cached
     overrides: dict[str, Any] = {}
     for field in (
         "allowed_tools",
@@ -447,6 +779,23 @@ async def create_project(
             if principal.project_ids
             else new_id("proj_")
         )
+    digest = payload_hash(
+        {
+            "name": body.name,
+            "repo_path": body.repo_path,
+            "project_id": project_id,
+            "overrides": overrides,
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=project_id,
+        operation="projects.create",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
     cfg = store.create_project(
         name=body.name,
         repo_path=body.repo_path,
@@ -461,7 +810,14 @@ async def create_project(
         payload={"name": cfg.name},
         dedupe_key=f"project.created:{cfg.project_id}",
     )
-    return store.store_idempotent(key, result)
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=cfg.project_id,
+        operation="projects.create",
+        request_digest=digest,
+    )
 
 
 @router.get("/projects/{project_id}")
@@ -496,8 +852,9 @@ async def history_search(
     principal: Principal = Depends(get_principal),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
     rows = store.history_index().search(q, status=status)
+    if "admin" not in principal.roles:
+        rows = [r for r in rows if r.get("project_id") in principal.project_ids]
     return {"entries": rows, "query": q, "status": status}
 
 
@@ -505,9 +862,13 @@ async def history_search(
 async def history_reopen(
     mission_id: str,
     principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    _ = principal
+    project_id = _history_project_id(store, mission_id)
+    if project_id is None:
+        raise ApiError("not_found", "history mission not found", status_code=404)
+    auth.require_project(principal, project_id)
     try:
         return store.history_index().reopen(mission_id)
     except (OSError, FileNotFoundError, TypeError, KeyError) as exc:

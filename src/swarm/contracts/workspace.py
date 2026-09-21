@@ -126,6 +126,7 @@ class Approval(StrictModel):
     permitted_operation: str
     destination: str
     grantor: str
+    project_id: str
     expires_at: datetime
     revoked_at: datetime | None = None
     constraints: dict[str, Any] = Field(default_factory=dict)

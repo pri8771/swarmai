@@ -15,4 +15,76 @@ jobs:
       - run: uv sync
       - run: uv run ruff check .
       - run: uv run mypy src/swarm
-      - run: uv run pytest tests/contracts tests/spikes
+      - name: Install / packaging check
+        run: uv run python -c "from pathlib import Path; from swarm.release.install import run_install_check; r=run_install_check(Path('.')); print(r.to_dict()); raise SystemExit(0 if r.ok else 1)"
+      - name: Alembic heads
+        run: uv run alembic heads
+      # Offline-safe unit/contract suites. Live-gated suites are a separate job
+      # that reports blocked/skipped honestly rather than implying pass.
+      - name: Offline pytest (non-live)
+        run: >
+          uv run pytest
+          tests/contracts
+          tests/spikes
+          tests/api
+          tests/broker
+          tests/controller
+          tests/chaos
+          tests/deployment
+          tests/evals
+          tests/load
+          tests/memory
+          tests/mission
+          tests/onboarding
+          tests/product
+          tests/providers
+          tests/regressions
+          tests/release
+          tests/runtime
+          tests/selfdev
+          tests/tools
+          tests/ui
+          tests/workers
+          tests/workspace
+          tests/e2e
+          -q
+          --ignore=tests/integration
+      - name: Integration pytest (requires SWARM_DATABASE_URL)
+        if: ${{ env.SWARM_DATABASE_URL != '' }}
+        run: uv run pytest tests/integration -q
+      - name: Integration skipped notice
+        if: ${{ env.SWARM_DATABASE_URL == '' }}
+        run: >
+          echo "::notice title=integration-tests-blocked::tests/integration skipped —
+          SWARM_DATABASE_URL not configured in this CI environment (honest skip, not a pass)."
+
+  console:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/console
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/console/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+
+  live-gated:
+    runs-on: ubuntu-latest
+    # Does not claim live success. Documents that live gates are not executed here.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Live gates not run in default CI
+        run: |
+          echo "::notice title=live-gates-blocked::Live provider/browser/mission acceptance"
+          echo "is intentionally NOT executed in default GitHub Actions CI."
+          echo "Reason: zero-spend + authorized-local-only policy; missing live credentials"
+          echo "and protected browser profiles in this runner. Live evidence is collected"
+          echo "in the authorized local/private environment under V1_4_EXECUTION_CONTRACT."
+          echo "status=blocked_not_skipped_green"

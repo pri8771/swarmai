@@ -1,0 +1,31 @@
+{
+  "gate": "INF-121",
+  "mode": "local_brokered_concurrent_zero_spend",
+  "started_at": "2026-09-20T20:36:35.036127+00:00",
+  "finished_at": "2026-09-20T20:36:35.087123+00:00",
+  "wall_seconds": 0.051,
+  "routes_used": [
+    "rt_ollama_gemma3:4b",
+    "rt_ollama_qwen3.5:4b"
+  ],
+  "call_count": 4,
+  "overlapping": true,
+  "timestamps": [
+    "2026-09-20T20:36:35.086933+00:00",
+    "2026-09-20T20:36:35.087026+00:00",
+    "2026-09-20T20:36:35.087052+00:00",
+    "2026-09-20T20:36:35.087074+00:00"
+  ],
+  "reservation_ids": [
+    "rsv_40eebbeda2314795a7a5d8668687d19a",
+    "rsv_498b85ae91e340b481a055f1917f5e5e",
+    "rsv_dacade52eb66403392f289269cd90b6d",
+    "rsv_da96f425f66249bba098d02c0c868d7f"
+  ],
+  "all_ok": true,
+  "total_cost_usd": 0.0,
+  "quota_remaining": 16,
+  "quota_settled": 4,
+  "remote_providers": "live_blocked_zero_charge_capacity_not_claimed",
+  "note": "Concurrent local dual-route pool proved; dual remote providers remain live-blocked without verified free remote quota."
+}

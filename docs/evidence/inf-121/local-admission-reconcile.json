@@ -1,0 +1,57 @@
+{
+  "gate": "INF-121",
+  "scenario": "local_admission_reconcile_and_deny",
+  "recorded_at": "2026-09-20T22:51:22.860575+00:00",
+  "started_at": "2026-09-20T22:51:22.843998+00:00",
+  "finished_at": "2026-09-20T22:51:22.860575+00:00",
+  "mode": "local_brokered_zero_spend",
+  "spend_usd": 0.0,
+  "allow_paid": false,
+  "request_limit": 3,
+  "accepted_calls": [
+    {
+      "ok": true,
+      "route_id": "rt_ollama_gemma3:4b",
+      "cost_usd": 0.0,
+      "model": "gemma3:4b",
+      "error": null
+    },
+    {
+      "ok": true,
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "cost_usd": 0.0,
+      "model": "qwen3.5:4b",
+      "error": null
+    },
+    {
+      "ok": true,
+      "route_id": "rt_ollama_gemma3:4b",
+      "cost_usd": 0.0,
+      "model": "gemma3:4b",
+      "error": null
+    }
+  ],
+  "routes_used": [
+    "rt_ollama_gemma3:4b",
+    "rt_ollama_qwen3.5:4b"
+  ],
+  "dual_local_routes": true,
+  "settled": 3,
+  "remaining_after_accept": 0,
+  "quota_exhausted_on_next": {
+    "raised": true,
+    "error": "broker_denied",
+    "result": {
+      "ok": false,
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "cost_usd": 0.0,
+      "model": "qwen3.5:4b",
+      "error": "broker_denied:QuotaExhaustedError:zero_remaining:qb_local_ollama_requests:requests"
+    },
+    "message": "broker_denied:QuotaExhaustedError:zero_remaining:qb_local_ollama_requests:requests"
+  },
+  "all_calls_accounted": true,
+  "remote_providers": "live_blocked_zero_charge_capacity_not_claimed",
+  "live_dual_remote_claimed": false,
+  "note": "Local dual-route admission + settle + deny-on-exhaust proved at $0. Remote dual-provider INF-121 remains live-blocked."
+}

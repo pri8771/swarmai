@@ -1,0 +1,49 @@
+{
+  "gate": "G11-RUN-111",
+  "scenario": "browser_console_create_observe",
+  "recorded_at": "2026-09-20T23:03:39.092554+00:00",
+  "mode": "live_local",
+  "status": "pass",
+  "command": "playwright console create + API get + CLI report",
+  "exit_code": 0,
+  "generated_at": "2026-09-20T23:03:39.092554+00:00",
+  "candidate_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+  "spend_usd": 0.0,
+  "execution_mode": "operational",
+  "identity": {
+    "candidate_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+    "model": "gemma3:4b",
+    "route_id": "rt_ollama_gemma3:4b",
+    "tool_versions": {
+      "swarm_cli": "uv-run",
+      "playwright": "1.x",
+      "pytest": "ci"
+    },
+    "config_version": "g11-lead012-v1",
+    "prompt_version": "lead012-hidden-acceptance-v1",
+    "dataset_version": "unfamiliar-local-only-v1"
+  },
+  "browser": {
+    "ok": true,
+    "mission_id": "2a21656307fe4258839c9d2637616708",
+    "console_url_host": "http://127.0.0.1:43127",
+    "api_base": "http://127.0.0.1:18765",
+    "mode_banner": "LIVE\nobserved_or_empty_not_mock_broker",
+    "browser": "playwright_chromium_headless",
+    "operator_console_ui_create": true
+  },
+  "api_observe": {
+    "http_ok": true,
+    "mission_id": "2a21656307fe4258839c9d2637616708",
+    "status": "planning",
+    "same_id": true
+  },
+  "cli_observe": {
+    "returncode": 0,
+    "mission_id": "2a21656307fe4258839c9d2637616708",
+    "status": "planning",
+    "same_id": true
+  },
+  "g11_lead_accept_invented": false,
+  "note": "Actual Chromium console UI create; not console-shaped TestClient only."
+}

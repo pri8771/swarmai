@@ -12,11 +12,31 @@ from swarm.contracts.mission import Mission
 
 class MissionCreateRequest(StrictModel):
     mission: Mission
+    task_family: str | None = None
+    required_checks: dict[str, Any] | None = None
+    # Grader-only rules — never shown to workers. Stored on the mission plan.
+    hidden_acceptance: dict[str, Any] | None = None
     idempotency_key: str | None = None
 
 
 class CancelRequest(StrictModel):
     reason: str | None = None
+    idempotency_key: str | None = None
+
+
+class MissionReviewRequest(StrictModel):
+    """Independent review controls acceptance — not decorative post-success notes."""
+
+    produced: dict[str, Any] = Field(default_factory=dict)
+    required_checks: dict[str, Any] | None = None
+    force_wrong: bool = False
+    idempotency_key: str | None = None
+
+
+class MissionExecuteRequest(StrictModel):
+    """Execute declared task_family via local zero-spend worker."""
+
+    model: str = "gemma3:4b"
     idempotency_key: str | None = None
 
 

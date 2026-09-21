@@ -146,7 +146,9 @@ def run_security_harden(repo: Path) -> HardenReport:
         if path.name in forbidden_names or rel in forbidden_names:
             tracked_secret_files.append(rel)
             continue
-        if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2"}:
+        if path.suffix.lower() in {
+            ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2"
+        }:
             continue
         if not path.is_file():
             continue

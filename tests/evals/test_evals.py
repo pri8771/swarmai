@@ -22,7 +22,7 @@ STARTER = ROOT / "benchmarks" / "starter.jsonl"
 def test_validate_starter_dataset() -> None:
     report = validate_dataset(STARTER)
     assert report["ok"] is True
-    assert report["case_count"] == 128
+    assert report["case_count"] == 224  # 128 + 96 expanded holdouts (5/cell)
     assert "extraction" in report["families"]
     assert set(report["grader_kinds"]) >= {"json_exact", "python_unit", "topological_order"}
 

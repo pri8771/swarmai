@@ -1,0 +1,32 @@
+{
+  "gate": "FIX-004",
+  "scenario": "cursor_agent_login_verify_after_second_operator_claim",
+  "recorded_at": "2026-09-20T20:52:43.854977+00:00",
+  "operator_claim": "Cursor agent login is done now",
+  "cursor_agent_status": "Not logged in",
+  "cursor_agent_whoami": "Not logged in",
+  "invented_success": false,
+  "hourly_spawn_resumed": false,
+  "skip_cursor_probe_cleared": false,
+  "checks": {
+    "cursor_agent_status": "Not logged in",
+    "cursor_agent_whoami": "Not logged in",
+    "login_probe": {
+      "no_open_browser": true,
+      "timed_out_seconds": 15,
+      "cli_state": "Waiting for browser authentication...",
+      "login_url": "https://cursor.com/loginDeepControl?challenge=NIfMk2wrbNMiIE5rIalH_gfLvGRcVWJK0-L3LVa3aPc&uuid=97277300-776f-4596-8c7e-44ec839560ce&mode=login&redirectTarget=cli"
+    },
+    "launchagent_env_unchanged": {
+      "SWARM_HOURLY_SKIP_CURSOR_PROBE": "1",
+      "reason": "not cleared \u2014 agent CLI still Not logged in"
+    }
+  },
+  "remaining_operator_step": {
+    "action": "Complete Cursor CLI agent browser login (password/passkey/MFA/consent)",
+    "cli": "cursor agent login",
+    "url": "https://cursor.com/loginDeepControl?challenge=NIfMk2wrbNMiIE5rIalH_gfLvGRcVWJK0-L3LVa3aPc&uuid=97277300-776f-4596-8c7e-44ec839560ce&mode=login&redirectTarget=cli",
+    "note": "IDE Cursor login is separate from `cursor agent` CLI auth. Open this URL (or run fresh `cursor agent login`) then re-check `cursor agent status`.",
+    "verify_after": "cursor agent status  # must NOT print 'Not logged in'"
+  }
+}

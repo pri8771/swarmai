@@ -1,0 +1,21 @@
+{
+  "gate": "RUN-111",
+  "scenario": "service_restart_reopen",
+  "recorded_at": "2026-09-20T20:36:50.382214+00:00",
+  "health_ready": {
+    "status": "ready",
+    "execution_mode": "mock",
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "mock_vs_live": "api_store_in_memory_not_live_providers"
+  },
+  "reopened_mission_id": "3f62094ff77a4f228a821ae2fc164c1a",
+  "reopened_status": "completed",
+  "acceptance_receipt_id": "acr_bde5ea82811243ddbd2ca09e1c00a1aa",
+  "plan_task_family": "extract",
+  "same_durable_id": true,
+  "database_status": "up",
+  "spend": 0
+}

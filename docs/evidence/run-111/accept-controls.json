@@ -1,0 +1,53 @@
+{
+  "gate": "RUN-111",
+  "recorded_at": "2026-09-20T20:36:41.535759+00:00",
+  "unsupported_task": {
+    "mission_id": "f8a71b3275a0447aa91677d1353f46a1",
+    "status": "failed",
+    "task_family": "teleportation",
+    "support": {
+      "supported": false,
+      "family": "teleportation",
+      "reason": "unsupported_task_family:teleportation"
+    },
+    "result": {
+      "ok": false,
+      "unsupported": true,
+      "support": {
+        "supported": false,
+        "family": "teleportation",
+        "reason": "unsupported_task_family:teleportation"
+      },
+      "summary": "unsupported_task_family:teleportation"
+    }
+  },
+  "wrong_output_rejected": {
+    "mission_id": "e38e714da6f14ce185b2bf03efa7823a",
+    "status": "failed",
+    "acceptance_receipt_id": null,
+    "review": {
+      "accepted": false,
+      "reasons": [
+        "wrong_result_rejected"
+      ],
+      "checks": {
+        "wrong_result": false
+      }
+    }
+  },
+  "independent_accept": {
+    "mission_id": "3f62094ff77a4f228a821ae2fc164c1a",
+    "status": "completed",
+    "acceptance_receipt_id": "acr_bde5ea82811243ddbd2ca09e1c00a1aa",
+    "review": {
+      "accepted": true,
+      "reasons": [
+        "all_independent_checks_passed"
+      ],
+      "checks": {
+        "fields_extracted": true
+      }
+    }
+  },
+  "spend": 0
+}

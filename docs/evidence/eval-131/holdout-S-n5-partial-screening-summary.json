@@ -1,0 +1,48 @@
+{
+  "gate": "EVAL-131",
+  "recorded_at": "2026-09-20T21:24:52.029642+00:00",
+  "mode": "live_local_zero_cost_brokered_holdout_S_n5_partial_screening",
+  "qualification_claimed": false,
+  "underpowered": true,
+  "note": "Partial n=5 path proof: code_generation+dependency_planning \u00d7 S \u00d7 gemma3:4b after dataset expansion to 5 holdouts/cell. Not qualification; not full coverage.",
+  "run_id": "run_0fb1e20617db420baeeabef41d48f8ef",
+  "models": [
+    "gemma3:4b"
+  ],
+  "case_ids": [
+    "code_generation_S_03",
+    "dependency_planning_S_03",
+    "code_generation_S_04",
+    "code_generation_S_05",
+    "code_generation_S_06",
+    "code_generation_S_07",
+    "dependency_planning_S_04",
+    "dependency_planning_S_05",
+    "dependency_planning_S_06",
+    "dependency_planning_S_07"
+  ],
+  "trial_count": 10,
+  "total_cost_usd": 0.0,
+  "sample_counts": [
+    {
+      "family": "code_generation",
+      "size": "S",
+      "model": "gemma3:4b",
+      "sample_count": 5,
+      "pass_rate": 0.0,
+      "qualification": false,
+      "state": "provisional"
+    },
+    {
+      "family": "dependency_planning",
+      "size": "S",
+      "model": "gemma3:4b",
+      "sample_count": 5,
+      "pass_rate": 1.0,
+      "qualification": false,
+      "state": "provisional"
+    }
+  ],
+  "live_claimed": false,
+  "candidate_sha": "aa6865a74249e046bfe697532accb00390bb5873"
+}

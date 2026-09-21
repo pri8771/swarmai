@@ -1,0 +1,167 @@
+{
+  "packet_id": "W-121A",
+  "gate": "INF-121",
+  "recorded_at": "2026-09-20T23:11:58.100039+00:00",
+  "candidate_docs_tip_sha": "724a324b77d60fff143674feecec9239062e9c3c",
+  "feature_tip_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+  "spend_usd": 0.0,
+  "live_dual_remote_claimed": false,
+  "live_remote_inference_executed": false,
+  "method": "metadata_only_inspect_plus_stale_historical_canary_review_plus_local_probe",
+  "policy": {
+    "metadata_only_auth_cannot_establish_inference_eligibility": true,
+    "charge_prevention_must_be_verified": true,
+    "stale_or_unknown_routes_rejected": true,
+    "no_paid_or_uncertain_calls": true
+  },
+  "local_routes": [
+    {
+      "provider": "ollama",
+      "route_ids": [
+        "rt_ollama_gemma3:4b",
+        "rt_ollama_qwen3.5:4b",
+        "rt_ollama_qwen3.5:9b"
+      ],
+      "auth": "local_daemon",
+      "health": "probed_ok",
+      "models_observed": [
+        "gemma3:4b",
+        "qwen3.5:4b",
+        "qwen3.5:9b"
+      ],
+      "zero_charge_eligibility": "local_zero_cost",
+      "quota_reset": "n/a_local",
+      "privacy": "local_only",
+      "admissible_for_g12_local_leg": true,
+      "evidence": "curl 127.0.0.1:11434/api/tags at packaging time"
+    }
+  ],
+  "remote_candidate_routes": [
+    {
+      "provider": "groq",
+      "account_alias": "groq-primary",
+      "exact_route_id": "unbound_until_fresh_zero_charge_canary",
+      "secret_present": true,
+      "metadata_inspect": {
+        "account_status": "configured",
+        "charge_prevention_verified": false,
+        "published_offer_category": "renewing_limited_free_tier",
+        "blocker_code": "charge_prevention_unverified"
+      },
+      "historical_free_canary": {
+        "path": "~/Library/Application Support/SwarmAI/account-inventory/groq-auth-canary.json",
+        "recorded_at": "2026-09-20T15:46:13.462650+00:00",
+        "auth_ok": true,
+        "freshness": "stale_for_current_g12_admission_without_reverification"
+      },
+      "zero_additional_spend_eligibility": "unknown_not_reverified",
+      "quota_remaining": "unknown",
+      "health": "metadata_only_not_inference_probed",
+      "privacy": "remote_provider_tos_applies",
+      "decision": "rejected_blocked",
+      "reason": "charge_prevention_unverified; historical canary not accepted as current inference eligibility"
+    },
+    {
+      "provider": "openrouter",
+      "account_alias": "openrouter-primary",
+      "exact_route_id": "unbound_until_fresh_zero_charge_canary",
+      "secret_present": true,
+      "metadata_inspect": {
+        "account_status": "configured",
+        "charge_prevention_verified": false,
+        "published_offer_category": "renewing_free_model_routes",
+        "blocker_code": "charge_prevention_unverified"
+      },
+      "historical_free_canary": {
+        "path": "~/Library/Application Support/SwarmAI/account-inventory/openrouter-free-canary.json",
+        "recorded_at": "2026-09-20T15:36:08.591117+00:00",
+        "cost": 0,
+        "freshness": "stale_for_current_g12_admission_without_reverification"
+      },
+      "zero_additional_spend_eligibility": "unknown_not_reverified",
+      "quota_remaining": "unknown",
+      "health": "metadata_only_not_inference_probed",
+      "privacy": "remote_provider_tos_applies",
+      "decision": "rejected_blocked",
+      "reason": "charge_prevention_unverified; historical free canary not accepted as current inference eligibility"
+    },
+    {
+      "provider": "gemini",
+      "account_alias": "gemini-primary",
+      "exact_route_id": "unbound_until_fresh_zero_charge_canary",
+      "secret_present": true,
+      "metadata_inspect": {
+        "account_status": "configured",
+        "charge_prevention_verified": false,
+        "published_offer_category": "model_and_project_specific_free_tier",
+        "blocker_code": "charge_prevention_unverified"
+      },
+      "historical_auth_canary": {
+        "path": "~/Library/Application Support/SwarmAI/account-inventory/gemini-auth-canary.json",
+        "auth": "models.list",
+        "inference_eligibility": "not_established"
+      },
+      "zero_additional_spend_eligibility": "unknown_not_reverified",
+      "quota_remaining": "unknown",
+      "health": "metadata_only_not_inference_probed",
+      "privacy": "remote_provider_tos_applies",
+      "decision": "rejected_blocked",
+      "reason": "models.list auth is not inference eligibility; charge_prevention_unverified"
+    },
+    {
+      "provider": "openai",
+      "account_alias": "openai-primary",
+      "secret_present": false,
+      "decision": "rejected_deferred",
+      "reason": "payment-gated; OPENAI_API_KEY absent; do not spend"
+    },
+    {
+      "provider": "together",
+      "account_alias": "together-primary",
+      "secret_present": true,
+      "decision": "rejected_blocked",
+      "reason": "prior inventory marks inference live-blocked under SWARM_ALLOW_PAID=false"
+    },
+    {
+      "provider": "fireworks",
+      "account_alias": "fireworks-primary",
+      "secret_present": true,
+      "decision": "rejected_blocked",
+      "reason": "prior inventory auth-only; inference not run / not zero-charge proven"
+    },
+    {
+      "provider": "anthropic",
+      "account_alias": "anthropic-primary",
+      "secret_present": true,
+      "decision": "rejected_blocked",
+      "reason": "charge_prevention_unverified; no current zero-additional-spend inference eligibility"
+    },
+    {
+      "provider": "deepinfra",
+      "account_alias": "deepinfra-primary",
+      "secret_present": true,
+      "decision": "rejected_blocked",
+      "reason": "charge_prevention_unverified; confirm zero-charge before any call"
+    }
+  ],
+  "admissible_remote_routes_count": 0,
+  "admissible_remote_routes": [],
+  "w121b_dual_remote_overlap": {
+    "status": "blocked",
+    "depends_on": "two_admissible_remote_routes_from_W-121A",
+    "local_leg_ready": true,
+    "executed": false
+  },
+  "operator_exact_next_step_if_unblocking": [
+    "On provider console, re-verify free/zero-additional-spend eligibility + remaining quota for exact model/route IDs for at least two remotes (historically: groq free tier + openrouter :free route).",
+    "Record fresh zero-charge canary with cost=0, exact route_id/model, quota remaining, timestamp \u2014 without enabling paid fallback.",
+    "Only then authorize W-121B dual-remote overlap mission."
+  ],
+  "sources": [
+    "uv run swarm providers inspect --provider {groq,openrouter,gemini} --metadata-only",
+    "docs/onboarding/ACCOUNT_INVENTORY.md",
+    "docs/onboarding/account-inventory.json",
+    "private canaries under ~/Library/Application Support/SwarmAI/account-inventory/ (paths only; secrets not copied)",
+    "docs/evidence/g12/DUAL_REMOTE_TEST_PLAN.md"
+  ]
+}

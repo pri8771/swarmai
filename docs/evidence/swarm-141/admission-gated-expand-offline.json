@@ -1,0 +1,52 @@
+{
+  "gate": "SWARM-141",
+  "scenario": "offline_admission_gated_expand_contract",
+  "recorded_at": "2026-09-20T22:51:23.025690+00:00",
+  "live_claimed": false,
+  "live_multi_planner_claimed": false,
+  "spend_usd": 0.0,
+  "mission_id": "mission_g14_admit_gate",
+  "max_model_calls": 4,
+  "max_graph_nodes": 2,
+  "ops": [
+    {
+      "op": "expand",
+      "planner": "as_planner_a",
+      "ok": true,
+      "revision": 2,
+      "spawned": [
+        "task_extract_a",
+        "task_triage_a"
+      ]
+    },
+    {
+      "op": "expand_denied",
+      "planner": "as_planner_b",
+      "ok": false,
+      "reason": "max_graph_nodes"
+    },
+    {
+      "op": "contract_retire",
+      "task_id": "task_triage_a",
+      "ok": true,
+      "note": "node removed from graph map \u2014 cancel alone does not free max_graph_nodes"
+    },
+    {
+      "op": "expand_after_contract",
+      "planner": "as_planner_a",
+      "ok": true,
+      "revision": 3,
+      "spawned": [
+        "task_plan_c"
+      ]
+    }
+  ],
+  "expand_denied": true,
+  "deny_detail": "max_graph_nodes",
+  "task_count": 2,
+  "task_statuses": {
+    "task_extract_a": "ready",
+    "task_plan_c": "ready"
+  },
+  "note": "Offline admission-gated expand/contract prep only. Not live multi-model multi-planner proof."
+}

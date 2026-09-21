@@ -14,7 +14,7 @@ from swarm.contracts.fixtures import sample_mission
 
 @pytest.fixture
 def client() -> TestClient:
-    app = create_app(require_auth=True, db_reachable=True)
+    app = create_app(require_auth=True, db_reachable=True, seed_loopback_token="atk_loopback_demo", seed_fixtures=True)
     return TestClient(app)
 
 
@@ -35,7 +35,7 @@ def test_health_ready_reflects_database(client: TestClient) -> None:
 
 
 def test_health_not_ready_when_db_down() -> None:
-    app = create_app(require_auth=True, db_reachable=False)
+    app = create_app(require_auth=True, db_reachable=False, seed_loopback_token="atk_loopback_demo", seed_fixtures=True)
     with TestClient(app) as c:
         body = c.get("/health/ready").json()
         assert body["status"] == "not_ready"
