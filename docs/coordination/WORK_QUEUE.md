@@ -1,4 +1,4 @@
-# SwarmAI artifact-derived execution queue — after LEAD-20260921-030
+# SwarmAI artifact-derived execution queue — after LEAD-20260921-031
 
 Canonical lifecycle is `ARTIFACT_REGISTRY.json`. Immediate target remains a V2.0 implementation/artifact-complete candidate; acceptance/live windows/main merge/public release/additional spend remain separately gated.
 
@@ -7,8 +7,8 @@ Canonical lifecycle is `ARTIFACT_REGISTRY.json`. Immediate target remains a V2.0
 - A / `cursor/v2-runtime-lane`: `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`; exact-tip CI `35558067148` remains red in the offline job from the shared autonomous-runner source.
 - B / `cursor/v2-product-lane`: `6b0e1277051ae90fe1d56825d3e771b042380755`; exact-tip CI `35558073323` remains red from the same shared source.
 - Reviewed integration: `cursor/v2-integration@9ce727842446b98cfa55c28c7e70808f57f17d7b`, reviewed code lineage `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
-- A scheduler: `03:47:19Z -> 04:02:22Z` = **2/3**, stale; no later scheduler receipt observed in this lead review.
-- B scheduler: current valid chain is `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z` = **6 consecutive valid scheduler receipts**. B individually satisfies bootstrap cadence, but global cadence remains 15 minutes because A does not.
+- A scheduler: `03:47:19Z -> 04:02:22Z` = **2/3**, stale; no later scheduler receipt observed.
+- B scheduler: current valid chain is `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z -> 08:59:27Z -> 09:14:18Z -> 09:29:17Z -> 09:44:17Z` = **10 consecutive valid scheduler receipts**. B individually satisfies bootstrap cadence, but global cadence remains 15 minutes because A does not.
 - No new A/B implementation commit or repo-assigned autonomous self-launch/push is verified.
 
 ## External worker-pc — G13 task-pool critical path
@@ -17,9 +17,9 @@ Canonical lifecycle is `ARTIFACT_REGISTRY.json`. Immediate target remains a V2.0
 
 - Attempt 01 `swarmai-v13-task-pool-freeze-01`: cancelled before result/branch; non-evidence.
 - Attempt 02: `worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692`; independently reviewed **changes required** because worker-visible hidden references exist, held-out depth is 5/cell rather than >=15, seed-isomorphic variants remain, and no Python/pytest/Ruff/mypy/CI actually ran.
-- Attempt 03: `swarmai-v13-task-pool-freeze-03`, remote-workers commit `cbdaaab46142e2165084a15157f1aabd8180483d`, run `35566726945`, job `106229937621`; **cancelled** at `08:02:30Z` after the submitted-task step ran for roughly two hours. Result JSON is absent and `worker/swarmai-v13-task-pool-freeze-03` does not exist. This is not implementation evidence.
+- Attempt 03: `swarmai-v13-task-pool-freeze-03`, remote-workers commit `cbdaaab46142e2165084a15157f1aabd8180483d`, run `35566726945`, job `106229937621`; cancelled with no result JSON and no worker branch. This is not implementation evidence.
 - Lead narrowed the retry contract in `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R2.md` at coordination commit `d67ed2bc07f7239220cdf7e4c8aca32f2ccbd0c8`.
-- After the shared worker became idle, attempt 04 was dispatched as `swarmai-v13-task-pool-freeze-04` from remote-workers commit `f3eeb62f836ece720f80e5e79a0a8a461c8e39cc`; workflow run `35580580156` was queued at dispatch observation. Expected SwarmAI branch: `worker/swarmai-v13-task-pool-freeze-04`.
+- Attempt 04 is actively executing as `swarmai-v13-task-pool-freeze-04`, remote-workers commit `f3eeb62f836ece720f80e5e79a0a8a461c8e39cc`, workflow run `35580580156`, job `106272271934`. At this review the job remained in `Execute submitted tasks`; result JSON was absent and `worker/swarmai-v13-task-pool-freeze-04` did not yet exist.
 
 `ART-V13-TASK-POOL` remains **drafting**. Counted qualification remains prohibited until the lead independently freezes a compliant v2 task pool.
 
@@ -84,11 +84,11 @@ ActionEnvelope / ApprovalGrant / ActionReceipt exact project/operation/destinati
 
 ## Honest blocked acceptance artifacts
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B individually complete at 6 consecutive valid receipts; no global hourly graduation.
+- `ART-OPS-HEARTBEAT`: A 2/3 stale; B individually complete at 10 consecutive valid receipts; no global hourly graduation.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - `ART-V10-WORKER-HEARTBEAT`: authenticated Cursor-agent receipts absent.
 - `ART-V12-REMOTE-OVERLAP`: 0 admitted remotes.
-- `ART-V13-TASK-POOL`: drafting; retry 02 changes-required, retry 03 cancelled, retry 04 dispatched/unreviewed.
+- `ART-V13-TASK-POOL`: drafting; retry 02 changes-required, retry 03 cancelled, retry 04 actively executing/unreviewed.
 - `ART-V13-QUALIFIED-MATRIX`: zero qualified cells.
 - `ART-V14-REAL-E2E`: first real attempt failed; repair waits behind A0.
 - G14 role/live-adaptive proof: blocked on G12/G13.
@@ -97,4 +97,4 @@ ActionEnvelope / ApprovalGrant / ActionReceipt exact project/operation/destinati
 
 ## Lead lane
 
-`ART-V13-TASK_POOL_REPAIR_CONTRACT.md` plus bounded retry packet `EXT-WORKER-PC-V2B-001-R2.md` define the current G13 repair boundary. `ART-V20-SECURITY-REVIEW` and `ART-V20-RELIABILITY-PROTOCOL` remain drafting lead-owned contracts; no security acceptance or elapsed reliability time is claimed.
+`ART-V13-TASK_POOL_REPAIR_CONTRACT.md` plus bounded retry packet `EXT-WORKER-PC-V2B-001-R2.md` define the current G13 repair boundary. `ART-V20-SECURITY-REVIEW` and `ART-V20-RELIABILITY-PROTOCOL` remain drafting. `ART-V20-PERFORMANCE-BASELINE` was advanced in `docs/artifacts/future/ART-V20-PERFORMANCE_BASELINE.md` at `ddfc8f969ab66684697fa822279da441a197421e` with frozen campaign identity, measurement discipline, resource accounting, fail-closed pathology rules and reproducible evidence requirements. No benchmark execution or performance acceptance is claimed.
