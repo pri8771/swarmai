@@ -40,9 +40,11 @@ A assignment remains `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled with o
 
 ## External worker-pc truth
 
-`worker-pc` is online, capacity 1, with verified Claude branch execution infrastructure. The SwarmAI task `swarmai-v13-task-pool-freeze-01` did **not** produce a result: dispatch commit `7e17163e7fc85455a8eb0180d3cb2173711dc978`, Actions run `35559390335` ended `cancelled`, result JSON is absent and expected worker branch is absent. Therefore `ART-V13-TASK-POOL` remains drafting and counted qualification remains forbidden.
+`worker-pc` is online, capacity 1, with verified Claude branch execution infrastructure. The first task-pool attempt `swarmai-v13-task-pool-freeze-01` produced no result: dispatch `7e17163e7fc85455a8eb0180d3cb2173711dc978`, run `35559390335` cancelled, no result JSON and no worker branch.
 
-At LEAD-026 the remote-worker lane was occupied by unrelated run `35560103791` observed `in_progress`. Do not submit a competing retry. When `worker-pc` is idle, create a new unique task ID for the same V2B-001 intent, then independently review its branch/diff/tests/result before any artifact transition. While that external retry is active, local B should not duplicate V2B-001.
+After the unrelated worker-pc run occupying capacity completed, lead dispatched a fresh unique retry `swarmai-v13-task-pool-freeze-02` at remote-workers commit `4c5fe82f227fc80038a3ce9b1643305be48f09d9`. Run `35562827710` is in progress. Expected branch: `worker/swarmai-v13-task-pool-freeze-02`. `ART-V13-TASK-POOL` remains drafting until lead independently inspects the structured result, branch/diff scope, tests and manifest against EVAL-131. Dispatch/running status earns no acceptance credit.
+
+Local B must not duplicate V2B-001 while external retry 02 is active. Counted qualification remains forbidden until the task pool is independently frozen.
 
 ## Retained reviewed work
 
@@ -66,7 +68,7 @@ A:
 
 B:
 - keep scheduler heartbeat running while assignment remains held;
-- after shared repair propagation/new generation: run `V2B-000` locally, then `V2B-002` locally while the external worker handles the retried `V2B-001` task-pool freeze;
+- after shared repair propagation/new generation: run `V2B-000` locally, then `V2B-002` locally while worker-pc executes V2B-001 retry 02;
 - counted W-131B only after lead freezes ART-V13-TASK-POOL; reviewer held-out only after reviewer design freeze.
 
 ## Gate truth and lead lane
