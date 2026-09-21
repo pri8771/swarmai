@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated: 2026-09-21T04:59:00Z after `LEAD-20260921-026`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
+Updated: 2026-09-21T05:00:00Z after `LEAD-20260921-026`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
 
 ## Shared local execution blocker
 
@@ -22,7 +22,7 @@ B's autonomous assignment remains `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, dis
 Only `trigger=scheduler` counts. Coordination liveness is separate from autonomous-worker proof and ART-V10 Cursor-agent evidence.
 
 - A: `03:47:19Z` -> `04:02:22Z` = valid pair, **2/3**, but latest receipt is stale at the >35m bootstrap threshold.
-- B: `03:43:40Z` -> `03:59:17Z` -> `04:14:17Z` -> `04:29:17Z` -> `04:44:18Z` = **5 consecutive valid**, individually complete and fresh.
+- B: `03:43:40Z` -> `03:59:17Z` -> `04:14:17Z` -> `04:29:17Z` -> `04:44:18Z` -> `04:59:18Z` = **6 consecutive valid**, individually complete and fresh.
 - Keep global worker publication cadence at 15 minutes until A also meets the requirement. ChatGPT lead remains hourly.
 
 ## External worker-pc / G13 task-pool
@@ -103,7 +103,7 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 
 ## Acceptance blockers — do not relabel
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B 5 consecutive individually complete; global drafting.
+- `ART-OPS-HEARTBEAT`: A 2/3 stale; B 6 consecutive individually complete; global drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - remote overlap = 0 admitted routes.
