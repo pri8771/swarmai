@@ -1,7 +1,11 @@
 {
   "schema_version": "2.0",
   "artifact_id": "ART-V13-TASK-POOL",
-  "packet": "EXT-WORKER-PC-V2B-001-R2",
+  "packet": "EXT-WORKER-PC-V2B-001-R3",
+  "packet_lineage": [
+    "EXT-WORKER-PC-V2B-001-R2 minted the corpus and the ten identities",
+    "EXT-WORKER-PC-V2B-001-R3 corrects provenance and records the measured independence deficiency; it did not re-mint the corpus"
+  ],
   "freeze_id": "g13-pool-freeze-v2",
   "freeze_version": 2,
   "artifact_state_requested": "reviewable",
@@ -9,34 +13,78 @@
   "qualification_claimed": false,
   "counted_qualification_started": false,
   "counted_qualification_permitted_by_this_artifact": false,
-  "base_branch": "worker/swarmai-v13-task-pool-freeze-02",
-  "base_commit": "bbe41b7770123fef4eb03c4f03f95fc18eefc692",
-  "worker_branch": "worker/swarmai-v13-task-pool-freeze-04",
+  "base_branch": "worker/swarmai-v13-task-pool-freeze-04",
+  "base_commit": "6467552f86e40964e5bd26d85e3b3a74d03aa059",
+  "base_commit_parent": "bbe41b7770123fef4eb03c4f03f95fc18eefc692",
+  "worker_branch": "worker/swarmai-v13-task-pool-freeze-06",
   "generated_by": "scripts/g13_freeze_task_pool_v2.py",
   "verified_by": "swarm.evals.task_pool_freeze_v2.verify_pool_freeze_v2",
 
   "provenance": {
+    "corpus_bytes_minted_by_packet": "EXT-WORKER-PC-V2B-001-R2",
+    "corpus_bytes_changed_by_packet_r3": false,
     "worker_environment_denied": [
-      "python (beyond python --version)",
+      "python (only python --version is permitted; python -c, python <script> and python -m are all refused)",
       "pytest",
       "ruff",
       "mypy",
-      "git add",
-      "git commit",
+      "uv",
       "git fetch",
-      "git push"
+      "awk"
     ],
     "worker_environment_permitted": [
-      "read-only git",
+      "read-only git (log, show, rev-parse, ls-files, for-each-ref)",
       "file read/write tools",
-      "PowerShell ConvertFrom-Json",
+      "PowerShell cmdlet pipelines including ConvertFrom-Json",
       "coreutils: head, tail, wc, grep, sort, uniq, od, sha256sum"
     ],
-    "digests_produced_by": "sha256sum over the committed bytes, then cross-checked with sha256sum -c --strict over SHA256SUMS (29/29 OK)",
+    "digests_produced_by": "sha256sum over the committed bytes, then cross-checked with sha256sum -c --strict over SHA256SUMS",
     "digests_produced_by_the_committed_generator": false,
-    "commit_state": "the artifact exists in the working tree of worker/swarmai-v13-task-pool-freeze-04 only. Every writing git command was denied, so there is no commit and no pushed branch, and no commit SHA can be quoted. The branch ref is at the unchanged base bbe41b7770123fef4eb03c4f03f95fc18eefc692.",
-    "honesty_note": "the corpus arity, digests, id uniqueness, JSON well-formedness, per-record size bands and answer-leak count were established with the tools listed above. The committed Python was never executed. The generator recomputes byte-identical sidecars; the lead must run scripts/g13_freeze_task_pool_v2.py --verify --stats and tests/evals/test_task_pool_freeze_v2.py, plus ruff and mypy, before accepting this artifact.",
+    "commit_state": "the R2 artifact IS committed. It is commit 6467552f86e40964e5bd26d85e3b3a74d03aa059 on worker/swarmai-v13-task-pool-freeze-04, whose parent is bbe41b7770123fef4eb03c4f03f95fc18eefc692. The R2 manifest's claim that no commit existed was written before the transport committed and is corrected here. R3 works on worker/swarmai-v13-task-pool-freeze-06, branched from that commit.",
+    "commit_state_correction_reason": "R2 recorded the working-tree state of its own session. The remote-workers transport committed that tree afterwards, so the recorded provenance no longer described the artifact and had to be rebound to the real branch and commit.",
+    "honesty_note": "the corpus arity, digests, id uniqueness, JSON well-formedness and answer-leak count were established with the tools listed above. The committed Python has still never been executed in any worker environment for this artifact. No packet in this lineage has run verify_pool_freeze_v2, the generator, pytest, ruff or mypy against the committed bytes.",
     "regeneration_command": "python scripts/g13_freeze_task_pool_v2.py --verify --stats"
+  },
+
+  "provenance_commands_executed": {
+    "environment": "packet EXT-WORKER-PC-V2B-001-R3 worker session on branch worker/swarmai-v13-task-pool-freeze-06",
+    "executed_and_their_outcomes": [
+      "git rev-parse HEAD -> 6467552f86e40964e5bd26d85e3b3a74d03aa059",
+      "git log --oneline -5 -> tip 6467552 worker: swarmai-v13-task-pool-freeze-04, parent bbe41b7 worker: swarmai-v13-task-pool-freeze-02",
+      "git for-each-ref --format=%(refname) -> no coordination or swarm-control ref is present locally",
+      "git ls-files --eol over the seven pinned source modules and one shard -> i/lf w/lf for all eight, so no CRLF drift exists in this checkout",
+      "git show HEAD~1:benchmarks/.gitattributes -> the tip change to that file is additive only",
+      "cd benchmarks/g13/pool_freeze_v2 && sha256sum -c --strict SHA256SUMS -> 29 of 29 files OK before the R3 edits",
+      "sha256sum over the seven manifest-pinned source modules -> all seven match the digests pinned under identities",
+      "wc -l over all 16 shards -> 15 records each, 240 total",
+      "wc -l SEALED_REFERENCE_IDS.txt -> 244 lines, being 4 header rows plus 240 commitment rows",
+      "grep -ho '\"variant\":\"[a-z_]*\"' over all 16 shards | sort | uniq -c -> 20 distinct variants, each occurring exactly 12 times",
+      "grep -ho '\"scenario\":\"[a-z_]*\"' over coding_S, coding_M and coding_XL -> byte-identical 15-scenario sequence in all three",
+      "grep -ho '\"scenario\":\"[a-z_]*\"' extraction_S.jsonl | sort | uniq -c -> 15 distinct scenarios, one each",
+      "grep -c 'returns an empty dict for an empty input list' over the four coding shards -> 3 3 3 3",
+      "grep -c 'station A1 recorded 43 units in cycle 1' over the four reasoning shards -> 9 9 9 9",
+      "grep -o '\"requirement\":' per coding shard | wc -l -> 45, 90, 150, 225",
+      "PowerShell ConvertFrom-Json over coding_S.jsonl selecting id, variant and scenario -> parsed cleanly, 15 rows, 5 variants",
+      "python --version -> Python 3.11.9, the only permitted python invocation"
+    ],
+    "refused_by_the_environment": [
+      "uv run ruff check .",
+      "uv run mypy src/swarm",
+      "uv run pytest tests/evals/test_task_pool_freeze_v2.py",
+      "python -m pytest tests/evals/test_task_pool_freeze_v2.py",
+      "python -c and python <script>",
+      "pytest --version, ruff --version, uv --version",
+      "git fetch origin coordination/swarm-control"
+    ],
+    "consequence": "R3 verified bytes, arity, uniqueness and archetype counts. R3 verified no behaviour. Every statement in this manifest about what the Python computes remains unexecuted and the code wins over this document if they disagree.",
+    "r3_commit_state": "git add and git commit were refused in the R3 worker session exactly as they were in R2, so R3 did not author its own commit and cannot quote its own commit SHA. The R3 changes exist in the working tree of worker/swarmai-v13-task-pool-freeze-06, whose parent is 6467552f86e40964e5bd26d85e3b3a74d03aa059. If a commit on that branch exists, the remote-workers transport created it after the session ended; the lead must read the branch tip to obtain the SHA.",
+    "r3_files_changed": [
+      "benchmarks/g13/pool_freeze_v2/task_pool_freeze_v2.manifest.json",
+      "benchmarks/g13/pool_freeze_v2/SHA256SUMS",
+      "docs/evidence/g13/TASK_POOL_FREEZE_V2.md",
+      "docs/evidence/g13/EVIDENCE_INDEX.md"
+    ],
+    "r3_files_not_changed": "no corpus record, no shard, no shard table, no id commitment, no identity spec, no Python module, no test, and no Session-A-owned API, store, route, schema, CLI, migration, pyproject or lockfile path"
   },
 
   "corpus": {
@@ -63,6 +111,8 @@
     "min_independent_per_required_cell": 15,
     "min_total_independent_held_out": 240,
     "frozen_independent_per_required_cell": 15,
+    "frozen_independent_per_required_cell_basis": "record count passing the eight frozen digest and normalised-template axes. It is NOT a count of independent semantic archetypes; see independence_design.measured_by_packet_r3, which measures 5 archetypes per cell against a protocol minimum of 15.",
+    "frozen_semantic_archetypes_per_required_cell": 5,
     "frozen_total_independent_held_out": 240,
     "protocol_max_distinct_per_cell": 60,
     "protocol_source": "EVAL_131_QUALIFICATION_PROTOCOL v1.0 as restated in docs/evidence/g13/QUALIFICATION_CRITERION.md",
@@ -81,8 +131,29 @@
       "L": [17, 18, 19],
       "XL": [24, 25, 26]
     },
-    "why_this_shape": "within one cell the fifteen inputs differ on two independent axes at once: five task variants with different instructions and output contracts, and three distinct structural loads per variant. Two inputs in the same cell therefore differ in both wording and payload arity, so neither is a re-skin of the other.",
-    "enforced_by": "swarm.evals.g13_independence.check_independence, fail-closed on all eight invariants"
+    "r2_claim_now_withdrawn": "R2 claimed that within one cell the fifteen inputs differ on two independent axes at once, so that neither of two inputs in a cell is a re-skin of the other. R3 measured the corpus and that claim is false. It is withdrawn.",
+    "measured_by_packet_r3": {
+      "method": "grep over the committed shards for the variant field, the scenario field and literal clause text; counts below are exact and reproducible with the commands in provenance_commands_executed",
+      "distinct_semantic_archetypes_per_required_cell": 5,
+      "required_semantic_archetypes_per_required_cell": 15,
+      "semantic_archetype_deficit_per_required_cell": 10,
+      "distinct_semantic_archetypes_in_whole_corpus": 20,
+      "records_in_whole_corpus": 240,
+      "archetype_key": "the record's variant field; each of the 20 variants occurs exactly 12 times",
+      "how_the_other_ten_records_in_a_cell_are_produced": [
+        "scenario-name substitution: the same archetype re-emitted under a different scenario noun, which the packet protocol explicitly refuses to count as independent",
+        "cumulative clause growth: the larger record's items list is a literal prefix-extension of the smaller record's items list"
+      ],
+      "scenario_sequence_identical_across_all_four_sizes": true,
+      "variant_and_scenario_pair_repeats_once_per_size": true,
+      "literal_clause_sharing_examples": [
+        "the coding clause 'returns an empty dict for an empty input list' occurs in 3 records in each of coding_S, coding_M, coding_L and coding_XL, so 12 records share it",
+        "the reasoning evidence line 'station A1 recorded 43 units in cycle 1' occurs in 9 records in each of the four reasoning shards, so 36 of the 60 reasoning records share it"
+      ],
+      "why_the_frozen_checker_does_not_catch_this": "g13-independence-checker-v2 normalises synthetic identifiers and digit runs, so it catches seed-isomorphic siblings of equal arity. A scenario-name substitution changes a lower-case noun, which normalisation preserves, and a cumulative clause variant changes the arity, so both survive every one of the eight frozen axes. Catching them needs a semantic-archetype axis that this freeze version does not have."
+    },
+    "enforced_by": "swarm.evals.g13_independence.check_independence, fail-closed on all eight digest and template invariants",
+    "not_enforced_by_this_freeze_version": "a semantic-archetype axis, a scenario-substitution axis and a clause-prefix-containment axis. Adding them is a breaking change: it needs a new checker id, a new freeze version and a re-minted corpus, none of which R3 could author because no packet in this lineage has been able to execute Python."
   },
 
   "identities": {
@@ -242,17 +313,20 @@
     "blocking_detail": "the freeze conditions are mechanical and self-contained, but the sealed reference bundle is minted outside this branch and its content digest is not yet bound. Until it is, no held-out response can be scored and counted_qualification_ready stays false.",
     "not_a_model_qualification_claim": "counted_qualification_ready describes the freeze only. It says nothing about whether any model, cell or capability profile is qualified.",
     "verifier_not_executed_in_this_worker_environment": true,
-    "verifier_not_executed_detail": "the worker environment for this packet denied python, pytest, ruff and mypy execution. The freeze conditions have not been machine-checked; the lead must run scripts/g13_freeze_task_pool_v2.py --verify --stats and tests/evals/test_task_pool_freeze_v2.py before accepting this artifact.",
+    "verifier_not_executed_detail": "the worker environment for this packet denied python, pytest, ruff, mypy and uv execution. The freeze conditions have not been machine-checked; the lead must run scripts/g13_freeze_task_pool_v2.py --verify --stats and tests/evals/test_task_pool_freeze_v2.py before accepting this artifact.",
     "remaining_blockers": [
       "B2-v2 - the sealed reference bundle does not exist yet; it must be minted outside this branch, quote the frozen id-commitment digest, hold exactly 240 entries, and have its content digest bound",
       "B4 - swarm.evals.wilson.wilson_lower_bound still defaults to z = 1.96 (one-sided 97.5 percent); counted runs must pass the one-sided 90 percent z = 1.2815515655446004 explicitly. No threshold or default was changed by this packet.",
       "B5 - the repository still has no LICENSE file at the frozen commit",
-      "B6 - the v2 freeze verifier, generator and tests were not executed in this worker environment"
+      "B6 - the v2 freeze verifier, generator and tests have never been executed in any worker environment for this artifact",
+      "B7 - OPEN AND BLOCKING, raised by R3: each required cell holds 5 distinct semantic archetypes, not the 15 the protocol requires. The remaining 10 records per cell are scenario-name substitutions and cumulative clause variants of those 5, which the packet protocol refuses to count as independent. A Wilson bound over 15 records per cell therefore still overstates confidence, which is the same defect class as v1 blocker B3 at a level the frozen checker cannot see. Closing B7 requires a re-minted corpus with 240 distinct archetypes plus a new checker id and freeze version; R3 could not author it because Python execution was denied and a blind re-mint could not be verified.",
+      "B8 - OPEN, raised by R3: GitHub Actions run 35587202715 reports an offline pytest failure at the exact tip 6467552f86e40964e5bd26d85e3b3a74d03aa059. R3 could not reproduce it: pytest, python and uv are all denied in this worker environment, and origin/coordination/swarm-control could not be fetched to read the run log. The failing test and its cause are therefore unidentified, and no fix for it is claimed."
     ],
+    "blocker_b3_reassessment": "R2 listed B3 as closed. R3 downgrades that: B3 is closed only for seed-isomorphic siblings of equal arity, which the normalised-template axis does catch. It is not closed for the broader independence claim, which B7 now carries.",
     "closed_blockers": [
-      "B1 - held-out depth was 5 per required cell against a protocol minimum of 15; the v2 corpus holds 15 independent inputs in every required cell, 240 in total",
+      "B1 - held-out RECORD depth was 5 per required cell; the v2 corpus holds 15 records in every required cell, 240 in total. Record depth is closed; archetype depth is not, and is carried by B7.",
       "B2 - hidden answers were worker-visible; a v2 record is input-only and carries only an opaque hidden_reference_id",
-      "B3 - seed-isomorphic held-out variants were reported but tolerated; g13-independence-checker-v2 rejects normalised-template collisions as hard failures"
+      "B3 - partially closed only: seed-isomorphic held-out variants of equal arity were reported but tolerated, and g13-independence-checker-v2 now rejects normalised-template collisions as hard failures. See blocker_b3_reassessment and B7 for what remains open."
     ]
   },
 
@@ -265,6 +339,9 @@
 
   "not_claimed": [
     "ART-V13-TASK-POOL is not accepted; lead review is requested",
+    "that each required cell holds 15 independent semantic archetypes; it holds 5, see blocker B7",
+    "that the offline pytest failure in Actions run 35587202715 was reproduced, diagnosed or fixed by packet R3",
+    "that packet R3 re-minted, regenerated or otherwise changed any corpus record",
     "no counted held-out qualification was run for this packet",
     "no W-131B counted qualification was run",
     "no cell is qualified and no capability profile was promoted",

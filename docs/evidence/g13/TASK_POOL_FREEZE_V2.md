@@ -1,11 +1,27 @@
-# ART-V13-TASK-POOL — `g13-pool-freeze-v2` held-out corpus (packet EXT-WORKER-PC-V2B-001-R2)
+# ART-V13-TASK-POOL — `g13-pool-freeze-v2` held-out corpus (packets EXT-WORKER-PC-V2B-001-R2, corrected by -R3)
 
 **Requested transition:** `drafting -> reviewable`
 **Accepted:** **no** — lead review requested, not granted
-**qualification_claimed:** **false** · **counted held-out runs in this packet:** **0**
+**qualification_claimed:** **false** · **counted held-out runs in these packets:** **0**
 **W-131B counted qualification:** **not run**
-**Base:** `worker/swarmai-v13-task-pool-freeze-02` @ `bbe41b7770123fef4eb03c4f03f95fc18eefc692`
-**Branch:** `worker/swarmai-v13-task-pool-freeze-04` — **uncommitted working tree**, no commit SHA (writing git was denied; see *Verification status*)
+**Corpus bytes minted by:** packet `EXT-WORKER-PC-V2B-001-R2`
+**Corpus bytes changed by R3:** **no** — R3 edited only this document, the manifest and `SHA256SUMS`
+**Base:** `worker/swarmai-v13-task-pool-freeze-04` @ `6467552f86e40964e5bd26d85e3b3a74d03aa059`
+(parent `bbe41b7770123fef4eb03c4f03f95fc18eefc692`)
+**Branch:** `worker/swarmai-v13-task-pool-freeze-06`
+
+> **Provenance correction (R3).** The R2 revision of this document said the
+> artifact was an *uncommitted working tree* with *no commit SHA*. That was true
+> when R2 wrote it and is false now: the remote-workers transport committed that
+> tree afterwards as `6467552f86e40964e5bd26d85e3b3a74d03aa059` on
+> `worker/swarmai-v13-task-pool-freeze-04`. Every provenance line in this
+> document is now bound to that commit.
+
+> **Independence correction (R3) — read before accepting.** R2 claimed 15
+> *independent* held-out inputs per required cell. R3 measured the committed
+> bytes: each cell holds **5 distinct semantic archetypes**, not 15. See
+> [Measured independence](#measured-independence--r3-correction). This is open
+> blocker **B7** and it is blocking.
 
 This packet builds a **new versioned held-out corpus**, `g13-pool-freeze-v2`. It
 does not amend v1. `benchmarks/g13/pool_freeze_v1/` and
@@ -16,9 +32,9 @@ the record of what retry-02 did and did not verify.
 
 | v1 blocker | v2 answer |
 |---|---|
-| **B1** — 5 held-out records per required cell against a protocol minimum of 15 | 240 held-out inputs: **15 independent inputs in every one of the 16 required cells** |
+| **B1** — 5 held-out records per required cell against a protocol minimum of 15 | 240 held-out inputs: **15 records in every one of the 16 required cells**. Record depth is closed. **Archetype depth is not** — only 5 of the 15 are semantically independent; see blocker **B7** |
 | **B2** — `expected_output`, `grader`, `reference_solution`, `broken_code` in plaintext on the worker-visible branch | a v2 record is **input-only**. There is no field in which an answer, grader fixture, rubric or reference could sit; a record carries only an opaque `hidden_reference_id` |
-| **B3** — seed-isomorphic held-out variants *reported* but tolerated | `g13-independence-checker-v2` is **fail-closed on all eight axes**; a normalised-template collision is a violation, not a statistic |
+| **B3** — seed-isomorphic held-out variants *reported* but tolerated | **partially answered.** `g13-independence-checker-v2` is fail-closed on all eight axes, so a normalised-template collision of *equal arity* is now a violation rather than a statistic. It does **not** catch scenario-name substitution or cumulative clause growth; that residue is blocker **B7** |
 | **B4** — `wilson_lower_bound` defaults to `z = 1.96` | recorded again in `identity_scorer_v2.json`. **No threshold or default was changed by this packet**; counted runs must pass the one-sided 90 % `z = 1.2815515655446004` explicitly |
 | **B5** — no LICENSE file at the frozen commit | recorded again in `source_and_license.license_blocker`; it affects redistribution, not contamination or immutability |
 
@@ -56,7 +72,7 @@ stored — every record's bytes are already pinned exactly, and the verifier
 recomputes record, payload, prompt and normalised-template digests at
 verification time, which is where the contamination decisions are actually made.
 
-## Coverage — 15 independent inputs in every required cell
+## Coverage — 15 *records* in every required cell
 
 | product family | dataset family | S | M | L | XL |
 |---|---|---|---|---|---|
@@ -65,25 +81,87 @@ verification time, which is where the contamination decisions are actually made.
 | planning | `dependency_planning` | 15 | 15 | 15 | 15 |
 | reasoning | `evidence_qa` | 15 | 15 | 15 | 15 |
 
-**16 required cells × 15 = 240 held-out inputs.** No auxiliary family is folded
+**16 required cells × 15 = 240 held-out records.** No auxiliary family is folded
 into a required cell: merging several task types into one qualification cell
 lets a strong sub-type mask a weak one.
 
-### How the fifteen inputs in a cell are made independent
+This table counts **records**. It is not a count of independent observations —
+see the next section.
 
-Two independent axes vary at once inside every cell:
+## Measured independence — R3 correction
 
-* **5 task variants** per required family — different instruction, different
-  question, different `output_contract.fields`. For coding: pure transform, lazy
-  iterator, record parser, stateful accumulator, typed error contract. For
-  planning: topological order, critical path, parallel waves, blocked set,
-  prerequisite closure. And so on.
-* **3 distinct structural loads** per variant, so payload arity differs too.
+R2 asserted that the fifteen records in a cell vary on two independent axes at
+once (5 task variants × 3 structural loads), so that "neither is a re-skin of the
+other". **R3 measured the committed bytes and withdraws that claim.**
 
-5 × 3 = 15. Two inputs in the same cell therefore differ in both wording and
-payload arity; neither is a re-skin of the other. Across cells the structural
-loads are disjoint by band (S 6–8, M 11–13, L 17–19, XL 24–26), so no cross-cell
-pair can collide either.
+### What the corpus actually contains
+
+| quantity | required | measured |
+|---|---|---|
+| distinct semantic archetypes per required cell | **15** | **5** |
+| distinct semantic archetypes in the whole corpus | 240 | **20** |
+| records per archetype | 1 | **12** |
+
+The archetype key is the record's `variant` field. There are 20 variants — 5 per
+product family — and each occurs exactly 12 times (3 records × 4 size bands).
+
+### How the other ten records in each cell are produced
+
+Both mechanisms are ones the packet protocol explicitly refuses to count as
+independent:
+
+1. **Scenario-name substitution.** The same archetype is re-emitted under a
+   different lower-case scenario noun. `coding_S` holds `pure_transform` three
+   times, as `ledger`, `telemetry` and `roster`.
+2. **Cumulative clause growth.** The larger record's `items` list is a literal
+   prefix-extension of the smaller record's. `coding_S_01` has `RQ-1`, `RQ-2`;
+   `coding_XL_01` has `RQ-1` … `RQ-14`, opening with the identical two clause
+   strings.
+
+The `(variant, scenario)` sequence is **byte-identical across all four size
+bands**, so each `(variant, scenario)` pair appears once per size. `coding_S`,
+`coding_M`, `coding_L` and `coding_XL` list the same fifteen scenarios in the
+same order.
+
+### Literal text shared across records
+
+| literal string | occurrences per shard | shards | records sharing it |
+|---|---|---|---|
+| `returns an empty dict for an empty input list` | 3 | all 4 coding shards | **12** |
+| `station A1 recorded 43 units in cycle 1` | 9 | all 4 reasoning shards | **36 of 60** |
+
+### Why the frozen checker does not catch this
+
+`g13-independence-checker-v2` normalises **upper-case synthetic identifiers** and
+**digit runs**, then lower-cases. That catches seed-isomorphic siblings *of equal
+arity*. It cannot catch either mechanism above:
+
+* a scenario-name substitution changes a **lower-case** noun, which
+  normalisation preserves, so the two templates differ and no collision is
+  reported;
+* a cumulative clause variant changes the **arity**, so the normalised templates
+  differ by construction.
+
+Both therefore pass all eight frozen axes. Catching them needs a
+semantic-archetype axis, a scenario-substitution axis and a
+clause-prefix-containment axis, none of which this freeze version has.
+
+### Consequence for qualification
+
+A one-sided Wilson bound computed over 15 records per cell treats them as 15
+independent trials. At 5 archetypes per cell the effective sample is far smaller
+and the bound overstates confidence — **the same defect class as v1 blocker B3**,
+one level below where the frozen checker can see it. This is open blocker **B7**
+and it blocks counted qualification independently of the sealed-bundle blocker.
+
+**R3 did not fix it.** Closing B7 needs a re-minted corpus with 240 distinct
+archetypes plus a new checker id and a new freeze version. R3 could not author
+that: Python execution was denied in this worker environment (see *Verification
+status*), so a 240-record re-mint could not have its size bands, template
+independence or verifier result checked even once before being committed.
+Replacing a corpus that is at least byte-consistent with one that is entirely
+unverified would have made the artifact worse, so the deficiency is reported
+rather than blindly rewritten.
 
 ## Sealed grader-reference interface
 
@@ -236,19 +314,81 @@ named violation code:
 
 ## Verification status — read this before accepting
 
-The worker environment for this packet **denied execution** of `python` (beyond
-`python --version`), `pytest`, `ruff`, `mypy`, and **every writing git command**
-(`git add`, `git commit`, `git fetch`, `git push`). Read-only git, file tools,
-PowerShell `ConvertFrom-Json` and a coreutils subset (`head`, `tail`, `wc`,
-`grep`, `sort`, `uniq`, `od`, `sha256sum`) were permitted.
+### R3 environment
 
-**Not committed.** The artifact exists in the **working tree** of
-`worker/swarmai-v13-task-pool-freeze-04` only. There is no commit and no pushed
-branch, so **there is no commit SHA to quote**; the branch ref is at the
-unchanged base `bbe41b7770123fef4eb03c4f03f95fc18eefc692`. This is the same
-environment restriction retry-02 hit, recorded again rather than worked around.
+`python` (beyond `python --version`), `pytest`, `ruff`, `mypy`, `uv`, `awk` and
+`git fetch` were all **refused** by this worker environment. `python -c`,
+`python <script>` and `python -m pytest` are each refused individually, so there
+is **no** route to executing repository code. Read-only git, file read/write
+tools, PowerShell cmdlet pipelines including `ConvertFrom-Json`, and a coreutils
+subset (`head`, `tail`, `wc`, `grep`, `sort`, `uniq`, `od`, `sha256sum`) were
+permitted.
 
-**Actually executed, and what it showed:**
+**Committed.** Unlike R2, the artifact *is* committed: the R2 tree is
+`6467552f86e40964e5bd26d85e3b3a74d03aa059` on
+`worker/swarmai-v13-task-pool-freeze-04`, parent
+`bbe41b7770123fef4eb03c4f03f95fc18eefc692`. R3 branches from that commit onto
+`worker/swarmai-v13-task-pool-freeze-06`.
+
+**Coordination branch not read.** `git fetch origin coordination/swarm-control`
+was refused and no `coordination/*` ref exists locally, so
+`EXT-WORKER-PC-V2B-001-R3.md` and `EVAL_131_QUALIFICATION_PROTOCOL.md` were
+**not read**. The packet requirements acted on here are those stated in the task
+instruction; protocol constants are still the in-repo restatement in
+`docs/evidence/g13/QUALIFICATION_CRITERION.md`. **If the coordination branch
+disagrees, the coordination branch wins.**
+
+**The CI failure was not reproduced.** Actions run `35587202715` reports an
+offline pytest failure at the exact tip `6467552`. With `pytest`, `python` and
+`uv` all refused, R3 could not run the suite, and the run log could not be
+fetched. The failing test is therefore **unidentified** and **no fix for it is
+claimed**. This is open blocker **B8**.
+
+### Commands R3 actually executed, and what they showed
+
+| Check | Command | Result |
+|---|---|---|
+| cover digest, before R3 edits | `sha256sum -c --strict SHA256SUMS` | **29/29 OK** |
+| cover digest, after R3 edits | `sha256sum -c --strict SHA256SUMS` | **29/29 OK** |
+| pinned source modules | `sha256sum` over the 7 modules pinned under `identities` | all 7 match the pinned digests |
+| tip identity | `git rev-parse HEAD`, `git log --oneline -5` | `6467552`, parent `bbe41b7` |
+| coordination refs | `git for-each-ref --format='%(refname)'` | no `coordination/*` ref present |
+| line endings of pinned files | `git ls-files --eol` over 7 modules + 1 shard | `i/lf w/lf` for all 8 — no CRLF drift |
+| `.gitattributes` change at tip | `git show HEAD~1:benchmarks/.gitattributes` | additive only |
+| corpus size | `wc -l` over all 16 shards | 15 each, **240** |
+| id-commitment size | `wc -l SEALED_REFERENCE_IDS.txt` | 4 header + **240** rows |
+| **archetype count** | `grep -ho '"variant":"[a-z_]*"' <16 shards> \| sort \| uniq -c` | **20 variants, 12 records each** |
+| **scenario reuse across sizes** | `grep -ho '"scenario":"[a-z_]*"'` on `coding_{S,M,XL}` | byte-identical 15-scenario sequence |
+| scenario uniqueness within a cell | `grep -ho '"scenario":…' extraction_S.jsonl \| sort \| uniq -c` | 15 distinct, one each |
+| **clause reuse, coding** | `grep -c 'returns an empty dict for an empty input list'` ×4 | `3 3 3 3` |
+| **clause reuse, reasoning** | `grep -c 'station A1 recorded 43 units in cycle 1'` ×4 | `9 9 9 9` |
+| coding item totals | `grep -o '"requirement":' \| wc -l` per shard | 45 / 90 / 150 / 225 |
+| manifest well-formedness | `ConvertFrom-Json` over the edited manifest | parsed cleanly |
+| manifest floating values | `grep -nE ': *(\[\]\|\{\}\|null\|"")'` and placeholder regex | **0 matches** |
+| manifest denylisted keys | `grep -noE '"(answer\|grader\|reference\|…)" *:'` | **0 matches** |
+| manifest line endings | `grep -cP '\r'`, `tail -c 32 \| od -c` | 0 CR, single trailing LF |
+
+### Commands R3 attempted and the environment refused
+
+```
+uv run ruff check .
+uv run mypy src/swarm
+uv run pytest tests/evals/test_task_pool_freeze_v2.py
+python -m pytest tests/evals/test_task_pool_freeze_v2.py
+python <script> / python -c
+pytest --version / ruff --version / uv --version
+git fetch origin coordination/swarm-control
+```
+
+None of these ran. Ruff, mypy, the packaging check, `alembic heads` and the
+ordinary non-live pytest suite are therefore **all unexecuted by R3**. R3 did not
+edit any Python, so it cannot have changed their outcome either way.
+
+### R2's checks, retained
+
+The table below is R2's record of its own coreutils checks. R3 re-ran the digest,
+arity and line-count rows (above) and they still hold. R3 did **not** re-derive
+the per-record band table; it is retained as R2 wrote it, still unexecuted.
 
 | Check | Command | Result |
 |---|---|---|
@@ -289,9 +429,11 @@ pins every record's item count into the band:
 | `planning_L` | 4..10 | `ENR` 15/15 | `AUD` absent | ✓ |
 | `planning_XL` | >= 6 | `PUB` 15/15 | — | ✓ |
 
-This proves the size classifier will agree with all 240 declared bands. It does
-**not** prove the classifier code computes what this table assumes — that still
-needs `python`.
+R2 wrote that this "proves the size classifier will agree with all 240 declared
+bands". It does not prove that. It constrains each record's *item count* to its
+band on the assumption that item refs are contiguous from 1, and it does **not**
+exercise `derive_features`, the weighting, or the band boundaries. R3 did not
+re-derive it.
 
 **Not executed — the lead must run all four:**
 
@@ -305,19 +447,33 @@ mypy src/swarm/evals/g13_size_classifier_v2.py src/swarm/evals/g13_prompt_v2.py 
      src/swarm/evals/task_pool_freeze_v2.py
 ```
 
-**The new Python is unexecuted.** The corpus arity, digests, uniqueness and
-leakage counts above were established with coreutils, but nothing has run
-`derive_features`, `render_prompt`, `normalise_template` or
-`verify_pool_freeze_v2` against the committed bytes. If any of them disagrees
-with this document, the code wins and this freeze needs a correction.
+**The Python is still unexecuted, in both packets.** The corpus arity, digests,
+uniqueness, archetype counts and leakage counts above were established with
+coreutils, but no packet in this lineage has run `derive_features`,
+`render_prompt`, `normalise_template` or `verify_pool_freeze_v2` against the
+committed bytes. If any of them disagrees with this document, the code wins and
+this freeze needs a correction. Given that CI reports a failure at this exact
+tip (**B8**), assume at least one of them does disagree.
 
-**Not read:** `origin/coordination/swarm-control` could not be fetched, so
-`EXT-WORKER-PC-V2B-001-R2.md`, `EVAL_131_QUALIFICATION_PROTOCOL.md`,
-`ARTIFACT_MANAGEMENT.md`, `ARTIFACT_REGISTRY.json`, `WORK_QUEUE.md` and
-`AGENT_MESSAGES.md` were unavailable. The protocol constants used here
-(families, sizes, `n >= 15`, max 60, one-sided 90 % Wilson >= 0.80, >= 3 exact
-model configs) were taken from `docs/evidence/g13/QUALIFICATION_CRITERION.md`.
+**Not read:** `origin/coordination/swarm-control` could not be fetched in either
+packet, so `EXT-WORKER-PC-V2B-001-R2.md`, `EXT-WORKER-PC-V2B-001-R3.md`,
+`EVAL_131_QUALIFICATION_PROTOCOL.md`, `ARTIFACT_MANAGEMENT.md`,
+`ARTIFACT_REGISTRY.json`, `WORK_QUEUE.md` and `AGENT_MESSAGES.md` were
+unavailable. The protocol constants used here (families, sizes, `n >= 15`,
+max 60, one-sided 90 % Wilson >= 0.80, >= 3 exact model configs) were taken from
+`docs/evidence/g13/QUALIFICATION_CRITERION.md`.
 **If the coordination branch says otherwise, the coordination branch wins.**
+
+## Open blockers
+
+| id | state | summary |
+|---|---|---|
+| **B2-v2** | open | the sealed reference bundle does not exist; its content digest is unbound, so `counted_qualification_ready` is `false` |
+| **B4** | open | `wilson_lower_bound` still defaults to `z = 1.96`; counted runs must pass `z = 1.2815515655446004` explicitly. Unchanged by both packets |
+| **B5** | open | no LICENSE file at the frozen commit |
+| **B6** | open | the v2 verifier, generator and tests have never been executed in any worker environment for this artifact |
+| **B7** | **open, raised by R3, blocking** | 5 semantic archetypes per required cell against a protocol minimum of 15; the other 10 records per cell are scenario substitutions and cumulative clause variants. Needs a re-minted 240-archetype corpus, a new checker id and a new freeze version |
+| **B8** | **open, raised by R3** | Actions `35587202715` reports an offline pytest failure at tip `6467552`; not reproduced, not diagnosed, not fixed, because `pytest`/`python`/`uv` are refused here |
 
 ## Scope discipline
 
@@ -331,11 +487,12 @@ migration, `pyproject.toml` or lockfile was edited. No `swarm/api`, `swarm/db`,
 | Claimed | Not claimed |
 |---|---|
 | A new versioned held-out corpus, `g13-pool-freeze-v2`, with 240 input-only records | That ART-V13-TASK-POOL is accepted |
-| 15 independent held-out inputs in every required coding/planning/reasoning/extraction × S/M/L/XL cell | That counted qualification may start |
-| Zero answer, grader, reference, rubric or solution fields anywhere in the corpus | That any cell is qualified |
-| A sealed grader-reference interface exposing only an opaque id plus version identity, fail-closed on this branch | That the sealed reference bundle exists |
-| A fail-closed, versioned independence checker covering all eight overlap axes | That the v2 verifier, generator or tests were executed here |
-| Ten pinned, non-floating identities | Any threshold, default or protocol constant change |
+| 15 held-out **records** in every required coding/planning/reasoning/extraction × S/M/L/XL cell | That those 15 records are 15 **independent** observations — they are 5 archetypes, see **B7** |
+| Zero answer, grader, reference, rubric or solution **field names** anywhere in the corpus | That counted qualification may start, or that any cell is qualified |
+| A sealed grader-reference interface exposing only an opaque id plus version identity, fail-closed on this branch | That the sealed reference bundle exists, or that its content digest is bound |
+| A fail-closed, versioned independence checker covering all eight **digest and template** overlap axes | That it covers semantic archetype, scenario substitution or clause-prefix containment — it does not |
+| Ten pinned, non-floating identities | That the v2 verifier, generator or tests were executed in any worker environment |
 | A readiness value the verifier computes and refuses to let the manifest overstate | That `counted_qualification_ready` says anything about a model |
 | v1 preserved unchanged as historical incomplete evidence | That v1 is usable for counted qualification |
-| Digest, arity, uniqueness, JSON and band checks actually run with coreutils and `ConvertFrom-Json` | That the branch was committed or pushed — writing git was denied, so no commit SHA exists |
+| Digest, arity, uniqueness, archetype and JSON checks actually run with coreutils and `ConvertFrom-Json` | Any threshold, default or protocol constant change |
+| Provenance bound to the real commit `6467552f86e40964e5bd26d85e3b3a74d03aa059` | That the offline pytest failure in Actions `35587202715` was reproduced or fixed — see **B8** |
