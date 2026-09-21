@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:28:03+00:00",
+    "observed_at": "2026-09-21T16:29:17+00:00",
     "trigger": "scheduler",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
-    "coordination_sha": "be2cd4dd13ea241d1f57af133e6807aa40d10f5a",
+    "coordination_sha": "85d73f34473e645707083e1ed8c465cf65cfb315",
     "effective_cadence_minutes": 5,
-    "packet_id": "V2B-001-R4",
-    "artifact_id": "ART-V13-TASK-POOL",
-    "status": "blocked",
-    "last_agent_activity_at": "2026-09-21T16:17:01+00:00",
-    "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
+    "packet_id": null,
+    "artifact_id": null,
+    "status": "bootstrap",
+    "last_agent_activity_at": null,
+    "note": null
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:11:06+00:00",
-      "trigger": "manual",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "a908a0e1ff023743892ecb10cfb7bd8df4b53d53",
-      "coordination_sha": "397829a49577db3fdb98eb1eaf373fd6e5bccda0",
-      "effective_cadence_minutes": 5,
-      "packet_id": "B-OPS-AUTO-SYNC-02",
-      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-      "status": "working",
-      "last_agent_activity_at": "2026-09-21T16:11:05+00:00",
-      "note": "Linux Lane B executing B-OPS-AUTO-SYNC-02; 5m tmux swarm-heartbeat-b installed (not Windows Task Scheduler)."
-    },
     {
       "observed_at": "2026-09-21T16:12:52+00:00",
       "trigger": "install",
@@ -198,7 +183,22 @@
       "status": "blocked",
       "last_agent_activity_at": "2026-09-21T16:17:01+00:00",
       "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
+    },
+    {
+      "observed_at": "2026-09-21T16:29:17+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
+      "coordination_sha": "85d73f34473e645707083e1ed8c465cf65cfb315",
+      "effective_cadence_minutes": 5,
+      "packet_id": null,
+      "artifact_id": null,
+      "status": "bootstrap",
+      "last_agent_activity_at": null,
+      "note": null
     }
   ],
-  "status": "blocked"
+  "status": "bootstrap"
 }
