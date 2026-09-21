@@ -42,7 +42,7 @@ cat > "$PLIST" <<EOF
   </array>
   <key>EnvironmentVariables</key>
   <dict><key>SWARM_GH_PATH</key><string>$GH</string></dict>
-  <key>StartInterval</key><integer>900</integer>
+  <key>StartInterval</key><integer>300</integer>
   <key>RunAtLoad</key><true/>
   <key>StandardOutPath</key><string>$APPDIR/stdout.log</string>
   <key>StandardErrorPath</key><string>$APPDIR/stderr.log</string>
@@ -53,4 +53,4 @@ EOF
 launchctl bootout "gui/$UID/com.swarmai.coord-heartbeat-a" >/dev/null 2>&1 || true
 launchctl bootstrap "gui/$UID" "$PLIST"
 SWARM_GH_PATH="$GH" "$PYTHON" "$RUNNER" --host "$HOST" --session "$SESSION" --branch "$BRANCH" --trigger install --force
-echo "Installed SwarmAI coordination heartbeat A. Scheduler wakes every 15m; client self-throttles after lead graduation."
+echo "Installed SwarmAI coordination heartbeat A. Scheduler wakes every 5m; client self-throttles to the cadence in HEARTBEAT_STATE.json."
