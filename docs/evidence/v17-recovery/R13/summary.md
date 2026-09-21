@@ -24,4 +24,4 @@ Alembic head: `a17effect004a0001`.
 
 No invent-accept of `ART-V15-LEASE-FENCING`. Next: R14 claim/renew/expire selective verify/port.
 
-Evidence tip: `e2defc5c8ef91eff074ff61f7afc8f97d9229009`.
+Evidence tip: `a0e1a882a2da6980ac03a513a97bb1f28e787a01`.
