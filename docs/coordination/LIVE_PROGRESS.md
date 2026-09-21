@@ -1,49 +1,84 @@
 # SwarmAI live progress
 
-Updated by lead: 2026-09-21T15:05:00Z
+Updated by lead: 2026-09-21T15:52:14Z
 
 ## Execution topology
 
 | Lane | Owner | Current queue | State |
 |---|---|---|---|
-| A | Mac / Cursor | V14-REAL-001-R -> V2A-003c | fresh generation 4; waiting fresh session/autonomous self-launch proof |
-| B | Windows / Cursor | runner sync -> integration sync -> G13 remint/freeze | fresh generation 4; waiting fresh session/autonomous self-launch proof |
-| C | worker-pc / Claude | V14 materialization read-only audit | dispatched through remote-workers |
+| A | Mac / Cursor | V14-REAL-001-R -> V2A-003c | assignment generation 4 enabled; no autonomous source push yet |
+| B | Windows / Cursor | B-OPS-AUTO-SYNC-02 -> V2B-000 -> V2B-001-R4 | assignment generation 4 enabled; no autonomous source push yet |
+| C | worker-pc / Claude | G13 retry-07 support | workflow 35616363073 in progress; no branch/result yet |
 | Lead | ChatGPT | review / assignment / acceptance / dashboard | active |
 
 ## Heartbeat
 
 Current mode: **5-minute stress Phase 1**.
 
-Target:
-- A: 3 consecutive scheduler heartbeats, 3–8m gaps.
-- B: 3 consecutive scheduler heartbeats, 3–8m gaps.
-- then 15m cadence for 24 real hours.
+- A: **1/3**, latest counted scheduler receipt `2026-09-21T15:52:14Z`. Previous counted receipt was ~15m02s earlier, so the chain reset.
+- B: **1/3**, latest counted scheduler receipt `2026-09-21T15:44:17Z`. Recent counted receipts remain ~15m apart, so the chain resets on every receipt.
+- Both ledgers are fresh at this evidence cutoff, but neither host is producing the required 3–8m spacing.
+- Phase 2 15m/24h soak has **not started**. No soak time is backfilled.
+- Both human-readable host status pages are still stale even though the JSON ledgers are updating. The current branch heartbeat installers specify a 5m OS wake interval and status-page publication, so the installed host copies/jobs need refresh/verification.
 
-Host live pages:
-- `docs/coordination/status/HOST-MAC-DEV.md`
-- `docs/coordination/status/HOST-WIN-DEV.md`
+## Lane A
 
-## Project position
+Current packet: `V14-REAL-001-R` / `ART-V14-REAL-E2E`.
 
-- V1.1 verified.
-- V1.2 local/broker behavior verified; remote overlap blocked.
-- V1.3 protocol/screening verified; task pool and qualification incomplete.
-- V1.4 real mission attempted honestly but failed materialization; repair/rerun is Lane A priority.
-- V1.5 claim/renew/expire fencing accepted; result acceptance and durable worker service remain.
-- V1.6/V1.7 source work follows G13/V1.5 critical path.
-- V2.0 architecture is ahead; integrated candidate and real acceptance campaigns remain incomplete.
+- Branch tip: `cursor/v2-runtime-lane@11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`.
+- Exact-tip CI: `35615739781` **green**.
+- Latest source commit is coordination-only heartbeat/status support, not V14 implementation.
+- Independent worker-pc V14 materialization audit completed successfully as read-only diagnostic evidence. Lead review confirmed the generic parser/materialization mismatch and ambiguous empty-diff reporting; `ART-V14-REAL-E2E` remains drafting.
+- Autonomous self-launch proof: **not yet proven**. The earlier `OPS-AUTO-001-R` repair was human-prompted and does not count.
 
-## Latest important evidence
+## Lane B
 
-- Mac autonomous-runner repair accepted: `0d71520...`, CI-bearing descendant `39bba630...`, CI 35609579398 success.
-- worker-pc retry06: `worker/swarmai-v13-task-pool-freeze-06@f780033...`; key finding = only 5 genuine semantic archetypes per required G13 cell, not 15.
-- reviewed integration remains `cursor/v2-integration@9ce727842...`.
+Current packet: `B-OPS-AUTO-SYNC-02` / `ART-OPS-AUTONOMOUS-WORKERS`.
+
+- Branch tip: `cursor/v2-product-lane@a908a0e1ff023743892ecb10cfb7bd8df4b53d53`.
+- Exact-tip CI: `35615750755` **red** in the offline job at Ruff; console lint/test/build is green.
+- No generation-4 autonomous implementation push is visible yet.
+- After runner sync: `V2B-000`, then final executable G13 packet `V2B-001-R4` on Windows B.
+
+## Lane C
+
+Completed:
+- `swarmai-v14-materialization-audit-01`: result status `success`, finished `2026-09-21T15:09:06Z`; read-only, so no branch/commit was expected. Lead independently reviewed it as useful diagnostic evidence only.
+
+Current:
+- `swarmai-v13-task-pool-freeze-07`, dispatch commit `3a69e1f5937b99b4f1e9a2d98b634d69a3900a94`, workflow `35616363073`: **in progress**.
+- Base: `worker/swarmai-v13-task-pool-freeze-06@f7800332594d67c8b872b3597abd59f35987a2a0`.
+- No retry-07 result JSON or SwarmAI worker branch exists yet, so there is nothing to accept or integrate.
+- Retry-07 is support/reference evidence only; Windows B remains final executable owner of `ART-V13-TASK-POOL`.
+
+## Latest reviews
+
+- `ART-V14-REAL-E2E`: worker-pc diagnostic audit = **useful / no lifecycle transition**. Generic repair remains Lane A owned.
+- `ART-V13-TASK-POOL`: retry-06 = **changes required**; only 5 genuine semantic archetypes/cell and exact-tip ordinary offline pytest red. Counted W-131B qualification remains prohibited.
+- `ARTIFACT_REGISTRY.json` was inspected first this run. No independently verified artifact lifecycle transition is justified.
 
 ## Top next actions
 
-1. Start fresh A/B sessions; reinstall 5m heartbeat + autonomous daemon.
-2. A repairs/reruns real V1.4 mission while B synchronizes runner/integration and re-mints G13 pool.
-3. Lead reviews first autonomous pushes and begins 24h heartbeat soak once A+B reach 3/3.
+1. Refresh/verify the current heartbeat + autonomous-worker installations on both local hosts so the 5m stress test and repo-assigned queues actually execute.
+2. A self-launches `V14-REAL-001-R`, pushes the generic materialization repair, then runs the preregistered new real brokered mission; lead reviews before `V2A-003c` advances.
+3. B self-launches `B-OPS-AUTO-SYNC-02`, restores exact-tip coordination-source CI, then `V2B-000` and `V2B-001-R4`; lead freezes G13 only after executable local verification.
 
-Human action: start the two fresh Cursor sessions with the lane prompts supplied by the lead.
+## Human action
+
+The current evidence strongly indicates stale host scheduler/daemon installations rather than a repository contract problem.
+
+On HOST-MAC-DEV from the current runtime checkout:
+
+```bash
+bash scripts/coordination/install_heartbeat_macos.sh
+bash scripts/coordination/install_autonomous_worker_macos.sh
+```
+
+On HOST-WIN-DEV from the current product checkout:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1
+powershell -ExecutionPolicy Bypass -File scripts\coordination\install_autonomous_worker_windows.ps1
+```
+
+If an autonomous-worker installer reports Cursor CLI authentication missing, run `agent login`, complete only required login/MFA/consent, and rerun that installer. No paid provider action is required for these local packets.
