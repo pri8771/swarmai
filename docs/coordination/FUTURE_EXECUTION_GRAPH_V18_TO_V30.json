@@ -1,9 +1,9 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "generated_at": "2026-09-21",
-  "status": "planning_only",
+  "status": "planning_only_lead_approved_not_active_until_dependencies",
   "scope": "V1.8_to_V3.0",
-  "note": "Not active queue. Canonical ARTIFACT_REGISTRY and current source must be reread before execution.",
+  "note": "Not an active queue. `packets` are coarse phase groups; each lists `maps_to` execution IDs. Execution IDs for V1.8-V2.3 live in V17_TO_V23_PACKET_QUEUE.json; execution IDs for V3.0 are `v30_packets` below. V30A-* are canonical (ART-V30-OBJECTIVE-CONTRACT). Entries with proposed=true are a proposed packetization that the lead must freeze before assignment. Canonical ARTIFACT_REGISTRY and current source must be reread before execution.",
   "packets": [
     {
       "id": "V18-01",
@@ -13,8 +13,8 @@
         "ART-V18-SPLIT-BRAIN-SAFETY"
       ],
       "depends_on": [
-        "V1.5-result-fencing",
-        "V1.7-effect-boundary"
+        "R15",
+        "R34"
       ],
       "code": [
         "src/swarm/db/**",
@@ -27,7 +27,16 @@
         "V18-AUTH-*",
         "V18-SPLIT-*"
       ],
-      "exit": "site epoch durable and bound to dispatch/result/effect with tests"
+      "exit": "site epoch durable and bound to dispatch/result/effect with tests",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "18-00a",
+        "18-01",
+        "18-02",
+        "18-03",
+        "18-04",
+        "18-08"
+      ]
     },
     {
       "id": "V18-02",
@@ -48,7 +57,13 @@
         "V18-BACKUP-*",
         "V18-RESTORE-*"
       ],
-      "exit": "backup/restore/reconciliation implementation reviewable"
+      "exit": "backup/restore/reconciliation implementation reviewable",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "18-05",
+        "18-06",
+        "18-07"
+      ]
     },
     {
       "id": "V18-03",
@@ -67,7 +82,11 @@
       "cases": [
         "V18-DRILL-*"
       ],
-      "exit": "drill harness complete; live evidence executed or honestly pending"
+      "exit": "drill harness complete; live evidence executed or honestly pending",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "18-09"
+      ]
     },
     {
       "id": "V19-01",
@@ -76,7 +95,7 @@
         "ART-V19-EXTENSION-CONTRACT"
       ],
       "depends_on": [
-        "V1.7-effect-boundary"
+        "R33"
       ],
       "code": [
         "src/swarm/extensions/**",
@@ -85,7 +104,13 @@
       "cases": [
         "V19-EXT-*"
       ],
-      "exit": "extension lifecycle and scope enforcement reviewable"
+      "exit": "extension lifecycle and scope enforcement reviewable",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "19-01",
+        "19-02",
+        "19-03"
+      ]
     },
     {
       "id": "V19-02",
@@ -108,7 +133,15 @@
         "V19-ROLLBACK-*",
         "V19-SUPPORT-*"
       ],
-      "exit": "clean install/upgrade/rollback/support bundle executable"
+      "exit": "clean install/upgrade/rollback/support bundle executable",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "19-00",
+        "19-04",
+        "19-05",
+        "19-06",
+        "19-08"
+      ]
     },
     {
       "id": "V19-03",
@@ -125,7 +158,12 @@
       "cases": [
         "V19-INSTALL-*"
       ],
-      "exit": "real fresh-environment evidence complete or blocked"
+      "exit": "real fresh-environment evidence complete or blocked",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "19-09",
+        "19-10"
+      ]
     },
     {
       "id": "V19-04",
@@ -135,7 +173,7 @@
       ],
       "depends_on": [
         "V19-01",
-        "V1.7-effect-boundary"
+        "R33"
       ],
       "code": [
         "src/swarm/selfdev/**",
@@ -145,7 +183,11 @@
       "cases": [
         "V19-SELFDEV-*"
       ],
-      "exit": "real bounded PR candidate path with independent review boundary"
+      "exit": "real bounded PR candidate path with independent review boundary",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "19-07"
+      ]
     },
     {
       "id": "V20-01",
@@ -167,7 +209,13 @@
       "cases": [
         "V20-CAND-*"
       ],
-      "exit": "one frozen reproducible CandidateManifest"
+      "exit": "one frozen reproducible CandidateManifest",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "20-01",
+        "20-02",
+        "20-03"
+      ]
     },
     {
       "id": "V20-02",
@@ -191,7 +239,12 @@
         "V20-UPGRADE-*",
         "V20-ROLLBACK-*"
       ],
-      "exit": "product journeys executed on frozen candidate"
+      "exit": "product journeys executed on frozen candidate",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "20-04",
+        "20-05"
+      ]
     },
     {
       "id": "V20-03",
@@ -212,7 +265,12 @@
         "V20-SEC-*",
         "V20-PERF-*"
       ],
-      "exit": "security/performance evidence candidate-bound"
+      "exit": "security/performance evidence candidate-bound",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "20-06",
+        "20-07"
+      ]
     },
     {
       "id": "V20-04",
@@ -234,7 +292,14 @@
         "V20-REL-*",
         "V20-REVIEW-*"
       ],
-      "exit": "required elapsed campaign and independent release review complete"
+      "exit": "required elapsed campaign and independent release review complete",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "20-08a",
+        "20-08b",
+        "20-08c",
+        "20-09"
+      ]
     },
     {
       "id": "V23-01",
@@ -260,7 +325,18 @@
         "V23-EPOCH-*",
         "V23-RECEIPT-*"
       ],
-      "exit": "durable fair scheduler/resource reservation path reviewable"
+      "exit": "durable fair scheduler/resource reservation path reviewable",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-01",
+        "23-02",
+        "23-03",
+        "23-04",
+        "23-05",
+        "23-06",
+        "23-07",
+        "23-12"
+      ]
     },
     {
       "id": "V23-02",
@@ -278,7 +354,11 @@
       "cases": [
         "V23-PACK-*"
       ],
-      "exit": "pack lifecycle with project-scoped permissions"
+      "exit": "pack lifecycle with project-scoped permissions",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-09"
+      ]
     },
     {
       "id": "V23-03",
@@ -288,7 +368,7 @@
       ],
       "depends_on": [
         "V19-01",
-        "V16-knowledge"
+        "R25"
       ],
       "code": [
         "src/swarm/product/**",
@@ -297,7 +377,11 @@
       "cases": [
         "V23-PORT-*"
       ],
-      "exit": "secret-free export/import with reconciliation"
+      "exit": "secret-free export/import with reconciliation",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-10"
+      ]
     },
     {
       "id": "V23-04",
@@ -316,7 +400,11 @@
       "cases": [
         "V23-OBS-*"
       ],
-      "exit": "read-only operational surface and action-bound mutations"
+      "exit": "read-only operational surface and action-bound mutations",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-08"
+      ]
     },
     {
       "id": "V23-05",
@@ -335,7 +423,11 @@
       "cases": [
         "V23-FLEET-*"
       ],
-      "exit": "trust/locality/capability placement with stale/drain fencing"
+      "exit": "trust/locality/capability placement with stale/drain fencing",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-11"
+      ]
     },
     {
       "id": "V23-06",
@@ -357,7 +449,12 @@
       "cases": [
         "V23-*"
       ],
-      "exit": "frozen deterministic plus multi-process/private evidence reviewed"
+      "exit": "frozen deterministic plus multi-process/private evidence reviewed",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "23-13",
+        "23-14"
+      ]
     },
     {
       "id": "V30-01",
@@ -377,7 +474,18 @@
       "cases": [
         "V30-OBJ-*"
       ],
-      "exit": "versioned objectives/triggers/proposals use normal mission admission"
+      "exit": "versioned objectives/triggers/proposals use normal mission admission",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30A-001",
+        "V30A-002",
+        "V30A-003",
+        "V30A-004",
+        "V30A-005",
+        "V30A-006",
+        "V30A-007",
+        "V30A-008"
+      ]
     },
     {
       "id": "V30-02",
@@ -397,7 +505,15 @@
       "cases": [
         "V30-LEARN-*"
       ],
-      "exit": "governed proposal/eval/canary/rollback state machine reviewable"
+      "exit": "governed proposal/eval/canary/rollback state machine reviewable",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30B-001",
+        "V30B-002",
+        "V30B-003",
+        "V30B-004",
+        "V30B-005"
+      ]
     },
     {
       "id": "V30-03",
@@ -416,7 +532,12 @@
       "cases": [
         "V30-ALLOC-*"
       ],
-      "exit": "allocator feeds scheduler without bypassing fairness/authority"
+      "exit": "allocator feeds scheduler without bypassing fairness/authority",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30C-001",
+        "V30C-002"
+      ]
     },
     {
       "id": "V30-04",
@@ -436,7 +557,12 @@
         "V30-LEARN-011",
         "V30-LEARN-012"
       ],
-      "exit": "selfdev governed as learning proposal, no self-merge/self-governance"
+      "exit": "selfdev governed as learning proposal, no self-merge/self-governance",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30D-001",
+        "V30D-002"
+      ]
     },
     {
       "id": "V30-05",
@@ -455,7 +581,12 @@
       "cases": [
         "V30-CAP-*"
       ],
-      "exit": "trusted/revocable capability ecosystem"
+      "exit": "trusted/revocable capability ecosystem",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30E-001",
+        "V30E-002"
+      ]
     },
     {
       "id": "V30-06",
@@ -476,7 +607,12 @@
         "V30-TENANT-*",
         "V30-AUDIT-*"
       ],
-      "exit": "tenant-aware fleet and reconstructible audit path"
+      "exit": "tenant-aware fleet and reconstructible audit path",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30F-001",
+        "V30F-002"
+      ]
     },
     {
       "id": "V30-07",
@@ -499,7 +635,459 @@
       "cases": [
         "V30-*"
       ],
-      "exit": "frozen integrated V3 private-live campaign and independent review"
+      "exit": "frozen integrated V3 private-live campaign and independent review",
+      "granularity": "coarse_phase",
+      "maps_to": [
+        "V30X-001",
+        "V30X-002",
+        "V30X-003"
+      ]
     }
-  ]
+  ],
+  "v30_packets": [
+    {
+      "id": "V30A-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "23-14"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Objective/version + TriggerReceipt durable contracts, repository, dedupe constraints (migration M30-01).",
+      "exit": "immutable objective versions; UNIQUE trigger dedupe scope/key; cross-project negative",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Schedule occurrence, restart and missed-run reconciliation; per-objective missed-run policy (D30-01), no hidden default.",
+      "exit": "restart creates no duplicate or unbounded catch-up missions",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-003",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Authenticated event trigger, replay rejection, cross-project validation.",
+      "exit": "replayed/forged/cross-project event creates no MissionProposal",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-004",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-002",
+        "V30A-003"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "MissionProposal + bridge into the normal mission admission path with authority-intersection digest (PolicyProvider seam from R28b).",
+      "exit": "a proposal is never execution authority; denied scope stays denied",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-005",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-004"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Pause/revoke/expiry/stop-condition fencing (deterministic predicates first, D30-02).",
+      "exit": "revoked objective cannot create or continue missions; in-flight effects fenced by cancellation generation",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-006",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-004",
+        "23-12"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "V2.3 fairness/resource integration and anti-amplification tests (rate, max_active, spawn gaming).",
+      "exit": "objective cannot exceed envelope or starve other projects",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-007",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-005",
+        "V30B-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Learning-candidate version, authority diff and rollback integration for objectives.",
+      "exit": "objective authority never widens through a learned change",
+      "status": "planned"
+    },
+    {
+      "id": "V30A-008",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V30A-005"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Audit/status/operator surface; every mutation re-enters the V1.7 action boundary.",
+      "exit": "read-only by default; receipts exportable",
+      "status": "planned"
+    },
+    {
+      "id": "V30B-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "23-14",
+        "R05"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "LearningProposal + LearningTransitionReceipt contracts, repository and forward-only state machine (migration M30-02).",
+      "exit": "illegal transition rejected; sealed refs only, no held-out plaintext on runtime rows",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30B-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "V30B-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Static/policy/security validation with the protected-authority denylist: permissions, spend, secrets, project boundaries, merge/release/deploy authority, grader and evidence rules.",
+      "exit": "proposal touching protected authority is rejected before calibration",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30B-003",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "V30B-002",
+        "R07"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Calibration -> freeze -> sealed held-out evaluation runner reusing the G13 sealed-reference binding and scorer versioning; thresholds frozen per proposal (D30-03).",
+      "exit": "no retune after freeze; contamination => state contaminated",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true,
+      "gate": "EXT-G13-SEALED-DIGEST"
+    },
+    {
+      "id": "V30B-004",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "V30B-003"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Independent review hook, bounded canary runner, deterministic rollback triggers (D30-04).",
+      "exit": "proposer cannot review itself; rollback restores parent version exactly",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true,
+      "gate": "WC-V30-CANARY"
+    },
+    {
+      "id": "V30B-005",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "V30B-004"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Drift detection, revalidation and supersession of learned versions.",
+      "exit": "stale learned version stops being served without manual edit",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30C-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-RESOURCE-ALLOCATOR"
+      ],
+      "depends_on": [
+        "V30A-006"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "ObjectiveResourceRequest + AllocationDecision on top of the V2.3 scheduler; allocator only supplies scheduler inputs.",
+      "exit": "no dispatch bypasses SchedulerDecisionReceipt; no new reservation authority",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30C-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-RESOURCE-ALLOCATOR"
+      ],
+      "depends_on": [
+        "V30C-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Negatives: hidden starvation, quota evasion, privacy relaxation, hidden cost shift.",
+      "exit": "allocation never authorizes a denied tool/provider/data scope",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30D-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CONTROLLED-SELFDEV"
+      ],
+      "depends_on": [
+        "V30B-004",
+        "19-07"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Self-development as a LearningProposal subtype over the 19-07 path and the R02a defect-proof gate.",
+      "exit": "bounded diff, isolated worktree, no self-merge/release",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30D-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CONTROLLED-SELFDEV"
+      ],
+      "depends_on": [
+        "V30D-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Negatives: a proposal may not modify its own governance, evaluation or reviewer rules.",
+      "exit": "mixed governance+code proposal rejected at static validation",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30E-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CAPABILITY-ECOSYSTEM"
+      ],
+      "depends_on": [
+        "23-09",
+        "19-03"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Publisher provenance, signature-ready fields and revocation on the shared pack/extension tables (M30-04; D19-02, D30-05).",
+      "exit": "no second ecosystem tables; revoked artifact cannot load",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30E-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CAPABILITY-ECOSYSTEM"
+      ],
+      "depends_on": [
+        "V30E-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Revocation propagation and cross-project negatives.",
+      "exit": "revocation drains and disables every project grant",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30F-001",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-FLEET-TENANCY-AUDIT"
+      ],
+      "depends_on": [
+        "23-11",
+        "23-08",
+        "V30A-008"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Tenant/project-scoped export of objective, learning and fleet receipts.",
+      "exit": "export reconstructs every consequential transition without secrets or model reasoning",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30F-002",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-FLEET-TENANCY-AUDIT"
+      ],
+      "depends_on": [
+        "V30F-001"
+      ],
+      "type": "code",
+      "sp": 2,
+      "goal": "Cross-tenant negative suite across objectives, learning, allocation and fleet.",
+      "exit": "zero cross-tenant content/effect/existence leakage",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30X-001",
+      "version": "3.0",
+      "artifacts": [
+        "V3-integrated-evidence"
+      ],
+      "depends_on": [
+        "V30A-008",
+        "V30B-005",
+        "V30C-002",
+        "V30D-002",
+        "V30E-002",
+        "V30F-002"
+      ],
+      "type": "lead_decision",
+      "sp": 1,
+      "goal": "Freeze the V3 acceptance workload manifest (FUTURE_ACCEPTANCE_WORKLOADS_V23_V30.json) and all D30 thresholds before counted evidence.",
+      "exit": "manifest digest recorded; later change invalidates counted evidence",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    },
+    {
+      "id": "V30X-002",
+      "version": "3.0",
+      "artifacts": [
+        "V3-integrated-evidence"
+      ],
+      "depends_on": [
+        "V30X-001"
+      ],
+      "type": "wall_clock",
+      "sp": 2,
+      "goal": "Live private CP30: real elapsed schedule evidence, one governed learning proposal through canary, revoke/pause negatives. The counted run must include one reversible real external action (for example the private-repo GitHub acceptance action) through the V1.7 boundary; restart/replay must not duplicate it.",
+      "exit": "wall-clock evidence observed, never simulated",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true,
+      "gate": "WC-V30-SCHEDULE"
+    },
+    {
+      "id": "V30X-003",
+      "version": "3.0",
+      "artifacts": [
+        "V3-integrated-evidence"
+      ],
+      "depends_on": [
+        "V30X-002"
+      ],
+      "type": "audit",
+      "sp": 2,
+      "goal": "Independent artifact-by-artifact V3.0 integrated audit.",
+      "exit": "formal acceptance only from the registry",
+      "status": "planned",
+      "proposed": true,
+      "requires_lead_freeze": true
+    }
+  ],
+  "v3_invariants": [
+    "An ObjectiveContract is an authorization envelope, never execution authority; every trigger yields a MissionProposal that passes normal mission admission.",
+    "Effective authority of any objective/learning/allocation/pack action = intersection of lower-layer grants; no layer can widen it (authority monotonicity).",
+    "Learning is versioned proposal promotion; production behavior changes only by an accepted version with a rollback target.",
+    "Protected authority is never learnable: permissions, spend, secrets, project boundaries, merge/release/deploy authority, grader and evidence rules.",
+    "The allocator supplies scheduler inputs only; the V2.3 scheduler remains the single dispatch authority.",
+    "Every consequential transition is reconstructible from append-only receipts without model reasoning text or secret material.",
+    "Every consequential effect, at every version, passes the V1.7 action boundary and its fences (lease, cancellation, site epoch)."
+  ],
+  "gates": [
+    {
+      "id": "WC-V30-CANARY",
+      "kind": "wall_clock",
+      "owner": "lead",
+      "status": "not_started",
+      "start_condition": "per LearningProposal, after heldout_passed + independent review",
+      "rule": "size/duration frozen per proposal before the canary begins (D30-04)",
+      "blocks": [
+        "V30B-004 counted evidence"
+      ]
+    },
+    {
+      "id": "WC-V30-SCHEDULE",
+      "kind": "wall_clock",
+      "owner": "lead",
+      "status": "not_started",
+      "start_condition": "V30X-001 frozen",
+      "rule": "schedule occurrences observed in real elapsed time",
+      "blocks": [
+        "V30X-002",
+        "V3.0 accepted"
+      ]
+    }
+  ],
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
 }
