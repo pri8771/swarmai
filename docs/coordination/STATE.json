@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T01:52:00Z",
+  "updated_at": "2026-09-21T01:56:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -17,32 +17,32 @@
     "implementation_workhorse": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260921-021",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-020.md",
+  "last_lead_message_id": "LEAD-20260921-022",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-022.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-006",
-  "last_lead_heartbeat_at": "2026-09-21T01:48:00Z",
+  "last_lead_heartbeat_at": "2026-09-21T01:56:00Z",
   "last_cursor_heartbeat_at": "2026-09-21T01:26:00Z",
   "current_source_verification": {
-    "verified_at": "2026-09-21T01:35:00Z",
+    "verified_at": "2026-09-21T01:56:00Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
-    "application_tree_last_changed_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
     "candidate_ci_run_id": 35545174895,
-    "candidate_ci_conclusion": "success",
+    "candidate_ci_conclusion": "success_historical_base",
     "candidate_database_integration": "skipped_no_SWARM_DATABASE_URL",
     "candidate_live_gated": "notice_only_not_live_evidence",
     "v2_base_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
     "v2_runtime_branch": "cursor/v2-runtime-lane",
-    "v2_runtime_sha": "7a2491a2840ef8381e275b05e11f3f76c7a522e6",
-    "v2_runtime_ci_run_id": 35550769734,
-    "v2_runtime_ci_conclusion": "success",
+    "v2_runtime_sha": "5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6",
+    "v2_runtime_ci_run_id": 35551159907,
+    "v2_runtime_ci_conclusion": "success_wip_packet_incomplete",
     "v2_runtime_impl_sha_v2a001": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
     "v2_runtime_impl_sha_v2a002": "48a02e3daae13f8fb569225e2d030097229f4780",
     "v2_runtime_impl_sha_v2a003a": "630ab780ab45858c5dad4075be143cfa145e975f",
     "v2_runtime_impl_sha_v2a003a_r": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
     "v2_runtime_impl_sha_v2a003b": "7dcefe4c72ae9ada2ff512adeaf65eefa28632e2",
+    "v2_runtime_wip_sha_v2a003b_r": "5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6",
     "v2_runtime_impl_sha_v2ah6a": "77ef7e4c1675b74dbfcdeba27f8c955ae39f119c",
     "v2_integration_branch": "cursor/v2-integration",
     "v2_integration_sha": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
@@ -51,10 +51,7 @@
     "v2_integration_ci_conclusion": "success",
     "v2_product_branch": "cursor/v2-product-lane",
     "v2_product_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
-    "v2_product_new_activity_observed": false,
-    "v2_runtime_wip_sha": "5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6",
-    "v2_verification_branch": "cursor/v2-verification-lane",
-    "v2_verification_base_sha": "9ce727842446b98cfa55c28c7e70808f57f17d7b"
+    "v2_product_new_activity_observed": false
   },
   "version_state": {
     "1.0-repair": {
@@ -83,7 +80,7 @@
       "provider_eligibility": "verified_zero_admissible_remotes",
       "admissible_remote_routes": 0,
       "remote_overlap": "blocked",
-      "local_fallback_and_reconciliation": "drafting_historical_stubbed_evidence_demoted_current_tip_real_local_revalidation_assigned_V2C-001"
+      "local_fallback_and_reconciliation": "drafting_current_integration_revalidation_owned_by_session_a_plus_lead"
     },
     "1.3": {
       "status": "not_accepted",
@@ -108,8 +105,9 @@
     },
     "1.5": {
       "status": "implementation_active_artifacts_drafting",
-      "lease_fencing": "drafting_003aR_verified_003b_changes_required",
-      "next_packet": "V2A-003b-R"
+      "lease_fencing": "003aR_foundation_verified_003bR_wip_incomplete",
+      "wip_review": "claim authority/project renewal/HOL pagination present; renewal authority recheck and expiry stale-authority fencing still missing",
+      "next_packet": "finish_V2A-003b-R_then_V2A-003c"
     },
     "1.6": {
       "status": "implementation_ready_no_session_b_activity_observed",
@@ -132,23 +130,24 @@
     },
     "3.0": {
       "status": "lead_architecture_drafting",
-      "artifact": "docs/artifacts/future/ART-V30-LEARNING_GOVERNANCE.md"
+      "artifacts": [
+        "docs/artifacts/future/ART-V30-PERSISTENT_OBJECTIVE_CONTRACT.md",
+        "docs/artifacts/future/ART-V30-LEARNING_GOVERNANCE.md"
+      ]
     }
   },
   "ready_worker_packets": [
     "V2A-003b-R",
     "V2A-H6A-R",
-    "WIN-B-BOOTSTRAP",
+    "V2A-003X",
     "V2B-001",
     "V2B-002",
     "V2B-003a",
     "V2B-004a"
   ],
   "reviewed_this_heartbeat": {
-    "V2A-020a": "accepted_packet_artifact_remains_drafting",
-    "V2A-H6A": "changes_required_secret_file_permissions_and_force_overwrite_semantics",
-    "ART-V12-LOCAL-FALLBACK": "demoted_to_drafting_stale_stubbed_evidence",
-    "ART-V12-ADMISSION-RECONCILIATION": "demoted_to_drafting_stale_stubbed_evidence"
+    "V2A-003b-R_WIP": "source_reviewed_incomplete_no_artifact_transition_no_worker_performance_score",
+    "ART-V30-OBJECTIVE-CONTRACT": "drafting_content_materially_advanced_no_acceptance_claim"
   },
   "blocked_worker_packets": {
     "W-041A": "human Cursor CLI login required for V1.0 heartbeat acceptance",
@@ -166,14 +165,14 @@
     "blocker": "cursor agent status/whoami Not logged in"
   },
   "lead_artifacts_advanced_this_heartbeat": [
-    "docs/artifacts/future/ART-V30-LEARNING_GOVERNANCE.md"
+    "docs/artifacts/future/ART-V30-PERSISTENT_OBJECTIVE_CONTRACT.md"
   ],
   "open_blockers": [
     "ART-V10-WORKER-HEARTBEAT requires live Cursor CLI authentication plus real receipts",
     "ART-V12-REMOTE-OVERLAP has 0 admissible remote routes",
     "ART-V13 task pool/reviewer qualification/qualified matrix incomplete",
     "ART-V14 live adaptive proof and LIVE-142 time-bound campaign remain incomplete",
-    "ART-V15-LEASE-FENCING needs V2A-003b-R then result-acceptance fencing",
+    "ART-V15-LEASE-FENCING V2A-003b-R still needs renew-authority revalidation and expiry stale-authority no-revive behavior, then V2A-003c",
     "ART-V20 foundation hardening H6A needs secret-file permission and overwrite/rotation semantics repair",
     "Session B has ready work but no new source activity was observed",
     "V2.0 acceptance cannot be honestly completed until all required artifacts and wall-clock evidence exist",
@@ -187,7 +186,7 @@
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
   },
-  "product_status": "v2_acceleration_two_active_lanes_lead_verification",
+  "product_status": "v2_acceleration_two_cursor_lanes_artifact_first",
   "implementation_stop": {
     "status": "superseded_by_owner_resume",
     "prior_stop_record": "docs/coordination/V1_4_ABRUPT_STOP.md",
@@ -211,31 +210,26 @@
     "cursor_sessions": 2,
     "integration_branch": "cursor/v2-integration",
     "session_a": {
-      "role": "runtime_control_plane_integration",
+      "role": "runtime_control_plane_distributed_recovery_integration",
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
       "prompt": "docs/coordination/CURSOR_MAC_RUNTIME_RESUME_PROMPT.md"
     },
     "session_b": {
-      "role": "knowledge_tools_evals_product_beta",
+      "role": "evaluation_knowledge_tools_product_beta",
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
       "prompt": "docs/coordination/CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md",
       "bootstrap_state": "fresh_windows_no_repo_or_toolchain_assumed"
     },
-    "contract": "docs/coordination/TWO_CURSOR_TEAM.md",
-    "active_or_available_sessions": 2,
-    "session_c": {
-      "role": "verification_reliability_security_spikes",
-      "host_alias": "HOST-MAC-VERIFY",
-      "branch": "cursor/v2-verification-lane",
-      "prompt": "docs/coordination/CURSOR_MAC_VERIFICATION_PROMPT.md",
-      "source_ownership": "tests_scripts_spikes_evidence_only_by_default",
-      "status": "dormant_available_not_started",
-      "activation_rule": "Start only when a concrete independent bottleneck/task justifies it; do not start merely to fill capacity."
-    }
+    "contract": "docs/coordination/TWO_CURSOR_TEAM.md"
+  },
+  "reserve_verification_branch": {
+    "branch": "cursor/v2-verification-lane",
+    "status": "dormant_not_a_current_team_session",
+    "activation_rule": "Do not activate while lead review capacity is healthy; verification remains lead-owned unless a concrete isolated bottleneck is explicitly reassigned."
   },
   "execution_plan": "docs/coordination/V2_EXECUTION_PLAN.md",
   "artifact_registry": "docs/coordination/ARTIFACT_REGISTRY.json",
-  "lead_operating_rule": "ChatGPT handles verification/review directly while Mac A and Windows B implement. A third Cursor session stays dormant until there is a concrete need."
+  "lead_operating_rule": "ChatGPT reviews/verifies/architects and hard-debug failures; Cursor A/B own the bulk of routine SP1-SP3 implementation."
 }
