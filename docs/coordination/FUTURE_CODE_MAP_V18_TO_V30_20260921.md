@@ -26,6 +26,32 @@ Current reusable seams:
 - product journeys: `src/swarm/product/**`
 - tests already grouped under matching domains.
 
+## V1.5–V1.7 actual surfaces and ownership (audited at `f2b8d5f`; Fable planning pass)
+
+Read this before the V1.8+ maps: those maps extend these files. "Wired" = reachable from the mission path today.
+
+| Concern | Production surface | Tests | Wired | Packets that own it next |
+|---|---|---|---|---|
+| Mission path | `src/swarm/mission/runtime.py` (`MissionRuntime.run`), `mission/worker.py` (`RepoWorker`, effect sites `:66`, `:593`, `:599`), `mission/worktree.py`, `mission/acceptance.py` | `tests/mission/` | yes | R28d, R25a, R02a, R17b |
+| Inference broker | `src/swarm/broker/broker.py`, `mission/brokered_inference.py` | `tests/broker/` | yes | — (do not touch) |
+| Durable leases / results | `src/swarm/db/lease_fencing.py` (`LeaseLifecycleService`, `_assert_accept_fence`) | `tests/integration/db/test_lease_*` | **no** | R28b (one read function), R17b |
+| Worker protocol | `src/swarm/workers/service.py`, `client.py`, `recovery_harness.py`; harness `scripts/r17_cp3_separate_process_recovery.py` | `tests/workers/` | **no** | R17a, R17b, R17c |
+| In-memory worker registry | `src/swarm/workers/registry.py`, used by `api/store.py:53`, `load/`, `chaos/` | `tests/workers/test_workers.py` | yes (wrong authority) | R17c |
+| Controller / scheduler | `src/swarm/controller/mission.py` (`reconcile_leases` no-op `:142`), `controller/scheduler.py` | `tests/controller/` | yes | R17b; V2.3 extends `scheduler.py`, never replaces it |
+| Knowledge | `src/swarm/knowledge/repository.py`, `retrieval.py`, `budget.py`, `memory_adapter.py`; contracts `contracts/knowledge.py` | `tests/knowledge/` | **no** | R25a, R25b |
+| Legacy memory | `src/swarm/memory/store.py` (`retrieve_context`, unfiltered) | `tests/memory/` | CLI only | R25a |
+| Action contracts | `src/swarm/contracts/actions.py` | `tests/tools/` | **no** | R28b, R29a |
+| Effect store | `src/swarm/tools/effects.py`; rows in `db/models.py` (`ApprovalRow :257`, `ActionEffectRow :284`) | `tests/tools/test_v17_gateway_negatives.py` | **no** | R27a–R27e, R31b |
+| V1.7 gateway | `src/swarm/tools/v17_gateway.py` | same | **no** | R27a, R27c, R27e, R28a–R28d |
+| Legacy gateway | `src/swarm/tools/gateway.py` (`_seen_ops`), used by `runtime/session.py`, `tools/permission_mission.py` | `tests/tools/test_gateway_sandbox.py`, `tests/runtime/` | tests/CLI proof only | R28c |
+| Adapters | `src/swarm/tools/adapters/` (`local_sandbox`, `api_mcp` echo, `browser_session` simulator), `tools/session_recovery.py` | same | **no** | R28d, R29a, R30b, R31a, R31b |
+| API / CLI (shared wiring) | `src/swarm/api/routes_v1.py`, `api/store.py`, `src/swarm/cli.py` | `tests/api/` | yes | R25a (one CLI handler), R17c (worker routes) |
+| Migrations | `migrations/versions/`: `9eb193b10f4e` → `a15lease003a0001` → `a16know003a0001` → `a17effect004a0001` (single head) | — | — | R27a adds `a17effect004b0001` |
+| Coordination tooling | `scripts/coordination/heartbeat.py`, `.github/workflows/ci.yml` | — | — | OPS-CI-01 |
+| Live fixture (new) | `sandbox/live_fixture/` — test infrastructure, never imported by `src/` | `tests/live_fixture/` | n/a | R30a |
+
+Single-worker rule for shared files: `cli.py`, `api/store.py`, `api/routes_v1.py`, `db/models.py`, `pyproject.toml` and `migrations/` are touched by at most one packet at a time; specs name them explicitly under *Surfaces*.
+
 ## V1.8 suggested code map
 
 ### Site authority
