@@ -2,11 +2,25 @@
 
 ## Current owner authorization — 2026-09-20
 
-The operator approved the roadmap direction through V3.0 and authorized IMPLEMENTATION NOW through V1.4 inclusive. The executable authority and acceptance contract is `docs/coordination/V1_4_EXECUTION_CONTRACT.md`; the starting prompt is `docs/coordination/START_CURSOR_TO_V1_4.md`.
+The earlier V1.4 abrupt stop is superseded by `docs/coordination/OWNER_RESUME_TO_V3.md`.
 
-Execute V1.0 repair -> V1.1 -> V1.2 -> V1.3 -> V1.4 without asking the operator to reauthorize each implementation increment. This supersedes older repair-only/per-0.1 implementation stop wording in historical handoffs and messages. It does not accept a checkpoint without evidence or grant main-merge/release authority. Independent lead review still applies. Work may progress on ready branches while review is pending; record that status honestly. Stop feature work at V1.4. V1.5-V3 remain roadmap, not execution authorization.
+The operator now authorizes SwarmAI SOURCE IMPLEMENTATION through V3.0, using artifact-oriented project management and a team of ChatGPT lead + two Cursor implementation sessions. Major milestones are V1.7, V2.3 and V3.0. Immediate execution target is a V2.0 implementation/artifact-complete candidate as quickly as possible.
 
-The operator owns final approvals. ChatGPT is the engineering lead: priorities, assignments, audit and independent review. Cursor is the implementation worker: code, tests, authorized local/browser operations and evidence. No additional spending, billing/cards, paid fallback, quota evasion, force-push, destructive reset, public deployment, production changes, main merge, tags or releases without separate explicit authorization. Bounded verified-zero-charge live validation in the authorized private/local environment is allowed under the contract. Do not start unrelated portfolio projects.
+This authorization allows ready future-version implementation to proceed in isolated lanes even while earlier live/time-bound acceptance artifacts remain blocked. It does NOT authorize main merge, release/tag/public deployment, additional spend/paid fallback or destructive production actions.
+
+Acceptance remains artifact/evidence-gated. Required wall-clock evidence cannot be accelerated or fabricated. A V2.0 implementation-complete candidate may exist before V2.0 is accepted.
+
+Read:
+- `docs/coordination/V2_EXECUTION_PLAN.md`
+- `docs/coordination/TWO_CURSOR_TEAM.md`
+- `docs/coordination/ARTIFACT_REGISTRY.json`
+
+Two Cursor sessions:
+- Session A: `cursor/v2-runtime-lane` — runtime/control plane/distributed/recovery and integration owner.
+- Session B: `cursor/v2-product-lane` — evaluation pools, knowledge, tools, product/beta.
+- Integration: `cursor/v2-integration`, owned by Session A.
+
+ChatGPT stays one artifact ahead with architecture/contracts/research/review and gives the majority of routine implementation to Cursor.
 
 ## Start from compact current state
 
@@ -49,13 +63,13 @@ Estimate new worker packets at SP1–SP5. Prefer SP1–SP3 assignments. Split SP
 
 Track worker outcomes prospectively by point size: first-pass CI, first lead review, rework cycles, evidence completeness, reopened defects and blocker class. Never invent timing or performance data. Lead acceptance/research/review work should continue in parallel rather than waiting idly for the worker.
 
-The owner also asked the lead to prepare future tasks when current useful lead work is exhausted. Future V1.5+ research/decomposition/backlog preparation is allowed, but current implementation remains version-gated: do not start V1.5+ code while the authorized V1.4 tranche is unfinished unless the owner explicitly activates that implementation tranche.
+The owner also asked the lead to prepare future tasks when current useful lead work is exhausted. Future implementation through V3.0 is now activated by the owner. Keep it isolated from the current acceptance candidate, artifact-bound, and integrated only at review boundaries.
 
 ## Hourly collaboration
 
 ChatGPT's hourly GitHub review is scheduled; it does not wake a local Cursor process. Cursor's unattended runner must be independently installed/verified through a supported no-extra-spend path. Follow `CURSOR_HOURLY_PROMPT.md` and the current V1.4 contract. One runner, no-overlap lease, scoped permissions, bounded sessions, secret-safe logs and resumable state.
 
-Both participants post actual Done / Evidence / Next / Blockers / source SHA and acknowledged IDs at least hourly during available operation and at handoffs. Missing heartbeat is not assumed progress. Never invent the other agent's review or future scheduled invocations. While an external blocker/review waits, continue safe ready work within V1.4, not beyond it.
+Both participants post actual Done / Evidence / Next / Blockers / source SHA and acknowledged IDs at least hourly during available operation and at handoffs. Missing heartbeat is not assumed progress. Never invent the other agent's review or future scheduled invocations. While an external blocker/review waits, continue the next dependency-ready artifact in the authorized V3 implementation range, preferring isolated non-conflicting work.
 
 ## Platform access and protected links
 
