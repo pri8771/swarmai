@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T01:35:05Z",
+  "updated_at": "2026-09-21T01:48:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -434,8 +434,8 @@
     {
       "artifact_id": "ART-V12-LOCAL-FALLBACK",
       "target_version": "1.2",
-      "owner": "Cursor",
-      "status": "reviewable",
+      "owner": "Cursor Session C + ChatGPT lead",
+      "status": "drafting",
       "path_or_source_ref": "docs/evidence/inf-121/",
       "dependencies": [
         "ART-V12-BROKER-CONTRACT"
@@ -444,22 +444,30 @@
         "concurrent-local-pool.json",
         "kill-route-local-fallback.json"
       ],
-      "worker_packets": [],
-      "next_action": "lead rebind/review against verified broker contract c3df96e",
-      "blockers": []
+      "worker_packets": [
+        "V2C-001"
+      ],
+      "next_action": "Re-prove exact-tip local route availability + route disable/fallback with actual local-model execution; historical stubbed broker artifacts remain prep only.",
+      "blockers": [],
+      "lane": "verification",
+      "notes": "Lead review: concurrent-local/kill-route historical evidence is stale relative to current integration and does not establish actual local-model execution identity sufficiently for current artifact verification."
     },
     {
       "artifact_id": "ART-V12-ADMISSION-RECONCILIATION",
       "target_version": "1.2",
-      "owner": "Cursor",
-      "status": "reviewable",
+      "owner": "Cursor Session C + ChatGPT lead",
+      "status": "drafting",
       "path_or_source_ref": "docs/evidence/inf-121/local-admission-reconcile.json",
       "dependencies": [
         "ART-V12-BROKER-CONTRACT"
       ],
-      "worker_packets": [],
-      "next_action": "lead rebind/review against verified broker and extend during remote proof",
-      "blockers": []
+      "worker_packets": [
+        "V2C-001"
+      ],
+      "next_action": "Re-prove current-tip reservation/settlement/quota-deny behavior; deterministic stub proof may supplement but not substitute actual local-route proof.",
+      "blockers": [],
+      "lane": "verification",
+      "notes": "Lead review: local-admission-reconcile uses a stubbed broker adapter and lacks current candidate/config binding; valid regression prep, not current live-local evidence."
     },
     {
       "artifact_id": "ART-V13-QUAL-PROTOCOL",
@@ -831,8 +839,8 @@
       "artifact_id": "ART-V15-DBOS-REUSE",
       "target_version": "1.5",
       "kind": "architecture-decision",
-      "owner": "ChatGPT lead + Cursor Session A",
-      "lane": "runtime",
+      "owner": "ChatGPT lead + Cursor Session C",
+      "lane": "verification",
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V15-DBOS_REUSE_DECISION.md",
       "dependencies": [
@@ -840,7 +848,8 @@
         "ART-V15-LEASE-FENCING"
       ],
       "worker_packets": [
-        "V2A-003X"
+        "V2A-003X",
+        "V2C-002"
       ],
       "next_action": "after durable repository foundation, confirm installed DBOS API/version and run isolated queue/restart/stale-fence spike",
       "blockers": []
@@ -1354,7 +1363,9 @@
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md",
       "dependencies": [],
-      "worker_packets": [],
+      "worker_packets": [
+        "V2C-004"
+      ],
       "next_action": "freeze candidate/metric identities before wall-clock reliability observation",
       "blockers": []
     },
@@ -1370,7 +1381,9 @@
         "ART-V20-INTEGRATED-CANDIDATE",
         "ART-V20-FOUNDATION-HARDENING"
       ],
-      "worker_packets": [],
+      "worker_packets": [
+        "V2C-003"
+      ],
       "next_action": "map every invariant to exact source/test/evidence after integration",
       "blockers": [
         "integrated candidate not ready"
@@ -1387,7 +1400,9 @@
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
-      "worker_packets": [],
+      "worker_packets": [
+        "V2C-004"
+      ],
       "next_action": "instrument/run after integrated candidate",
       "blockers": [
         "integrated candidate not ready"
