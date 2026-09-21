@@ -10,5 +10,6 @@
   "cases_digest": "52e956c30086e0015086e64485b57f56bea6120426f05fd7b728a52edb57c813",
   "passed": 10,
   "failed": 0,
-  "ok": true
+  "ok": true,
+  "evidence_tip_sha": "e44d523379db557c3842f8b89531b95f06f87e60"
 }
