@@ -11,17 +11,24 @@
 
 **No production deploy from this kit.** No paid cloud auto-path. Oracle Always Free is optional and requires owner verification first.
 
-## Secrets (V2A-H6A)
+## Secrets (V2A-H6A / H6A-R)
 
 Operational default is **empty/unconfigured**. Compose files do **not** embed a fixed DB password.
 
 ```sh
 python scripts/generate_compose_env.py
-# writes deploy/compose/.env (gitignored); secret is not printed
+# writes deploy/compose/.env (gitignored) owner-only 0600; secret is not printed
 # or copy deploy/compose/.env.example and fill SWARM_POSTGRES_PASSWORD + SWARM_DATABASE_URL
 ```
 
 `SWARM_DATABASE_URL` must be set for live DB access. The forbidden demo DSN containing `swarm:swarm@` is rejected.
+
+Regenerating an existing `.env` requires an explicit fresh-config acknowledgement. This writes a **new** local password/DSN and is **not** safe credential rotation for an already-initialized Postgres volume:
+
+```sh
+python scripts/generate_compose_env.py --force --acknowledge-fresh-config
+# renames prior .env to .env.pre-force-<UTC> (also 0600); never prints the secret
+```
 
 API publish remains loopback: `127.0.0.1:8765`. DB has no host port.
 
@@ -37,7 +44,7 @@ Standalone/hybrid/recovery refuse *live start* without `SWARM_DATABASE_URL` (doc
 ## Compose config smoke (local)
 
 ```sh
-python scripts/generate_compose_env.py --force
+python scripts/generate_compose_env.py --force --acknowledge-fresh-config
 docker compose --env-file deploy/compose/.env -f deploy/compose/standalone.yml config
 ```
 

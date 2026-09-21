@@ -126,6 +126,7 @@ def test_generate_compose_env_and_compose_config_smoke() -> None:
 
     env_path = COMPOSE_DIR / ".env"
     backup = env_path.read_text() if env_path.exists() else None
+    pre_force_backups: list[Path] = []
     try:
         if env_path.exists():
             env_path.unlink()
@@ -134,17 +135,42 @@ def test_generate_compose_env_and_compose_config_smoke() -> None:
         text = env_path.read_text()
         assert "SWARM_POSTGRES_PASSWORD=" in text
         assert "swarm:swarm@" not in text
+        assert "not proof of DB credential rotation" in text
+        mode = env_path.stat().st_mode & 0o777
+        assert mode == 0o600, f"expected owner-only 0600, got {oct(mode)}"
         password_line = next(
             line for line in text.splitlines() if line.startswith("SWARM_POSTGRES_PASSWORD=")
         )
         secret = password_line.split("=", 1)[1]
         assert secret
 
+        # --force without acknowledgement must fail closed.
+        denied = subprocess.run(
+            [
+                os.environ.get("PYTHON", "python3"),
+                str(ROOT / "scripts" / "generate_compose_env.py"),
+                "--force",
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert denied.returncode != 0
+        assert "acknowledge-fresh-config" in (denied.stderr + denied.stdout)
+        assert secret not in denied.stdout
+        assert secret not in denied.stderr
+
+        # World-readable .env must be repaired to 0600 on acknowledged force.
+        env_path.chmod(0o644)
+        assert (env_path.stat().st_mode & 0o777) == 0o644
+
         proc = subprocess.run(
             [
                 os.environ.get("PYTHON", "python3"),
                 str(ROOT / "scripts" / "generate_compose_env.py"),
                 "--force",
+                "--acknowledge-fresh-config",
             ],
             cwd=ROOT,
             check=True,
@@ -154,6 +180,10 @@ def test_generate_compose_env_and_compose_config_smoke() -> None:
         assert "wrote deploy/compose/.env" in proc.stdout
         assert secret not in proc.stdout
         assert secret not in proc.stderr
+        assert (env_path.stat().st_mode & 0o777) == 0o600
+        pre_force_backups = sorted(COMPOSE_DIR.glob(".env.pre-force-*"))
+        assert pre_force_backups, "force should rename prior .env aside"
+        assert (pre_force_backups[-1].stat().st_mode & 0o777) == 0o600
 
         docker = shutil.which("docker")
         if docker is None:
@@ -210,8 +240,50 @@ def test_generate_compose_env_and_compose_config_smoke() -> None:
             if sidelined.exists():
                 sidelined.replace(env_path)
     finally:
+        for path in COMPOSE_DIR.glob(".env.pre-force-*"):
+            path.unlink(missing_ok=True)
         if backup is None:
             if env_path.exists():
                 env_path.unlink()
         else:
             env_path.write_text(backup)
+            try:
+                os.chmod(env_path, 0o600)
+            except OSError:
+                pass
+
+
+def test_generate_compose_env_owner_only_and_force_guard(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """V2A-H6A-R: 0600 permissions + --force requires fresh-config acknowledgement."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "generate_compose_env_h6ar",
+        ROOT / "scripts" / "generate_compose_env.py",
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    # Point module paths at an isolated temp compose dir.
+    compose_dir = tmp_path / "compose"
+    compose_dir.mkdir()
+    env_path = compose_dir / ".env"
+    monkeypatch.setattr(mod, "COMPOSE_DIR", compose_dir)
+    monkeypatch.setattr(mod, "ENV_PATH", env_path)
+    monkeypatch.setattr(mod, "REPO", tmp_path)
+
+    written = mod.generate(force=False)
+    assert written == env_path
+    assert (env_path.stat().st_mode & 0o777) == 0o600
+
+    with pytest.raises(SystemExit, match="acknowledge-fresh-config"):
+        mod.generate(force=True, acknowledge_fresh_config=False)
+
+    env_path.chmod(0o644)
+    rewritten = mod.generate(force=True, acknowledge_fresh_config=True)
+    assert rewritten == env_path
+    assert (env_path.stat().st_mode & 0o777) == 0o600
+    backups = list(compose_dir.glob(".env.pre-force-*"))
+    assert len(backups) == 1
+    assert (backups[0].stat().st_mode & 0o777) == 0o600
+    assert "Fresh local compose config only" in env_path.read_text()
