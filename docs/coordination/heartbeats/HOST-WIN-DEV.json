@@ -5,7 +5,7 @@
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
     "observed_at": "2026-09-21T16:12:52+00:00",
-    "trigger": "scheduler",
+    "trigger": "install",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
@@ -186,7 +186,7 @@
     },
     {
       "observed_at": "2026-09-21T16:12:52+00:00",
-      "trigger": "scheduler",
+      "trigger": "install",
       "host_alias": "HOST-WIN-DEV",
       "session_id": "B",
       "branch": "cursor/v2-product-lane",
