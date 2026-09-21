@@ -1,132 +1,108 @@
-# ART-V20-SECURITY-REVIEW — integrated threat model
+# ART-V20-SECURITY-REVIEW — integrated V2 threat model
 
 Status: drafting
 Target: V2.0
 Owner: ChatGPT lead
 
+## Assets
+
+- project/mission/task data;
+- provider/tool/browser credentials and secret references;
+- worker membership/identity;
+- approvals and consequential effect rights;
+- accepted artifacts/results;
+- reusable knowledge/provenance;
+- provider quotas/cost budgets;
+- backup/export bundles;
+- extension code/config;
+- site authority/epoch.
+
 ## Trust boundaries
 
-1. Operator/user -> control plane
-2. Control plane -> worker hosts
-3. Control plane -> inference providers
-4. Control plane -> tool/integration adapters
-5. Control plane -> artifact storage
-6. Control plane -> knowledge store
-7. Primary site -> recovery site
-8. Core -> extensions/capability packs
-9. Swarm self-development -> repository/worktree/release authority
+1. operator <-> control plane
+2. control plane <-> worker host
+3. control plane/worker <-> inference provider
+4. mission <-> tool/integration
+5. project <-> project
+6. knowledge store <-> retrieval context
+7. extension <-> core
+8. active site <-> recovered/stale site
+9. self-development workspace <-> product source/release authority
 
-## High-priority threats
+## Required invariants
 
-### Cross-project leakage
-Paths:
-- worker registry/list/heartbeat;
+### Tenant/project
+Authorization occurs before:
+- cache/history/artifact lookup;
+- worker/approval view;
 - knowledge retrieval/ranking;
-- artifacts/history/cache;
-- approvals/action receipts;
-- extension state/export.
+- export;
+- tool execution.
 
-Required controls:
-- project scope before lookup/ranking;
-- durable ownership;
-- scoped idempotency/cache keys;
-- negative two-project tests.
+No existence/count/routing-preference leak across projects.
 
-### Stale worker / duplicate effects
-- expired lease result accepted after reassignment;
-- old generation heartbeat/result;
-- worker acts after cancellation;
-- external outcome unknown then blindly retried.
+### Worker
+- raw durable membership credentials forbidden;
+- generation/lease/cancellation/source fences;
+- stale result retained but not accepted;
+- worker capability claim does not expand authority;
+- browser/session workers are separate trust class.
 
-Controls:
-- durable lease/source/cancel generations;
-- acceptance fence;
-- effect key/idempotency;
-- reconciliation state;
-- at-most-one accepted Swarm effect receipt.
+### Inference
+- every operational model call governed by broker;
+- auth/health/price/quota/qualification distinct;
+- unknown charge => no remote admission;
+- retries/accounting cannot bypass reservations.
 
-### Provider spend/route bypass
-- direct model call bypasses broker;
-- unknown price treated free;
-- free route auto-falls back paid;
-- stale quota evidence.
+### Tools/effects
+- exact project/actor/operation/destination/payload/effect approval binding;
+- durable effect idempotency/reconciliation;
+- unknown external outcome is not success and not blind retry.
 
-Controls:
-- all operational inference through broker;
-- exact admitted route;
-- fail-closed price/quota;
-- no paid fallback;
-- usage reconciliation.
+### Knowledge
+- permission filter before ranking;
+- provenance/version/tombstone;
+- model-generated hypothesis not accepted fact by default;
+- derived summary loses visibility when dependencies are revoked/deleted.
 
-### Tool approval confusion
-- approved payload changed;
-- destination changed;
-- generic approval reused;
-- expired approval;
-- retry duplicates side effect.
+### Recovery
+- only current site epoch accepts new consequential effects;
+- backup excludes raw ephemeral credentials where possible;
+- restored site begins fenced/recovery mode;
+- old site cannot resume writes after new epoch.
 
-Controls:
-- ActionEnvelope hash;
-- exact/constrained ApprovalGrant;
-- effect key;
-- revalidate immediately before execution.
+### Extensions
+- manifest validated before import;
+- permission requests do not self-grant;
+- incompatible version fails closed;
+- disable/uninstall cannot corrupt core state.
 
-### Knowledge poisoning
-- hypothesis becomes accepted fact;
-- stale fact dominates newer source;
-- deleted item remains in vector/summary cache;
-- cross-project nearest-neighbor leakage.
-
-Controls:
-- knowledge classes/state;
-- provenance/version;
-- supersession/tombstones;
-- permission-before-ranking;
-- retrieval receipts.
-
-### Recovery split brain
-- old site and restored site both writable;
-- stale site accepts worker/tool result.
-
-Controls:
-- site epoch authority;
-- recovery mode read-only;
-- epoch bound to acceptance/effect path.
-
-### Malicious/buggy extension
-- claims capabilities/permissions;
-- imports incompatible code;
-- hides network/filesystem use.
-
-Controls:
-- explicit manifest/compatibility;
-- operator enable;
-- permissions independent of manifest claim;
-- isolate failure;
-- extension cannot self-qualify.
-
-### Self-development privilege escalation
-- selfdev changes policy/evaluators;
-- modifies hidden answers;
-- self-merges/releases;
-- accesses credentials.
-
-Controls:
+### Self-development
 - isolated workspace;
-- path/policy validation;
-- independent reviewer;
-- no release authority;
-- protected evaluator/credential paths.
+- no hidden answer/known patch;
+- cannot modify approval/release/credential authority;
+- cannot self-merge/release.
 
-## V2 security evidence set
+## Adversarial test families
 
-- two-project security suite;
-- worker stale/cancel/race suite;
-- broker bypass negative;
-- tool approval mutation/duplicate suite;
-- knowledge leak/deletion suite;
-- stale recovery epoch suite;
-- incompatible/malicious extension suite;
-- selfdev privilege-expansion rejection.
+- cross-project IDs/idempotency keys/knowledge queries;
+- stale worker generation/lease/result;
+- cancellation/result race;
+- provider quota/charge uncertainty;
+- approval payload/destination swap;
+- lost response after external effect;
+- malicious extension manifest/import;
+- restored stale site writes;
+- poisoned knowledge/supersession/deletion;
+- selfdev privilege-expansion diff;
+- support-bundle secret scan.
 
-Security review is not accepted until these tests run on the integrated candidate.
+## V2 security artifact acceptance
+
+Lead review must link every invariant to:
+- source enforcement point;
+- regression/negative test;
+- live/integration evidence where necessary;
+- support limitation if not supported.
+
+No security claim from document intent alone.
