@@ -3,6 +3,10 @@
 Date: 2026-09-21
 Status: PLANNING ONLY
 
+## REAL-WORLD RULE
+
+Per `REAL_WORLD_ACCEPTANCE_POLICY.md`, `live_local` fixture evidence is necessary for reproducible fault semantics but is not sufficient for a milestone working claim. Counted milestone evidence must also include the milestone-specific real external/physical proof: CP18 real outage/restore, CP19 fresh environment, CP20 real elapsed candidate campaign, CP23 physical multi-host + non-fixture external resource, and CP30 real elapsed objective + reversible external effect.
+
 Legend:
 - U = unit/deterministic
 - I = integration
