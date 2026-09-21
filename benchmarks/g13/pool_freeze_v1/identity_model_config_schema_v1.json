@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "swarmai:g13/exact_model_config/v1",
+  "schema_version": "1.0",
+  "artifact": "ART-V13-TASK-POOL",
+  "freeze_id": "g13-pool-freeze-v1",
+  "schema_id": "g13-exact-model-config-v1",
+  "title": "EVAL-131 exact model configuration identity",
+  "description": "Every counted held-out observation must quote exactly one object of this shape. EVAL-131 requires at least three distinct exact_model_config_id values across the required coverage; a model NAME is not an identity, because a provider alias can be repointed at new weights without notice.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exact_model_config_id",
+    "provider",
+    "endpoint_kind",
+    "model_name",
+    "model_revision",
+    "weights_digest",
+    "quantization",
+    "context_window_tokens",
+    "max_output_tokens",
+    "decoding",
+    "runtime",
+    "prompt_id",
+    "tool_protocol_id",
+    "scorer_id",
+    "size_classifier_id",
+    "pool_freeze_id",
+    "paid",
+    "cost_usd"
+  ],
+  "properties": {
+    "exact_model_config_id": {
+      "type": "string",
+      "pattern": "^emc_[0-9a-f]{32}$",
+      "description": "emc_ + the first 32 hex characters of sha256 over the canonical JSON of this object with exact_model_config_id removed. Canonical JSON = json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=True)."
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "ollama"
+      ]
+    },
+    "endpoint_kind": {
+      "type": "string",
+      "enum": [
+        "local_ollama",
+        "local_other",
+        "hosted_api"
+      ]
+    },
+    "model_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "provider-facing alias, e.g. gemma3:4b. Alias only; never an identity on its own."
+    },
+    "model_revision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "provider-reported revision/tag resolved at call time"
+    },
+    "weights_digest": {
+      "type": "string",
+      "minLength": 1,
+      "description": "content digest of the served weights, e.g. the Ollama manifest digest. Use the literal string unresolved when the provider will not disclose it; unresolved forbids qualification for that configuration."
+    },
+    "quantization": {
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "Q4_K_M",
+        "fp16",
+        "provider_undisclosed"
+      ]
+    },
+    "context_window_tokens": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_output_tokens": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "decoding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repeat_penalty",
+        "seed"
+      ],
+      "properties": {
+        "temperature": {
+          "type": "number",
+          "minimum": 0
+        },
+        "top_p": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "top_k": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repeat_penalty": {
+          "type": "number",
+          "minimum": 0
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "description": "integer seed when the provider honours one, otherwise the literal string provider_nondeterministic. A nondeterministic seed is permitted, but it must be declared rather than omitted."
+        }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "absent",
+            "lora",
+            "full_finetune"
+          ]
+        },
+        "digest": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "omit entirely when no adapter is applied"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "engine_version",
+        "host_class"
+      ],
+      "properties": {
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engine_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host_class": {
+          "type": "string",
+          "minLength": 1,
+          "description": "coarse hardware class, e.g. workstation_cpu_x86_64 or workstation_cuda. Coarse on purpose: no host secrets or identifiers."
+        }
+      }
+    },
+    "prompt_id": {
+      "type": "string",
+      "const": "g13-prompt-v1"
+    },
+    "tool_protocol_id": {
+      "type": "string",
+      "const": "g13-tool-protocol-v1-no-model-visible-tools"
+    },
+    "scorer_id": {
+      "type": "string",
+      "const": "g13-scorer-v1"
+    },
+    "size_classifier_id": {
+      "type": "string",
+      "const": "g13-size-classifier-v1"
+    },
+    "pool_freeze_id": {
+      "type": "string",
+      "const": "g13-pool-freeze-v1"
+    },
+    "paid": {
+      "type": "boolean",
+      "description": "true only when the configuration is billed. This freeze is a zero-spend lane and expects false."
+    },
+    "cost_usd": {
+      "type": [
+        "number",
+        "string"
+      ],
+      "description": "0 for zero-spend lanes, a positive number when billed, or the literal string unknown. unknown must never be silently rendered as 0."
+    }
+  },
+  "per_observation_overhead_fields": {
+    "note": "recorded on the observation, not on the configuration identity",
+    "required": [
+      "wall_ms",
+      "prompt_tokens",
+      "completion_tokens",
+      "attempts",
+      "retry_count",
+      "accepted",
+      "policy_violation",
+      "candidate_sha",
+      "case_id",
+      "split",
+      "batch_index"
+    ]
+  },
+  "invalidation_rule": "if weights_digest, quantization, decoding, runtime.engine_version or any of the frozen *_id fields change, the exact_model_config_id changes and all prior counted observations become a different cell. They must not be pooled."
+}

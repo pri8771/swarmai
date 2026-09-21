@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "artifact": "ART-V13-TASK-POOL",
+  "freeze_id": "g13-pool-freeze-v1",
+  "scorer_id": "g13-scorer-v1",
+  "description": "Deterministic offline scorers used to accept or reject a trial. No model-as-judge, no scoring network, no human grading in this freeze.",
+  "entrypoint": "swarm.evals.graders.grade_case",
+  "scorer_kinds": {
+    "json_exact": {
+      "module_function": "swarm.evals.graders.grade_json_exact",
+      "decision": "parsed model JSON must equal the hidden reference value exactly, after fenced-code-block stripping",
+      "extra_constraint": "max_compact_chars, when declared on the record, bounds the serialised compact form",
+      "score_components": [
+        "exact",
+        "length_ok"
+      ]
+    },
+    "topological_order": {
+      "module_function": "swarm.evals.graders.grade_topological_order",
+      "decision": "any permutation that covers every node exactly once and respects every precedence edge is accepted; the fixture order is not privileged",
+      "score_components": [
+        "topo"
+      ]
+    },
+    "python_unit": {
+      "module_function": "swarm.evals.graders.grade_python_unit",
+      "decision": "model code is executed against hidden unit cases inside IsolatedCodeRunner with the network disabled; all cases must pass",
+      "sandbox": {
+        "runner": "swarm.tools.sandbox_runner.IsolatedCodeRunner",
+        "network": false,
+        "timeout_seconds": 5.0,
+        "memory_mb": 256
+      },
+      "policy_flag": "the presence of os/socket/subprocess in emitted code raises policy_violation when the trial also fails",
+      "score_components": [
+        "unit"
+      ]
+    }
+  },
+  "determinism": {
+    "json_exact": "fully deterministic",
+    "topological_order": "fully deterministic",
+    "python_unit": "deterministic given the same interpreter and sandbox limits; a sandbox timeout is reported as sandbox_fail and counted as a failed trial, never as a missing observation"
+  },
+  "acceptance_binding": {
+    "grader_version_field": "EvalResult.grader_version must carry g13-scorer-v1 for every counted observation",
+    "worker_visibility": "hidden reference values and unit cases are grader-side inputs and must never be routed into the model prompt; see identity_prompt_v1.json"
+  },
+  "confidence_bound": {
+    "function": "swarm.evals.wilson.wilson_lower_bound",
+    "protocol_requirement": "one-sided 90 percent Wilson lower bound >= 0.80",
+    "z_for_one_sided_90": 1.2815515655446004,
+    "caution": "wilson_lower_bound defaults to z=1.96 (one-sided 97.5 percent). Counted qualification must pass z explicitly; the default must not be relied on."
+  },
+  "change_policy": "any change to the pinned grader or sandbox modules invalidates this scorer identity: mint g13-scorer-v2 and a new pool freeze version"
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "artifact": "ART-V13-TASK-POOL",
+  "freeze_id": "g13-pool-freeze-v1",
+  "prompt_id": "g13-prompt-v1",
+  "template_kind": "verbatim_passthrough_of_visible_case_input",
+  "description": "The frozen pool carries its full instruction text inside each record. The harness adds no wrapper, no system prompt, no few-shot exemplars and no chain-of-thought scaffold.",
+  "assembly_contract": {
+    "visible_payload_function": "swarm.evals.dataset.build_model_input",
+    "rule": "visible = dict(record['input']) with the banned keys removed; when visible['prompt'] is a string it is sent verbatim, otherwise the canonical JSON of visible is sent",
+    "messages": [
+      {
+        "role": "user",
+        "content": "<visible prompt>"
+      }
+    ],
+    "system_prompt": "absent_by_design",
+    "few_shot_exemplars": 0,
+    "stop_sequences": "absent_by_design",
+    "response_postprocessing": "fenced code blocks are stripped before grading for the json_exact, topological_order and python_unit scorers; no other rewriting is permitted"
+  },
+  "banned_keys_stripped_from_visible_payload": [
+    "expected_output",
+    "grader",
+    "answer",
+    "reference_solution",
+    "broken_code",
+    "holdout_label",
+    "case_id",
+    "id"
+  ],
+  "leakage_guard": {
+    "assertion_function": "swarm.evals.dataset.assert_no_leakage",
+    "checks": [
+      "expected_output must not appear in the serialised model input",
+      "the grader block must not appear in the serialised model input",
+      "the exact serialised hidden reference value must not appear verbatim in the model input"
+    ]
+  },
+  "current_implementation_reference": {
+    "module": "src/swarm/evals/live_benchmark.py",
+    "functions": [
+      "_case_prompt",
+      "_strip_fences"
+    ],
+    "pinned": false,
+    "why_not_pinned": "the counted-qualification harness still has to gain the EVAL-131 overhead accounting fields (wall_ms, token counts, attempt counts, exact model config). What is frozen here is the prompt contract above, which any counted harness must satisfy; pinning the current harness file would block that required work."
+  },
+  "binding": "CapabilityProfile.prompt_version and every counted observation must carry g13-prompt-v1",
+  "change_policy": "any change to the assembly contract or the banned-key list is breaking: mint g13-prompt-v2 and a new pool freeze version"
+}

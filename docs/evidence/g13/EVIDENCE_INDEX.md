@@ -5,6 +5,8 @@
 
 | Artifact | Claim | Not claimed |
 |----------|-------|-------------|
+| `g13/TASK_POOL_FREEZE.md` | ART-V13-TASK-POOL (V2B-001/W-131C1): frozen calibration-vs-held-out pool + manifest, digest-pinned identities, deterministic overlap/floating-manifest verifier | Artifact accept; authorisation to start counted qualification (`counted_qualification_ready=false`) |
+| `g13/integration-note-v2b-001-shared-deltas.md` | Shared-file deltas counted qualification will need, written down instead of edited | Any Session-A shared file change |
 | `g13/QUALIFICATION_CRITERION.md` | Frozen rule pointer: n≥15, Wilson 90% LB≥0.80, families coding/planning/reasoning/extraction | Qualification |
 | `eval-131/w131a-qualification-gap-map.json` | Machine-readable W-131A gap map; third-model L/XL n=5 gaps **filled**; planned W-131B batches still `planned_not_executed` | n≥15/n≥30 qualification |
 | `eval-131/aggregated-provisional-matrix.json` | Aggregated local $0 provisional; **72 cells at n≥5**; 3 models × S/M/L/XL | Automatic qualification |

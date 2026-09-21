@@ -1,0 +1,337 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "ART-V13-TASK-POOL",
+  "packet": "V2B-001",
+  "work_item": "W-131C1",
+  "freeze_id": "g13-pool-freeze-v1",
+  "freeze_version": 1,
+  "artifact_state_requested": "reviewable",
+  "lead_review": "requested_not_granted",
+  "qualification_claimed": false,
+  "counted_qualification_started": false,
+  "counted_qualification_permitted_by_this_artifact": false,
+  "base_branch": "cursor/v2-integration",
+  "base_commit": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
+  "worker_branch": "worker/swarmai-v13-task-pool-freeze-02",
+  "generated_by": "scripts/g13_freeze_task_pool.py",
+  "verified_by": "swarm.evals.task_pool_freeze.verify_pool_freeze",
+
+  "pool_source": {
+    "path": "benchmarks/starter.jsonl",
+    "sha256": "573bad7f04f6ea818fec31a6f790e4b4f70d3499c9b1c91eb39b5573de59be78",
+    "record_count": 224,
+    "format": "jsonl",
+    "encoding": "utf-8",
+    "line_terminator": "LF",
+    "trailing_newline": true,
+    "record_schema_module": "swarm.evals.dataset.BenchmarkCase"
+  },
+
+  "record_digests": {
+    "path": "benchmarks/g13/pool_freeze_v1/POOL_RECORD_DIGESTS.txt",
+    "sha256": "c8ca2abff6a502aab0564153eb3c745653a632ea1ce3021d61cba74bd87fb051",
+    "entry_count": 224
+  },
+
+  "record_digest_spec": {
+    "algorithm": "sha256",
+    "input": "the exact UTF-8 bytes of one JSONL record line from pool_source.path, including its terminating LF",
+    "python_equivalent": "hashlib.sha256((line + chr(10)).encode('utf-8')).hexdigest()",
+    "shell_equivalent": "head -n <N> benchmarks/starter.jsonl | tail -n 1 | sha256sum",
+    "file_format": "<case_id> <sha256-hex> *-   (lines beginning with # are comments)",
+    "ordering": "dataset file order; the Nth non-comment line corresponds to line N of pool_source.path"
+  },
+
+  "provenance": {
+    "record_digests_produced_by": "POSIX shell, one head|tail|sha256sum invocation per record, as documented in record_digest_spec.shell_equivalent",
+    "regeneration_command": "python scripts/g13_freeze_task_pool.py --verify",
+    "honesty_note": "the worker environment for this packet denied python, pytest, ruff, mypy and every writing git command (add, commit, fetch, push). The digests below were therefore produced with the documented shell equivalent rather than by executing the committed generator, and the work was left in the working tree of worker/swarmai-v13-task-pool-freeze-02 rather than committed. The generator recomputes byte-identical values; the lead must run it, plus tests/evals/test_task_pool_freeze.py, before accepting this artifact."
+  },
+
+  "source_and_license": {
+    "third_party_datasets_used": 0,
+    "datasets": [
+      {
+        "dataset_id": "swarmai-starter-v1",
+        "path": "benchmarks/starter.jsonl",
+        "origin": "synthetically generated inside this repository",
+        "generator_revision": "seed-v1",
+        "generation_marker_on_every_record": "generation.synthetic == true",
+        "human_authored_records": 0,
+        "scraped_or_crawled_records": 0,
+        "license": "inherits the SwarmAI repository terms; no separate dataset licence applies",
+        "license_file_present_at_frozen_commit": false,
+        "license_blocker": "the repository has no LICENSE file at the frozen commit, so the pool inherits unstated repository terms. Recorded for the lead; it does not affect contamination or immutability.",
+        "redistribution": "internal_only",
+        "personal_data": "absent by construction; every identifier is a generated token such as ORD-310-001 or task_505_07",
+        "attribution_required": false
+      }
+    ],
+    "per_family_content": {
+      "extraction": "structured record extraction from a synthetic authoritative ledger with distractor commentary",
+      "classification": "synthetic label assignment over generated records",
+      "evidence_qa": "question answering constrained to synthetic evidence supplied inline",
+      "code_generation": "write a pure python function satisfying hidden unit cases",
+      "code_repair": "repair a synthetic broken python function against hidden unit cases",
+      "dependency_planning": "emit any valid topological order over a synthetic task graph",
+      "tool_selection": "emit a JSON plan naming tools; no tool is actually invoked",
+      "context_compaction": "compress synthetic context under a declared character budget"
+    }
+  },
+
+  "product_family_map": {
+    "required": {
+      "coding": {
+        "dataset_family": "code_generation",
+        "rationale": "matches swarm.evals.live_benchmark.FAMILY_MAP coding -> code_generation"
+      },
+      "planning": {
+        "dataset_family": "dependency_planning",
+        "rationale": "matches swarm.evals.live_benchmark.FAMILY_MAP planning -> dependency_planning"
+      },
+      "reasoning": {
+        "dataset_family": "evidence_qa",
+        "rationale": "matches swarm.evals.live_benchmark.FAMILY_MAP reasoning -> evidence_qa"
+      },
+      "extraction": {
+        "dataset_family": "extraction",
+        "rationale": "matches swarm.evals.live_benchmark.FAMILY_MAP extraction -> extraction"
+      }
+    },
+    "auxiliary": {
+      "auxiliary_classification": {
+        "dataset_family": "classification",
+        "rationale": "unmapped in FAMILY_MAP; frozen for completeness, excluded from required coverage"
+      },
+      "auxiliary_code_repair": {
+        "dataset_family": "code_repair",
+        "rationale": "unmapped in FAMILY_MAP; a second coding surface, deliberately not folded into coding so that the required coding cells stay a single homogeneous task type"
+      },
+      "auxiliary_review": {
+        "dataset_family": "tool_selection",
+        "rationale": "FAMILY_MAP review -> tool_selection; review is not an EVAL-131 required family"
+      },
+      "auxiliary_summarization": {
+        "dataset_family": "context_compaction",
+        "rationale": "FAMILY_MAP summarization -> context_compaction; summarization is not an EVAL-131 required family"
+      }
+    },
+    "mapping_discipline": "one product family maps to exactly one dataset family. Folding several dataset families into one product family would let a strong sub-family mask a weak one inside a single qualification cell."
+  },
+
+  "coverage": {
+    "required_product_families": [
+      "coding",
+      "planning",
+      "reasoning",
+      "extraction"
+    ],
+    "required_sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "required_cell_count": 16,
+    "calibration_per_required_cell": 2,
+    "held_out_per_required_cell": 5,
+    "auxiliary_product_families": [
+      "auxiliary_classification",
+      "auxiliary_code_repair",
+      "auxiliary_review",
+      "auxiliary_summarization"
+    ],
+    "min_distinct_exact_model_configs": 3,
+    "min_distinct_exact_model_configs_source": "EVAL_131_QUALIFICATION_PROTOCOL v1.0 as restated in docs/evidence/g13/QUALIFICATION_CRITERION.md"
+  },
+
+  "identities": {
+    "size_classifier": {
+      "classifier_id": "g13-size-classifier-v1",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v1/identity_size_classifier_v1.json",
+        "sha256": "7576f71b7940acceacede01993590464c68a0bfd43738c8f734c18df9bdbe597"
+      },
+      "implementation_module": "src/swarm/evals/size_classifier.py",
+      "mirror_assertion": "the spec .identity block equals swarm.evals.size_classifier.classifier_identity(), asserted by tests/evals/test_task_pool_freeze.py",
+      "round_trip_assertion": "the classifier reproduces the declared size band of all 224 frozen records"
+    },
+    "scorer": {
+      "scorer_id": "g13-scorer-v1",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v1/identity_scorer_v1.json",
+        "sha256": "3806b7d7b3812ce0c82d6d0c8e7289b1266706f374b99741bc0f71cdcad8fcee"
+      },
+      "pinned_files": {
+        "src/swarm/evals/graders.py": "4018533327fd905dfaa4a7f7163de9b364f06e5a9c66dbad3ae9e9fed2434600",
+        "src/swarm/tools/sandbox_runner.py": "b65064f24d124358f4f74dcd1d6ec45577d6aab027d4bdca7537b45e07d8f4ec",
+        "src/swarm/evals/wilson.py": "4fa8477547aecb99c1274c67256d2ca4e457e608712a3d0cbaf1b15c740a1774"
+      }
+    },
+    "prompt": {
+      "prompt_id": "g13-prompt-v1",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v1/identity_prompt_v1.json",
+        "sha256": "14128671155e619195c13309f194a449982a51f56ffffa125956c7d78a944588"
+      },
+      "pinned_files": {
+        "src/swarm/evals/dataset.py": "7d5445b2da5a9f0f9987a008b3b24ec3d4e7a507c968f3454bd7a2aa9f501e40"
+      }
+    },
+    "tool_protocol": {
+      "tool_protocol_id": "g13-tool-protocol-v1-no-model-visible-tools",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v1/identity_tool_protocol_v1.json",
+        "sha256": "ebb524f67a7dcae2aae2668ecb1387381bf9ceb5259b36b29502d5668d4e22ed"
+      }
+    },
+    "model_config_schema": {
+      "schema_id": "g13-exact-model-config-v1",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v1/identity_model_config_schema_v1.json",
+        "sha256": "c3f8be3910ede8ef4fe7a2abbdec508736aa15e23a37a492f910de2210d7e950"
+      },
+      "binding": "every counted held-out observation must quote exactly one conforming exact_model_config object and its exact_model_config_id"
+    }
+  },
+
+  "hidden_answer_policy": {
+    "hidden_record_fields": [
+      "expected_output",
+      "grader",
+      "reference_solution",
+      "broken_code"
+    ],
+    "worker_visible_on_this_branch": true,
+    "containment_status": "NOT_CONTAINED",
+    "finding": "the hidden reference answers and grader fixtures sit in plaintext inside benchmarks/starter.jsonl, which any worker on this branch can read. This predates packet V2B-001 and is not introduced by it.",
+    "committed_by_this_artifact": "case ids, split membership, coverage counts, per-record sha256 digests and identity metadata only",
+    "not_committed_by_this_artifact": "no reference answer, no grader fixture, no hidden unit case, no solution text",
+    "remediation_required_before_counted_qualification": [
+      "move the held-out hidden fields out of the worker-visible branch into a sealed store the qualification harness reads and workers do not",
+      "replace the in-record hidden fields with a per-record hidden_answer_sha256 so the pool stays verifiable without being readable",
+      "re-freeze as g13-pool-freeze-v2 once the sealed store exists, because the record bytes and therefore every record digest will change"
+    ],
+    "enforced_by": "swarm.evals.task_pool_freeze.find_hidden_field_names, applied to this manifest and to every identity spec"
+  },
+
+  "contamination_boundary": {
+    "enforced_invariants": [
+      "no case id appears in both splits",
+      "no record sha256 appears in both splits",
+      "no model-visible prompt digest appears in both splits",
+      "no two held-out records share a model-visible prompt digest"
+    ],
+    "derived_digests_not_stored": "visible-prompt, hidden-answer and normalised-template digests are pure functions of the frozen record bytes, which are already pinned by pool_source.sha256 and by every entry in POOL_RECORD_DIGESTS.txt. Storing them again would create a second source of truth that can drift.",
+    "template_isomorphism": {
+      "status": "expected_present_by_construction",
+      "method": "sha256 of the model-visible payload with every run of digits replaced by a single #",
+      "why_it_matters": "the seeded generator emits isomorphic variants: two records can differ only in their synthetic identifiers. Isomorphic held-out records are not independent observations, so a Wilson bound computed over them overstates confidence.",
+      "enforcement": "reported as a verifier statistic, never enforced; driving it to zero requires regenerating the pool, which is out of scope for this packet"
+    }
+  },
+
+  "qualification_readiness": {
+    "counted_qualification_ready": false,
+    "blocking_reason": "insufficient_distinct_held_out_depth",
+    "protocol_min_distinct_per_cell": 15,
+    "protocol_max_distinct_per_cell": 60,
+    "frozen_held_out_per_required_cell": 5,
+    "additional_held_out_cases_for_min_depth": 160,
+    "additional_held_out_cases_for_max_depth": 880,
+    "explanation": "the protocol requires n >= 15 independent held-out observations per (exact_model_config, family, size) cell, and swarm.evals.profiles.ProfileStore counts DISTINCT cases for the Wilson bound. The frozen pool holds 5 distinct held-out records per required cell, so re-running the same 5 records cannot reach n = 15. Closing the minimum needs 10 more distinct held-out records per required cell across 16 required cells.",
+    "secondary_blockers": [
+      "hidden answers are worker-visible on this branch (see hidden_answer_policy)",
+      "held-out records include seed-isomorphic variants (see contamination_boundary.template_isomorphism)",
+      "swarm.evals.wilson.wilson_lower_bound defaults to z = 1.96; counted runs must pass the one-sided 90 percent z = 1.2815515655446004 explicitly"
+    ]
+  },
+
+  "not_claimed": [
+    "ART-V13-TASK-POOL is not accepted; lead review is requested",
+    "no counted held-out qualification was run for this packet",
+    "no cell is qualified and no capability profile was promoted",
+    "no threshold, acceptance rule or protocol constant was changed",
+    "no paid inference, deploy, release, main merge or force push occurred",
+    "the pool freeze does not by itself authorise counted qualification; qualification_readiness.counted_qualification_ready is false"
+  ],
+
+  "splits": {
+    "calibration": {
+      "purpose": "screening and calibration only; observations over these records are provisional and must never be counted towards qualification",
+      "case_count": 64,
+      "cells": [
+        {"product_family": "extraction", "family": "extraction", "size": "S", "case_ids": ["extraction_S_01", "extraction_S_02"]},
+        {"product_family": "extraction", "family": "extraction", "size": "M", "case_ids": ["extraction_M_01", "extraction_M_02"]},
+        {"product_family": "extraction", "family": "extraction", "size": "L", "case_ids": ["extraction_L_01", "extraction_L_02"]},
+        {"product_family": "extraction", "family": "extraction", "size": "XL", "case_ids": ["extraction_XL_01", "extraction_XL_02"]},
+        {"product_family": "coding", "family": "code_generation", "size": "S", "case_ids": ["code_generation_S_01", "code_generation_S_02"]},
+        {"product_family": "coding", "family": "code_generation", "size": "M", "case_ids": ["code_generation_M_01", "code_generation_M_02"]},
+        {"product_family": "coding", "family": "code_generation", "size": "L", "case_ids": ["code_generation_L_01", "code_generation_L_02"]},
+        {"product_family": "coding", "family": "code_generation", "size": "XL", "case_ids": ["code_generation_XL_01", "code_generation_XL_02"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "S", "case_ids": ["dependency_planning_S_01", "dependency_planning_S_02"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "M", "case_ids": ["dependency_planning_M_01", "dependency_planning_M_02"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "L", "case_ids": ["dependency_planning_L_01", "dependency_planning_L_02"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "XL", "case_ids": ["dependency_planning_XL_01", "dependency_planning_XL_02"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "S", "case_ids": ["evidence_qa_S_01", "evidence_qa_S_02"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "M", "case_ids": ["evidence_qa_M_01", "evidence_qa_M_02"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "L", "case_ids": ["evidence_qa_L_01", "evidence_qa_L_02"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "XL", "case_ids": ["evidence_qa_XL_01", "evidence_qa_XL_02"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "S", "case_ids": ["classification_S_01", "classification_S_02"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "M", "case_ids": ["classification_M_01", "classification_M_02"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "L", "case_ids": ["classification_L_01", "classification_L_02"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "XL", "case_ids": ["classification_XL_01", "classification_XL_02"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "S", "case_ids": ["code_repair_S_01", "code_repair_S_02"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "M", "case_ids": ["code_repair_M_01", "code_repair_M_02"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "L", "case_ids": ["code_repair_L_01", "code_repair_L_02"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "XL", "case_ids": ["code_repair_XL_01", "code_repair_XL_02"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "S", "case_ids": ["tool_selection_S_01", "tool_selection_S_02"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "M", "case_ids": ["tool_selection_M_01", "tool_selection_M_02"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "L", "case_ids": ["tool_selection_L_01", "tool_selection_L_02"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "XL", "case_ids": ["tool_selection_XL_01", "tool_selection_XL_02"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "S", "case_ids": ["context_compaction_S_01", "context_compaction_S_02"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "M", "case_ids": ["context_compaction_M_01", "context_compaction_M_02"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "L", "case_ids": ["context_compaction_L_01", "context_compaction_L_02"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "XL", "case_ids": ["context_compaction_XL_01", "context_compaction_XL_02"]}
+      ]
+    },
+    "holdout": {
+      "purpose": "qualification-held-out only; these records must not be used for screening, prompt tuning, routing calibration or any inspection that could shape a candidate",
+      "case_count": 160,
+      "cells": [
+        {"product_family": "extraction", "family": "extraction", "size": "S", "case_ids": ["extraction_S_03", "extraction_S_04", "extraction_S_05", "extraction_S_06", "extraction_S_07"]},
+        {"product_family": "extraction", "family": "extraction", "size": "M", "case_ids": ["extraction_M_03", "extraction_M_04", "extraction_M_05", "extraction_M_06", "extraction_M_07"]},
+        {"product_family": "extraction", "family": "extraction", "size": "L", "case_ids": ["extraction_L_03", "extraction_L_04", "extraction_L_05", "extraction_L_06", "extraction_L_07"]},
+        {"product_family": "extraction", "family": "extraction", "size": "XL", "case_ids": ["extraction_XL_03", "extraction_XL_04", "extraction_XL_05", "extraction_XL_06", "extraction_XL_07"]},
+        {"product_family": "coding", "family": "code_generation", "size": "S", "case_ids": ["code_generation_S_03", "code_generation_S_04", "code_generation_S_05", "code_generation_S_06", "code_generation_S_07"]},
+        {"product_family": "coding", "family": "code_generation", "size": "M", "case_ids": ["code_generation_M_03", "code_generation_M_04", "code_generation_M_05", "code_generation_M_06", "code_generation_M_07"]},
+        {"product_family": "coding", "family": "code_generation", "size": "L", "case_ids": ["code_generation_L_03", "code_generation_L_04", "code_generation_L_05", "code_generation_L_06", "code_generation_L_07"]},
+        {"product_family": "coding", "family": "code_generation", "size": "XL", "case_ids": ["code_generation_XL_03", "code_generation_XL_04", "code_generation_XL_05", "code_generation_XL_06", "code_generation_XL_07"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "S", "case_ids": ["dependency_planning_S_03", "dependency_planning_S_04", "dependency_planning_S_05", "dependency_planning_S_06", "dependency_planning_S_07"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "M", "case_ids": ["dependency_planning_M_03", "dependency_planning_M_04", "dependency_planning_M_05", "dependency_planning_M_06", "dependency_planning_M_07"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "L", "case_ids": ["dependency_planning_L_03", "dependency_planning_L_04", "dependency_planning_L_05", "dependency_planning_L_06", "dependency_planning_L_07"]},
+        {"product_family": "planning", "family": "dependency_planning", "size": "XL", "case_ids": ["dependency_planning_XL_03", "dependency_planning_XL_04", "dependency_planning_XL_05", "dependency_planning_XL_06", "dependency_planning_XL_07"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "S", "case_ids": ["evidence_qa_S_03", "evidence_qa_S_04", "evidence_qa_S_05", "evidence_qa_S_06", "evidence_qa_S_07"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "M", "case_ids": ["evidence_qa_M_03", "evidence_qa_M_04", "evidence_qa_M_05", "evidence_qa_M_06", "evidence_qa_M_07"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "L", "case_ids": ["evidence_qa_L_03", "evidence_qa_L_04", "evidence_qa_L_05", "evidence_qa_L_06", "evidence_qa_L_07"]},
+        {"product_family": "reasoning", "family": "evidence_qa", "size": "XL", "case_ids": ["evidence_qa_XL_03", "evidence_qa_XL_04", "evidence_qa_XL_05", "evidence_qa_XL_06", "evidence_qa_XL_07"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "S", "case_ids": ["classification_S_03", "classification_S_04", "classification_S_05", "classification_S_06", "classification_S_07"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "M", "case_ids": ["classification_M_03", "classification_M_04", "classification_M_05", "classification_M_06", "classification_M_07"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "L", "case_ids": ["classification_L_03", "classification_L_04", "classification_L_05", "classification_L_06", "classification_L_07"]},
+        {"product_family": "auxiliary_classification", "family": "classification", "size": "XL", "case_ids": ["classification_XL_03", "classification_XL_04", "classification_XL_05", "classification_XL_06", "classification_XL_07"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "S", "case_ids": ["code_repair_S_03", "code_repair_S_04", "code_repair_S_05", "code_repair_S_06", "code_repair_S_07"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "M", "case_ids": ["code_repair_M_03", "code_repair_M_04", "code_repair_M_05", "code_repair_M_06", "code_repair_M_07"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "L", "case_ids": ["code_repair_L_03", "code_repair_L_04", "code_repair_L_05", "code_repair_L_06", "code_repair_L_07"]},
+        {"product_family": "auxiliary_code_repair", "family": "code_repair", "size": "XL", "case_ids": ["code_repair_XL_03", "code_repair_XL_04", "code_repair_XL_05", "code_repair_XL_06", "code_repair_XL_07"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "S", "case_ids": ["tool_selection_S_03", "tool_selection_S_04", "tool_selection_S_05", "tool_selection_S_06", "tool_selection_S_07"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "M", "case_ids": ["tool_selection_M_03", "tool_selection_M_04", "tool_selection_M_05", "tool_selection_M_06", "tool_selection_M_07"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "L", "case_ids": ["tool_selection_L_03", "tool_selection_L_04", "tool_selection_L_05", "tool_selection_L_06", "tool_selection_L_07"]},
+        {"product_family": "auxiliary_review", "family": "tool_selection", "size": "XL", "case_ids": ["tool_selection_XL_03", "tool_selection_XL_04", "tool_selection_XL_05", "tool_selection_XL_06", "tool_selection_XL_07"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "S", "case_ids": ["context_compaction_S_03", "context_compaction_S_04", "context_compaction_S_05", "context_compaction_S_06", "context_compaction_S_07"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "M", "case_ids": ["context_compaction_M_03", "context_compaction_M_04", "context_compaction_M_05", "context_compaction_M_06", "context_compaction_M_07"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "L", "case_ids": ["context_compaction_L_03", "context_compaction_L_04", "context_compaction_L_05", "context_compaction_L_06", "context_compaction_L_07"]},
+        {"product_family": "auxiliary_summarization", "family": "context_compaction", "size": "XL", "case_ids": ["context_compaction_XL_03", "context_compaction_XL_04", "context_compaction_XL_05", "context_compaction_XL_06", "context_compaction_XL_07"]}
+      ]
+    }
+  }
+}

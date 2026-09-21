@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "artifact": "ART-V13-TASK-POOL",
+  "freeze_id": "g13-pool-freeze-v1",
+  "tool_protocol_id": "g13-tool-protocol-v1-no-model-visible-tools",
+  "model_visible_tool_count": 0,
+  "protocol": {
+    "transport": "single_turn_chat_completion",
+    "turns_per_trial": 1,
+    "function_calling": "disabled_by_design",
+    "tool_schema_advertised_to_model": "absent_by_design",
+    "retrieval": "absent_by_design; every record carries its own context inline",
+    "network_access_for_the_model": "absent_by_design"
+  },
+  "grader_side_execution": {
+    "note": "the python_unit scorer executes MODEL-EMITTED CODE inside a sandbox after the trial has ended. This is grader-side execution, not a tool offered to the model, and it is therefore not part of the model-visible tool protocol.",
+    "runner": "swarm.tools.sandbox_runner.IsolatedCodeRunner",
+    "network": false
+  },
+  "tool_steps_feature": {
+    "meaning": "size_features.tool_steps is a difficulty estimate of how many tool steps a solver would need, not a count of tools actually offered",
+    "required_product_families_value": 0,
+    "non_zero_families": [
+      "tool_selection"
+    ],
+    "non_zero_note": "tool_selection asks the model to emit a JSON plan about tools; it still calls no tool. tool_selection is an auxiliary family and is not part of the EVAL-131 required coverage."
+  },
+  "forbidden_action_rule": "the EVAL-131 integrity clause (zero forbidden/unauthorised tool actions) is satisfied vacuously for this freeze because no tool surface is exposed. Any future freeze that exposes tools must mint a new tool protocol id and re-state the rule non-vacuously.",
+  "binding": "CapabilityProfile.tool_protocol and every counted observation must carry g13-tool-protocol-v1-no-model-visible-tools",
+  "change_policy": "exposing any tool to the model is breaking: mint a new tool protocol id and a new pool freeze version"
+}

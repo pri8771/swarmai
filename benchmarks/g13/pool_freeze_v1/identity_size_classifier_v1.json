@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "artifact": "ART-V13-TASK-POOL",
+  "freeze_id": "g13-pool-freeze-v1",
+  "source_module": "src/swarm/evals/size_classifier.py",
+  "identity": {
+    "classifier_id": "g13-size-classifier-v1",
+    "feature_schema": [
+      "input_characters",
+      "input_tokens_estimate",
+      "entity_count",
+      "dependency_depth",
+      "file_count",
+      "tool_steps"
+    ],
+    "decision_feature": "input_tokens_estimate",
+    "size_bands": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "boundary_kind": "inclusive_upper_bound_per_family",
+    "family_bands": {
+      "classification": {
+        "S_max": 205,
+        "M_max": 404,
+        "L_max": 779,
+        "XL": "> 779"
+      },
+      "code_generation": {
+        "S_max": 232,
+        "M_max": 404,
+        "L_max": 866,
+        "XL": "> 866"
+      },
+      "code_repair": {
+        "S_max": 216,
+        "M_max": 355,
+        "L_max": 621,
+        "XL": "> 621"
+      },
+      "context_compaction": {
+        "S_max": 252,
+        "M_max": 458,
+        "L_max": 843,
+        "XL": "> 843"
+      },
+      "dependency_planning": {
+        "S_max": 113,
+        "M_max": 205,
+        "L_max": 381,
+        "XL": "> 381"
+      },
+      "evidence_qa": {
+        "S_max": 347,
+        "M_max": 716,
+        "L_max": 1415,
+        "XL": "> 1415"
+      },
+      "extraction": {
+        "S_max": 184,
+        "M_max": 341,
+        "L_max": 634,
+        "XL": "> 634"
+      },
+      "tool_selection": {
+        "S_max": 257,
+        "M_max": 418,
+        "L_max": 731,
+        "XL": "> 731"
+      }
+    }
+  },
+  "feature_semantics": {
+    "input_characters": "character length of the model-visible prompt, as emitted by the pool generator",
+    "input_tokens_estimate": "generator estimate, characters/4; NOT provider usage accounting",
+    "entity_count": "distinct synthetic entities the task must reason over",
+    "dependency_depth": "longest precedence chain in the task graph; 0 when not a graph task",
+    "file_count": "number of source artefacts supplied in the prompt",
+    "tool_steps": "estimated tool steps a solver would need; 0 for every required product family in this freeze"
+  },
+  "boundary_derivation": {
+    "method": "floor of the midpoint between the highest observed decision-feature value of a band and the lowest observed value of the next band, computed per family over the frozen pool",
+    "why_per_family": "a single global cut cannot separate the bands: dependency_planning XL (471-535) sits below classification L (538)",
+    "recompute_features": "disabled by design; the frozen records carry generator-owned feature values and re-deriving them here would fork the definition"
+  },
+  "change_policy": "any change to classifier_id, feature_schema, decision_feature or family_bands is breaking: mint a new classifier id and a new pool freeze version"
+}
