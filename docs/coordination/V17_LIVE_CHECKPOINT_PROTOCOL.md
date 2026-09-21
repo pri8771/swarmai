@@ -102,6 +102,19 @@ Negative live/deterministic cases:
 - unknown external outcome;
 - session expires/signs out, recovers destination, and does NOT duplicate submission.
 
+## Checkpoint CP5-REALWORLD — real external effect
+
+After CP5 fixture-based semantics pass, run R33c under `REAL_WORLD_ACCEPTANCE_POLICY.md`.
+
+Minimum proof:
+- actual private GitHub repository boundary (preferred current proof);
+- create, observe, comment once, and close one uniquely named test issue through the V1.7 gateway;
+- all mutations approval/effect-key bound;
+- duplicate replay creates no duplicate external state;
+- unknown outcome reconciled before retry;
+- no credential/token material in evidence.
+
+CP5 without CP5-REALWORLD may be described as live-local checkpointed, not working/operationally proven.
 ## Checkpoint CP6 — V1.7 exact-tip integrated review
 
 Must bind:
