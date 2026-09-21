@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T06:02:06Z",
+  "updated_at": "2026-09-21T06:51:13Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -24,36 +24,30 @@
         "2026-09-21T04:02:22+00:00"
       ],
       "stale": true,
-      "status": "post-reinstall scheduler streak 2/3; no scheduler receipt since 04:02:22Z, so A remains stale at bootstrap threshold"
+      "status": "current scheduler streak 2/3; no scheduler receipt since 04:02:22Z, so A remains stale at bootstrap threshold"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T05:29:17+00:00",
-      "consecutive_valid_15m": 8,
+      "last_heartbeat_at": "2026-09-21T06:29:17+00:00",
+      "consecutive_valid_15m": 2,
       "verified_timestamps": [
-        "2026-09-21T03:43:40+00:00",
-        "2026-09-21T03:59:17+00:00",
-        "2026-09-21T04:14:17+00:00",
-        "2026-09-21T04:29:17+00:00",
-        "2026-09-21T04:44:18+00:00",
-        "2026-09-21T04:59:18+00:00",
-        "2026-09-21T05:14:17+00:00",
-        "2026-09-21T05:29:17+00:00"
+        "2026-09-21T06:14:26+00:00",
+        "2026-09-21T06:29:17+00:00"
       ],
       "stale": false,
-      "status": "bootstrap cadence requirement met individually with 8 consecutive valid scheduler receipts; waiting for A before global hourly graduation"
+      "status": "current scheduler streak 2/3 after the prior chain was broken by the 45-minute 05:29:17Z -> 06:14:26Z gap; fresh but not graduation-ready"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T06:02:06Z",
+    "last_review_at": "2026-09-21T06:51:13Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Only scheduler heartbeats count. A remains at two valid consecutive receipts and is stale. B has eight valid consecutive receipts and individually satisfies bootstrap. Global cadence remains 15 minutes until A reaches three consecutive valid scheduler receipts and the lead reconciles both histories."
+    "note": "Only scheduler heartbeats count. A remains stale at 2/3. B's earlier streak was interrupted by a >25-minute gap; the current B streak is 2/3 from 06:14:26Z and 06:29:17Z. Global worker cadence therefore remains 15 minutes; ChatGPT lead remains hourly."
   },
   "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
   "notifications": {
