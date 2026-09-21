@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `f06fd1f40963c8f1b33a9529413479b7fab6dc7d`
-- Coordination SHA: `f299e9b237b4386747d0f49705ed96efb199bf41`
-- Updated: `2026-09-21T18:43:23Z`
-- Trigger: `scheduler`
+- Branch SHA: `5dd8e2be9670132f33ffac27a91686fff05c1cff`
+- Coordination SHA: `fa1f93752645b9695100440195a1aa43cdf8f8c3`
+- Updated: `2026-09-21T18:44:42Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `V2A-003c`
-- Current artifact: `ART-V15-LEASE-FENCING`
-- Last meaningful activity: `2026-09-21T18:39:18Z`
+- Current packet: `V2A-004`
+- Current artifact: `ART-V15-WORKER-PROTOCOL`
+- Last meaningful activity: `2026-09-21T18:44:41Z`
 - Spend USD: `0.0`
-- Blocker: G13/ART-V13-TASK-POOL: HOST-WIN-DEV unavailable on Darwin; ART-V14-REAL-E2E drafting pending independent review
+- Blocker: G13/ART-V13-TASK-POOL: HOST-WIN-DEV unavailable on Darwin; ART-V14-REAL-E2E drafting pending independent review; B3 multi-host UNKNOWN
 
 ## Update
 
-V1.5/V2A-003c accept fence landed (ddd96a6); tests 40 pass/$0. ART-V14-REAL-E2E still drafting (await lead). G13 still HOST-WIN-DEV blocked. Multi-host live evidence UNKNOWN.
+B2/V2A-004 worker service+client landed (5dd8e2b); B1/V2A-003c done. ART-V14-REAL-E2E still drafting. G13 HOST-WIN-DEV blocked. B3 multi-host live UNKNOWN. HTTP transport still drafting.
 
 ## Next
 
