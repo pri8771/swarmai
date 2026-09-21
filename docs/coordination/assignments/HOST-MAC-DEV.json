@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "assignment_id": "A-V14-REAL-001-R",
+  "generation": 1,
+  "enabled": true,
+  "host_alias": "HOST-MAC-DEV",
+  "session_id": "A",
+  "branch": "cursor/v2-runtime-lane",
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "instruction_path": "docs/coordination/packets/V14-REAL-001-R.md",
+  "priority": "immediate",
+  "max_runtime_seconds": 2400,
+  "boundaries": {
+    "additional_spend": false,
+    "main_merge": false,
+    "public_deploy": false,
+    "force_push": false
+  },
+  "next_assignment_owner": "ChatGPT lead",
+  "note": "Execute exactly this bounded repair+real-rerun packet, push evidence, then stop for lead review."
+}
