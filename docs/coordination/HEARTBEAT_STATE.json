@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T17:20:00Z",
+  "updated_at": "2026-09-21T17:47:50Z",
   "mode": "single_session_5m",
   "worker_effective_cadence_minutes": 5,
   "active_session_epoch": "single-v17-20260921-01",
@@ -17,7 +17,21 @@
   "legacy": {
     "two_lane_stress_test": "superseded_by_owner_directive",
     "old_ledgers": "historical_only",
-    "old_assignments": "disabled"
+    "old_assignments": "disabled",
+    "post_supersession_publishers_observed": [
+      {
+        "producer": "HOST-MAC-DEV",
+        "last_seen_at": "2026-09-21T17:37:30Z",
+        "coordination_commit": "75af0089465725db353d29e4a54c2aeb3e6942d7",
+        "counted": false
+      },
+      {
+        "producer": "HOST-WIN-DEV",
+        "last_seen_at": "2026-09-21T17:28:46Z",
+        "counted": false
+      }
+    ],
+    "action_required": "Stop legacy A/B heartbeat and autonomous-runner processes before registering CURSOR-V17-SINGLE."
   },
   "semantics": {
     "purpose": "liveness_and_progress_only",
@@ -28,5 +42,5 @@
   },
   "stale_threshold_minutes": 12,
   "lead_heartbeat_automation": false,
-  "note": "One active Cursor implementation session and one 5-minute heartbeat producer. No A/B stress phase or 24h heartbeat soak."
+  "note": "One active Cursor implementation session and one 5-minute heartbeat producer. The single-session producer is not registered yet; legacy A/B publishers were still writing after supersession and must be stopped."
 }
