@@ -3,8 +3,8 @@
   "packet_id": "V2A-003a",
   "scenario": "schema_models_repository_foundation",
   "status": "pass",
-  "recorded_at": "2026-09-21T01:02:58.269305+00:00",
-  "candidate_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+  "recorded_at": "2026-09-21T01:03:05.865104+00:00",
+  "candidate_sha": "630ab780ab45858c5dad4075be143cfa145e975f",
   "spend_usd": 0.0,
   "g15_lead_accept_invented": false,
   "commands": [
