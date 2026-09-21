@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T16:10:00Z",
+  "updated_at": "2026-09-21T16:31:00Z",
   "mode": "stress_5m",
   "worker_effective_cadence_minutes": 5,
   "lead_effective_cadence_minutes": 60,
@@ -22,7 +22,11 @@
       "verified_at": null,
       "verified_timestamps": {
         "A": [],
-        "B": []
+        "B": [
+          "2026-09-21T16:17:56+00:00",
+          "2026-09-21T16:22:59+00:00",
+          "2026-09-21T16:28:03+00:00"
+        ]
       }
     },
     "phase2": {
@@ -51,16 +55,21 @@
       "consecutive_valid_phase1": 0,
       "verified_timestamps": [],
       "stale": false,
-      "status": "awaiting fresh-session registration for reset-20260921-new-lanes-01; old scheduler entries ignored"
+      "status": "fresh-session registration still not proven; recent scheduler gaps do not form a valid 3-8m chain"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": null,
-      "consecutive_valid_phase1": 0,
-      "verified_timestamps": [],
+      "last_heartbeat_at": "2026-09-21T16:28:03+00:00",
+      "consecutive_valid_phase1": 4,
+      "verified_timestamps": [
+        "2026-09-21T16:14:17+00:00",
+        "2026-09-21T16:17:56+00:00",
+        "2026-09-21T16:22:59+00:00",
+        "2026-09-21T16:28:03+00:00"
+      ],
       "stale": false,
-      "status": "awaiting fresh-session registration for reset-20260921-new-lanes-01; old scheduler entries ignored"
+      "status": "fresh lane registered; Phase-1 5m burst verified at least 3/3 with valid gaps 3m39s, 5m03s, 5m04s"
     }
   },
   "prior_verified_hourly_graduation": {
@@ -72,7 +81,7 @@
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
     "last_review_at": "2026-09-21T15:52:14Z",
-    "note": "Owner closed all previous A/B sessions. Current test counts only fresh-session scheduler receipts after explicit epoch registration for reset-20260921-new-lanes-01."
+    "note": "Reconciled fresh-session evidence: B is registered and has a valid 5m Phase-1 chain (>=3 consecutive). A is not yet registered/qualified, so Phase 2 has not started."
   },
   "stale_threshold_minutes": {
     "stress_5m": 12,
@@ -90,8 +99,9 @@
       "registered_at": null
     },
     "B": {
-      "registered": false,
-      "registered_at": null
+      "registered": true,
+      "registered_at": "2026-09-21T16:11:06+00:00",
+      "evidence": "manual fresh-lane heartbeat B-OPS-AUTO-SYNC-02 with new lane activity"
     }
   }
 }
