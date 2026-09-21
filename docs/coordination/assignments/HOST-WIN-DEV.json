@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.2",
-  "assignment_id": "B-RESET-BATCH-05",
-  "generation": 5,
+  "schema_version": "1.3",
+  "assignment_id": "B-TWO-LANE-01",
+  "generation": 6,
   "enabled": true,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
@@ -18,11 +18,11 @@
     {
       "packet_id": "V2B-002",
       "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
-      "instruction_path": "docs/coordination/packets/V2B-002.md",
+      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
       "max_runtime_seconds": 3600,
-      "note": "Calibration-only reviewer benchmark/scorer repair and freeze candidate. No held-out reviewer run and no W-131B product qualification."
+      "note": "Calibration-only reviewer benchmark/scorer repair and freeze. No held-out qualification until lead freeze."
     }
   ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Generation 4 is closed and must not replay: B-OPS-AUTO-SYNC-02, V2B-000 and V2B-001-R4 were completed through human-prompted work; an autonomous V2B-001-R4 launch exited without a source push. Generation 5 intentionally exposes one dependency-safe critical-path packet so a genuine repo-driven self-launch can be observed. ART-V13-TASK-POOL is lead-frozen, but counted product qualification remains blocked until a real sealed-reference bundle content digest is bound."
+  "note": "Fresh two-lane epoch. G13 task pool is already lead-verified/frozen. Do not redo V2B-001. Wait for lead generation after V2B-002."
 }
