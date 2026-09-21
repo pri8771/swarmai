@@ -1,91 +1,74 @@
 # SwarmAI live progress
 
-Updated by lead: 2026-09-21T15:52:14Z
+Updated by lead: 2026-09-21T17:04:00Z
 
 ## Execution topology
 
 | Lane | Owner | Current queue | State |
 |---|---|---|---|
-| A | Mac / Cursor | V14-REAL-001-R -> V2A-003c | assignment generation 4 enabled; no autonomous source push yet |
-| B | Windows / Cursor | B-OPS-AUTO-SYNC-02 -> V2B-000 -> V2B-001-R4 | assignment generation 4 enabled; no autonomous source push yet |
-| C | worker-pc / Claude | G13 retry-07 support | workflow 35616363073 in progress; no branch/result yet |
+| A | Mac / Cursor | `V14-REAL-001-R -> V2A-003c` | generation 4 enabled; no reset-generation autonomous source push yet |
+| B | HOST-WIN-DEV identity / Cursor | `V2B-002` | generation 5 enabled after G13 task-pool freeze; autonomous proof still absent |
+| C | worker-pc / Claude | independent G13 v3 static audit | run `35629554863` in progress; read-only support only |
 | Lead | ChatGPT | review / assignment / acceptance / dashboard | active |
 
 ## Heartbeat
 
-Active session epoch: `reset-20260921-new-lanes-01`.
+Active epoch: `reset-20260921-new-lanes-01`. Mode: `stress_5m`.
 
-All previous A/B interactive sessions are **closed**. Their heartbeat entries remain historical only and do not count toward the current test.
-
-Current fresh-session registration:
-- A: **not yet registered**
-- B: **not yet registered**
-
-After each fresh lane registers this epoch, Phase 1 starts at 0/3 for that lane:
-- effective cadence 5 minutes;
-- only scheduler receipts count;
-- valid adjacent gaps 3–8 minutes.
-
-After both fresh lanes reach 3/3, Phase 2 begins: 15-minute cadence for 24 real hours.
+- **A: 0/3 counted.** Ledger is live through `16:52:23Z`, but A has never registered the fresh epoch with the required `session_started` context. Its human-readable host status page is still stale, so these scheduler receipts cannot count for the reset stress test.
+- **B: Phase-1 verified 3/3** on `16:17:56Z -> 16:22:59Z -> 16:28:03Z`; B remains fresh through `16:53:21Z` and its status page is current.
+- Phase 2 has **not started**. No 24h soak time is backfilled. It starts only after A also passes Phase 1.
 
 ## Lane A
 
 Current packet: `V14-REAL-001-R` / `ART-V14-REAL-E2E`.
 
-- Branch tip: `cursor/v2-runtime-lane@11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`.
-- Exact-tip CI: `35615739781` **green**.
-- Latest source commit is coordination-only heartbeat/status support, not V14 implementation.
-- Independent worker-pc V14 materialization audit completed successfully as read-only diagnostic evidence. Lead review confirmed the generic parser/materialization mismatch and ambiguous empty-diff reporting; `ART-V14-REAL-E2E` remains drafting.
-- Autonomous self-launch proof: **not yet proven**. The earlier `OPS-AUTO-001-R` repair was human-prompted and does not count.
+- Tip: `cursor/v2-runtime-lane@11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`.
+- Exact-tip CI: `35615739781` green.
+- No V14 repair/rerun source push is visible yet.
+- The read-only materialization audit remains diagnostic: fix the generic raw-source/fenced-parser mismatch and no-op `implement_applied` classification, then run a new preregistered real mission on a different subsystem.
+- Autonomous self-launch + attributable source push: **not proven**.
 
 ## Lane B
 
-Current packet: `B-OPS-AUTO-SYNC-02` / `ART-OPS-AUTONOMOUS-WORKERS`.
+Current packet: `V2B-002` / `ART-V13-REVIEWER-QUALIFICATION`.
 
-- Branch tip: `cursor/v2-product-lane@a908a0e1ff023743892ecb10cfb7bd8df4b53d53`.
-- Exact-tip CI: `35615750755` **red** in the offline job at Ruff; console lint/test/build is green.
-- No generation-4 autonomous implementation push is visible yet.
-- After runner sync: `V2B-000`, then final executable G13 packet `V2B-001-R4` on Windows B.
+- Tip: `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`.
+- Exact-tip CI: `35625964121` **green**.
+- `V2B-001-R4` was independently reviewed and `ART-V13-TASK-POOL` is now **verified/frozen** as `g13-pool-freeze-v3`: 240 held-out inputs, 15 genuinely distinct semantic archetypes in every required family/size cell, fail-closed sibling checks, input-only worker-visible records, and `counted_qualification_ready=false`.
+- The active B implementation session reported Linux while using the HOST-WIN-DEV identity. This is acceptable for the platform-neutral G13 contract plus exact-tip CI, but it is **not Windows-specific evidence**.
+- Assignment advanced to `B-RESET-BATCH-05` generation 5 with exactly one safe packet, `V2B-002`, so generation-4 work cannot replay and a genuine repo-driven self-launch can be observed.
+- Counted W-131B product qualification remains blocked until a real lead-controlled sealed-reference bundle content digest is bound.
 
 ## Lane C
 
-Completed:
-- `swarmai-v14-materialization-audit-01`: result status `success`, finished `2026-09-21T15:09:06Z`; read-only, so no branch/commit was expected. Lead independently reviewed it as useful diagnostic evidence only.
-
-Current:
-- `swarmai-v13-task-pool-freeze-07`, dispatch commit `3a69e1f5937b99b4f1e9a2d98b634d69a3900a94`, workflow `35616363073`: **in progress**.
-- Base: `worker/swarmai-v13-task-pool-freeze-06@f7800332594d67c8b872b3597abd59f35987a2a0`.
-- No retry-07 result JSON or SwarmAI worker branch exists yet, so there is nothing to accept or integrate.
-- Retry-07 is support/reference evidence only; Windows B remains final executable owner of `ART-V13-TASK-POOL`.
+- Retry-07 result is real: `worker/swarmai-v13-task-pool-freeze-07@02cd0a2ea23342c331e83efd78b7682617dd16d3`, one commit above retry-06, G13-scoped, Actions `35625433324` green. It is useful support only and is not integrated over the authoritative local-B v3 implementation.
+- New task `swarmai-v13-task-pool-v3-audit-01` was dispatched read-only from remote-workers commit `31b0234a93fe2043b250af91a0f97c6b8561504d`; workflow `35629554863` is in progress. It is an adversarial static audit of exact B tip `5344763`, not an acceptance owner.
 
 ## Latest reviews
 
-- `ART-V14-REAL-E2E`: worker-pc diagnostic audit = **useful / no lifecycle transition**. Generic repair remains Lane A owned.
-- `ART-V13-TASK-POOL`: retry-06 = **changes required**; only 5 genuine semantic archetypes/cell and exact-tip ordinary offline pytest red. Counted W-131B qualification remains prohibited.
-- `ARTIFACT_REGISTRY.json` was inspected first this run. No independently verified artifact lifecycle transition is justified.
+- `ART-V13-TASK-POOL`: **drafting -> verified/frozen** at `534476393257794c4e8ebf8d65f44fd090ab28eb`; lead review recorded in `docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md`.
+- `ART-V14-REAL-E2E`: remains drafting; generic repair/rerun still required.
+- `ART-OPS-AUTONOMOUS-WORKERS`: remains drafting; B had an autonomous launch that exited without a source push, and generation-4 completed source work was human-prompted. A also lacks qualifying self-launch evidence.
 
-## Top next actions
+## Top 3 next actions
 
-1. Refresh/verify the current heartbeat + autonomous-worker installations on both local hosts so the 5m stress test and repo-assigned queues actually execute.
-2. A self-launches `V14-REAL-001-R`, pushes the generic materialization repair, then runs the preregistered new real brokered mission; lead reviews before `V2A-003c` advances.
-3. B self-launches `B-OPS-AUTO-SYNC-02`, restores exact-tip coordination-source CI, then `V2B-000` and `V2B-001-R4`; lead freezes G13 only after executable local verification.
+1. Restore/register A's reset-aware heartbeat + autonomous daemon; then A self-launches `V14-REAL-001-R` and requests review.
+2. Let B generation 5 self-launch `V2B-002`; review/freeze the reviewer calibration benchmark before any reviewer held-out run.
+3. Lead authors/binds a real sealed-reference bundle for frozen `g13-pool-freeze-v3`; only then may W-131B counted product qualification begin.
 
 ## Human action
 
-The current evidence strongly indicates stale host scheduler/daemon installations rather than a repository contract problem.
+**HOST-MAC-DEV only:** the ledger is active but is clearly coming from a stale/reset-unaware publisher because it never registered the new epoch and does not update `status/HOST-MAC-DEV.md`.
 
-On HOST-MAC-DEV from the current runtime checkout:
+From the current `cursor/v2-runtime-lane` checkout, refresh the branch and reinstall the repo-defined services:
 
 ```bash
+git fetch origin
+git checkout cursor/v2-runtime-lane
+git pull --ff-only
 bash scripts/coordination/install_heartbeat_macos.sh
 bash scripts/coordination/install_autonomous_worker_macos.sh
 ```
 
-On HOST-WIN-DEV from the current product checkout:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1
-powershell -ExecutionPolicy Bypass -File scripts\coordination\install_autonomous_worker_windows.ps1
-```
-
-If an autonomous-worker installer reports Cursor CLI authentication missing, run `agent login`, complete only required login/MFA/consent, and rerun that installer. No paid provider action is required for these local packets.
+The fresh lane must publish `status=session_started` with note containing `session_epoch=reset-20260921-new-lanes-01` before scheduler receipts can count. If the autonomous installer reports missing Cursor CLI authentication, run `agent login`, complete only the required login/MFA/consent, then rerun the installer.
