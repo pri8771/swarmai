@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "session_id": "CURSOR-V17-SINGLE",
+  "session_epoch": "single-v17-20260921-01",
+  "branch": "cursor/v17-single-session",
+  "branch_sha": null,
+  "coordination_sha": null,
+  "timestamp_utc": null,
+  "trigger": "bootstrap",
+  "status": "awaiting_session_start",
+  "current_packet": "BOOTSTRAP",
+  "current_artifact": "cross-version",
+  "short_note": "Single Cursor implementation session authorized; heartbeat producer not yet registered.",
+  "last_meaningful_activity_at": null,
+  "blocker": null,
+  "spend_usd": 0
+}
