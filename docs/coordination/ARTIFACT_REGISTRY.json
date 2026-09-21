@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T02:40:00Z",
+  "updated_at": "2026-09-21T02:45:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -390,9 +390,10 @@
         "docs/artifacts/current/ART-V12-REMOTE-ADMISSION-RESEARCH.md"
       ],
       "worker_packets": [
-        "W-121A"
+        "W-121A",
+        "V12-REMOTE-ADMIT-01"
       ],
-      "next_action": "fresh exact-route account/tier/zero-charge/quota/health evidence for >=2 remotes",
+      "next_action": "Run account-specific admission for exact zero-charge OpenRouter/Groq/Gemini candidate routes; public docs alone never admit; then promote at least two exact remotes for G12 overlap.",
       "blockers": [
         "0 admissible remote routes"
       ]
@@ -424,10 +425,11 @@
         "ART-V12-BROKER-CONTRACT"
       ],
       "worker_packets": [
-        "W-121B"
+        "W-121B",
+        "V12-REMOTE-ADMIT-01"
       ],
       "story_points_next": 3,
-      "next_action": "execute only after two exact remote routes are independently admitted",
+      "next_action": "First admit two exact remote routes with account/tier/model/quota/health/zero-charge proof, then execute overlapping governed calls and reconciliation.",
       "blockers": [
         "0 admissible remote routes"
       ]
@@ -498,7 +500,7 @@
         "V2B-001"
       ],
       "story_points_next": 2,
-      "next_action": "Session B freeze calibration vs held-out IDs/hashes and scorer/prompt/tool/model identities",
+      "next_action": "Critical path: freeze calibration vs held-out identities immediately after B0 sync; lead reviews before any counted qualification.",
       "blockers": []
     },
     {
@@ -534,7 +536,7 @@
         "W-131B"
       ],
       "story_points_next": 2,
-      "next_action": "after task-pool freeze, run five-observation held-out batches only under frozen criterion",
+      "next_action": "Critical path: begin counted held-out five-observation batches immediately after task-pool freeze; continue until required cells qualify or honestly block.",
       "blockers": [
         "ART-V13-TASK-POOL not frozen",
         "no n>=15 qualified cell"
@@ -570,10 +572,11 @@
       ],
       "worker_packets": [
         "W-131C2",
-        "V2B-002"
+        "V2B-002",
+        "G13-REVIEWER-HELDOUT"
       ],
       "story_points_next": 3,
-      "next_action": "calibration-only benchmark/scorer repair, freeze benchmark, then held-out reviewer qualification",
+      "next_action": "Calibration-only scorer/benchmark repair+freeze, then held-out reviewer-role qualification before G14.",
       "blockers": [
         "current review screening not promotable"
       ]
@@ -767,7 +770,7 @@
       "owner": "Cursor Session A + ChatGPT lead",
       "lane": "runtime",
       "status": "drafting",
-      "path_or_source_ref": "cursor/v2-runtime-lane@e764834a69315d1c2c85f00322c3392aa5037fd9",
+      "path_or_source_ref": "cursor/v2-runtime-lane@685810cc84d17594fa54a168c1d23b8463dc0871",
       "dependencies": [
         "ART-V15-WORKER-PROTOCOL",
         "ART-V15-DURABLE-SCHEMA"
@@ -781,7 +784,7 @@
         "V2A-003b-R2"
       ],
       "story_points_next": 1,
-      "next_action": "V2A-003b-R2: reject terminal task/attempt on renew and make expiry compare lease/attempt revision/source/cancellation authority before requeue; then lead review; V2A-003c still required.",
+      "next_action": "Lead source review of V2A-003b-R2 found requested terminal/expiry fences present; await exact-tip CI/review closure, then V2A-003c result acceptance fence.",
       "blockers": [
         "renewal does not yet explicitly fence terminal/incompatible task or attempt state",
         "expiry reconciliation is task-only and can miss lease/attempt source/revision/cancellation drift",
@@ -796,9 +799,10 @@
         "tests/workers/test_workers.py",
         "docs/evidence/v15/v2a003a-r-lease-foundation-repair.json @ 8e2c9754c9f64aa0e68e4fe5de47d646713a5413",
         "V2A-003b-R source e764834a69315d1c2c85f00322c3392aa5037fd9",
-        "V2A-003b-R evidence c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6; focused suite 52 passed; lead changes-required"
+        "V2A-003b-R evidence c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6; focused suite 52 passed; lead changes-required",
+        "V2A-003b-R2 evidence 391e8ea217c792cca19de4a2409d06e427c15866; 56 focused tests"
       ],
-      "notes": "003a-R foundation repair verified. 003b-R materially improved claim/renew/expire but independent lead source review still requires terminal task/attempt renewal fences plus lease/attempt-bound expiry authority before this slice is reviewable."
+      "notes": "003a-R foundation repair verified. 003b-R materially improved claim/renew/expire but independent lead source review still requires terminal task/attempt renewal fences plus lease/attempt-bound expiry authority before this slice is reviewable. V2A-003b-R2 submitted with terminal task/attempt renewal fences and lease/attempt-stamped expiry authority; 56 focused tests. Full artifact remains drafting pending lead closure + V2A-003c."
     },
     {
       "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
