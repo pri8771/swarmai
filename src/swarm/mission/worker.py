@@ -76,17 +76,60 @@ def _run_cmd(cwd: Path, cmd: list[str], *, timeout: float = 120.0) -> dict[str, 
     }
 
 
+def _looks_like_python_source(text: str) -> bool:
+    """Heuristic for full-file Python responses (no Markdown required)."""
+    s = text.lstrip()
+    if not s:
+        return False
+    starts_ok = s.startswith(
+        (
+            '"""',
+            "'''",
+            "#",
+            "from ",
+            "import ",
+            "def ",
+            "class ",
+            "async def ",
+            "@",
+            "#!/",
+        )
+    )
+    if not starts_ok:
+        return False
+    return any(token in s for token in ("def ", "class ", "import ", "from "))
+
+
+def _normalize_python_source(text: str) -> str:
+    body = text.strip() + "\n"
+    return body
+
+
 def _extract_python_file(text: str) -> str | None:
-    fence = re.search(r"```(?:python)?\n(.*?)```", text, re.S)
+    """Extract full-file Python from a model response.
+
+    Accepts Markdown fences or raw source matching the implement prompt contract
+    ("Return ONLY the full corrected file contents"). Fixture-specific
+    ``inclusive_range_count`` recovery remains for the dogfood sample only.
+    """
+    if not text or not str(text).strip():
+        return None
+    raw = str(text)
+    fence = re.search(r"```(?:python)?\n(.*?)```", raw, re.S)
     if fence:
-        return fence.group(1).strip() + "\n"
-    if "def inclusive_range_count" in text and "return" in text:
-        # Best-effort: take from module docstring/import through end.
-        start = text.find('"""')
+        body = _normalize_python_source(fence.group(1))
+        return body if _looks_like_python_source(body) else None
+    stripped = raw.strip()
+    if _looks_like_python_source(stripped):
+        return _normalize_python_source(stripped)
+    if "def inclusive_range_count" in raw and "return" in raw:
+        # Fixture-only best-effort: take from module docstring/import through end.
+        start = raw.find('"""')
         if start < 0:
-            start = text.find("def inclusive_range_count")
+            start = raw.find("def inclusive_range_count")
         if start >= 0:
-            return text[start:].strip() + "\n"
+            body = _normalize_python_source(raw[start:])
+            return body if _looks_like_python_source(body) else None
     return None
 
 
@@ -435,12 +478,39 @@ class RepoWorker:
             return result, handle
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(patched, encoding="utf-8")
+        # Material git diff is the sole authority for "work changed". In-memory
+        # inequality or a write attempt must never count as success alone.
         diff = worktree_diff(handle)
+        if not diff.strip():
+            if patched != original and target.exists():
+                target.write_text(original, encoding="utf-8")
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_no_material_diff",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "used_model_fallback": used_fallback,
+                    "known_answer_forbidden": True,
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "target_file": str(target_rel),
+                    "noop_or_untracked": patched == original,
+                    "model_output_excerpt": (inference.text or "")[:500],
+                },
+                inference=inference.to_dict(),
+                cost_usd=inference.cost_usd,
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
         result = WorkerResult(
             worker_id=self.worker_id,
             task_id=task.id,
             task_family="implement",
-            ok=bool(diff.strip()) or patched != original,
+            ok=True,
             summary="implement_applied",
             artifacts={
                 "worktree": handle.to_dict(),
@@ -527,6 +597,9 @@ class RepoWorker:
         if banned:
             decision = "reject"
             reasons.append("secret_like_content_in_diff")
+        if not diff.strip():
+            decision = "reject"
+            reasons.append("no_material_diff")
         if verify is None or not verify.ok:
             decision = "reject"
             reasons.append("verification_failed")
