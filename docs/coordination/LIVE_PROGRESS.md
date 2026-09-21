@@ -1,55 +1,52 @@
 # SwarmAI live progress
 
-Updated by lead: 2026-09-21T17:15:00Z
+Updated: 2026-09-21
 
 ## Current operating model
 
-Exactly two fresh implementation sessions are authorized.
+Exactly ONE implementation session is authorized.
 
-| Lane | Owner | Assignment | Current work |
-|---|---|---|---|
-| A | Mac / Cursor | A-TWO-LANE-01 gen 6 | V14-REAL-001-R -> V2A-003c |
-| B | Windows / Cursor | B-TWO-LANE-01 gen 6 | V2B-002 reviewer calibration/freeze |
-| Lead | ChatGPT | project authority | review, assignments, acceptance, integration, heartbeat state |
-| Background | worker-pc / Claude | lead-controlled only | independent audit/support; not a user-managed lane |
+| Role | Identity | Scope |
+|---|---|---|
+| Implementation | CURSOR-V17-SINGLE | Current truth -> V1.7 implementation-complete/reviewable candidate |
+| Heartbeat | CURSOR-V17-SINGLE | Exactly one 5-minute scheduled producer |
+| Operator | owner | Final authority |
+| ChatGPT | downstream planning/review helper | V1.6-V3.0 planning; not a competing implementation lane |
 
-All prior interactive sessions are closed history.
+Implementation branch: `cursor/v17-single-session`.
+
+Legacy A/B autonomous assignments are disabled. Historical branches remain donor/evidence branches only.
 
 ## Heartbeat
 
-Active epoch: `reset-20260921-two-lanes-02`.
+Protocol: `SINGLE_SESSION_HEARTBEAT.md`
 
-Both fresh lanes start at **0/3**.
-Only scheduler heartbeats after each lane explicitly registers this epoch count.
+- one session;
+- one heartbeat stream;
+- cadence: 5 minutes while active;
+- no two-lane stress test;
+- no 24-hour heartbeat soak;
+- heartbeat is progress/liveness evidence, not artifact acceptance.
 
-Phase 1:
-- effective cadence 5 minutes
-- need 3 consecutive scheduler receipts per lane
-- valid gap 3–8 minutes
+Current ledger:
+- `heartbeats/CURSOR-V17-SINGLE.json`
+- `status/CURSOR-V17-SINGLE.md`
 
-After both pass:
-- Phase 2 starts at 15-minute cadence
-- real 24-hour soak
-- no backfill
+## Current project position
 
-Old/stale scheduler processes may still publish to historical ledgers, but they do not count unless they inherit the fresh epoch registration.
+Canonical truth remains `ARTIFACT_REGISTRY.json`.
 
-## Project position
+Known critical work entering this run:
+- V1.3 reviewer/counted qualification machinery still needs closure/evidence;
+- V1.4 genuine E2E materialization repair/rerun remains;
+- V1.5 durable result acceptance/worker service/multi-host evidence remains;
+- V1.6 and V1.7 are implementation-ready after/alongside dependency-safe lower work;
+- V1.2 remote overlap still requires real account-specific zero-charge provider admission before live acceptance.
 
-- V1.1 verified artifact set.
-- V1.2 local broker/fallback/admission reconciliation verified; remote overlap still blocked at 0 admitted remote routes.
-- V1.3 task pool is now **verified/frozen** at `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`; reviewer qualification and counted qualification remain.
-- V1.4 real E2E remains drafting; first genuine run failed on generic materialization/no-diff and must be repaired/rerun.
-- V1.5 claim/renew/expire fencing is accepted; durable result acceptance V2A-003c remains.
-- V2.0 integrated candidate and elapsed reliability/security/performance/install evidence remain incomplete.
+## Forward planning
 
-## Next critical path
+Future design/task planning is prepared in:
+- `V16_TO_V30_FORWARD_PLAN_20260921.md`
+- `V16_TO_V30_TASK_BACKLOG_20260921.md`
 
-1. Fresh A repairs/reruns V14 real E2E.
-2. Fresh B freezes reviewer benchmark/calibration.
-3. Lead binds real sealed G13 references, then issues counted qualification.
-4. A completes V2A-003c and durable worker service.
-5. G12 admits two exact zero-charge remote routes and proves overlap.
-6. Continue V1.6/V1.7 then V1.8/V1.9/V2.0 integration and real acceptance.
-
-No main merge, public release/deploy or additional spend is authorized.
+No main merge, public release/deploy, force push, or additional spend is authorized.
