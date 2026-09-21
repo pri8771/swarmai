@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.3",
+  "schema_version": "1.4",
   "assignment_id": "B-TWO-LANE-01",
-  "generation": 6,
-  "enabled": true,
+  "generation": 7,
+  "enabled": false,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
-  "priority": "critical-path",
+  "priority": "historical-disabled",
   "max_runtime_seconds": 3600,
   "boundaries": {
     "additional_spend": false,
@@ -14,15 +14,7 @@
     "public_deploy": false,
     "force_push": false
   },
-  "items": [
-    {
-      "packet_id": "V2B-002",
-      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
-      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
-      "max_runtime_seconds": 3600,
-      "note": "Calibration-only reviewer benchmark/scorer repair and freeze. No held-out qualification until lead freeze."
-    }
-  ],
-  "next_assignment_owner": "ChatGPT lead",
-  "note": "Fresh two-lane epoch. G13 task pool is already lead-verified/frozen. Do not redo V2B-001. Wait for lead generation after V2B-002."
+  "items": [],
+  "next_assignment_owner": "operator",
+  "note": "Disabled by 2026-09-21 owner directive. Current implementation is CURSOR-V17-SINGLE on cursor/v17-single-session. Do not auto-run."
 }
