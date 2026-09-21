@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `218a3fd40bab965499613fa26fe35ed2c28ab0fc`
-- Coordination SHA: `88ca637ab95f241b2ade6af2a546fc1ede168056`
-- Updated: `2026-09-21T18:49:45Z`
-- Trigger: `manual`
+- Coordination SHA: `4da41ff385580df66fd5f76e3de8706ab218c001`
+- Updated: `2026-09-21T18:53:33Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `V2B-003a`
 - Current artifact: `ART-V16-DURABLE-SCHEMA`
