@@ -4,19 +4,19 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `ed0888046a07b0d7fb422d4e1b58f1950869debf`
-- Coordination SHA: `0a64f3f295155dae408ea06adecf78dbb6722a14`
-- Updated: `2026-09-21T18:17:57Z`
-- Trigger: `scheduler`
+- Coordination SHA: `bf4d0ad78a0abedffbd7ad3b8c850e40c0a7a74e`
+- Updated: `2026-09-21T18:19:08Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `BOOTSTRAP+A1/A2`
-- Current artifact: `ART-V13-TASK-POOL,ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T18:17:21Z`
+- Current packet: `A1-G13-HONESTY`
+- Current artifact: `ART-V13-TASK-POOL`
+- Last meaningful activity: `2026-09-21T18:19:07Z`
 - Spend USD: `0.0`
-- Blocker: none
+- Blocker: HOST-WIN-DEV final executable verification unavailable on this Darwin host
 
 ## Update
 
-Baseline green: ruff pass, mypy 139 files clean, offline pytest 53 passed. Next: G13 Mac honesty blocker + V14 materialization repair. Legacy HOST-MAC runner dir renamed disabled.
+G13 honesty: reconciled STATE.json task_pool to registry reviewable; Darwin session cannot satisfy HOST-WIN-DEV executable verification; sealed-ref/W-131B still blocked. Parallel V14 materialization WIP present. LIVE_PROGRESS refreshed.
 
 ## Next
 
