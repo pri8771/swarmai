@@ -5,6 +5,31 @@ Status: PLANNING ONLY
 
 These are intentionally NOT decided by prep work. Each has a latest-safe decision point and evidence required.
 
+## Decisions raised by the V1.7 depth audit (Fable planning pass, 2026-09-21)
+
+Each has a fail-closed default already written into the packet specs so work is not blocked; the lead may change the default before the named freeze point.
+
+### D17-01 Does "V1.7 implementation-complete" require operational wiring?
+Default: **yes**. A subsystem no mission can reach is `implementation` but not `wired` (claim ladder, master plan 0.2). Cemented decision 3 and ART-V20-INTEGRATION-CONTRACT ("no duplicate persistence authorities") already imply it. Freeze: before `R34b`.
+
+### D17-02 Must leased execution (`R17b`/`R17c`) land before the V1.7 handoff or may it move to `20-01`?
+Default: before the handoff, because CP6 claims durable workers. Alternative: move both to V2.0 integration and label V1.5 `wired: standalone` in CP6. Freeze: before `R34a`.
+
+### D17-03 `reconciled` as an effect state
+The accepted schema lists `reconciled` as a state. Specs keep terminal states `succeeded`/`failed` and record reconciliation in `reconciled_at` + receipt `reconciliation_state`, so "was it applied?" stays a single-column question. Freeze: before `R27e` review.
+
+### D17-04 Is real-HTTP cookie-session evidence enough for ART-V17-SESSION-RECOVERY?
+The registry kind is `live-browser-evidence`; CP5 says "browser-like". Default: real HTTP sessions satisfy V1.7 live-checkpointed; a real browser engine would be a new dependency and, if required, becomes a separate external-pending evidence item. Freeze: before `R33b`.
+
+### D17-05 G13 Windows verification
+Recovery plan R04 argues semantic corpus verification is platform-neutral; the registry still requires HOST-WIN-DEV. Only lead governance can change that. Freeze: whenever the lead next updates the registry (gate `EXT-G13-WIN-VERIFY`).
+
+### D16-01 Are permission-denied counts visible to the requesting actor?
+`RetrievalReceipt.omitted_reason_counts` includes `permission_denied`, which reveals that hidden items exist. Default in `R25a`: the actor-visible bundle carries only `budget_truncated` and `ranked_out`; the full counts stay in the audit receipt. Freeze: before `R25b`.
+
+### D20-02 May `20-05`/`20-07` run on the reliability-campaign deployment?
+Needed by `20-08a`. Default: separate deployment of the same frozen candidate unless the protocol declares the load windows up front.
+
 ## D18-01 SiteEpoch fencing authority mechanism
 
 Need:
