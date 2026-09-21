@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T06:51:13Z",
+  "updated_at": "2026-09-21T07:51:25Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -29,25 +29,25 @@
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T06:29:17+00:00",
+      "last_heartbeat_at": "2026-09-21T07:44:17+00:00",
       "consecutive_valid_15m": 2,
       "verified_timestamps": [
-        "2026-09-21T06:14:26+00:00",
-        "2026-09-21T06:29:17+00:00"
+        "2026-09-21T07:29:17+00:00",
+        "2026-09-21T07:44:17+00:00"
       ],
       "stale": false,
-      "status": "current scheduler streak 2/3 after the prior chain was broken by the 45-minute 05:29:17Z -> 06:14:26Z gap; fresh but not graduation-ready"
+      "status": "current scheduler streak 2/3 after the 06:29:17Z -> 07:29:17Z 60-minute gap broke the prior chain; fresh but not graduation-ready"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T06:51:13Z",
+    "last_review_at": "2026-09-21T07:51:25Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Only scheduler heartbeats count. A remains stale at 2/3. B's earlier streak was interrupted by a >25-minute gap; the current B streak is 2/3 from 06:14:26Z and 06:29:17Z. Global worker cadence therefore remains 15 minutes; ChatGPT lead remains hourly."
+    "note": "Only scheduler heartbeats count. A remains stale at 2/3. B has a fresh two-receipt chain at 07:29:17Z and 07:44:17Z after a 60-minute cadence break; global worker cadence therefore remains 15 minutes and ChatGPT lead remains hourly."
   },
   "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
   "notifications": {
