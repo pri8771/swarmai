@@ -3,7 +3,7 @@
   "artifact_id": "ART-V14-REAL-E2E",
   "run_id": "v14-real-007",
   "frozen_at": "2026-09-21T19:39:16Z",
-  "candidate_sha": "acd80b8c82634b0cf75afd63b53d5f6af5a17144",
+  "candidate_sha": "e2fca4c619977b021696189ff337bdf0378662a3",
   "checkpoint": "CP1",
   "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <context.py audit> --model qwen2.5-coder:14b --no-evidence-router",
   "selected_model": "qwen2.5-coder:14b",
