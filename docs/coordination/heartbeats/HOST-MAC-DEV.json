@@ -4,18 +4,18 @@
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T02:36:37+00:00",
+    "observed_at": "2026-09-21T02:40:04+00:00",
     "trigger": "manual",
     "host_alias": "HOST-MAC-DEV",
     "session_id": "A",
     "branch": "cursor/v2-runtime-lane",
-    "branch_sha": "b1a8eeeaf2235c02c12750a7a93a7dd713eabe92",
-    "coordination_sha": "0f45b54695768e9d0eb325721fd87b493cf4cdab",
+    "branch_sha": "d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42",
+    "coordination_sha": "4c6592dca19cf7d540e76664509ab58421b33a7f",
     "effective_cadence_minutes": 15,
     "packet_id": "V2A-003X",
     "artifact_id": "ART-V15-ARCH",
-    "status": "working",
-    "last_agent_activity_at": "2026-09-21T02:36:36+00:00",
+    "status": "review_requested",
+    "last_agent_activity_at": "2026-09-21T02:40:03+00:00",
     "note": null
   },
   "history": [
@@ -93,7 +93,22 @@
       "status": "working",
       "last_agent_activity_at": "2026-09-21T02:36:36+00:00",
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T02:40:04+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-MAC-DEV",
+      "session_id": "A",
+      "branch": "cursor/v2-runtime-lane",
+      "branch_sha": "d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42",
+      "coordination_sha": "4c6592dca19cf7d540e76664509ab58421b33a7f",
+      "effective_cadence_minutes": 15,
+      "packet_id": "V2A-003X",
+      "artifact_id": "ART-V15-ARCH",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T02:40:03+00:00",
+      "note": null
     }
   ],
-  "status": "working"
+  "status": "review_requested"
 }
