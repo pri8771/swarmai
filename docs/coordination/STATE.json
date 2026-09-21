@@ -1,13 +1,17 @@
 {
   "schema_version": "1.4",
-  "updated_at": "2026-09-21T03:12:30Z",
+  "updated_at": "2026-09-21T03:20:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "implementation_authorized_through": "3.0",
   "active_execution_target": "2.0_implementation_artifact_complete_candidate",
-  "major_milestones": ["1.7", "2.3", "3.0"],
+  "major_milestones": [
+    "1.7",
+    "2.3",
+    "3.0"
+  ],
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -106,17 +110,61 @@
     "ART-V15-DBOS-REUSE drafting->verified"
   ],
   "version_state": {
-    "1.0-repair": {"status":"not_accepted","blocker":"ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"},
-    "1.1": {"status":"required_artifacts_verified_set_not_promoted"},
-    "1.2": {"status":"not_accepted","broker_contract":"verified","provider_eligibility":"verified_zero_admissible_remotes","local_fallback":"verified","admission_reconciliation":"verified","admissible_remote_routes":0,"remote_overlap":"blocked"},
-    "1.3": {"status":"not_accepted_critical_path","protocol":"accepted_frozen","screening":"verified_72_provisional_n5_cells","task_pool":"drafting_not_frozen","qualified_cells":0,"reviewer_qualification":"drafting"},
-    "1.4": {"status":"not_accepted","real_e2e":"first_real_attempt_failed_usefully_repair_assigned","real_e2e_packet":"V14-REAL-001-R","role_manifest":"blocked_on_G13","live_adaptive":"blocked_on_G12_G13","LIVE142":"not_started"},
-    "1.5": {"status":"implementation_active","lease_fencing":"claim_renew_expire_R2_packet_accepted_result_acceptance_V2A-003c_ready","DBOS_reuse":"verified_partial_reuse_decision_no_production_adoption"},
-    "1.6": {"status":"implementation_ready_waiting_session_b"},
-    "1.7": {"status":"implementation_ready_waiting_session_b"},
-    "2.0": {"status":"implementation_target_active","integrated_candidate":"drafting_reviewed_baseline_001_002_only","foundation_hardening":"drafting_H6A_R_packet_accepted_other_items_remaining","reliability_protocol":"drafting_advanced_no_elapsed_time_claimed"},
-    "2.3": {"status":"lead_architecture_drafting"},
-    "3.0": {"status":"lead_architecture_drafting"}
+    "1.0-repair": {
+      "status": "not_accepted",
+      "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"
+    },
+    "1.1": {
+      "status": "required_artifacts_verified_set_not_promoted"
+    },
+    "1.2": {
+      "status": "not_accepted",
+      "broker_contract": "verified",
+      "provider_eligibility": "verified_zero_admissible_remotes",
+      "local_fallback": "verified",
+      "admission_reconciliation": "verified",
+      "admissible_remote_routes": 0,
+      "remote_overlap": "blocked"
+    },
+    "1.3": {
+      "status": "not_accepted_critical_path",
+      "protocol": "accepted_frozen",
+      "screening": "verified_72_provisional_n5_cells",
+      "task_pool": "drafting_not_frozen",
+      "qualified_cells": 0,
+      "reviewer_qualification": "drafting"
+    },
+    "1.4": {
+      "status": "not_accepted",
+      "real_e2e": "first_real_attempt_failed_usefully_repair_assigned",
+      "real_e2e_packet": "V14-REAL-001-R",
+      "role_manifest": "blocked_on_G13",
+      "live_adaptive": "blocked_on_G12_G13",
+      "LIVE142": "not_started"
+    },
+    "1.5": {
+      "status": "implementation_active",
+      "lease_fencing": "claim_renew_expire_R2_packet_accepted_result_acceptance_V2A-003c_ready",
+      "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"
+    },
+    "1.6": {
+      "status": "implementation_ready_waiting_session_b"
+    },
+    "1.7": {
+      "status": "implementation_ready_waiting_session_b"
+    },
+    "2.0": {
+      "status": "implementation_target_active",
+      "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
+      "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
+      "reliability_protocol": "drafting_advanced_no_elapsed_time_claimed"
+    },
+    "2.3": {
+      "status": "lead_architecture_drafting"
+    },
+    "3.0": {
+      "status": "lead_architecture_drafting"
+    }
   },
   "session_a_next": [
     "V14-REAL-001-R / ART-V14-REAL-E2E / SP2",
@@ -134,6 +182,7 @@
     "continue V2.3/V3 architecture without stealing routine worker implementation"
   ],
   "open_blockers": [
+    "ART-OPS-AUTONOMOUS-WORKERS requires one-time Cursor CLI auth/install of daemon on Mac A and Windows B",
     "A coordination scheduler proof stale at 1/3; corrected client reinstall required",
     "B coordination scheduler proof stale at 0/3; no scheduler receipt; reinstall/diagnostics required",
     "ART-V10 authenticated Cursor-agent evidence blocked on cursor agent authentication",
@@ -150,5 +199,37 @@
     "isolated_tests_count_as_live": false,
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
+  },
+  "autonomous_workers": {
+    "protocol": "docs/coordination/AUTONOMOUS_WORKER_PROTOCOL.md",
+    "status": "repo_implementation_ready_host_install_pending",
+    "poll_seconds": 60,
+    "active_hosts": {
+      "A": {
+        "host": "HOST-MAC-DEV",
+        "branch": "cursor/v2-runtime-lane",
+        "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
+        "queued_packets": [
+          "V14-REAL-001-R",
+          "V2A-003c"
+        ],
+        "daemon_install": "scripts/coordination/install_autonomous_worker_macos.sh",
+        "proven": false
+      },
+      "B": {
+        "host": "HOST-WIN-DEV",
+        "branch": "cursor/v2-product-lane",
+        "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
+        "queued_packets": [
+          "V2B-000",
+          "V2B-001",
+          "V2B-002"
+        ],
+        "daemon_install": "scripts/coordination/install_autonomous_worker_windows.ps1",
+        "proven": false
+      }
+    },
+    "lead_behavior": "After every independent review, update canonical artifacts first, then advance assignment file generation/queue so workers can self-wake and continue.",
+    "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
   }
 }
