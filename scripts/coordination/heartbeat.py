@@ -164,6 +164,12 @@ def render_status(entry: dict) -> str:
     packet = entry.get("current_packet") or "none"
     artifact = entry.get("current_artifact") or "none"
     activity = entry.get("last_meaningful_activity_at") or "none recorded"
+    next_action = entry.get("next_action") or (
+        "Await independent lead review; session implementation scope complete through V1.7; "
+        "no V1.8+ unless operator expands scope."
+        if entry.get("status") == "review_requested"
+        else "Continue single-session work toward V1.7 implementation-complete/reviewable candidate."
+    )
     return f"""# CURSOR-V17-SINGLE status
 
 - Session: `{entry["session_id"]}`
@@ -186,7 +192,7 @@ def render_status(entry: dict) -> str:
 
 ## Next
 
-Continue single-session queue toward V1.7 implementation-complete/reviewable candidate.
+{next_action}
 """
 
 
@@ -236,6 +242,7 @@ def main() -> int:
     p.add_argument("--status")
     p.add_argument("--note")
     p.add_argument("--blocker")
+    p.add_argument("--next-action")
     p.add_argument("--spend-usd", type=float)
     p.add_argument("--force", action="store_true")
     p.add_argument("--skip-state-update", action="store_true")
@@ -255,6 +262,7 @@ def main() -> int:
                 "status": "working",
                 "short_note": None,
                 "blocker": None,
+                "next_action": None,
                 "spend_usd": 0,
                 "last_meaningful_activity_at": None,
             },
@@ -269,11 +277,21 @@ def main() -> int:
             context["short_note"] = args.note[:400]
         if args.blocker is not None:
             context["blocker"] = args.blocker[:400] if args.blocker else None
+        if args.next_action is not None:
+            context["next_action"] = args.next_action[:400] if args.next_action else None
         if args.spend_usd is not None:
             context["spend_usd"] = float(args.spend_usd)
         if any(
             v is not None
-            for v in (args.packet, args.artifact, args.status, args.note, args.blocker, args.spend_usd)
+            for v in (
+                args.packet,
+                args.artifact,
+                args.status,
+                args.note,
+                args.blocker,
+                args.next_action,
+                args.spend_usd,
+            )
         ):
             context["last_meaningful_activity_at"] = utc_now()
             write_json_private(context_path, context)
@@ -328,6 +346,9 @@ def main() -> int:
             "short_note": (
                 str(context.get("short_note"))[:400] if context.get("short_note") else None
             ),
+            "next_action": (
+                str(context.get("next_action"))[:400] if context.get("next_action") else None
+            ),
             "last_meaningful_activity_at": context.get("last_meaningful_activity_at"),
             "blocker": context.get("blocker"),
             "spend_usd": context.get("spend_usd", 0),
@@ -352,6 +373,7 @@ def main() -> int:
             "current_packet": entry["current_packet"],
             "current_artifact": entry["current_artifact"],
             "short_note": entry["short_note"],
+            "next_action": entry.get("next_action"),
             "last_meaningful_activity_at": entry["last_meaningful_activity_at"],
             "blocker": entry["blocker"],
             "spend_usd": entry["spend_usd"],
