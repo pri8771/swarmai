@@ -107,3 +107,17 @@ Primary responsibilities:
 - later regression reproduction against reviewed integration snapshots.
 
 Session C must not become a general production implementation lane. By default it owns tests/scripts/spikes/evidence only. If a test reveals a production defect, hand it to Session A or B.
+
+
+## Session C activation policy
+
+The verification branch `cursor/v2-verification-lane` exists as a reserve lane only.
+
+Do **not** start Session C merely because capacity exists. The default active team is:
+- ChatGPT lead/reviewer;
+- Cursor Session A on Mac;
+- Cursor Session B on Windows.
+
+ChatGPT handles verification, review, architecture and hard debugging directly while review capacity is healthy.
+
+Activate Session C only when there is a concrete independent packet that would otherwise become a bottleneck and that can be executed without creating extra integration/review overhead. Examples: a large isolated benchmark campaign, platform compatibility matrix, or a bounded spike that would materially delay A/B if done by the lead.
