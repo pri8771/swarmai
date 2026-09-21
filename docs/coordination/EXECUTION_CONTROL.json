@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Additive lead control over existing packet DAGs; not a second queue and not evidence of product completion",
+  "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
+  "goal_version": "3.0",
+  "initial_phase": "v17",
+  "implementation_branch": "cursor/v17-single-session",
+  "audited_source_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
+  "heartbeat_path": "heartbeats/CURSOR-V17-SINGLE.json",
+  "max_implementation_sessions": 1,
+  "max_heartbeat_producers": 1,
+  "dependency_additions": {
+    "R27e": ["R27d"],
+    "R28a": ["R27d"],
+    "R34a": ["R17c"],
+    "R34b": ["R33c", "R17c", "R27d"]
+  },
+  "execution_gates": {
+    "R07": ["EXT-G13-WIN-VERIFY", "EXT-G13-SEALED-DIGEST"],
+    "R10": ["EXT-G12-REMOTE-ROUTES"],
+    "R11": ["EXT-G13-WIN-VERIFY", "EXT-G13-SEALED-DIGEST", "EXT-G12-REMOTE-ROUTES"],
+    "R33c": ["EXT-V17-REALWORLD-GITHUB"]
+  },
+  "result_only_gates": ["EXT-V14-LEAD-REVIEW"],
+  "runtime_probe_gates": ["EXT-V17-REALWORLD-GITHUB"],
+  "review_before": {
+    "R27e": ["R27c"],
+    "R28a": ["R27e"]
+  },
+  "reviewed_packets": {},
+  "frozen_packets": [],
+  "rules": [
+    "Existing review holds remain mandatory; worker may prepare review bundles but may not invent reviews.",
+    "A ready label never overrides dependencies or execution prerequisites.",
+    "Evidence-only or review-pending can explain a historical code baseline, but cannot satisfy a live checkpoint.",
+    "Existing GitHub account use is authorized for R33c only after a fresh read-only host probe and exact action approvals; tool connectivity elsewhere is not local gh authentication.",
+    "Structural validate_plan.py output is not permission to execute. Apply execution_guard.py and packet/runtime checks.",
+    "Empty reviewed_packets and frozen_packets are intentional: this handoff does not preapprove future code or freeze unresolved acceptance thresholds.",
+    "Do not replace the artifact registry, duplicate the queues, or rewrite old evidence. Control only adds prerequisites.",
+    "A heartbeat tick is not progress; preserve the last real activity timestamp and inspect the actual worker or long-running test process."
+  ]
+}
