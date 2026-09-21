@@ -15,12 +15,11 @@
 - This setup run is also useful V1.9 clean-install/Windows portability evidence.
 - Later, after the durable worker protocol is reviewable, this host should become the first real second-host SwarmAI worker for V1.5 multi-host evidence.
 
-### HOST-MAC-VERIFY — Cursor Session C
-- Same physical Mac, but a **separate Git worktree** and branch.
-- Branch: `cursor/v2-verification-lane`, based on reviewed `cursor/v2-integration`.
-- Verification/reliability/security-negative/benchmark harnesses and isolated spikes only.
-- No default production-source ownership; discovered defects are handed to A/B.
-- Prompt: `CURSOR_MAC_VERIFICATION_PROMPT.md`.
+### Reserve verification branch
+- `cursor/v2-verification-lane` exists but is dormant.
+- Do not start a third Cursor session just because capacity exists.
+- Lead owns verification/review while review capacity is healthy.
+- Activate the reserve branch only for a concrete isolated bottleneck explicitly reassigned by the lead.
 
 Never share one working directory between sessions. Mac A and Mac C must use separate worktrees; Windows clones independently. Each pushes only its own lane.
 
@@ -95,19 +94,6 @@ Integration steps:
 Do not use a green lane CI result as proof the integrated tree is green.
 
 
-### Cursor Session C — Verification / Reliability / Spikes
-
-Branch: `cursor/v2-verification-lane`
-
-Primary responsibilities:
-- integrated broker/admission evidence revalidation;
-- isolated DBOS reuse spike;
-- security-negative harness;
-- V2 reliability/performance runner scaffold;
-- later regression reproduction against reviewed integration snapshots.
-
-Session C must not become a general production implementation lane. By default it owns tests/scripts/spikes/evidence only. If a test reveals a production defect, hand it to Session A or B.
-
 
 ## Session C activation policy
 
@@ -121,3 +107,15 @@ Do **not** start Session C merely because capacity exists. The default active te
 ChatGPT handles verification, review, architecture and hard debugging directly while review capacity is healthy.
 
 Activate Session C only when there is a concrete independent packet that would otherwise become a bottleneck and that can be executed without creating extra integration/review overhead. Examples: a large isolated benchmark campaign, platform compatibility matrix, or a bounded spike that would materially delay A/B if done by the lead.
+
+
+## Durable heartbeat coordination
+
+Active workers A and B use `HEARTBEAT_PROTOCOL.md`.
+
+- bootstrap worker publication cadence: 15 minutes;
+- 3 consecutive valid 15-minute heartbeats required for each active worker;
+- ChatGPT lead automation reviews hourly because the automation platform does not support sub-hour schedules;
+- after lead verifies both 3-heartbeat histories, worker effective publication cadence changes to hourly;
+- branch-local `SESSION_INSTRUCTIONS.md` tells each worker to install heartbeat and continuously pull coordination/claim next work;
+- heartbeat liveness must never be confused with implementation acceptance or FIX-004 authenticated Cursor-agent receipts.
