@@ -1,7 +1,7 @@
 {
   "schema_version": "1.2",
-  "assignment_id": "B-RESET-BATCH-04",
-  "generation": 4,
+  "assignment_id": "B-RESET-BATCH-05",
+  "generation": 5,
   "enabled": true,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
@@ -16,27 +16,13 @@
   },
   "items": [
     {
-      "packet_id": "B-OPS-AUTO-SYNC-02",
-      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-      "instruction_path": "docs/coordination/packets/B-OPS-AUTO-SYNC-02.md",
-      "max_runtime_seconds": 1800,
-      "note": "Synchronize reviewed runner repair while preserving Windows status/heartbeat features."
-    },
-    {
-      "packet_id": "V2B-000",
-      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-      "instruction_path": "docs/coordination/packets/V2B-000.md",
-      "max_runtime_seconds": 2400,
-      "note": "Sync reviewed integration baseline only and run Windows baseline."
-    },
-    {
-      "packet_id": "V2B-001-R4",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "instruction_path": "docs/coordination/packets/V2B-001-R4.md",
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "instruction_path": "docs/coordination/packets/V2B-002.md",
       "max_runtime_seconds": 3600,
-      "note": "Final executable remint/freeze with >=15 genuine semantic archetypes per required cell."
+      "note": "Calibration-only reviewer benchmark/scorer repair and freeze candidate. No held-out reviewer run and no W-131B product qualification."
     }
   ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Fresh execution-reset generation. Windows B is final G13 implementation/test owner. Do not start counted qualification until lead freezes ART-V13-TASK-POOL."
+  "note": "Generation 4 is closed and must not replay: B-OPS-AUTO-SYNC-02, V2B-000 and V2B-001-R4 were completed through human-prompted work; an autonomous V2B-001-R4 launch exited without a source push. Generation 5 intentionally exposes one dependency-safe critical-path packet so a genuine repo-driven self-launch can be observed. ART-V13-TASK-POOL is lead-frozen, but counted product qualification remains blocked until a real sealed-reference bundle content digest is bound."
 }
