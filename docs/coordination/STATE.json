@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T04:59:00Z",
+  "updated_at": "2026-09-21T05:00:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -54,15 +54,15 @@
     },
     "b": {
       "host": "HOST-WIN-DEV",
-      "streak": 5,
+      "streak": 6,
       "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T04:44:18Z",
+      "last_counted_scheduler_at": "2026-09-21T04:59:18Z",
       "verified": true,
       "stale": false,
       "status": "individual bootstrap cadence requirement met; waiting A for global graduation"
     },
     "graduated_to_hourly": false,
-    "note": "B individually satisfies the 3-heartbeat requirement. A is 2/3 and stale. Global worker publication cadence remains 15 minutes; ChatGPT lead remains hourly."
+    "note": "B individually satisfies the 3-heartbeat requirement with six consecutive scheduler receipts. A is 2/3 and stale. Global worker publication cadence remains 15 minutes; ChatGPT lead remains hourly."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -144,26 +144,8 @@
     "worker": "worker-pc",
     "worker_status": "online_capacity_1_active_retry",
     "attempts": [
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-01",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "V2B-001",
-        "dispatch_commit": "7e17163e7fc85455a8eb0180d3cb2173711dc978",
-        "dispatch_run": 35559390335,
-        "status": "cancelled_before_result_or_worker_branch",
-        "result_present": false,
-        "worker_branch_present": false
-      },
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-02",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "V2B-001",
-        "dispatch_commit": "4c5fe82f227fc80038a3ce9b1643305be48f09d9",
-        "dispatch_run": 35562827710,
-        "status": "in_progress_unreviewed",
-        "expected_worker_branch": "worker/swarmai-v13-task-pool-freeze-02",
-        "merge_authorized": false
-      }
+      {"task_id": "swarmai-v13-task-pool-freeze-01", "artifact_id": "ART-V13-TASK-POOL", "packet_id": "V2B-001", "dispatch_commit": "7e17163e7fc85455a8eb0180d3cb2173711dc978", "dispatch_run": 35559390335, "status": "cancelled_before_result_or_worker_branch", "result_present": false, "worker_branch_present": false},
+      {"task_id": "swarmai-v13-task-pool-freeze-02", "artifact_id": "ART-V13-TASK-POOL", "packet_id": "V2B-001", "dispatch_commit": "4c5fe82f227fc80038a3ce9b1643305be48f09d9", "dispatch_run": 35562827710, "status": "in_progress_unreviewed", "expected_worker_branch": "worker/swarmai-v13-task-pool-freeze-02", "merge_authorized": false}
     ],
     "next_action": "when retry 02 completes, inspect structured result, branch, diff scope and tests; update ARTIFACT_REGISTRY first and never auto-merge",
     "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
