@@ -4,19 +4,19 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `ed0888046a07b0d7fb422d4e1b58f1950869debf`
-- Coordination SHA: `a15c084787e9ebef3772aa7d549362ef21ce83d6`
-- Updated: `2026-09-21T18:16:46Z`
-- Trigger: `install`
-- Status: **session_started**
-- Current packet: `BOOTSTRAP`
-- Current artifact: `cross-version`
-- Last meaningful activity: `2026-09-21T18:16:45Z`
+- Coordination SHA: `485afdeaea8644267cced72a169a72c3faf6aafa`
+- Updated: `2026-09-21T18:17:22Z`
+- Trigger: `manual`
+- Status: **working**
+- Current packet: `BOOTSTRAP+A1/A2`
+- Current artifact: `ART-V13-TASK-POOL,ART-V14-REAL-E2E`
+- Last meaningful activity: `2026-09-21T18:17:21Z`
 - Spend USD: `0.0`
 - Blocker: none
 
 ## Update
 
-CURSOR-V17-SINGLE session_started; legacy A/B LaunchAgents stopped; exactly one v17 producer installed.
+Baseline green: ruff pass, mypy 139 files clean, offline pytest 53 passed. Next: G13 Mac honesty blocker + V14 materialization repair. Legacy HOST-MAC runner dir renamed disabled.
 
 ## Next
 
