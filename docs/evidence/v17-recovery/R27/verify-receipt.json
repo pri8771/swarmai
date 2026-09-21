@@ -1,0 +1,15 @@
+{
+  "packet_id": "R27",
+  "artifact_id": "ART-V17-APPROVAL-BINDING",
+  "status": "durable_effects_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a",
+  "verified_at": "2026-09-21T20:05:32Z",
+  "migration": "migrations/versions/a17effect004a0001_art_v17_durable_effects.py",
+  "alembic_head": "a17effect004a0001",
+  "tests": {
+    "command": "pytest -q tests/tools/test_v17_gateway_negatives.py -k effect/approval",
+    "result": "4 passed"
+  },
+  "note": "Durable approvals/effect reservations schema+gateway negatives on tip. No invent-accept."
+}
