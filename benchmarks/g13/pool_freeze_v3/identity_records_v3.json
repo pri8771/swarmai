@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "answer_key_policy": "closed denylist applied at every depth",
+    "record_count": 240,
+    "record_digest_algorithm": "sha256",
+    "record_digests_stored": false,
+    "record_key_authority": "swarm.evals.g13_prompt_v3.RECORD_KEY_ALLOWLIST",
+    "record_kind": "input_only",
+    "record_schema_version": "3.0",
+    "records_id": "g13-records-v3"
+  },
+  "spec_of": "records"
+}

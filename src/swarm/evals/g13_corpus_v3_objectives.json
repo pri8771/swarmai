@@ -1,0 +1,1002 @@
+{
+  "coding": {
+    "S": [
+      [
+        "bitstream_run_length",
+        "run-length encode a packed bitstream without a trailing empty run"
+      ],
+      [
+        "interval_label_fuse",
+        "fuse adjacent half-open integer intervals that share a label"
+      ],
+      [
+        "stable_top_k_select",
+        "select the k lowest scores with original-index stability"
+      ],
+      [
+        "balanced_paren_depths",
+        "report the maximum nesting depth of a balanced parenthesis string"
+      ],
+      [
+        "matrix_saddle_scan",
+        "find saddle values that are row minima and column maxima"
+      ],
+      [
+        "prefix_xor_queries",
+        "answer range xor queries using a prefix table"
+      ],
+      [
+        "anagram_bucket_join",
+        "group words that are letter-multiset anagrams of each other"
+      ],
+      [
+        "circular_buffer_wrap",
+        "implement wrap-around enqueue and dequeue for a fixed ring"
+      ],
+      [
+        "sparse_coo_add",
+        "add two coordinate-list sparse vectors and drop zeros"
+      ],
+      [
+        "edit_script_lcs",
+        "emit the shortest insert/delete script from a longest common subsequence"
+      ],
+      [
+        "monotonic_stack_span",
+        "compute next-greater distances using a monotonic stack"
+      ],
+      [
+        "binary_gcd_steps",
+        "count binary-gcd iterations for a pair of positive integers"
+      ],
+      [
+        "runway_slot_pack",
+        "pack variable-length jobs into the fewest non-overlapping slots"
+      ],
+      [
+        "gray_code_neighbors",
+        "list binary reflected gray-code neighbors of a bitstring"
+      ],
+      [
+        "median_of_two_sorted",
+        "find the median of two sorted arrays in logarithmic probes"
+      ]
+    ],
+    "M": [
+      [
+        "kahan_compensated_sum",
+        "sum floats with kahan compensation and report residual"
+      ],
+      [
+        "union_find_with_parity",
+        "union-find that tracks even/odd relation constraints"
+      ],
+      [
+        "aho_keyword_hits",
+        "report first-hit positions of several keywords in a haystack"
+      ],
+      [
+        "skyline_merge_buildings",
+        "merge building rectangles into a skyline contour"
+      ],
+      [
+        "tarjan_scc_labels",
+        "label strongly connected components with tarjan discovery"
+      ],
+      [
+        "fenwick_range_update",
+        "point-query a fenwick tree after range updates"
+      ],
+      [
+        "hungarian_min_cost",
+        "solve a square assignment problem for minimum cost"
+      ],
+      [
+        "suffix_array_lcp",
+        "build a suffix array and its lcp array for a string"
+      ],
+      [
+        "bloom_false_positive",
+        "estimate bloom-filter false-positive rate from bits and hashes"
+      ],
+      [
+        "convex_hull_monotone",
+        "compute a 2d monotone-chain convex hull"
+      ],
+      [
+        "dijkstra_k_shortest",
+        "enumerate k simple shortest paths in a nonnegative digraph"
+      ],
+      [
+        "sat_2cnf_implication",
+        "decide 2-sat via implication-graph sccs"
+      ],
+      [
+        "fft_polynomial_multiply",
+        "multiply two integer polynomials via fft convolution"
+      ],
+      [
+        "maxflow_dinic",
+        "compute maximum flow with dinic layered blocking flows"
+      ],
+      [
+        "persistent_segtree_kth",
+        "answer kth-order statistics on prefixes via persistence"
+      ]
+    ],
+    "L": [
+      [
+        "type_infer_hindley",
+        "infer principal types for a tiny let-polymorphic language"
+      ],
+      [
+        "bytecode_stack_verify",
+        "verify that a stack bytecode program never underflows"
+      ],
+      [
+        "css_specificity_sort",
+        "order css selectors by specificity then source order"
+      ],
+      [
+        "regex_nfa_simulate",
+        "simulate an explicit nfa and report match spans"
+      ],
+      [
+        "greengc_tri_color",
+        "run a tri-color mark-sweep over a heap snapshot"
+      ],
+      [
+        "ssa_phi_placement",
+        "place phi nodes for a single assignment form conversion"
+      ],
+      [
+        "wasm_type_check",
+        "type-check a wasm-like instruction stream"
+      ],
+      [
+        "sql_algebra_pushdown",
+        "push selections through a relational-algebra tree"
+      ],
+      [
+        "crdt_orset_merge",
+        "merge two observed-remove sets and list remaining members"
+      ],
+      [
+        "raft_log_match",
+        "decide whether a raft follower log matches a leader prefix"
+      ],
+      [
+        "capability_attenuate",
+        "attenuate a capability token along a designated path"
+      ],
+      [
+        "bidirectional_typer",
+        "type-check a bidirectional core calculus"
+      ],
+      [
+        "prolog_unify_occurs",
+        "unify terms with occurs-check and return substitutions"
+      ],
+      [
+        "greylock_cache_clock",
+        "simulate clock-pro replacement on a cache trace"
+      ],
+      [
+        "peg_packrat_parse",
+        "packrat-parse a peg grammar and return the cst shape"
+      ]
+    ],
+    "XL": [
+      [
+        "multiprocess_barrier_liveness",
+        "check liveness of a tree barrier over process traces"
+      ],
+      [
+        "distributed_snapshot_cut",
+        "detect consistent cuts in a distributed snapshot log"
+      ],
+      [
+        "query_planner_join_order",
+        "choose a left-deep join order under a simple cost model"
+      ],
+      [
+        "static_single_assignment_mem2reg",
+        "promote allocas to registers with dominance frontiers"
+      ],
+      [
+        "symbolic_exec_path_merge",
+        "merge symbolic states at a join point without losing constraints"
+      ],
+      [
+        "consensus_quorum_intersection",
+        "verify that configured quorums pairwise intersect"
+      ],
+      [
+        "linear_types_borrowck",
+        "reject programs that use a linear resource twice"
+      ],
+      [
+        "effect_system_masking",
+        "mask and unmask algebraic effects through handlers"
+      ],
+      [
+        "gradual_type_blame",
+        "insert blame labels for a gradual-typing boundary"
+      ],
+      [
+        "dependently_typed_eq_elim",
+        "check equality elimination in a tiny dependent core"
+      ],
+      [
+        "session_type_duality",
+        "check duality of a binary session-type protocol"
+      ],
+      [
+        "smt_bitvector_rewrite",
+        "apply a fixed bitvector rewrite system to a formula"
+      ],
+      [
+        "abstract_interp_interval",
+        "run interval abstract interpretation to a fixpoint"
+      ],
+      [
+        "hardware_isa_decode",
+        "decode a mixed-width isa stream and list instruction boundaries"
+      ],
+      [
+        "proof_net_correctness",
+        "validate a multiplicative linear-logic proof net"
+      ]
+    ]
+  },
+  "planning": {
+    "S": [
+      [
+        "darkroom_print_order",
+        "order darkroom steps so undeveloped film never meets light"
+      ],
+      [
+        "sourdough_feed_bake",
+        "schedule feeding so the starter peaks before the bake"
+      ],
+      [
+        "kite_rig_launch",
+        "rig a dual-line kite so bridles are even before launch"
+      ],
+      [
+        "beehive_inspection",
+        "inspect a hive without blocking the entrance with smoke first"
+      ],
+      [
+        "letterpress_lockup",
+        "lock type so the form is plane before inking"
+      ],
+      [
+        "canoe_portage_chain",
+        "portage a canoe so the yoke is free before the lift"
+      ],
+      [
+        "telescope_collimate",
+        "collimate a newtonian before first light"
+      ],
+      [
+        "espresso_puck_prep",
+        "prep a puck so distribution precedes tamping"
+      ],
+      [
+        "sail_reef_before_gust",
+        "reef a mainsail before the gust window"
+      ],
+      [
+        "pottery_bisque_glaze",
+        "bisque ware before glaze firing"
+      ],
+      [
+        "orchard_graft_order",
+        "graft scions only after the rootstock is waking"
+      ],
+      [
+        "loom_warp_dress",
+        "dress a loom so warp tension is even before weft"
+      ],
+      [
+        "ice_climb_screw_order",
+        "place ice screws so the belay is in before the leader moves"
+      ],
+      [
+        "sourdough_laminate",
+        "laminate dough after bulk rise but before final shape"
+      ],
+      [
+        "ham_radio_qso_log",
+        "log a contact only after the exchange is complete"
+      ]
+    ],
+    "M": [
+      [
+        "field_hospital_triage",
+        "triage so airway checks precede wound packing"
+      ],
+      [
+        "ferry_load_stability",
+        "load a ferry so ballast is set before vehicles board"
+      ],
+      [
+        "observatory_dome_slew",
+        "slew a dome after weather hold but before tracking"
+      ],
+      [
+        "winery_punchdown",
+        "punch down caps after crush but before malolactic"
+      ],
+      [
+        "trail_crew_switchback",
+        "cut switchbacks after drainage but before tread finish"
+      ],
+      [
+        "glassblowing_anneal",
+        "anneal a piece after the last gather cools"
+      ],
+      [
+        "orchestra_pit_setup",
+        "set pit rails before harps are rolled in"
+      ],
+      [
+        "avalanche_beacon_check",
+        "check beacons before the skin track starts"
+      ],
+      [
+        "letterpress_makeready",
+        "makeready after lockup but before the edition run"
+      ],
+      [
+        "apiary_split_colony",
+        "split a colony after queen cells are capped"
+      ],
+      [
+        "dry_stone_battered_wall",
+        "set through-stones after the first lift of faces"
+      ],
+      [
+        "blacksmith_normalize",
+        "normalize steel after forging and before quench"
+      ],
+      [
+        "cinema_focus_pull",
+        "mark focus after blocking but before the take"
+      ],
+      [
+        "reef_mooring_install",
+        "set mooring tackle after the site survey"
+      ],
+      [
+        "coop_predator_proof",
+        "proof a coop after nest-box install but before birds move in"
+      ]
+    ],
+    "L": [
+      [
+        "suborbital_countdown",
+        "hold the countdown so fueling precedes range-go"
+      ],
+      [
+        "museum_loan_crate",
+        "crate a loan after condition photos and before courier"
+      ],
+      [
+        "hydro_penstock_inspect",
+        "inspect a penstock after dewater and before re-water"
+      ],
+      [
+        "cathedral_scaffold_strike",
+        "strike scaffold after pointing and before floor opening"
+      ],
+      [
+        "particle_beam_tune",
+        "tune a beamline after vacuum recover and before users"
+      ],
+      [
+        "wildfire_burnout_line",
+        "cut a burnout line after lookouts are posted"
+      ],
+      [
+        "opera_supertitle_cue",
+        "cue supertitles after Sitzprobe and before opening"
+      ],
+      [
+        "shipyard_undock",
+        "undock after tank tests and before sea trial"
+      ],
+      [
+        "archive_digitize_chain",
+        "digitize after conservation and before public ingest"
+      ],
+      [
+        "seed_vault_deposit",
+        "deposit seed lots after viability tests"
+      ],
+      [
+        "radio_telescope_panel",
+        "set panels after holography and before first light"
+      ],
+      [
+        "canal_lock_maintenance",
+        "maintain a lock after isolation and before traffic"
+      ],
+      [
+        "glacier_mass_balance",
+        "measure stakes after ablation season starts"
+      ],
+      [
+        "foundry_pour_sequence",
+        "pour after mold close and before shakeout"
+      ],
+      [
+        "embassy_pouch_route",
+        "route a pouch after seals and before courier flight"
+      ]
+    ],
+    "XL": [
+      [
+        "polar_overwinter_handover",
+        "hand over a polar station after winter inventory"
+      ],
+      [
+        "spacecraft_rtg_install",
+        "install an rtg after range safety and before encapsulation"
+      ],
+      [
+        "deep_mine_refuge_drill",
+        "drill refuge chambers after gas checks"
+      ],
+      [
+        "tsunami_siren_net",
+        "arm a siren net after tide-gauge health checks"
+      ],
+      [
+        "high_energy_target_swap",
+        "swap a target after beam permit and before resume"
+      ],
+      [
+        "undersea_cable_splice",
+        "splice after burial survey and before power-up"
+      ],
+      [
+        "biosafety_exit_cascade",
+        "exit a bsl suite after decon and before badge return"
+      ],
+      [
+        "dam_spillway_test",
+        "test a spillway after piezometer review"
+      ],
+      [
+        "airport_catiii_cert",
+        "certify cat-iii lighting after flight check"
+      ],
+      [
+        "fusion_first_plasma",
+        "attempt first plasma after coil cooldown"
+      ],
+      [
+        "archival_microfilm_vault",
+        "vault film after densitometry and before climate seal"
+      ],
+      [
+        "orbital_debris_dodge",
+        "execute a debris dodge after conjunction screening"
+      ],
+      [
+        "volcano_evacuation_ring",
+        "open an evacuation ring after tremor thresholds"
+      ],
+      [
+        "icebreaker_convoy",
+        "form a convoy after ice-chart update"
+      ],
+      [
+        "nuclear_outage_breaker",
+        "rack a breaker after isolation and before clearance"
+      ]
+    ]
+  },
+  "reasoning": {
+    "S": [
+      [
+        "two_clock_timezones",
+        "decide which local clock is earlier given offset evidence"
+      ],
+      [
+        "weighing_fake_coin",
+        "identify a single light coin with a balance scale"
+      ],
+      [
+        "river_crossing_cap",
+        "decide if a capacity-limited crossing is possible"
+      ],
+      [
+        "liar_truth_badge",
+        "classify speakers from one liar-one-truth badge rule"
+      ],
+      [
+        "modular_weekday_shift",
+        "compute the weekday after a modular shift"
+      ],
+      [
+        "blood_type_parent",
+        "decide if a claimed parentage is blood-type possible"
+      ],
+      [
+        "toggle_three_switches",
+        "identify which switch drives a delayed lamp"
+      ],
+      [
+        "hat_color_common_knowledge",
+        "infer a hat color from common-knowledge silence"
+      ],
+      [
+        "postage_frobenius",
+        "decide whether an amount is makeable with two stamp values"
+      ],
+      [
+        "fair_division_last_diminisher",
+        "apply last-diminisher to three claimants"
+      ],
+      [
+        "graph_euler_parity",
+        "decide if an undirected graph has an euler tour"
+      ],
+      [
+        "bayes_false_positive",
+        "update a rare-disease probability after a noisy test"
+      ],
+      [
+        "lock_and_key_parity",
+        "decide if a parity lock can open given two keys"
+      ],
+      [
+        "calendar_span_inclusive",
+        "count inclusive nights between two dated stays"
+      ],
+      [
+        "tiling_mutilated_board",
+        "decide if a mutilated board admits a domino tiling"
+      ]
+    ],
+    "M": [
+      [
+        "newcomb_causal_vs_evidential",
+        "choose one-box or two-box from stated decision theory"
+      ],
+      [
+        "sleeping_beauty_halfer",
+        "compute the halfer credence after an awakening"
+      ],
+      [
+        "monty_hall_goat_reveal",
+        "update after a known-goat door is opened"
+      ],
+      [
+        "simpson_paradox_split",
+        "choose the treatment that wins in both wards"
+      ],
+      [
+        "causal_do_calculus_backdoor",
+        "identify a backdoor set from a given dag"
+      ],
+      [
+        "arrow_impossibility_profile",
+        "show a profile that violates independence of irrelevants"
+      ],
+      [
+        "nash_mixed_2x2",
+        "compute the mixed nash of a 2x2 payoff matrix"
+      ],
+      [
+        "kolmogorov_complexity_upper",
+        "give a short program upper bound for a string"
+      ],
+      [
+        "rice_theorem_undecidable",
+        "classify a semantic property as undecidable"
+      ],
+      [
+        "godel_sentence_unprovable",
+        "identify which sentence is unprovable in the given theory"
+      ],
+      [
+        "banach_tarski_hypotheses",
+        "name the choice principle used in a paradoxical decomposition"
+      ],
+      [
+        "p_vs_np_relativization",
+        "say whether a claimed proof relativizes"
+      ],
+      [
+        "halting_reduction_direction",
+        "state the correct reduction direction for a halt instance"
+      ],
+      [
+        "chaitin_omega_prefix",
+        "reason about a finite prefix of chaitin omega"
+      ],
+      [
+        "ainslie_hyperbolic_discount",
+        "choose the consistent plan under hyperbolic discounting"
+      ]
+    ],
+    "L": [
+      [
+        "anthropic_self_sampling",
+        "apply self-sampling assumption to a duplication scenario"
+      ],
+      [
+        "functional_decision_ssp",
+        "apply functional decision theory to a transparent newcomb variant"
+      ],
+      [
+        "logical_uncertainty_induction",
+        "assign a probability to a yet-unproved arithmetic claim"
+      ],
+      [
+        "infra_bayesian_catastrophe",
+        "choose an infra-bayesian policy against a catastrophe hypothesis"
+      ],
+      [
+        "embedded_agency_grain",
+        "identify a grain-of-truth failure in an embedded agent"
+      ],
+      [
+        "ldt_mouse_space",
+        "reason about mouse-space counterfactuals in a toy ldt"
+      ],
+      [
+        "updateless_policy_selection",
+        "select an updateless policy before observing a bit"
+      ],
+      [
+        "evidential_blackmail_resist",
+        "decide whether to pay an evidential blackmailer"
+      ],
+      [
+        "counterfactual_mugging_tau",
+        "choose whether to pay in a counterfactual mugging"
+      ],
+      [
+        "troll_bridge_cdt",
+        "predict cdt on the troll-bridge problem"
+      ],
+      [
+        "5_and_10_spurious",
+        "identify the spurious proof in a 5-and-10 agent"
+      ],
+      [
+        "procrastination_button",
+        "decide if a bounded procrastination button ever presses"
+      ],
+      [
+        "asymmetric_information_lemon",
+        "price a lemon market with hidden quality"
+      ],
+      [
+        "common_knowledge_email",
+        "find the first day common knowledge of muddy children holds"
+      ],
+      [
+        "agreement_theorem_priors",
+        "apply auch_mann agreement to two posterior announcements"
+      ]
+    ],
+    "XL": [
+      [
+        "lob_induction_fixed_point",
+        "apply lob's theorem to a self-referential soundness claim"
+      ],
+      [
+        "parametric_polymorphism_theorems",
+        "use parametricity to derive a free theorem"
+      ],
+      [
+        "forcing_continuum_poset",
+        "name the poset used to force a continuum hypothesis failure"
+      ],
+      [
+        "homotopy_univalence_transport",
+        "transport a structure along a univalent equality"
+      ],
+      [
+        "ordinal_analysis_pa",
+        "identify the proof-theoretic ordinal of peano arithmetic"
+      ],
+      [
+        "reverse_math_wkl0",
+        "place a compactness theorem in the reverse-math hierarchy"
+      ],
+      [
+        "inner_model_mouse",
+        "say which inner model contains a given mouse"
+      ],
+      [
+        "large_cardinal_strength",
+        "order two large-cardinal axioms by consistency strength"
+      ],
+      [
+        "adiamond_clubsuit",
+        "decide whether a stated diamond principle holds in l"
+      ],
+      [
+        "determinacy_projective",
+        "state the large-cardinal strength of projective determinacy"
+      ],
+      [
+        "woodin_tower_iteration",
+        "describe a tower condition in a woodin iteration"
+      ],
+      [
+        "constructible_universe_gch",
+        "say whether gch holds in l"
+      ],
+      [
+        "measurable_ultrapower",
+        "describe the ultrapower embedding from a measurable cardinal"
+      ],
+      [
+        "stationary_tower_forcing",
+        "name the generic embedding from stationary tower forcing"
+      ],
+      [
+        "core_model_induction",
+        "outline one step of a core-model induction"
+      ]
+    ]
+  },
+  "extraction": {
+    "S": [
+      [
+        "lab_notebook_temps",
+        "extract recorded temperatures and units from a lab note"
+      ],
+      [
+        "recipe_yield_mass",
+        "extract yield mass and ingredient masses from a recipe card"
+      ],
+      [
+        "trail_register_times",
+        "extract entry and exit times from a trail register"
+      ],
+      [
+        "invoice_line_skus",
+        "extract sku codes and quantities from invoice lines"
+      ],
+      [
+        "weather_station_gusts",
+        "extract peak gust and direction from a station log"
+      ],
+      [
+        "library_due_slips",
+        "extract due dates and barcodes from due slips"
+      ],
+      [
+        "radio_log_callsigns",
+        "extract callsigns and rst reports from a radio log"
+      ],
+      [
+        "garden_ph_readings",
+        "extract soil ph and bed ids from a garden sheet"
+      ],
+      [
+        "swim_heat_times",
+        "extract lane times and heat numbers from a heat sheet"
+      ],
+      [
+        "postage_manifest_oz",
+        "extract ounce weights and dest zips from a postage list"
+      ],
+      [
+        "climb_topo_grades",
+        "extract pitch grades and lengths from a climbing topo"
+      ],
+      [
+        "telescope_filter_set",
+        "extract filter names and exposure seconds from a log"
+      ],
+      [
+        "apiary_mite_counts",
+        "extract mite counts and hive numbers from a sheet"
+      ],
+      [
+        "ferry_manifest_pax",
+        "extract passenger counts and vehicle counts from a manifest"
+      ],
+      [
+        "bakery_proof_temps",
+        "extract proof-box temperature and humidity from a log"
+      ]
+    ],
+    "M": [
+      [
+        "archival_finding_aid",
+        "extract series titles and date spans from a finding aid"
+      ],
+      [
+        "clinical_trial_arms",
+        "extract arm names and n from a trial registry blob"
+      ],
+      [
+        "court_docket_parties",
+        "extract party roles and filing dates from a docket"
+      ],
+      [
+        "seismic_event_catalog",
+        "extract magnitudes and depths from an event catalog"
+      ],
+      [
+        "herbarium_sheet_text",
+        "extract taxon and collection date from a sheet label"
+      ],
+      [
+        "patent_claim_numbers",
+        "extract independent claim numbers and their classes"
+      ],
+      [
+        "customs_hs_codes",
+        "extract hs codes and declared values from an entry"
+      ],
+      [
+        "orbital_tle_pair",
+        "extract mean motion and inclination from a tle pair"
+      ],
+      [
+        "museum_object_accno",
+        "extract accession numbers and materials from a record"
+      ],
+      [
+        "genealogy_parish_act",
+        "extract names and event dates from a parish act"
+      ],
+      [
+        "forestry_plot_dbh",
+        "extract dbh and species codes from a plot tally"
+      ],
+      [
+        "epidemic_case_line",
+        "extract onset dates and locations from a line list"
+      ],
+      [
+        "inscribed_stele_dates",
+        "extract regnal years and places from a stele text"
+      ],
+      [
+        "audio_cue_sheet",
+        "extract cue in-points and isrc codes from a cue sheet"
+      ],
+      [
+        "sailing_log_fixes",
+        "extract lat/long fixes and times from a sailing log"
+      ]
+    ],
+    "L": [
+      [
+        "legislative_amendment_chain",
+        "extract amended section ids and effective dates"
+      ],
+      [
+        "chip_errata_table",
+        "extract errata ids and affected stepping from a table"
+      ],
+      [
+        "genome_variant_vcf",
+        "extract chrom, pos, ref, alt from a vcf excerpt"
+      ],
+      [
+        "flight_data_recorder",
+        "extract altitude and airspeed samples from a fdr dump"
+      ],
+      [
+        "bond_prospectus_covenants",
+        "extract covenant names and thresholds from a prospectus"
+      ],
+      [
+        "archaeological_locus",
+        "extract locus ids, soils, and finds from a context sheet"
+      ],
+      [
+        "pharmacovigilance_icsr",
+        "extract reaction terms and seriousness from an icsr"
+      ],
+      [
+        "satellite_telemetry_hk",
+        "extract subsystem voltages and timestamps from hk"
+      ],
+      [
+        "insurance_loss_run",
+        "extract claim numbers, reserves, and accident dates"
+      ],
+      [
+        "maritime_notice_to_mariners",
+        "extract charted depths and obstruction positions"
+      ],
+      [
+        "building_energy_model",
+        "extract zone loads and occupancy hours from a bem"
+      ],
+      [
+        "chemical_sds_hazards",
+        "extract h-codes and p-codes from a safety data sheet"
+      ],
+      [
+        "electoral_precinct_canvass",
+        "extract precinct ids and vote totals from a canvass"
+      ],
+      [
+        "hydrology_rating_curve",
+        "extract stage-discharge pairs from a rating table"
+      ],
+      [
+        "radioastronomy_scan",
+        "extract scan ids, frequencies, and integration times"
+      ]
+    ],
+    "XL": [
+      [
+        "multi_instrument_crossmatch",
+        "extract matched source ids across two catalogs"
+      ],
+      [
+        "clinical_nlp_negation",
+        "extract affirmed vs negated findings from a note"
+      ],
+      [
+        "contract_defined_terms",
+        "extract defined-term bindings and section anchors"
+      ],
+      [
+        "standards_errata_delta",
+        "extract clause ids changed between two standard drafts"
+      ],
+      [
+        "bank_sar_narrative",
+        "extract involved accounts and typologies from a sar"
+      ],
+      [
+        "epidemic_phylogeny",
+        "extract cluster ids and mutation lists from a tree note"
+      ],
+      [
+        "spacecraft_anomaly_log",
+        "extract anomaly ids, subsystems, and close-out dates"
+      ],
+      [
+        "war_diary_order_of_battle",
+        "extract unit designations and positions from a diary"
+      ],
+      [
+        "metrology_calibration_chain",
+        "extract artifact ids and uncertainty budgets"
+      ],
+      [
+        "materials_fatigue_coupon",
+        "extract r-ratios, cycles, and failure modes"
+      ],
+      [
+        "cyber_ioc_bundle",
+        "extract indicators of compromise and first-seen times"
+      ],
+      [
+        "paleoclimate_proxy",
+        "extract depth, age, and proxy values from a core log"
+      ],
+      [
+        "treaty_reservation_list",
+        "extract reservations, articles, and depositing states"
+      ],
+      [
+        "fusion_shot_metadata",
+        "extract shot numbers, stored energy, and pulse lengths"
+      ],
+      [
+        "digital_preservation_fixity",
+        "extract fixity algorithms, hashes, and file roles"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "identity": {
+    "filesystem_access_permitted": false,
+    "model_visible_tools": 0,
+    "multi_turn_permitted": false,
+    "network_access_permitted": false,
+    "protocol_version": 3,
+    "response_shape": "one assistant message, rendered per input.output_contract",
+    "retrieval_permitted": false,
+    "sandbox_use": "grader side only; the python_unit scorer runs candidate source in src/swarm/tools/sandbox_runner.py after the observation is complete",
+    "tool_calls_permitted": false,
+    "tool_descriptions_in_prompt": 0,
+    "tool_protocol_id": "g13-tool-protocol-v3-no-model-visible-tools",
+    "turns_per_observation": 1
+  },
+  "implementation_pins": {
+    "prompt_module": "src/swarm/evals/g13_prompt_v3.py",
+    "sandbox_runner_module": "src/swarm/tools/sandbox_runner.py"
+  },
+  "spec_of": "tool_protocol"
+}

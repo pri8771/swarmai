@@ -1,0 +1,41 @@
+{
+  "identity": {
+    "checker_id": "g13-independence-checker-v3",
+    "checker_version": 3,
+    "cross_partition_invariants": [
+      "cross_partition_case_id_overlap",
+      "cross_partition_payload_digest_overlap",
+      "cross_partition_prompt_digest_overlap",
+      "cross_partition_template_isomorph",
+      "cross_partition_semantic_archetype_overlap",
+      "cross_partition_scenario_stem_overlap"
+    ],
+    "intra_holdout_invariants": [
+      "holdout_case_id_duplicate",
+      "holdout_payload_digest_duplicate",
+      "holdout_prompt_digest_duplicate",
+      "holdout_template_duplicate",
+      "holdout_semantic_archetype_duplicate",
+      "holdout_scenario_substitution_sibling",
+      "holdout_clause_prefix_containment_sibling",
+      "required_cell_archetype_depth_below_minimum"
+    ],
+    "mode": "fail_closed",
+    "normalisation": {
+      "case_folding": "lower",
+      "digit_run_pattern": "[0-9]+",
+      "scenario_noun_blocklist_count": 20,
+      "synthetic_identifier_pattern": "\\b[A-Z]{2,}(?:[-_][A-Za-z0-9]+)*\\b"
+    },
+    "rejects": [
+      "semantic-archetype duplicates",
+      "scenario-substitution siblings",
+      "identifier/numeric reseeds",
+      "clause-prefix/containment siblings",
+      "payload/prompt/template digest overlap"
+    ],
+    "reported_but_tolerated_axis_count": 0
+  },
+  "implementation_module": "src/swarm/evals/g13_independence_v3.py",
+  "spec_of": "independence_checker"
+}

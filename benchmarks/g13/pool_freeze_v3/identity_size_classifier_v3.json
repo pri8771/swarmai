@@ -1,0 +1,38 @@
+{
+  "identity": {
+    "boundary_kind": "inclusive_upper_bound_global",
+    "classifier_id": "g13-size-classifier-v3",
+    "decision_feature": "structural_load",
+    "decision_formula": "sum(FEATURE_WEIGHTS[f] * features[f] for f in FEATURE_SCHEMA)",
+    "feature_schema": [
+      "entity_count",
+      "constraint_count",
+      "dependency_depth",
+      "output_field_count",
+      "distractor_count"
+    ],
+    "feature_source": "derived_from_model_visible_payload",
+    "feature_weights": {
+      "constraint_count": 1,
+      "dependency_depth": 2,
+      "distractor_count": 1,
+      "entity_count": 1,
+      "output_field_count": 1
+    },
+    "load_bands": {
+      "L_max": 21,
+      "M_max": 14,
+      "S_max": 8,
+      "XL": "> 21"
+    },
+    "records_declare_features": false,
+    "size_bands": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  "implementation_module": "src/swarm/evals/g13_size_classifier_v3.py",
+  "spec_of": "size_classifier"
+}
