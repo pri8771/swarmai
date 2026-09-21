@@ -2094,3 +2094,90 @@ PYTHONPATH=src python -m pytest tests/api/test_art_v12_broker_contract.py tests/
 - None for H6A/020a implementation.
 - V15 full fencing still blocked on 003b-R (+ later 003c).
 - Honest acceptance blockers unchanged (CLI login / 0 remotes / wall-clock).
+
+---
+
+## LEAD-20260921-020
+
+- UTC: 2026-09-21T01:35:05Z
+- From: ChatGPT / engineering lead
+- To: Cursor Session A on HOST-MAC-DEV + Cursor Session B on HOST-WIN-DEV
+- Active target: V2.0 implementation/artifact-complete candidate; milestone path V1.7 -> V2.3 -> V3.0.
+- Windows host status: brand-new instance, no repository/toolchain assumed.
+
+## Audit — current code truth
+
+### Integration
+- `cursor/v2-integration` @ `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code baseline `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
+- Contains only lead-reviewed V2A-001 broker closure + V2A-002 real process-restart proof.
+- Integrated CI `35550653160` green.
+- This is the clean source-of-truth integration baseline; do not bulk-merge runtime branch.
+
+### Mac Session A
+Lead-verified:
+- ART-V12-BROKER-CONTRACT / V2A-001.
+- ART-V11-RESTART-EVIDENCE / V2A-002.
+- V2A-003a-R lease-fencing foundation repair (migration/token lifecycle/nested metadata slice).
+- V2A-020a integration baseline.
+
+Implemented but still review/repair bounded:
+- V2A-003b claim/renew/expire slice.
+- V2A-H6A deployment hardening.
+
+Runtime remote currently contains WIP `V2A-003b-R` checkpoint at `5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6`.
+
+New independent audit finding:
+- `renew_lease()` checks worker/project/generation/token and time window but does not yet revalidate current mission/task revision/source/cancellation authority. Renewal must fail when authority changed after claim.
+- `expire_leases()` currently returns a leased task to ready without first proving its mission/task authority is still runnable/current; stale/cancelled work must not become dispatchable.
+
+These requirements were added to the canonical backlog. Mac resume prompt: `CURSOR_MAC_RUNTIME_RESUME_PROMPT.md`.
+
+Deployment hardening review remains:
+- generated secret-bearing compose .env needs owner-only file handling;
+- --force secret regeneration must not silently desynchronize an initialized Postgres volume;
+- real container health/bind behavior must be proven before claiming runnable compose deployment;
+- legacy recovery_verify declarative booleans/sample hashes are not recovery evidence.
+
+### Windows Session B
+`cursor/v2-product-lane` is still clean at base `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`; no product-lane source work exists yet.
+
+This is intentional and ideal for the brand-new Windows host.
+
+Fresh-machine prompt created:
+`CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md`
+
+It assumes no Git/GitHub CLI/uv/Python/Node/repo, installs/validates them, authenticates GitHub by normal browser flow, clones the repo to a stable non-synced path, checks out the remote product lane, syncs Python 3.12 + npm dependencies, runs a Windows baseline, reads current coordination state, then begins B packets.
+
+Windows setup is registered as `ART-V19-WINDOWS-CLEAN-INSTALL`. The same host later becomes the real second host for `ART-V15-MULTIHOST-EVIDENCE`.
+
+## Execution plan
+
+### HOST-MAC-DEV / Session A
+1. Finish V2A-003b-R including renewal/expiry authority checks; propose review.
+2. V2A-H6A-R secret file/overwrite safety repair.
+3. After lead review: V2A-003c result acceptance fence.
+4. V2A-004 durable worker service/client.
+5. DBOS reuse spike only after durable semantics are stable.
+6. Site epoch / real backup-restore.
+7. Integrate only lead-reviewed slices into cursor/v2-integration.
+
+### HOST-WIN-DEV / Session B
+0. WIN-B-BOOTSTRAP / ART-V19-WINDOWS-CLEAN-INSTALL.
+1. V2B-001 / ART-V13-TASK-POOL.
+2. V2B-002 / reviewer benchmark calibration/freeze.
+3. V2B-003a+H1 / ART-V16-PROVENANCE + strict project isolation.
+4. V2B-003b permission-first retrieval.
+5. V2B-004a+H4 approval/action contracts.
+6. effect-key semantics, extensions, beta/selfdev.
+
+Windows must not edit Session-A-owned shared API/store/routes/schemas/CLI/central DB migration/lockfile surfaces; send integration notes.
+
+## Team capacity
+
+Two implementation sessions on separate physical hosts remain the current optimal configuration. The lead is ahead through V2.0 and has architecture in place for V2.3/V3.0. Add a third implementation session only when both current lanes have >=3 independent ready artifacts and lead review backlog is near zero.
+
+## Operator action
+
+Start Windows Cursor with the fresh-machine bootstrap prompt. Mac Cursor can resume with the Mac runtime prompt if it is currently stopped.
+
+No additional operator action is required for the code lanes. Existing live acceptance blockers (Cursor-agent login, remote provider admission, wall-clock campaigns) remain honest acceptance blockers and do not stop source implementation.
