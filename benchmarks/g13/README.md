@@ -6,21 +6,30 @@ not be used for counted qualification.
 
 | Freeze | Status | Why |
 |---|---|---|
-| `pool_freeze_v2/` | current | 240 input-only held-out inputs, 15 per required cell, sealed grader references, fail-closed independence checker |
+| `pool_freeze_v2/` | current | 240 input-only held-out inputs, 15 per required cell **and 15 distinct semantic archetypes per cell**, sealed grader references, two fail-closed independence axes |
 | `pool_freeze_v1/` | historical, superseded | 5 held-out records per cell against a protocol minimum of 15, and its reference answers were worker-visible in plaintext, which burns the split |
 
 ---
 
 ## `pool_freeze_v2/` — current
 
-Frozen EVAL-131 **held-out** corpus for artifact **ART-V13-TASK-POOL** (packet
-`EXT-WORKER-PC-V2B-001-R2`). Records are **input-only**: a v2 record has no field
-in which an answer, grader fixture, rubric or reference could sit.
+Frozen EVAL-131 **held-out** corpus for artifact **ART-V13-TASK-POOL** (corpus
+bytes minted by packet `EXT-WORKER-PC-V2B-001-R4`). Records are **input-only**: a
+v2 record has no field in which an answer, grader fixture, rubric or reference
+could sit.
+
+Independence is enforced on **two** axes. `g13-independence-checker-v2` is
+fail-closed on eight id, payload-digest, prompt-digest and normalised-template
+invariants. `g13-semantic-group-axis-v1` sits on top of it and is fail-closed on
+*archetype* depth: a scenario rename, a numeric or seed substitution, and
+cumulative clause-only growth all collapse to one semantic group, and every
+required cell must hold at least fifteen distinct groups. Record depth is not
+archetype depth, and a Wilson bound counts the latter.
 
 | File | What it pins |
 |------|--------------|
-| `task_pool_freeze_v2.manifest.json` | freeze/corpus identity, coverage, sealed-reference binding, foreign corpora, ten pinned identities, computed readiness |
-| `holdout/<product_family>_<size>.jsonl` | one shard per required cell, 15 independent inputs each |
+| `task_pool_freeze_v2.manifest.json` | freeze/corpus identity, coverage, sealed-reference binding, foreign corpora, eleven pinned identities, computed readiness |
+| `holdout/<product_family>_<size>.jsonl` | one shard per required cell, 15 inputs each, each its own semantic archetype |
 | `CORPUS_SHARD_DIGESTS.txt` | the split identity: one row per shard binding family, size, split, record count and sha256 |
 | `SEALED_REFERENCE_IDS.txt` | the hidden-reference id commitment — opaque surrogate keys only |
 | `identity_pool_v2.json` | pool identity `g13-pool-freeze-v2` |
@@ -32,6 +41,7 @@ in which an answer, grader fixture, rubric or reference could sit.
 | `identity_tool_protocol_v2.json` | tool protocol `g13-tool-protocol-v2-no-model-visible-tools` |
 | `identity_model_config_schema_v2.json` | `exact_model_config` schema `g13-exact-model-config-v2` |
 | `identity_independence_checker_v2.json` | contamination checker `g13-independence-checker-v2` |
+| `identity_semantic_group_v1.json` | semantic archetype axis `g13-semantic-group-axis-v1` |
 | `identity_sealed_reference_v2.json` | sealed grader-reference interface `g13-sealed-reference-interface-v2` |
 | `SHA256SUMS` | digest of every file above, recursively |
 

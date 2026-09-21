@@ -66,11 +66,19 @@ HIDDEN_REFERENCE_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"^g13hr2-[0-9]
 #: The only keys a record's ``hidden_reference`` block may carry.
 HANDLE_KEY_ALLOWLIST: Final[frozenset[str]] = frozenset({"interface_id", "hidden_reference_id"})
 
+#: Header of the committed id commitment.
+#:
+#: The wording is load-bearing, not decorative. ``test_commitment_renders_opaque_ids_only``
+#: asserts that the rendered commitment contains no held-out-content vocabulary at all,
+#: and an earlier revision of this header failed that assertion by *naming* the things it
+#: promised to exclude ("no reference answer, no grader fixture, no rubric"). A disclaimer
+#: that has to spell out the forbidden words cannot be checked by substring search, so the
+#: promise is now phrased without any of them and the check is exact.
 COMMITMENT_HEADER: Final[tuple[str, ...]] = (
     "# g13-sealed-reference-interface-v2 hidden-reference id commitment",
     "# format: <case_id> <hidden_reference_id>",
-    "# contains opaque surrogate keys only: no reference answer, no grader"
-    " fixture, no rubric, no answer digest",
+    "# contains opaque surrogate keys only: no held-out content of any kind, and no"
+    " digest of any held-out content",
     "# order: corpus canonical order (product_family, size, record index)",
 )
 

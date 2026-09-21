@@ -29,6 +29,21 @@ per-record list would only add a place to drift. The verifier recomputes record,
 payload, prompt and normalised-template digests at verification time, which is
 where the contamination decisions are actually made.
 
+Two independence axes, not one
+------------------------------
+``g13-independence-checker-v2`` runs exactly as it always has: eight fail-closed
+id / payload-digest / prompt-digest / normalised-template invariants, inside the
+held-out partition and against every foreign partition. Nothing here relaxes it.
+
+``g13-semantic-group-axis-v1`` is stacked **on top** of it, because record depth
+is not archetype depth. Fifteen records that differ only by a domain noun, by a
+seed, or by extra appended clauses are one observation repeated fifteen times,
+and every string-equality axis sees fifteen distinct records. The group axis
+reduces each record to a recipe digest plus a clause-digest set, treats
+recipe-equal records whose clause sets nest as one group, and requires
+``coverage.min_semantic_groups_per_required_cell`` (floored at 15 by the axis
+itself) distinct groups in **every** required cell. See ``g13_semantic_group``.
+
 Readiness
 ---------
 ``qualification_readiness.counted_qualification_ready`` is **computed**, not
@@ -77,6 +92,16 @@ from swarm.evals.g13_sealed_reference import (
     load_commitment,
     render_commitment,
 )
+from swarm.evals.g13_semantic_group import (
+    GROUP_AXIS_ID,
+    MIN_SEMANTIC_GROUPS_PER_CELL,
+    SemanticFingerprint,
+    SemanticGroupError,
+    assign_groups,
+    corpus_scenario_vocabulary,
+    groups_per_cell,
+    semantic_fingerprint,
+)
 from swarm.evals.g13_size_classifier_v2 import (
     CLASSIFIER_ID,
     SizeClassifierV2Error,
@@ -111,6 +136,7 @@ REQUIRED_IDENTITIES: tuple[str, ...] = (
     "tool_protocol",
     "model_config_schema",
     "independence_checker",
+    "semantic_group",
     "sealed_reference_interface",
 )
 
@@ -119,6 +145,7 @@ IDENTITY_CODE_BINDINGS: dict[str, tuple[str, str]] = {
     "size_classifier": ("classifier_id", CLASSIFIER_ID),
     "prompt": ("prompt_id", PROMPT_ID),
     "independence_checker": ("checker_id", CHECKER_ID),
+    "semantic_group": ("group_axis_id", GROUP_AXIS_ID),
     "sealed_reference_interface": ("interface_id", INTERFACE_ID),
 }
 
@@ -908,6 +935,54 @@ def verify_pool_freeze_v2(
             f" {declared_min_total}",
         )
 
+    # --- semantic archetype / independence-group axis --------------------
+    # Record *depth* is not archetype *depth*: fifteen re-skins of one recipe
+    # are one observation repeated. This axis is additive — every digest and
+    # normalised-template invariant above still runs, unchanged.
+    declared_min_groups = _as_int(
+        _get(coverage, "min_semantic_groups_per_required_cell", "$.coverage"),
+        "$.coverage.min_semantic_groups_per_required_cell",
+    )
+    if declared_min_groups < MIN_SEMANTIC_GROUPS_PER_CELL:
+        result.add(
+            "semantic_group_minimum_below_protocol",
+            f"manifest declares min_semantic_groups_per_required_cell={declared_min_groups},"
+            f" {GROUP_AXIS_ID} floors it at {MIN_SEMANTIC_GROUPS_PER_CELL}",
+        )
+    effective_min_groups = max(declared_min_groups, MIN_SEMANTIC_GROUPS_PER_CELL)
+    vocabulary = corpus_scenario_vocabulary(entry.record for entry in records)
+    fingerprints: list[SemanticFingerprint] = []
+    for entry in records:
+        try:
+            fingerprints.append(
+                semantic_fingerprint(
+                    entry.record, cell=entry.row.cell(), vocabulary=vocabulary
+                )
+            )
+        except SemanticGroupError as exc:
+            result.add(
+                "semantic_group_unreducible",
+                f"{entry.row.shard}:{entry.line_no}: {exc}",
+            )
+    cell_groups: dict[str, int] = {}
+    distinct_groups = 0
+    try:
+        cell_groups = groups_per_cell(fingerprints)
+        distinct_groups = len(set(assign_groups(fingerprints).values()))
+    except SemanticGroupError as exc:
+        result.add("semantic_group_axis_failed", str(exc))
+    for product_family, size in required:
+        cell = f"{product_family}/{size}"
+        groups = cell_groups.get(cell, 0)
+        if groups < effective_min_groups:
+            result.add(
+                "required_cell_below_minimum_semantic_groups",
+                f"{cell} holds {cell_counts.get(cell, 0)} records but only {groups} distinct"
+                f" semantic groups under {GROUP_AXIS_ID}; the protocol minimum is"
+                f" {effective_min_groups}. Scenario renames, numeric substitutions and"
+                " cumulative clause growth do not make a new group",
+            )
+
     # --- independence ----------------------------------------------------
     own = [
         IndependenceRecord(
@@ -955,6 +1030,11 @@ def verify_pool_freeze_v2(
         "held_out_record_count": len(records),
         "distinct_record_digests": len(set(record_digests.values())),
         "independent_per_required_cell": {cell: cell_counts[cell] for cell in sorted(cell_counts)},
+        "semantic_group_axis_id": GROUP_AXIS_ID,
+        "min_semantic_groups_per_required_cell": effective_min_groups,
+        "semantic_groups_per_required_cell": cell_groups,
+        "distinct_semantic_groups": distinct_groups,
+        "semantic_fingerprints": len(fingerprints),
         "answer_leak_count": answer_leak_count,
         "sealed_reference_handles": len(_handles),
         "sealed_bundle_content_digest_bound": bundle_bound,

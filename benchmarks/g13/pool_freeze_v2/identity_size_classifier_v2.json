@@ -42,8 +42,9 @@
   "why_global_bands": "v1 needed per-family bounds because it cut on a generator-declared token estimate whose scale differed wildly between families. structural_load is measured in comparable units, countable payload elements, so a single global band table separates the sizes across all four required families.",
   "observed_loads_in_this_freeze": {
     "S": [6, 7, 8],
-    "M": [11, 12, 13],
-    "L": [17, 18, 19],
-    "XL": [24, 25, 26]
-  }
+    "M": [11, 12, 13, 14],
+    "L": [16, 17, 18, 19],
+    "XL": [22, 23, 24, 25]
+  },
+  "observed_loads_basis": "measured over the re-minted g13-corpus-v2r4 corpus. The planning family carries a dependency spine, which is weighted 2, so its loads sit one to two points above the other three families in every band."
 }

@@ -1,0 +1,117 @@
+{
+  "spec_of": "semantic_group",
+  "identity": {
+    "group_axis_id": "g13-semantic-group-axis-v1",
+    "group_axis_version": 1,
+    "mode": "fail_closed",
+    "min_semantic_groups_per_required_cell": 15,
+    "group_key_source": "derived_from_model_visible_payload",
+    "records_declare_their_own_group": false,
+    "normalisation": {
+      "synthetic_identifier_pattern": "\\b[A-Z]{2,}(?:[-_][A-Za-z0-9]+)*\\b",
+      "digit_run_pattern": "[0-9]+",
+      "word_pattern": "[a-z]+",
+      "case_folding": "lower",
+      "min_token_length": 3,
+      "stopwords": [
+        "all",
+        "and",
+        "any",
+        "are",
+        "below",
+        "but",
+        "can",
+        "each",
+        "every",
+        "for",
+        "from",
+        "has",
+        "have",
+        "into",
+        "its",
+        "not",
+        "one",
+        "only",
+        "other",
+        "our",
+        "out",
+        "per",
+        "that",
+        "the",
+        "their",
+        "them",
+        "then",
+        "there",
+        "these",
+        "they",
+        "this",
+        "those",
+        "use",
+        "used",
+        "using",
+        "was",
+        "were",
+        "what",
+        "when",
+        "which",
+        "while",
+        "with",
+        "you",
+        "your"
+      ],
+      "scenario_vocabulary": "corpus_wide_union_of_every_declared_scenario_slug",
+      "scenario_slug_pattern": "^[a-z][a-z0-9_]{2,31}$",
+      "order": [
+        "erase synthetic identifiers",
+        "erase digit runs",
+        "lower-case",
+        "split into words",
+        "drop tokens shorter than min_token_length",
+        "drop stopwords",
+        "drop corpus-wide scenario vocabulary"
+      ]
+    },
+    "recipe_fields": [
+      "task",
+      "instruction",
+      "question",
+      "signature"
+    ],
+    "clause_sections": [
+      "items",
+      "constraints",
+      "distractors"
+    ],
+    "sibling_rule": "equal recipe digests AND one clause-digest set contained in the other (equality included); groups are connected components of that relation",
+    "transformations_that_must_not_create_a_group": [
+      "scenario or domain rename",
+      "numeric, seed or synthetic-identifier substitution",
+      "cumulative clause-only growth from one recipe"
+    ],
+    "refusals": [
+      "record.id absent or empty",
+      "scenario absent or not a lower-case slug",
+      "declared scenario absent from the record's own rendered prompt",
+      "input.output_contract missing, or its fields array empty",
+      "a clause section that is not an array",
+      "no clause survives normalisation",
+      "duplicate case id inside the axis"
+    ],
+    "weakens_existing_axes": false,
+    "residual_limitation": "lexical, not semantic: two records sharing a recipe whose clause sets merely overlap without containment are counted as two groups, so re-authored (not appended) clauses can still buy a group"
+  },
+  "implementation_module": "src/swarm/evals/g13_semantic_group.py",
+  "mirror_assertion": "this spec .identity block equals swarm.evals.g13_semantic_group.group_axis_identity(), asserted by tests/evals/test_task_pool_freeze_v2.py",
+  "why_this_axis_exists": {
+    "problem": "g13-independence-checker-v2 compares strings. A scenario rename, a numeric substitution or an appended clause produces a string it has never seen while producing no new information, so fifteen re-skins of one recipe pass all eight of its axes as fifteen independent records.",
+    "consequence": "a Wilson bound over those fifteen records counts one observation fifteen times and overstates confidence, which is v1 blocker B3 at a level string equality cannot see",
+    "remedy": "count distinct semantic groups per required cell, not distinct records, and floor that count at fifteen"
+  },
+  "relationship_to_the_independence_checker": {
+    "replaces_any_existing_axis": false,
+    "relaxes_any_existing_axis": false,
+    "independence_checker_module_changed_by_this_packet": false,
+    "stacking": "additive: every id, payload-digest, prompt-digest and normalised-template invariant of g13-independence-checker-v2 still runs unchanged, and this axis fails the freeze on top of them"
+  },
+  "why_the_declared_scenario_cannot_inflate_a_count": "erasing a token can only make two records look more alike, so it can only merge groups and never split them. The vocabulary erased from every record is the corpus-wide union of every declared scenario slug, not just the record's own, so a record cannot manufacture a group by declaring a convenient scenario. A record whose declared scenario does not occur in its own rendered prompt is refused outright."
+}

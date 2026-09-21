@@ -1,6 +1,6 @@
 # g13-sealed-reference-interface-v2 hidden-reference id commitment
 # format: <case_id> <hidden_reference_id>
-# contains opaque surrogate keys only: no reference answer, no grader fixture, no rubric, no answer digest
+# contains opaque surrogate keys only: no held-out content of any kind, and no digest of any held-out content
 # order: corpus canonical order (product_family, size, record index)
 g13v2_coding_S_01 g13hr2-0001
 g13v2_coding_S_02 g13hr2-0002

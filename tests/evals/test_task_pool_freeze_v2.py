@@ -52,6 +52,18 @@ from swarm.evals.g13_sealed_reference import (
     render_commitment,
     resolve,
 )
+from swarm.evals.g13_semantic_group import (
+    GROUP_AXIS_ID,
+    MIN_SEMANTIC_GROUPS_PER_CELL,
+    SemanticFingerprint,
+    SemanticGroupError,
+    assign_groups,
+    corpus_scenario_vocabulary,
+    group_axis_identity,
+    groups_per_cell,
+    semantic_fingerprint,
+    semantic_tokens,
+)
 from swarm.evals.g13_size_classifier_v2 import (
     CLASSIFIER_ID,
     classifier_identity,
@@ -124,6 +136,7 @@ def test_checksums_regenerate_byte_identically() -> None:
         ("identity_size_classifier_v2.json", classifier_identity),
         ("identity_prompt_v2.json", prompt_identity),
         ("identity_independence_checker_v2.json", checker_identity),
+        ("identity_semantic_group_v1.json", group_axis_identity),
         ("identity_sealed_reference_v2.json", interface_identity),
     ],
 )
@@ -141,6 +154,38 @@ def test_required_coverage_is_at_least_fifteen_per_cell() -> None:
             assert per_cell[cell] >= 15, f"{cell}: {per_cell.get(cell)}"
     assert stats["held_out_record_count"] >= 240
     assert stats["distinct_record_digests"] == stats["held_out_record_count"]
+
+
+def test_required_semantic_group_depth_is_at_least_fifteen_per_cell() -> None:
+    """Record depth is not archetype depth. This asserts the depth that counts.
+
+    Fifteen records that differ only by a domain noun, a seed or an appended
+    clause are one observation repeated fifteen times. Every one of the sixteen
+    required cells must hold fifteen *distinct* semantic groups.
+    """
+    stats = verify_pool_freeze_v2(REPO).stats
+    per_cell = stats["semantic_groups_per_required_cell"]
+    for product_family in REQUIRED_FAMILIES:
+        for size in SIZES:
+            cell = f"{product_family}/{size}"
+            assert per_cell[cell] >= MIN_SEMANTIC_GROUPS_PER_CELL, f"{cell}: {per_cell.get(cell)}"
+    assert stats["semantic_group_axis_id"] == GROUP_AXIS_ID
+    assert stats["min_semantic_groups_per_required_cell"] >= MIN_SEMANTIC_GROUPS_PER_CELL
+    assert stats["semantic_fingerprints"] == stats["held_out_record_count"]
+    # Every committed record is its own archetype: no record in the frozen
+    # corpus is a re-skin of any other, in its own cell or in any other cell.
+    assert stats["distinct_semantic_groups"] == stats["held_out_record_count"]
+
+
+def test_every_committed_record_declares_a_scenario_bound_to_its_own_prompt() -> None:
+    """The scenario declaration is erasure input, so it must not be free text."""
+    records = [entry.record for entry in canonical_corpus_records(REPO)]
+    vocabulary = corpus_scenario_vocabulary(records)
+    assert vocabulary, "no scenario slug was declared anywhere in the corpus"
+    for entry in canonical_corpus_records(REPO):
+        # Raises SemanticGroupError if the declared scenario is absent from the
+        # record's own rendered prompt.
+        semantic_fingerprint(entry.record, cell=entry.row.cell(), vocabulary=vocabulary)
 
 
 def test_committed_corpus_leaks_no_answer() -> None:
@@ -280,6 +325,28 @@ _WORDS = (
     "oscar",
 )
 
+#: Fifteen distinct task archetypes, one per index. The *scenario* word is
+#: erased by ``g13-semantic-group-axis-v1``, so a fixture whose fifteen records
+#: differed only by that word would hold one archetype, not fifteen, and would
+#: fail its own freeze. Distinctness has to come from here.
+_ARCHETYPES: tuple[tuple[str, str], ...] = (
+    ("reconcile", "ledger"),
+    ("summarise", "roster"),
+    ("validate", "manifest"),
+    ("order", "backlog"),
+    ("classify", "intake"),
+    ("deduplicate", "catalogue"),
+    ("project", "forecast"),
+    ("audit", "voucher"),
+    ("route", "consignment"),
+    ("balance", "workload"),
+    ("annotate", "transcript"),
+    ("partition", "corpus"),
+    ("rank", "submission"),
+    ("merge", "timeline"),
+    ("compress", "telemetry"),
+)
+
 #: ``size -> (items, constraints, distractors, output fields)``. The resulting
 #: structural loads are 6 / 11 / 17 / 24, which land in S / M / L / XL under
 #: ``g13-size-classifier-v2``.
@@ -296,14 +363,17 @@ def _synthetic_record(
 ) -> dict[str, Any]:
     items_n, constraints_n, distractors_n, fields_n = _SHAPE[size]
     word = _WORDS[index - 1]
+    verb, subject = _ARCHETYPES[index - 1]
     payload: dict[str, Any] = {
         "task": family,
-        "instruction": f"synthetic {product_family} {word} exercise",
+        "instruction": f"{verb} the {subject} for the {word} {product_family} exercise",
         "items": [
-            {"ref": f"SX-{i}", "requirement": f"{word} clause {i}"}
+            {"ref": f"SX-{i}", "requirement": f"{subject} clause {i} holds"}
             for i in range(1, items_n + 1)
         ],
-        "constraints": [f"{word} rule {i}" for i in range(1, constraints_n + 1)],
+        "constraints": [
+            f"{subject} rule {i} applies" for i in range(1, constraints_n + 1)
+        ],
         "output_contract": {
             "format": "json",
             "fields": [f"field_{i}" for i in range(1, fields_n + 1)],
@@ -312,7 +382,7 @@ def _synthetic_record(
     }
     if distractors_n:
         payload["distractors"] = [
-            f"{word} aside {i}" for i in range(1, distractors_n + 1)
+            f"{subject} aside {i} is not authoritative" for i in range(1, distractors_n + 1)
         ]
     return {
         "schema_version": "2.0",
@@ -455,6 +525,13 @@ def _write_synthetic_freeze(root: Path) -> Path:
             checker_identity(),
             checker_id=CHECKER_ID,
         ),
+        "semantic_group": _identity_block(
+            root,
+            "semantic_group",
+            "identity_semantic_group_v1.json",
+            group_axis_identity(),
+            group_axis_id=GROUP_AXIS_ID,
+        ),
         "sealed_reference_interface": _identity_block(
             root,
             "sealed_reference_interface",
@@ -486,6 +563,7 @@ def _write_synthetic_freeze(root: Path) -> Path:
             "required_product_families": sorted(REQUIRED_FAMILIES),
             "required_sizes": list(SIZES),
             "min_independent_per_required_cell": 15,
+            "min_semantic_groups_per_required_cell": MIN_SEMANTIC_GROUPS_PER_CELL,
             "min_total_independent_held_out": 240,
         },
         "identities": identities,
@@ -584,6 +662,201 @@ def test_synthetic_fixture_is_itself_clean(freeze: Path) -> None:
     assert verify_checksums_v2(freeze).ok
     assert result.stats["freeze_conditions_pass"] is True
     assert result.stats["counted_qualification_ready_computed"] is False
+    per_cell = result.stats["semantic_groups_per_required_cell"]
+    assert min(per_cell.values()) >= MIN_SEMANTIC_GROUPS_PER_CELL, per_cell
+
+
+# ---------------------------------------------------------------------------
+# semantic archetype / independence-group axis
+#
+# These are the axis' own negative cases. Each one builds the exact
+# transformation the packet protocol refuses to count as independent, shows
+# that the pre-existing digest and normalised-template axes cannot always see
+# it, and asserts that the group axis collapses it to one group anyway.
+# ---------------------------------------------------------------------------
+
+
+def _group_labels(records: list[dict[str, Any]], cell: str = "coding/S") -> set[str]:
+    vocabulary = corpus_scenario_vocabulary(records)
+    fingerprints: list[SemanticFingerprint] = [
+        semantic_fingerprint(record, cell=cell, vocabulary=vocabulary) for record in records
+    ]
+    return set(assign_groups(fingerprints).values())
+
+
+def _sibling_of(record: dict[str, Any], case_id: str, reference_index: int) -> dict[str, Any]:
+    clone: dict[str, Any] = json.loads(json.dumps(record))
+    clone["id"] = case_id
+    clone["hidden_reference"]["hidden_reference_id"] = f"g13hr2-{reference_index:04d}"
+    return clone
+
+
+def _prompt_of(record: dict[str, Any]) -> str:
+    return render_prompt(visible_input(record))
+
+
+def test_semantic_tokens_erase_identifiers_digits_and_the_scenario_vocabulary() -> None:
+    tokens = semantic_tokens(
+        "Reconcile ORD-310-001 for the harbor ledger 4242", frozenset({"harbor"})
+    )
+    assert tokens == ("reconcile", "ledger")
+
+
+def test_two_genuinely_different_archetypes_stay_two_groups() -> None:
+    first = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    second = _synthetic_record("coding", "code_generation", "S", 2, 2)
+    assert len(_group_labels([first, second])) == 2
+
+
+def test_groups_per_cell_counts_distinct_archetypes() -> None:
+    records = [
+        _synthetic_record("coding", "code_generation", "S", index, index)
+        for index in range(1, 16)
+    ]
+    vocabulary = corpus_scenario_vocabulary(records)
+    fingerprints = [
+        semantic_fingerprint(record, cell="coding/S", vocabulary=vocabulary)
+        for record in records
+    ]
+    assert groups_per_cell(fingerprints) == {"coding/S": 15}
+
+
+def test_scenario_rename_does_not_buy_a_semantic_group() -> None:
+    base = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    renamed = _sibling_of(base, "scenario_sibling", 2)
+    renamed["scenario"] = "zulu"
+    renamed["input"]["instruction"] = base["input"]["instruction"].replace(
+        str(base["scenario"]), "zulu"
+    )
+    # The pre-existing axes genuinely cannot see this: a lower-case domain noun
+    # survives normalisation, so both the rendered prompt and its normalised
+    # template differ.
+    assert _prompt_of(base) != _prompt_of(renamed)
+    assert normalise_template(_prompt_of(base)) != normalise_template(_prompt_of(renamed))
+    assert len(_group_labels([base, renamed])) == 1
+
+
+def test_seed_and_number_substitution_does_not_buy_a_semantic_group() -> None:
+    _verb, subject = _ARCHETYPES[3]
+    base = _synthetic_record("reasoning", "evidence_qa", "M", 4, 1)
+    reseeded = _sibling_of(base, "seed_sibling", 2)
+    payload = reseeded["input"]
+    payload["items"] = [
+        {
+            "ref": f"QQ-{position * 7717}",
+            "requirement": f"{subject} clause {position * 31} holds",
+        }
+        for position in range(1, len(payload["items"]) + 1)
+    ]
+    payload["constraints"] = [
+        f"{subject} rule {position * 907} applies"
+        for position in range(1, len(payload["constraints"]) + 1)
+    ]
+    payload["distractors"] = [
+        f"{subject} aside {position * 53} is not authoritative"
+        for position in range(1, len(payload["distractors"]) + 1)
+    ]
+    # This one the normalised-template axis already catches; the group axis must
+    # agree with it rather than be laxer.
+    assert _prompt_of(base) != _prompt_of(reseeded)
+    assert normalise_template(_prompt_of(base)) == normalise_template(_prompt_of(reseeded))
+    assert len(_group_labels([base, reseeded])) == 1
+
+
+def test_cumulative_clause_growth_does_not_buy_a_semantic_group() -> None:
+    _verb, subject = _ARCHETYPES[4]
+    small = _synthetic_record("planning", "dependency_planning", "S", 5, 1)
+    grown = _sibling_of(small, "growth_sibling", 2)
+    grown["input"]["items"].extend(
+        {"ref": f"SX-{position}", "requirement": f"{subject} clause {position} also holds"}
+        for position in range(90, 95)
+    )
+    grown["input"]["constraints"].append(f"{subject} rule 9 applies in addition")
+    # Arity changed, so every equality-based axis sees two distinct records.
+    assert normalise_template(_prompt_of(small)) != normalise_template(_prompt_of(grown))
+    assert len(_group_labels([small, grown])) == 1
+
+
+def test_axis_refuses_a_scenario_absent_from_its_own_prompt() -> None:
+    record = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    record["scenario"] = "quebec"
+    with pytest.raises(SemanticGroupError):
+        semantic_fingerprint(record, cell="coding/S", vocabulary=frozenset({"quebec"}))
+
+
+def test_axis_refuses_a_scenario_that_is_not_a_slug() -> None:
+    record = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    record["scenario"] = "Alfa Exercise"
+    with pytest.raises(SemanticGroupError):
+        semantic_fingerprint(record, cell="coding/S", vocabulary=frozenset())
+
+
+def test_axis_refuses_a_contaminated_record() -> None:
+    record = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    record["input"]["grader"] = {"kind": "json_exact"}
+    with pytest.raises(SemanticGroupError):
+        semantic_fingerprint(record, cell="coding/S", vocabulary=frozenset({"alfa"}))
+
+
+def test_axis_refuses_a_duplicate_case_id() -> None:
+    record = _synthetic_record("coding", "code_generation", "S", 1, 1)
+    vocabulary = corpus_scenario_vocabulary([record])
+    fingerprint = semantic_fingerprint(record, cell="coding/S", vocabulary=vocabulary)
+    with pytest.raises(SemanticGroupError):
+        assign_groups([fingerprint, fingerprint])
+
+
+def test_rejects_a_fifteen_record_cell_holding_one_archetype(freeze: Path) -> None:
+    """The case the packet names: full record depth, no archetype depth.
+
+    Every record in the cell becomes a scenario rename of the first. The cell
+    still holds fifteen records with fifteen distinct ids, payload digests,
+    prompt digests and normalised templates, so every pre-existing axis passes
+    it. The group axis must fail it.
+    """
+    records = _read_shard(freeze, "coding_S.jsonl")
+    template = records[0]
+    for position in range(1, len(records)):
+        clone = json.loads(
+            json.dumps(template).replace(str(template["scenario"]), _WORDS[position])
+        )
+        clone["id"] = records[position]["id"]
+        clone["hidden_reference"] = records[position]["hidden_reference"]
+        records[position] = clone
+    _write_shard(freeze, "coding_S.jsonl", records)
+    _remint(freeze)
+
+    result = verify_pool_freeze_v2(freeze)
+    codes = result.codes()
+    assert "required_cell_below_minimum_semantic_groups" in codes, result.report()
+    assert result.stats["semantic_groups_per_required_cell"]["coding/S"] == 1
+    # Record depth is untouched and every pre-existing axis still passes, which
+    # is exactly why the new axis had to be added.
+    assert result.stats["independent_per_required_cell"]["coding/S"] == 15
+    assert "required_cell_below_minimum" not in codes
+    assert "holdout_template_duplicate" not in codes
+    assert "holdout_payload_digest_duplicate" not in codes
+    assert "holdout_prompt_digest_duplicate" not in codes
+
+
+def test_rejects_a_manifest_that_lowers_the_semantic_group_minimum(freeze: Path) -> None:
+    _patch_manifest(
+        freeze,
+        lambda m: m["coverage"].__setitem__("min_semantic_groups_per_required_cell", 5),
+    )
+    result = verify_pool_freeze_v2(freeze)
+    assert "semantic_group_minimum_below_protocol" in result.codes(), result.report()
+
+
+def test_rejects_a_record_the_group_axis_cannot_reduce(freeze: Path) -> None:
+    records = _read_shard(freeze, "extraction_M.jsonl")
+    records[2]["scenario"] = "not a slug"
+    _write_shard(freeze, "extraction_M.jsonl", records)
+    _remint(freeze)
+    result = verify_pool_freeze_v2(freeze)
+    codes = result.codes()
+    assert "semantic_group_unreducible" in codes, result.report()
+    assert "required_cell_below_minimum_semantic_groups" in codes
 
 
 # --- negative: visible answer leakage --------------------------------------
@@ -842,13 +1115,37 @@ def test_rejects_a_bundle_claiming_a_digest_it_does_not_declare(freeze: Path) ->
     assert "sealed_reference_bundle_digest_absent" in result.codes(), result.report()
 
 
+#: Vocabulary that must not appear anywhere in the rendered id commitment, not
+#: even inside a header promising to exclude it. A disclaimer that spells out
+#: the forbidden words cannot be checked by substring search.
+_HELD_OUT_VOCABULARY = (
+    "expected",
+    "grader",
+    "grading",
+    "rubric",
+    "gold",
+    "solution",
+    "answer",
+    "unit_tests",
+    "test_cases",
+    "broken_code",
+    "target",
+)
+
+
 def test_commitment_renders_opaque_ids_only() -> None:
     rendered = render_commitment(
         [HiddenReferenceHandle("case_1", "g13hr2-0001", INTERFACE_ID)]
     )
     assert "g13hr2-0001" in rendered
-    assert "expected" not in rendered
-    assert "grader" not in rendered
+    for word in _HELD_OUT_VOCABULARY:
+        assert word not in rendered, f"{word!r} appears in the rendered commitment"
+
+
+def test_committed_commitment_file_holds_no_held_out_vocabulary() -> None:
+    text = (FREEZE / COMMITMENT_FILENAME).read_bytes().decode("utf-8")
+    for word in _HELD_OUT_VOCABULARY:
+        assert word not in text, f"{word!r} appears in {COMMITMENT_FILENAME}"
 
 
 # --- negative: mutated bytes ------------------------------------------------
