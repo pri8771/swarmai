@@ -1,6 +1,6 @@
 # SwarmAI compact project memory
 
-Curated after `LEAD-20260921-030`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
+Curated after `LEAD-20260921-031`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
 
 ## Authority and team
 
@@ -22,7 +22,7 @@ A runtime `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`, Actions `35558067148` red 
 B product `6b0e1277051ae90fe1d56825d3e771b042380755`, Actions `35558073323` red from the same shared source.
 Reviewed integration baseline `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
 
-No A/B implementation commit advanced in LEAD-030. `OPS-AUTO-001-R` remains the immediate local implementation blocker.
+No A/B implementation commit advanced in LEAD-031. `OPS-AUTO-001-R` remains the immediate local implementation blocker.
 
 ## Heartbeat / autonomy truth
 
@@ -30,7 +30,7 @@ Only `trigger=scheduler` counts. Need 3 consecutive receipts 10-25 minutes apart
 
 Current verified scheduler state:
 - A: `03:47:19Z -> 04:02:22Z`, **2/3 and stale**; no later receipt observed.
-- B: `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z`, **6 consecutive valid scheduler receipts** and individually complete.
+- B: `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z -> 08:59:27Z -> 09:14:18Z -> 09:29:17Z -> 09:44:17Z`, **10 consecutive valid scheduler receipts** and individually complete.
 - Global mode remains `bootstrap_15m` because A has not reached a current 3/3 chain.
 
 Coordination heartbeat does not satisfy `ART-V10-WORKER-HEARTBEAT`. Neither host has proven a repo-assigned autonomous self-launch plus attributable source push, so `ART-OPS-AUTONOMOUS-WORKERS` remains drafting.
@@ -41,22 +41,22 @@ A assignment: `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled with only `OP
 
 Attempt 01 (`swarmai-v13-task-pool-freeze-01`) was cancelled with no result or worker branch.
 
-Attempt 02 produced the last real scoped SwarmAI branch:
+Attempt 02 produced the last independently reviewed scoped SwarmAI branch:
 - `worker/swarmai-v13-task-pool-freeze-02`
 - commit `bbe41b7770123fef4eb03c4f03f95fc18eefc692`
 - exact parent reviewed integration `9ce727842446b98cfa55c28c7e70808f57f17d7b`.
 
 Independent lead review found useful freeze/verifier work but changes required: worker-visible hidden answers/grader/reference material exists; only 5 held-out cases exist per required family/size cell while EVAL-131 requires at least 15 independent observations; seed-isomorphic variants remain; and the remote executor ran no Python/pytest/Ruff/mypy/CI. `ART-V13-TASK-POOL` remains drafting and counted qualification remains forbidden.
 
-Attempt 03 (`swarmai-v13-task-pool-freeze-03`, run `35566726945`, job `106229937621`) was cancelled at `08:02:30Z` after the submitted-task step ran for roughly two hours. `results/swarmai-v13-task-pool-freeze-03.json` is absent and no `worker/swarmai-v13-task-pool-freeze-03` branch exists. Treat it as non-evidence; no worker-performance score was added.
+Attempt 03 (`swarmai-v13-task-pool-freeze-03`, run `35566726945`, job `106229937621`) was cancelled with no result JSON and no worker branch. Treat it as non-evidence; no worker-performance score was added.
 
-Lead created a narrower retry packet `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R2.md` at `d67ed2bc07f7239220cdf7e4c8aca32f2ccbd0c8`. After worker-pc capacity became free, retry 04 was dispatched:
+Lead created narrower retry packet `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R2.md` at `d67ed2bc07f7239220cdf7e4c8aca32f2ccbd0c8`. Retry 04 is active:
 - task `swarmai-v13-task-pool-freeze-04`
 - packet `EXT-WORKER-PC-V2B-001-R2`
 - base `worker/swarmai-v13-task-pool-freeze-02`
 - remote-workers commit `f3eeb62f836ece720f80e5e79a0a8a461c8e39cc`
-- workflow run `35580580156`, queued when first observed
-- expected branch `worker/swarmai-v13-task-pool-freeze-04`.
+- workflow run `35580580156`, job `106272271934`
+- lead observation: still `in_progress` in `Execute submitted tasks`; result JSON absent; expected branch `worker/swarmai-v13-task-pool-freeze-04` absent.
 
 Retry 04 must produce a freeze-v2 core: worker-visible input-only held-out data; sealed/opaque grader-reference identity; >=15 independent held-out inputs in all 16 coding/planning/reasoning/extraction × S/M/L/XL cells; contamination/isomorphism rejection; frozen identities; and actually executed focused verification. No counted qualification is part of the retry.
 
@@ -87,8 +87,8 @@ B:
 
 ## Gate truth and lead lane
 
-V1.0 still blocked on separate authenticated Cursor-agent evidence. V1.1 required artifacts are verified. V1.2 broker/local admission are verified but dual-remote overlap is blocked at 0 admitted remotes. V1.3 has zero qualified cells and task-pool retry 04 is unreviewed. V1.4 first real E2E failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 result acceptance remains. V1.6/V1.7 are queued behind B critical-path work. V2.0 integration/hardening remain drafting; its 168-hour reliability campaign has not started.
+V1.0 still blocked on separate authenticated Cursor-agent evidence. V1.1 required artifacts are verified. V1.2 broker/local admission are verified but dual-remote overlap is blocked at 0 admitted remotes. V1.3 has zero qualified cells and task-pool retry 04 is active/unreviewed. V1.4 first real E2E failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 result acceptance remains. V1.6/V1.7 are queued behind B critical-path work. V2.0 integration/hardening remain drafting; its 168-hour reliability campaign has not started.
 
-Lead-owned G13 repair boundary is `ART-V13-TASK_POOL_REPAIR_CONTRACT.md` plus `EXT-WORKER-PC-V2B-001-R2.md`. `ART-V20-SECURITY-REVIEW` and `ART-V20-RELIABILITY-PROTOCOL` remain drafting; no security acceptance or elapsed reliability evidence is claimed.
+Lead-owned G13 repair boundary is `ART-V13-TASK_POOL_REPAIR_CONTRACT.md` plus `EXT-WORKER-PC-V2B-001-R2.md`. `ART-V20-SECURITY-REVIEW` and `ART-V20-RELIABILITY-PROTOCOL` remain drafting. `ART-V20-PERFORMANCE-BASELINE` remains drafting but its protocol was materially advanced at `ddfc8f969ab66684697fa822279da441a197421e`: immutable campaign identity, warm-up/counted-sample separation, reproducible raw evidence, resource accounting, sample/percentile semantics, fail-closed pathology rules and explicit non-substitution for reliability/security/G12/G13/LIVE-142. No benchmark run or performance acceptance is claimed.
 
 Zero-spend, fail-closed, no operational mocks, no known-answer substitution, no admission bypass and no fabricated worker/provider/cost/time/acceptance evidence remain mandatory.
