@@ -28,9 +28,9 @@ No A/B source commit advanced in LEAD-026. The shared runner repair `OPS-AUTO-00
 
 Only `trigger=scheduler` counts. Need 3 consecutive receipts 10-25 minutes apart for both workers before global worker publication cadence may graduate to hourly. ChatGPT lead remains hourly.
 
-At LEAD-026:
-- A scheduler receipts `03:47:19Z` and `04:02:22Z` form a valid pair: **2/3**, but the latest was >35 minutes old at review, so A is **stale**.
-- B receipts `03:43:40Z`, `03:59:17Z`, `04:14:17Z`, `04:29:17Z`, `04:44:18Z` form **5 consecutive valid** intervals. B individually satisfies the requirement and is fresh.
+At the final LEAD-026 snapshot:
+- A scheduler receipts `03:47:19Z` and `04:02:22Z` form a valid pair: **2/3**, but A is **stale** (>35m since latest receipt).
+- B receipts `03:43:40Z`, `03:59:17Z`, `04:14:17Z`, `04:29:17Z`, `04:44:18Z`, `04:59:18Z` form **6 consecutive valid** intervals. B individually satisfies the requirement and is fresh.
 - Global mode remains `bootstrap_15m` because A has not satisfied the requirement.
 - Coordination heartbeat is not `ART-V10-WORKER-HEARTBEAT` authenticated Cursor-agent evidence.
 
@@ -42,7 +42,7 @@ A assignment remains `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled with o
 
 `worker-pc` is online, capacity 1, with verified Claude branch execution infrastructure. The first task-pool attempt `swarmai-v13-task-pool-freeze-01` produced no result: dispatch `7e17163e7fc85455a8eb0180d3cb2173711dc978`, run `35559390335` cancelled, no result JSON and no worker branch.
 
-After the unrelated worker-pc run occupying capacity completed, lead dispatched a fresh unique retry `swarmai-v13-task-pool-freeze-02` at remote-workers commit `4c5fe82f227fc80038a3ce9b1643305be48f09d9`. Run `35562827710` is in progress. Expected branch: `worker/swarmai-v13-task-pool-freeze-02`. `ART-V13-TASK-POOL` remains drafting until lead independently inspects the structured result, branch/diff scope, tests and manifest against EVAL-131. Dispatch/running status earns no acceptance credit.
+After remote capacity freed, lead dispatched fresh unique retry `swarmai-v13-task-pool-freeze-02` at remote-workers commit `4c5fe82f227fc80038a3ce9b1643305be48f09d9`. Run `35562827710` is in progress. Expected branch: `worker/swarmai-v13-task-pool-freeze-02`. `ART-V13-TASK-POOL` remains drafting until lead independently inspects the structured result, branch/diff scope, tests and manifest against EVAL-131. Dispatch/running status earns no acceptance credit.
 
 Local B must not duplicate V2B-001 while external retry 02 is active. Counted qualification remains forbidden until the task pool is independently frozen.
 
