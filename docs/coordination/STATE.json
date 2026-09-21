@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T12:53:00Z",
+  "updated_at": "2026-09-21T14:20:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -48,28 +48,33 @@
   "heartbeat": {
     "protocol": "docs/coordination/HEARTBEAT_PROTOCOL.md",
     "state": "docs/coordination/HEARTBEAT_STATE.json",
-    "mode": "bootstrap_15m",
+    "mode": "stress_5m",
     "counted_trigger": "scheduler_only",
-    "a": {
-      "host": "HOST-MAC-DEV",
-      "streak": 2,
-      "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T12:51:41Z",
-      "verified": false,
-      "stale": false,
-      "status": "fresh current chain 2/3 at 12:36:39Z -> 12:51:41Z"
+    "phase1": {
+      "cadence_minutes": 5,
+      "required_consecutive": 3,
+      "valid_gap_minutes": {
+        "min": 3,
+        "max": 8
+      },
+      "a": {
+        "streak": 0,
+        "verified": false
+      },
+      "b": {
+        "streak": 0,
+        "verified": false
+      }
     },
-    "b": {
-      "host": "HOST-WIN-DEV",
-      "streak": 1,
-      "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T12:29:17Z",
-      "verified": false,
-      "stale": false,
-      "status": "fresh current chain 1/3 after 11:59:17Z -> 12:29:17Z 30m reset gap"
+    "phase2": {
+      "cadence_minutes": 15,
+      "duration_hours": 24,
+      "started_at": null,
+      "ends_at": null,
+      "completed": false
     },
-    "graduated_to_hourly": false,
-    "note": "A is fresh 2/3 and B is fresh 1/3 at the lead cutoff. Global worker cadence remains 15 minutes; ChatGPT lead remains hourly."
+    "after_success": "return to hourly only after full 24h lead verification",
+    "note": "Owner intentionally reset the previously verified heartbeat cadence for a new 5m burst + 24h 15m soak."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -176,7 +181,7 @@
     "continue V2 security/recovery and V2.3/V3 architecture without taking routine SP1-SP3 implementation from workers"
   ],
   "open_blockers": [
-    "Heartbeat not graduated: A fresh 2/3; B fresh 1/3 after a 30m reset gap",
+    "Heartbeat stress test reset: A 0/3 and B 0/3 at 5-minute phase; then 24-hour 15-minute soak required",
     "A/B active lane exact-tip offline CI red due shared autonomous-runner coordination scripts",
     "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
     "ART-V10 authenticated Cursor-agent evidence blocked on authenticated Cursor-agent receipts",
