@@ -92,11 +92,21 @@ When a lease expires, do not blindly set a task back to `ready` if:
 
 Use an honest non-dispatchable status consistent with current contracts (cancelled/superseded/etc.) or leave it non-ready for reconciliation.
 
+### Dependency readiness and renewal horizon
+
+Before claim, do not trust a persisted `ready` status alone. Validate durable dependencies for the same current mission/project/graph are in the accepted/completed state permitted by the task contract. An unresolved/stale dependency must leave that task unmutated and allow the scan to continue.
+
+`renewable_until` is a HARD maximum. Renewal must never produce `expires_at > renewable_until`. Do not accidentally shorten an already-later valid expiry, and reject renewal when no positive bounded extension remains.
+
 Add direct regressions:
 - cancel mission after claim -> renew denied;
 - bump cancellation generation after claim -> renew denied;
 - source/revision changes after claim -> renew denied;
 - expired lease on cancelled/stale task does not become runnable;
+- unresolved dependency cannot be claimed; a later independent eligible task can;
+- renewal just before the horizon is capped at the horizon;
+- renewal at/after the horizon is denied;
+- early renewal does not shorten an existing valid expiry;
 - existing >32 HOL and exactly-one-winner tests remain green.
 
 Then run focused DB tests and full exact-tip CI. Post exact implementation/evidence SHA. Do not self-accept.
