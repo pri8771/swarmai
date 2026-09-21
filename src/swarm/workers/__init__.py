@@ -7,6 +7,7 @@ from swarm.workers.envelopes import (
     EnrollmentRequest,
     WorkerSoftwareInfo,
 )
+from swarm.workers.recovery_harness import MultiWorkerRecoveryHarness, RecoveryHarnessReport
 from swarm.workers.registry import WorkerRegistryService, worker_self_test
 from swarm.workers.service import DurableWorkerService, ProtocolVersionError
 from swarm.workers.transport import InProcessWorkerTransport, WorkerTransport
@@ -17,7 +18,9 @@ __all__ = [
     "DurableWorkerService",
     "EnrollmentRequest",
     "InProcessWorkerTransport",
+    "MultiWorkerRecoveryHarness",
     "ProtocolVersionError",
+    "RecoveryHarnessReport",
     "WorkerClient",
     "WorkerRegistryService",
     "WorkerSoftwareInfo",
