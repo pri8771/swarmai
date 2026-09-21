@@ -1,0 +1,9 @@
+Darwin Apple-M5-Pro-87 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050 arm64
+ProductName:		macOS
+ProductVersion:		26.6.2
+BuildVersion:		25G83
+Python 3.12.13
+uv 0.11.1 (a6042f67f 2026-03-24 aarch64-apple-darwin)
+branch_sha=4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead
+host=Apple-M5-Pro-87
+os=Darwin/macOS

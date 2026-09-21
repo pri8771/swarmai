@@ -164,12 +164,18 @@ def render_status(entry: dict) -> str:
     packet = entry.get("current_packet") or "none"
     artifact = entry.get("current_artifact") or "none"
     activity = entry.get("last_meaningful_activity_at") or "none recorded"
-    next_action = entry.get("next_action") or (
-        "Await independent lead review; session implementation scope complete through V1.7; "
-        "no V1.8+ unless operator expands scope."
-        if entry.get("status") == "review_requested"
-        else "Continue single-session work toward V1.7 implementation-complete/reviewable candidate."
-    )
+    if entry.get("next_action"):
+        next_action = str(entry["next_action"])
+    elif entry.get("status") == "review_requested":
+        next_action = (
+            "Await independent lead review; session implementation scope complete "
+            "through V1.7; no V1.8+ unless operator expands scope."
+        )
+    else:
+        next_action = (
+            "Continue single-session work toward V1.7 "
+            "implementation-complete/reviewable candidate."
+        )
     return f"""# CURSOR-V17-SINGLE status
 
 - Session: `{entry["session_id"]}`

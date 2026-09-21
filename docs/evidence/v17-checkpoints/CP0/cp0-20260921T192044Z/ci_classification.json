@@ -1,0 +1,20 @@
+{
+  "packet": "R00",
+  "checkpoint": "CP0",
+  "classified_at": "2026-09-21T19:21:00Z",
+  "exact_tip_sha": "4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead",
+  "sample_failed_run_id": 35642708049,
+  "sample_failed_run_url": "https://github.com/pri8771/swarmai/actions/runs/35642708049",
+  "jobs_observed": ["offline", "console", "live-gated"],
+  "steps_recorded": 0,
+  "runner_name": "",
+  "cause_class": "github_actions_account_billing_or_spending_limit",
+  "annotation_message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+  "workflow_config_defective": false,
+  "source_test_failure": false,
+  "rerun_spam_authorized": false,
+  "last_known_green_run_id": 35632562088,
+  "last_known_green_at": "2026-09-21T17:31:32Z",
+  "last_known_green_branch": "cursor/v17-single-session",
+  "user_action_required": "Operator must restore GitHub Actions billing / spending limit under account Billing & plans before exact-tip CI can start jobs."
+}

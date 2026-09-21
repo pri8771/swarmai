@@ -1,0 +1,17 @@
+[
+  {
+    "command": "uv run ruff check .",
+    "started": "2026-09-21T19:28:55Z",
+    "exit_code": 0
+  },
+  {
+    "command": "uv run mypy src/swarm",
+    "started": "2026-09-21T19:28:55Z",
+    "exit_code": 0
+  },
+  {
+    "command": "uv run pytest tests/contracts tests/workers tests/tools tests/memory tests/mission -q --tb=line",
+    "started": "2026-09-21T19:28:55Z",
+    "exit_code": 0
+  }
+]

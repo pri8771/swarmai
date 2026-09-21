@@ -1,0 +1,12 @@
+{
+  "os": "Darwin",
+  "hostname": "Apple-M5-Pro-87",
+  "arch": "arm64",
+  "python": "Python 3.12.13",
+  "uv": "uv 0.11.1 (a6042f67f 2026-03-24 aarch64-apple-darwin)",
+  "branch": "cursor/v17-single-session",
+  "branch_sha": "4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead",
+  "spend_usd": 0,
+  "SWARM_ALLOW_PAID": "false",
+  "secrets_present": false
+}

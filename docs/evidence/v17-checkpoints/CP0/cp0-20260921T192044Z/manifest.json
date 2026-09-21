@@ -1,0 +1,12 @@
+{
+  "checkpoint": "CP0",
+  "packet": "R00",
+  "run_id": "cp0-20260921T192044Z",
+  "branch": "cursor/v17-single-session",
+  "branch_sha_at_start": "4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead",
+  "session": "CURSOR-V17-SINGLE",
+  "host": "Apple-M5-Pro-87",
+  "os": "Darwin",
+  "spend_usd": 0,
+  "created_at": "2026-09-21T19:27:34Z"
+}
