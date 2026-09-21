@@ -1,0 +1,27 @@
+{
+  "spec_of": "split",
+  "identity": {
+    "split_id": "g13-split-v2",
+    "splits_present": ["holdout"],
+    "holdout_purpose": "qualification-held-out only. These inputs must not be used for screening, prompt tuning, routing calibration, few-shot selection, or any inspection that could shape a candidate.",
+    "membership_authority": "benchmarks/g13/pool_freeze_v2/CORPUS_SHARD_DIGESTS.txt",
+    "membership_encoding": "one row per shard binding (product_family, family, size, split, record_count, sha256, shard filename)",
+    "membership_list_of_case_ids_stored": false,
+    "membership_list_of_case_ids_stored_reason": "the shard table byte-pins each shard and the verifier reads (product_family, family, size, split) back out of every record, so a separate 240-entry id list would be a second source of truth with nothing extra to say",
+    "required_product_families": ["coding", "extraction", "planning", "reasoning"],
+    "required_sizes": ["S", "M", "L", "XL"],
+    "required_cell_count": 16,
+    "independent_inputs_per_required_cell": 15,
+    "screening_split_location": "the v1 pool, benchmarks/starter.jsonl, which this freeze declares as a contaminating foreign corpus",
+    "cross_split_policy": "no held-out input may share a case id, record digest, model-visible payload digest, rendered prompt digest or normalised template with any record of any other partition, including any split of the v1 pool"
+  },
+  "notes": {
+    "product_family_map": {
+      "coding": "code_generation",
+      "extraction": "extraction",
+      "planning": "dependency_planning",
+      "reasoning": "evidence_qa"
+    },
+    "mapping_discipline": "one product family maps to exactly one dataset family. Folding several dataset families into one product family would let a strong sub-family mask a weak one inside a single qualification cell."
+  }
+}

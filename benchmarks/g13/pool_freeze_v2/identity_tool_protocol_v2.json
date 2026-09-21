@@ -1,0 +1,23 @@
+{
+  "spec_of": "tool_protocol",
+  "identity": {
+    "tool_protocol_id": "g13-tool-protocol-v2-no-model-visible-tools",
+    "protocol_version": 2,
+    "model_visible_tools": 0,
+    "tool_descriptions_in_prompt": 0,
+    "tool_calls_permitted": false,
+    "retrieval_permitted": false,
+    "network_access_permitted": false,
+    "filesystem_access_permitted": false,
+    "multi_turn_permitted": false,
+    "turns_per_observation": 1,
+    "response_shape": "one assistant message, rendered per input.output_contract",
+    "sandbox_use": "grader side only; the python_unit scorer runs candidate source in src/swarm/tools/sandbox_runner.py after the observation is complete",
+    "rationale": "an observation that can call tools measures the harness as much as the model. Holding the tool surface at zero keeps an exact_model_config the only thing that varies between cells."
+  },
+  "implementation_pins": {
+    "prompt_module": "src/swarm/evals/g13_prompt_v2.py",
+    "sandbox_runner_module": "src/swarm/tools/sandbox_runner.py"
+  },
+  "binding": "every counted held-out observation must quote this tool_protocol_id; an observation taken under any other tool surface is not comparable and must not be counted"
+}

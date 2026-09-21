@@ -1,0 +1,24 @@
+{
+  "spec_of": "records",
+  "identity": {
+    "records_id": "g13-records-v2",
+    "record_count": 240,
+    "record_schema_version": "2.0",
+    "record_kind": "input_only",
+    "record_key_authority": "swarm.evals.g13_prompt_v2.RECORD_KEY_ALLOWLIST",
+    "record_key_policy": "closed allowlist; a record carrying any other key fails the freeze",
+    "answer_key_policy": "closed denylist applied at every depth; a record naming any answer, grader, reference, rubric or solution key fails the freeze",
+    "record_digest_algorithm": "sha256",
+    "record_digest_input": "the exact UTF-8 bytes of one JSONL record line including its terminating LF",
+    "record_digest_python_equivalent": "hashlib.sha256((line + chr(10)).encode('utf-8')).hexdigest()",
+    "record_digests_stored": false,
+    "record_digests_stored_reason": "each shard is byte-pinned by CORPUS_SHARD_DIGESTS.txt and each record's position is pinned by the declared canonical order, so every record's bytes are already pinned exactly. A second per-record list would only add a place to drift; the verifier recomputes record digests at verification time, which is where the contamination decisions are made.",
+    "record_digest_uniqueness_enforced": true,
+    "size_features_declared_on_record": false,
+    "size_features_declared_on_record_reason": "v1 bucketed on a generator-declared token estimate, which a record could misdescribe. v2 derives every structural feature from the model-visible payload, so a record cannot misdescribe its own size."
+  },
+  "notes": {
+    "shell_equivalent_for_one_record": "tail -n +K benchmarks/g13/pool_freeze_v2/holdout/<shard>.jsonl | head -n 1 | sha256sum",
+    "shard_equivalent": "sha256sum benchmarks/g13/pool_freeze_v2/holdout/<shard>.jsonl"
+  }
+}

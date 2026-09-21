@@ -1,0 +1,42 @@
+{
+  "spec_of": "independence_checker",
+  "identity": {
+    "checker_id": "g13-independence-checker-v2",
+    "checker_version": 2,
+    "mode": "fail_closed",
+    "reported_but_tolerated_axis_count": 0,
+    "normalisation": {
+      "synthetic_identifier_pattern": "\\b[A-Z]{2,}(?:[-_][A-Za-z0-9]+)*\\b",
+      "synthetic_identifier_placeholder": "@",
+      "digit_run_pattern": "[0-9]+",
+      "digit_run_placeholder": "#",
+      "case_folding": "lower",
+      "order": [
+        "substitute synthetic identifiers",
+        "substitute digit runs",
+        "lower-case"
+      ]
+    },
+    "intra_holdout_invariants": [
+      "holdout_case_id_duplicate",
+      "holdout_payload_digest_duplicate",
+      "holdout_prompt_digest_duplicate",
+      "holdout_template_duplicate"
+    ],
+    "cross_partition_invariants": [
+      "cross_partition_case_id_overlap",
+      "cross_partition_payload_digest_overlap",
+      "cross_partition_prompt_digest_overlap",
+      "cross_partition_template_isomorph"
+    ],
+    "foreign_partition_policy": "every partition other than the declared qualification held-out partition is treated as contaminating, including a foreign corpus' own held-out split: a split whose reference answers were ever worker-visible is burned"
+  },
+  "implementation_module": "src/swarm/evals/g13_independence.py",
+  "mirror_assertion": "this spec .identity block equals swarm.evals.g13_independence.checker_identity(), asserted by tests/evals/test_task_pool_freeze_v2.py",
+  "changed_from_v1": {
+    "v1_behaviour": "four invariants enforced (split id, record digest and visible-prompt overlap, plus duplicate held-out prompts); cross_split_template_isomorphs and distinct_held_out_templates reported as statistics only",
+    "v1_blocker": "B3 - seed-isomorphic held-out variants are distinct by digest but not statistically independent, so a Wilson bound over them overstates confidence",
+    "v2_behaviour": "all eight invariants are hard failures; a normalised-template collision is a violation, not a statistic"
+  },
+  "why_aggressive_normalisation": "a false collision fails the freeze, which is recoverable. A missed collision silently inflates a qualification bound, which is not."
+}

@@ -1,0 +1,27 @@
+{
+  "spec_of": "pool",
+  "identity": {
+    "pool_id": "g13-pool-freeze-v2",
+    "freeze_version": 2,
+    "supersedes": "g13-pool-freeze-v1",
+    "supersede_reason": "v1 held reference answers, graders and solutions in plaintext on the worker-visible branch, so its held-out split is burned and cannot be reused for counted qualification",
+    "corpus_root": "benchmarks/g13/pool_freeze_v2/holdout",
+    "sharding": "one JSONL shard per required (product_family, size) cell",
+    "shard_count": 16,
+    "record_count": 240,
+    "splits_present": ["holdout"],
+    "format": "jsonl",
+    "encoding": "utf-8",
+    "line_terminator": "LF",
+    "trailing_newline": true,
+    "record_kind": "input_only",
+    "hidden_fields_in_record": 0,
+    "canonical_order": "product_family ascending, then size in S, M, L, XL order, then record index ascending within a shard",
+    "byte_pin": "every shard is pinned by sha256 in CORPUS_SHARD_DIGESTS.txt, whose own sha256 is pinned by the manifest, whose sha256 is pinned by SHA256SUMS",
+    "regeneration_command": "python scripts/g13_freeze_task_pool_v2.py --verify --stats"
+  },
+  "notes": {
+    "why_sharded": "one shard per required cell makes the split identity and the per-cell depth readable without a 240-entry membership list, and lets a cell be re-minted without touching the other fifteen",
+    "why_no_calibration_split": "this artifact freezes only the qualification held-out corpus. Screening and routing calibration continue to use the v1 pool, which the independence checker treats as a contaminating foreign corpus so that no held-out input can be reused from it."
+  }
+}

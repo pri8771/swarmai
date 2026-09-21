@@ -1,0 +1,39 @@
+{
+  "spec_of": "scorer",
+  "identity": {
+    "scorer_id": "g13-scorer-v2",
+    "grader_contract_version": 2,
+    "scoring_is_binary_per_case": true,
+    "scoring_input": "the model response text plus exactly one sealed reference record resolved through g13-sealed-reference-interface-v2",
+    "scorer_may_read_the_corpus": true,
+    "scorer_may_read_the_reference_bundle": true,
+    "worker_may_read_the_reference_bundle": false,
+    "scorer_kinds": [
+      "json_exact",
+      "topological_order",
+      "python_unit"
+    ],
+    "scorer_kind_per_product_family": {
+      "coding": "python_unit",
+      "extraction": "json_exact",
+      "planning": "topological_order",
+      "reasoning": "json_exact"
+    },
+    "output_contract_is_authoritative": true,
+    "partial_credit": false,
+    "wilson_bound": {
+      "function": "swarm.evals.wilson.wilson_lower_bound",
+      "default_z_in_code": 1.96,
+      "default_z_is_wrong_for_this_protocol": true,
+      "required_one_sided_90_percent_z": 1.2815515655446004,
+      "counted_runs_must_pass_z_explicitly": true,
+      "changed_by_this_packet": false
+    }
+  },
+  "implementation_pins": {
+    "graders_module": "src/swarm/evals/graders.py",
+    "sandbox_runner_module": "src/swarm/tools/sandbox_runner.py",
+    "wilson_module": "src/swarm/evals/wilson.py"
+  },
+  "not_claimed": "no grader was executed by this packet, no threshold or default was changed, and no scorer output exists for any v2 record because the sealed reference bundle does not exist on this branch"
+}

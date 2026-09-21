@@ -5,7 +5,8 @@
 
 | Artifact | Claim | Not claimed |
 |----------|-------|-------------|
-| `g13/TASK_POOL_FREEZE.md` | ART-V13-TASK-POOL (V2B-001/W-131C1): frozen calibration-vs-held-out pool + manifest, digest-pinned identities, deterministic overlap/floating-manifest verifier | Artifact accept; authorisation to start counted qualification (`counted_qualification_ready=false`) |
+| `g13/TASK_POOL_FREEZE_V2.md` | ART-V13-TASK-POOL (EXT-WORKER-PC-V2B-001-R2): `g13-pool-freeze-v2` — 240 input-only held-out inputs, 15 per required cell, sealed grader-reference interface, fail-closed independence checker, ten pinned identities, computed readiness | Artifact accept; authorisation to start counted qualification (`counted_qualification_ready=false`); that the v2 verifier/generator/tests were executed in the worker environment |
+| `g13/TASK_POOL_FREEZE.md` | **historical, superseded by v2** — ART-V13-TASK-POOL (V2B-001/W-131C1): frozen calibration-vs-held-out pool + manifest, digest-pinned identities, deterministic overlap/floating-manifest verifier | Artifact accept; authorisation to start counted qualification (`counted_qualification_ready=false`) |
 | `g13/integration-note-v2b-001-shared-deltas.md` | Shared-file deltas counted qualification will need, written down instead of edited | Any Session-A shared file change |
 | `g13/QUALIFICATION_CRITERION.md` | Frozen rule pointer: n≥15, Wilson 90% LB≥0.80, families coding/planning/reasoning/extraction | Qualification |
 | `eval-131/w131a-qualification-gap-map.json` | Machine-readable W-131A gap map; third-model L/XL n=5 gaps **filled**; planned W-131B batches still `planned_not_executed` | n≥15/n≥30 qualification |

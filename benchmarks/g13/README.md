@@ -1,7 +1,68 @@
 # G13 benchmark freezes
 
+Two freezes live here. **`pool_freeze_v2/` is the current one**; `pool_freeze_v1/`
+is retained unchanged as historical, incomplete evidence from retry-02 and must
+not be used for counted qualification.
+
+| Freeze | Status | Why |
+|---|---|---|
+| `pool_freeze_v2/` | current | 240 input-only held-out inputs, 15 per required cell, sealed grader references, fail-closed independence checker |
+| `pool_freeze_v1/` | historical, superseded | 5 held-out records per cell against a protocol minimum of 15, and its reference answers were worker-visible in plaintext, which burns the split |
+
+---
+
+## `pool_freeze_v2/` — current
+
+Frozen EVAL-131 **held-out** corpus for artifact **ART-V13-TASK-POOL** (packet
+`EXT-WORKER-PC-V2B-001-R2`). Records are **input-only**: a v2 record has no field
+in which an answer, grader fixture, rubric or reference could sit.
+
+| File | What it pins |
+|------|--------------|
+| `task_pool_freeze_v2.manifest.json` | freeze/corpus identity, coverage, sealed-reference binding, foreign corpora, ten pinned identities, computed readiness |
+| `holdout/<product_family>_<size>.jsonl` | one shard per required cell, 15 independent inputs each |
+| `CORPUS_SHARD_DIGESTS.txt` | the split identity: one row per shard binding family, size, split, record count and sha256 |
+| `SEALED_REFERENCE_IDS.txt` | the hidden-reference id commitment — opaque surrogate keys only |
+| `identity_pool_v2.json` | pool identity `g13-pool-freeze-v2` |
+| `identity_records_v2.json` | record identity `g13-records-v2` |
+| `identity_split_v2.json` | split identity `g13-split-v2` |
+| `identity_size_classifier_v2.json` | structured size classifier `g13-size-classifier-v2` |
+| `identity_scorer_v2.json` | scorer / grader contract `g13-scorer-v2` |
+| `identity_prompt_v2.json` | prompt and model-visible surface `g13-prompt-v2` |
+| `identity_tool_protocol_v2.json` | tool protocol `g13-tool-protocol-v2-no-model-visible-tools` |
+| `identity_model_config_schema_v2.json` | `exact_model_config` schema `g13-exact-model-config-v2` |
+| `identity_independence_checker_v2.json` | contamination checker `g13-independence-checker-v2` |
+| `identity_sealed_reference_v2.json` | sealed grader-reference interface `g13-sealed-reference-interface-v2` |
+| `SHA256SUMS` | digest of every file above, recursively |
+
+### Independent verification
+
+```sh
+# immutability, with nothing but coreutils (run from inside pool_freeze_v2/)
+sha256sum -c --strict SHA256SUMS
+
+# full verification: identities, coverage, leakage, independence, readiness
+python scripts/g13_freeze_task_pool_v2.py --verify --stats
+python -m pytest tests/evals/test_task_pool_freeze_v2.py -q
+```
+
+### Status
+
+`counted_qualification_ready` is **computed**, not asserted: the verifier
+requires it to equal `freeze_conditions_pass and sealed_bundle_content_digest_bound`,
+so the manifest cannot drift into an unearned claim. It is currently **false**,
+because the sealed reference bundle is minted outside this branch and its content
+digest is not yet bound. It is a statement about the freeze, never about a model.
+See `docs/evidence/g13/TASK_POOL_FREEZE_V2.md`.
+
+---
+
+## `pool_freeze_v1/` — historical, superseded
+
 `pool_freeze_v1/` is the frozen EVAL-131 calibration / held-out task pool for
-artifact **ART-V13-TASK-POOL** (packet V2B-001, work item W-131C1).
+artifact **ART-V13-TASK-POOL** (packet V2B-001, work item W-131C1). It is kept
+byte-for-byte as it was, as the record of what retry-02 did and did not verify.
+Its calibration split is still the screening split; its held-out split is burned.
 
 | File | What it pins |
 |------|--------------|
@@ -14,7 +75,7 @@ artifact **ART-V13-TASK-POOL** (packet V2B-001, work item W-131C1).
 | `identity_model_config_schema_v1.json` | `exact_model_config` schema `g13-exact-model-config-v1` |
 | `SHA256SUMS` | digest of every file above |
 
-## Independent verification
+### Independent verification
 
 Immutability, with nothing but coreutils:
 
@@ -31,9 +92,9 @@ python scripts/g13_freeze_task_pool.py --verify --stats
 python -m pytest tests/evals/test_task_pool_freeze.py -q
 ```
 
-## Status
+### Status
 
-`qualification_claimed = false`. The freeze does **not** authorise counted
+`qualification_claimed = false`. The v1 freeze does **not** authorise counted
 qualification: `qualification_readiness.counted_qualification_ready` is `false`
 because the required cells hold 5 distinct held-out records each and the
 protocol needs `n >= 15`. See `docs/evidence/g13/TASK_POOL_FREEZE.md`.

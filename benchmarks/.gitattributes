@@ -1,5 +1,7 @@
 # Byte-frozen EVAL-131 artifacts. Their sha256 digests are pinned by
-# benchmarks/g13/pool_freeze_v1/, so git must never rewrite line endings on
-# checkout or commit — a CRLF checkout would invalidate every record digest.
+# benchmarks/g13/pool_freeze_v1/ and benchmarks/g13/pool_freeze_v2/, so git must
+# never rewrite line endings on checkout or commit — a CRLF checkout would
+# invalidate every record and shard digest.
 starter.jsonl -text
 g13/pool_freeze_v1/** -text
+g13/pool_freeze_v2/** -text

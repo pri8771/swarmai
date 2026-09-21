@@ -1,0 +1,276 @@
+{
+  "schema_version": "2.0",
+  "artifact_id": "ART-V13-TASK-POOL",
+  "packet": "EXT-WORKER-PC-V2B-001-R2",
+  "freeze_id": "g13-pool-freeze-v2",
+  "freeze_version": 2,
+  "artifact_state_requested": "reviewable",
+  "lead_review": "requested_not_granted",
+  "qualification_claimed": false,
+  "counted_qualification_started": false,
+  "counted_qualification_permitted_by_this_artifact": false,
+  "base_branch": "worker/swarmai-v13-task-pool-freeze-02",
+  "base_commit": "bbe41b7770123fef4eb03c4f03f95fc18eefc692",
+  "worker_branch": "worker/swarmai-v13-task-pool-freeze-04",
+  "generated_by": "scripts/g13_freeze_task_pool_v2.py",
+  "verified_by": "swarm.evals.task_pool_freeze_v2.verify_pool_freeze_v2",
+
+  "provenance": {
+    "worker_environment_denied": [
+      "python (beyond python --version)",
+      "pytest",
+      "ruff",
+      "mypy",
+      "git add",
+      "git commit",
+      "git fetch",
+      "git push"
+    ],
+    "worker_environment_permitted": [
+      "read-only git",
+      "file read/write tools",
+      "PowerShell ConvertFrom-Json",
+      "coreutils: head, tail, wc, grep, sort, uniq, od, sha256sum"
+    ],
+    "digests_produced_by": "sha256sum over the committed bytes, then cross-checked with sha256sum -c --strict over SHA256SUMS (29/29 OK)",
+    "digests_produced_by_the_committed_generator": false,
+    "commit_state": "the artifact exists in the working tree of worker/swarmai-v13-task-pool-freeze-04 only. Every writing git command was denied, so there is no commit and no pushed branch, and no commit SHA can be quoted. The branch ref is at the unchanged base bbe41b7770123fef4eb03c4f03f95fc18eefc692.",
+    "honesty_note": "the corpus arity, digests, id uniqueness, JSON well-formedness, per-record size bands and answer-leak count were established with the tools listed above. The committed Python was never executed. The generator recomputes byte-identical sidecars; the lead must run scripts/g13_freeze_task_pool_v2.py --verify --stats and tests/evals/test_task_pool_freeze_v2.py, plus ruff and mypy, before accepting this artifact.",
+    "regeneration_command": "python scripts/g13_freeze_task_pool_v2.py --verify --stats"
+  },
+
+  "corpus": {
+    "root": "benchmarks/g13/pool_freeze_v2/holdout",
+    "format": "jsonl",
+    "encoding": "utf-8",
+    "line_terminator": "LF",
+    "trailing_newline": true,
+    "record_count": 240,
+    "shard_count": 16,
+    "record_kind": "input_only",
+    "record_schema_authority": "swarm.evals.g13_prompt_v2.RECORD_KEY_ALLOWLIST",
+    "shard_table": {
+      "path": "benchmarks/g13/pool_freeze_v2/CORPUS_SHARD_DIGESTS.txt",
+      "sha256": "d9d0c074eb303db5ae243bfce1b2b1d707181a4e0d578d25b6bc66f215bbf6c6",
+      "row_count": 16
+    }
+  },
+
+  "coverage": {
+    "required_product_families": ["coding", "planning", "reasoning", "extraction"],
+    "required_sizes": ["S", "M", "L", "XL"],
+    "required_cell_count": 16,
+    "min_independent_per_required_cell": 15,
+    "min_total_independent_held_out": 240,
+    "frozen_independent_per_required_cell": 15,
+    "frozen_total_independent_held_out": 240,
+    "protocol_max_distinct_per_cell": 60,
+    "protocol_source": "EVAL_131_QUALIFICATION_PROTOCOL v1.0 as restated in docs/evidence/g13/QUALIFICATION_CRITERION.md",
+    "protocol_source_caveat": "origin/coordination/swarm-control was unreachable from this worker environment, so the protocol constants were taken from the in-repo restatement. If the coordination branch says otherwise, the coordination branch wins and this freeze needs a correction.",
+    "min_distinct_exact_model_configs": 3,
+    "auxiliary_product_families_in_this_freeze": 0,
+    "auxiliary_policy": "the v2 corpus holds required cells only. Auxiliary families are out of scope for this freeze and are not folded into any required cell, because merging several task types into one qualification cell lets a strong sub-type mask a weak one."
+  },
+
+  "independence_design": {
+    "distinct_task_variants_per_required_family": 5,
+    "distinct_scenarios_per_cell": 15,
+    "structural_loads_per_size": {
+      "S": [6, 7, 8],
+      "M": [11, 12, 13],
+      "L": [17, 18, 19],
+      "XL": [24, 25, 26]
+    },
+    "why_this_shape": "within one cell the fifteen inputs differ on two independent axes at once: five task variants with different instructions and output contracts, and three distinct structural loads per variant. Two inputs in the same cell therefore differ in both wording and payload arity, so neither is a re-skin of the other.",
+    "enforced_by": "swarm.evals.g13_independence.check_independence, fail-closed on all eight invariants"
+  },
+
+  "identities": {
+    "pool": {
+      "pool_id": "g13-pool-freeze-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_pool_v2.json",
+        "sha256": "39e20a679f9c5f2c7a506a1c48b87c613d3fe8658fce37ad7a87951db8347f27"
+      }
+    },
+    "records": {
+      "records_id": "g13-records-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_records_v2.json",
+        "sha256": "05976149532a9846c972c1873806abc9fc4e9a8c199c9ebca6b81c6d6cc8b547"
+      }
+    },
+    "split": {
+      "split_id": "g13-split-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_split_v2.json",
+        "sha256": "b8362aefbbb2db533d5981cef41ef6eff53d111acfde5de358ee413683ede77d"
+      }
+    },
+    "size_classifier": {
+      "classifier_id": "g13-size-classifier-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_size_classifier_v2.json",
+        "sha256": "b19a0e8a2b35c285d7db0f72948d6ed4e1eb846648839992725de3df365c650e"
+      },
+      "pinned_files": {
+        "src/swarm/evals/g13_size_classifier_v2.py": "e4757b60ba64a9c2458bf29348b3d7620a52aee1608d7602d1f2cf6af6244cd5"
+      },
+      "mirror_assertion": "the spec .identity block equals swarm.evals.g13_size_classifier_v2.classifier_identity()",
+      "round_trip_assertion": "the classifier reproduces the declared size band of all 240 frozen records"
+    },
+    "scorer": {
+      "scorer_id": "g13-scorer-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_scorer_v2.json",
+        "sha256": "3086f6d3a8db14d848b9c415692511e12489a5fed7102c7729f06b9124171578"
+      },
+      "pinned_files": {
+        "src/swarm/evals/graders.py": "4018533327fd905dfaa4a7f7163de9b364f06e5a9c66dbad3ae9e9fed2434600",
+        "src/swarm/tools/sandbox_runner.py": "b65064f24d124358f4f74dcd1d6ec45577d6aab027d4bdca7537b45e07d8f4ec",
+        "src/swarm/evals/wilson.py": "4fa8477547aecb99c1274c67256d2ca4e457e608712a3d0cbaf1b15c740a1774"
+      }
+    },
+    "prompt": {
+      "prompt_id": "g13-prompt-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_prompt_v2.json",
+        "sha256": "754c90b23c040cd7114ad11f420e63a4a4ceeac90f24b5eec7421f742fa34225"
+      },
+      "pinned_files": {
+        "src/swarm/evals/g13_prompt_v2.py": "57db6c7f01c6412ea801d9ea299be67ea611f97510fd87535301523ffc605e89"
+      },
+      "mirror_assertion": "the spec .identity block equals swarm.evals.g13_prompt_v2.prompt_identity()"
+    },
+    "tool_protocol": {
+      "tool_protocol_id": "g13-tool-protocol-v2-no-model-visible-tools",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_tool_protocol_v2.json",
+        "sha256": "eef1d9bb28ea8aaf25ec9a5080922af30cb74387bf043cfc5c1b003fb76db0ce"
+      }
+    },
+    "model_config_schema": {
+      "schema_id": "g13-exact-model-config-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_model_config_schema_v2.json",
+        "sha256": "346729b8ebb2511f228a28eb2fa7e0f4c563bcc9a8d93a7bb4ef8aaaf1ed8c78"
+      },
+      "binding": "every counted held-out observation must quote exactly one conforming exact_model_config object and its exact_model_config_id"
+    },
+    "independence_checker": {
+      "checker_id": "g13-independence-checker-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_independence_checker_v2.json",
+        "sha256": "c5d6744d42efc0af7a6699144ddbe646e4767d08ae2e22b945708476b862ff41"
+      },
+      "pinned_files": {
+        "src/swarm/evals/g13_independence.py": "9bb245f7a5fa17e9408efa9acf00c1d8ab03f362bf5d2b988915016adb710b57"
+      },
+      "mirror_assertion": "the spec .identity block equals swarm.evals.g13_independence.checker_identity()"
+    },
+    "sealed_reference_interface": {
+      "interface_id": "g13-sealed-reference-interface-v2",
+      "spec": {
+        "path": "benchmarks/g13/pool_freeze_v2/identity_sealed_reference_v2.json",
+        "sha256": "74e9fb307125e93acfc262927dec0e873b7ce228a83f59c01bfffbc8226cbc8c"
+      },
+      "pinned_files": {
+        "src/swarm/evals/g13_sealed_reference.py": "c2eba42d3d92c53a09ddfa8bf36d8308e93f80e7b637c2647c8829197f354537"
+      },
+      "mirror_assertion": "the spec .identity block equals swarm.evals.g13_sealed_reference.interface_identity()"
+    }
+  },
+
+  "sealed_reference": {
+    "interface_id": "g13-sealed-reference-interface-v2",
+    "worker_visible_fields_per_record": ["hidden_reference_id", "interface_id"],
+    "hidden_fields_in_record": 0,
+    "id_commitment": {
+      "path": "benchmarks/g13/pool_freeze_v2/SEALED_REFERENCE_IDS.txt",
+      "sha256": "43220642751fc1bd025c65b59d56e27297b5691d8d29e84c24b3402081677727",
+      "entry_count": 240,
+      "contents": "opaque surrogate keys only; no reference answer, grader fixture, rubric or answer digest"
+    },
+    "reference_bundle": {
+      "bundle_id": "g13-sealed-reference-bundle-v2",
+      "location": "outside_the_worker_visible_branch",
+      "expected_entry_count": 240,
+      "authored_by_this_packet": false,
+      "committed_to_this_branch": false,
+      "content_digest_binding": {
+        "declared_here": false,
+        "required_before_counted_qualification": true,
+        "bound_by": "whoever mints the sealed bundle, outside this branch",
+        "reason": "the bundle is not authored by this packet and must not be. A content digest quoted here would be fabricated, so the freeze leaves the binding open and the verifier computes counted_qualification_ready = false until it is bound."
+      },
+      "resolver_behaviour_on_this_branch": "fail_closed"
+    },
+    "closes_v1_blocker_b2": "v1 held expected_output, grader, reference_solution and broken_code in plaintext inside benchmarks/starter.jsonl. A v2 record has no field in which any of those could sit."
+  },
+
+  "foreign_corpora": [
+    {
+      "corpus_id": "g13-pool-freeze-v1",
+      "path": "benchmarks/starter.jsonl",
+      "sha256": "573bad7f04f6ea818fec31a6f790e4b4f70d3499c9b1c91eb39b5573de59be78",
+      "record_count": 224,
+      "prompt_field": "prompt",
+      "splits_present": ["calibration", "holdout"],
+      "why_foreign": "every split of the v1 pool is treated as contaminating. Its calibration split is used for screening, and its held-out split is burned because its reference answers were worker-visible in plaintext. No v2 held-out input may share a case id, payload digest, rendered prompt digest or normalised template with any v1 record.",
+      "mutated_by_this_packet": false
+    }
+  ],
+
+  "source_and_license": {
+    "third_party_datasets_used": 0,
+    "scraped_or_crawled_records": 0,
+    "personal_data": "absent by construction; every identifier is a generated token such as HRB-101, RQ-4, EV-7 or PUB",
+    "origin": "hand-authored inside this repository for packet EXT-WORKER-PC-V2B-001-R2",
+    "generation_marker_on_every_record": "generation.synthetic == true and generation.third_party_source == false",
+    "license": "inherits the SwarmAI repository terms; no separate dataset licence applies",
+    "license_file_present_at_frozen_commit": false,
+    "license_blocker": "the repository has no LICENSE file at the frozen commit, so the corpus inherits unstated repository terms. Carried forward from v1 blocker B5; it affects redistribution, not contamination or immutability.",
+    "redistribution": "internal_only",
+    "attribution_required": false
+  },
+
+  "qualification_readiness": {
+    "counted_qualification_ready": false,
+    "counted_qualification_ready_is_computed_not_declared": true,
+    "computation": "counted_qualification_ready == (freeze_conditions_pass and sealed_bundle_content_digest_bound). The manifest's declared value must equal the computed value or the freeze fails, so this field cannot drift into an unearned claim.",
+    "blocking_reason": "sealed_reference_bundle_content_digest_not_bound",
+    "blocking_detail": "the freeze conditions are mechanical and self-contained, but the sealed reference bundle is minted outside this branch and its content digest is not yet bound. Until it is, no held-out response can be scored and counted_qualification_ready stays false.",
+    "not_a_model_qualification_claim": "counted_qualification_ready describes the freeze only. It says nothing about whether any model, cell or capability profile is qualified.",
+    "verifier_not_executed_in_this_worker_environment": true,
+    "verifier_not_executed_detail": "the worker environment for this packet denied python, pytest, ruff and mypy execution. The freeze conditions have not been machine-checked; the lead must run scripts/g13_freeze_task_pool_v2.py --verify --stats and tests/evals/test_task_pool_freeze_v2.py before accepting this artifact.",
+    "remaining_blockers": [
+      "B2-v2 - the sealed reference bundle does not exist yet; it must be minted outside this branch, quote the frozen id-commitment digest, hold exactly 240 entries, and have its content digest bound",
+      "B4 - swarm.evals.wilson.wilson_lower_bound still defaults to z = 1.96 (one-sided 97.5 percent); counted runs must pass the one-sided 90 percent z = 1.2815515655446004 explicitly. No threshold or default was changed by this packet.",
+      "B5 - the repository still has no LICENSE file at the frozen commit",
+      "B6 - the v2 freeze verifier, generator and tests were not executed in this worker environment"
+    ],
+    "closed_blockers": [
+      "B1 - held-out depth was 5 per required cell against a protocol minimum of 15; the v2 corpus holds 15 independent inputs in every required cell, 240 in total",
+      "B2 - hidden answers were worker-visible; a v2 record is input-only and carries only an opaque hidden_reference_id",
+      "B3 - seed-isomorphic held-out variants were reported but tolerated; g13-independence-checker-v2 rejects normalised-template collisions as hard failures"
+    ]
+  },
+
+  "historical_evidence_preserved": {
+    "v1_freeze_directory": "benchmarks/g13/pool_freeze_v1",
+    "v1_evidence_document": "docs/evidence/g13/TASK_POOL_FREEZE.md",
+    "v1_status": "retained unchanged as historical incomplete evidence for retry-02; not superseded in place, not deleted, and still accurate about what it did and did not verify",
+    "modified_by_this_packet": false
+  },
+
+  "not_claimed": [
+    "ART-V13-TASK-POOL is not accepted; lead review is requested",
+    "no counted held-out qualification was run for this packet",
+    "no W-131B counted qualification was run",
+    "no cell is qualified and no capability profile was promoted",
+    "no threshold, acceptance rule or protocol constant was changed",
+    "no paid inference, deploy, release, main merge or force push occurred",
+    "the v2 freeze verifier, generator and test suite were not executed in this worker environment",
+    "the freeze does not by itself authorise counted qualification; qualification_readiness.counted_qualification_ready is false"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "spec_of": "sealed_reference_interface",
+  "identity": {
+    "interface_id": "g13-sealed-reference-interface-v2",
+    "interface_version": 2,
+    "bundle_id": "g13-sealed-reference-bundle-v2",
+    "worker_visible_fields": ["hidden_reference_id", "interface_id"],
+    "hidden_reference_id_pattern": "^g13hr2-[0-9]{4}$",
+    "hidden_reference_id_kind": "opaque_surrogate_key",
+    "hidden_reference_id_derived_from_reference_content": false,
+    "commitment_file": "SEALED_REFERENCE_IDS.txt",
+    "commitment_digest_algorithm": "sha256",
+    "reference_content_location": "outside_the_worker_visible_branch",
+    "reference_content_digest_declared_by_this_freeze": false,
+    "reference_content_digest_reason": "the sealed bundle is not authored by this packet and must not be, so a content digest quoted here would be fabricated. It is bound at seal time by whoever mints the bundle.",
+    "resolver_default_source_present": false,
+    "resolver_behaviour_without_source": "raise SealedReferenceUnavailable",
+    "resolver_requires_commitment_match": true,
+    "local_fallback_paths": 0
+  },
+  "implementation_module": "src/swarm/evals/g13_sealed_reference.py",
+  "mirror_assertion": "this spec .identity block equals swarm.evals.g13_sealed_reference.interface_identity(), asserted by tests/evals/test_task_pool_freeze_v2.py",
+  "closes_v1_blocker": {
+    "blocker": "B2 - expected_output, grader, reference_solution and broken_code sat in plaintext inside benchmarks/starter.jsonl, so any worker with repository read access could read the held-out answers",
+    "how": "a v2 record has no field in which an answer, grader fixture, rubric or answer digest could sit. It carries only an opaque surrogate key and an interface version, and the resolver has no default source and no local fallback path."
+  },
+  "what_the_worker_can_learn_from_a_hidden_reference_id": [
+    "that a sealed reference exists for this case",
+    "which interface version resolves it",
+    "its index in the bundle's own ordering"
+  ],
+  "what_the_worker_cannot_learn": [
+    "the reference content",
+    "the reference length or shape",
+    "any digest of the reference content",
+    "whether two cases share a reference"
+  ],
+  "seal_time_obligations": [
+    "the bundle must quote the commitment digest of SEALED_REFERENCE_IDS.txt as frozen by this manifest",
+    "the bundle must hold exactly 240 entries, one per opaque id, with no extra and no missing id",
+    "the bundle must live outside the worker-visible branch and must never be committed to it",
+    "the bundle's content digest must be bound before any counted qualification run; until then the freeze verifier computes counted_qualification_ready = false"
+  ]
+}

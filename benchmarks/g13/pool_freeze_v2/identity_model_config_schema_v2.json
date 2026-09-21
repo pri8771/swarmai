@@ -1,0 +1,114 @@
+{
+  "spec_of": "model_config_schema",
+  "identity": {
+    "schema_id": "g13-exact-model-config-v2",
+    "schema_version": 2,
+    "binding": "every counted held-out observation must quote exactly one conforming exact_model_config object together with its exact_model_config_id, and observations taken under two different conforming objects are never pooled into one cell",
+    "exact_model_config_id_rule": "sha256 of json.dumps(exact_model_config, sort_keys=True, separators=(',',':'), ensure_ascii=True), first 32 hex characters, prefixed with g13emc2-",
+    "unspecified_field_policy": "no field may be omitted and no field may be null. A model configuration that cannot state a value is not an exact configuration.",
+    "required_fields": [
+      "provider",
+      "model_id",
+      "model_version_or_snapshot",
+      "temperature",
+      "top_p",
+      "max_output_tokens",
+      "stop_sequences_present",
+      "seed_present",
+      "reasoning_effort",
+      "system_prompt_present",
+      "tool_surface_id",
+      "prompt_id",
+      "scorer_id",
+      "pool_id"
+    ]
+  },
+  "json_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "g13-exact-model-config-v2",
+    "title": "EVAL-131 exact model configuration, G13 freeze v2",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "provider",
+      "model_id",
+      "model_version_or_snapshot",
+      "temperature",
+      "top_p",
+      "max_output_tokens",
+      "stop_sequences_present",
+      "seed_present",
+      "reasoning_effort",
+      "system_prompt_present",
+      "tool_surface_id",
+      "prompt_id",
+      "scorer_id",
+      "pool_id"
+    ],
+    "properties": {
+      "provider": {
+        "type": "string",
+        "minLength": 1,
+        "description": "inference provider identifier, for example anthropic or openai"
+      },
+      "model_id": {
+        "type": "string",
+        "minLength": 1,
+        "description": "provider-side model identifier as sent on the wire"
+      },
+      "model_version_or_snapshot": {
+        "type": "string",
+        "minLength": 1,
+        "description": "the pinned snapshot or dated version; a floating alias is not an exact configuration"
+      },
+      "temperature": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 2
+      },
+      "top_p": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "maximum": 1
+      },
+      "max_output_tokens": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "stop_sequences_present": {
+        "type": "boolean"
+      },
+      "seed_present": {
+        "type": "boolean"
+      },
+      "reasoning_effort": {
+        "type": "string",
+        "enum": ["off", "low", "medium", "high", "max"],
+        "description": "off rather than none: a frozen identity spec must contain no token the freeze verifier reads as an unfilled slot"
+      },
+      "system_prompt_present": {
+        "type": "boolean",
+        "const": false,
+        "description": "g13-prompt-v2 sends no system prompt"
+      },
+      "tool_surface_id": {
+        "type": "string",
+        "const": "g13-tool-protocol-v2-no-model-visible-tools"
+      },
+      "prompt_id": {
+        "type": "string",
+        "const": "g13-prompt-v2"
+      },
+      "scorer_id": {
+        "type": "string",
+        "const": "g13-scorer-v2"
+      },
+      "pool_id": {
+        "type": "string",
+        "const": "g13-pool-freeze-v2"
+      }
+    }
+  },
+  "min_distinct_exact_model_configs_for_qualification": 3,
+  "min_distinct_exact_model_configs_source": "EVAL_131_QUALIFICATION_PROTOCOL v1.0 as restated in docs/evidence/g13/QUALIFICATION_CRITERION.md; the coordination branch was unreachable from this worker environment and wins if it says otherwise"
+}

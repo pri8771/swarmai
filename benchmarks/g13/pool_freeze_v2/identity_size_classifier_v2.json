@@ -1,0 +1,49 @@
+{
+  "spec_of": "size_classifier",
+  "identity": {
+    "classifier_id": "g13-size-classifier-v2",
+    "feature_source": "derived_from_model_visible_payload",
+    "feature_schema": [
+      "entity_count",
+      "constraint_count",
+      "dependency_depth",
+      "output_field_count",
+      "distractor_count"
+    ],
+    "feature_weights": {
+      "entity_count": 1,
+      "constraint_count": 1,
+      "dependency_depth": 2,
+      "output_field_count": 1,
+      "distractor_count": 1
+    },
+    "decision_feature": "structural_load",
+    "decision_formula": "sum(FEATURE_WEIGHTS[f] * features[f] for f in FEATURE_SCHEMA)",
+    "size_bands": ["S", "M", "L", "XL"],
+    "boundary_kind": "inclusive_upper_bound_global",
+    "load_bands": {
+      "S_max": 8,
+      "M_max": 14,
+      "L_max": 21,
+      "XL": "> 21"
+    },
+    "records_declare_features": false
+  },
+  "implementation_module": "src/swarm/evals/g13_size_classifier_v2.py",
+  "mirror_assertion": "this spec .identity block equals swarm.evals.g13_size_classifier_v2.classifier_identity(), asserted by tests/evals/test_task_pool_freeze_v2.py",
+  "round_trip_assertion": "the classifier reproduces the declared size band of all 240 frozen records, asserted by the freeze verifier",
+  "feature_derivation": {
+    "entity_count": "len(input.items)",
+    "constraint_count": "len(input.constraints)",
+    "dependency_depth": "edge count of the longest path through input.dependencies, 0 when the family declares no dependency graph; a cycle is a hard failure",
+    "output_field_count": "len(input.output_contract.fields)",
+    "distractor_count": "len(input.distractors), 0 when absent"
+  },
+  "why_global_bands": "v1 needed per-family bounds because it cut on a generator-declared token estimate whose scale differed wildly between families. structural_load is measured in comparable units, countable payload elements, so a single global band table separates the sizes across all four required families.",
+  "observed_loads_in_this_freeze": {
+    "S": [6, 7, 8],
+    "M": [11, 12, 13],
+    "L": [17, 18, 19],
+    "XL": [24, 25, 26]
+  }
+}
