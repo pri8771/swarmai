@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `8c28f0d5eed9f4b4a47f020760a55f44664bef45`
-- Coordination SHA: `d6d2d4857d967fddd1d1eede65c41c5e6e3627f6`
-- Updated: `2026-09-21T19:55:33Z`
+- Branch SHA: `f322672c24db3aae513c1b3301b005d4673419b6`
+- Coordination SHA: `a74191e4e81f0c8a6125e0d3845235bf6f80075f`
+- Updated: `2026-09-21T19:57:38Z`
 - Trigger: `manual`
 - Status: **working**
-- Current packet: `R15`
-- Current artifact: `ART-V15-LEASE-FENCING`
-- Last meaningful activity: `2026-09-21T19:55:32Z`
+- Current packet: `R16`
+- Current artifact: `ART-V15-WORKER-PROTOCOL`
+- Last meaningful activity: `2026-09-21T19:57:37Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: Actions billing; ART-V14 lead on v14-real-007; R06 sealed digest needs lead-held material
+- Blocker: USER_ACTION: Actions billing; ART-V14 CHANGES REQUIRED (new mission); R06 sealed digest lead-held; G12 0 remote routes
 
 ## Update
 
-R03 Done. Continued R13-R15 lease verify-on-tip (11+17+10 tests). Tip=8c28f0d5eed9f4b4a47f020760a55f44664bef45. No invent-accept R02/v14-real-007. Dual-writer cleared.
+R16 Done: worker protocol verify-on-tip vs a26f21a; 18/18 tests; tip=f322672c24db3aae513c1b3301b005d4673419b6. No invent-accept ART-V14/R02.
 
 ## Next
 
-R16 durable worker protocol verify, or R09 remote zero-charge admission
+R17 CP3 local recovery live checkpoint
