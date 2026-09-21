@@ -40,9 +40,11 @@ Key invariant: permission filter BEFORE ranking/context assembly.
 
 ## V1.7 / actions/tools/session
 For ART-V17-*:
-- `docs/artifacts/future/ART-V17-*.md`
+- the packet spec `packets/<ID>.md` (self-contained; conventions in `packets/README.md`)
+- `docs/artifacts/future/ART-V17-*.md` only if the spec sends you there
 - relevant ToolGateway/contracts/adapters/session source/tests
 Key invariant: durable approval/effect boundary; process-local idempotency is insufficient.
+Key truth: a library is not `wired` until the mission path calls it (audit findings W1–W4).
 
 ## V1.8–V2.3
 After V1.7 handoff:
@@ -64,6 +66,19 @@ Open only on demand:
 - `FUTURE_ACCEPTANCE_CASE_IDS_20260921.md`
 - `FUTURE_OPEN_DECISIONS_FREEZE_POINTS_20260921.md`
 - `FUTURE_INFRA_REUSE_DECISIONS_20260921.md`
+
+## Plan integrity
+- `tools/validate_plan.py` — run after any edit to a queue/graph JSON; `--ready` prints the executable set.
+- ID authority: execution IDs in the two queue files and `v30_packets`; contract-embedded IDs (`V2A-018a`, `V23A-001`, …) and coarse phase IDs (`V18-01`, …) are `aliases`/`maps_to` of those nodes.
+
+## Superseded — do not load for execution
+Kept for history only; where they conflict with the files above, the files above win.
+- `V16_TO_V30_FORWARD_PLAN_20260921.md`, `V16_TO_V30_TASK_BACKLOG_20260921.md` → `MASTER_PLAN_V17_TO_V30_20260921.md` + the queue files
+- `WORKER_PACKET_BACKLOG.md`, `V2_EXECUTION_PLAN.md` → the queue files (two-lane topology retired)
+- `V2_FOUNDATION_HARDENING_PACKETS.md` → lane assignments retired; its defect list remains an input to packet `20-01`
+- `TWO_CURSOR_TEAM.md`, `CURSOR_SESSION_A_RUNTIME_PROMPT.md`, `CURSOR_SESSION_B_PRODUCT_PROMPT.md`, `CURSOR_MAC_*_PROMPT.md`, `CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md`, `CURSOR_HOURLY_PROMPT.md`, `START_CURSOR_*.md`, `V1_4_*.md`, `EXECUTION_RESET_PLAN.md`, `packets/V2B-*`, `packets/EXT-WORKER-*`, `packets/OPS-AUTO-*`, `packets/B-OPS-*`, `packets/HB-CI-001.md`
+- `V17_CODE_AUDIT_20260921_1432.md` → `V17_CODE_AUDIT_20260921_2030_FABLE.md`
+- `ROADMAP_V1_TO_V3.md` keeps its owner-authority statements; its execution detail is superseded by the master plan.
 
 ## Rule
 If a large doc is unchanged and the active packet does not depend on it, do not reread it.
