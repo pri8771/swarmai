@@ -1,6 +1,6 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21T18:25:28Z
+Updated: 2026-09-21T18:54:11Z
 
 ## Current operating model
 
@@ -11,42 +11,57 @@ Updated: 2026-09-21T18:25:28Z
 | Operator | owner | Final authority |
 | ChatGPT | planning / coordination / independent review | No competing implementation lane |
 
-Implementation branch: `cursor/v17-single-session` @ `314f25b71b9f82dc37b092b8fb931ae3196c457c`.
-Legacy A/B assignments remain disabled.
+Implementation branch: `cursor/v17-single-session` @ `d4440bf20ed8218d7974411e6607bd668a890e1a`.
+Legacy A/B assignments remain disabled. Repository owner directive continues to supersede the older two-lane reset text.
 
 ## Heartbeat
 
 - Protocol: `SINGLE_SESSION_HEARTBEAT.md`; epoch `single-v17-20260921-01`; producer registered.
-- Heartbeat is liveness/progress only; this update does not invent scheduler receipts.
+- Recent scheduler receipts are healthy at `18:38:18Z`, `18:43:23Z`, and `18:48:27Z` (about five minutes apart).
+- Current human status at `18:54:11Z`: working on V1.6 knowledge, branch `d4440bf`.
+- Heartbeat is liveness/progress only and does not accept artifacts.
 
-## ART-V14-REAL-E2E — honest failed run packaged
+## Latest independent review — ART-V14-REAL-E2E
 
-- Run: **`v14-real-002`** / mission `18b9b59bd8a8479cb2152c13d3240d1b` @ candidate `17bf3a1c939df291023048b59bfcec6c2805eae6`.
-- Outcome: **failed** / `accepted=false` / `summary=repair_required` / `changed_files=[]` / spend **$0**.
-- Evidence (fail-closed, bound): `docs/evidence/v14-real-e2e/v14-real-002/` including `pre-run-freeze.json`, `mission-run.stdout.json`, `mission-record.json`, `cost-show.json`, `manifest.json`, `DIAGNOSIS.md`, **`bind.json`**.
-- Packaging tip: `314f25b71b9f82dc37b092b8fb931ae3196c457c` (bind stamped to `27f4a591eec07b0cd9051cf08fd07552ea63d95e`).
-- **Not accepted. Not V1.4 complete. No self-accept.**
+Decision: **CHANGES REQUIRED** for `v14-real-005` / candidate `9e82a5c5f90f04027e5d2dc1edf7941806205ddd`.
 
-### Root cause (v14-real-002)
+The run is valuable real evidence: persisted mission, actual brokered local `qwen2.5-coder:14b` calls at $0, isolated worktree, material diff, verification command, repair round, and no automatic primary-checkout apply.
 
-Implement path at run tip used `max_tokens=800`; Ollama returned `completion_tokens=800` with an **unclosed** ` ```python ` fence. Closed-fence-only `_extract_python_file` returned `None` → `implement_failed_no_known_answer_fallback` (known-answer path correctly refused) → empty material diff / review reject.
+It does **not** verify ART-V14-REAL-E2E. Independent review found:
+- the patch reads `cost.route_id` / `cost.model`, while the observed mission cost schema stores route/model on `cost.entries[]`, so the proposed fix does not repair the demonstrated loss;
+- the semantic reviewer prompt/text was contaminated by the unrelated `inclusive_range_count` dogfood task;
+- verification ran broad `tests/mission` rather than a focused regression proving the claimed cost-ledger fix.
 
-### Repair candidate (does not convert 002 to pass)
+Canonical review: `docs/coordination/reviews/ART-V14-REAL-E2E-V14-REAL-005-LEAD-REVIEW.md`.
+Preserve `v14-real-005` as failed independent-review evidence. Required next step is a bounded generic-review + focused-verification repair followed by a **new preregistered real mission**. Do not rewrite 005 into a pass.
 
-Branch tip includes unclosed-fence extract + higher implement `max_tokens` (see `4224b90` / later commits). A **new** preregistered freeze/run is required after lead authorization. Do not rewrite `v14-real-002`.
+## V1.5 progress
 
-## Other artifact truth
+- `V2A-003c` landed result-acceptance fencing at `ddd96a6a577f45f419ce9868506688ed4b08b5cf`; evidence reports 40 focused tests passed plus Ruff/mypy clean locally.
+- `V2A-004` landed durable worker service/client at `a26f21ab94ee784ce26423eac9ee3d28d15311a0`; evidence reports 33 focused tests passed plus Ruff/mypy clean locally; transport is in-process only.
+- `V2A-005` landed a simulated single-process multi-worker recovery harness at `ab6cd8d62e18ea025ac60351faf9a4d83416773a`; live Mac+Windows multi-host evidence remains **UNKNOWN / not satisfied**.
+- These are implementation/evidence advances, not V1.5 artifact acceptance.
 
-- `ART-V13-TASK-POOL` remains **reviewable** (not verified/frozen); HOST-WIN-DEV executable verification blocked on Darwin.
-- G12 remote overlap remains 0 admitted routes.
-- Incomplete local `v14-real-003` scratch (if present) is **not** a counted/packaged pass attempt under this update.
+## V1.6 progress
+
+- C1 knowledge repository landed at `7f8698159acc91eb5e6a2e41d4ad17031e9fbea1`.
+- C2-C5 permission-first retrieval, lifecycle, MemoryStore adapter, and context-budget work are present by `d4440bf20ed8218d7974411e6607bd668a890e1a`.
+- No V1.6 artifact acceptance is claimed; task-quality evidence remains UNKNOWN pending review.
+
+## CI / blockers
+
+- Exact-tip GitHub Actions run `35641393824` for `d4440bf` is red. All three jobs (`offline`, `console`, `live-gated`) ended with no recorded steps, so this run does not provide executable source-test evidence. Do not relabel it green or infer a code failure from absent steps.
+- `ART-V13-TASK-POOL` remains **reviewable, not verified/frozen**; actual HOST-WIN-DEV executable verification is still required before lead freeze and sealed-reference binding.
+- G12 remote overlap remains blocked at 0 admitted remote routes.
+- ART-V14 real E2E remains drafting / changes required.
+- V1.5 live multi-host evidence remains incomplete.
 
 ## Top next actions
 
-1. Lead review of fail-closed `v14-real-002` bind + diagnosis.
-2. If repair candidate accepted: authorize **new** freeze/run id for genuine mission rerun (not a parallel duplicate of 002).
-3. Continue G13 honesty / dependency-independent V1.5–V1.7 work without inventing V14 acceptance.
+1. Repair the generic V14 semantic reviewer and require a target-relevant regression/check; run a new preregistered real mission.
+2. Continue dependency-independent V1.6/V1.7 implementation, but keep all artifact states honest and do not self-accept.
+3. Resolve/observe GitHub Actions pre-step failure and preserve local test evidence; do not treat red/no-step CI as source verification.
 
 ## Human action
 
-No main merge, public release/deploy, force push, or additional spend authorized.
+No main merge, public release/deploy, force push, or additional spend authorized. No immediate human-only MFA/login/consent action is currently required.
