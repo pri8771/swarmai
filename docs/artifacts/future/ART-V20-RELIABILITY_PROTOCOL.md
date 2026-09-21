@@ -1,4 +1,4 @@
-# ART-V20-RELIABILITY-PROTOCOL — integrated V2 observation plan
+# ART-V20-RELIABILITY-PROTOCOL — integrated reliability observation
 
 Status: drafting
 Target: V2.0
@@ -6,68 +6,94 @@ Owner: ChatGPT lead
 
 ## Candidate freeze
 
-Before time-bound observation:
+Before reliability evidence counts:
 - exact integration SHA;
-- schema/migration revision;
-- dependency lock;
-- provider route/admission versions;
-- model qualification profile;
+- migration head;
+- config/policy versions;
+- route/qualification profile versions;
 - extension manifests;
+- knowledge schema/version;
 - worker protocol version;
-- knowledge/tool/recovery policy versions;
-- support matrix.
+- site epoch/recovery version;
+- supported-capability matrix.
 
 Material runtime/security/routing changes restart affected observation evidence.
 
 ## Metrics
 
-For each supported mission/journey:
-- attempted/completed/accepted/failed;
-- expected denial vs unexpected exception;
-- wall time;
-- model/tool attempts and retries;
-- inference tokens/usage/cost or unknown;
-- worker lease churn;
-- provider fallback;
-- knowledge retrieval token cost;
-- tool effects/reconciliation;
-- artifact counts;
-- restart/recovery events.
+Per supported mission:
+- final accepted/failed/blocked status;
+- unexpected application exceptions;
+- latency;
+- model calls/tokens/cost or explicit unknown;
+- retries/repair rounds;
+- worker leases/reassignments;
+- provider reservation/fallback;
+- tool action/unknown/reconciliation;
+- artifact integrity;
+- knowledge retrieval counts/tokens/provenance;
+- cancellation behavior.
 
-Global:
-- unexpected application exception count;
-- duplicate accepted effect count;
-- cross-project violation count;
-- secret leakage count;
-- unapproved spend count;
-- stuck mission/lease count;
-- stale result accepted count.
+System:
+- control-plane restarts;
+- worker heartbeat/lease expiry;
+- DB/migration failures;
+- queue backlog/age;
+- duplicate accepted result/effect count;
+- cross-project denial failures;
+- stale-site rejection;
+- backup age/RPO;
+- resource use.
 
-Targets for accepted candidate:
-- zero cross-project violations;
-- zero secret leaks;
-- zero unapproved charges;
-- zero duplicate accepted consequential effects;
-- zero stale worker/site results accepted;
-- zero known unresolved defects in declared supported workflows;
-- unexpected app errors triaged/fixed/rerun before acceptance.
+## Failure classification
 
-## Fault drills
+Expected handled:
+- unsupported task;
+- quota exhaustion;
+- denied permission;
+- explicit cancellation;
+- unqualified/unavailable route;
+- intentionally injected worker/provider outage.
 
-During observation include:
-- provider route unavailable;
-- worker process killed;
-- control-plane restart;
-- lease expiry/reassignment;
-- knowledge item superseded/deleted;
-- approval expires/changes;
-- extension disabled/incompatible;
-- backup/restore recovery drill.
+Unexpected:
+- unhandled exception on supported path;
+- data/authorization leak;
+- duplicate accepted consequential effect;
+- lost accepted mission/artifact without declared recovery limitation;
+- false success/readiness;
+- process deadlock requiring undocumented intervention.
 
-## Observation truth
+## Required drills
 
-Implementation-complete V2.0 may exist before this wall-clock protocol finishes.
+- API/control restart with durable mission reopen;
+- worker kill/reassignment/stale result;
+- provider route loss/fallback or honest wait;
+- tool response-loss reconciliation;
+- backup/restore to clean target;
+- stale-site/epoch rejection;
+- knowledge deletion/supersession;
+- extension incompatibility/disable;
+- concurrency/backpressure under declared limits.
 
-Never backdate, compress or infer elapsed stability from unit tests.
+## Observation duration
 
-The exact accepted duration is an owner/lead release artifact and should be frozen before final observation begins; until then report implementation candidate, not accepted stable release.
+The owner wants implementation speed, but elapsed reliability windows remain real time.
+
+Use the existing roadmap's intended deployment observation as the final V2 acceptance window unless a later explicit owner/lead protocol changes it before the run. Do not post-hoc shorten after seeing results.
+
+Today's target may be an implementation-complete candidate with this protocol frozen and drills runnable.
+
+## Exit report
+
+- candidate/config identities;
+- start/end wall-clock;
+- mission/drill inventory including failures/retries;
+- unexpected-error inventory;
+- known limitations;
+- duplicate-effect count;
+- security boundary violations;
+- RPO/RTO observations;
+- resource/cost observations;
+- support-matrix changes.
+
+No universal bug-free claim.
