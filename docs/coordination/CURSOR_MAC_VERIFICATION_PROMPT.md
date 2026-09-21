@@ -103,12 +103,23 @@ Requirements:
 - no paid/remote calls;
 - no claim that local dual routes satisfy dual-remote G12;
 - no stub/mock result may be labeled live inference;
-- distinguish deterministic broker/admission simulation from actual local-model execution;
 - candidate SHA/config identity recorded;
 - broker denial cannot execute adapter/direct fallback;
 - reconciliation/accounting complete.
 
-If existing evidence harnesses overstate "live" semantics because adapter behavior is stubbed, fix the evidence labeling/harness, not production broker code.
+Lead review has already demoted the historical local fallback/reconciliation artifacts to drafting because their broker adapter was stubbed and source binding is stale.
+
+Therefore C1 should attempt a **real local Ollama revalidation** using exact currently installed models, preferably the existing `gemma3:4b` and `qwen3.5:4b` only if actually present:
+1. record `/api/tags` model availability or equivalent exact local inventory;
+2. call each route through the governed broker with real local inference;
+3. record exact model/route/config/candidate identity, timestamps and actual usage available;
+4. perform controlled local route disable/unavailability and actually execute the permitted alternative route;
+5. exercise bounded quota reservation/settlement and honest deny on exhaustion;
+6. preserve zero cost and no remote calls.
+
+If the required local model is unavailable, record the artifact blocked/partial rather than substituting the stub. The existing stubbed harness may remain as deterministic broker regression evidence but must be labeled simulated/deterministic, not live-local inference.
+
+Do not modify production broker code in C1; a discovered broker defect is handed to Session A with a failing regression.
 
 Proposed transition:
 local fallback/reconciliation may become reviewable/verified only after ChatGPT reviews exact evidence.
