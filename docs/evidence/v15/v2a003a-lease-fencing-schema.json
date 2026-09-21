@@ -1,0 +1,30 @@
+{
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "packet_id": "V2A-003a",
+  "scenario": "schema_models_repository_foundation",
+  "status": "pass",
+  "recorded_at": "2026-09-21T01:02:58.269305+00:00",
+  "candidate_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "commands": [
+    "PYTHONPATH=src python -m pytest tests/db/test_token_hash.py tests/integration/db/test_lease_fencing_schema.py -q",
+    "PYTHONPATH=src python -m pytest tests/integration/db/test_persistence.py -q"
+  ],
+  "results": {
+    "token_hash_and_lease_fencing_tests": "8 passed",
+    "persistence_regression": "passed_after_schema_delta",
+    "migration_revision": "a15lease003a0001",
+    "tables_added": [
+      "task_leases",
+      "worker_results"
+    ],
+    "tables_extended": [
+      "worker_leases",
+      "task_attempts"
+    ],
+    "raw_membership_token_persisted": false,
+    "api_routes_wired": false,
+    "note": "V2A-003a foundation only; claim/renew/accept fencing is V2A-003b/c"
+  }
+}

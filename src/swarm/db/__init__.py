@@ -7,6 +7,13 @@ from swarm.db.engine import (
     ping,
     session_scope,
 )
+from swarm.db.lease_fencing import (
+    RawTokenPersistenceError,
+    TaskAttemptRepository,
+    TaskLeaseRepository,
+    WorkerRegistrationRepository,
+    WorkerResultRepository,
+)
 from swarm.db.models import Base
 from swarm.db.outbox import OutboxPublisher
 from swarm.db.repositories import (
@@ -18,6 +25,7 @@ from swarm.db.repositories import (
     MissionRepository,
     OutboxRepository,
 )
+from swarm.db.token_hash import hash_membership_token, new_token_id, verify_membership_token
 
 __all__ = [
     "Base",
@@ -34,4 +42,12 @@ __all__ = [
     "LedgerRepository",
     "MissionRepository",
     "OutboxRepository",
+    "RawTokenPersistenceError",
+    "TaskAttemptRepository",
+    "TaskLeaseRepository",
+    "WorkerRegistrationRepository",
+    "WorkerResultRepository",
+    "hash_membership_token",
+    "new_token_id",
+    "verify_membership_token",
 ]

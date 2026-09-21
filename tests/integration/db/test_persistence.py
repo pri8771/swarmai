@@ -67,7 +67,8 @@ def session(engine):
                 "TRUNCATE missions, tasks, graph_revisions, findings, artifact_metadata, "
                 "reservations, attempt_receipts, events, outbox, provider_accounts, "
                 "route_snapshots, quota_buckets, capability_profiles, approvals, "
-                "worker_leases, task_attempts RESTART IDENTITY CASCADE"
+                "worker_results, task_leases, worker_leases, task_attempts "
+                "RESTART IDENTITY CASCADE"
             )
         )
         sess.commit()
