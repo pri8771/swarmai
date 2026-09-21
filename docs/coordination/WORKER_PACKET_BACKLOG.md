@@ -28,7 +28,9 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
   3. Remove the `_CLAIM_CANDIDATE_BATCH=32` head-of-line correctness limit. Safely paginate/filter until an eligible row is found or the current eligible set is exhausted; add a regression with >32 incompatible higher-priority rows followed by an eligible row.
   4. Renewal must re-check current task/mission authority before extension: mission still runnable/not cancelled, task/mission/project/revision/source/cancellation generation still match the lease/attempt. A lease must not be extended merely because worker/project/generation/token still match.
 5. Expiry/requeue must not revive a cancelled/superseded/stale-authority task as runnable work. Reconcile the task to an honest terminal/superseded/cancelled state or otherwise keep it non-dispatchable when mission/task authority is no longer current.
-6. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
+6. Enforce durable dependency readiness before claim: every dependency in the current task graph must be in an allowed completed/accepted terminal state for the same mission/project/current graph. A stale `ready` flag alone is not sufficient. Unresolved/stale dependencies leave the task unmutated and the scan continues to another eligible task.
+7. Renewal must enforce `renewable_until` as a hard upper bound. A renewal may not set `expires_at` beyond the renewable horizon, may not accidentally shorten a currently later valid expiry, and must fail when no positive renewal window remains. Add boundary regressions.
+8. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
 - Acceptance: direct negative tests for cancellation/source/project staleness, >32 HOL regression, focused DB tests, and full exact-tip CI green. No result acceptance fence or API route wiring is silently folded in.
 
 ### READY A1 — V2A-H6A-R — secret-file and overwrite-safety repair
