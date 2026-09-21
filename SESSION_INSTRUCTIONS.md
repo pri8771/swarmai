@@ -13,6 +13,19 @@ Session A owns shared runtime/API/DB migration/integration surfaces.
 4. Read fresh `HEARTBEAT_PROTOCOL.md`, `HEARTBEAT_STATE.json`, `ARTIFACT_REGISTRY.json`, `WORK_QUEUE.md`, `WORKER_PACKET_BACKLOG.md`, and newest `AGENT_MESSAGES.md` from `origin/coordination/swarm-control`.
 5. Newest coordination state overrides older bootstrap text.
 
+## Heartbeat stress-test override — 2026-09-21
+
+Fresh owner-directed heartbeat test supersedes older cadence text.
+
+After pulling:
+1. rerun `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`;
+2. OS scheduler wakes every 5 minutes;
+3. Phase 1 requires 3 consecutive scheduler heartbeats with 3–8 minute gaps for BOTH A and B;
+4. after lead verifies both, canonical cadence becomes 15 minutes for a real 24-hour soak;
+5. after the full 24-hour soak is independently verified, cadence may return to hourly.
+
+Only `trigger=scheduler` counts. Manual/install/work/review heartbeats never advance the streak. Heartbeat testing must not stop useful project work.
+
 ## Heartbeat client update — reinstall once
 
 The heartbeat client was corrected so manual/forced packet updates no longer reset or suppress the scheduler's 15-minute proof clock. Windows scheduler diagnostics were also added.
