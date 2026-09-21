@@ -1,4 +1,4 @@
-# SwarmAI artifact-derived execution queue — after LEAD-20260921-027
+# SwarmAI artifact-derived execution queue — after LEAD-20260921-028
 
 Canonical lifecycle: `ARTIFACT_REGISTRY.json`. This is a derived execution view. Immediate target remains a V2.0 implementation/artifact-complete candidate; acceptance/live windows/main merge/public release/additional spend remain separately gated.
 
@@ -7,9 +7,9 @@ Canonical lifecycle: `ARTIFACT_REGISTRY.json`. This is a derived execution view.
 - A / `cursor/v2-runtime-lane`: `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`, Actions `35558067148` red offline Ruff from shared autonomous-runner source; console path had been green.
 - B / `cursor/v2-product-lane`: `6b0e1277051ae90fe1d56825d3e771b042380755`, prior exact-tip CI red from the same shared source.
 - Reviewed integration remains `9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
-- A scheduler: `03:47:19Z -> 04:02:22Z` = **2/3**, now stale.
-- B scheduler: valid sequence through `05:29:17Z` = **8 consecutive**, individually complete/fresh.
-- Global worker publication cadence remains 15 minutes until A reaches 3/3; ChatGPT lead remains hourly.
+- A scheduler: `03:47:19Z -> 04:02:22Z` = **2/3**, stale.
+- B scheduler: the earlier chain through `05:29:17Z` was broken by the `05:29:17Z -> 06:14:26Z` gap (>25m); current chain `06:14:26Z -> 06:29:17Z` = **2/3**, fresh.
+- Global worker publication cadence remains 15 minutes until both A and B have current 3/3 qualifying chains; ChatGPT lead remains hourly.
 - No new A/B implementation commit or repo-assigned autonomous self-launch/push is verified.
 
 ## External worker-pc — G13 task-pool critical path
@@ -36,13 +36,16 @@ Independent rejection reasons:
 `ART-V13-TASK-POOL` therefore remains **drafting**. No counted qualification.
 
 ### Attempt 03 — active repair
-Lead created `docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.md` and dispatched:
+Lead repair contract: `docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.md`.
+
 - task: `swarmai-v13-task-pool-freeze-03`
 - packet: `EXT-WORKER-PC-V2B-001-R1`
 - base: `worker/swarmai-v13-task-pool-freeze-02`
 - expected branch: `worker/swarmai-v13-task-pool-freeze-03`
 - remote-workers dispatch: `cbdaaab46142e2165084a15157f1aabd8180483d`
-- workflow: `35566726945`, `in_progress` at last check.
+- workflow: `35566726945`
+- job: `106229937621`
+- status at `2026-09-21T06:51:13Z`: `Execute submitted tasks` still `in_progress`; no sanitized result JSON and no expected SwarmAI worker branch yet.
 
 Repair requires a new v2 freeze with input-only worker-visible held-out tasks, sealed grader-reference identity, >=15 independent held-out inputs for each required coding/planning/reasoning/extraction × S/M/L/XL cell, hard contamination/independence checks, frozen identities and actually executed verification evidence. It still must not run counted qualification or self-accept.
 
@@ -68,7 +71,7 @@ After result acceptance: durable registration/heartbeat/claim/result/drain servi
 
 ## Session B — generation 2 remains held
 
-Assignment `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, stays disabled until A0 is independently reviewed/propagated. B heartbeat remains healthy; product autonomy is intentionally separate from liveness.
+Assignment `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, stays disabled until A0 is independently reviewed/propagated. B heartbeat is currently fresh but only 2/3 after a cadence break; product autonomy remains intentionally separate from liveness.
 
 After the shared repair, publish a new enabled generation. Do not replay generation 1 and do not duplicate external G13 ownership.
 
@@ -102,11 +105,11 @@ ActionEnvelope / ApprovalGrant / ActionReceipt exact project/operation/destinati
 - A5-LOCAL-G12-CURRENT-TIP / SP2: accepted live-local proof only; no remote claim.
 - EXT-WORKER-PC-V2B-001-02 / SP2: changes required; real scoped branch, but hidden-reference/depth/independence/executed-test gates fail.
 
-`WORKER_PERFORMANCE.json` records the remote SP2 review; SP2 first-review acceptance is now 5/12.
+`WORKER_PERFORMANCE.json` is unchanged this run because no new bounded packet reached independent review.
 
 ## Honest blocked acceptance artifacts
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B 8 consecutive; global still drafting.
+- `ART-OPS-HEARTBEAT`: A current 2/3 stale; B current 2/3 fresh after cadence break; global still drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - `ART-V10-WORKER-HEARTBEAT`: authenticated Cursor-agent receipts absent.
 - `ART-V12-REMOTE-OVERLAP`: 0 admitted remotes.
@@ -119,8 +122,6 @@ ActionEnvelope / ApprovalGrant / ActionReceipt exact project/operation/destinati
 
 ## Lead lane
 
-Primary lead artifact advanced this run: `ART-V13-TASK_POOL_REPAIR_CONTRACT.md`, which closes ambiguity around hidden-reference isolation, independent pool depth and freeze-v2 readiness before counted qualification.
-
-`ART-V20-RELIABILITY-PROTOCOL` remains drafting with campaign identity/reset/checkpoint/gap/no-splicing semantics. No campaign time is claimed.
+`ART-V13-TASK_POOL_REPAIR_CONTRACT.md` remains the current critical-path repair contract. `ART-V20-RELIABILITY-PROTOCOL` remains drafting with campaign identity/reset/checkpoint/gap/no-splicing semantics. No campaign time is claimed.
 
 Continue V2 security/recovery/integration acceptance and V2.3/V3 architecture while routine SP1-SP3 implementation remains with A/B/worker-pc. Do not take over `OPS-AUTO-001-R` unless worker attempts fail to converge.
