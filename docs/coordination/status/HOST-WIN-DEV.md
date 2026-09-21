@@ -3,7 +3,7 @@
 Lane: B — Product / Evaluation / Knowledge / Tools  
 Session: B  
 Updated: 2026-09-21T16:12:52+00:00  
-Heartbeat: scheduler  
+Heartbeat: install  
 Effective cadence: 5 minutes  
 Branch: `cursor/v2-product-lane`  
 Branch SHA: `2693bb59d9142a753546ed55ccb787223572ea94`  
