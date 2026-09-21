@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `f322672c24db3aae513c1b3301b005d4673419b6`
-- Coordination SHA: `a74191e4e81f0c8a6125e0d3845235bf6f80075f`
-- Updated: `2026-09-21T19:57:38Z`
-- Trigger: `manual`
+- Coordination SHA: `fb379d8fb8600ee2a30ad3da59857a960c92c6fd`
+- Updated: `2026-09-21T20:00:25Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R16`
 - Current artifact: `ART-V15-WORKER-PROTOCOL`
