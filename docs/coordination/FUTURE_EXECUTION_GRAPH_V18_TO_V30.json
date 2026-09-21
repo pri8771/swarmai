@@ -1030,7 +1030,7 @@
       ],
       "type": "wall_clock",
       "sp": 2,
-      "goal": "Live private CP30: real elapsed schedule evidence, one governed learning proposal through canary, revoke/pause negatives.",
+      "goal": "Live private CP30: real elapsed schedule evidence, one governed learning proposal through canary, revoke/pause negatives. The counted run must include one reversible real external action (for example the private-repo GitHub acceptance action) through the V1.7 boundary; restart/replay must not duplicate it.",
       "exit": "wall-clock evidence observed, never simulated",
       "status": "planned",
       "proposed": true,
