@@ -120,4 +120,122 @@ The lead may advance design artifacts without changing the active candidate. `AR
 
 ## Queue rule
 
-When a packet blocks on human auth/provider eligibility/review, Cursor moves to another dependency-ready packet **inside V1.4**. Routine SP1-SP3 implementation/test work stays with Cursor. The lead should preserve at least three ready packets when practical, resolve architecture/evidence contracts, and must not invent worker execution or start future-version code.
+When a packet blocks on human auth/provider eligibility/review, Cursor moves to another dependency-ready packet **inside V1.4**. Routine SP1-SP3 implementation/test work stays with Cursor. The lead should preserve at least three ready packets when practical, resolve architecture/evidence contracts, and must not invent worker execution or start future-version code.## V2 acceleration packets — two Cursor sessions
+
+### Session A — Runtime / Control Plane / Integration
+
+#### V2A-001 — close operational broker bypass
+- Artifact: ART-V12-BROKER-CONTRACT
+- SP2
+- Branch: cursor/v2-runtime-lane
+- Ready: yes
+- Acceptance: ProductStore/generic API+CLI path uses governed project-scoped broker; direct fallback cannot execute if broker denies; focused regression + full lane CI.
+
+#### V2A-002 — actual service process restart
+- Artifact: ART-V11-RESTART-EVIDENCE
+- SP1
+- Branch: cursor/v2-runtime-lane
+- Ready: yes
+- Acceptance: stop real API process, start fresh process against same durable store, reopen same mission from another surface with exact evidence.
+
+#### V2A-003a — durable worker schema/repository
+- Artifact: ART-V15-LEASE-FENCING
+- SP2
+- Branch: cursor/v2-runtime-lane
+- Ready: yes after reading lead ADR
+- Acceptance: SQLAlchemy/Alembic worker/attempt/lease/result persistence; migrations and repository tests.
+
+#### V2A-003b — atomic lease claim/renew/expire
+- Artifact: ART-V15-LEASE-FENCING
+- SP2
+- Depends: V2A-003a
+- Acceptance: transactional single-winner claim, renewal/expiry semantics, race tests.
+
+#### V2A-003c — result acceptance fence
+- Artifact: ART-V15-LEASE-FENCING
+- SP2
+- Depends: V2A-003b
+- Acceptance: stale generation/lease/cancel/source/duplicate result cannot become accepted.
+
+#### V2A-004 — worker protocol service/client
+- Artifact: ART-V15-WORKER-PROTOCOL
+- SP3
+- Depends: V2A-003c
+- Acceptance: registration/heartbeat/claim/result/drain against durable store; restart-safe tests.
+
+#### V2A-018a — site authority epoch
+- Artifact: ART-V18-SITE-EPOCH
+- SP2
+- Depends: durable worker/control store
+- Acceptance: only current epoch may accept new consequential effects.
+
+#### V2A-018b — backup manifest/CLI
+- Artifact: ART-V18-SITE-EPOCH
+- SP2
+
+#### V2A-018c — restore/reconcile CLI
+- Artifact: ART-V18-SITE-EPOCH
+- SP3
+
+### Session B — Knowledge / Tools / Product / Beta
+
+#### V2B-001 — freeze qualification held-out manifest
+- Artifact: ART-V13-TASK-POOL
+- SP2
+- Branch: cursor/v2-product-lane
+- Ready: yes
+- Acceptance: separate calibration vs held-out IDs/hashes plus scorer/prompt/tool/size/model versions; no worker-visible hidden answers.
+
+#### V2B-002 — reviewer calibration + benchmark freeze
+- Artifact: ART-V13-REVIEWER-QUALIFICATION
+- SP3
+- Branch: cursor/v2-product-lane
+- Ready: yes (calibration only)
+- Acceptance: diagnose weak current reviewer screening on calibration tasks, freeze new benchmark/scorer version; no qualification claim yet.
+
+#### V2B-003a — provenance repository
+- Artifact: ART-V16-PROVENANCE
+- SP2
+- Ready: yes after lead schema
+- Acceptance: versioned knowledge classes/provenance/permission labels/tombstones behind non-shared module.
+
+#### V2B-003b — permission-first retrieval
+- Artifact: ART-V16-PERMISSION-RETRIEVAL
+- SP2
+- Depends: V2B-003a
+
+#### V2B-003c — supersession/deletion migration
+- Artifact: ART-V16-SUPERSESSION
+- SP2
+- Depends: V2B-003a
+
+#### V2B-004a — action/approval/receipt contracts
+- Artifact: ART-V17-APPROVAL-BINDING
+- SP2
+- Ready: yes after lead contract
+
+#### V2B-004b — ToolGateway adapter
+- Artifact: ART-V17-APPROVAL-BINDING / ART-V17-TOOL-CONTRACT
+- SP2
+- Depends: V2B-004a
+
+#### V2B-019a — extension manifest
+- Artifact: ART-V19-EXTENSION-CONTRACT
+- SP2
+- Depends: V2B-004a
+
+## Shared integration packets
+
+Session A owns integration branch `cursor/v2-integration`.
+
+At each artifact review boundary:
+1. lead reviews lane artifact;
+2. Session B provides exact commit/integration note when applicable;
+3. Session A integrates reviewed commits;
+4. full integrated CI;
+5. artifact source ref moves to integration SHA.
+
+Do not continuously merge half-finished work.
+
+
+
