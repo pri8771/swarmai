@@ -1,114 +1,116 @@
 # SwarmAI worker packet backlog — current
 
-Updated by `LEAD-20260921-036`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file tracks bounded execution state only. `WORK_QUEUE.md`, assignment files, and artifact acceptance contracts control ordering and scope.
+Updated by `LEAD-20260921-037`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file tracks bounded execution state only. `WORK_QUEUE.md`, assignment files, and artifact acceptance contracts control ordering and scope.
 
-## Current topology and autonomous assignments
+## A / HOST-MAC-DEV / `cursor/v2-runtime-lane`
 
-### A / HOST-MAC-DEV / `cursor/v2-runtime-lane`
-Current tip observed: `11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`; exact-tip CI `35615739781` green.
+Current tip: `11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`; exact-tip CI `35615739781` green.  
 Assignment: `A-RESET-BATCH-04`, generation 4, enabled.
 
 Execute sequentially, one bounded packet per invocation:
-1. `V14-REAL-001-R` / `ART-V14-REAL-E2E` — generic model-output materialization repair plus a new real non-mock brokered mission.
+1. `V14-REAL-001-R` / `ART-V14-REAL-E2E` — generic model-output materialization repair plus new real non-mock brokered mission.
 2. `V2A-003c` / `ART-V15-LEASE-FENCING` — durable result acceptance fencing.
 
-`OPS-AUTO-001-R` source repair was independently reviewed earlier at implementation `0d71520de72338b3ae38dca00258a07c134e2b2a`, exact-tip `39bba630306729b64ad4679346b1eb900f44ccaf`, CI `35609579398` green. That execution was human-prompted and therefore does **not** satisfy autonomous self-launch acceptance. Do not replay it.
+`OPS-AUTO-001-R` was accepted source but human-prompted and must not replay or count as autonomous proof. No generation-4 autonomous source push is visible.
 
-No generation-4 autonomous source push is visible yet.
+A heartbeat ledger is still publishing, but fresh epoch `reset-20260921-new-lanes-01` was never registered and `status/HOST-MAC-DEV.md` is stale. Refresh the repo-defined heartbeat and autonomous-worker services before trusting new self-launch evidence.
 
-### B / HOST-WIN-DEV / `cursor/v2-product-lane`
-Current tip observed: `a908a0e1ff023743892ecb10cfb7bd8df4b53d53`; exact-tip CI `35615750755` red at Ruff in the offline job; console checks are green.
-Assignment: `B-RESET-BATCH-04`, generation 4, enabled.
+## B / HOST-WIN-DEV identity / `cursor/v2-product-lane`
 
-Execute sequentially, one bounded packet per invocation:
-1. `B-OPS-AUTO-SYNC-02` / `ART-OPS-AUTONOMOUS-WORKERS` — synchronize reviewed runner repair while preserving Windows heartbeat/status changes and restore exact-tip CI.
-2. `V2B-000` / `ART-V20-INTEGRATED-CANDIDATE` — sync reviewed integration baseline only and run the Windows baseline.
-3. `V2B-001-R4` / `ART-V13-TASK-POOL` — final executable G13 remint/freeze with >=15 genuine semantic archetypes in every required family/size cell.
+Current tip: `534476393257794c4e8ebf8d65f44fd090ab28eb`; exact-tip CI `35625964121` green.  
+Assignment: `B-RESET-BATCH-05`, generation 5, enabled.
 
-Windows B remains final executable G13 implementation/test owner. Counted qualification remains prohibited until independent lead freeze and real sealed-reference binding.
+Generation 4 is closed and must not replay:
+- `B-OPS-AUTO-SYNC-02` completed at `2693bb59d9142a753546ed55ccb787223572ea94`; CI `35624109265` green.
+- `V2B-000` synchronized reviewed integration baseline `9ce727842446b98cfa55c28c7e70808f57f17d7b` onto the product lane.
+- `V2B-001-R4` completed at `534476393257794c4e8ebf8d65f44fd090ab28eb`; exact-tip CI `35625964121` green; lead independently froze `ART-V13-TASK-POOL`.
 
-No generation-4 autonomous source push is visible yet.
+Current generation-5 packet:
+1. `V2B-002` / `ART-V13-REVIEWER-QUALIFICATION` — calibration-only reviewer benchmark/scorer repair and freeze candidate. No reviewer held-out qualification and no W-131B product counted qualification in this packet.
 
-## Heartbeat stress test
+The generation-4 source work was human-prompted. An autonomous launch of `V2B-001-R4` exited without a source push, so B autonomous acceptance remains unproven. Generation 5 intentionally contains one dependency-safe packet to create a clean self-launch opportunity.
 
-Mode remains `stress_5m`; effective worker cadence remains 5 minutes. Only `trigger=scheduler` counts.
+The active B implementation session reported Linux while using HOST-WIN-DEV coordination identity. Do not use that work as Windows-specific runtime/install evidence.
 
-Latest independently reconciled Phase-1 state:
-- A: **1/3** at `15:52:14Z`; `15:37:12Z -> 15:52:14Z` is ~15m02s, above the 8m maximum.
-- B: **1/3** at `15:44:17Z`; `15:29:17Z -> 15:44:17Z` is 15m, above the 8m maximum.
-- Both ledgers are fresh at the evidence cutoff, but neither is producing the required 3–8m spacing.
-- The host status markdown pages are stale despite new ledger receipts.
+## ART-OPS-AUTONOMOUS-WORKERS
 
-Current branch heartbeat installers configure 5m OS wake intervals and current heartbeat source publishes a human-readable status page after each ledger write. The observed ~15m spacing + stale status pages indicate stale installed host copies/jobs until disproven. Reinstall/verify the current heartbeat and autonomous-worker services on both hosts.
+Status remains **drafting**.
 
-Phase 2 (`soak_15m_24h`) has **not started**. No soak time may be backfilled. After both hosts reach 3 consecutive valid 5m receipts, lead may set 15m effective cadence and begin an exact 24-hour soak. Hourly restoration is forbidden before the full soak is verified.
+Acceptance still requires A and B each to self-launch at least one repo-assigned packet through the autonomous runner and push attributable implementation evidence without a human prompting the Cursor conversation.
 
-## Autonomous-worker acceptance
+- A: not proven.
+- B: not proven; blocked self-launch attempt exists but no attributable source push from that attempt.
 
-`ART-OPS-AUTONOMOUS-WORKERS` remains drafting.
-
-Required proof is unchanged: A and B must each self-launch at least one repo-assigned packet through the autonomous runner and push attributable implementation evidence **without a human prompting the Cursor conversation**. Scheduler heartbeat/status commits are liveness only.
-
-No qualifying A or B self-launch + implementation push has been independently verified in this run.
+Heartbeat/status commits are liveness only.
 
 ## G13 / ART-V13-TASK-POOL
 
-### Retry 06 — independently reviewed changes-required
-External branch/commit: `worker/swarmai-v13-task-pool-freeze-06@f7800332594d67c8b872b3597abd59f35987a2a0`.
+### Local B v3 — independently frozen
 
-Findings retained:
-- exact-tip ordinary offline pytest is red (`35610017583`);
-- corpus has 15 records/cell but only 5 genuine semantic archetypes/cell;
-- input-only/opaque-reference direction is useful, but independence depth is insufficient;
-- counted qualification remains disabled;
-- external Claude sandbox denied repository Python/pytest/Ruff/mypy execution.
+Authoritative implementation: `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`  
+Freeze: `g13-pool-freeze-v3`  
+CI: `35625964121` success  
+Lead review: `docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md`
 
-Disposition: **changes required**. `ART-V13-TASK-POOL` remains drafting. `W-131B` remains prohibited.
+Verified properties:
+- 240 held-out inputs / 16 required cells / 15 semantic archetypes per cell;
+- materially distinct objectives rather than scenario/numeric/clause-growth siblings;
+- fail-closed semantic-archetype, scenario-substitution, clause-containment, digest/template and cross-partition checks;
+- separate calibration/held-out identities;
+- worker-visible held-out records are input-only with opaque reference handles;
+- no local sealed-reference fallback and no fabricated bundle content digest;
+- `counted_qualification_ready=false`, `w131b_started=false`;
+- generator/verifier + Ruff + mypy + focused/offline pytest reported successful; exact-tip GitHub CI green.
 
-### Final executable repair — local B
-Packet: `V2B-001-R4`.
+Disposition: **ART-V13-TASK-POOL verified/frozen**. Any semantic change requires a new version/freeze and new lead review.
 
-Required outcome includes:
-- >=15 genuinely distinct semantic archetypes in each of 16 required family x size cells;
-- versioned fail-closed semantic independence checker in addition to existing contamination axes;
-- negative tests for scenario substitutions, seed/numeric/synthetic-ID siblings, clause-prefix/containment siblings and <15-group cells;
-- input-only held-out records and opaque hidden-reference handles;
-- no fabricated sealed-reference digest;
-- actual generator/verifier/focused tests/Ruff/mypy/offline pytest execution on Windows B;
-- `counted_qualification_ready=false` until lead-controlled sealed reference binding exists.
+Still blocked:
+- real lead-controlled sealed-reference bundle content digest binding;
+- W-131B product counted qualification;
+- reviewer calibration/freeze and reviewer held-out qualification.
 
-### External retry 07 — support/reference only
-Task: `swarmai-v13-task-pool-freeze-07`.
-Dispatch commit: `3a69e1f5937b99b4f1e9a2d98b634d69a3900a94`.
-Workflow run: `35616363073`, **in progress**.
-Base: `worker/swarmai-v13-task-pool-freeze-06@f7800332594d67c8b872b3597abd59f35987a2a0`.
+### External retry-07 — support only
 
-No retry-07 result JSON or SwarmAI branch exists yet. If one appears, it is independent/reference evidence only and cannot override Windows-B executable ownership or artifact acceptance.
+`worker/swarmai-v13-task-pool-freeze-07@02cd0a2ea23342c331e83efd78b7682617dd16d3` is real, one commit above retry06, G13-scoped, and exact-tip CI `35625433324` is green. It remains support/reference evidence only and is not automatically merged or substituted for v3.
+
+### Lane C current
+
+Task: `swarmai-v13-task-pool-v3-audit-01`  
+Mode: read-only  
+Dispatch: `31b0234a93fe2043b250af91a0f97c6b8561504d`  
+Workflow: `35629554863` in progress.
+
+This audit is intentionally static/adversarial and has no acceptance authority.
+
+## Heartbeat stress test
+
+Mode: `stress_5m`; effective worker cadence 5 minutes; only scheduler receipts count.
+
+- A: **0/3 counted** because the fresh reset epoch is not registered. Latest ledger receipt is `16:52:23Z`; status markdown is stale.
+- B: **Phase-1 verified 3/3** on `16:17:56Z -> 16:22:59Z -> 16:28:03Z`; status publishing is current.
+- Phase 2 (`soak_15m_24h`) has not started. No soak time may be backfilled.
 
 ## V14 / ART-V14-REAL-E2E
 
 The first genuine mission remains preserved as failed evidence: real local brokered inference produced implementation text but no material isolated-worktree diff, which was correctly rejected.
 
-The read-only worker-pc audit `swarmai-v14-materialization-audit-01` completed successfully at `2026-09-21T15:09:06Z`. Lead independently confirmed two generic repair targets:
-- prompt/parser mismatch: `_implement` requests raw full-file source while `_extract_python_file` generically requires fenced code;
-- empty-diff classification: `_implement` can report `implement_applied` after a write attempt despite no material git diff.
-
-Lane A owns the repair. Preserve git diff as material authority, add unrelated temp-repo regressions, and rerun a separately preregistered real mission against a different subsystem. No target-specific known answer is permitted.
+Lane A owns the generic repair. Preserve git diff as material authority, fix the raw-source/fenced-parser mismatch and no-op status classification generically, add unrelated temporary-repo regressions, then run a separately preregistered real mission against a different subsystem. No target-specific known answer is permitted.
 
 ## V15 / durable worker path
 
 - `V2A-003b-R2`: accepted bounded claim/renew/expire repair slice.
-- `ART-V15-LEASE-FENCING` remains drafting until `V2A-003c` result acceptance is implemented and independently reviewed.
+- `ART-V15-LEASE-FENCING`: drafting until `V2A-003c` result acceptance is implemented/reviewed.
 - `V2A-H6A-R`: accepted hardening slice.
-- DBOS decision remains partial reuse only.
+- DBOS decision: partial reuse only.
 
-After A's `V2A-003c` review: integrate only reviewed slices with a receipt, then `V2A-004` durable worker service/client and real Mac+Windows recovery/multi-host evidence.
+After `V2A-003c` review: integrate reviewed slices with a receipt, then `V2A-004` durable worker service/client and real Mac+Windows recovery/multi-host evidence.
 
-## Other hard blockers retained
+## Retained hard blockers
 
 - G12 remote overlap: **0 admitted remote routes**; no paid fallback and no remote canary without exact account/model zero-charge eligibility.
-- G13 reviewer calibration/held-out qualification incomplete; zero qualified cells.
-- G14 role/live-adaptive proof remains blocked on G12/G13.
+- G13 product counted qualification: sealed reference bundle not yet bound; zero qualified cells.
+- G13 reviewer benchmark/qualification incomplete.
+- G14 role/live-adaptive proof blocked on G12/G13.
 - LIVE-142 campaign not started; real wall clock cannot be backfilled.
 - V2.0 168-hour reliability campaign not started; real wall clock cannot be backfilled.
 - No main merge, public release/deploy, force push, additional spend, fabricated success or known-answer substitution.
