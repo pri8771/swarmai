@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T01:56:00Z",
+  "updated_at": "2026-09-21T02:22:30Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -17,13 +17,13 @@
     "implementation_workhorse": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260921-022",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-022.md",
+  "last_lead_message_id": "LEAD-20260921-023",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-023.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-006",
-  "last_lead_heartbeat_at": "2026-09-21T01:56:00Z",
+  "last_lead_heartbeat_at": "2026-09-21T02:22:30Z",
   "last_cursor_heartbeat_at": "2026-09-21T01:26:00Z",
   "current_source_verification": {
-    "verified_at": "2026-09-21T01:56:00Z",
+    "verified_at": "2026-09-21T02:22:30Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
     "candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
@@ -51,7 +51,12 @@
     "v2_integration_ci_conclusion": "success",
     "v2_product_branch": "cursor/v2-product-lane",
     "v2_product_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
-    "v2_product_new_activity_observed": false
+    "v2_product_new_activity_observed": false,
+    "v2_runtime_branch_tip": "859271e7adfec892a1fdf1a5dcb6c2612846606d",
+    "v2_runtime_last_meaningful_impl_sha": "e764834a69315d1c2c85f00322c3392aa5037fd9",
+    "v2_runtime_last_evidence_tip": "c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6",
+    "v2_product_branch_tip": "770c80b6ccbcef8f442696508ab95f3696aa3176",
+    "v2_product_last_meaningful_impl_sha": null
   },
   "version_state": {
     "1.0-repair": {
@@ -105,16 +110,15 @@
     },
     "1.5": {
       "status": "implementation_active_artifacts_drafting",
-      "lease_fencing": "003aR_foundation_verified_003bR_wip_incomplete",
-      "wip_review": "claim authority/project renewal/HOL pagination present; renewal authority recheck and expiry stale-authority fencing still missing",
-      "next_packet": "finish_V2A-003b-R_then_V2A-003c"
+      "lease_fencing": "003aR_foundation_verified_003bR_changes_required_R2_ready",
+      "next_packet": "V2A-003b-R2"
     },
     "1.6": {
-      "status": "implementation_ready_no_session_b_activity_observed",
+      "status": "implementation_ready_waiting_session_b",
       "next_packet": "V2B-003a+H1"
     },
     "1.7": {
-      "status": "implementation_ready_no_session_b_activity_observed",
+      "status": "implementation_ready_waiting_session_b",
       "next_packet": "V2B-004a+H4"
     },
     "2.0": {
@@ -137,17 +141,21 @@
     }
   },
   "ready_worker_packets": [
-    "V2A-003b-R",
+    "HB-A-BOOTSTRAP",
+    "V2A-003b-R2",
     "V2A-H6A-R",
     "V2A-003X",
+    "HB-B-BOOTSTRAP",
+    "V2B-000",
     "V2B-001",
     "V2B-002",
     "V2B-003a",
     "V2B-004a"
   ],
   "reviewed_this_heartbeat": {
-    "V2A-003b-R_WIP": "source_reviewed_incomplete_no_artifact_transition_no_worker_performance_score",
-    "ART-V30-OBJECTIVE-CONTRACT": "drafting_content_materially_advanced_no_acceptance_claim"
+    "V2A-003b-R": "changes_required_terminal_task_attempt_renew_and_lease_bound_expiry_authority",
+    "ART-OPS-HEARTBEAT": "configured_not_yet_verified",
+    "V2B": "no_product_implementation_visible_remote"
   },
   "blocked_worker_packets": {
     "W-041A": "human Cursor CLI login required for V1.0 heartbeat acceptance",
@@ -168,15 +176,15 @@
     "docs/artifacts/future/ART-V30-PERSISTENT_OBJECTIVE_CONTRACT.md"
   ],
   "open_blockers": [
-    "ART-V10-WORKER-HEARTBEAT requires live Cursor CLI authentication plus real receipts",
+    "ART-OPS-HEARTBEAT awaits first durable heartbeat from HOST-MAC-DEV",
+    "ART-OPS-HEARTBEAT awaits first durable heartbeat from HOST-WIN-DEV",
+    "ART-V10-WORKER-HEARTBEAT separately requires live Cursor CLI authentication plus real receipts",
     "ART-V12-REMOTE-OVERLAP has 0 admissible remote routes",
     "ART-V13 task pool/reviewer qualification/qualified matrix incomplete",
     "ART-V14 live adaptive proof and LIVE-142 time-bound campaign remain incomplete",
-    "ART-V15-LEASE-FENCING V2A-003b-R still needs renew-authority revalidation and expiry stale-authority no-revive behavior, then V2A-003c",
-    "ART-V20 foundation hardening H6A needs secret-file permission and overwrite/rotation semantics repair",
-    "Session B has ready work but no new source activity was observed",
-    "V2.0 acceptance cannot be honestly completed until all required artifacts and wall-clock evidence exist",
-    "ART-V12 local fallback/reconciliation require current-tip actual local-model revalidation; historical stubbed broker evidence is prep only"
+    "ART-V15-LEASE-FENCING requires V2A-003b-R2 then V2A-003c",
+    "ART-V20 foundation hardening H6A needs secret-file permission and safe overwrite/rotation semantics repair",
+    "V2.0 acceptance requires remaining artifact set and real wall-clock evidence"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
@@ -186,7 +194,7 @@
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
   },
-  "product_status": "v2_acceleration_two_cursor_lanes_artifact_first",
+  "product_status": "v2_pull_driven_two_cursor_heartbeat_bootstrap",
   "implementation_stop": {
     "status": "superseded_by_owner_resume",
     "prior_stop_record": "docs/coordination/V1_4_ABRUPT_STOP.md",
@@ -213,23 +221,33 @@
       "role": "runtime_control_plane_distributed_recovery_integration",
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "prompt": "docs/coordination/CURSOR_MAC_RUNTIME_RESUME_PROMPT.md"
+      "standing_instructions": "SESSION_INSTRUCTIONS.md",
+      "heartbeat_installer": "scripts/coordination/install_heartbeat_macos.sh"
     },
     "session_b": {
       "role": "evaluation_knowledge_tools_product_beta",
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "prompt": "docs/coordination/CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md",
-      "bootstrap_state": "fresh_windows_no_repo_or_toolchain_assumed"
+      "standing_instructions": "SESSION_INSTRUCTIONS.md",
+      "heartbeat_installer": "scripts/coordination/install_heartbeat_windows.ps1"
     },
     "contract": "docs/coordination/TWO_CURSOR_TEAM.md"
   },
   "reserve_verification_branch": {
     "branch": "cursor/v2-verification-lane",
     "status": "dormant_not_a_current_team_session",
-    "activation_rule": "Do not activate while lead review capacity is healthy; verification remains lead-owned unless a concrete isolated bottleneck is explicitly reassigned."
+    "activation_rule": "Only explicit lead reassignment for a concrete isolated bottleneck."
   },
   "execution_plan": "docs/coordination/V2_EXECUTION_PLAN.md",
   "artifact_registry": "docs/coordination/ARTIFACT_REGISTRY.json",
-  "lead_operating_rule": "ChatGPT reviews/verifies/architects and hard-debug failures; Cursor A/B own the bulk of routine SP1-SP3 implementation."
+  "lead_operating_rule": "Review new A/B work hourly, update artifact registry first, notify on meaningful changes/stale workers, continuously restock dependency-ready packets. Never claim sub-hour ChatGPT polling.",
+  "heartbeat": {
+    "protocol": "docs/coordination/HEARTBEAT_PROTOCOL.md",
+    "state": "docs/coordination/HEARTBEAT_STATE.json",
+    "mode": "bootstrap_15m",
+    "worker_effective_cadence_minutes": 15,
+    "lead_effective_cadence_minutes": 60,
+    "graduation_requirement": "3 consecutive valid 15m heartbeats from A and B, then lead sets worker cadence hourly",
+    "verified": false
+  }
 }
