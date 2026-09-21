@@ -4,36 +4,21 @@
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:07:16+00:00",
+    "observed_at": "2026-09-21T16:19:36+00:00",
     "trigger": "scheduler",
     "host_alias": "HOST-MAC-DEV",
     "session_id": "A",
     "branch": "cursor/v2-runtime-lane",
     "branch_sha": "11a7e1d51c4c4d630c7d83c1af65e380c32ad80f",
-    "coordination_sha": "1f87be673362f3926df943febb3e0fd41c478a39",
+    "coordination_sha": "64cd686b1b1959819ead4ae4af9ce07b3ed83e6f",
     "effective_cadence_minutes": 5,
-    "packet_id": "A5-LOCAL-G12-CURRENT-TIP",
-    "artifact_id": "ART-V12-REMOTE-OVERLAP",
+    "packet_id": "OPS-AUTO-001-R",
+    "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
     "status": "review_requested",
-    "last_agent_activity_at": "2026-09-21T02:53:06+00:00",
-    "note": null
+    "last_agent_activity_at": "2026-09-21T14:07:00+00:00",
+    "note": "CURSOR-A-20260921-014 human-prompted repair tip=39bba63 CI=35609579398; not autonomous self-launch; waiting new generation"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T14:00:57+00:00",
-      "trigger": "install",
-      "host_alias": "HOST-MAC-DEV",
-      "session_id": "A",
-      "branch": "cursor/v2-runtime-lane",
-      "branch_sha": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
-      "coordination_sha": "d28cd8cdb67960c6e218f3f0929e149a01d515b2",
-      "effective_cadence_minutes": 60,
-      "packet_id": "OPS-AUTO-001-R",
-      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-      "status": "working",
-      "last_agent_activity_at": "2026-09-21T14:00:56+00:00",
-      "note": "linux origin session A installing corrected heartbeat client; repairing ruff baseline"
-    },
     {
       "observed_at": "2026-09-21T14:01:00+00:00",
       "trigger": "scheduler",
@@ -198,6 +183,21 @@
       "status": "review_requested",
       "last_agent_activity_at": "2026-09-21T02:53:06+00:00",
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T16:19:36+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-MAC-DEV",
+      "session_id": "A",
+      "branch": "cursor/v2-runtime-lane",
+      "branch_sha": "11a7e1d51c4c4d630c7d83c1af65e380c32ad80f",
+      "coordination_sha": "64cd686b1b1959819ead4ae4af9ce07b3ed83e6f",
+      "effective_cadence_minutes": 5,
+      "packet_id": "OPS-AUTO-001-R",
+      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T14:07:00+00:00",
+      "note": "CURSOR-A-20260921-014 human-prompted repair tip=39bba63 CI=35609579398; not autonomous self-launch; waiting new generation"
     }
   ],
   "status": "review_requested"
