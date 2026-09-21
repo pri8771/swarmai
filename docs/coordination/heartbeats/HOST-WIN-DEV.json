@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:16:54+00:00",
+    "observed_at": "2026-09-21T16:16:58+00:00",
     "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
-    "coordination_sha": "57017a76ef3786986f98aabea8994591e33cdada",
+    "coordination_sha": "68f792666cd29dbc40f515a7f91e453196eeb808",
     "effective_cadence_minutes": 5,
-    "packet_id": "V2B-000",
-    "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-    "status": "review_requested",
-    "last_agent_activity_at": "2026-09-21T16:16:53+00:00",
-    "note": "V2B-000 merged reviewed 9ce7278; tip 3de9688; Linux ruff/mypy/287 pytest/console green; 8 integration DB errors no postgres. Not accepted."
+    "packet_id": "V2B-001-R4",
+    "artifact_id": "ART-V13-TASK-POOL",
+    "status": "autonomous_working",
+    "last_agent_activity_at": "2026-09-21T16:16:57+00:00",
+    "note": "assignment=B-RESET-BATCH-04:4:V2B-001-R4"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T15:14:18+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "a908a0e1ff023743892ecb10cfb7bd8df4b53d53",
-      "coordination_sha": "c03f7ef60b7ec5dde963c833483ad32fb87cc80e",
-      "effective_cadence_minutes": 5,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T15:29:17+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "review_requested",
       "last_agent_activity_at": "2026-09-21T16:16:53+00:00",
       "note": "V2B-000 merged reviewed 9ce7278; tip 3de9688; Linux ruff/mypy/287 pytest/console green; 8 integration DB errors no postgres. Not accepted."
+    },
+    {
+      "observed_at": "2026-09-21T16:16:58+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
+      "coordination_sha": "68f792666cd29dbc40f515a7f91e453196eeb808",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-001-R4",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "status": "autonomous_working",
+      "last_agent_activity_at": "2026-09-21T16:16:57+00:00",
+      "note": "assignment=B-RESET-BATCH-04:4:V2B-001-R4"
     }
   ],
-  "status": "review_requested"
+  "status": "autonomous_working"
 }
