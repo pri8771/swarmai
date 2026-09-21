@@ -2,29 +2,31 @@
   "artifact_id": "ART-V15-LEASE-FENCING",
   "packet_id": "V2A-003b-R",
   "hardening_packet_id": "V2A-H3",
-  "scenario": "claim_renew_authority_project_match_paginated_hol",
+  "scenario": "claim_renew_expire_authority_dependency_renewable_bound",
   "status": "pass",
-  "recorded_at": "2026-09-21T02:04:02.612334+00:00",
-  "candidate_sha": "5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6",
+  "recorded_at": "2026-09-21T02:08:25Z",
+  "candidate_sha": "e764834a69315d1c2c85f00322c3392aa5037fd9",
   "spend_usd": 0.0,
   "g15_lead_accept_invented": false,
   "public_deploy_claimed": false,
   "main_merge": false,
   "commands": [
     "PYTHONPATH=src python -m mypy src/swarm/db/lease_fencing.py",
-    "PYTHONPATH=src python -m pytest tests/integration/db/test_lease_claim_renew_expire.py tests/integration/db/test_lease_fencing_schema.py tests/db/test_token_hash.py tests/workers/test_workers.py tests/deployment/test_deployment.py -q",
-    "PYTHONPATH=src python -m pytest tests/integration/db/test_persistence.py -q",
+    "PYTHONPATH=src python -m pytest tests/integration/db/test_lease_claim_renew_expire.py tests/integration/db/test_lease_fencing_schema.py tests/db/test_token_hash.py tests/workers/test_workers.py tests/deployment/test_deployment.py tests/integration/db/test_persistence.py -q",
     "ruff check src/swarm/db/lease_fencing.py migrations/env.py tests/integration/db/test_lease_claim_renew_expire.py"
   ],
   "results": {
     "mypy_lease_fencing": "Success: no issues found",
-    "focused_suite": "40 passed",
-    "persistence_regression": "8 passed",
+    "focused_suite": "52 passed",
     "ruff": "All checks passed",
     "cancelled_mission_leaves_task_unmutated": true,
     "stale_source_revision_leaves_task_unmutated": true,
     "stale_cancellation_generation_leaves_task_unmutated": true,
     "renew_rejects_worker_project_reassignment": true,
+    "renew_rejects_stale_mission_authority": true,
+    "expire_does_not_revive_cancelled_mission_task": true,
+    "claim_skips_unresolved_dependencies": true,
+    "renew_caps_expires_at_to_renewable_until": true,
     "paginated_claim_beyond_32_incompatible_heads": true,
     "race_exactly_one_winner": true,
     "incompatible_head_does_not_block_eligible": true,
@@ -32,6 +34,6 @@
     "alembic_upgrade_tests_with_injected_dsn": true,
     "api_routes_wired": false,
     "accept_fencing_implemented": false,
-    "note": "V2A-003b-R repairs claim/renew authority + project-scoped renew + paginated HOL; result acceptance fence remains V2A-003c; not self-accepted"
+    "note": "V2A-003b-R completes LEAD-022 claim/renew/expire repair requirements; result acceptance fence remains V2A-003c; not self-accepted"
   }
 }
