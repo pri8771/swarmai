@@ -11,7 +11,7 @@ import pytest
 from sqlalchemy import select, text
 
 from swarm.contracts.common import new_id
-from swarm.contracts.enums import TaskStatus
+from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.contracts.fixtures import sample_mission, sample_task
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.lease_fencing import (
@@ -19,7 +19,7 @@ from swarm.db.lease_fencing import (
     LeaseRenewError,
     WorkerRegistrationRepository,
 )
-from swarm.db.models import Base, TaskLeaseRow, TaskRow
+from swarm.db.models import Base, MissionRow, TaskLeaseRow, TaskRow
 from swarm.db.repositories import MissionRepository
 
 pytestmark = pytest.mark.integration
@@ -30,9 +30,9 @@ DATABASE_URL = os.environ.get(
 )
 
 
-def _unique_mission():
+def _unique_mission(*, status: MissionStatus = MissionStatus.RUNNING):
     mission = sample_mission()
-    return mission.model_copy(update={"id": new_id("msn_")})
+    return mission.model_copy(update={"id": new_id("msn_"), "status": status})
 
 
 def _insert_ready_task(
@@ -43,8 +43,12 @@ def _insert_ready_task(
     scopes: list[str] | None = None,
     priority: int = 100,
     task_id: str | None = None,
+    graph_revision: int | None = None,
+    source_revision: str | None = None,
+    cancellation_generation: int | None = None,
 ) -> TaskRow:
     tid = task_id or new_id("tsk_")
+    rev = mission.revision if graph_revision is None else graph_revision
     task = sample_task(mission_id=mission.id).model_copy(
         update={
             "id": tid,
@@ -53,8 +57,14 @@ def _insert_ready_task(
             "scopes": list(scopes or ["scope_repo_demo"]),
             "status": TaskStatus.READY,
             "priority": priority,
+            "graph_revision": rev,
         }
     )
+    payload = task.model_dump(mode="json")
+    if source_revision is not None:
+        payload["source_revision"] = source_revision
+    if cancellation_generation is not None:
+        payload["cancellation_generation"] = cancellation_generation
     row = TaskRow(
         id=tid,
         project_id=mission.project_id,
@@ -62,11 +72,11 @@ def _insert_ready_task(
         objective=task.objective,
         task_family=task.task_family,
         status="ready",
-        graph_revision=1,
+        graph_revision=rev,
         priority=priority,
         scopes=list(task.scopes),
         dependency_ids=[],
-        payload=task.model_dump(mode="json"),
+        payload=payload,
     )
     session.add(row)
     session.flush()
@@ -371,3 +381,172 @@ def test_privacy_mismatch_skips_without_mutating_task(session) -> None:
     assert claimed is not None
     assert claimed.task_id == open_task.id
     assert session.get(TaskRow, local_task.id).status == "ready"  # type: ignore[union-attr]
+
+
+def test_cancelled_mission_claim_leaves_task_unmutated(session) -> None:
+    """V2A-003b-R: cancelled mission cannot be claimed; task stays ready."""
+    mission = _unique_mission(status=MissionStatus.CANCELLED)
+    MissionRepository(session).insert(mission)
+    session.flush()
+    task = _insert_ready_task(
+        session, mission=mission, required_capabilities=["code.read"], priority=1
+    )
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    claimed = LeaseLifecycleService(session).claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token
+    )
+    session.flush()
+    assert claimed is None
+    loaded = session.get(TaskRow, task.id)
+    assert loaded is not None
+    assert loaded.status == "ready"
+    assert session.scalars(select(TaskLeaseRow)).all() == []
+
+
+def test_stale_source_revision_claim_leaves_task_unmutated(session) -> None:
+    """V2A-003b-R: stale task source_revision cannot bind a lease."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    stale = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=1,
+        source_revision="stale_source_v0",
+    )
+    current = LeaseLifecycleService._mission_source_revision(
+        session.get(MissionRow, mission.id)  # type: ignore[arg-type]
+    )
+    fresh = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=50,
+        source_revision=current,
+    )
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    claimed = LeaseLifecycleService(session).claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token
+    )
+    session.flush()
+    assert claimed is not None
+    assert claimed.task_id == fresh.id
+    assert session.get(TaskRow, stale.id).status == "ready"  # type: ignore[union-attr]
+
+
+def test_stale_cancellation_generation_skips_without_mutation(session) -> None:
+    mission = _unique_mission()
+    # Bump mission cancellation generation without cancelling status.
+    mission = mission.model_copy(update={"cancellation_generation": 3, "status": MissionStatus.RUNNING})
+    MissionRepository(session).insert(mission)
+    session.flush()
+    stale = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=1,
+        cancellation_generation=0,
+    )
+    ok = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=2,
+        cancellation_generation=3,
+    )
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    claimed = LeaseLifecycleService(session).claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token
+    )
+    session.flush()
+    assert claimed is not None
+    assert claimed.task_id == ok.id
+    assert session.get(TaskRow, stale.id).status == "ready"  # type: ignore[union-attr]
+
+
+def test_renew_rejects_worker_project_reassignment(session) -> None:
+    """V2A-003b-R: renew requires durable worker.project_id == lease.project_id."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+        generation=1,
+    )
+    svc = LeaseLifecycleService(session)
+    claimed = svc.claim_eligible_attempt(worker_id=worker_id, membership_token=token)
+    session.flush()
+    assert claimed is not None
+
+    # Reassign worker to another project (same token/generation).
+    worker = WorkerRegistrationRepository(session).get(worker_id)
+    assert worker is not None
+    worker.project_id = new_id("proj_")
+    session.flush()
+
+    with pytest.raises(LeaseRenewError, match="lease_project_mismatch"):
+        svc.renew_lease(
+            lease_id=claimed.lease_id,
+            worker_id=worker_id,
+            worker_generation=claimed.worker_generation,
+            membership_token=token,
+        )
+
+
+def test_paginated_claim_beyond_32_incompatible_heads(session) -> None:
+    """V2A-003b-R: >32 incompatible higher-priority rows cannot HOL-block an eligible task."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    for i in range(40):
+        _insert_ready_task(
+            session,
+            mission=mission,
+            required_capabilities=["vision.ocr"],
+            priority=i,  # 0..39 higher priority than eligible
+        )
+    eligible = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=100,
+    )
+    token = new_id("wt_")
+    # Tiny page size forces multiple pagination rounds past the old 32 ceiling.
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    claimed = LeaseLifecycleService(session, candidate_page_size=8).claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token
+    )
+    session.flush()
+    assert claimed is not None
+    assert claimed.task_id == eligible.id
+    assert session.get(TaskRow, eligible.id).status == "leased"  # type: ignore[union-attr]

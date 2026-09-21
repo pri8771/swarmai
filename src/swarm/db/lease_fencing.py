@@ -1,7 +1,7 @@
-"""V2A-003a/b / ART-V15-LEASE-FENCING — durable worker/attempt/lease/result repos.
+"""V2A-003a/b/R / ART-V15-LEASE-FENCING — durable worker/attempt/lease/result repos.
 
 V2A-003a: persistence primitives (token_hash only — V2A-H2).
-V2A-003b: atomic claim/renew/expire (+ V2A-H3 eligible-task skip).
+V2A-003b/R: atomic claim/renew/expire (+ H3 eligible skip, authority checks, paginated HOL).
 Accept fencing remains V2A-003c.
 """
 
@@ -11,11 +11,12 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import literal, select, tuple_
 from sqlalchemy.orm import Session
 
 from swarm.contracts.common import new_id, utc_now
 from swarm.db.models import (
+    MissionRow,
     OutboxRow,
     TaskAttemptRow,
     TaskLeaseRow,
@@ -33,7 +34,18 @@ _ACTIVE_LEASE_STATES = frozenset({"active", "renewed"})
 _CLAIMABLE_TASK_STATUS = "ready"
 _DEFAULT_LEASE_SECONDS = 60
 _DEFAULT_RENEWABLE_HORIZON_SECONDS = 3600
-_CLAIM_CANDIDATE_BATCH = 32
+# Page size for SKIP LOCKED scans only — not a correctness ceiling (V2A-003b-R).
+_CLAIM_CANDIDATE_PAGE = 32
+_RUNNABLE_MISSION_STATUSES = frozenset(
+    {
+        "planning",
+        "running",
+        "waiting_capacity",
+        "waiting_input",
+        "waiting_approval",
+        "verifying",
+    }
+)
 
 
 class RawTokenPersistenceError(ValueError):
@@ -420,11 +432,12 @@ class ClaimedLease:
 
 
 class LeaseLifecycleService:
-    """V2A-003b atomic claim / renew / expire (+ V2A-H3 eligible skip).
+    """V2A-003b/R atomic claim / renew / expire (+ V2A-H3 eligible skip).
 
-    Fairness: claim candidates are ordered by ``(priority ASC, created_at ASC)``.
-    Incompatible locked rows are left unmutated so other workers may claim them;
-    the claimer continues scanning rather than head-of-line blocking.
+    Fairness: claim candidates are ordered by ``(priority ASC, created_at ASC, id ASC)``.
+    Incompatible or authority-stale locked rows are left unmutated so other workers
+    may claim them; the claimer paginates until an eligible row is found or the
+    eligible set is exhausted (no fixed 32-row correctness ceiling).
     """
 
     def __init__(
@@ -433,10 +446,12 @@ class LeaseLifecycleService:
         *,
         default_lease_seconds: int = _DEFAULT_LEASE_SECONDS,
         renewable_horizon_seconds: int = _DEFAULT_RENEWABLE_HORIZON_SECONDS,
+        candidate_page_size: int = _CLAIM_CANDIDATE_PAGE,
     ) -> None:
         self.session = session
         self.default_lease_seconds = default_lease_seconds
         self.renewable_horizon_seconds = renewable_horizon_seconds
+        self.candidate_page_size = max(1, candidate_page_size)
         self._attempts = TaskAttemptRepository(session)
         self._leases = TaskLeaseRepository(session)
         self._workers = WorkerRegistrationRepository(session)
@@ -449,12 +464,12 @@ class LeaseLifecycleService:
         agent_profile_id: str = "ap_default",
         now: datetime | None = None,
         lease_seconds: int | None = None,
-        candidate_batch: int = _CLAIM_CANDIDATE_BATCH,
     ) -> ClaimedLease | None:
         """Atomically claim one eligible ready task for the worker.
 
-        Uses ``SELECT … FOR UPDATE SKIP LOCKED``. Returns ``None`` when no
-        eligible task exists; does not mutate queue/task state in that case.
+        Uses ``SELECT … FOR UPDATE SKIP LOCKED`` with keyset pagination until an
+        eligible authoritative task is found or the set is exhausted. Returns
+        ``None`` without mutating queue/task state when nothing is claimable.
         """
         clock = now or utc_now()
         worker = self._require_claimable_worker(worker_id, membership_token)
@@ -462,24 +477,36 @@ class LeaseLifecycleService:
         if not project_id:
             raise WorkerNotEligibleError("worker_missing_project_id")
 
-        candidates = self._lock_ready_candidates(
-            project_id=project_id,
-            limit=candidate_batch,
-        )
-        for task in candidates:
-            if not self._worker_eligible_for_task(worker, task):
-                # V2A-H3: leave incompatible head locked-unmutated; keep scanning.
-                continue
-            if self._has_active_lease(task.id):
-                continue
-            return self._bind_claim(
-                worker=worker,
-                task=task,
-                agent_profile_id=agent_profile_id,
-                clock=clock,
-                lease_seconds=lease_seconds or self.default_lease_seconds,
+        after: tuple[int, datetime, str] | None = None
+        while True:
+            candidates = self._lock_ready_candidates(
+                project_id=project_id,
+                limit=self.candidate_page_size,
+                after=after,
             )
-        return None
+            if not candidates:
+                return None
+            for task in candidates:
+                after = (task.priority, task.created_at, task.id)
+                if not self._worker_eligible_for_task(worker, task):
+                    # V2A-H3: leave incompatible head locked-unmutated; keep scanning.
+                    continue
+                if self._has_active_lease(task.id):
+                    continue
+                mission = self._load_claimable_mission(task)
+                if mission is None:
+                    # Authority stale/cancelled/missing — leave task unmutated.
+                    continue
+                return self._bind_claim(
+                    worker=worker,
+                    task=task,
+                    mission=mission,
+                    agent_profile_id=agent_profile_id,
+                    clock=clock,
+                    lease_seconds=lease_seconds or self.default_lease_seconds,
+                )
+            if len(candidates) < self.candidate_page_size:
+                return None
 
     def renew_lease(
         self,
@@ -491,7 +518,7 @@ class LeaseLifecycleService:
         extend_seconds: int | None = None,
         now: datetime | None = None,
     ) -> TaskLeaseRow:
-        """Extend an active/renewed lease when generation and renewable window match."""
+        """Extend an active/renewed lease when generation, project, and window match."""
         clock = now or utc_now()
         worker = self._require_claimable_worker(worker_id, membership_token)
         lease = self.session.get(TaskLeaseRow, lease_id)
@@ -499,6 +526,8 @@ class LeaseLifecycleService:
             raise LeaseRenewError("lease_not_found")
         if lease.worker_id != worker_id:
             raise LeaseRenewError("lease_worker_mismatch")
+        if worker.project_id != lease.project_id:
+            raise LeaseRenewError("lease_project_mismatch")
         if lease.worker_generation != worker_generation:
             raise LeaseRenewError("lease_generation_mismatch")
         if worker.lease_generation != worker_generation:
@@ -573,18 +602,64 @@ class LeaseLifecycleService:
             raise WorkerNotEligibleError("invalid_membership_token")
         return worker
 
-    def _lock_ready_candidates(self, *, project_id: str, limit: int) -> list[TaskRow]:
+    def _lock_ready_candidates(
+        self,
+        *,
+        project_id: str,
+        limit: int,
+        after: tuple[int, datetime, str] | None = None,
+    ) -> list[TaskRow]:
         stmt = (
             select(TaskRow)
             .where(
                 TaskRow.project_id == project_id,
                 TaskRow.status == _CLAIMABLE_TASK_STATUS,
             )
-            .order_by(TaskRow.priority.asc(), TaskRow.created_at.asc())
+            .order_by(TaskRow.priority.asc(), TaskRow.created_at.asc(), TaskRow.id.asc())
             .limit(limit)
             .with_for_update(skip_locked=True)
         )
+        if after is not None:
+            priority, created_at, task_id = after
+            stmt = stmt.where(
+                tuple_(TaskRow.priority, TaskRow.created_at, TaskRow.id)
+                > tuple_(literal(priority), literal(created_at), literal(task_id))
+            )
         return list(self.session.scalars(stmt))
+
+    def _load_claimable_mission(self, task: TaskRow) -> MissionRow | None:
+        """Return mission when task/mission/project/graph/source/cancel authority is current.
+
+        On any failure returns None and must not mutate the task row.
+        """
+        mission = self.session.get(MissionRow, task.mission_id)
+        if mission is None:
+            return None
+        if mission.status not in _RUNNABLE_MISSION_STATUSES:
+            return None
+        if mission.status == "cancelled" or mission.cancellation_generation < 0:
+            return None
+        if task.project_id != mission.project_id:
+            return None
+        if task.graph_revision != mission.revision:
+            return None
+        payload = task.payload if isinstance(task.payload, dict) else {}
+        task_cancel = payload.get("cancellation_generation")
+        if task_cancel is not None and int(task_cancel) != int(mission.cancellation_generation):
+            return None
+        current_source = self._mission_source_revision(mission)
+        task_source = payload.get("source_revision")
+        if task_source is not None and str(task_source) != current_source:
+            return None
+        return mission
+
+    @staticmethod
+    def _mission_source_revision(mission: MissionRow) -> str:
+        payload = mission.payload if isinstance(mission.payload, dict) else {}
+        explicit = payload.get("source_revision")
+        if isinstance(explicit, str) and explicit:
+            return explicit
+        return f"msnrev:{mission.revision}"
 
     @staticmethod
     def _worker_eligible_for_task(worker: WorkerLeaseRow, task: TaskRow) -> bool:
@@ -615,16 +690,20 @@ class LeaseLifecycleService:
         *,
         worker: WorkerLeaseRow,
         task: TaskRow,
+        mission: MissionRow,
         agent_profile_id: str,
         clock: datetime,
         lease_seconds: int,
     ) -> ClaimedLease:
         assert worker.project_id is not None
+        if worker.project_id != mission.project_id or worker.project_id != task.project_id:
+            raise LeaseClaimError("claim_project_mismatch")
         expires_at = clock + timedelta(seconds=lease_seconds)
         renewable_until = clock + timedelta(seconds=self.renewable_horizon_seconds)
         payload = task.payload if isinstance(task.payload, dict) else {}
         input_digest = payload.get("input_digest") if isinstance(payload, dict) else None
-        source_revision = payload.get("source_revision") if isinstance(payload, dict) else None
+        source_revision = self._mission_source_revision(mission)
+        cancel_gen = int(mission.cancellation_generation)
         attempt = self._attempts.insert(
             task_id=task.id,
             agent_profile_id=agent_profile_id,
@@ -636,7 +715,8 @@ class LeaseLifecycleService:
             lease_generation=worker.lease_generation,
             task_revision=task.graph_revision,
             input_digest=input_digest if isinstance(input_digest, str) else None,
-            source_revision=source_revision if isinstance(source_revision, str) else None,
+            source_revision=source_revision,
+            cancellation_generation=cancel_gen,
         )
         lease = self._leases.insert(
             attempt_id=attempt.attempt_id,
@@ -650,6 +730,7 @@ class LeaseLifecycleService:
             task_revision=task.graph_revision,
             input_digest=attempt.input_digest,
             source_revision=attempt.source_revision,
+            cancellation_generation=cancel_gen,
             issued_at=clock,
             renewable_until=renewable_until,
             policy_version=worker.policy_version,
