@@ -1,0 +1,446 @@
+{
+  "schema_version": "1.0",
+  "status": "cemented_future_plan_not_active",
+  "active_after": "V1.7 recovery completion + operator authorization",
+  "architecture_plan": "docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md",
+  "live_checkpoints": "docs/coordination/V17_TO_V23_LIVE_CHECKPOINTS.md",
+  "one_session_default": true,
+  "packet_rule": "one bounded artifact concern per commit; split if >3 production files or broad refactor unless migration/wiring inherently cross-cutting",
+  "packets": [
+    {
+      "id": "18-00",
+      "version": "1.8",
+      "artifact": "handoff",
+      "depends": [
+        "R34"
+      ],
+      "goal": "Bind exact V1.7 CP6 source/evidence as V1.8 base manifest.",
+      "status": "planned"
+    },
+    {
+      "id": "18-01",
+      "version": "1.8",
+      "artifact": "ART-V18-SITE-EPOCH",
+      "depends": [
+        "18-00"
+      ],
+      "goal": "SiteAuthority/SiteEpoch/AuthorityBinding/transition receipt contracts.",
+      "status": "planned"
+    },
+    {
+      "id": "18-02",
+      "version": "1.8",
+      "artifact": "ART-V18-SITE-EPOCH",
+      "depends": [
+        "18-01"
+      ],
+      "goal": "DB persistence + migration + authority state transitions.",
+      "status": "planned"
+    },
+    {
+      "id": "18-03",
+      "version": "1.8",
+      "artifact": "ART-V18-SITE-EPOCH",
+      "depends": [
+        "18-02"
+      ],
+      "goal": "Dispatch epoch fence.",
+      "status": "planned"
+    },
+    {
+      "id": "18-04",
+      "version": "1.8",
+      "artifact": "ART-V18-SITE-EPOCH",
+      "depends": [
+        "18-02"
+      ],
+      "goal": "Result/effect epoch fences + stale negatives.",
+      "status": "planned"
+    },
+    {
+      "id": "18-05",
+      "version": "1.8",
+      "artifact": "ART-V18-DEPLOYMENT-MANIFEST",
+      "depends": [
+        "18-02"
+      ],
+      "goal": "Redacted deployment + BackupManifest contracts.",
+      "status": "planned"
+    },
+    {
+      "id": "18-06",
+      "version": "1.8",
+      "artifact": "ART-V18-BACKUP-RESTORE",
+      "depends": [
+        "18-05"
+      ],
+      "goal": "Backup create/verify/corruption detection.",
+      "status": "planned"
+    },
+    {
+      "id": "18-07",
+      "version": "1.8",
+      "artifact": "ART-V18-BACKUP-RESTORE",
+      "depends": [
+        "18-04",
+        "18-06"
+      ],
+      "goal": "Restore/recovery-mode/reconciliation/new authority interface.",
+      "status": "planned"
+    },
+    {
+      "id": "18-08",
+      "version": "1.8",
+      "artifact": "ART-V18-SPLIT-BRAIN-SAFETY",
+      "depends": [
+        "18-03",
+        "18-04",
+        "18-07"
+      ],
+      "goal": "Stale-site/duplicate-authority negative suite.",
+      "status": "planned"
+    },
+    {
+      "id": "18-09",
+      "version": "1.8",
+      "artifact": "ART-V18-OUTAGE-DRILL",
+      "depends": [
+        "18-08"
+      ],
+      "goal": "Live CP18 recovery drill with RPO/RTO.",
+      "checkpoint": "CP18",
+      "status": "planned"
+    },
+    {
+      "id": "19-01",
+      "version": "1.9",
+      "artifact": "ART-V19-EXTENSION-CONTRACT",
+      "depends": [
+        "R33"
+      ],
+      "goal": "ExtensionManifest contracts.",
+      "status": "planned"
+    },
+    {
+      "id": "19-02",
+      "version": "1.9",
+      "artifact": "ART-V19-EXTENSION-CONTRACT",
+      "depends": [
+        "19-01"
+      ],
+      "goal": "Project-scoped install/grant/lifecycle persistence.",
+      "status": "planned"
+    },
+    {
+      "id": "19-03",
+      "version": "1.9",
+      "artifact": "ART-V19-EXTENSION-CONTRACT",
+      "depends": [
+        "19-02"
+      ],
+      "goal": "ToolGateway extension bridge and no-bypass negatives.",
+      "status": "planned"
+    },
+    {
+      "id": "19-04",
+      "version": "1.9",
+      "artifact": "ART-V19-INSTALL-UPGRADE",
+      "depends": [
+        "18-07"
+      ],
+      "goal": "Clean install/doctor/empty state/migrations.",
+      "status": "planned"
+    },
+    {
+      "id": "19-05",
+      "version": "1.9",
+      "artifact": "ART-V19-INSTALL-UPGRADE",
+      "depends": [
+        "19-04"
+      ],
+      "goal": "Upgrade preflight/backup/migration/failure semantics.",
+      "status": "planned"
+    },
+    {
+      "id": "19-06",
+      "version": "1.9",
+      "artifact": "ART-V19-INSTALL-UPGRADE",
+      "depends": [
+        "19-05"
+      ],
+      "goal": "Rollback + redacted support bundle.",
+      "status": "planned"
+    },
+    {
+      "id": "19-07",
+      "version": "1.9",
+      "artifact": "ART-V19-SELFDEV-PR-EVIDENCE",
+      "depends": [
+        "19-03",
+        "R33"
+      ],
+      "goal": "Bounded isolated selfdev PR-candidate path; no self-merge/release.",
+      "status": "planned"
+    },
+    {
+      "id": "19-08",
+      "version": "1.9",
+      "artifact": "V1.9-live",
+      "depends": [
+        "19-03",
+        "19-06",
+        "19-07"
+      ],
+      "goal": "Live CP19 install/extension/upgrade/rollback/selfdev checkpoint.",
+      "checkpoint": "CP19",
+      "status": "planned"
+    },
+    {
+      "id": "20-01",
+      "version": "2.0",
+      "artifact": "ART-V20-INTEGRATED-CANDIDATE",
+      "depends": [
+        "18-09",
+        "19-08"
+      ],
+      "goal": "Integrate reviewed lower-version slices; one migration head.",
+      "status": "planned"
+    },
+    {
+      "id": "20-02",
+      "version": "2.0",
+      "artifact": "ART-V20-INTEGRATED-CANDIDATE",
+      "depends": [
+        "20-01"
+      ],
+      "goal": "Freeze CandidateManifest exact source/schema/deps/policies.",
+      "status": "planned"
+    },
+    {
+      "id": "20-03",
+      "version": "2.0",
+      "artifact": "ART-V20-INTEGRATED-CANDIDATE",
+      "depends": [
+        "20-02"
+      ],
+      "goal": "Exact-tip deterministic matrix + migration checks.",
+      "status": "planned"
+    },
+    {
+      "id": "20-04",
+      "version": "2.0",
+      "artifact": "ART-V20-SUPPORT-MATRIX",
+      "depends": [
+        "20-03"
+      ],
+      "goal": "Evidence-grounded support matrix + clean install journey.",
+      "status": "planned"
+    },
+    {
+      "id": "20-05",
+      "version": "2.0",
+      "artifact": "ART-V20-UPGRADE-ROLLBACK",
+      "depends": [
+        "20-03"
+      ],
+      "goal": "Candidate-bound upgrade/rollback journey.",
+      "status": "planned"
+    },
+    {
+      "id": "20-06",
+      "version": "2.0",
+      "artifact": "ART-V20-SECURITY-REVIEW",
+      "depends": [
+        "20-03"
+      ],
+      "goal": "Candidate-bound threat/negative review.",
+      "status": "planned"
+    },
+    {
+      "id": "20-07",
+      "version": "2.0",
+      "artifact": "ART-V20-PERFORMANCE-BASELINE",
+      "depends": [
+        "20-03"
+      ],
+      "goal": "Candidate-bound performance/resource baseline with orchestration overhead.",
+      "status": "planned"
+    },
+    {
+      "id": "20-08",
+      "version": "2.0",
+      "artifact": "ART-V20-RELIABILITY-PROTOCOL",
+      "depends": [
+        "20-04",
+        "20-05",
+        "20-06",
+        "20-07"
+      ],
+      "goal": "Freeze/start real reliability campaign.",
+      "checkpoint": "CP20-start",
+      "status": "planned"
+    },
+    {
+      "id": "20-09",
+      "version": "2.0",
+      "artifact": "ART-V20-RELEASE-REVIEW",
+      "depends": [
+        "20-08"
+      ],
+      "goal": "After actual elapsed campaign, independent release review.",
+      "checkpoint": "CP20-final",
+      "status": "planned"
+    },
+    {
+      "id": "23-01",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "20-03"
+      ],
+      "goal": "Durable SchedulerPolicy/ProjectQueueState/decision receipt schema + migration.",
+      "status": "planned"
+    },
+    {
+      "id": "23-02",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-01"
+      ],
+      "goal": "Weighted-deficit project selector + bounded aging + deterministic tie-break.",
+      "status": "planned"
+    },
+    {
+      "id": "23-03",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-02"
+      ],
+      "goal": "Mission/task eligibility selector + anti-head-of-line blocking.",
+      "status": "planned"
+    },
+    {
+      "id": "23-04",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-03"
+      ],
+      "goal": "DispatchIntent multi-resource reservation/compensation.",
+      "status": "planned"
+    },
+    {
+      "id": "23-05",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-04"
+      ],
+      "goal": "Crash/unknown reservation reconciliation.",
+      "status": "planned"
+    },
+    {
+      "id": "23-06",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-03"
+      ],
+      "goal": "Backpressure/cancel/project+worker+site drain.",
+      "status": "planned"
+    },
+    {
+      "id": "23-07",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-01",
+        "23-04"
+      ],
+      "goal": "Scheduler epoch/restart/fairness-state reconciliation.",
+      "status": "planned"
+    },
+    {
+      "id": "23-08",
+      "version": "2.3",
+      "artifact": "ART-V23-OBSERVABILITY",
+      "depends": [
+        "23-02",
+        "23-07"
+      ],
+      "goal": "Scheduling/effect/artifact read model + decision receipts; UI mutation via V1.7 boundary.",
+      "status": "planned"
+    },
+    {
+      "id": "23-09",
+      "version": "2.3",
+      "artifact": "ART-V23-CAPABILITY-PACKS",
+      "depends": [
+        "19-03"
+      ],
+      "goal": "Capability pack manifest/lifecycle/project scoping.",
+      "status": "planned"
+    },
+    {
+      "id": "23-10",
+      "version": "2.3",
+      "artifact": "ART-V23-PORTABILITY",
+      "depends": [
+        "19-03",
+        "R25"
+      ],
+      "goal": "Secret-free export/import bundle + reconciliation.",
+      "status": "planned"
+    },
+    {
+      "id": "23-11",
+      "version": "2.3",
+      "artifact": "ART-V23-FLEET-POLICY",
+      "depends": [
+        "23-07",
+        "18-09"
+      ],
+      "goal": "Trust/locality/privacy/capability placement + drain/migration/stale fencing.",
+      "status": "planned"
+    },
+    {
+      "id": "23-12",
+      "version": "2.3",
+      "artifact": "ART-V23-MULTIMISSION-OPS",
+      "depends": [
+        "23-05",
+        "23-06",
+        "23-07"
+      ],
+      "goal": "Freeze/run deterministic pathological fairness/reservation workload.",
+      "status": "planned"
+    },
+    {
+      "id": "23-13",
+      "version": "2.3",
+      "artifact": "V2.3-live",
+      "depends": [
+        "23-08",
+        "23-09",
+        "23-10",
+        "23-11",
+        "23-12"
+      ],
+      "goal": "Live CP23 multi-project/fleet/pack/portability/observability checkpoint.",
+      "checkpoint": "CP23",
+      "status": "planned"
+    },
+    {
+      "id": "23-14",
+      "version": "2.3",
+      "artifact": "V2.3-integrated-audit",
+      "depends": [
+        "23-13"
+      ],
+      "goal": "Independent artifact-by-artifact V2.3 integrated audit.",
+      "status": "planned"
+    }
+  ]
+}
