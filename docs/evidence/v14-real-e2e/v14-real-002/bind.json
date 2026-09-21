@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-002",
+  "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+  "bound_at": "2026-09-21T18:25:02Z",
+  "candidate_sha_at_run": "17bf3a1c939df291023048b59bfcec6c2805eae6",
+  "evidence_packaged_on_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
+  "status": "fail",
+  "accepted": false,
+  "summary": "repair_required",
+  "g14_lead_accept_invented": false,
+  "self_accepted": false,
+  "spend_usd": 0.0,
+  "primary_checkout_modified": false,
+  "artifacts": {
+    "pre-run-freeze.json": {
+      "sha256": "df371992eeaa1729da5f2182bdfcb76be6813bd78b4fe93071d0067ec4ed8689",
+      "bytes": 2046,
+      "git_blob": "386916b6e4afae53040e0bf8d5f8a3cb5ca9a9db"
+    },
+    "mission-run.stdout.json": {
+      "sha256": "aa6e95858d6dc04fb68bdd539c373a2074a912557fb02fd679b12fc32bfc1a47",
+      "bytes": 28832,
+      "git_blob": "1c93af46492261ac040978ec5e6eeefb181445a1"
+    },
+    "mission-record.json": {
+      "sha256": "e03e250fcbf6f06ab896841303e5e355c5ed3daafae559ce24dadb5fbc249617",
+      "bytes": 28385,
+      "git_blob": "84445ce1690585ddafb9ab0ea667f3d14b44f78a"
+    },
+    "cost-show.json": {
+      "sha256": "917a8dee1a153ee1013802b4fd204c1ec8c58fd2aac82cfbb73ae391b219b681",
+      "bytes": 981,
+      "git_blob": "cb1ce82a32492d128d98fa0293e99dda5c511893"
+    },
+    "manifest.json": {
+      "sha256": "0b78c3a0fc9fb11321d1d4332b4620864c0bc43474b6d5f5c340ca05b895c796",
+      "bytes": 3620,
+      "git_blob": "bf5668c31a77fe5f01b472370319112f9045275b"
+    },
+    "DIAGNOSIS.md": {
+      "sha256": "863dff88cb78f0f7c29b00247a0896fede922321275071fab97d7d177469e576",
+      "bytes": 1469,
+      "git_blob": "2fdaabc2caa74d8f71655919611516518d221800"
+    }
+  },
+  "bundle_sha256": "e8b1618286a898f97bc06e6b3f99da7838743cd747765f63959170ac196d729a",
+  "bundle_sha256_method": "sha256 over sorted name:file_sha256 lines",
+  "root_cause": {
+    "summary": "implement_failed_no_known_answer_fallback because truncated fenced model output failed closed-fence extract",
+    "files": [
+      "src/swarm/mission/worker.py:_extract_python_file (closed-fence-only at 17bf3a1)",
+      "src/swarm/mission/worker.py:RepoWorker._implement max_tokens=800 at 17bf3a1"
+    ],
+    "evidence": [
+      "three broker receipts with completion_tokens=800 exactly",
+      "inference.text starts with ```python and has no closing fence",
+      "changed_files=[] / result.accepted=false / summary=repair_required"
+    ]
+  },
+  "repair_proposed_on_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
+  "repair_note": "unclosed-fence extract + implement max_tokens=4096; does not convert this failed run into a pass; new preregistered rerun required after lead authorization",
+  "next_authorized_step": "Lead review of failed v14-real-002 + proposed parser/max_tokens repair; authorize a NEW freeze/run id (not a rewrite of 002) only after repair is accepted as candidate"
+}

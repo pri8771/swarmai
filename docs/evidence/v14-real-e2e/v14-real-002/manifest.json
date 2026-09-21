@@ -101,5 +101,12 @@
     "finished_at": "2026-09-21T18:21:18.331222+00:00"
   },
   "root_cause_hypothesis": "implement max_tokens=800 truncated mid-fence; closed-fence regex rejected body; follow-up raises max_tokens and accepts unclosed fences when body looks like Python",
-  "materialization_repair_prior_sha": "739368ce7cf468762f7005d52c03703f695fc3c8"
+  "materialization_repair_prior_sha": "739368ce7cf468762f7005d52c03703f695fc3c8",
+  "evidence_bind": "docs/evidence/v14-real-e2e/v14-real-002/bind.json",
+  "bind_added_at": "2026-09-21T18:24:35Z",
+  "accepted": false,
+  "self_accepted": false,
+  "follow_up_repair_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
+  "follow_up_repair_converts_this_run_to_pass": false,
+  "bind_packaging_note": "bind.json added fail-closed; packaging commit will bind itself by tip SHA"
 }
