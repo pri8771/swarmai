@@ -116,10 +116,13 @@ Default writable surfaces: tests/verification, tests/security, tests/reliability
 - Artifacts: `ART-V12-LOCAL-FALLBACK`, `ART-V12-ADMISSION-RECONCILIATION`, V2 integrated verification
 - SP2
 - Base: current verification lane from reviewed integration
-- Rebind local broker admission/quota/reconciliation/fallback evidence to exact integrated source/config.
-- Correct any evidence labeling that treats stubbed adapter execution as actual local-model inference.
+- Historical broker artifacts were demoted by lead because adapter execution was stubbed and source binding is stale.
+- Rebind local broker admission/quota/reconciliation/fallback evidence to exact integrated source/config using **actual local Ollama inference** if the exact installed models are available.
+- Inventory exact local models first; do not assume gemma/qwen availability.
+- Actually execute the permitted alternative after a controlled local route disable.
+- Keep stubbed harnesses only as clearly deterministic regression evidence.
 - No remote calls, no dual-remote claim, no production broker edits.
-- Acceptance: reproducible verification tests/scripts, exact candidate/config identity, honest evidence mode, failures retained.
+- Acceptance: reproducible verification tests/scripts, exact candidate/config/model identity, actual local inference where claimed, honest evidence mode, failures retained.
 
 ### READY C2 — V2C-002 — DBOS reuse spike
 - Artifact: `ART-V15-DBOS-REUSE`
