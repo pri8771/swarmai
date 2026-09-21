@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T17:15:00Z",
+  "updated_at": "2026-09-21T17:20:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -16,9 +16,8 @@
   "public_release_authorized": false,
   "additional_spend_authorized": false,
   "roles": {
-    "lead": "ChatGPT",
-    "session_a": "Cursor A / HOST-MAC-DEV / runtime+integration",
-    "session_b": "Cursor B / HOST-WIN-DEV identity / product+evaluation",
+    "implementation": "Cursor / CURSOR-V17-SINGLE",
+    "downstream_planning": "ChatGPT",
     "final_authority": "operator"
   },
   "last_lead_message_id": "LEAD-20260921-037",
@@ -46,38 +45,17 @@
     "reserve_verification_lane": "dormant"
   },
   "heartbeat": {
-    "protocol": "docs/coordination/HEARTBEAT_PROTOCOL.md",
+    "protocol": "docs/coordination/SINGLE_SESSION_HEARTBEAT.md",
     "state": "docs/coordination/HEARTBEAT_STATE.json",
-    "mode": "stress_5m",
-    "counted_trigger": "scheduler_only",
-    "active_session_epoch": "reset-20260921-two-lanes-02",
-    "phase1": {
-      "cadence_minutes": 5,
-      "required_consecutive": 3,
-      "valid_gap_minutes": {
-        "min": 3,
-        "max": 8
-      },
-      "a": {
-        "streak": 0,
-        "verified": false,
-        "registered": false
-      },
-      "b": {
-        "streak": 0,
-        "verified": false,
-        "registered": false
-      }
-    },
-    "phase2": {
-      "cadence_minutes": 15,
-      "duration_hours": 24,
-      "started_at": null,
-      "ends_at": null,
-      "completed": false
-    },
-    "after_success": "return to hourly only after full 24h lead verification",
-    "note": "All old session receipts ignored. Only the two fresh sessions registered to reset-20260921-two-lanes-02 count."
+    "mode": "single_session_5m",
+    "active_session_epoch": "single-v17-20260921-01",
+    "active_session": "CURSOR-V17-SINGLE",
+    "branch": "cursor/v17-single-session",
+    "producers_allowed": 1,
+    "cadence_minutes": 5,
+    "ledger": "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json",
+    "status_page": "docs/coordination/status/CURSOR-V17-SINGLE.md",
+    "note": "Legacy A/B heartbeat stress/soak is superseded for current execution. Heartbeat is liveness/progress only."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -174,21 +152,10 @@
       "status": "lead_architecture_drafting"
     }
   },
-  "session_a_next": [
-    "register fresh epoch + single heartbeat producer",
-    "V14-REAL-001-R",
-    "V2A-003c"
-  ],
-  "session_b_next": [
-    "register fresh epoch + single heartbeat producer",
-    "V2B-002 reviewer calibration/freeze",
-    "wait for lead generation"
-  ],
   "lead_parallel": [
-    "monitor read-only Lane-C G13 v3 audit",
-    "author/bind a real sealed-reference bundle for frozen g13-pool-freeze-v3 without worker leakage",
-    "review A/B autonomous pushes when they appear",
-    "recompute heartbeat stress phase from scheduler-only ledger history each run"
+    "prepare/refine V1.6-V3.0 architecture and task backlog without creating competing implementation lanes",
+    "review current-session evidence when explicitly needed",
+    "do not dispatch new worker-pc or A/B implementation work under single-session directive"
   ],
   "open_blockers": [
     "Heartbeat stress Phase1: A is not fresh-epoch registered; B is verified; 24h soak not started",
@@ -210,37 +177,20 @@
   },
   "autonomous_workers": {
     "protocol": "docs/coordination/AUTONOMOUS_WORKER_PROTOCOL.md",
-    "status": "A_generation_4_pending_reset_registration; B_generation_5_issued_self_launch_proof_pending",
-    "poll_seconds": 60,
-    "active_hosts": {
-      "A": {
-        "host": "HOST-MAC-DEV",
-        "branch": "cursor/v2-runtime-lane",
-        "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
-        "assignment_id": "A-RESET-BATCH-04",
-        "generation": 4,
-        "enabled": true,
-        "queued_packets": [
-          "V14-REAL-001-R",
-          "V2A-003c"
-        ],
-        "proven": false
-      },
-      "B": {
-        "host": "HOST-WIN-DEV",
-        "branch": "cursor/v2-product-lane",
-        "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "assignment_id": "B-RESET-BATCH-05",
-        "generation": 5,
-        "enabled": true,
-        "queued_packets": [
-          "V2B-002"
-        ],
-        "proven": false
-      }
+    "status": "suspended_for_current_single_session_execution",
+    "active_hosts": {},
+    "legacy_assignments_disabled": [
+      "docs/coordination/assignments/HOST-MAC-DEV.json",
+      "docs/coordination/assignments/HOST-WIN-DEV.json"
+    ],
+    "current_session": {
+      "session_id": "CURSOR-V17-SINGLE",
+      "branch": "cursor/v17-single-session",
+      "interactive": true,
+      "autonomous_assignment_daemon": false,
+      "heartbeat_producers": 1
     },
-    "lead_behavior": "Do not replay completed packets. Review attributable autonomous source push before advancing generation. Artifact verifies only after both hosts self-launch one repo-assigned packet without a human Cursor prompt.",
-    "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
+    "safety": "no self-acceptance/main merge/public deploy/additional spend/force push"
   },
   "external_workers": {
     "infrastructure_repo": "pri8771/remote-workers",
@@ -255,33 +205,46 @@
     "rule": "never final owner of Python/test-dependent acceptance when executor cannot run required verification"
   },
   "execution_reset": {
-    "audit": "docs/coordination/FULL_AUDIT_2026-09-21.md",
     "plan": "docs/coordination/EXECUTION_RESET_PLAN.md",
-    "topology": "two_fresh_implementation_sessions_plus_chatgpt_lead",
-    "lanes": {
-      "A": {
-        "owner": "HOST-MAC-DEV / Cursor",
-        "branch": "cursor/v2-runtime-lane",
-        "scope": "runtime_real_acceptance_durable_workers_recovery_integration",
-        "assignment": "A-TWO-LANE-01"
-      },
-      "B": {
-        "owner": "HOST-WIN-DEV / Cursor",
-        "branch": "cursor/v2-product-lane",
-        "scope": "product_evaluation_reviewer_qualification_knowledge_tools",
-        "assignment": "B-TWO-LANE-01"
-      }
+    "topology": "one_cursor_implementation_session_plus_operator; ChatGPT downstream planning only",
+    "active_session": {
+      "session_id": "CURSOR-V17-SINGLE",
+      "branch": "cursor/v17-single-session",
+      "scope": "through_v1.7_implementation_candidate"
     },
+    "heartbeat": "docs/coordination/SINGLE_SESSION_HEARTBEAT.md",
     "dashboard": "docs/coordination/LIVE_PROGRESS.md",
-    "host_status": [
-      "docs/coordination/status/HOST-MAC-DEV.md",
-      "docs/coordination/status/HOST-WIN-DEV.md"
-    ],
-    "active_session_epoch": "reset-20260921-two-lanes-02",
+    "status": "docs/coordination/status/CURSOR-V17-SINGLE.md",
+    "active_session_epoch": "single-v17-20260921-01",
     "old_sessions_closed": true,
+    "legacy_assignments_disabled": true,
     "background_worker": {
-      "owner": "worker-pc / Claude via remote-workers",
-      "scope": "lead-controlled independent audit/support only"
+      "enabled": false,
+      "note": "no new worker-pc dispatch under current owner directive"
     }
+  },
+  "current_execution_directive": {
+    "mode": "single_cursor_session",
+    "session_id": "CURSOR-V17-SINGLE",
+    "implementation_branch": "cursor/v17-single-session",
+    "scope": "current_truth_to_v1.7_implementation_complete_reviewable_candidate",
+    "heartbeat_producers": 1,
+    "parallel_implementation_lanes": 0,
+    "chatgpt_role": "downstream_v1.6_to_v3.0_planning_and_review_help_not_competing_implementation",
+    "contract": "docs/coordination/SINGLE_SESSION_V17_EXECUTION.md",
+    "startup": "docs/coordination/CURSOR_V17_START.md"
+  },
+  "single_session_next": [
+    "bootstrap exactly one heartbeat producer and disable legacy local A/B services",
+    "reconcile canonical registry against donor branches",
+    "close implementation/evidence gaps V1.3 -> V1.5",
+    "implement V1.6 scoped knowledge",
+    "implement V1.7 unified tools/browser/permissions",
+    "push final V1.0-repair -> V1.7 implementation/evidence/blocker report"
+  ],
+  "future_planning": {
+    "forward_plan": "docs/coordination/V16_TO_V30_FORWARD_PLAN_20260921.md",
+    "task_backlog": "docs/coordination/V16_TO_V30_TASK_BACKLOG_20260921.md",
+    "implementation_authority": "planning_only_beyond_v1.7_until_operator_changes_scope"
   }
 }
