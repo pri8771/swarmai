@@ -46,6 +46,7 @@ def _insert_ready_task(
     graph_revision: int | None = None,
     source_revision: str | None = None,
     cancellation_generation: int | None = None,
+    dependency_ids: list[str] | None = None,
 ) -> TaskRow:
     tid = task_id or new_id("tsk_")
     rev = mission.revision if graph_revision is None else graph_revision
@@ -75,7 +76,7 @@ def _insert_ready_task(
         graph_revision=rev,
         priority=priority,
         scopes=list(task.scopes),
-        dependency_ids=[],
+        dependency_ids=list(dependency_ids or []),
         payload=payload,
     )
     session.add(row)
@@ -550,3 +551,154 @@ def test_paginated_claim_beyond_32_incompatible_heads(session) -> None:
     assert claimed is not None
     assert claimed.task_id == eligible.id
     assert session.get(TaskRow, eligible.id).status == "leased"  # type: ignore[union-attr]
+
+
+def test_renew_rejects_stale_mission_authority(session) -> None:
+    """V2A-003b-R: renew fails when mission/source/cancel authority drifts after claim."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session)
+    claimed = svc.claim_eligible_attempt(worker_id=worker_id, membership_token=token)
+    session.flush()
+    assert claimed is not None
+
+    row = session.get(MissionRow, mission.id)
+    assert row is not None
+    row.status = "cancelled"
+    session.flush()
+
+    with pytest.raises(LeaseRenewError, match="authority_stale"):
+        svc.renew_lease(
+            lease_id=claimed.lease_id,
+            worker_id=worker_id,
+            worker_generation=claimed.worker_generation,
+            membership_token=token,
+        )
+
+
+def test_expire_does_not_revive_cancelled_mission_task(session) -> None:
+    """V2A-003b-R: expiry must not return cancelled-authority work to ready."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    task = _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session, default_lease_seconds=5)
+    claimed = svc.claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token, lease_seconds=5
+    )
+    session.flush()
+    assert claimed is not None
+
+    row = session.get(MissionRow, mission.id)
+    assert row is not None
+    row.status = "cancelled"
+    session.flush()
+
+    past = claimed.expires_at + timedelta(seconds=1)
+    expired = svc.expire_leases(now=past)
+    session.flush()
+    assert claimed.lease_id in expired
+    task_row = session.get(TaskRow, task.id)
+    assert task_row is not None
+    assert task_row.status == "cancelled"
+    assert task_row.status != "ready"
+
+
+def test_claim_skips_unresolved_dependencies(session) -> None:
+    """V2A-003b-R: unresolved deps leave dependent unmutated; eligible peer is claimed."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    blocker = _insert_ready_task(
+        session, mission=mission, required_capabilities=["code.read"], priority=1
+    )
+    blocker.status = "running"
+    session.flush()
+    blocked = _insert_ready_task(
+        session,
+        mission=mission,
+        required_capabilities=["code.read"],
+        priority=2,
+        dependency_ids=[blocker.id],
+    )
+    eligible = _insert_ready_task(
+        session, mission=mission, required_capabilities=["code.read"], priority=3
+    )
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    claimed = LeaseLifecycleService(session).claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token
+    )
+    session.flush()
+    assert claimed is not None
+    assert claimed.task_id == eligible.id
+    assert session.get(TaskRow, blocked.id).status == "ready"  # type: ignore[union-attr]
+
+
+def test_renew_caps_expires_at_to_renewable_until(session) -> None:
+    """V2A-003b-R: renew cannot push expires_at past renewable_until; empty window fails."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(
+        session, default_lease_seconds=30, renewable_horizon_seconds=40
+    )
+    claimed = svc.claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token, lease_seconds=30
+    )
+    session.flush()
+    assert claimed is not None
+    lease = session.get(TaskLeaseRow, claimed.lease_id)
+    assert lease is not None
+    assert lease.renewable_until is not None
+
+    renewed = svc.renew_lease(
+        lease_id=claimed.lease_id,
+        worker_id=worker_id,
+        worker_generation=claimed.worker_generation,
+        membership_token=token,
+        extend_seconds=120,
+    )
+    session.flush()
+    assert renewed.expires_at == lease.renewable_until
+
+    # Already at the horizon with time remaining on the lease: no positive extension window.
+    just_before = lease.renewable_until - timedelta(seconds=1)
+    with pytest.raises(LeaseRenewError, match="no_positive_renewal_window"):
+        svc.renew_lease(
+            lease_id=claimed.lease_id,
+            worker_id=worker_id,
+            worker_generation=claimed.worker_generation,
+            membership_token=token,
+            extend_seconds=10,
+            now=just_before,
+        )

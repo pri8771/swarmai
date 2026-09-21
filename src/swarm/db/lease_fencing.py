@@ -46,6 +46,10 @@ _RUNNABLE_MISSION_STATUSES = frozenset(
         "verifying",
     }
 )
+# Durable dependency terminals that unblock a dependent claim (V2A-003b-R).
+_DEPENDENCY_DONE_STATUSES = frozenset({"accepted", "completed"})
+_NON_DISPATCHABLE_ON_STALE_EXPIRE = "superseded"
+_CANCELLED_ON_EXPIRE = "cancelled"
 
 
 class RawTokenPersistenceError(ValueError):
@@ -493,6 +497,9 @@ class LeaseLifecycleService:
                     continue
                 if self._has_active_lease(task.id):
                     continue
+                if not self._dependencies_satisfied(task):
+                    # Stale/unresolved deps — leave task unmutated; continue scan.
+                    continue
                 mission = self._load_claimable_mission(task)
                 if mission is None:
                     # Authority stale/cancelled/missing — leave task unmutated.
@@ -518,7 +525,7 @@ class LeaseLifecycleService:
         extend_seconds: int | None = None,
         now: datetime | None = None,
     ) -> TaskLeaseRow:
-        """Extend an active/renewed lease when generation, project, and window match."""
+        """Extend an active/renewed lease when worker, project, authority, and window match."""
         clock = now or utc_now()
         worker = self._require_claimable_worker(worker_id, membership_token)
         lease = self.session.get(TaskLeaseRow, lease_id)
@@ -536,10 +543,12 @@ class LeaseLifecycleService:
             raise LeaseRenewError(f"lease_not_renewable:{lease.state}")
         if lease.expires_at <= clock:
             raise LeaseRenewError("lease_already_expired")
-        if lease.renewable_until is not None and clock > lease.renewable_until:
-            raise LeaseRenewError("past_renewable_until")
-        extension = timedelta(seconds=extend_seconds or self.default_lease_seconds)
-        lease.expires_at = clock + extension
+        self._require_current_lease_authority(lease)
+        lease.expires_at = self._renewal_expires_at(
+            lease=lease,
+            clock=clock,
+            extend_seconds=extend_seconds or self.default_lease_seconds,
+        )
         lease.state = "renewed"
         lease.updated_at = clock
         self.session.flush()
@@ -554,8 +563,9 @@ class LeaseLifecycleService:
     ) -> list[str]:
         """Expire active leases whose ``expires_at`` has passed (server clock).
 
-        Returns expired lease IDs. Tasks still marked ``leased`` are returned to
-        ``ready`` so a later claim can reassign them.
+        Returns expired lease IDs. Tasks still marked ``leased`` return to
+        ``ready`` only when mission/task authority is still current; otherwise
+        they are reconciled to a non-dispatchable cancelled/superseded status.
         """
         clock = now or utc_now()
         stmt = (
@@ -580,7 +590,7 @@ class LeaseLifecycleService:
                 attempt.terminal_at = clock
             task = self.session.get(TaskRow, lease.task_id)
             if task is not None and task.status == "leased":
-                task.status = _CLAIMABLE_TASK_STATUS
+                task.status = self._expire_task_status(task)
             expired_ids.append(lease.lease_id)
         self.session.flush()
         return expired_ids
@@ -653,6 +663,95 @@ class LeaseLifecycleService:
             return None
         return mission
 
+    def _require_current_lease_authority(self, lease: TaskLeaseRow) -> None:
+        """Fail renew when task/mission/attempt authority drifted after claim."""
+        task = self.session.get(TaskRow, lease.task_id)
+        if task is None:
+            raise LeaseRenewError("task_missing")
+        if task.project_id != lease.project_id:
+            raise LeaseRenewError("task_project_mismatch")
+        if lease.task_revision is not None and int(task.graph_revision) != int(lease.task_revision):
+            raise LeaseRenewError("task_revision_mismatch")
+        attempt = self.session.get(TaskAttemptRow, lease.attempt_id)
+        if attempt is None:
+            raise LeaseRenewError("attempt_missing")
+        if attempt.task_id != lease.task_id or attempt.mission_id != lease.mission_id:
+            raise LeaseRenewError("attempt_lease_mismatch")
+        if attempt.project_id is not None and attempt.project_id != lease.project_id:
+            raise LeaseRenewError("attempt_project_mismatch")
+        mission = self._load_claimable_mission(task)
+        if mission is None:
+            raise LeaseRenewError("authority_stale")
+        current_source = self._mission_source_revision(mission)
+        if lease.source_revision is not None and str(lease.source_revision) != current_source:
+            raise LeaseRenewError("source_revision_stale")
+        if (
+            lease.cancellation_generation is not None
+            and int(lease.cancellation_generation) != int(mission.cancellation_generation)
+        ):
+            raise LeaseRenewError("cancellation_generation_stale")
+        if attempt.source_revision is not None and str(attempt.source_revision) != current_source:
+            raise LeaseRenewError("attempt_source_stale")
+        if (
+            attempt.cancellation_generation is not None
+            and int(attempt.cancellation_generation) != int(mission.cancellation_generation)
+        ):
+            raise LeaseRenewError("attempt_cancellation_stale")
+
+    @staticmethod
+    def _renewal_expires_at(
+        *,
+        lease: TaskLeaseRow,
+        clock: datetime,
+        extend_seconds: int,
+    ) -> datetime:
+        """Compute renew expiry with ``renewable_until`` as a hard upper bound."""
+        desired = clock + timedelta(seconds=extend_seconds)
+        upper = lease.renewable_until
+        if upper is None:
+            return desired
+        if clock >= upper:
+            raise LeaseRenewError("past_renewable_until")
+        capped = min(desired, upper)
+        if capped <= clock:
+            raise LeaseRenewError("no_positive_renewal_window")
+        # Already at the horizon: cannot grant additional time.
+        if lease.expires_at >= upper:
+            raise LeaseRenewError("no_positive_renewal_window")
+        # Never accidentally shorten a currently later valid expiry.
+        if capped < lease.expires_at:
+            return lease.expires_at
+        return capped
+
+    def _expire_task_status(self, task: TaskRow) -> str:
+        """Return ready only when authority is still current; else non-dispatchable."""
+        mission = self._load_claimable_mission(task)
+        if mission is not None:
+            return _CLAIMABLE_TASK_STATUS
+        mission_row = self.session.get(MissionRow, task.mission_id)
+        if mission_row is None or mission_row.status == "cancelled":
+            return _CANCELLED_ON_EXPIRE
+        if mission_row.status not in _RUNNABLE_MISSION_STATUSES:
+            return _CANCELLED_ON_EXPIRE
+        return _NON_DISPATCHABLE_ON_STALE_EXPIRE
+
+    def _dependencies_satisfied(self, task: TaskRow) -> bool:
+        """True when every dependency is accepted/completed for same mission/project/graph."""
+        deps = list(task.dependency_ids or [])
+        if not deps:
+            return True
+        for dep_id in deps:
+            dep = self.session.get(TaskRow, str(dep_id))
+            if dep is None:
+                return False
+            if dep.mission_id != task.mission_id or dep.project_id != task.project_id:
+                return False
+            if int(dep.graph_revision) != int(task.graph_revision):
+                return False
+            if dep.status not in _DEPENDENCY_DONE_STATUSES:
+                return False
+        return True
+
     @staticmethod
     def _mission_source_revision(mission: MissionRow) -> str:
         payload = mission.payload if isinstance(mission.payload, dict) else {}
@@ -700,6 +799,8 @@ class LeaseLifecycleService:
             raise LeaseClaimError("claim_project_mismatch")
         expires_at = clock + timedelta(seconds=lease_seconds)
         renewable_until = clock + timedelta(seconds=self.renewable_horizon_seconds)
+        if expires_at > renewable_until:
+            expires_at = renewable_until
         payload = task.payload if isinstance(task.payload, dict) else {}
         input_digest = payload.get("input_digest") if isinstance(payload, dict) else None
         source_revision = self._mission_source_revision(mission)
