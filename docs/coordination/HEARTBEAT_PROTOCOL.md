@@ -27,7 +27,7 @@ Meaningful work must still produce a CURSOR-A/B message with exact source/eviden
 
 Each active worker heartbeat scheduler runs every 15 minutes during bootstrap.
 
-A worker heartbeat is valid when it contains:
+A worker heartbeat payload is structurally valid when it contains:
 - host_alias
 - session_id
 - assigned branch
@@ -37,7 +37,9 @@ A worker heartbeat is valid when it contains:
 - current packet/artifact/status if known
 - no fabricated work/acceptance fields
 
-For bootstrap verification, a consecutive 15-minute heartbeat is one whose timestamp is 10–25 minutes after the prior valid heartbeat from the same session.
+For the bootstrap cadence proof, ONLY heartbeats with `trigger = "scheduler"` count. Manual/install/working/review-request heartbeats are useful coordination events but do not advance the 15-minute streak.
+
+A consecutive 15-minute scheduler heartbeat is one whose timestamp is 10–25 minutes after the prior counted scheduler heartbeat from the same session.
 
 Required before graduation:
 - HOST-MAC-DEV / Session A: 3 consecutive valid 15-minute heartbeats
@@ -57,6 +59,10 @@ Therefore:
 - do not claim that ChatGPT itself executed three 15-minute scheduled runs.
 
 This is a platform scheduling limit, not a worker limitation.
+
+## Scheduler independence
+
+Manual/forced packet heartbeats must never reset or suppress the scheduler cadence clock. The heartbeat client keeps scheduler timing separately from work-status updates.
 
 ## Hourly graduation
 
