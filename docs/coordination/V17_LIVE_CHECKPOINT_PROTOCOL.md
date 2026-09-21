@@ -102,6 +102,19 @@ Negative live/deterministic cases:
 - unknown external outcome;
 - session expires/signs out, recovers destination, and does NOT duplicate submission.
 
+## Checkpoint CP5-REALWORLD — real external effect
+
+After CP5 fixture-based semantics pass, run R33c under `REAL_WORLD_ACCEPTANCE_POLICY.md`.
+
+Minimum proof:
+- actual private GitHub repository boundary (preferred current proof);
+- create, observe, comment once, and close one uniquely named test issue through the V1.7 gateway;
+- all mutations approval/effect-key bound;
+- duplicate replay creates no duplicate external state;
+- unknown outcome reconciled before retry;
+- no credential/token material in evidence.
+
+CP5 without CP5-REALWORLD may be described as live-local checkpointed, not working/operationally proven.
 ## Checkpoint CP6 — V1.7 exact-tip integrated review
 
 Must bind:
@@ -119,3 +132,18 @@ Must bind:
 Any accepted protocol requiring elapsed wall clock starts as early as dependencies permit and runs while later implementation continues.
 
 Never backfill time.
+
+---
+
+## Proposed amendments (Fable planning pass, 2026-09-21 — effective only after lead approval)
+
+Motivation: findings V1–V5 of `V17_CODE_AUDIT_20260921_2030_FABLE.md`.
+
+1. **Operational-path rule.** A checkpoint for a subsystem passes only if the evidence shows the subsystem was reached from an operational entrypoint (mission, API or CLI), not only from a test or a standalone script. CP4 requires real missions; CP5 requires all three integrations to pass through one gateway object; CP6 requires one mission whose record contains broker, lease, knowledge and action receipts.
+2. **Own-run rule.** Every packet's test output is produced by that packet's own run. Byte-identical outputs shared across packets count once.
+3. **Skips are not passes.** Evidence lists every skipped or deselected test by name. A required case that was skipped is `not_run`.
+4. **Requirement tables.** CP evidence carries a machine-readable `requirements` map (`name → demonstrated, detail`) covering every bullet of the checkpoint definition.
+5. **CP3 additions made explicit.** Duplicate-result race must be concurrent across processes; cancellation-generation rejection must be exercised (packet `R17a`).
+6. **CP4 additions made explicit.** Existence-inference negative (B's actor-visible receipt is invariant to the size of A's corpus) and strict token savings (`<`, not `>= 0`) (packet `R25b`).
+7. **CP5 additions made explicit.** Response loss, kill between `begin_execution` and finalize, concurrent execution from two processes, login-never-submits (packets `R33a`/`R33b`, cases in `packets/R32a.md`).
+8. **Run directories are write-once.** A rerun gets a new run-id; failed runs stay committed.
