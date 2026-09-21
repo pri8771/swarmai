@@ -16,3 +16,5 @@ Harness pytest also green (simulated single-process suite).
 `live_multi_host_evidence=UNKNOWN` — R18 still needs a second physical host.
 
 No invent-accept of `ART-V15-RECOVERY-EVIDENCE`.
+
+Evidence tip: `cea12c622a44196b57bb8abe76b0ed83da1d97b6`.

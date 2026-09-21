@@ -10,5 +10,6 @@
   "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host",
   "harness_pytest": "1 passed (simulated_multi_worker_single_process)",
   "script": "scripts/r17_cp3_separate_process_recovery.py",
-  "note": "CP3 separate-OS-process proof green; R18 multi-host still UNKNOWN. No invent-accept."
+  "note": "CP3 separate-OS-process proof green; R18 multi-host still UNKNOWN. No invent-accept.",
+  "evidence_tip_sha": "cea12c622a44196b57bb8abe76b0ed83da1d97b6"
 }
