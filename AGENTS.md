@@ -40,3 +40,7 @@ No secrets in Git.
 No paid fallback by default.
 No main merge/public release/destructive production action without explicit operator authorization.
 No permission/spend/release/self-review escalation by persistent objectives, learning, extensions, or self-development.
+
+
+## Review authority
+No worker may impersonate the ChatGPT lead, fabricate a lead review, or promote its own branch as approved. Worker-produced review suggestions are advisory only. Canonical promotion requires an actual operator/ChatGPT lead decision after independent inspection.
