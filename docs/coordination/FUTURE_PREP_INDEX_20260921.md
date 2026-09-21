@@ -46,3 +46,14 @@ Before executing a future packet, a worker must:
 2. inspect current source;
 3. reconcile any contract changes made since this prep set;
 4. use current source/evidence rather than assuming the 2026-09-21 code map is still exact.
+
+## Additional prepared accelerators
+
+- `FUTURE_INFRA_REUSE_DECISIONS_20260921.md` — prevents unnecessary infrastructure/framework expansion.
+- `FUTURE_MIGRATION_SEQUENCE_V18_TO_V30_20260921.md` — pre-orders durable schema work.
+- `FUTURE_VERSION_EXIT_CHECKLISTS_20260921.md` — implementation-complete vs accepted checklists.
+- `FUTURE_OPERATOR_JOURNEYS_V18_TO_V30_20260921.md` — end-to-end acceptance journeys.
+- `FUTURE_ACCEPTANCE_CASE_IDS_20260921.md` — stable negative/live case identifiers.
+- `FUTURE_EVIDENCE_TEMPLATES_20260921.md` — candidate/recovery/scheduler/objective/learning evidence skeletons.
+- `FUTURE_WORKER_START_PROMPTS_V18_TO_V30_20260921.md` — prepared future worker bootstraps.
+- `FUTURE_TRACEABILITY_MATRIX_V18_TO_V30_20260921.md` — artifact -> packet -> code -> case -> evidence mapping.
