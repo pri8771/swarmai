@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T02:58:00Z",
+  "updated_at": "2026-09-21T03:04:30Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -42,12 +42,12 @@
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T02:42:00Z",
+    "last_review_at": "2026-09-21T03:04:00Z",
     "last_notified_worker_sha": {
-      "A": "e764834a69315d1c2c85f00322c3392aa5037fd9",
-      "B": null
+      "A": "f393f7fa0ed62d5233350740515ed77069fd4eef",
+      "B": "770c80b6ccbcef8f442696508ab95f3696aa3176"
     },
-    "note": "Only trigger=scheduler counts toward 15m proof. Manual/install heartbeats are coordination notifications only. Cadence bug fixed in branch heartbeat clients; workers must pull/reinstall."
+    "note": "Only trigger=scheduler counts toward 15m proof. Manual/install heartbeats are coordination notifications only. A remains 1/3 scheduler heartbeats; B remains 0/3. Cadence bug fixed in branch heartbeat clients; both workers must pull/reinstall. No graduation."
   },
   "stale_threshold_minutes": {
     "bootstrap_15m": 35,
