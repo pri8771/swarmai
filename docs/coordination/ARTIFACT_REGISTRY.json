@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T12:34:00Z",
+  "updated_at": "2026-09-21T14:20:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -196,12 +196,13 @@
         "HB-B-BOOTSTRAP"
       ],
       "story_points_next": 1,
-      "next_action": "Keep 15-minute bootstrap cadence; diagnose Mac scheduler interruption and Windows missed intervals; require fresh 3/3 consecutive scheduler chain on both before hourly graduation.",
+      "next_action": "Run fresh owner-directed Phase 1: both A/B produce 3 consecutive scheduler receipts at 5m cadence (3–8m gaps); then Phase 2: 15m cadence for 24 real hours; only after full soak verification return to hourly.",
       "blockers": [
-        "HOST-MAC-DEV stale: current scheduler chain 1/3; no receipt since 11:55:14Z",
-        "HOST-WIN-DEV current scheduler chain reset to 1/3 after 30-minute gap before 12:29:17Z"
+        "new Phase-1 5m proof intentionally reset to 0/3 for A",
+        "new Phase-1 5m proof intentionally reset to 0/3 for B",
+        "24h 15m soak not started"
       ],
-      "notes": "Only trigger=scheduler counts. Coordination heartbeat is not ART-V10 authenticated Cursor-agent evidence."
+      "notes": "Only trigger=scheduler counts. Coordination heartbeat is not ART-V10 authenticated Cursor-agent evidence. Prior 15m->hourly bootstrap was verified historically; owner intentionally requested a stricter fresh stress test on 2026-09-21."
     },
     {
       "artifact_id": "ART-V10-CANDIDATE",
