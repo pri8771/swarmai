@@ -1,6 +1,6 @@
 # SwarmAI compact project memory
 
-Curated 2026-09-21 after `LEAD-20260921-026`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
+Curated 2026-09-21 after `LEAD-20260921-027`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
 
 ## Authority and team
 
@@ -11,70 +11,83 @@ Active implementation team:
 - Cursor A / HOST-MAC-DEV / `cursor/v2-runtime-lane`: runtime/control plane/distributed/recovery + `cursor/v2-integration` owner.
 - Cursor B / HOST-WIN-DEV / `cursor/v2-product-lane`: evaluation/knowledge/tools/product/beta.
 - verification lane dormant reserve.
-- `pri8771/remote-workers` is external execution infrastructure only; it never owns SwarmAI roadmap/state/acceptance.
+- `pri8771/remote-workers` is execution infrastructure only; SwarmAI repository remains roadmap/state/acceptance authority.
 
 Artifacts are primary; packets advance artifact state. Cursor gets routine SP1-SP3 work. Lead reviews independently and advances architecture/recovery/security/evaluation/future contracts in parallel.
 
 ## Current source truth
 
-Main: `b9141fa3150f853586dede0334a47b344571bc16`.
-A runtime: `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`, Actions `35558067148` red offline Ruff; console green.
-B product: `6b0e1277051ae90fe1d56825d3e771b042380755`, prior exact-tip CI red from the same shared autonomous-runner source; console green.
-Reviewed integration baseline remains `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
+Main `b9141fa3150f853586dede0334a47b344571bc16`.
+A runtime `1e4b560a2cd1e4285222452a6839a5a5cc5b4c60`, Actions `35558067148` red offline Ruff on shared autonomous-runner source.
+B product `6b0e1277051ae90fe1d56825d3e771b042380755`, prior exact-tip CI red from the same shared source.
+Reviewed integration baseline `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
 
-No A/B source commit advanced in LEAD-026. The shared runner repair `OPS-AUTO-001-R` remains the immediate local implementation blocker; do not call either active lane tip green.
+No A/B source implementation commit advanced in LEAD-027. `OPS-AUTO-001-R` remains the immediate local implementation blocker.
 
-## Heartbeat and autonomous-worker truth
+## Heartbeat / autonomy truth
 
-Only `trigger=scheduler` counts. Need 3 consecutive receipts 10-25 minutes apart for both workers before global worker publication cadence may graduate to hourly. ChatGPT lead remains hourly.
+Only `trigger=scheduler` counts. Need 3 consecutive receipts 10-25 minutes apart for both workers before global worker cadence can graduate to hourly; ChatGPT lead itself remains hourly.
 
-At the final LEAD-026 snapshot:
-- A scheduler receipts `03:47:19Z` and `04:02:22Z` form a valid pair: **2/3**, but A is **stale** (>35m since latest receipt).
-- B receipts `03:43:40Z`, `03:59:17Z`, `04:14:17Z`, `04:29:17Z`, `04:44:18Z`, `04:59:18Z` form **6 consecutive valid** intervals. B individually satisfies the requirement and is fresh.
-- Global mode remains `bootstrap_15m` because A has not satisfied the requirement.
-- Coordination heartbeat is not `ART-V10-WORKER-HEARTBEAT` authenticated Cursor-agent evidence.
+Current verified scheduler state:
+- A: `03:47:19Z -> 04:02:22Z`, **2/3 and stale**; no later receipt observed.
+- B: valid sequence through `05:29:17Z`, **8 consecutive**, individually complete/fresh.
+- Global mode remains `bootstrap_15m` because A has not met the requirement.
 
-Repo-driven autonomous-runner source/installers exist on both A/B branches, but neither host has proven a repo-assigned autonomous self-launch + attributable source push. `ART-OPS-AUTONOMOUS-WORKERS` remains drafting.
+Coordination heartbeat does not satisfy `ART-V10-WORKER-HEARTBEAT`. Neither host has proven a repo-assigned autonomous self-launch plus attributable source push, so `ART-OPS-AUTONOMOUS-WORKERS` remains drafting.
 
-A assignment remains `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled with only `OPS-AUTO-001-R`. B assignment remains `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, disabled until that repair is independently reviewed/propagated. Do not replay prior generations.
+A assignment: `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled with only `OPS-AUTO-001-R`. B assignment: `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, disabled pending independent review/propagation of the shared runner repair. Never replay older generations.
 
-## External worker-pc truth
+## External worker-pc / G13 truth
 
-`worker-pc` is online, capacity 1, with verified Claude branch execution infrastructure. The first task-pool attempt `swarmai-v13-task-pool-freeze-01` produced no result: dispatch `7e17163e7fc85455a8eb0180d3cb2173711dc978`, run `35559390335` cancelled, no result JSON and no worker branch.
+Attempt 01 (`swarmai-v13-task-pool-freeze-01`) was cancelled with no result or worker branch.
 
-After remote capacity freed, lead dispatched fresh unique retry `swarmai-v13-task-pool-freeze-02` at remote-workers commit `4c5fe82f227fc80038a3ce9b1643305be48f09d9`. Run `35562827710` is in progress. Expected branch: `worker/swarmai-v13-task-pool-freeze-02`. `ART-V13-TASK-POOL` remains drafting until lead independently inspects the structured result, branch/diff scope, tests and manifest against EVAL-131. Dispatch/running status earns no acceptance credit.
+Attempt 02 produced a real scoped SwarmAI branch:
+- `worker/swarmai-v13-task-pool-freeze-02`
+- commit `bbe41b7770123fef4eb03c4f03f95fc18eefc692`
+- exact parent `cursor/v2-integration@9ce727842446b98cfa55c28c7e70808f57f17d7b`.
 
-Local B must not duplicate V2B-001 while external retry 02 is active. Counted qualification remains forbidden until the task pool is independently frozen.
+Independent lead review found useful freeze/verifier work but **changes required**. The manifest itself proves why it is not qualification-ready: worker-visible hidden answers/grader/reference material exists in `benchmarks/starter.jsonl`; only 5 held-out cases exist per required family/size cell while EVAL-131 requires at least 15 independent observations before qualification is possible; seed-isomorphic variants remain; and the remote executor ran no Python/pytest/Ruff/mypy or GitHub CI. `ART-V13-TASK-POOL` therefore remains drafting and counted qualification remains forbidden.
+
+Lead created `docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.md` and dispatched repair 03:
+- task `swarmai-v13-task-pool-freeze-03`
+- packet `EXT-WORKER-PC-V2B-001-R1`
+- base `worker/swarmai-v13-task-pool-freeze-02`
+- remote-workers commit `cbdaaab46142e2165084a15157f1aabd8180483d`
+- workflow `35566726945` was in progress when last checked.
+
+Repair 03 must create a new v2 freeze: worker-visible held-out inputs contain no hidden references; grader references are sealed/opaque; all 16 required family×size cells have >=15 independent held-out inputs; duplicate/isomorphic contamination is rejected; identities are frozen; and exact-commit verification actually runs. No counted qualification is part of this repair.
 
 ## Retained reviewed work
 
-- V2A-003b-R2/SP1 accepted packet; parent `ART-V15-LEASE-FENCING` stays drafting pending V2A-003c result acceptance.
-- V2A-H6A-R/SP1 accepted packet; parent V2 foundation hardening remains drafting.
-- V2A-003X/SP2 accepted architecture spike: partial DBOS reuse for worker execution only after Swarm authority fencing; durable authority remains PostgreSQL-owned.
-- V14-REAL-001 is a real failed mission, not a pass: actual brokered qwen3.5:4b at $0 but empty material diff; repair packet V14-REAL-001-R remains after runner repair.
+- V2A-003b-R2/SP1 accepted packet; parent `ART-V15-LEASE-FENCING` still drafting pending V2A-003c result acceptance.
+- V2A-H6A-R/SP1 accepted packet; parent V2 hardening remains drafting.
+- V2A-003X/SP2 accepted architecture spike: partial DBOS reuse only; Swarm authority remains PostgreSQL-owned.
+- V14-REAL-001 is a real failed mission, not a pass: actual brokered qwen3.5:4b at $0 but empty material diff; repair V14-REAL-001-R remains queued after runner repair.
 - Current-tip local G12 proof accepted: actual Ollama inventory, two brokered local models, route-disable alternate, quota settlement/deny, $0. No remote claim.
-- Remote G12 admission remains 0 routes: metadata/auth does not prove exact account free-tier/zero-charge eligibility.
-- G13 screening has 72 provisional n=5 cells; zero qualified cells. Task/version pool and reviewer design must be frozen before counted held-out qualification.
-
-No new bounded implementation packet reached independent review in LEAD-026, so `WORKER_PERFORMANCE.json` remains unchanged.
+- G12 remote admission remains 0 routes: metadata/auth does not prove exact-account free-tier/zero-charge eligibility.
+- G13 screening has 72 provisional n=5 cells; zero qualified cells.
+- External retry 02/SP2 was changes-required and is now recorded in `WORKER_PERFORMANCE.json`; repair 03 is active.
 
 ## Immediate queues
 
 A:
-1. `OPS-AUTO-001-R` SP1 — repair autonomous-runner/heartbeat source + focused fail-closed regressions + exact-tip green CI.
-2. after lead review/new assignment generation: `V14-REAL-001-R` SP2.
-3. then `V2A-003c` SP2 result-acceptance fencing.
-4. after review: reviewed-slice integration receipt, then durable worker service/client.
+1. `OPS-AUTO-001-R` SP1 — shared runner source + fail-closed regressions + exact-tip green CI.
+2. after independent review/new generation: `V14-REAL-001-R` SP2.
+3. then `V2A-003c` SP2 durable result-acceptance fencing.
+4. then reviewed-slice integration receipt and durable worker service/client.
 
 B:
-- keep scheduler heartbeat running while assignment remains held;
-- after shared repair propagation/new generation: run `V2B-000` locally, then `V2B-002` locally while worker-pc executes V2B-001 retry 02;
-- counted W-131B only after lead freezes ART-V13-TASK-POOL; reviewer held-out only after reviewer design freeze.
+- keep heartbeat scheduler running while product assignment is held;
+- do not duplicate external task-pool repair;
+- after shared runner repair/new generation: `V2B-000`, then `V2B-002` reviewer calibration/freeze where ownership is independent;
+- W-131B counted qualification only after lead freezes `ART-V13-TASK-POOL`; reviewer held-out only after reviewer design freeze.
 
 ## Gate truth and lead lane
 
-V1.0 still blocked on separate authenticated Cursor-agent evidence. V1.1 required artifacts are verified. V1.2 broker/local admission are verified but dual-remote overlap blocked at 0 admitted remotes. V1.3 zero qualified cells. V1.4 first real E2E failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 result acceptance remains. V1.6/V1.7 are queued behind B critical-path work. V2.0 integration/hardening remain drafting; its 7-day reliability wall-clock campaign has not started.
+V1.0 still blocked on separate authenticated Cursor-agent evidence. V1.1 required artifacts are verified. V1.2 broker/local admission are verified but dual-remote overlap is blocked at 0 admitted remotes. V1.3 has zero qualified cells and task-pool repair 03 is active. V1.4 first real E2E failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 result acceptance remains. V1.6/V1.7 are queued behind B critical-path work. V2.0 integration/hardening remain drafting; its 168-hour reliability campaign has not started.
 
-Lead advanced `ART-V20-RELIABILITY-PROTOCOL` at `170d0b8c72a89e698cdc15cbeb86901c0cecab1b`: campaign identity, reset matrix, immutable checkpoints, monitoring-gap treatment and no-splicing/no-backfill rules now bind any future 168-hour campaign. This is protocol work only, not elapsed evidence.
+Lead-owned critical artifact added this run: `ART-V13-TASK_POOL_REPAIR_CONTRACT.md`, binding hidden-reference isolation, independent held-out depth and freeze-v2 verification before any counted qualification can start.
+
+`ART-V20-RELIABILITY-PROTOCOL` remains drafting with campaign identity/reset matrix, immutable checkpoints, monitoring-gap handling and no-splicing/no-backfill. No elapsed reliability evidence is claimed.
 
 Zero-spend, fail-closed, no operational mocks, no known-answer substitution, no admission bypass and no fabricated worker/provider/cost/time/acceptance evidence remain mandatory.
