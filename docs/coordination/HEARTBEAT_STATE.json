@@ -1,97 +1,32 @@
 {
-  "schema_version": "1.1",
-  "updated_at": "2026-09-21T17:15:00Z",
-  "mode": "stress_5m",
+  "schema_version": "1.2",
+  "updated_at": "2026-09-21T17:20:00Z",
+  "mode": "single_session_5m",
   "worker_effective_cadence_minutes": 5,
-  "lead_effective_cadence_minutes": 60,
-  "lead_platform_minimum_minutes": 60,
-  "stress_test": {
-    "owner_directive_date": "2026-09-21",
-    "phase1": {
-      "name": "5m_burst",
-      "required_consecutive_per_session": 3,
-      "valid_gap_minutes": {
-        "min": 3,
-        "max": 8
-      },
-      "requires_sessions": [
-        "A",
-        "B"
-      ],
-      "all_workers_verified": false,
-      "verified_at": null,
-      "verified_timestamps": {
-        "A": [],
-        "B": []
-      }
-    },
-    "phase2": {
-      "name": "15m_24h_soak",
-      "required_duration_hours": 24,
-      "valid_gap_minutes": {
-        "min": 10,
-        "max": 25
-      },
-      "started_at": null,
-      "ends_at": null,
-      "completed": false,
-      "verified_at": null,
-      "miss_policy": "any unresolved >25m scheduler gap fails/restarts clean soak unless owner explicitly waives"
-    },
-    "after_success": {
-      "mode": "hourly",
-      "worker_effective_cadence_minutes": 60
-    }
+  "active_session_epoch": "single-v17-20260921-01",
+  "producer_limit": 1,
+  "session": {
+    "session_id": "CURSOR-V17-SINGLE",
+    "branch": "cursor/v17-single-session",
+    "ledger": "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json",
+    "status_page": "docs/coordination/status/CURSOR-V17-SINGLE.md",
+    "registered": false,
+    "last_heartbeat_at": null,
+    "status": "awaiting_session_start"
   },
-  "sessions": {
-    "A": {
-      "host_alias": "HOST-MAC-DEV",
-      "branch": "cursor/v2-runtime-lane",
-      "last_heartbeat_at": null,
-      "consecutive_valid_phase1": 0,
-      "verified_timestamps": [],
-      "stale": false,
-      "status": "awaiting fresh two-lane session registration for reset-20260921-two-lanes-02; all earlier receipts are history only"
-    },
-    "B": {
-      "host_alias": "HOST-WIN-DEV",
-      "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": null,
-      "consecutive_valid_phase1": 0,
-      "verified_timestamps": [],
-      "stale": false,
-      "status": "awaiting fresh two-lane session registration for reset-20260921-two-lanes-02; all earlier receipts are history only"
-    }
+  "legacy": {
+    "two_lane_stress_test": "superseded_by_owner_directive",
+    "old_ledgers": "historical_only",
+    "old_assignments": "disabled"
   },
-  "prior_verified_hourly_graduation": {
-    "verified": true,
-    "graduated_at": "2026-09-21T13:56:51Z",
-    "note": "Historical heartbeat bootstrap proof remains valid evidence; owner intentionally reset cadence for a new stress test."
+  "semantics": {
+    "purpose": "liveness_and_progress_only",
+    "accepts_artifacts": false,
+    "backfill_allowed": false,
+    "duplicate_producers_allowed": false,
+    "heartbeat_when_no_code_change": "required_while_session_active_with_specific_still_working_note"
   },
-  "lead": {
-    "automation_id": "6ab02943e168819192c9c5672b2a6578",
-    "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T17:02:02Z",
-    "note": "All prior interactive lanes closed. Exactly two fresh implementation sessions are authorized. Only receipts after explicit reset-20260921-two-lanes-02 registration count."
-  },
-  "stale_threshold_minutes": {
-    "stress_5m": 12,
-    "soak_15m_24h": 35,
-    "hourly": 90
-  },
-  "notifications": {
-    "channel": "GitHub durable coordination -> hourly lead automation -> operator",
-    "instant_push_guaranteed": false
-  },
-  "active_session_epoch": "reset-20260921-two-lanes-02",
-  "session_epoch_registration": {
-    "A": {
-      "registered": false,
-      "registered_at": null
-    },
-    "B": {
-      "registered": false,
-      "registered_at": null
-    }
-  }
+  "stale_threshold_minutes": 12,
+  "lead_heartbeat_automation": false,
+  "note": "One active Cursor implementation session and one 5-minute heartbeat producer. No A/B stress phase or 24h heartbeat soak."
 }
