@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:18:09Z",
+  "updated_at": "2026-09-21T00:24:47Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -1198,34 +1198,40 @@
     },
     {
       "artifact_id": "ART-V20-RELIABILITY-PROTOCOL",
-      "name": "V2.0 reliability observation protocol",
+      "name": "Integrated V2.0 reliability observation protocol",
       "target_version": "2.0",
       "kind": "acceptance-protocol",
       "owner": "ChatGPT lead",
       "lane": "lead",
       "status": "drafting",
-      "path_or_source_ref": "docs/artifacts/future/ART-V20-ACCEPTANCE.md",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md",
       "dependencies": [],
       "worker_packets": [],
-      "next_action": "freeze observation metrics/candidate rules before final reliability run",
-      "blockers": []
+      "next_action": "freeze exact duration/candidate/config before final observation",
+      "blockers": [],
+      "acceptance_refs": [
+        "docs/artifacts/future/ART-V20-ACCEPTANCE.md"
+      ]
     },
     {
       "artifact_id": "ART-V20-SECURITY-REVIEW",
-      "name": "Integrated security/threat review",
+      "name": "Integrated V2.0 threat/security review",
       "target_version": "2.0",
-      "kind": "review",
+      "kind": "review-and-negative-evidence",
       "owner": "ChatGPT lead",
       "lane": "lead",
-      "status": "planned",
-      "path_or_source_ref": null,
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md",
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
       "worker_packets": [],
-      "next_action": "threat-model integrated worker/knowledge/tool/recovery/extension boundaries",
+      "next_action": "derive/run integrated negative suites as lane artifacts land",
       "blockers": [
-        "integrated candidate"
+        "integrated candidate incomplete"
+      ],
+      "acceptance_refs": [
+        "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md"
       ]
     },
     {
