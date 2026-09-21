@@ -29,3 +29,14 @@ Packet status: **blocked_user_action_account_tier_canary** — **0 admissible re
 | Local Ollama canary (known-zero loopback) | `v12-remote-admit-01-ollama-canary.json` | `rt_ollama_gemma3:4b` canaried/settled; local only — not a remote admit |
 
 USER_ACTION required before remote admit: operator confirms Free-plan/tier in OpenRouter, Groq, and Gemini dashboards and authorizes one bounded zero-charge canary per exact route. Public docs / API price metadata alone never admit.
+
+## A5 — current-tip local G12 proof (2026-09-21)
+
+Packet: **A5-LOCAL-G12-CURRENT-TIP** / live Ollama only — **not** remote dual claim.
+
+| Evidence | Path | Result |
+|---|---|---|
+| Live inventory + brokered inference + kill/fallback + quota deny | `a5-current-tip-local-proof.json` | `ok=true`; models `gemma3:4b` + `qwen3.5:4b`; adapter **not** stubbed; kill → `route_unavailable`; fourth call → `QuotaExhaustedError`; spend `$0`; `live_dual_remote_claimed=false` |
+| Script | `scripts/g12_current_tip_local_proof.py` | exit 0 |
+
+Historical stubbed `scripts/g12_local_admission_reconcile_proof.py` remains regression prep only.

@@ -1,0 +1,136 @@
+{
+  "packet_id": "A5-LOCAL-G12-CURRENT-TIP",
+  "gate": "INF-121-local-only",
+  "scenario": "current_tip_live_local_inventory_broker_disable_quota",
+  "ok": true,
+  "started_at": "2026-09-21T02:52:30.523664+00:00",
+  "finished_at": "2026-09-21T02:52:34.468883+00:00",
+  "wall_live_inference_seconds": 3.711,
+  "tip_sha": "84df040b6ac5981856ab7f32b66966cc0cf38894",
+  "branch": "cursor/v2-runtime-lane",
+  "allow_paid": false,
+  "spend_usd": 0.0,
+  "swarm_allow_paid_env": "false",
+  "ollama_base_url_env_set": true,
+  "inventory": {
+    "endpoint": "http://127.0.0.1:11434",
+    "loopback": true,
+    "version": {
+      "version": "0.21.0"
+    },
+    "model_count": 6,
+    "models": [
+      {
+        "name": "qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "digest": "2a654d98e6fba55d",
+        "size": 3389983735,
+        "modified_at": "2026-09-13T20:27:31.558567108-04:00"
+      },
+      {
+        "name": "qwen3.5:9b",
+        "model": "qwen3.5:9b",
+        "digest": "6488c96fa5faab64",
+        "size": 6594474711,
+        "modified_at": "2026-07-31T12:24:18.392438477-04:00"
+      },
+      {
+        "name": "deepseek-coder-v2:16b",
+        "model": "deepseek-coder-v2:16b",
+        "digest": "63fb193b3a9b4322",
+        "size": 8905126121,
+        "modified_at": "2026-07-10T16:52:54.282747962-04:00"
+      },
+      {
+        "name": "qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "digest": "9ec8897f747e246e",
+        "size": 8988124298,
+        "modified_at": "2026-07-10T16:52:46.554408133-04:00"
+      },
+      {
+        "name": "gemma3:4b",
+        "model": "gemma3:4b",
+        "digest": "a2af6cc3eb7fa8be",
+        "size": 3338801804,
+        "modified_at": "2026-04-17T22:24:25.036829425-04:00"
+      },
+      {
+        "name": "qwen2.5vl:3b",
+        "model": "qwen2.5vl:3b",
+        "digest": "fb90415cde1ef08a",
+        "size": 3200627168,
+        "modified_at": "2026-04-17T22:21:17.815100844-04:00"
+      }
+    ],
+    "preferred_present": [
+      "gemma3:4b",
+      "qwen3.5:4b"
+    ]
+  },
+  "models_under_test": [
+    "gemma3:4b",
+    "qwen3.5:4b"
+  ],
+  "live_brokered_inference": {
+    "call_a": {
+      "ok": true,
+      "text": "ALPHA",
+      "model": "gemma3:4b",
+      "route_id": "rt_ollama_gemma3:4b",
+      "prompt_tokens": 14,
+      "completion_tokens": 3,
+      "cost_usd": 0.0,
+      "error": null
+    },
+    "call_b": {
+      "ok": true,
+      "text": "BETA",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "prompt_tokens": 18,
+      "completion_tokens": 3,
+      "cost_usd": 0.0,
+      "error": null
+    },
+    "adapter_stubbed": false,
+    "adapter_class": "_LocalAdapter->local_chat(Ollama loopback)"
+  },
+  "route_disable_fallback": {
+    "killed_route": "rt_ollama_gemma3:4b",
+    "killed_availability": "unavailable",
+    "denied_ok": true,
+    "denied_error": "broker_denied:PolicyDeniedError:route_unavailable",
+    "alternative_route": "rt_ollama_qwen3.5:4b",
+    "alternative_ok": true,
+    "alternative": {
+      "ok": true,
+      "text": "ALT",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "prompt_tokens": 17,
+      "completion_tokens": 2,
+      "cost_usd": 0.0,
+      "error": null
+    }
+  },
+  "quota": {
+    "request_limit": 3,
+    "settled_before_fourth": 3,
+    "remaining_before_fourth": 0,
+    "fourth_denied": true,
+    "fourth": {
+      "ok": false,
+      "text": "",
+      "model": "qwen3.5:4b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "error": "broker_denied:QuotaExhaustedError:zero_remaining:qb_local_ollama_requests:requests"
+    }
+  },
+  "remote_providers": "not_claimed",
+  "live_dual_remote_claimed": false,
+  "note": "Current-tip live local G12 proof only. Uses real Ollama inventory + brokered local_chat (no execute_one stub). Remote dual-provider overlap remains blocked pending admitted zero-charge remotes."
+}
