@@ -358,3 +358,27 @@ Do not sit idle.
 
 If a packet grows beyond its scope:
 split it before coding more.
+
+---
+
+# Revision 2 — proposed by the Fable planning pass (2026-09-21T20:30Z, pending lead review)
+
+Basis: `V17_CODE_AUDIT_20260921_2030_FABLE.md`. Stages 0–6 above stay as history. The machine-readable queue (`V17_RECOVERY_PACKET_QUEUE.json`, schema 1.1) and the specs in `packets/` are the executable form; if this prose and the queue disagree, the queue wins.
+
+## What changed and why
+
+1. **R13–R16 and R19–R27 are `evidence_only`.** Their commits changed no source. They re-verified code landed earlier in six broad commits. R17 (CP3), R25 (CP4), R26 and R27 are `gaps_found`.
+2. **Library ≠ wired.** Durable workers, scoped knowledge and the V1.7 boundary are not called by the mission path. New wiring packets: `R28d` (actions), `R25a` (knowledge), `R17b`/`R17c` (leased execution, single worker-state authority).
+3. **R27 is re-opened as `R27a`–`R27e`** for durable receipts, atomic reserve/execute, repository-owned transactions, approval integrity and the crash window.
+4. **R28–R34 are split** into `R28a`–`R28d`, `R29a`, `R30a`–`R30b`, `R31a`–`R31b`, `R32a`, `R33a`–`R33b`, `R34a`–`R34b`. The two simulators are replaced by real-HTTP adapters against a local fixture process, so CP5 can be live.
+5. **R02 gets a runtime repair before a third mission:** `R02a` (red→green defect proof), then `R02b` (`v14-real-008`).
+6. **`OPS-CI-01` goes first.** Heartbeat commits were triggering about 1,000 CI runs per day; restoring Actions billing before this lands would exhaust it again.
+
+## Order for the single worker
+
+`OPS-CI-01` → `R27a` → `R27b` → `R27c` → `R27d`/`R27e` → `R28a` → `R28b` → `R28c` → `R29a` → `R28d` → `R30b` → `R31a` → `R31b` → `R32a` → `R33a` → `R33b` → `R25a` → `R25b` → `R17b` → `R17c` → `R34a` → `R34b`.
+Dependency-free fillers whenever the chain is waiting on a lead diff review: `R30a`, `R17a`, `R02a` → `R02b`.
+
+## Unchanged rules
+
+One packet per commit; tests and evidence produced by that packet's own run; failures preserved; no self-acceptance; `SWARM_ALLOW_PAID=false`; no main merge.
