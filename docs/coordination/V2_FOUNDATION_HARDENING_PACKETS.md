@@ -1,5 +1,7 @@
 # V2 foundation hardening packets
 
+> **PARTLY SUPERSEDED (2026-09-21, proposed by Fable planning pass):** the A/B lane assignments are retired. The hardening defect list remains an input to packet `20-01` (`ART-V20-FOUNDATION-HARDENING`).
+
 Derived from ART-V20-FOUNDATION-HARDENING. These are normal worker packets, not a third implementation lane.
 
 ## Session A additions

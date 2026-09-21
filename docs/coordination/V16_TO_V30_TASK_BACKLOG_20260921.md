@@ -1,5 +1,7 @@
 # SwarmAI future task backlog — V1.6 through V3.0
 
+> **SUPERSEDED (2026-09-21, proposed by Fable planning pass):** history only. Canonical packets: `V17_RECOVERY_PACKET_QUEUE.json`, `V17_TO_V23_PACKET_QUEUE.json`, `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json`. See `DOC_ROUTER.md`.
+
 Date: 2026-09-21
 Status: PLANNING ONLY
 No task here overrides the active V1.7 single-session execution scope or artifact registry.
