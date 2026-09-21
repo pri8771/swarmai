@@ -5,7 +5,7 @@
   "status": "operational_pass_pending_independent_lead_review",
   "failure_class": null,
   "recorded_at": "2026-09-21T19:40:26Z",
-  "candidate_sha": "dd3ec870efe41a1618485823bc70e7f5d9e9a1d1",
+  "candidate_sha": "46461a39b4903b1bdc0735fb526d0cd38c6cd8f5",
   "freeze_sha": "e2fca4c619977b021696189ff337bdf0378662a3",
   "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
   "spend_usd": 0.0,
@@ -50,5 +50,6 @@
     "behavior_change_risk": "provenance order no longer stable (set)",
     "focused_tests_passed": true,
     "invent_accept": false
-  }
+  },
+  "evidence_tip_sha": "46461a39b4903b1bdc0735fb526d0cd38c6cd8f5"
 }

@@ -3,8 +3,9 @@
   "packet": "R02",
   "run_id": "v14-real-007",
   "evidence": "docs/evidence/v14-real-e2e/v14-real-007/",
-  "branch_sha_pending_push": true,
   "operational_pass": true,
   "independent_lead_review": "pending",
-  "self_accept": false
+  "self_accept": false,
+  "evidence_tip_sha": "46461a39b4903b1bdc0735fb526d0cd38c6cd8f5",
+  "candidate_sha": "46461a39b4903b1bdc0735fb526d0cd38c6cd8f5"
 }
