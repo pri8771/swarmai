@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:29:17+00:00",
-    "trigger": "scheduler",
+    "observed_at": "2026-09-21T16:29:49+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
-    "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
-    "coordination_sha": "85d73f34473e645707083e1ed8c465cf65cfb315",
+    "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+    "coordination_sha": "798b1e3a57ea3987e7056d95d57c485e27bf88cf",
     "effective_cadence_minutes": 5,
-    "packet_id": null,
-    "artifact_id": null,
-    "status": "bootstrap",
-    "last_agent_activity_at": null,
-    "note": null
+    "packet_id": "V2B-001-R4",
+    "artifact_id": "ART-V13-TASK-POOL",
+    "status": "review_requested",
+    "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
+    "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:12:52+00:00",
-      "trigger": "install",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-      "coordination_sha": "a1c3c227c12ebbd2c5b32f443b1cecda757bfa1f",
-      "effective_cadence_minutes": 5,
-      "packet_id": "B-OPS-AUTO-SYNC-02",
-      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-      "status": "working",
-      "last_agent_activity_at": "2026-09-21T16:11:05+00:00",
-      "note": "Linux Lane B executing B-OPS-AUTO-SYNC-02; 5m tmux swarm-heartbeat-b installed (not Windows Task Scheduler)."
-    },
     {
       "observed_at": "2026-09-21T16:14:02+00:00",
       "trigger": "manual",
@@ -198,7 +183,22 @@
       "status": "bootstrap",
       "last_agent_activity_at": null,
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T16:29:49+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "798b1e3a57ea3987e7056d95d57c485e27bf88cf",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-001-R4",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
+      "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
     }
   ],
-  "status": "bootstrap"
+  "status": "review_requested"
 }
