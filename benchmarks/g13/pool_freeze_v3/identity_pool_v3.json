@@ -1,0 +1,10 @@
+{
+  "identity": {
+    "calibration_record_count": 16,
+    "freeze_version": 3,
+    "held_out_record_count": 240,
+    "pool_id": "g13-pool-freeze-v3",
+    "required_cells": 16
+  },
+  "spec_of": "pool"
+}

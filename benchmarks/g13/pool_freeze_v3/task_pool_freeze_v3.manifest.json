@@ -1,0 +1,67 @@
+{
+  "artifact": "ART-V13-TASK-POOL",
+  "corpus": {
+    "calibration_dir": "calibration",
+    "foreign_corpus_count": 0,
+    "holdout_dir": "holdout",
+    "shard_table": "CORPUS_SHARD_DIGESTS.txt",
+    "shard_table_sha256": "41efe640926197175a6c45d4070c293fa120253499b5eed4c40bcffd0017f0a1"
+  },
+  "coverage": {
+    "min_independent_archetypes_per_cell": 15,
+    "min_total_independent_held_out": 240,
+    "required_product_families": [
+      "coding",
+      "planning",
+      "reasoning",
+      "extraction"
+    ],
+    "required_sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ]
+  },
+  "freeze_id": "g13-pool-freeze-v3",
+  "freeze_version": 3,
+  "identities": {
+    "independence_checker": "identity_independence_checker_v3.json",
+    "model_config_schema": "identity_model_config_schema_v3.json",
+    "pool": "identity_pool_v3.json",
+    "prompt": "identity_prompt_v3.json",
+    "records": "identity_records_v3.json",
+    "scorer": "identity_scorer_v3.json",
+    "sealed_reference_interface": "identity_sealed_reference_interface_v3.json",
+    "size_classifier": "identity_size_classifier_v3.json",
+    "split": "identity_split_v3.json",
+    "tool_protocol": "identity_tool_protocol_v3.json"
+  },
+  "packet": "V2B-001-R4",
+  "qualification_readiness": {
+    "counted_qualification_ready": false,
+    "reason": "freeze may become reviewable, but counted qualification stays false until lead binds a real sealed reference bundle content digest",
+    "w131b_started": false
+  },
+  "reference_bundle": {
+    "bundle_id": "g13-sealed-reference-bundle-v3",
+    "content_digest_binding": {
+      "declared_here": false,
+      "reason": "the sealed bundle is not authored on this branch; quoting a content digest here would be fabricated"
+    },
+    "id_commitment_file": "SEALED_REFERENCE_IDS.txt",
+    "interface_id": "g13-sealed-reference-interface-v3"
+  },
+  "source_and_license": {
+    "authoring": "hand_authored_unique_objectives",
+    "hidden_answers_in_worker_visible_tree": false,
+    "license": "CC0-1.0-equivalent-synthetic-original",
+    "license_blocker": false,
+    "third_party_source": false
+  },
+  "wilson": {
+    "function": "swarm.evals.wilson.wilson_lower_bound",
+    "required_one_sided_90_percent_z": 1.2815515655446004,
+    "thresholds_changed_by_this_packet": false
+  }
+}
