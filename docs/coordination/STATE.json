@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T01:36:00Z",
+  "updated_at": "2026-09-21T01:35:05Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -20,7 +20,7 @@
   "last_lead_message_id": "LEAD-20260921-020",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-020.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-006",
-  "last_lead_heartbeat_at": "2026-09-21T01:35:00Z",
+  "last_lead_heartbeat_at": "2026-09-21T01:35:05Z",
   "last_cursor_heartbeat_at": "2026-09-21T01:26:00Z",
   "current_source_verification": {
     "verified_at": "2026-09-21T01:35:00Z",
@@ -51,7 +51,8 @@
     "v2_integration_ci_conclusion": "success",
     "v2_product_branch": "cursor/v2-product-lane",
     "v2_product_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
-    "v2_product_new_activity_observed": false
+    "v2_product_new_activity_observed": false,
+    "v2_runtime_wip_sha": "5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6"
   },
   "version_state": {
     "1.0-repair": {
@@ -132,19 +133,15 @@
       "artifact": "docs/artifacts/future/ART-V30-LEARNING_GOVERNANCE.md"
     }
   },
-  "ready_worker_packets": {
-    "session_a": [
-      "V2A-003b-R",
-      "V2A-H6A-R",
-      "V2A-003X"
-    ],
-    "session_b": [
-      "V2B-001",
-      "V2B-002",
-      "V2B-003a+H1",
-      "V2B-004a+H4"
-    ]
-  },
+  "ready_worker_packets": [
+    "V2A-003b-R",
+    "V2A-H6A-R",
+    "WIN-B-BOOTSTRAP",
+    "V2B-001",
+    "V2B-002",
+    "V2B-003a",
+    "V2B-004a"
+  ],
   "reviewed_this_heartbeat": {
     "V2A-020a": "accepted_packet_artifact_remains_drafting",
     "V2A-H6A": "changes_required_secret_file_permissions_and_force_overwrite_semantics"
@@ -210,13 +207,16 @@
     "integration_branch": "cursor/v2-integration",
     "session_a": {
       "role": "runtime_control_plane_integration",
+      "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "prompt": "docs/coordination/CURSOR_SESSION_A_RUNTIME_PROMPT.md"
+      "prompt": "docs/coordination/CURSOR_MAC_RUNTIME_RESUME_PROMPT.md"
     },
     "session_b": {
-      "role": "knowledge_tools_product_beta",
+      "role": "knowledge_tools_evals_product_beta",
+      "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "prompt": "docs/coordination/CURSOR_SESSION_B_PRODUCT_PROMPT.md"
+      "prompt": "docs/coordination/CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md",
+      "bootstrap_state": "fresh_windows_no_repo_or_toolchain_assumed"
     },
     "contract": "docs/coordination/TWO_CURSOR_TEAM.md"
   },
