@@ -4,18 +4,18 @@
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T02:31:51+00:00",
+    "observed_at": "2026-09-21T02:34:24+00:00",
     "trigger": "manual",
     "host_alias": "HOST-MAC-DEV",
     "session_id": "A",
     "branch": "cursor/v2-runtime-lane",
-    "branch_sha": "859271e7adfec892a1fdf1a5dcb6c2612846606d",
-    "coordination_sha": "ce8197f14c20e738f9b706ae4dd29493a8a05c40",
+    "branch_sha": "391e8ea217c792cca19de4a2409d06e427c15866",
+    "coordination_sha": "7c62c2435c76fd87bf2f852bb6a6a6b453764c9b",
     "effective_cadence_minutes": 15,
-    "packet_id": "V2A-003b-R2",
-    "artifact_id": "ART-V15-LEASE-FENCING",
+    "packet_id": "V2A-H6A-R",
+    "artifact_id": "ART-V20-FOUNDATION-HARDENING",
     "status": "working",
-    "last_agent_activity_at": "2026-09-21T02:31:50+00:00",
+    "last_agent_activity_at": "2026-09-21T02:34:23+00:00",
     "note": null
   },
   "history": [
@@ -47,6 +47,21 @@
       "artifact_id": "ART-V15-LEASE-FENCING",
       "status": "working",
       "last_agent_activity_at": "2026-09-21T02:31:50+00:00",
+      "note": null
+    },
+    {
+      "observed_at": "2026-09-21T02:34:24+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-MAC-DEV",
+      "session_id": "A",
+      "branch": "cursor/v2-runtime-lane",
+      "branch_sha": "391e8ea217c792cca19de4a2409d06e427c15866",
+      "coordination_sha": "7c62c2435c76fd87bf2f852bb6a6a6b453764c9b",
+      "effective_cadence_minutes": 15,
+      "packet_id": "V2A-H6A-R",
+      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
+      "status": "working",
+      "last_agent_activity_at": "2026-09-21T02:34:23+00:00",
       "note": null
     }
   ],
