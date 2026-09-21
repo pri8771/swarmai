@@ -1,20 +1,14 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T04:50:04Z",
+  "updated_at": "2026-09-21T04:59:30Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
   "lead_platform_minimum_minutes": 60,
   "graduation": {
     "required_consecutive_per_session": 3,
-    "valid_gap_minutes": {
-      "min": 10,
-      "max": 25
-    },
-    "requires_sessions": [
-      "A",
-      "B"
-    ],
+    "valid_gap_minutes": {"min": 10, "max": 25},
+    "requires_sessions": ["A", "B"],
     "all_workers_verified": false,
     "graduated_at": null,
     "counted_trigger": "scheduler_only"
@@ -35,33 +29,31 @@
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T04:44:18+00:00",
-      "consecutive_valid_15m": 5,
+      "last_heartbeat_at": "2026-09-21T04:59:18+00:00",
+      "consecutive_valid_15m": 6,
       "verified_timestamps": [
         "2026-09-21T03:43:40+00:00",
         "2026-09-21T03:59:17+00:00",
         "2026-09-21T04:14:17+00:00",
         "2026-09-21T04:29:17+00:00",
-        "2026-09-21T04:44:18+00:00"
+        "2026-09-21T04:44:18+00:00",
+        "2026-09-21T04:59:18+00:00"
       ],
       "stale": false,
-      "status": "bootstrap cadence requirement met individually (5 consecutive); waiting for A before global hourly graduation"
+      "status": "bootstrap cadence requirement met individually (6 consecutive); waiting for A before global hourly graduation"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T04:50:04Z",
+    "last_review_at": "2026-09-21T04:59:30Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Only scheduler heartbeats count. A has two valid consecutive receipts but is now stale; B has five valid consecutive receipts and individually satisfies the 3-heartbeat bootstrap requirement. Global cadence remains 15 minutes until A also reaches the requirement and is reconciled by the lead."
+    "note": "Only scheduler heartbeats count. A has two valid consecutive receipts but is stale; B has six valid consecutive receipts and individually satisfies the 3-heartbeat bootstrap requirement. Global cadence remains 15 minutes until A also reaches the requirement and is reconciled by the lead."
   },
-  "stale_threshold_minutes": {
-    "bootstrap_15m": 35,
-    "hourly": 90
-  },
+  "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
   "notifications": {
     "channel": "GitHub durable coordination -> hourly lead automation -> operator",
     "instant_push_guaranteed": false
