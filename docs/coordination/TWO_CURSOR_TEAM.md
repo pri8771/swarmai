@@ -15,7 +15,14 @@
 - This setup run is also useful V1.9 clean-install/Windows portability evidence.
 - Later, after the durable worker protocol is reviewable, this host should become the first real second-host SwarmAI worker for V1.5 multi-host evidence.
 
-Never share one working directory between the hosts. Each clones/fetches from GitHub and pushes its own lane.
+### HOST-MAC-VERIFY — Cursor Session C
+- Same physical Mac, but a **separate Git worktree** and branch.
+- Branch: `cursor/v2-verification-lane`, based on reviewed `cursor/v2-integration`.
+- Verification/reliability/security-negative/benchmark harnesses and isolated spikes only.
+- No default production-source ownership; discovered defects are handed to A/B.
+- Prompt: `CURSOR_MAC_VERIFICATION_PROMPT.md`.
+
+Never share one working directory between sessions. Mac A and Mac C must use separate worktrees; Windows clones independently. Each pushes only its own lane.
 
 
 # Two-Cursor-session execution contract
@@ -86,3 +93,17 @@ Integration steps:
 5. Update exact artifact source ref.
 
 Do not use a green lane CI result as proof the integrated tree is green.
+
+
+### Cursor Session C — Verification / Reliability / Spikes
+
+Branch: `cursor/v2-verification-lane`
+
+Primary responsibilities:
+- integrated broker/admission evidence revalidation;
+- isolated DBOS reuse spike;
+- security-negative harness;
+- V2 reliability/performance runner scaffold;
+- later regression reproduction against reviewed integration snapshots.
+
+Session C must not become a general production implementation lane. By default it owns tests/scripts/spikes/evidence only. If a test reveals a production defect, hand it to Session A or B.
