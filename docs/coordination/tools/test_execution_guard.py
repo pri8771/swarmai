@@ -130,11 +130,13 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(evaluate(docs(packet('A', kind='lead_decision')), {})['ready'], [])
 
     def test_future_freeze_not_implied_by_authorized_version(self):
-        d = docs(); d['v30']['v30_packets'] = [packet('V30A-001', requires_lead_freeze=True)]
+        d = docs()
+        d['v30']['v30_packets'] = [packet('V30A-001', requires_lead_freeze=True)]
         self.assertEqual(evaluate(d, {}, 'v30')['ready'], [])
 
     def test_other_phases_not_selected(self):
-        d = docs(packet('A')); d['v23']['packets'] = [packet('B')]
+        d = docs(packet('A'))
+        d['v23']['packets'] = [packet('B')]
         self.assertEqual(evaluate(d, {}, 'v17')['ready'], ['A'])
         self.assertEqual(evaluate(d, {}, 'v23')['ready'], ['B'])
 
