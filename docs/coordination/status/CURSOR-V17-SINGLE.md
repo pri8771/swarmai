@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead`
-- Coordination SHA: `755f82a387b600652d3edbb7b41bba47e67495fd`
-- Updated: `2026-09-21T19:19:42Z`
-- Trigger: `install`
+- Coordination SHA: `8499471a6ba496b728c13cdaf6ba816bda157e15`
+- Updated: `2026-09-21T19:24:47Z`
+- Trigger: `scheduler`
 - Status: **session_started**
 - Current packet: `BOOTSTRAP`
 - Current artifact: `cross-version`
