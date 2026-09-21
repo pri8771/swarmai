@@ -23,5 +23,6 @@
     "result": "10 passed",
     "db": "swarmai_v17_r13"
   },
-  "note": "R15 verify-on-tip; tip already carries V2A-003c accept fence. No invent-accept."
+  "note": "R15 verify-on-tip; tip already carries V2A-003c accept fence. No invent-accept.",
+  "evidence_tip_sha": "d3e1cd4035067abf30ce07093e7b0663f7f13ba9"
 }
