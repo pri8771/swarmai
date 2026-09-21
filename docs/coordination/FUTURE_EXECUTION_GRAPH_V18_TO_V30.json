@@ -1,0 +1,505 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-21",
+  "status": "planning_only",
+  "scope": "V1.8_to_V3.0",
+  "note": "Not active queue. Canonical ARTIFACT_REGISTRY and current source must be reread before execution.",
+  "packets": [
+    {
+      "id": "V18-01",
+      "version": "1.8",
+      "artifacts": [
+        "ART-V18-SITE-EPOCH",
+        "ART-V18-SPLIT-BRAIN-SAFETY"
+      ],
+      "depends_on": [
+        "V1.5-result-fencing",
+        "V1.7-effect-boundary"
+      ],
+      "code": [
+        "src/swarm/db/**",
+        "src/swarm/controller/**",
+        "src/swarm/workers/**",
+        "src/swarm/tools/**",
+        "src/swarm/recovery/**"
+      ],
+      "cases": [
+        "V18-AUTH-*",
+        "V18-SPLIT-*"
+      ],
+      "exit": "site epoch durable and bound to dispatch/result/effect with tests"
+    },
+    {
+      "id": "V18-02",
+      "version": "1.8",
+      "artifacts": [
+        "ART-V18-DEPLOYMENT-MANIFEST",
+        "ART-V18-BACKUP-RESTORE"
+      ],
+      "depends_on": [
+        "V18-01"
+      ],
+      "code": [
+        "src/swarm/recovery/**",
+        "src/swarm/deploy/**",
+        "src/swarm/db/**"
+      ],
+      "cases": [
+        "V18-BACKUP-*",
+        "V18-RESTORE-*"
+      ],
+      "exit": "backup/restore/reconciliation implementation reviewable"
+    },
+    {
+      "id": "V18-03",
+      "version": "1.8",
+      "artifacts": [
+        "ART-V18-OUTAGE-DRILL"
+      ],
+      "depends_on": [
+        "V18-02"
+      ],
+      "code": [
+        "tests/deployment/**",
+        "tests/integration/**",
+        "src/swarm/recovery/**"
+      ],
+      "cases": [
+        "V18-DRILL-*"
+      ],
+      "exit": "drill harness complete; live evidence executed or honestly pending"
+    },
+    {
+      "id": "V19-01",
+      "version": "1.9",
+      "artifacts": [
+        "ART-V19-EXTENSION-CONTRACT"
+      ],
+      "depends_on": [
+        "V1.7-effect-boundary"
+      ],
+      "code": [
+        "src/swarm/extensions/**",
+        "src/swarm/tools/**"
+      ],
+      "cases": [
+        "V19-EXT-*"
+      ],
+      "exit": "extension lifecycle and scope enforcement reviewable"
+    },
+    {
+      "id": "V19-02",
+      "version": "1.9",
+      "artifacts": [
+        "ART-V19-INSTALL-UPGRADE"
+      ],
+      "depends_on": [
+        "V18-02",
+        "V19-01"
+      ],
+      "code": [
+        "src/swarm/deploy/**",
+        "migrations/**",
+        "src/swarm/release/**"
+      ],
+      "cases": [
+        "V19-INSTALL-*",
+        "V19-UPGRADE-*",
+        "V19-ROLLBACK-*",
+        "V19-SUPPORT-*"
+      ],
+      "exit": "clean install/upgrade/rollback/support bundle executable"
+    },
+    {
+      "id": "V19-03",
+      "version": "1.9",
+      "artifacts": [
+        "ART-V19-EXTERNAL-INSTALLS"
+      ],
+      "depends_on": [
+        "V19-02"
+      ],
+      "code": [
+        "docs/evidence/**"
+      ],
+      "cases": [
+        "V19-INSTALL-*"
+      ],
+      "exit": "real fresh-environment evidence complete or blocked"
+    },
+    {
+      "id": "V19-04",
+      "version": "1.9",
+      "artifacts": [
+        "ART-V19-SELFDEV-PR-EVIDENCE"
+      ],
+      "depends_on": [
+        "V19-01",
+        "V1.7-effect-boundary"
+      ],
+      "code": [
+        "src/swarm/selfdev/**",
+        "src/swarm/workspace/**",
+        "src/swarm/review/**"
+      ],
+      "cases": [
+        "V19-SELFDEV-*"
+      ],
+      "exit": "real bounded PR candidate path with independent review boundary"
+    },
+    {
+      "id": "V20-01",
+      "version": "2.0",
+      "artifacts": [
+        "ART-V20-FOUNDATION-HARDENING",
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "depends_on": [
+        "V18-01",
+        "V18-02",
+        "V19-01",
+        "V19-02",
+        "V19-04"
+      ],
+      "code": [
+        "cross-cutting"
+      ],
+      "cases": [
+        "V20-CAND-*"
+      ],
+      "exit": "one frozen reproducible CandidateManifest"
+    },
+    {
+      "id": "V20-02",
+      "version": "2.0",
+      "artifacts": [
+        "ART-V20-SUPPORT-MATRIX",
+        "ART-V20-INSTALL-JOURNEY",
+        "ART-V20-UPGRADE-ROLLBACK"
+      ],
+      "depends_on": [
+        "V20-01"
+      ],
+      "code": [
+        "src/swarm/product/**",
+        "src/swarm/deploy/**",
+        "docs/evidence/**"
+      ],
+      "cases": [
+        "V20-SUPPORT-*",
+        "V20-INSTALL-*",
+        "V20-UPGRADE-*",
+        "V20-ROLLBACK-*"
+      ],
+      "exit": "product journeys executed on frozen candidate"
+    },
+    {
+      "id": "V20-03",
+      "version": "2.0",
+      "artifacts": [
+        "ART-V20-SECURITY-REVIEW",
+        "ART-V20-PERFORMANCE-BASELINE"
+      ],
+      "depends_on": [
+        "V20-01"
+      ],
+      "code": [
+        "tests/**",
+        "benchmarks/**",
+        "src/swarm/observability/**"
+      ],
+      "cases": [
+        "V20-SEC-*",
+        "V20-PERF-*"
+      ],
+      "exit": "security/performance evidence candidate-bound"
+    },
+    {
+      "id": "V20-04",
+      "version": "2.0",
+      "artifacts": [
+        "ART-V20-RELIABILITY-PROTOCOL",
+        "ART-V20-RELEASE-REVIEW"
+      ],
+      "depends_on": [
+        "V20-01",
+        "V20-02",
+        "V20-03"
+      ],
+      "code": [
+        "src/swarm/observability/**",
+        "docs/evidence/**"
+      ],
+      "cases": [
+        "V20-REL-*",
+        "V20-REVIEW-*"
+      ],
+      "exit": "required elapsed campaign and independent release review complete"
+    },
+    {
+      "id": "V23-01",
+      "version": "2.3",
+      "artifacts": [
+        "ART-V23-MULTIMISSION-OPS"
+      ],
+      "depends_on": [
+        "V20-01",
+        "V18-01"
+      ],
+      "code": [
+        "src/swarm/controller/**",
+        "src/swarm/db/**",
+        "src/swarm/workers/**"
+      ],
+      "cases": [
+        "V23-SCHED-*",
+        "V23-RES-*",
+        "V23-BP-*",
+        "V23-CANCEL-*",
+        "V23-DRAIN-*",
+        "V23-EPOCH-*",
+        "V23-RECEIPT-*"
+      ],
+      "exit": "durable fair scheduler/resource reservation path reviewable"
+    },
+    {
+      "id": "V23-02",
+      "version": "2.3",
+      "artifacts": [
+        "ART-V23-CAPABILITY-PACKS"
+      ],
+      "depends_on": [
+        "V19-01"
+      ],
+      "code": [
+        "src/swarm/extensions/**",
+        "src/swarm/capabilities/**"
+      ],
+      "cases": [
+        "V23-PACK-*"
+      ],
+      "exit": "pack lifecycle with project-scoped permissions"
+    },
+    {
+      "id": "V23-03",
+      "version": "2.3",
+      "artifacts": [
+        "ART-V23-PORTABILITY"
+      ],
+      "depends_on": [
+        "V19-01",
+        "V16-knowledge"
+      ],
+      "code": [
+        "src/swarm/product/**",
+        "src/swarm/contracts/export_schemas.py"
+      ],
+      "cases": [
+        "V23-PORT-*"
+      ],
+      "exit": "secret-free export/import with reconciliation"
+    },
+    {
+      "id": "V23-04",
+      "version": "2.3",
+      "artifacts": [
+        "ART-V23-OBSERVABILITY"
+      ],
+      "depends_on": [
+        "V20-01"
+      ],
+      "code": [
+        "src/swarm/observability/**",
+        "src/swarm/api/**",
+        "apps/console/**"
+      ],
+      "cases": [
+        "V23-OBS-*"
+      ],
+      "exit": "read-only operational surface and action-bound mutations"
+    },
+    {
+      "id": "V23-05",
+      "version": "2.3",
+      "artifacts": [
+        "ART-V23-FLEET-POLICY"
+      ],
+      "depends_on": [
+        "V23-01",
+        "V18-01"
+      ],
+      "code": [
+        "src/swarm/workers/**",
+        "src/swarm/controller/**"
+      ],
+      "cases": [
+        "V23-FLEET-*"
+      ],
+      "exit": "trust/locality/capability placement with stale/drain fencing"
+    },
+    {
+      "id": "V23-06",
+      "version": "2.3",
+      "artifacts": [
+        "V2.3-integrated-evidence"
+      ],
+      "depends_on": [
+        "V23-01",
+        "V23-02",
+        "V23-03",
+        "V23-04",
+        "V23-05"
+      ],
+      "code": [
+        "tests/**",
+        "docs/evidence/**"
+      ],
+      "cases": [
+        "V23-*"
+      ],
+      "exit": "frozen deterministic plus multi-process/private evidence reviewed"
+    },
+    {
+      "id": "V30-01",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-OBJECTIVE-CONTRACT"
+      ],
+      "depends_on": [
+        "V23-01",
+        "V23-05"
+      ],
+      "code": [
+        "src/swarm/objectives/**",
+        "src/swarm/mission/**",
+        "src/swarm/controller/**"
+      ],
+      "cases": [
+        "V30-OBJ-*"
+      ],
+      "exit": "versioned objectives/triggers/proposals use normal mission admission"
+    },
+    {
+      "id": "V30-02",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-LEARNING-GOVERNANCE"
+      ],
+      "depends_on": [
+        "V30-01",
+        "V20-04"
+      ],
+      "code": [
+        "src/swarm/learning/**",
+        "src/swarm/evals/**",
+        "src/swarm/review/**"
+      ],
+      "cases": [
+        "V30-LEARN-*"
+      ],
+      "exit": "governed proposal/eval/canary/rollback state machine reviewable"
+    },
+    {
+      "id": "V30-03",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-RESOURCE-ALLOCATOR"
+      ],
+      "depends_on": [
+        "V23-01",
+        "V23-05",
+        "V30-01"
+      ],
+      "code": [
+        "src/swarm/controller/**"
+      ],
+      "cases": [
+        "V30-ALLOC-*"
+      ],
+      "exit": "allocator feeds scheduler without bypassing fairness/authority"
+    },
+    {
+      "id": "V30-04",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CONTROLLED-SELFDEV"
+      ],
+      "depends_on": [
+        "V30-02",
+        "V19-04"
+      ],
+      "code": [
+        "src/swarm/learning/**",
+        "src/swarm/selfdev/**"
+      ],
+      "cases": [
+        "V30-LEARN-011",
+        "V30-LEARN-012"
+      ],
+      "exit": "selfdev governed as learning proposal, no self-merge/self-governance"
+    },
+    {
+      "id": "V30-05",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-CAPABILITY-ECOSYSTEM"
+      ],
+      "depends_on": [
+        "V23-02",
+        "V19-01"
+      ],
+      "code": [
+        "src/swarm/capabilities/**",
+        "src/swarm/extensions/**"
+      ],
+      "cases": [
+        "V30-CAP-*"
+      ],
+      "exit": "trusted/revocable capability ecosystem"
+    },
+    {
+      "id": "V30-06",
+      "version": "3.0",
+      "artifacts": [
+        "ART-V30-FLEET-TENANCY-AUDIT"
+      ],
+      "depends_on": [
+        "V23-04",
+        "V23-05",
+        "V30-01"
+      ],
+      "code": [
+        "src/swarm/workers/**",
+        "src/swarm/observability/**"
+      ],
+      "cases": [
+        "V30-TENANT-*",
+        "V30-AUDIT-*"
+      ],
+      "exit": "tenant-aware fleet and reconstructible audit path"
+    },
+    {
+      "id": "V30-07",
+      "version": "3.0",
+      "artifacts": [
+        "V3-integrated-evidence"
+      ],
+      "depends_on": [
+        "V30-01",
+        "V30-02",
+        "V30-03",
+        "V30-04",
+        "V30-05",
+        "V30-06"
+      ],
+      "code": [
+        "tests/**",
+        "docs/evidence/**"
+      ],
+      "cases": [
+        "V30-*"
+      ],
+      "exit": "frozen integrated V3 private-live campaign and independent review"
+    }
+  ]
+}
