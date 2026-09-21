@@ -47,6 +47,7 @@ jobs:
           tests/workers
           tests/workspace
           tests/e2e
+          tests/coordination
           -q
           --ignore=tests/integration
       - name: Integration pytest (requires SWARM_DATABASE_URL)
