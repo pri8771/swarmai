@@ -420,3 +420,78 @@ class OutboxRow(Base):
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class KnowledgeItemRow(Base):
+    """V1.6 / ART-V16 versioned reusable knowledge item (not FindingRow)."""
+
+    __tablename__ = "knowledge_items"
+    __table_args__ = (
+        UniqueConstraint("item_id", "version", name="uq_knowledge_item_version"),
+        Index("ix_knowledge_items_project_class_state", "project_id", "class", "acceptance_state"),
+        Index("ix_knowledge_items_project_item", "project_id", "item_id"),
+    )
+
+    row_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    item_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    mission_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    class_: Mapped[str] = mapped_column("class", String(32), index=True)
+    topic: Mapped[str] = mapped_column(Text)
+    body: Mapped[str] = mapped_column(Text)
+    acceptance_state: Mapped[str] = mapped_column(String(32), index=True, default="unreviewed")
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    producer_type: Mapped[str] = mapped_column(String(32), default="system")
+    producer_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    permission_labels: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    retrieval_labels: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    source_digests: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    provenance_refs: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    content_digest: Mapped[str] = mapped_column(String(128))
+    observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    superseded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class KnowledgeLinkRow(Base):
+    """Project-scoped knowledge relation (cross-project links forbidden)."""
+
+    __tablename__ = "knowledge_links"
+    __table_args__ = (
+        Index("ix_knowledge_links_project_from", "project_id", "from_item_id"),
+        Index("ix_knowledge_links_project_to", "project_id", "to_item_id"),
+    )
+
+    link_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    from_item_id: Mapped[str] = mapped_column(String(64), index=True)
+    from_version: Mapped[int] = mapped_column(Integer)
+    relation: Mapped[str] = mapped_column(String(32), index=True)
+    to_item_id: Mapped[str] = mapped_column(String(64), index=True)
+    to_version: Mapped[int] = mapped_column(Integer)
+    evidence_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class KnowledgeTombstoneRow(Base):
+    """Deletion tombstone so caches/index rebuilds cannot resurrect content."""
+
+    __tablename__ = "knowledge_tombstones"
+    __table_args__ = (
+        UniqueConstraint("project_id", "item_id", "deleted_version", name="uq_knowledge_tombstone"),
+        Index("ix_knowledge_tombstones_project_item", "project_id", "item_id"),
+    )
+
+    tombstone_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    item_id: Mapped[str] = mapped_column(String(64), index=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    deleted_version: Mapped[int] = mapped_column(Integer)
+    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    reason_class: Mapped[str] = mapped_column(String(64))
+    replacement_item_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    replacement_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
