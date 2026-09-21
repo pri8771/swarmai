@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T12:53:00Z",
-  "mode": "bootstrap_15m",
-  "worker_effective_cadence_minutes": 15,
+  "updated_at": "2026-09-21T13:56:51Z",
+  "mode": "hourly",
+  "worker_effective_cadence_minutes": 60,
   "lead_effective_cadence_minutes": 60,
   "lead_platform_minimum_minutes": 60,
   "graduation": {
@@ -15,44 +15,59 @@
       "A",
       "B"
     ],
-    "all_workers_verified": false,
-    "graduated_at": null,
-    "counted_trigger": "scheduler_only"
+    "all_workers_verified": true,
+    "graduated_at": "2026-09-21T13:56:51Z",
+    "counted_trigger": "scheduler_only",
+    "graduation_timestamps": {
+      "A": [
+        "2026-09-21T13:21:56+00:00",
+        "2026-09-21T13:36:58+00:00",
+        "2026-09-21T13:52:01+00:00"
+      ],
+      "B": [
+        "2026-09-21T13:14:17+00:00",
+        "2026-09-21T13:29:18+00:00",
+        "2026-09-21T13:44:19+00:00"
+      ]
+    }
   },
   "sessions": {
     "A": {
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "last_heartbeat_at": "2026-09-21T12:51:41+00:00",
-      "consecutive_valid_15m": 2,
+      "last_heartbeat_at": "2026-09-21T13:52:01+00:00",
+      "consecutive_valid_15m": 3,
       "verified_timestamps": [
-        "2026-09-21T12:36:39+00:00",
-        "2026-09-21T12:51:41+00:00"
+        "2026-09-21T13:21:56+00:00",
+        "2026-09-21T13:36:58+00:00",
+        "2026-09-21T13:52:01+00:00"
       ],
       "stale": false,
-      "status": "fresh current chain 2/3; 11:55:14Z -> 12:36:39Z gap was ~41m (>25m) and reset the prior chain"
+      "status": "bootstrap cadence verified 3/3; hourly effective cadence now applies"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T12:29:17+00:00",
-      "consecutive_valid_15m": 1,
+      "last_heartbeat_at": "2026-09-21T13:44:19+00:00",
+      "consecutive_valid_15m": 4,
       "verified_timestamps": [
-        "2026-09-21T12:29:17+00:00"
+        "2026-09-21T13:14:17+00:00",
+        "2026-09-21T13:29:18+00:00",
+        "2026-09-21T13:44:19+00:00"
       ],
       "stale": false,
-      "status": "fresh current chain 1/3; 11:59:17Z -> 12:29:17Z gap was 30m (>25m) and reset the prior chain"
+      "status": "bootstrap cadence verified; hourly effective cadence now applies"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T12:53:00Z",
+    "last_review_at": "2026-09-21T13:56:51Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Recomputed from durable scheduler ledgers at 12:53Z: A is fresh 2/3 at 12:36:39Z -> 12:51:41Z; B is fresh 1/3 at 12:29:17Z after a 30m reset gap. Global worker cadence remains 15m; no hourly graduation."
+    "note": "Recomputed from durable scheduler ledgers: both workers satisfy the 3-consecutive scheduler-heartbeat bootstrap proof. Global effective worker cadence graduated to hourly; OS schedulers may continue waking every 15 minutes while clients self-throttle."
   },
   "stale_threshold_minutes": {
     "bootstrap_15m": 35,
