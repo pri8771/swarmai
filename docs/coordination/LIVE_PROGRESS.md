@@ -1,52 +1,55 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21
+Updated: 2026-09-21T17:47:50Z
 
 ## Current operating model
 
-Exactly ONE implementation session is authorized.
+Repository authority is the active single-session directive:
 
 | Role | Identity | Scope |
 |---|---|---|
-| Implementation | CURSOR-V17-SINGLE | Current truth -> V1.7 implementation-complete/reviewable candidate |
-| Heartbeat | CURSOR-V17-SINGLE | Exactly one 5-minute scheduled producer |
+| Implementation | `CURSOR-V17-SINGLE` | Current truth -> V1.7 implementation-complete/reviewable candidate |
+| Heartbeat | `CURSOR-V17-SINGLE` | Exactly one 5-minute scheduled producer |
 | Operator | owner | Final authority |
-| ChatGPT | downstream planning/review helper | V1.6-V3.0 planning; not a competing implementation lane |
+| ChatGPT | planning / coordination / independent review | No competing implementation lane |
 
 Implementation branch: `cursor/v17-single-session`.
-
-Legacy A/B autonomous assignments are disabled. Historical branches remain donor/evidence branches only.
+Legacy A/B assignments are disabled and their branches are donor/evidence branches only.
 
 ## Heartbeat
 
-Protocol: `SINGLE_SESSION_HEARTBEAT.md`
+- Protocol: `SINGLE_SESSION_HEARTBEAT.md`.
+- Epoch: `single-v17-20260921-01`.
+- Current session heartbeat: **not registered / awaiting session start**.
+- `cursor/v17-single-session` currently points to `9ce727842446b98cfa55c28c7e70808f57f17d7b`; exact-tip CI `35632562088` is green.
+- Legacy publishers are still writing after supersession: HOST-MAC-DEV was observed at `2026-09-21T17:37:30Z`; HOST-WIN-DEV at `2026-09-21T17:28:46Z`. They are historical noise and do not count.
+- Required startup correction: stop legacy A/B heartbeat/autonomous processes, start exactly one `CURSOR-V17-SINGLE` producer, publish `session_started`, then continue implementation.
 
-- one session;
-- one heartbeat stream;
-- cadence: 5 minutes while active;
-- no two-lane stress test;
-- no 24-hour heartbeat soak;
-- heartbeat is progress/liveness evidence, not artifact acceptance.
+## Current artifact truth
 
-Current ledger:
-- `heartbeats/CURSOR-V17-SINGLE.json`
-- `status/CURSOR-V17-SINGLE.md`
+Canonical source is `ARTIFACT_REGISTRY.json`.
 
-## Current project position
+- `ART-V13-TASK-POOL` is **reviewable, not verified/frozen** in the canonical registry at `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`.
+- Remaining G13 gate: actual HOST-WIN-DEV execution evidence for generator/verifier/Ruff/mypy/offline pytest, then independent lead freeze; sealed-reference content binding remains pending. W-131B counted qualification is prohibited.
+- `STATE.json` currently overstates this artifact as verified/frozen and must be treated as stale derived state until reconciled to the registry.
+- `ART-V14-REAL-E2E` remains incomplete: generic materialization repair + new genuine real mission required.
+- V1.5 durable result acceptance and worker service/recovery evidence remain incomplete.
+- G12 remote overlap remains blocked at 0 admitted remote routes.
 
-Canonical truth remains `ARTIFACT_REGISTRY.json`.
+## Background support
 
-Known critical work entering this run:
-- V1.3 reviewer/counted qualification machinery still needs closure/evidence;
-- V1.4 genuine E2E materialization repair/rerun remains;
-- V1.5 durable result acceptance/worker service/multi-host evidence remains;
-- V1.6 and V1.7 are implementation-ready after/alongside dependency-safe lower work;
-- V1.2 remote overlap still requires real account-specific zero-charge provider admission before live acceptance.
+worker-pc task `swarmai-v13-task-pool-v3-audit-01` completed read-only against `534476393257794c4e8ebf8d65f44fd090ab28eb` at `2026-09-21T17:14:12Z`. It confirmed useful static fail-closed/sealed-reference properties, modified no SwarmAI code, and could not inspect CI or run project Python/pytest/ruff/mypy in the Claude sandbox. It does not change artifact acceptance.
 
-## Forward planning
+No new worker-pc dispatch is authorized under the active single-session directive.
 
-Future design/task planning is prepared in:
-- `V16_TO_V30_FORWARD_PLAN_20260921.md`
-- `V16_TO_V30_TASK_BACKLOG_20260921.md`
+## Top next actions
+
+1. Start `CURSOR-V17-SINGLE` from `CURSOR_V17_START.md`, stopping legacy A/B heartbeat/autonomous processes first.
+2. Reconcile derived `STATE.json` against canonical `ARTIFACT_REGISTRY.json` before making G13 status claims.
+3. Execute the single-session queue: G13 reviewer/qualification machinery with honest environment blockers, V1.4 materialization repair/rerun, then V1.5 durable result/worker work toward V1.7.
+
+## Human action
+
+Start exactly one Cursor implementation session using `docs/coordination/CURSOR_V17_START.md`. On that machine, disable/stop the old A/B SwarmAI heartbeat and autonomous-runner processes before registering the single-session heartbeat.
 
 No main merge, public release/deploy, force push, or additional spend is authorized.
