@@ -27,13 +27,15 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
   4. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
 - Acceptance: direct negative tests for cancellation/source/project staleness, >32 HOL regression, focused DB tests, and full exact-tip CI green. No result acceptance fence or API route wiring is silently folded in.
 
-### READY A1 — V2A-H6A — deployment secret/runtime-mode hardening
+### SUBMITTED A1 — V2A-H6A — deployment secret/runtime-mode hardening
+- Status: **submitted reviewable** @ `77ef7e4c1675b74dbfcdeba27f8c955ae39f119c` / tip `7a2491a2840ef8381e275b05e11f3f76c7a522e6` CI `35550769734` (not self-accepted).
 - Artifacts: `ART-V20-FOUNDATION-HARDENING`, `ART-V18-DEPLOYMENT-MANIFEST`, `ART-V19-INSTALL-UPGRADE`
 - SP2
 - Separate write surfaces from A0: deploy/compose/runtime config and focused deploy tests/docs.
 - Remove fixed normal-mode DB password; explicit generated/operator secret/ref; operational empty/unconfigured default; explicit private/loopback exposure; real compose config/health smoke without public-deployment claim.
 
-### READY A2 — V2A-020a — start V2 integration candidate from verified commits only
+### SUBMITTED A2 — V2A-020a — start V2 integration candidate from verified commits only
+- Status: **submitted drafting** @ `9ce727842446b98cfa55c28c7e70808f57f17d7b` (code `ee5a06612aa2e4409fa8bbfd1969225c16887615`) CI `35550653160`; excluded 003a-R/003b.
 - Artifact: `ART-V20-INTEGRATED-CANDIDATE`
 - SP1
 - Intended transition: `planned -> drafting`.

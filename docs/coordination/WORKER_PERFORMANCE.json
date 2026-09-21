@@ -15,23 +15,218 @@
     "first_lead_review_acceptance_requires_no_changes_requested": true
   },
   "story_point_summary": {
-    "1": {"completed_lead_verified":3,"reviewed_packets":3,"first_lead_review_acceptance_rate":1.0,"stable":false,"reviewed_packet_ids":["W-131A","V2A-002","V2A-003a-R"]},
-    "2": {"completed_lead_verified":3,"reviewed_packets":6,"first_lead_review_acceptance_rate":0.5,"stable":false,"reviewed_packet_ids":["W-111A","W-111B","W-121A","V2A-001","V2A-003a","V2A-003b"]},
-    "3": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false},
-    "4": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false},
-    "5": {"completed_lead_verified":0,"reviewed_packets":0,"stable":false}
+    "1": {
+      "completed_lead_verified": 3,
+      "reviewed_packets": 3,
+      "first_lead_review_acceptance_rate": 1.0,
+      "stable": false,
+      "reviewed_packet_ids": [
+        "W-131A",
+        "V2A-002",
+        "V2A-003a-R"
+      ]
+    },
+    "2": {
+      "completed_lead_verified": 3,
+      "reviewed_packets": 6,
+      "first_lead_review_acceptance_rate": 0.5,
+      "stable": false,
+      "reviewed_packet_ids": [
+        "W-111A",
+        "W-111B",
+        "W-121A",
+        "V2A-001",
+        "V2A-003a",
+        "V2A-003b"
+      ]
+    },
+    "3": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    },
+    "4": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    },
+    "5": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    }
   },
   "reviewed_packets": [
-    {"packet_id":"W-111A","story_points":2,"artifact_id":"ART-V11-MULTISURFACE-EVIDENCE","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"},
-    {"packet_id":"W-111B","story_points":2,"artifact_id":"ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":true,"completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce","note":"Control evidence accepted; restart portion required real OS process restart and was later superseded by V2A-002."},
-    {"packet_id":"W-121A","story_points":2,"artifact_id":"ART-V12-PROVIDER-ELIGIBILITY","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"19b91ba89bfac5d670af0d766f21f4b9f2ca1a62","note":"Truthful blocked result: zero admissible remote routes."},
-    {"packet_id":"W-131A","story_points":1,"artifact_id":"ART-V13-SCREENING-MATRIX","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"03d85540e36c36fa3a5c92a3082be9959d93f66d"},
-    {"packet_id":"V2A-001","story_points":2,"artifact_id":"ART-V12-BROKER-CONTRACT","worker":"Cursor Session A","first_pass_ci":"success_35548643473","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"c3df96ef074568e7a92dd2f6c6bfd070fe5374f3","note":"Generic ProductStore execution injects governed project-scoped broker; direct local fallback is fail-closed under broker-required operation."},
-    {"packet_id":"V2A-002","story_points":1,"artifact_id":"ART-V11-RESTART-EVIDENCE","worker":"Cursor Session A","first_pass_ci":"success_35549111809","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"48a02e3daae13f8fb569225e2d030097229f4780","evidence_sha":"ee5a06612aa2e4409fa8bbfd1969225c16887615","note":"Actual uvicorn PID stop/start plus same durable mission/disk hash reopened through HTTP and separate CLI."},
-    {"packet_id":"V2A-003a","story_points":2,"artifact_id":"ART-V15-LEASE-FENCING","worker":"Cursor Session A","first_pass_ci":"success_35549624046","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":false,"completion_sha":"630ab780ab45858c5dad4075be143cfa145e975f","evidence_sha":"37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b","changes_required":["true Alembic upgrade from populated previous schema","durable token rotate/revoke lifecycle","recursive/typed token-sensitive metadata boundary"],"artifact_status_after_review":"drafting","next_packet":"V2A-003a-R"},
-    {"packet_id":"V2A-003a-R","story_points":1,"artifact_id":"ART-V15-LEASE-FENCING","worker":"Cursor Session A","first_pass_ci":"success_current_descendant_35550277430","first_lead_review":"accepted","rework_cycles":0,"evidence_complete_first_submission":true,"completion_sha":"92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2","evidence_sha":"8e2c9754c9f64aa0e68e4fe5de47d646713a5413","note":"Lead source/evidence review confirmed real Alembic upgrade from populated 9eb193b10f4e legacy schema, null unknown project ownership, token rotate/revoke fencing and recursive nested token-metadata denial. Whole ART-V15-LEASE-FENCING remains drafting."},
-    {"packet_id":"V2A-003b","story_points":2,"artifact_id":"ART-V15-LEASE-FENCING","worker":"Cursor Session A","first_pass_ci":"failure_35549994050_ruff","current_descendant_ci":"success_35550277430","first_lead_review":"changes_required","rework_cycles":1,"evidence_complete_first_submission":false,"completion_sha":"7dcefe4c72ae9ada2ff512adeaf65eefa28632e2","evidence_sha":"f55f8078b73597892b6dcddc2e41ac947d3c904e","positive_findings":["uses SELECT FOR UPDATE SKIP LOCKED for durable ready-task claim","race test targets exactly one lease winner","renew/expire survives new SQLAlchemy sessions","later import-only commit fixed current-tip lint/CI"],"changes_required":["claim must verify current mission cancellation/status/source/graph authority before creating attempt/lease","renew must require current worker project to match lease project","fixed 32-row candidate scan can still HOL-block eligible task #33; safely paginate/filter until eligible/exhausted","direct regressions required for each negative path"],"artifact_status_after_review":"drafting","next_packet":"V2A-003b-R"}
+    {
+      "packet_id": "W-111A",
+      "story_points": 2,
+      "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+    },
+    {
+      "packet_id": "W-111B",
+      "story_points": 2,
+      "artifact_id": "ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+      "note": "Control evidence accepted; restart portion required real OS process restart and was later superseded by V2A-002."
+    },
+    {
+      "packet_id": "W-121A",
+      "story_points": 2,
+      "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
+      "note": "Truthful blocked result: zero admissible remote routes."
+    },
+    {
+      "packet_id": "W-131A",
+      "story_points": 1,
+      "artifact_id": "ART-V13-SCREENING-MATRIX",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d"
+    },
+    {
+      "packet_id": "V2A-001",
+      "story_points": 2,
+      "artifact_id": "ART-V12-BROKER-CONTRACT",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35548643473",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+      "note": "Generic ProductStore execution injects governed project-scoped broker; direct local fallback is fail-closed under broker-required operation."
+    },
+    {
+      "packet_id": "V2A-002",
+      "story_points": 1,
+      "artifact_id": "ART-V11-RESTART-EVIDENCE",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35549111809",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "48a02e3daae13f8fb569225e2d030097229f4780",
+      "evidence_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+      "note": "Actual uvicorn PID stop/start plus same durable mission/disk hash reopened through HTTP and separate CLI."
+    },
+    {
+      "packet_id": "V2A-003a",
+      "story_points": 2,
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35549624046",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": false,
+      "completion_sha": "630ab780ab45858c5dad4075be143cfa145e975f",
+      "evidence_sha": "37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b",
+      "changes_required": [
+        "true Alembic upgrade from populated previous schema",
+        "durable token rotate/revoke lifecycle",
+        "recursive/typed token-sensitive metadata boundary"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V2A-003a-R"
+    },
+    {
+      "packet_id": "V2A-003a-R",
+      "story_points": 1,
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_current_descendant_35550277430",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
+      "evidence_sha": "8e2c9754c9f64aa0e68e4fe5de47d646713a5413",
+      "note": "Lead source/evidence review confirmed real Alembic upgrade from populated 9eb193b10f4e legacy schema, null unknown project ownership, token rotate/revoke fencing and recursive nested token-metadata denial. Whole ART-V15-LEASE-FENCING remains drafting."
+    },
+    {
+      "packet_id": "V2A-003b",
+      "story_points": 2,
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "failure_35549994050_ruff",
+      "current_descendant_ci": "success_35550277430",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": false,
+      "completion_sha": "7dcefe4c72ae9ada2ff512adeaf65eefa28632e2",
+      "evidence_sha": "f55f8078b73597892b6dcddc2e41ac947d3c904e",
+      "positive_findings": [
+        "uses SELECT FOR UPDATE SKIP LOCKED for durable ready-task claim",
+        "race test targets exactly one lease winner",
+        "renew/expire survives new SQLAlchemy sessions",
+        "later import-only commit fixed current-tip lint/CI"
+      ],
+      "changes_required": [
+        "claim must verify current mission cancellation/status/source/graph authority before creating attempt/lease",
+        "renew must require current worker project to match lease project",
+        "fixed 32-row candidate scan can still HOL-block eligible task #33; safely paginate/filter until eligible/exhausted",
+        "direct regressions required for each negative path"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V2A-003b-R"
+    }
   ],
-  "superseded_duplicate_intents": [{"packet_id":"W-111C","superseded_by":"V2A-002"},{"packet_id":"W-122A","superseded_by":"V2A-001"}],
-  "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md"
+  "superseded_duplicate_intents": [
+    {
+      "packet_id": "W-111C",
+      "superseded_by": "V2A-002"
+    },
+    {
+      "packet_id": "W-122A",
+      "superseded_by": "V2A-001"
+    }
+  ],
+  "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+  "packets": [
+    {
+      "packet_id": "V2A-H6A",
+      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
+      "story_points": 2,
+      "gate": "V2.0",
+      "task_family": "deploy/integration",
+      "status": "submitted_reviewable",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "35550769734",
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true
+    },
+    {
+      "packet_id": "V2A-020a",
+      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+      "story_points": 1,
+      "gate": "V2.0",
+      "task_family": "integration",
+      "status": "submitted_drafting",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "35550653160",
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true
+    }
+  ]
 }

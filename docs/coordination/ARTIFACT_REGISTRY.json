@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T01:14:30Z",
+  "updated_at": "2026-09-21T01:26:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -1075,7 +1075,10 @@
       ],
       "worker_packets": [],
       "next_action": "derive actual host/runtime manifest without claiming unverified free entitlement",
-      "blockers": []
+      "blockers": [],
+      "evidence_refs": [
+        "V2A-H6A: docs/evidence/v20/v2ah6a-deploy-secret-hardening.json @ 7a2491a2840ef8381e275b05e11f3f76c7a522e6"
+      ]
     },
     {
       "artifact_id": "ART-V18-BACKUP-RESTORE",
@@ -1154,6 +1157,9 @@
       "next_action": "implement clean install/upgrade/rollback evidence once extension boundary stabilizes",
       "blockers": [
         "extension/source integration incomplete"
+      ],
+      "evidence_refs": [
+        "V2A-H6A: docs/evidence/v20/v2ah6a-deploy-secret-hardening.json @ 7a2491a2840ef8381e275b05e11f3f76c7a522e6"
       ]
     },
     {
@@ -1244,12 +1250,13 @@
         "V2B-H9",
         "V2B-H10"
       ],
-      "next_action": "fold fixes into owning lane artifacts; lead verifies each hardening invariant",
+      "next_action": "lead review V2A-H6A deploy-secret slice; continue remaining H items",
       "blockers": [],
       "evidence_refs": [
-        "V2A-H3: docs/evidence/v15/v2a003b-lease-claim-renew-expire.json @ f55f8078b73597892b6dcddc2e41ac947d3c904e"
+        "V2A-H3: docs/evidence/v15/v2a003b-lease-claim-renew-expire.json @ f55f8078b73597892b6dcddc2e41ac947d3c904e",
+        "docs/evidence/v20/v2ah6a-deploy-secret-hardening.json @ 7a2491a2840ef8381e275b05e11f3f76c7a522e6"
       ],
-      "notes": "H3 claim HOL fix proposed reviewable with V2A-003b"
+      "notes": "H3 claim HOL fix proposed reviewable with V2A-003b; H6A deploy-secret hardening proposed reviewable @ 77ef7e4c1675b74dbfcdeba27f8c955ae39f119c"
     },
     {
       "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
@@ -1257,8 +1264,8 @@
       "kind": "source-candidate",
       "owner": "Cursor Session A integration owner",
       "lane": "integration",
-      "status": "planned",
-      "path_or_source_ref": "cursor/v2-integration",
+      "status": "drafting",
+      "path_or_source_ref": "cursor/v2-integration@9ce727842446b98cfa55c28c7e70808f57f17d7b",
       "dependencies": [
         "ART-V15-LEASE-FENCING",
         "ART-V16-PERMISSION-RETRIEVAL",
@@ -1269,10 +1276,14 @@
         "ART-V20-FOUNDATION-HARDENING"
       ],
       "worker_packets": [],
-      "next_action": "integrate only reviewed lane commits at artifact boundaries and run full integrated CI",
+      "next_action": "lead review V2A-020a drafting receipt; add reviewed packets only",
       "blockers": [
-        "upstream source artifacts drafting"
-      ]
+        "V15 lease fencing not integrated until 003b-R verified"
+      ],
+      "evidence_refs": [
+        "docs/evidence/v20/v2a020a-integration-receipt.json @ 9ce727842446b98cfa55c28c7e70808f57f17d7b"
+      ],
+      "notes": "Contains verified V2A-001/002 only through ee5a06612aa2e4409fa8bbfd1969225c16887615; excluded 003a-R/003b due to 003b ancestry"
     },
     {
       "artifact_id": "ART-V20-SUPPORT-MATRIX",
