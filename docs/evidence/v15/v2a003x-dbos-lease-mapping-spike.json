@@ -4,7 +4,7 @@
   "scenario": "dbos_lease_mapping_partial_reuse_spike",
   "status": "pass",
   "recorded_at": "2026-09-21T02:39:00Z",
-  "candidate_sha": "db31df37b9ab0955cd45ec49780d0457e441f694",
+  "candidate_sha": "0fe0831a642039feae48e63076b6889a195f6036",
   "spend_usd": 0.0,
   "g15_lead_accept_invented": false,
   "public_deploy_claimed": false,
