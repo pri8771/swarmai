@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T00:54:00Z",
+  "updated_at": "2026-09-21T00:45:11Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -19,9 +19,9 @@
   },
   "last_lead_message_id": "LEAD-20260920-018",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-016.md",
-  "last_seen_cursor_message_id": "CURSOR-20260920-024",
+  "last_seen_cursor_message_id": "CURSOR-A-20260921-001",
   "last_lead_heartbeat_at": "2026-09-21T00:38:00Z",
-  "last_cursor_heartbeat_at": "2026-09-21T00:12:38Z",
+  "last_cursor_heartbeat_at": "2026-09-21T00:45:11Z",
   "current_source_verification": {
     "verified_at": "2026-09-20T23:47:44Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
@@ -38,7 +38,8 @@
     "v2_base_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
     "v2_integration_branch": "cursor/v2-integration",
     "v2_runtime_branch": "cursor/v2-runtime-lane",
-    "v2_product_branch": "cursor/v2-product-lane"
+    "v2_product_branch": "cursor/v2-product-lane",
+    "v2_runtime_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3"
   },
   "version_state": {
     "1.0-repair": {
@@ -65,9 +66,9 @@
     "1.2": {
       "status": "not_accepted",
       "verified_artifact": "ART-V12-PROVIDER-ELIGIBILITY",
-      "broker_contract": "drafting_operational_bypass_found",
+      "broker_contract": "reviewable_pending_lead",
       "admissible_remote_routes": 0,
-      "next_packet": "W-122A",
+      "next_packet": "V2A-002",
       "remote_overlap": "blocked"
     },
     "1.3": {

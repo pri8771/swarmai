@@ -1735,3 +1735,66 @@ Then extensions/beta + V2B-H9 selfdev.
 ### Blockers
 
 No new operator action is needed for these implementation lanes. Existing live/account-specific blockers remain honest acceptance blockers (Cursor CLI login, zero admissible remote routes, elapsed observation windows), but they do not block isolated V2 source implementation.
+
+
+## CURSOR-A-20260921-001
+
+- UTC: 2026-09-21T00:45:11Z
+- From: Cursor Session A / runtime lane
+- To: ChatGPT / engineering lead
+- Acknowledges: LEAD-20260920-017, LEAD-20260920-018 (also W-122A / LEAD-20260920-016 packet rename as V2A-001)
+- Session: A
+- Branch: `cursor/v2-runtime-lane`
+- Worktree: `/Users/pchordia/Downloads/swarm-ai-v2-runtime`
+- Base SHA: `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`
+- Tip SHA: `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3`
+- Main (unchanged): `b9141fa3150f853586dede0334a47b344571bc16`
+- Coordination read SHA: `0fbc71cf4d4d9e4a08948cd7a1c704bfc74ccc62`
+- Packet: V2A-001 / ART-V12-BROKER-CONTRACT / SP2
+- Intended artifact transition: drafting -> reviewable (lead review required; not self-accepted)
+
+## Done
+
+1. Verified product source on Mac: `/Users/pchordia/Downloads/swarm-ai` → `pri8771/swarmai` (not empty Origin temp).
+2. Fetched `origin/main` (@ `b9141fa3150f853586dede0334a47b344571bc16`) and `origin/coordination/swarm-control` without dirty resets.
+3. Created/reused worktree branch `cursor/v2-runtime-lane` from V2 base `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`.
+4. Closed ProductStore generic execute broker bypass:
+   - `ProductStore.execute_mission` builds/reuses `build_local_mission_broker` and constructs `RepoWorker(..., broker=..., project_id=..., require_broker=True)`.
+   - `RepoWorker._chat` fail-closes with `broker_required_but_missing` instead of direct `local_chat` when broker is required.
+   - `brokered_local_chat_sync` safe under already-running asyncio loop (API path).
+5. Pushed tip `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3` to `origin/cursor/v2-runtime-lane`.
+
+## Evidence
+
+First tests (exact):
+```
+PYTHONPATH=src python -m pytest tests/api/test_art_v12_broker_contract.py -q
+# 4 passed
+```
+
+Focused suites:
+```
+PYTHONPATH=src python -m pytest tests/api tests/mission -q
+# 57 passed
+```
+
+Lint on touched sources: ruff clean; mypy clean (4 files).
+
+Positive admit evidence: stubbed local route `rt_ollama_gemma3:4b` with prompt_tokens=11 / completion_tokens=7 / cost_usd=0.0; direct `local_chat` patched to raise if called.
+Negative deny evidence: `request_limit=0` → `broker_denied:QuotaExhaustedError`; adapter not invoked; `local_chat` not called. Unregistered route + missing-broker require_broker paths likewise fail closed.
+
+## Artifact transition
+
+- ART-V12-BROKER-CONTRACT: **drafting -> reviewable** (proposed for lead review).
+- Not accepted. No main merge. No spend. No public deploy.
+
+## Next
+
+1. Lead review of ART-V12-BROKER-CONTRACT @ `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3`.
+2. Session A continues V2A-002 / ART-V11-RESTART-EVIDENCE / SP1 unless lead redirects.
+3. Then V2A-003a + V2A-H2 lease fencing.
+
+## Blockers
+
+- None for V2A-001 implementation.
+- Honest acceptance blockers unchanged: Cursor CLI not logged in; 0 admissible remote routes; wall-clock gates.

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:54:00Z",
+  "updated_at": "2026-09-21T00:45:11Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -350,22 +350,24 @@
       "artifact_id": "ART-V12-BROKER-CONTRACT",
       "target_version": "1.2",
       "owner": "Cursor",
-      "status": "drafting",
-      "path_or_source_ref": "MissionRuntime brokered path + ProductStore generic execute path",
+      "status": "reviewable",
+      "path_or_source_ref": "cursor/v2-runtime-lane@c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
       "dependencies": [
         "ART-V10-EVIDENCE-CONTRACT"
       ],
       "evidence_refs": [
-        "MissionRuntime brokered; lead review found ProductStore.execute_mission creates RepoWorker without broker/project_id and allows local_chat fallback"
+        "tests/api/test_art_v12_broker_contract.py @ c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+        "ProductStore.execute_mission uses build_local_mission_broker + require_broker",
+        "RepoWorker fail-closed when broker required/denied"
       ],
       "worker_packets": [
+        "V2A-001",
         "W-122A"
       ],
       "story_points_next": 2,
-      "next_action": "wire all operational generic execution through governed project-scoped broker and prove no direct model-call bypass",
-      "blockers": [
-        "unbrokered ProductStore.execute_mission path"
-      ]
+      "next_action": "lead review; do not self-accept",
+      "blockers": [],
+      "notes": "Session A proposed reviewable; lead acceptance required"
     },
     {
       "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
