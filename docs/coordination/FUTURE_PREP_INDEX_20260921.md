@@ -57,3 +57,5 @@ Before executing a future packet, a worker must:
 - `FUTURE_EVIDENCE_TEMPLATES_20260921.md` — candidate/recovery/scheduler/objective/learning evidence skeletons.
 - `FUTURE_WORKER_START_PROMPTS_V18_TO_V30_20260921.md` — prepared future worker bootstraps.
 - `FUTURE_TRACEABILITY_MATRIX_V18_TO_V30_20260921.md` — artifact -> packet -> code -> case -> evidence mapping.
+
+- `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json` — machine-readable future packet DAG for dependency-ready selection/automation.
