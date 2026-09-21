@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `561b4aff082988a753b7d95815b8867acc05498b`
-- Coordination SHA: `dac481d64b3dcc0515643ea9e0b81a8e13ed9497`
-- Updated: `2026-09-21T19:29:53Z`
-- Trigger: `scheduler`
+- Branch SHA: `bb54517cd7b5f12a39adb91954a8c8e0ac5a83ce`
+- Coordination SHA: `149f1bdb4ff742d0baf414d25ac13887113d59f0`
+- Updated: `2026-09-21T19:33:19Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `R00`
-- Current artifact: `cross-version-verification`
-- Last meaningful activity: `2026-09-21T19:29:28Z`
+- Current packet: `R01`
+- Current artifact: `ART-V14-REAL-E2E`
+- Last meaningful activity: `2026-09-21T19:33:18Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit before exact-tip CI can start jobs
+- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit (exact-tip CI cannot start jobs)
 
 ## Update
 
-R00/CP0 done: Actions billing/spend-limit blocker classified (run 35642708049); local ruff+mypy+94 pytest green on Mac. No CI spam.
+R01 pushed: reviewer grounding guard rejects stale inclusive_range text + broad tests/mission-only verify for non-dogfood diffs. Tip=bb54517cd7b5f12a39adb91954a8c8e0ac5a83ce. Next R02 new live mission.
 
 ## Next
 
-R01 ART-V14-REAL-E2E reviewer grounding guard; dependency-independent recovery continues
+R02 new preregistered real V14 mission after grounding guard
