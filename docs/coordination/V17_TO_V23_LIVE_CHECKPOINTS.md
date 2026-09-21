@@ -34,6 +34,8 @@ Bound to one CandidateManifest:
 - independent release review.
 
 ## CP23 Operational platform
+
+Real-world requirement: at least two physically distinct worker hosts/execution nodes and at least one non-fixture external provider/tool interaction through normal authority. A single-host synthetic fleet can validate algorithms but cannot make V2.3 a working claim.
 - multiple projects and missions;
 - constrained shared capacity;
 - fairness observed under frozen workload;
