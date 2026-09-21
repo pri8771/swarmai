@@ -19,6 +19,23 @@ The operator should only need to tell each Cursor session:
 
 Every worker then fetches `coordination/swarm-control`, reads the canonical registry/queue/backlog/new lead messages, installs/verifies heartbeat, works the next packet, pushes evidence, and immediately claims another dependency-ready packet.
 
+## Immediate priority override — real example first
+
+Owner rule: **V1.4 is not complete until one real end-to-end SwarmAI mission is independently verified.**
+
+Mandatory artifact: `ART-V14-REAL-E2E`
+Protocol: `REAL_V14_E2E_PROTOCOL.md`
+
+This real mission is intentionally independent of the blocked dual-remote G12 and formal G13 qualification gates so we can prove the actual product works now while those acceptance gates continue in parallel.
+
+Priority order:
+1. Session A finishes any already-in-flight bounded repair packet, then runs `V14-REAL-001` before optional architecture/spike work.
+2. Session A then attacks G12 admission directly via `V12-REMOTE-ADMIT-01` (exact account/model/tier/quota/zero-charge proof; no paid fallback).
+3. Session B treats G13 as the critical path: B0 -> B1 task-pool freeze -> B2 reviewer calibration/freeze -> counted held-out qualification batches. V1.6/V1.7 product work comes after this critical G13 path unless lead explicitly reorders.
+4. Failed real runs are preserved and repaired; no fixture/mock substitution.
+
+The real example does not replace G12/G13/G14/LIVE-142. It is an additional mandatory gate.
+
 ## Heartbeat bootstrap
 
 Protocol: `HEARTBEAT_PROTOCOL.md`
@@ -74,7 +91,27 @@ Required:
 
 Artifact remains drafting. V2A-003c still follows after lead verification.
 
-### A1 — V2A-H6A-R / ART-V20-FOUNDATION-HARDENING / SP1
+### A1 — V14-REAL-001 / ART-V14-REAL-E2E / SP2 — immediate product proof
+After any already-started bounded A packet, run the frozen real mission protocol:
+- actual operational mission surface;
+- actual local Ollama model inventory and inference through governed broker;
+- real current repository inspection;
+- no supplied defect/answer;
+- isolated worktree only;
+- real regression/check execution;
+- exact mission/model/tool/cost evidence;
+- independent lead review.
+Do not claim G12/G13/G14 from this smoke unless their separate criteria are also met.
+
+### A2 — V12-REMOTE-ADMIT-01 / G12 unblock / SP2
+Probe configured provider secret presence without printing values, then attempt account-specific admission for the strongest current zero-charge candidates:
+- OpenRouter Free exact `:free` model;
+- Groq Free exact model;
+- Gemini Free exact model as third/fallback.
+For each route, require exact authenticated account/tier, exact model, public/account zero-price evidence, quota/health, fail-closed no-paid-fallback config, and one bounded zero-charge canary.
+If credentials/account access are absent, emit a precise USER_ACTION rather than fabricating admission.
+
+### A3 — V2A-H6A-R / ART-V20-FOUNDATION-HARDENING / SP1
 Independent while A0 review waits:
 - generated compose secret file owner-only on POSIX;
 - safe fresh-config overwrite semantics;
@@ -82,7 +119,7 @@ Independent while A0 review waits:
 - no secret output;
 - focused tests + exact evidence.
 
-### A2 — V2A-003X / ART-V15-DBOS-REUSE / SP2
+### A4 — V2A-003X / ART-V15-DBOS-REUSE / SP2
 If A0/H6A wait on lead:
 - isolated spike only;
 - actual pinned DBOS API/version;
@@ -91,7 +128,7 @@ If A0/H6A wait on lead:
 - ADR: reuse / partial reuse / do not adopt;
 - no production transport switch.
 
-### A3 — current-tip local G12 proof / SP2
+### A5 — current-tip local G12 proof / SP2
 After critical V15 work or in a non-conflicting A worktree:
 - actual local Ollama route inventory;
 - actual brokered local inference;
@@ -125,10 +162,21 @@ Freeze calibration vs held-out task/version manifest. No counted qualification b
 ### B2 — V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3
 Calibration-only reviewer benchmark/scorer repair/freeze. No held-out contamination or qualification claim.
 
-### B3 — V2B-003a+H1 / ART-V16-PROVENANCE / SP2
+### B3 — W-131B / ART-V13-QUALIFIED-MATRIX / SP2 — counted qualification
+Immediately after B1 task-pool freeze is lead-accepted, begin counted held-out qualification under the frozen EVAL-131 protocol in five-observation batches. Do not wait for V1.6/V1.7 work.
+- no calibration/held-out contamination;
+- all planning/coordination/retry/review overhead counted;
+- preserve every failure;
+- qualification only when the frozen Wilson criterion is met;
+- continue until required family x size cells are qualified or honestly blocked.
+
+### B4 — reviewer-role qualification / ART-V13-REVIEWER-QUALIFICATION
+After B2 freezes the repaired reviewer benchmark/scorer, run the held-out reviewer-role qualification needed for G14. No self-qualification claims; lead verifies.
+
+### B5 — V2B-003a+H1 / ART-V16-PROVENANCE / SP2
 Project-scoped versioned knowledge/provenance; permission filter before ranking; tombstones/supersession; two-project non-leak tests. Send central migration delta to A.
 
-### B4 — V2B-004a+H4 / ART-V17-APPROVAL-BINDING / SP2
+### B6 — V2B-004a+H4 / ART-V17-APPROVAL-BINDING / SP2
 ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity and exact effect binding; no operational demo default.
 
 Then permission-first retrieval -> supersession/deletion -> effect-key semantics -> extensions -> beta/non-demo self-development.
