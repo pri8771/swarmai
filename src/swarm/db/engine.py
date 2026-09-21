@@ -1,4 +1,9 @@
-"""Database engine and session helpers."""
+"""Database engine and session helpers.
+
+V2A-H6A: operational default is empty/unconfigured. A secret-backed
+``SWARM_DATABASE_URL`` must be set explicitly — never fall back to a
+committed ``swarm:swarm`` password.
+"""
 
 from __future__ import annotations
 
@@ -10,11 +15,25 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DEFAULT_DATABASE_URL = "postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm"
+
+class DatabaseConfigError(RuntimeError):
+    """Raised when the operational database DSN is missing or unsafe."""
 
 
 def database_url() -> str:
-    return os.environ.get("SWARM_DATABASE_URL", DEFAULT_DATABASE_URL)
+    """Return the configured DSN or fail closed when unconfigured."""
+    url = (os.environ.get("SWARM_DATABASE_URL") or "").strip()
+    if not url:
+        raise DatabaseConfigError(
+            "SWARM_DATABASE_URL is unset — operational default is empty/unconfigured; "
+            "set an explicit secret-backed DSN (see deploy/compose/.env.example)"
+        )
+    if "swarm:swarm@" in url:
+        raise DatabaseConfigError(
+            "SWARM_DATABASE_URL uses the forbidden fixed demo credential swarm:swarm; "
+            "generate an operator secret (scripts/generate_compose_env.py)"
+        )
+    return url
 
 
 def create_db_engine(url: str | None = None, *, echo: bool = False) -> Engine:

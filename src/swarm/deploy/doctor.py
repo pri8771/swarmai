@@ -67,12 +67,14 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
         # Require SWARM_DATABASE_URL to be set OR explicitly allow missing for doctor dry-run.
         db_url = os.environ.get("SWARM_DATABASE_URL")
         if db_url and ("password=" in db_url.lower() or "@" in db_url):
-            # URL may contain credentials — never echo it.
+            forbidden_fixed = "swarm:swarm@" in db_url
             checks.append(
                 _check(
                     "database_url_configured",
-                    True,
-                    "SWARM_DATABASE_URL present (value hidden)",
+                    not forbidden_fixed,
+                    "SWARM_DATABASE_URL present (value hidden)"
+                    if not forbidden_fixed
+                    else "forbidden fixed credential swarm:swarm",
                 )
             )
         else:
@@ -80,7 +82,7 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
                 _check(
                     "database_url_configured",
                     False,
-                    "SWARM_DATABASE_URL missing — refuse live start",
+                    "SWARM_DATABASE_URL missing — refuse live start (empty/unconfigured default)",
                 )
             )
     else:
@@ -94,6 +96,31 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
             str(compose.relative_to(root)) if compose.exists() else f"missing {compose.name}",
         )
     )
+    if compose.exists() and profile != "mock":
+        compose_text = compose.read_text()
+        checks.append(
+            _check(
+                "compose_no_fixed_db_password",
+                "POSTGRES_PASSWORD: swarm" not in compose_text
+                and "swarm:swarm@" not in compose_text,
+                "compose must require generated/operator secret (no fixed swarm password)",
+            )
+        )
+        checks.append(
+            _check(
+                "compose_loopback_api_bind",
+                "127.0.0.1:8765:8765" in compose_text,
+                "API publish must stay loopback/private",
+            )
+        )
+        checks.append(
+            _check(
+                "compose_requires_secret_vars",
+                "SWARM_POSTGRES_PASSWORD:?" in compose_text
+                and "SWARM_DATABASE_URL:?" in compose_text,
+                "compose must fail closed when secrets are unset",
+            )
+        )
     checks.append(
         _check(
             "allow_paid_cloud_false",
@@ -124,6 +151,9 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
             "allow_paid_cloud_false",
             "architecture_smoke",
             "compose_artifact",
+            "compose_no_fixed_db_password",
+            "compose_loopback_api_bind",
+            "compose_requires_secret_vars",
         }
     )
     measured = {

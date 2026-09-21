@@ -1,4 +1,5 @@
 # Recovery drill — restore target with side-effect freeze (local only).
+# V2A-H6A: no fixed DB password; secrets come from generated/operator .env.
 services:
   api:
     image: swarm-ai:local
@@ -9,22 +10,29 @@ services:
       SWARM_EXECUTION_MODE: recovery
       SWARM_SIDE_EFFECT_FREEZE: "true"
       SWARM_FENCE_OLD_PRIMARY: "true"
-      SWARM_DATABASE_URL: postgresql+psycopg://swarm:swarm@db:5432/swarm
+      SWARM_DATABASE_URL: ${SWARM_DATABASE_URL:?SWARM_DATABASE_URL must be set from generated/operator secret}
+      SWARM_BIND_HOST: "127.0.0.1"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - internal
   db:
     image: postgres:16-alpine
     user: "999:999"
     environment:
-      POSTGRES_USER: swarm
-      POSTGRES_PASSWORD: swarm
-      POSTGRES_DB: swarm
+      POSTGRES_USER: ${SWARM_POSTGRES_USER:-swarm}
+      POSTGRES_PASSWORD: ${SWARM_POSTGRES_PASSWORD:?SWARM_POSTGRES_PASSWORD must be set from generated/operator secret}
+      POSTGRES_DB: ${SWARM_POSTGRES_DB:-swarm}
     networks:
       - internal
     volumes:
       - swarm_pg_restore:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 networks:
   internal:

@@ -55,9 +55,15 @@ def cmd_db_migrate() -> None:
 
 
 def cmd_db_validate() -> None:
-    engine = create_db_engine()
-    ping(engine)
-    print(f"ok database={database_url().split('@')[-1]}")
+    from swarm.db.engine import DatabaseConfigError
+
+    try:
+        engine = create_db_engine()
+        ping(engine)
+        print(f"ok database={database_url().split('@')[-1]}")
+    except DatabaseConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2) from exc
 
 
 def cmd_providers_list(*, mode: str, show_account_status: bool = False) -> None:

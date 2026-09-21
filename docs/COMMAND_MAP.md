@@ -31,7 +31,8 @@
 PostgreSQL integration path (P02+; optional for P01):
 
 ```sh
-export SWARM_DATABASE_URL=postgresql://swarm:swarm@127.0.0.1:5432/swarm
+export SWARM_DATABASE_URL=postgresql+psycopg://USER:SECRET@127.0.0.1:5432/swarm
+# Never use the forbidden fixed demo credential swarm:swarm
 uv run pytest tests/integration/db -m integration
 ```
 

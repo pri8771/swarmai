@@ -1,6 +1,7 @@
 """Database package exports."""
 
 from swarm.db.engine import (
+    DatabaseConfigError,
     create_db_engine,
     database_url,
     make_session_factory,
@@ -34,6 +35,7 @@ from swarm.db.token_hash import hash_membership_token, new_token_id, verify_memb
 
 __all__ = [
     "Base",
+    "DatabaseConfigError",
     "create_db_engine",
     "database_url",
     "make_session_factory",

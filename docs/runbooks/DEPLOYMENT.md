@@ -11,6 +11,20 @@
 
 **No production deploy from this kit.** No paid cloud auto-path. Oracle Always Free is optional and requires owner verification first.
 
+## Secrets (V2A-H6A)
+
+Operational default is **empty/unconfigured**. Compose files do **not** embed a fixed DB password.
+
+```sh
+python scripts/generate_compose_env.py
+# writes deploy/compose/.env (gitignored); secret is not printed
+# or copy deploy/compose/.env.example and fill SWARM_POSTGRES_PASSWORD + SWARM_DATABASE_URL
+```
+
+`SWARM_DATABASE_URL` must be set for live DB access. The forbidden demo DSN containing `swarm:swarm@` is rejected.
+
+API publish remains loopback: `127.0.0.1:8765`. DB has no host port.
+
 ## Doctor
 
 ```sh
@@ -19,6 +33,15 @@ uv run swarm recovery verify --profile recovery
 ```
 
 Standalone/hybrid/recovery refuse *live start* without `SWARM_DATABASE_URL` (doctor reports the gap; values never printed).
+
+## Compose config smoke (local)
+
+```sh
+python scripts/generate_compose_env.py --force
+docker compose --env-file deploy/compose/.env -f deploy/compose/standalone.yml config
+```
+
+This validates secret interpolation and loopback binds. It is **not** a public deployment.
 
 ## Restore (local)
 
