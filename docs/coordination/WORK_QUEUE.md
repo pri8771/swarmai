@@ -9,7 +9,8 @@ Live dashboard: `LIVE_PROGRESS.md`.
 
 ### Lane A — Mac / runtime + real acceptance
 Branch: `cursor/v2-runtime-lane`
-Assignment: `A-RESET-BATCH-04`
+Current observed tip: `11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`; exact-tip CI `35615739781` green.
+Assignment: `A-RESET-BATCH-04`, generation 4.
 
 1. `V14-REAL-001-R` — generic materialization repair + new real end-to-end mission.
 2. `V2A-003c` — durable result acceptance fencing.
@@ -17,39 +18,58 @@ Assignment: `A-RESET-BATCH-04`
 
 ### Lane B — Windows / product + evaluation
 Branch: `cursor/v2-product-lane`
-Assignment: `B-RESET-BATCH-04`
+Current observed tip: `a908a0e1ff023743892ecb10cfb7bd8df4b53d53`; exact-tip CI `35615750755` red at Ruff on the unsynchronized autonomous-runner source.
+Assignment: `B-RESET-BATCH-04`, generation 4.
 
-1. `B-OPS-AUTO-SYNC-02` — synchronize reviewed runner repair and validate coordination tests.
-2. `V2B-000` — sync reviewed integration baseline.
-3. `V2B-001-R4` — final executable G13 task-pool remint/freeze with >=15 genuine semantic archetypes per required cell.
+1. `B-OPS-AUTO-SYNC-02` — synchronize the independently reviewed runner repair while preserving Windows status/heartbeat features; restore exact-tip coordination-source CI.
+2. `V2B-000` — sync reviewed integration baseline and run Windows baseline.
+3. `V2B-001-R4` — final executable G13 task-pool remint/freeze with >=15 genuine semantic archetypes per required cell and actual Windows verification.
 4. After lead freeze: reviewer calibration/freeze -> counted qualification -> V16/V17.
 
 ### Lane C — worker-pc / independent support
-Infrastructure: `pri8771/remote-workers`.
-Current task: `swarmai-v14-materialization-audit-01` read-only diagnostic support for Lane A.
+Infrastructure: `pri8771/remote-workers` only; no SwarmAI acceptance authority.
 
-Lane C does not own SwarmAI acceptance and does not own Python/test-dependent gates when its executor cannot run required verification.
+Current execution:
+- `swarmai-v14-materialization-audit-01` — read-only diagnostic support for Lane A; workflow `35616202805` is in progress.
+
+Queued transport:
+- `swarmai-v13-task-pool-freeze-07` — workflow `35616363073` is pending behind the occupied capacity-1 worker. Because Windows B is now the executable/final G13 owner, any retry-07 output is reference evidence only: no automatic integration and no acceptance claim.
+
+Lane C does not own Python/test-dependent acceptance gates when its Claude executor cannot run the required repository verification.
+
+## G13 current decision
+
+Retry 06 is independently **changes-required** at `worker/swarmai-v13-task-pool-freeze-06@f7800332594d67c8b872b3597abd59f35987a2a0`:
+- exact-tip CI `35610017583` is red in ordinary offline pytest;
+- the frozen corpus has 15 records/cell but only 5 genuine semantic archetypes/cell;
+- counted qualification remains disabled;
+- `ART-V13-TASK-POOL` stays drafting and W-131B may not start.
+
+Independent review: `docs/coordination/reviews/ART-V13-TASK-POOL-RETRY06-LEAD-REVIEW.md`.
+Final executable repair packet: `docs/coordination/packets/V2B-001-R4.md` on Windows B after its runner sync and baseline packet.
 
 ## Heartbeat stress test
 
-Phase 1:
+Phase 1 is active:
 - A/B effective cadence 5m.
 - only scheduler heartbeats count.
-- 3 consecutive receipts each; valid gaps 3–8m.
+- each host needs 3 consecutive receipts; adjacent valid gaps are 3–8m.
+- current lead-reconciled state: A **1/3** at `15:07:07Z`; B **1/3** at `14:59:17Z`.
+- both prior adjacent gaps were outside the 3–8m window, so neither earlier receipt can extend the current chain.
 
 Phase 2:
-- after both pass, effective cadence 15m for 24 real hours.
-- valid gaps 10–25m.
-- unresolved miss fails the clean soak.
+- starts only after both pass Phase 1;
+- effective cadence 15m for 24 real elapsed hours;
+- valid gaps 10–25m;
+- unresolved >25m miss prevents a clean soak-success claim;
+- no backfill.
 
-After verified soak:
-- return to hourly.
+After independently verified Phase 2 only:
+- return worker effective cadence to hourly.
 
 Every heartbeat updates its host status page:
 - `status/HOST-MAC-DEV.md`
 - `status/HOST-WIN-DEV.md`
-
-Lead refreshes `LIVE_PROGRESS.md` hourly.
 
 ## Critical acceptance path
 
