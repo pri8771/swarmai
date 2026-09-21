@@ -46,5 +46,6 @@
     "multi-host/recovery live harness evidence (B3)",
     "ART-V15 lead acceptance"
   ],
-  "note": "V2A-003c result acceptance fencing on cursor/v17-single-session; V14 ART remains drafting; no self-accept"
+  "note": "V2A-003c result acceptance fencing on cursor/v17-single-session; V14 ART remains drafting; no self-accept",
+  "candidate_sha": "ddd96a6a577f45f419ce9868506688ed4b08b5cf"
 }
