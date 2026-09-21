@@ -13,13 +13,20 @@ Updated by lead: 2026-09-21T15:52:14Z
 
 ## Heartbeat
 
-Current mode: **5-minute stress Phase 1**.
+Active session epoch: `reset-20260921-new-lanes-01`.
 
-- A: **1/3**, latest counted scheduler receipt `2026-09-21T15:52:14Z`. Previous counted receipt was ~15m02s earlier, so the chain reset.
-- B: **1/3**, latest counted scheduler receipt `2026-09-21T15:44:17Z`. Recent counted receipts remain ~15m apart, so the chain resets on every receipt.
-- Both ledgers are fresh at this evidence cutoff, but neither host is producing the required 3–8m spacing.
-- Phase 2 15m/24h soak has **not started**. No soak time is backfilled.
-- Both human-readable host status pages are still stale even though the JSON ledgers are updating. The current branch heartbeat installers specify a 5m OS wake interval and status-page publication, so the installed host copies/jobs need refresh/verification.
+All previous A/B interactive sessions are **closed**. Their heartbeat entries remain historical only and do not count toward the current test.
+
+Current fresh-session registration:
+- A: **not yet registered**
+- B: **not yet registered**
+
+After each fresh lane registers this epoch, Phase 1 starts at 0/3 for that lane:
+- effective cadence 5 minutes;
+- only scheduler receipts count;
+- valid adjacent gaps 3–8 minutes.
+
+After both fresh lanes reach 3/3, Phase 2 begins: 15-minute cadence for 24 real hours.
 
 ## Lane A
 
