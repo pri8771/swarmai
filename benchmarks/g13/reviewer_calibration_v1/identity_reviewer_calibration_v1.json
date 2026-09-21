@@ -1,0 +1,27 @@
+{
+  "identity_id": "g13-reviewer-calibration-v1",
+  "identity_version": 1,
+  "artifact": "ART-V13-REVIEWER-QUALIFICATION",
+  "packet": "R05",
+  "kind": "reviewer_calibration_only",
+  "held_out_qualification_started": false,
+  "wilson": {
+    "function": "swarm.evals.wilson.wilson_lower_bound",
+    "required_one_sided_90_percent_z": 1.2815515655446004,
+    "thresholds_not_tuned_on_calibration": true
+  },
+  "prompt_identity": "g13-reviewer-prompt-v1-placeholder",
+  "scorer_module": "src/swarm/evals/g13_reviewer_calibration_v1.py",
+  "tool_protocol": "evidence_refs_and_diff_only_no_product_sealed_bundle",
+  "calibration_path": "benchmarks/g13/reviewer_calibration_v1/calibration/cases.jsonl",
+  "future_held_out_interface": {
+    "split": "holdout_reviewer",
+    "answers_in_worker_visible_tree": false,
+    "minted_in_this_packet": false
+  },
+  "notes": [
+    "Calibration labels may exist in cases.jsonl for scorer debugging.",
+    "worker_visible_reviewer_payload() must strip expected_score/label_rationale.",
+    "Do not invent-accept ART-V13-REVIEWER-QUALIFICATION."
+  ]
+}
