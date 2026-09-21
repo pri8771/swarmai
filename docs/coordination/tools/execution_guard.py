@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -185,25 +185,38 @@ def evaluate(documents: dict[str, dict[str, Any]], control: dict[str, Any],
             reasons.append('lead_spec_freeze_required')
         for dep in control.get('review_before', {}).get(pid, []):
             receipt = control.get('reviewed_packets', {}).get(dep)
-            if not isinstance(receipt, dict) or not receipt.get('review_ref') or not receipt.get('source_sha'):
+            if (
+                not isinstance(receipt, dict)
+                or not receipt.get('review_ref')
+                or not receipt.get('source_sha')
+            ):
                 reasons.append(f'independent_review:{dep}')
         required = list(control.get('execution_gates', {}).get(pid, []))
         own_gate = packet.get('gate')
-        if own_gate and kind not in BUILD_TYPES and own_gate not in control.get('result_only_gates', []):
+        if (
+            own_gate and kind not in BUILD_TYPES
+            and own_gate not in control.get('result_only_gates', [])
+        ):
             required.append(own_gate)
         probe = False
         for gid in dict.fromkeys(required):
             gate = gates.get(gid, {})
             if gate.get('status') in CLOSED_GATE and gate.get('evidence_refs'):
                 continue
-            if gid in control.get('runtime_probe_gates', []) and gate.get('status') == 'preauthorized_if_existing_gh_session_available':
+            if (
+                gid in control.get('runtime_probe_gates', [])
+                and gate.get('status') == 'preauthorized_if_existing_gh_session_available'
+            ):
                 probe = True
                 continue
             reasons.append(f'execution_gate:{gid}:{gate.get("status", "missing")}')
         if reasons:
             blocked.append({'packet': pid, 'reasons': reasons})
         elif probe:
-            preflight.append({'packet': pid, 'condition': 'read_only_auth_and_runtime_probe_required_before_any_mutation'})
+            preflight.append({
+                'packet': pid,
+                'condition': 'read_only_auth_and_runtime_probe_required_before_any_mutation',
+            })
         else:
             ready.append(pid)
 
@@ -224,11 +237,16 @@ def main() -> int:
     args = parser.parse_args()
     try:
         control = json.loads((args.coord / 'EXECUTION_CONTROL.json').read_text())
-        documents = {name: json.loads((args.coord / filename).read_text()) for name, filename in FILES.items()}
+        documents = {
+            name: json.loads((args.coord / filename).read_text())
+            for name, filename in FILES.items()
+        }
         result = evaluate(documents, control, args.phase)
         hb_path = args.coord / control['heartbeat_path']
         if hb_path.exists():
-            result['heartbeat'] = heartbeat_assessment(json.loads(hb_path.read_text()), datetime.now(timezone.utc))
+            result['heartbeat'] = heartbeat_assessment(
+                json.loads(hb_path.read_text()), datetime.now(UTC)
+            )
     except (OSError, ValueError, KeyError, TypeError, RecursionError) as exc:
         result = {'ok': False, 'ready': [], 'errors': [f'input_error:{type(exc).__name__}:{exc}']}
     print(json.dumps(result, indent=2))
