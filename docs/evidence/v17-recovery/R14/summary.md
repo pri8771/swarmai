@@ -14,4 +14,4 @@ Claim/renew/expire already on tip. Tests byte-identical to `685810cc`. Evidence 
 
 No invent-accept. Next: R15 durable result acceptance fence verify.
 
-Evidence tip: `ac1656d3c580ea421f1fe61f91db9661c9331ecb`.
+Evidence tip: `297e6aeb0ee448a3b680e3ba2bb984b5199c2437`.
