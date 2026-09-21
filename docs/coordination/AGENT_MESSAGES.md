@@ -2681,3 +2681,56 @@ Then:
 ## Authority
 
 No main merge, public release/deploy, paid fallback/additional spend or destructive operation. Preserve real failures; no fabricated success.
+
+## CURSOR-A-20260921-010
+
+- UTC: 2026-09-21T02:41:00Z
+- From: Cursor Session A / runtime lane
+- To: ChatGPT / engineering lead
+- Acknowledges: backlog **READY A2 V2A-003X**; SESSION_INSTRUCTIONS continuous work after H6A-R
+- Session: A
+- Branch: `cursor/v2-runtime-lane`
+- Worktree: `/Users/pchordia/Downloads/swarm-ai-v2-runtime`
+- Implementation SHA (candidate): 
+- Tip SHA (evidence rebind): `d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42`
+- Main (unchanged): `b9141fa3150f853586dede0334a47b344571bc16`
+- Coordination read SHA: `55addb6190bd2199911eb815206aa079f36c4340`
+- Packet: **V2A-003X** / ART-V15-ARCH / SP2
+- Intended artifact transition: drafting -> reviewable for **implementation-choice spike only** (not production migration; not self-accepted)
+
+## Done
+
+1. Isolated DBOS 3.0.0 lease-mapping spike (`src/swarm/spike/dbos_lease_mapping.py`) using private SQLite system DB only.
+2. Demonstrated `SetWorkflowID` + `@DBOS.step` idempotency vs Swarm-owned source/cancel stamp fences on renew.
+3. ADR-0002 recommends **partial_reuse**: keep Swarm claim/renew/expire authority in Postgres; optional DBOS only for worker execution durability after V15 fencing is lead-verified.
+4. No production schema migration; no Conductor; no invent accept / main merge / spend / public deploy.
+
+## Evidence
+
+```
+PYTHONPATH=src .venv/bin/python -m pytest tests/spikes/test_dbos_lease_mapping_spike.py -q
+# 3 passed
+```
+
+Evidence: `docs/evidence/v15/v2a003x-dbos-lease-mapping-spike.json` @ tip `d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42`.
+`recommendation=partial_reuse`. `g15_lead_accept_invented=false`.
+
+## Session A packets this resume
+
+| Packet | Candidate | Tip / ACK |
+|---|---|---|
+| V2A-003b-R2 | `685810c...` | `391e8ea...` / CURSOR-A-008 |
+| V2A-H6A-R | `d40c1fd...` | `b1a8eee...` / CURSOR-A-009 |
+| V2A-003X | `0fe0831...` | `d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42` / CURSOR-A-010 |
+
+## Next
+
+1. Lead review of 003b-R2, H6A-R, 003X.
+2. Do **not** start V2A-003c until 003b-R2 lead-verified.
+3. Integration still receives only lead-reviewed slices.
+
+## Blockers
+
+- None for 003X spike.
+- V2A-003c blocked on 003b-R2 lead accept.
+- Honest acceptance blockers unchanged.
