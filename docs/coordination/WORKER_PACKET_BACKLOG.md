@@ -104,3 +104,40 @@ Lead continues architecture/acceptance/research rather than routine source imple
 ## Queue rule
 
 Take dependency-ready work before waiting on human auth/provider/live gates. Keep >=3 ready packets per lane where practical. If a Session-B packet needs a shared Session-A-owned file, stop and hand off the delta. Every return names artifact ID, intended transition, base/completion SHA, exact tests/evidence and remaining blockers.
+
+
+## Session C — verification/reliability/spikes
+
+Owns `cursor/v2-verification-lane`, branched from the reviewed `cursor/v2-integration` baseline. This is NOT a third general production-code lane.
+
+Default writable surfaces: tests/verification, tests/security, tests/reliability, tests/performance, scripts/verification, scripts/acceptance, scripts/spikes, spike-only modules and its own evidence files. Production defects are handed to Session A/B.
+
+### READY C1 — V2C-001 — integrated broker/admission revalidation
+- Artifacts: `ART-V12-LOCAL-FALLBACK`, `ART-V12-ADMISSION-RECONCILIATION`, V2 integrated verification
+- SP2
+- Base: current verification lane from reviewed integration
+- Rebind local broker admission/quota/reconciliation/fallback evidence to exact integrated source/config.
+- Correct any evidence labeling that treats stubbed adapter execution as actual local-model inference.
+- No remote calls, no dual-remote claim, no production broker edits.
+- Acceptance: reproducible verification tests/scripts, exact candidate/config identity, honest evidence mode, failures retained.
+
+### READY C2 — V2C-002 — DBOS reuse spike
+- Artifact: `ART-V15-DBOS-REUSE`
+- SP2
+- Isolated spike only; no production queue/dependency migration.
+- Inspect actual installed DBOS version/API; prove durable workflow/queue restart and duplicate semantics; map attempt IDs to workflow IDs; demonstrate Swarm stale-fence rejection remains independent; recommend reuse/partial/do-not-adopt.
+
+### READY C3 — V2C-003 — V2 security-negative harness
+- Artifact: `ART-V20-SECURITY-REVIEW`
+- SP2
+- Convert currently integrated threat-model invariants to negative tests.
+- Future-not-integrated capabilities get a versioned blocked/test manifest, not fake green tests.
+- Any discovered production defect is reported to owning lane with a failing regression.
+
+### READY C4 — V2C-004 — reliability/performance runner scaffold
+- Artifacts: `ART-V20-RELIABILITY-PROTOCOL`, `ART-V20-PERFORMANCE-BASELINE`
+- SP2
+- Candidate-bound reusable runner; wall-clock/latency/resources/model calls; preserve failures/retries; blocked vs unsupported vs unexpected; no fake elapsed time or universal thresholds.
+
+### Session C rule
+If Session C needs to modify production source to make a test pass, STOP and hand the defect to Session A/B unless the lead explicitly transfers that file/packet.
