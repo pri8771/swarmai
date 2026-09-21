@@ -51,5 +51,6 @@
     "result": "17 passed",
     "db": "swarmai_v17_r13"
   },
-  "note": "R14 complete as verify-on-tip; no invent-accept of ART-V15."
+  "note": "R14 complete as verify-on-tip; no invent-accept of ART-V15.",
+  "evidence_tip_sha": "233478804c001423b6c2bce3494651a7c9dcae47"
 }
