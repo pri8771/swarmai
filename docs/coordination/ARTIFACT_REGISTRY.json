@@ -1,11 +1,11 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T04:00:00Z",
+  "updated_at": "2026-09-21T06:02:46Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
-    "previous_registry_blob_sha": "6e20a668a195adb5290d8994757a0d2699977b79",
-    "normalization_note": "Canonical registry re-compacted after LEAD-20260921-024. Lifecycle promotions are limited to independently reviewed evidence: current-tip local fallback/admission-reconciliation and DBOS reuse decision. Packet acceptance does not promote broader parent artifacts."
+    "previous_registry_blob_sha": "dd1316473d3baf2f6d2a3d2cbfcc559a14c070c6",
+    "normalization_note": "LEAD-20260921-027 independently reviewed external G13 retry 02 as changes-required, so ART-V13-TASK-POOL remains drafting. Heartbeat facts were reconciled without lifecycle promotion: A is 2/3 and stale; B has 8 consecutive valid scheduler receipts. No artifact lifecycle promotion occurred in this update."
   },
   "governance": {
     "owner_directive": "Artifacts are primary. Source implementation is authorized through V3.0; major milestones V1.7, V2.3, V3.0; immediate target is a V2.0 implementation/artifact-complete candidate. Main merge/public release/additional spend remain separately gated.",
@@ -196,10 +196,10 @@
         "HB-B-BOOTSTRAP"
       ],
       "story_points_next": 1,
-      "next_action": "Continue 15-minute scheduler proof until A and B each reach 3 consecutive counted receipts; then lead graduates effective cadence to hourly.",
+      "next_action": "Restore/observe HOST-MAC-DEV scheduler receipts and reach 3 consecutive valid 10-25 minute intervals; B already exceeds its individual requirement. Graduate global worker cadence only after both satisfy the protocol.",
       "blockers": [
-        "A scheduler streak 1/3",
-        "B scheduler streak 2/3"
+        "A scheduler 2/3 and stale after 04:02:22Z",
+        "B individually complete with 8 consecutive valid receipts; global cadence waits for A"
       ],
       "notes": "Only trigger=scheduler counts. Coordination heartbeat is not ART-V10 authenticated Cursor-agent evidence."
     },
@@ -578,20 +578,27 @@
         "ART-V13-QUAL-PROTOCOL"
       ],
       "acceptance_refs": [
-        "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md"
+        "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
+        "docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.md"
       ],
       "evidence_refs": [
-        "screening IDs exist; held-out/version manifest not frozen"
+        "screening IDs exist; counted pool not frozen",
+        "worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692 independently reviewed changes-required: hidden references worker-visible, held-out depth 5/cell, seed-isomorphic variants, no executed Python/pytest/Ruff/mypy/CI"
       ],
       "worker_packets": [
         "V2B-001",
         "W-131C1",
-        "EXT-WORKER-PC-V2B-001"
+        "EXT-WORKER-PC-V2B-001",
+        "EXT-WORKER-PC-V2B-001-R1"
       ],
       "story_points_next": 2,
-      "next_action": "External worker-pc task swarmai-v13-task-pool-freeze-01 is dispatched from reviewed cursor/v2-integration; independently review its worker branch/result before any artifact promotion or counted qualification.",
-      "blockers": [],
-      "notes": "External worker infrastructure is transport only; SwarmAI project governance remains authoritative."
+      "next_action": "Review worker-pc repair task swarmai-v13-task-pool-freeze-03 when complete. Require a new v2 freeze with input-only held-out tasks, sealed grader references, >=15 independent held-out inputs in every required family/size cell, contamination/independence rejection, frozen identities and actually executed verification before any lead freeze or counted qualification.",
+      "blockers": [
+        "retry 02 failed hidden-reference containment and independent held-out depth",
+        "retry 03 in progress/unreviewed",
+        "counted qualification prohibited until independent lead freeze"
+      ],
+      "notes": "External worker infrastructure is transport only; SwarmAI project governance remains authoritative. Retry 02 is preserved as useful incomplete evidence, not rewritten as success."
     },
     {
       "artifact_id": "ART-V13-SCREENING-MATRIX",
@@ -1940,6 +1947,7 @@
       "dependencies": [
         "ART-OPS-HEARTBEAT"
       ],
+      "acceptance_refs": [],
       "evidence_refs": [
         "docs/coordination/assignments/HOST-MAC-DEV.json",
         "docs/coordination/assignments/HOST-WIN-DEV.json",
@@ -1947,15 +1955,17 @@
       ],
       "worker_packets": [
         "AUTO-A-INSTALL",
-        "AUTO-B-INSTALL"
+        "AUTO-B-INSTALL",
+        "OPS-AUTO-001-R"
       ],
-      "next_action": "A/B pull branches, authenticate Cursor CLI if needed, install local autonomous daemon, prove one repo-assigned packet is self-launched and pushed from each host; then keep lead assignment files continuously stocked.",
+      "story_points_next": 1,
+      "next_action": "A must execute generation-2 OPS-AUTO-001-R and push a green fail-closed runner repair; then lead publishes fresh non-replay generations and each A/B host must self-launch one repo-assigned packet and push attributable evidence. B remains held until the shared source repair is reviewed/propagated.",
       "blockers": [
-        "daemon not yet installed/proven on HOST-MAC-DEV",
-        "daemon not yet installed/proven on HOST-WIN-DEV",
-        "Cursor CLI authentication may require one human login per host"
+        "A generation-2 runner repair has not produced a new source commit and A host is stale",
+        "B autonomous assignment intentionally disabled pending shared source repair",
+        "zero verified repo-assigned autonomous self-launch + source push on either host"
       ],
-      "notes": "Assignment files may preload multiple dependency-safe packets; daemon executes one packet per invocation and never self-selects project priorities or self-accepts."
+      "notes": "Heartbeat scheduler liveness is separate from autonomous implementation proof. Assignment files may preload dependency-safe packets only after preceding acceptance dependencies are satisfied."
     }
   ],
   "major_milestones": {
