@@ -63,7 +63,7 @@ cat > "$PLIST" <<EOF
   </dict>
   <key>WorkingDirectory</key><string>${APPDIR}</string>
   <key>StartInterval</key><integer>300</integer>
-  <key>RunAtLoad</key><true/>
+  <key>RunAtLoad</key><false/>
   <key>StandardOutPath</key><string>${APPDIR}/stdout.log</string>
   <key>StandardErrorPath</key><string>${APPDIR}/stderr.log</string>
   <key>ProcessType</key><string>Background</string>
