@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T12:34:00Z",
+  "updated_at": "2026-09-21T12:53:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -21,10 +21,10 @@
     "session_b": "Cursor B / HOST-WIN-DEV / product+evaluation",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260921-032",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-032.md",
+  "last_lead_message_id": "LEAD-20260921-034",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-034.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-013",
-  "last_lead_heartbeat_at": "2026-09-21T10:49:09Z",
+  "last_lead_heartbeat_at": "2026-09-21T12:53:00Z",
   "source_refs": {
     "main": "b9141fa3150f853586dede0334a47b344571bc16",
     "runtime_branch": "cursor/v2-runtime-lane",
@@ -52,12 +52,12 @@
     "counted_trigger": "scheduler_only",
     "a": {
       "host": "HOST-MAC-DEV",
-      "streak": 1,
+      "streak": 2,
       "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T11:55:14Z",
+      "last_counted_scheduler_at": "2026-09-21T12:51:41Z",
       "verified": false,
-      "stale": true,
-      "status": "stale current chain 1/3"
+      "stale": false,
+      "status": "fresh current chain 2/3 at 12:36:39Z -> 12:51:41Z"
     },
     "b": {
       "host": "HOST-WIN-DEV",
@@ -66,10 +66,10 @@
       "last_counted_scheduler_at": "2026-09-21T12:29:17Z",
       "verified": false,
       "stale": false,
-      "status": "fresh current chain reset to 1/3 after 30m gap"
+      "status": "fresh current chain 1/3 after 11:59:17Z -> 12:29:17Z 30m reset gap"
     },
     "graduated_to_hourly": false,
-    "note": "A remains stale at 2/3. B is fresh but its previous qualifying streak broke on a 30-minute gap, so B is currently 1/3. Global worker cadence remains 15 minutes; ChatGPT lead remains hourly."
+    "note": "A is fresh 2/3 and B is fresh 1/3 at the lead cutoff. Global worker cadence remains 15 minutes; ChatGPT lead remains hourly."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -83,18 +83,17 @@
   },
   "verified_artifact_transitions_this_heartbeat": [],
   "coordination_findings_this_heartbeat": {
-    "messages": "LEAD-20260921-032 appended; no newer local Cursor implementation message/commit observed",
-    "registry": "canonical registry inspected first; ART-V13-TASK-POOL remains drafting and no lifecycle promotion is justified",
-    "autonomous_runner_source": "A/B implementation tips unchanged and still red at shared runner Ruff failure",
+    "messages": "LEAD-20260921-034 appended; no newer local Cursor implementation message/commit observed",
+    "registry": "canonical registry inspected first; no independently verified lifecycle transition is justified; ART-V13-TASK-POOL and ART-OPS-HEARTBEAT remain drafting",
+    "autonomous_runner_source": "A/B implementation tips unchanged and exact-tip CI still red at shared autonomous-runner source",
     "autonomous_self_launch_proven_a": false,
     "autonomous_self_launch_proven_b": false,
     "worker_performance_updated": false,
-    "worker_performance_reason": "retry04 is a repair attempt of the already-reviewed V2B-001 intent; disposition recorded as changes-required without incrementing duplicate packet summary counts",
-    "heartbeat_recompute": "A 2/3 stale; B current chain reset to 1/3 after 10:14:17Z -> 10:44:17Z 30-minute gap; no hourly graduation",
-    "remote_worker_attempt_04": "worker branch worker/swarmai-v13-task-pool-freeze-04@6467552f86e40964e5bd26d85e3b3a74d03aa059 exists one commit above retry02. remote-workers run 35580580156 failed only at result publication after task execution, so result JSON is absent. SwarmAI exact-tip CI 35587202715 is red at offline pytest while Ruff/mypy/package/Alembic and console pass.",
-    "g13_review": "changes required; see docs/coordination/reviews/ART-V13-TASK-POOL-RETRY04-LEAD-REVIEW.md",
-    "g13_next_packet": "EXT-WORKER-PC-V2B-001-R3 prepared at coordination commit 63fa4c807f6e9d171963b91501293692e1785ce3; not dispatched because worker-pc capacity is occupied by unrelated remote task run 35590523591",
-    "lead_parallel_artifact": "G13 sealed-reference binding preregistration created at coordination commit 363c783699ef516539d9aeddd3b48e5dffaff993; no sealed bundle/content digest is claimed"
+    "worker_performance_reason": "no new bounded implementation packet reached independent review; retry05 remains in progress and heartbeat receipts are liveness only",
+    "heartbeat_recompute": "A fresh 2/3 from 12:36:39Z -> 12:51:41Z; B fresh 1/3 at 12:29:17Z after a 30m reset gap; no hourly graduation",
+    "remote_worker_attempt_05": "task swarmai-v13-task-pool-freeze-05 / run 35596577823 / job 106322668369 remains in progress in Execute submitted tasks; no result JSON and no worker/swarmai-v13-task-pool-freeze-05 branch yet",
+    "g13_review": "retry04 remains changes required; retry05 cannot be reviewed until real branch/result/evidence exists; counted W-131B remains prohibited",
+    "lead_parallel_artifact": "ART-V20-UPGRADE-ROLLBACK protocol strengthened at 0c74cb9db6bcf26583b234c33566573c9f8f42e7; protocol progress only, no executable upgrade/rollback evidence claimed"
   },
   "version_state": {
     "1.0-repair": {
@@ -117,7 +116,7 @@
       "status": "not_accepted_critical_path",
       "protocol": "accepted_frozen",
       "screening": "verified_72_provisional_n5_cells",
-      "task_pool": "drafting_retry04_changes_required_R3_prepared_not_dispatched",
+      "task_pool": "drafting_retry04_changes_required_retry05_in_progress",
       "qualified_cells": 0,
       "reviewer_qualification": "drafting"
     },
@@ -143,6 +142,8 @@
       "status": "implementation_target_active",
       "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
       "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
+      "install_journey": "drafting_protocol_only_no_executed_clean_install_evidence",
+      "upgrade_rollback": "drafting_protocol_strengthened_no_executed_evidence",
       "reliability_protocol": "drafting_no_elapsed_time_claimed",
       "security_review": "drafting_no_candidate_acceptance_claim",
       "performance_baseline": "drafting_protocol_advanced_no_benchmark_execution"
@@ -155,7 +156,6 @@
     }
   },
   "session_a_next": [
-    "restore HOST-MAC-DEV heartbeat/autonomous LaunchAgents if not running",
     "OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1",
     "after lead review/new generation: V14-REAL-001-R / ART-V14-REAL-E2E / SP2",
     "then V2A-003c / ART-V15-LEASE-FENCING / SP2"
@@ -167,21 +167,22 @@
     "W-131B counted qualification waits for lead freeze plus real sealed-reference binding"
   ],
   "lead_parallel": [
-    "EXT-WORKER-PC-V2B-001-R3 prepared for the next free worker-pc slot",
+    "retry05 / EXT-WORKER-PC-V2B-001-R3 is running; independently review only after branch/result/evidence exists",
     "G13_SEALED_REFERENCE_BINDING_PROTOCOL preregistered; actual hidden bundle remains absent/unbound",
+    "ART-V20-UPGRADE-ROLLBACK protocol strengthened at 0c74cb9db6bcf26583b234c33566573c9f8f42e7",
     "ART-V20-PERFORMANCE-BASELINE remains drafting with no benchmark results claimed",
     "ART-V20-SECURITY-REVIEW remains drafting with candidate-bound negative/evidence requirements",
     "ART-V20-RELIABILITY-PROTOCOL remains drafting; no elapsed campaign time claimed",
     "continue V2 security/recovery and V2.3/V3 architecture without taking routine SP1-SP3 implementation from workers"
   ],
   "open_blockers": [
-    "Heartbeat not graduated: Mac stale at 1/3; Windows fresh but reset to 1/3 after a 30m gap",
+    "Heartbeat not graduated: A fresh 2/3; B fresh 1/3 after a 30m reset gap",
     "A/B active lane exact-tip offline CI red due shared autonomous-runner coordination scripts",
     "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
     "ART-V10 authenticated Cursor-agent evidence blocked on authenticated Cursor-agent receipts",
     "G12 remote overlap: zero admitted routes; account-specific free tier/zero-charge admission missing",
     "G13 retry04 exact-tip offline pytest red; semantic independence not mechanically strong enough; evidence provenance stale; lead-controlled sealed bundle/content digest unbound; zero qualified cells",
-    "worker-pc currently occupied by unrelated remote-workers run 35590523591, so G13 R3 is prepared but not dispatched",
+    "worker-pc capacity 1 occupied by SwarmAI retry05 run 35596577823; no result/branch yet",
     "V1.4 real E2E repair/rerun waiting behind runner source repair",
     "G14 live adaptive proof and LIVE-142 remain blocked/not started",
     "V2.0 integrated artifact set incomplete; 7-day reliability wall-clock campaign has not started"
@@ -233,7 +234,7 @@
     "infrastructure_repo": "pri8771/remote-workers",
     "project_authority": false,
     "worker": "worker-pc",
-    "worker_status": "online_capacity_1_currently_occupied_by_unrelated_run_35590523591",
+    "worker_status": "online_capacity_1_occupied_by_swarmai_retry05_run_35596577823",
     "attempts": [
       {
         "task_id": "swarmai-v13-task-pool-freeze-01",
@@ -279,11 +280,24 @@
         "swarmai_ci_run": 35587202715,
         "swarmai_ci": "failure_offline_pytest",
         "merge_authorized": false
+      },
+      {
+        "task_id": "swarmai-v13-task-pool-freeze-05",
+        "artifact_id": "ART-V13-TASK-POOL",
+        "packet_id": "EXT-WORKER-PC-V2B-001-R3",
+        "dispatch_commit": "d12ec01e9d741f4ac117c074190811a4d48d0e41",
+        "dispatch_run": 35596577823,
+        "dispatch_job": 106322668369,
+        "status": "in_progress_no_result_no_branch_at_lead_cutoff",
+        "result_present": false,
+        "worker_branch_present": false,
+        "expected_branch": "worker/swarmai-v13-task-pool-freeze-05",
+        "merge_authorized": false
       }
     ],
-    "next_packet": "EXT-WORKER-PC-V2B-001-R3",
+    "next_packet": null,
     "next_expected_branch": "worker/swarmai-v13-task-pool-freeze-05",
-    "next_action": "dispatch R3 only after worker-pc capacity is free; then independently review exact branch/commit, CI, independence groups, hidden-reference boundary and evidence provenance before any artifact promotion",
+    "next_action": "wait for retry05 to close; then independently review exact branch/commit, CI, independence groups, hidden-reference boundary and evidence provenance before any artifact promotion or new dispatch",
     "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
   }
 }
