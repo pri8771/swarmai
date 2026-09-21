@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `739368ce7cf468762f7005d52c03703f695fc3c8`
-- Coordination SHA: `bf63e94ceab85a01106a710666473cc3e92a8836`
-- Updated: `2026-09-21T18:19:31Z`
+- Branch SHA: `17bf3a1c939df291023048b59bfcec6c2805eae6`
+- Coordination SHA: `6a2dfb66539ed7cc6f190f354830036cd2131c9b`
+- Updated: `2026-09-21T18:20:02Z`
 - Trigger: `manual`
-- Status: **working**
-- Current packet: `A2-V14-MATERIALIZATION`
+- Status: **testing**
+- Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T18:19:30Z`
+- Last meaningful activity: `2026-09-21T18:20:01Z`
 - Spend USD: `0.0`
 - Blocker: HOST-WIN-DEV final executable verification unavailable on this Darwin host
 
 ## Update
 
-Pushed V14 materialization repair + empty-diff fail-closed (tests 5/5). G13 remains reviewable; HOST-WIN-DEV executable verification still blocked on Darwin. Next: broader regression then genuine real mission when prerequisites allow.
+Materialization repair at tip; G13 Mac HOST-WIN-DEV blocker recorded; starting v14-real-002 pre-run freeze then genuine local Ollama mission on worktree.py (not token_hash).
 
 ## Next
 
