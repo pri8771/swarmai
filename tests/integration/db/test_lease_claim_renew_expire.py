@@ -8,9 +8,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
-from sqlalchemy import text
-
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from swarm.contracts.common import new_id
 from swarm.contracts.enums import TaskStatus
