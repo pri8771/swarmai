@@ -106,6 +106,27 @@ async def test_capability_mismatch_blocks_dispatch() -> None:
 
 
 @pytest.mark.asyncio
+async def test_incompatible_head_does_not_block_eligible_task() -> None:
+    """V2A-H3: capability-mismatched head must not HOL-block a later eligible task."""
+    reg = WorkerRegistryService()
+    token = new_id("wt_")
+    w = await reg.register(_lease(capabilities=["chat", "tools"]), token=token)
+    blocked = sample_task().model_copy(
+        update={"id": new_id("tsk_"), "required_capabilities": ["vision.ocr"]}
+    )
+    eligible = sample_task().model_copy(
+        update={"id": new_id("tsk_"), "required_capabilities": ["chat"]}
+    )
+    reg.enqueue(blocked)
+    reg.enqueue(eligible)
+    claimed = await reg.claim_dispatch(w.worker_id, token=token)
+    assert claimed is not None
+    assert claimed.id == eligible.id
+    # Incompatible head remains queued for a capable worker (fairness).
+    assert reg._dispatch_queue[0].id == blocked.id  # noqa: SLF001
+
+
+@pytest.mark.asyncio
 async def test_lost_heartbeat_is_suspicion() -> None:
     reg = WorkerRegistryService(heartbeat_ttl_seconds=0)
     token = new_id("wt_")

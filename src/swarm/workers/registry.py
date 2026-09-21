@@ -91,19 +91,16 @@ class WorkerRegistryService:
             return None
         if worker_id in self._quarantine:
             return None
-        # Capability / runtime mismatch check.
-        while self._dispatch_queue:
-            task = self._dispatch_queue.pop(0)
+        # V2A-H3: scan for first eligible task; leave incompatible heads in place
+        # so they do not head-of-line block later compatible work (fairness preserved).
+        for index, task in enumerate(self._dispatch_queue):
             needed = set(task.required_capabilities)
             have = set(rec.lease.capabilities)
             if needed and not needed.issubset(have):
-                # Put back and skip — mismatch prevents dispatch.
-                self._dispatch_queue.insert(0, task)
-                return None
-            # Local-only privacy never migrates to unauthorized cloud.
+                continue
             if "local_only" in task.scopes and "local" not in rec.privacy_classes:
-                self._dispatch_queue.insert(0, task)
-                return None
+                continue
+            self._dispatch_queue.pop(index)
             rec.claimed_task_id = task.id
             return task
         return None

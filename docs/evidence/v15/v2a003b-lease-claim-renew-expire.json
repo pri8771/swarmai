@@ -1,0 +1,27 @@
+{
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "packet_id": "V2A-003b",
+  "hardening_packet_id": "V2A-H3",
+  "scenario": "atomic_claim_renew_expire_and_head_of_line",
+  "status": "pass",
+  "recorded_at": "2026-09-21T01:09:33.632813+00:00",
+  "candidate_sha": "PENDING_COMMIT",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "commands": [
+    "PYTHONPATH=src python -m pytest tests/workers/test_workers.py tests/integration/db/test_lease_claim_renew_expire.py tests/integration/db/test_lease_fencing_schema.py tests/db/test_token_hash.py -q",
+    "PYTHONPATH=src python -m pytest tests/integration/db/test_persistence.py -q"
+  ],
+  "results": {
+    "worker_h3_and_claim_tests": "21 passed (includes in-memory H3 + durable race/HOL/renew-expire)",
+    "persistence_regression": "8 passed",
+    "race_exactly_one_winner": true,
+    "incompatible_head_does_not_block_eligible": true,
+    "renew_expire_survives_new_session": true,
+    "privacy_mismatch_skips_without_mutation": true,
+    "api_routes_wired": false,
+    "accept_fencing_implemented": false,
+    "fairness": "claim candidates ordered by (priority ASC, created_at ASC); incompatible rows left unmutated",
+    "note": "V2A-003b claim/renew/expire + V2A-H3 only; result acceptance fence is V2A-003c"
+  }
+}
