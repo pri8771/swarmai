@@ -4,13 +4,29 @@ Curated 2026-09-20 after LEAD-20260920-016. `ARTIFACT_REGISTRY.json` is canonica
 
 ## Authority and operating model
 
-Owner authorized implementation through V1.4 inclusive. ChatGPT leads artifact design, decomposition, research, statistics and independent review; Cursor is implementation workhorse and should receive most SP1-SP3 code/test/evidence work. Versions are accepted artifact sets, not task counts. Main merge/release/public deployment/new spend/destructive actions/V1.5+ source implementation remain unauthorized. Future architecture/contracts may be advanced by lead in isolation.
+Owner resumed engineering after the abrupt V1.4 stop and authorized source implementation through V3.0. Major milestones are V1.7, V2.3 and V3.0; immediate target is a V2.0 implementation/artifact-complete candidate. Main merge/public release/additional spend remain separately gated. Required live/time-bound evidence remains honest wall-clock evidence and may finish after implementation.
 
-No operational demo data, fake readiness, known-answer substitution, mock-success fallback, quota bypass or invented live evidence. Isolated tests never satisfy live gates. Credentials/private identities/browser state stay outside Git.
+Project management is artifact-oriented. ChatGPT leads architecture/contracts/research/review and stays one artifact ahead. Two Cursor sessions do most implementation:
+- Session A: runtime/control plane/distributed/recovery + integration owner on `cursor/v2-runtime-lane` / `cursor/v2-integration`.
+- Session B: evaluation pools/knowledge/tools/product/beta on `cursor/v2-product-lane`.
+
+Execution: `V2_EXECUTION_PLAN.md` and `TWO_CURSOR_TEAM.md`.
 
 ## Current source
 
 Main `b9141fa…`. Draft PR #14 `cursor/v1.4-live-integration-11e2` @ `03d85540e36c36fa3a5c92a3082be9959d93f66d`. Application tree last materially changed at `d9da26c…`; later candidate changes are evidence/docs. Actions `35545174895` is green for offline+console. DB integration is honestly skipped without `SWARM_DATABASE_URL`; live-gated CI is notice-only, not live evidence.
+
+## V2 acceleration
+
+Three branches were created from the frozen V1.4 tip `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`: `cursor/v2-integration`, `cursor/v2-runtime-lane`, `cursor/v2-product-lane`.
+
+Session A first packets: close operational broker bypass (V2A-001 SP2), actual service process restart (V2A-002 SP1), durable worker lease schema/repository (V2A-003a SP2).
+
+Session B first packets: freeze G13 held-out/version manifest (V2B-001 SP2), reviewer calibration/freeze (V2B-002 SP3), provenance repository (V2B-003a SP2), action/approval/receipt contracts (V2B-004a SP2).
+
+Lead implementation-ready artifacts now exist for durable lease/fencing, provenance, approval binding, site authority/backup, extension contracts and V2.0 acceptance. Lead also drafted V2.3 operational-platform and V3 persistent-objective/learning architectures.
+
+Important reuse findings: worker generation/fencing already exists in memory; V1.5 is primarily durability/CAS + real multi-host proof. Memory already has bounded retrieval; V1.6 extends provenance/permissions/versioning. ToolGateway already has scope/payload approval/receipt primitives; V1.7 normalizes and extends them. Standalone Postgres/Alembic is enough for first recovery implementation.
 
 ## Artifact truth
 
@@ -38,6 +54,6 @@ Lead drafted substantive V1.5 distributed-worker architecture and `ART-V15-WORKE
 
 Only immediate human step for G10 is completing a live `cursor agent login` while its CLI waiter remains active, then confirming `cursor agent status` and `cursor agent whoami` authenticate. Do not clear the probe skip before that.
 
-## Operator abrupt stop (2026-09-21T00:12:38Z)
+## Historical abrupt stop
 
-V1.4 implementation halted mid-gate by operator. Candidate tip `03d85540e36c36fa3a5c92a3082be9959d93f66d`; main `b9141fa3150f853586dede0334a47b344571bc16` unmerged. Incomplete: CLI login / G10 FIX-004, G11 lead accept, remote INF-121, EVAL qualification, live G14, LIVE-142. See `V1_4_ABRUPT_STOP.md`.
+The 2026-09-21T00:12:38Z V1.4 stop remains historical evidence only and is superseded by the owner's explicit resume through V3.0. See `OWNER_RESUME_TO_V3.md`.
