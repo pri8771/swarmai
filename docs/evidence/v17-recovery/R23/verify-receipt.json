@@ -10,5 +10,6 @@
     "result": "7 passed"
   },
   "module": "src/swarm/knowledge/retrieval.py",
-  "note": "R23 verify-on-tip; no invent-accept."
+  "note": "R23 verify-on-tip; no invent-accept.",
+  "evidence_tip_sha": "0088d2cbb7eb8ac75334c2d5571411e3518b7d44"
 }
