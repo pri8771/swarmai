@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `fe6acbf6097bb32250115c5cd8b6a21acf9d060a`
-- Coordination SHA: `3088b7bc8fc917d9d9a26595dc1705bc20b00e2f`
-- Updated: `2026-09-21T18:38:18Z`
-- Trigger: `scheduler`
+- Branch SHA: `f06fd1f40963c8f1b33a9529413479b7fab6dc7d`
+- Coordination SHA: `5877394486308a8ce3f5b083ba769de2f3272e6b`
+- Updated: `2026-09-21T18:39:19Z`
+- Trigger: `manual`
 - Status: **working**
 - Current packet: `V2A-003c`
 - Current artifact: `ART-V15-LEASE-FENCING`
-- Last meaningful activity: `2026-09-21T18:34:19Z`
+- Last meaningful activity: `2026-09-21T18:39:18Z`
 - Spend USD: `0.0`
-- Blocker: ART-V13-TASK-POOL needs HOST-WIN-DEV; ART-V14 awaits lead review (not self-accepted)
+- Blocker: G13/ART-V13-TASK-POOL: HOST-WIN-DEV unavailable on Darwin; ART-V14-REAL-E2E drafting pending independent review
 
 ## Update
 
-Bringing reviewed V2A-003a/b lease foundation from donor; implementing V2A-003c result-acceptance fence. V14-real-005 still drafting pending lead review; G13 HOST-WIN-DEV blocked.
+V1.5/V2A-003c accept fence landed (ddd96a6); tests 40 pass/$0. ART-V14-REAL-E2E still drafting (await lead). G13 still HOST-WIN-DEV blocked. Multi-host live evidence UNKNOWN.
 
 ## Next
 
