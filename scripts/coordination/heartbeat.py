@@ -158,16 +158,28 @@ def main() -> int:
     )
     cadence = int(hb_state.get("worker_effective_cadence_minutes") or 15)
 
-    local_state = load_json(local_state_path, {"last_sent_epoch": 0.0})
+    # Scheduler cadence is tracked independently from manual/work heartbeats.
+    # A forced packet-status update must never reset/suppress the 15-minute
+    # scheduler proof clock.
+    local_state = load_json(
+        local_state_path,
+        {"last_sent_epoch": 0.0, "last_scheduler_sent_epoch": 0.0},
+    )
     now_epoch = time.time()
     last_sent = float(local_state.get("last_sent_epoch") or 0.0)
-    if not args.force and last_sent and (now_epoch - last_sent) < cadence * 60 * 0.8:
+    last_scheduler_sent = float(local_state.get("last_scheduler_sent_epoch") or 0.0)
+    if (
+        args.trigger == "scheduler"
+        and not args.force
+        and last_scheduler_sent
+        and (now_epoch - last_scheduler_sent) < cadence * 60 * 0.8
+    ):
         print(
             json.dumps(
                 {
-                    "status": "skipped_not_due",
+                    "status": "skipped_scheduler_not_due",
                     "effective_cadence_minutes": cadence,
-                    "last_sent_epoch": last_sent,
+                    "last_scheduler_sent_epoch": last_scheduler_sent,
                 },
                 indent=2,
             )
@@ -226,6 +238,9 @@ def main() -> int:
             "effective_cadence_minutes": cadence,
         }
     )
+    if args.trigger == "scheduler":
+        local_state["last_scheduler_sent_epoch"] = now_epoch
+        local_state["last_scheduler_sent_at"] = observed_at
     write_json_private(local_state_path, local_state)
     print(json.dumps(entry, indent=2))
     return 0
