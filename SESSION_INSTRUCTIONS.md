@@ -38,6 +38,19 @@ B3: `V2B-003a+H1 / ART-V16-PROVENANCE / SP2` — versioned project-scoped knowle
 B4: `V2B-004a+H4 / ART-V17-APPROVAL-BINDING / SP2` — ActionEnvelope/ApprovalGrant/ActionReceipt with mandatory project identity, no production proj_demo default, exact actor/project/integration/operation/destination/payload/effect binding, expiry/revocation.
 Then continue newest B queue: permission-first retrieval -> supersession/deletion -> effect-key semantics -> extensions -> beta/non-demo selfdev.
 
+## Owner priority override — G13 critical path
+
+G13 is now higher priority than V1.6/V1.7 product expansion.
+
+After B0 integration sync:
+1. **B1 / V2B-001** freeze calibration vs held-out task/version manifest.
+2. **B2 / V2B-002** repair/freeze reviewer benchmark/scorer using calibration only.
+3. As soon as B1 is lead-verified, start **W-131B counted held-out qualification** in frozen five-observation batches; do not defer this behind provenance/tools work.
+4. After B2 freeze, run held-out reviewer-role qualification needed for G14.
+5. Only then return to B3 provenance / B4 approval contracts unless a newer lead message explicitly reorders.
+
+Preserve all failures and all overhead. No held-out contamination, threshold changes after results, or qualification self-claims.
+
 ## Ownership boundary
 Do NOT edit without explicit handoff: `src/swarm/api/store.py`, `routes_v1.py`, `schemas.py`, `cli.py`, `src/swarm/db/models.py`, `migrations/**`, `pyproject.toml`, `uv.lock`.
 Implement owned domain modules/tests and send Session A an integration note.
