@@ -1,73 +1,139 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-21T01:02:52Z",
-  "history": {"previous_blob_sha":"b99930d2fd8f0789fc591ceec980899da15baddc","note":"Normalized after independent review of Session A V2A-001/V2A-002; previous packet detail remains in Git history."},
-  "purpose": "Prospective evidence-backed worker performance calibration by story-point size. Story points measure complexity/risk, not time.",
+  "updated_at": "2026-09-21T01:10:40Z",
+  "history": {
+    "previous_blob_sha": "ab34b97b9ceb5bb058d32816c7190d77f961ca13",
+    "note": "Compacted to reviewed packet evidence plus current calibration. Full earlier packet inventory remains in Git history; active work is canonical in WORKER_PACKET_BACKLOG.md."
+  },
+  "purpose": "Evidence-backed worker calibration by story-point complexity. Story points are not hours.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
-  "worker_types": ["Cursor", "Cursor Session A", "Cursor Session B"],
   "aggregation_policy": {
     "minimum_completed_packets_for_stable_bucket_summary": 5,
-    "metrics": ["completed_count","first_lead_review_acceptance_rate","first_pass_ci_rate_where_applicable","median_rework_cycles","reopened_defects","evidence_complete_first_submission_rate","blocker_distribution"],
     "historical_pre_protocol_work_counts_for_calibration": false,
-    "duplicate_packet_intents_are_counted_once": true
+    "duplicate_packet_intents_are_counted_once": true,
+    "first_lead_review_acceptance_requires_no_changes_requested": true
   },
   "story_point_summary": {
-    "1": {"completed":2,"stable":false,"reviewed_packets":2,"first_lead_review_acceptance_rate":1.0,"note":"W-131A and V2A-002; W-111C superseded by V2A-002 and not double-counted."},
-    "2": {"completed":3,"stable":false,"reviewed_packets":4,"first_lead_review_acceptance_rate":0.75,"note":"W-111A, W-121A, V2A-001 completed; W-111B required changes. W-122A superseded by V2A-001."},
-    "3": {"completed":0,"stable":false},
-    "4": {"completed":0,"stable":false},
-    "5": {"completed":0,"stable":false}
+    "1": {
+      "completed_lead_verified": 2,
+      "reviewed_packets": 2,
+      "first_lead_review_acceptance_rate": 1.0,
+      "stable": false,
+      "reviewed_packet_ids": ["W-131A", "V2A-002"]
+    },
+    "2": {
+      "completed_lead_verified": 3,
+      "reviewed_packets": 5,
+      "first_lead_review_acceptance_rate": 0.6,
+      "stable": false,
+      "reviewed_packet_ids": ["W-111A", "W-111B", "W-121A", "V2A-001", "V2A-003a"]
+    },
+    "3": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false},
+    "4": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false},
+    "5": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false}
   },
-  "packets": [
-    {"packet_id":"W-041A","story_points":1,"gate":"G10","artifact_id":"ART-V10-WORKER-HEARTBEAT","task_family":"infra/auth","status":"blocked_external_human_auth","worker":"Cursor","first_pass_ci":"not_applicable","first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-041B","story_points":2,"gate":"G10","artifact_id":"ART-V10-WORKER-HEARTBEAT","task_family":"infra/live-evidence","status":"queued_blocked_on_w041a","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-041C","story_points":2,"gate":"G10","artifact_id":"ART-V10-WORKER-HEARTBEAT","task_family":"infra/live-evidence","status":"queued_blocked_on_w041b","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-111A","story_points":2,"gate":"G11","artifact_id":"ART-V11-MULTISURFACE-EVIDENCE","task_family":"ui/integration","status":"completed_lead_verified","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"accepted","rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"c1ebf20abb10c53c0209dcc15bfa5bf89efba510","completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"},
-    {"packet_id":"W-111B","story_points":2,"gate":"G11","artifact_id":"ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE","task_family":"integration/live-evidence","status":"changes_required_split_restart_followup","worker":"Cursor","first_pass_ci":"success_current_descendant_35545174895","first_lead_review":"changes_required","rework_cycles":1,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"c1ebf20abb10c53c0209dcc15bfa5bf89efba510","completion_sha":"d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"},
-    {"packet_id":"W-111C","story_points":1,"gate":"G11","artifact_id":"ART-V11-RESTART-EVIDENCE","task_family":"integration/live-evidence","status":"superseded_by_V2A-002","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-121A","story_points":2,"gate":"G12","artifact_id":"ART-V12-PROVIDER-ELIGIBILITY","task_family":"provider/live-evidence","status":"completed_lead_verified_blocked_result","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"724a324b77d60fff143674feecec9239062e9c3c","completion_sha":"19b91ba89bfac5d670af0d766f21f4b9f2ca1a62"},
-    {"packet_id":"W-121B","story_points":3,"gate":"G12","artifact_id":"ART-V12-REMOTE-OVERLAP","task_family":"provider/integration","status":"blocked_on_zero_admissible_remotes","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-122A","story_points":2,"gate":"G12","artifact_id":"ART-V12-BROKER-CONTRACT","task_family":"provider/runtime-integration","status":"superseded_by_V2A-001","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-131A","story_points":1,"gate":"G13","artifact_id":"ART-V13-SCREENING-MATRIX","task_family":"evaluation/data","status":"completed_lead_verified","worker":"Cursor","first_pass_ci":"success_35545174895","first_lead_review":"accepted","rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"724a324b77d60fff143674feecec9239062e9c3c","completion_sha":"03d85540e36c36fa3a5c92a3082be9959d93f66d"},
-    {"packet_id":"W-131B","story_points":2,"gate":"G13","artifact_id":"ART-V13-QUALIFIED-MATRIX","task_family":"evaluation/live-evidence","status":"blocked_on_task_pool_freeze","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-131C1","story_points":2,"gate":"G13","artifact_id":"ART-V13-TASK-POOL","task_family":"evaluation/data-contract","status":"ready_alias_of_V2B-001","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-131C2","story_points":3,"gate":"G13","artifact_id":"ART-V13-REVIEWER-QUALIFICATION","task_family":"evaluation/integration","status":"ready_alias_of_V2B-002_calibration_only","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141A","story_points":1,"gate":"G14","artifact_id":"ART-V14-ROLE-MANIFEST","task_family":"orchestration/config","status":"blocked_on_G13","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141B1","story_points":2,"gate":"G14","artifact_id":"ART-V14-LIVE-ADAPTIVE-PROOF","task_family":"orchestration/instrumentation","status":"blocked_on_G13","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141B2","story_points":3,"gate":"G14","artifact_id":"ART-V14-LIVE-ADAPTIVE-PROOF","task_family":"orchestration/integration","status":"blocked_on_G13_G12","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141B3","story_points":3,"gate":"G14","artifact_id":"ART-V14-LIVE-ADAPTIVE-PROOF","task_family":"orchestration/live-evidence","status":"blocked_on_W-141B2","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141B4","story_points":2,"gate":"G14","artifact_id":"ART-V14-LIVE-ADAPTIVE-PROOF","task_family":"observability/live-evidence","status":"blocked_on_W-141B2","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"W-141C","story_points":3,"gate":"G14","artifact_id":"ART-V14-MODE-COMPARISON","task_family":"evaluation/integration","status":"blocked_on_G14","worker":"Cursor","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-
-    {"packet_id":"V2A-001","artifact_id":"ART-V12-BROKER-CONTRACT","story_points":2,"gate":"G12/V2 runtime","task_family":"code/integration","status":"completed_lead_verified","worker":"Cursor Session A","first_pass_ci":"success_35548643473","first_lead_review":"accepted","rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea","completion_sha":"c3df96ef074568e7a92dd2f6c6bfd070fe5374f3","completion_note":"Independent source/test review confirmed ProductStore generic execution injects the governed project-scoped broker; require_broker denial/missing/unregistered-route regressions prevent direct local_chat bypass."},
-    {"packet_id":"V2A-002","artifact_id":"ART-V11-RESTART-EVIDENCE","story_points":1,"gate":"G11","task_family":"live-evidence","status":"completed_lead_verified","worker":"Cursor Session A","first_pass_ci":"success_35549111809","first_lead_review":"accepted","rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":true,"base_sha":"c3df96ef074568e7a92dd2f6c6bfd070fe5374f3","completion_sha":"48a02e3daae13f8fb569225e2d030097229f4780","evidence_sha":"ee5a06612aa2e4409fa8bbfd1969225c16887615","completion_note":"Independent review confirmed actual uvicorn PID stop/start, first process exit, same durable mission/disk hash reopened through HTTP and a separate CLI process."},
-    {"packet_id":"V2A-003a","artifact_id":"ART-V15-LEASE-FENCING","story_points":2,"gate":"V1.5","task_family":"code/db","status":"ready","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-003b","artifact_id":"ART-V15-LEASE-FENCING","story_points":2,"gate":"V1.5","task_family":"code/integration","status":"blocked_on_V2A-003a","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-003c","artifact_id":"ART-V15-LEASE-FENCING","story_points":2,"gate":"V1.5","task_family":"code/security","status":"blocked_on_V2A-003b","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-004","artifact_id":"ART-V15-WORKER-PROTOCOL","story_points":3,"gate":"V1.5","task_family":"integration","status":"blocked_on_V2A-003c","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-003X","artifact_id":"ART-V15-DBOS-REUSE","story_points":2,"gate":"V1.5","task_family":"architecture-spike","status":"blocked_on_V2A-003a","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-H2","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":1,"gate":"V2.0","task_family":"security/db","status":"ready_fold_into_V2A-003a","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-H3","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":2,"gate":"V2.0","task_family":"scheduler/integration","status":"ready_after_V2A-003a","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-H6A","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":2,"gate":"V2.0","task_family":"deploy/security","status":"ready_after_worker_store","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2A-H8","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":3,"gate":"V2.0","task_family":"recovery/integration","status":"blocked_on_site_epoch","worker":"Cursor Session A","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-
-    {"packet_id":"V2B-001","artifact_id":"ART-V13-TASK-POOL","story_points":2,"gate":"G13","task_family":"evaluation/data","status":"ready","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-002","artifact_id":"ART-V13-REVIEWER-QUALIFICATION","story_points":3,"gate":"G13","task_family":"evaluation/integration","status":"ready_calibration_only","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-003a","artifact_id":"ART-V16-PROVENANCE","story_points":2,"gate":"V1.6","task_family":"code/data","status":"ready","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-003b","artifact_id":"ART-V16-PERMISSION-RETRIEVAL","story_points":2,"gate":"V1.6","task_family":"code/retrieval","status":"blocked_on_V2B-003a","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-004a","artifact_id":"ART-V17-APPROVAL-BINDING","story_points":2,"gate":"V1.7","task_family":"code/contracts","status":"ready","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-004b","artifact_id":"ART-V17-APPROVAL-BINDING","story_points":2,"gate":"V1.7","task_family":"code/integration","status":"blocked_on_V2B-004a","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-H1","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":2,"gate":"V2.0","task_family":"memory/security","status":"ready_fold_into_V2B-003a","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-H4","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":1,"gate":"V2.0","task_family":"tools/security","status":"ready_fold_into_V2B-004a","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-H5","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":2,"gate":"V2.0","task_family":"tools/idempotency","status":"ready_after_V2B-004a","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-H9","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":3,"gate":"V1.9","task_family":"selfdev/integration","status":"ready_after_extension_contract","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null},
-    {"packet_id":"V2B-H10","artifact_id":"ART-V20-FOUNDATION-HARDENING","story_points":1,"gate":"V2.0","task_family":"docs/product","status":"blocked_on_integrated_behavior","worker":"Cursor Session B","first_pass_ci":null,"first_lead_review":null,"rework_cycles":0,"reopened_defect":false,"evidence_complete_first_submission":null}
+  "reviewed_packets": [
+    {
+      "packet_id": "W-111A",
+      "story_points": 2,
+      "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+    },
+    {
+      "packet_id": "W-111B",
+      "story_points": 2,
+      "artifact_id": "ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+      "note": "Control evidence accepted; restart portion required real OS process restart and was later superseded by V2A-002."
+    },
+    {
+      "packet_id": "W-121A",
+      "story_points": 2,
+      "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62",
+      "note": "Truthful blocked result: zero admissible remote routes."
+    },
+    {
+      "packet_id": "W-131A",
+      "story_points": 1,
+      "artifact_id": "ART-V13-SCREENING-MATRIX",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d"
+    },
+    {
+      "packet_id": "V2A-001",
+      "story_points": 2,
+      "artifact_id": "ART-V12-BROKER-CONTRACT",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35548643473",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+      "note": "Generic ProductStore execution now injects governed project-scoped broker; direct local_chat bypass is fail-closed under broker-required operation."
+    },
+    {
+      "packet_id": "V2A-002",
+      "story_points": 1,
+      "artifact_id": "ART-V11-RESTART-EVIDENCE",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35549111809",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "48a02e3daae13f8fb569225e2d030097229f4780",
+      "evidence_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+      "note": "Actual uvicorn PID stop/start plus same durable mission/disk hash reopened through HTTP and separate CLI."
+    },
+    {
+      "packet_id": "V2A-003a",
+      "story_points": 2,
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35549624046",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": false,
+      "completion_sha": "630ab780ab45858c5dad4075be143cfa145e975f",
+      "evidence_sha": "37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b",
+      "positive_findings": [
+        "extends existing worker/task-attempt schema rather than creating a competing authority",
+        "adds task_leases and worker_results repositories",
+        "raw membership token has no database column and current hash/roundtrip tests pass",
+        "current-tip CI is green"
+      ],
+      "changes_required": [
+        "ART-V15-DURABLE-SCHEMA requires migration-up evidence with representative rows created under the previous schema. Current test_migration_preserves_legacy_worker_and_attempt_rows creates current Base metadata first and inserts legacy-shaped nullable rows; it does not exercise Alembic upgrade from down_revision with populated legacy rows.",
+        "V2A-H2 requires revocation/rotation evidence. Current submission verifies hash/mismatch and raw-token absence but has no durable revoke/rotate lifecycle test.",
+        "Add a bounded regression for raw-token-like fields nested inside metadata or replace free-form token-sensitive metadata with a typed/sanitized boundary; current _assert_no_raw_token_fields checks only top-level resource_payload keys."
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V2A-003a-R"
+    }
   ],
-  "historical_context": [
-    {"work":"FIX-001","note":"pre-protocol; do not use in calibrated aggregate"},
-    {"work":"FIX-002","note":"pre-protocol; do not use in calibrated aggregate"},
-    {"work":"FIX-003","note":"pre-protocol; do not use in calibrated aggregate"},
-    {"work":"FIX-005","note":"pre-protocol; do not use in calibrated aggregate"}
-  ]
+  "superseded_duplicate_intents": [
+    {"packet_id":"W-111C","superseded_by":"V2A-002"},
+    {"packet_id":"W-122A","superseded_by":"V2A-001"}
+  ],
+  "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md"
 }
