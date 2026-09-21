@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:31:00Z",
+  "updated_at": "2026-09-21T00:38:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -1154,12 +1154,12 @@
       "owner": "ChatGPT lead + Cursor Session B",
       "lane": "product",
       "status": "drafting",
-      "path_or_source_ref": "docs/artifacts/future/ART-V20-ACCEPTANCE.md",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-SUPPORT_MATRIX_TEMPLATE.md",
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
       "worker_packets": [],
-      "next_action": "derive supported/experimental/blocked matrix from integrated evidence",
+      "next_action": "Session B populate only from integrated evidence; lead verifies support classes",
       "blockers": [
         "integrated candidate not ready"
       ]
@@ -1171,13 +1171,13 @@
       "kind": "integration-evidence",
       "owner": "Cursor Session B",
       "lane": "product",
-      "status": "planned",
-      "path_or_source_ref": null,
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-INSTALL_UPGRADE_PROTOCOL.md",
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
       "worker_packets": [],
-      "next_action": "implement clean install/upgrade/support bundle and run journey",
+      "next_action": "Session A/B implement clean install protocol in owned surfaces",
       "blockers": [
         "integrated candidate"
       ]
@@ -1189,13 +1189,13 @@
       "kind": "integration-evidence",
       "owner": "Cursor Session A",
       "lane": "runtime",
-      "status": "planned",
-      "path_or_source_ref": null,
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-INSTALL_UPGRADE_PROTOCOL.md",
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
       "worker_packets": [],
-      "next_action": "define migration snapshot + rollback limitations and test",
+      "next_action": "Session A implement migration/backup restore path; Session B extension/operator compatibility",
       "blockers": [
         "integrated candidate"
       ]
@@ -1246,13 +1246,13 @@
       "kind": "analysis-evidence",
       "owner": "Cursor + ChatGPT lead",
       "lane": "integration",
-      "status": "planned",
-      "path_or_source_ref": null,
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-PERFORMANCE_BASELINE.md",
       "dependencies": [
         "ART-V20-INTEGRATED-CANDIDATE"
       ],
       "worker_packets": [],
-      "next_action": "measure latency/throughput/overhead/resource use on supported journeys",
+      "next_action": "instrument and run after integrated candidate",
       "blockers": [
         "integrated candidate"
       ]
