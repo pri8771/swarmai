@@ -50,6 +50,14 @@ _RUNNABLE_MISSION_STATUSES = frozenset(
 _DEPENDENCY_DONE_STATUSES = frozenset({"accepted", "completed"})
 _NON_DISPATCHABLE_ON_STALE_EXPIRE = "superseded"
 _CANCELLED_ON_EXPIRE = "cancelled"
+# Terminal task states that must never renew even if the mission is still runnable.
+_TERMINAL_TASK_STATUSES = frozenset(
+    {"accepted", "rejected", "failed", "cancelled", "superseded"}
+)
+# Attempt statuses that are no longer renewable.
+_TERMINAL_ATTEMPT_STATUSES = frozenset(
+    {"succeeded", "failed", "cancelled", "expired", "accepted"}
+)
 
 
 class RawTokenPersistenceError(ValueError):
@@ -590,7 +598,7 @@ class LeaseLifecycleService:
                 attempt.terminal_at = clock
             task = self.session.get(TaskRow, lease.task_id)
             if task is not None and task.status == "leased":
-                task.status = self._expire_task_status(task)
+                task.status = self._expire_task_status(task, lease=lease, attempt=attempt)
             expired_ids.append(lease.lease_id)
         self.session.flush()
         return expired_ids
@@ -668,6 +676,8 @@ class LeaseLifecycleService:
         task = self.session.get(TaskRow, lease.task_id)
         if task is None:
             raise LeaseRenewError("task_missing")
+        if task.status in _TERMINAL_TASK_STATUSES:
+            raise LeaseRenewError(f"task_terminal:{task.status}")
         if task.project_id != lease.project_id:
             raise LeaseRenewError("task_project_mismatch")
         if lease.task_revision is not None and int(task.graph_revision) != int(lease.task_revision):
@@ -679,6 +689,14 @@ class LeaseLifecycleService:
             raise LeaseRenewError("attempt_lease_mismatch")
         if attempt.project_id is not None and attempt.project_id != lease.project_id:
             raise LeaseRenewError("attempt_project_mismatch")
+        if attempt.status in _TERMINAL_ATTEMPT_STATUSES:
+            raise LeaseRenewError(f"attempt_terminal:{attempt.status}")
+        if attempt.terminal_at is not None:
+            raise LeaseRenewError("attempt_terminal_at_set")
+        if attempt.completed_at is not None:
+            raise LeaseRenewError("attempt_completed")
+        if attempt.accepted_result_id:
+            raise LeaseRenewError("attempt_accepted_result")
         mission = self._load_claimable_mission(task)
         if mission is None:
             raise LeaseRenewError("authority_stale")
@@ -697,6 +715,8 @@ class LeaseLifecycleService:
             and int(attempt.cancellation_generation) != int(mission.cancellation_generation)
         ):
             raise LeaseRenewError("attempt_cancellation_stale")
+        if int(attempt.task_revision) != int(mission.revision):
+            raise LeaseRenewError("attempt_revision_stale")
 
     @staticmethod
     def _renewal_expires_at(
@@ -723,17 +743,64 @@ class LeaseLifecycleService:
             return lease.expires_at
         return capped
 
-    def _expire_task_status(self, task: TaskRow) -> str:
-        """Return ready only when authority is still current; else non-dispatchable."""
-        mission = self._load_claimable_mission(task)
-        if mission is not None:
-            return _CLAIMABLE_TASK_STATUS
-        mission_row = self.session.get(MissionRow, task.mission_id)
-        if mission_row is None or mission_row.status == "cancelled":
+    def _expire_task_status(
+        self,
+        task: TaskRow,
+        *,
+        lease: TaskLeaseRow,
+        attempt: TaskAttemptRow | None,
+    ) -> str:
+        """Return ready only when lease/attempt/task authority is still current.
+
+        Compares lease/attempt stored revision/source/cancellation stamps to the
+        current durable mission authority so source drift is caught even when
+        TaskRow payload lacks the original source marker (V2A-003b-R2).
+        """
+        mission = self.session.get(MissionRow, task.mission_id)
+        if mission is None or mission.status == "cancelled":
             return _CANCELLED_ON_EXPIRE
-        if mission_row.status not in _RUNNABLE_MISSION_STATUSES:
+        if mission.status not in _RUNNABLE_MISSION_STATUSES:
             return _CANCELLED_ON_EXPIRE
-        return _NON_DISPATCHABLE_ON_STALE_EXPIRE
+        current_source = self._mission_source_revision(mission)
+        if self._lease_stamp_authority_stale(
+            lease=lease,
+            attempt=attempt,
+            task=task,
+            mission=mission,
+            current_source=current_source,
+        ):
+            return _NON_DISPATCHABLE_ON_STALE_EXPIRE
+        if self._load_claimable_mission(task) is None:
+            return _NON_DISPATCHABLE_ON_STALE_EXPIRE
+        return _CLAIMABLE_TASK_STATUS
+
+    @staticmethod
+    def _lease_stamp_authority_stale(
+        *,
+        lease: TaskLeaseRow,
+        attempt: TaskAttemptRow | None,
+        task: TaskRow,
+        mission: MissionRow,
+        current_source: str,
+    ) -> bool:
+        """True when lease/attempt stamps disagree with current durable authority."""
+        if int(task.graph_revision) != int(mission.revision):
+            return True
+        if lease.task_revision is not None and int(lease.task_revision) != int(mission.revision):
+            return True
+        if lease.source_revision is not None and str(lease.source_revision) != current_source:
+            return True
+        if int(lease.cancellation_generation) != int(mission.cancellation_generation):
+            return True
+        if attempt is None:
+            return False
+        if int(attempt.task_revision) != int(mission.revision):
+            return True
+        if attempt.source_revision is not None and str(attempt.source_revision) != current_source:
+            return True
+        if int(attempt.cancellation_generation) != int(mission.cancellation_generation):
+            return True
+        return False
 
     def _dependencies_satisfied(self, task: TaskRow) -> bool:
         """True when every dependency is accepted/completed for same mission/project/graph."""

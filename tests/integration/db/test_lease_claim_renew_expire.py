@@ -19,7 +19,7 @@ from swarm.db.lease_fencing import (
     LeaseRenewError,
     WorkerRegistrationRepository,
 )
-from swarm.db.models import Base, MissionRow, TaskLeaseRow, TaskRow
+from swarm.db.models import Base, MissionRow, TaskAttemptRow, TaskLeaseRow, TaskRow
 from swarm.db.repositories import MissionRepository
 
 pytestmark = pytest.mark.integration
@@ -702,3 +702,158 @@ def test_renew_caps_expires_at_to_renewable_until(session) -> None:
             extend_seconds=10,
             now=just_before,
         )
+
+
+def test_renew_rejects_terminal_task_status(session) -> None:
+    """V2A-003b-R2: terminal TaskRow cannot renew even if mission stays runnable."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    task = _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session)
+    claimed = svc.claim_eligible_attempt(worker_id=worker_id, membership_token=token)
+    session.flush()
+    assert claimed is not None
+
+    row = session.get(TaskRow, task.id)
+    assert row is not None
+    row.status = "accepted"
+    session.flush()
+
+    with pytest.raises(LeaseRenewError, match="task_terminal:accepted"):
+        svc.renew_lease(
+            lease_id=claimed.lease_id,
+            worker_id=worker_id,
+            worker_generation=claimed.worker_generation,
+            membership_token=token,
+        )
+
+
+def test_renew_rejects_accepted_attempt(session) -> None:
+    """V2A-003b-R2: attempt with accepted_result_id / terminal markers cannot renew."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session)
+    claimed = svc.claim_eligible_attempt(worker_id=worker_id, membership_token=token)
+    session.flush()
+    assert claimed is not None
+
+    attempt = session.get(TaskAttemptRow, claimed.attempt_id)
+    assert attempt is not None
+    attempt.accepted_result_id = new_id("res_")
+    attempt.status = "succeeded"
+    attempt.terminal_at = claimed.expires_at
+    session.flush()
+
+    with pytest.raises(LeaseRenewError, match="attempt_terminal|attempt_accepted_result"):
+        svc.renew_lease(
+            lease_id=claimed.lease_id,
+            worker_id=worker_id,
+            worker_generation=claimed.worker_generation,
+            membership_token=token,
+        )
+
+
+def test_expire_source_drift_via_lease_stamp_never_requeues(session) -> None:
+    """V2A-003b-R2: mission source drift after claim keeps expired task non-dispatchable.
+
+    TaskRow payload intentionally omits source_revision so task-only checks would
+    miss the drift; lease/attempt stamps must fence it.
+    """
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    task = _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    # Ensure payload has no source_revision marker.
+    row = session.get(TaskRow, task.id)
+    assert row is not None
+    payload = dict(row.payload or {})
+    payload.pop("source_revision", None)
+    row.payload = payload
+    session.flush()
+
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session, default_lease_seconds=5)
+    claimed = svc.claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token, lease_seconds=5
+    )
+    session.flush()
+    assert claimed is not None
+    lease = session.get(TaskLeaseRow, claimed.lease_id)
+    assert lease is not None
+    assert lease.source_revision  # stamped at claim
+
+    msn = session.get(MissionRow, mission.id)
+    assert msn is not None
+    msn_payload = dict(msn.payload or {})
+    msn_payload["source_revision"] = "post_claim_source_v2"
+    msn.payload = msn_payload
+    session.flush()
+
+    past = claimed.expires_at + timedelta(seconds=1)
+    expired = svc.expire_leases(now=past)
+    session.flush()
+    assert claimed.lease_id in expired
+    task_row = session.get(TaskRow, task.id)
+    assert task_row is not None
+    assert task_row.status == "superseded"
+    assert task_row.status != "ready"
+
+
+def test_expire_cancellation_generation_drift_never_requeues(session) -> None:
+    """V2A-003b-R2: post-claim cancellation_generation bump keeps expired task non-ready."""
+    mission = _unique_mission()
+    MissionRepository(session).insert(mission)
+    session.flush()
+    task = _insert_ready_task(session, mission=mission, required_capabilities=["code.read"])
+    token = new_id("wt_")
+    worker_id = _register_worker(
+        session,
+        project_id=mission.project_id,
+        capabilities=["code.read"],
+        token=token,
+    )
+    svc = LeaseLifecycleService(session, default_lease_seconds=5)
+    claimed = svc.claim_eligible_attempt(
+        worker_id=worker_id, membership_token=token, lease_seconds=5
+    )
+    session.flush()
+    assert claimed is not None
+
+    msn = session.get(MissionRow, mission.id)
+    assert msn is not None
+    msn.cancellation_generation = int(msn.cancellation_generation) + 1
+    # Keep mission runnable so only stamp drift fences expiry.
+    assert msn.status == "running"
+    session.flush()
+
+    past = claimed.expires_at + timedelta(seconds=1)
+    expired = svc.expire_leases(now=past)
+    session.flush()
+    assert claimed.lease_id in expired
+    task_row = session.get(TaskRow, task.id)
+    assert task_row is not None
+    assert task_row.status == "superseded"
+    assert task_row.status != "ready"
