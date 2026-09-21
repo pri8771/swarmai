@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:45:11Z",
+  "updated_at": "2026-09-21T00:56:38Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -311,23 +311,24 @@
       "artifact_id": "ART-V11-RESTART-EVIDENCE",
       "target_version": "1.1",
       "owner": "Cursor",
-      "status": "drafting",
-      "path_or_source_ref": "docs/evidence/g11/restart-reopen-operational.json",
+      "status": "reviewable",
+      "path_or_source_ref": "cursor/v2-runtime-lane@48a02e3daae13f8fb569225e2d030097229f4780",
       "dependencies": [
         "ART-V11-MISSION-PATH"
       ],
       "evidence_refs": [
-        "partial: new create_app instance reopens durable ID"
+        "docs/evidence/g11/process-restart-reopen-operational.json @ ee5a06612aa2e4409fa8bbfd1969225c16887615",
+        "scripts/v2a002_process_restart_evidence.py",
+        "tests/api/test_art_v11_process_restart.py"
       ],
       "worker_packets": [
-        "W-111B",
+        "V2A-002",
         "W-111C"
       ],
       "story_points_next": 1,
-      "next_action": "perform actual service process stop/start and reopen same mission from another interface",
-      "blockers": [
-        "current evidence is object/app recreation, not actual service process restart"
-      ]
+      "next_action": "lead review of actual OS process restart evidence; do not self-accept",
+      "blockers": [],
+      "notes": "Session A proposed reviewable after real uvicorn PID stop/start + HTTP/CLI reopen"
     },
     {
       "artifact_id": "ART-V11-APPLY-BOUNDARY",
