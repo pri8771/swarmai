@@ -1,0 +1,382 @@
+{
+  "schema_version": "1.0",
+  "status": "active_recovery_plan_not_worker_started_until_operator_prompt",
+  "generated_at": "2026-09-21T18:35:00Z",
+  "branch": "cursor/v17-single-session",
+  "session": "CURSOR-V17-SINGLE",
+  "max_active_implementation_sessions": 1,
+  "heartbeat_producers": 1,
+  "packet_rule": "one_small_packet_per_commit; blocked external packet does not block dependency-independent packets",
+  "live_checkpoint_protocol": "docs/coordination/V17_LIVE_CHECKPOINT_PROTOCOL.md",
+  "audit": "docs/coordination/V17_CODE_AUDIT_20260921_1432.md",
+  "plan": "docs/coordination/V17_RECOVERY_PLAN_ARTIFACT_FIRST.md",
+  "packets": [
+    {
+      "id": "R00",
+      "artifact": "cross-version-verification",
+      "depends": [],
+      "type": "infra",
+      "goal": "Classify GitHub Actions pre-step failures; package CP0 local exact-tip deterministic health.",
+      "checkpoint": "CP0",
+      "status": "planned"
+    },
+    {
+      "id": "R01",
+      "artifact": "ART-V14-REAL-E2E",
+      "depends": [
+        "R00"
+      ],
+      "type": "code",
+      "goal": "Ground reviewer in actual diff/target/focused regression; reject stale unrelated review.",
+      "status": "planned"
+    },
+    {
+      "id": "R02",
+      "artifact": "ART-V14-REAL-E2E",
+      "depends": [
+        "R01"
+      ],
+      "type": "live",
+      "goal": "New preregistered real mission; semantically correct patch + focused check + independent review.",
+      "checkpoint": "CP1",
+      "status": "planned"
+    },
+    {
+      "id": "R03",
+      "artifact": "ART-V13-TASK-POOL",
+      "depends": [
+        "R00"
+      ],
+      "type": "transplant",
+      "goal": "Selectively transplant G13 v3 corpus/freeze/verifier source+tests from product donor; exclude coordination daemons.",
+      "status": "planned"
+    },
+    {
+      "id": "R04",
+      "artifact": "ART-V13-TASK-POOL",
+      "depends": [
+        "R03"
+      ],
+      "type": "evidence",
+      "goal": "Run current-topology generator/verifier/Ruff/mypy/offline tests and bind frozen digests.",
+      "status": "planned"
+    },
+    {
+      "id": "R05",
+      "artifact": "ART-V13-REVIEWER-QUALIFICATION",
+      "depends": [
+        "R04"
+      ],
+      "type": "code",
+      "goal": "Reviewer input/scorer/calibration/contamination guard only.",
+      "status": "planned"
+    },
+    {
+      "id": "R06",
+      "artifact": "ART-V13-QUALIFIED-MATRIX",
+      "depends": [
+        "R04"
+      ],
+      "type": "lead_sensitive",
+      "goal": "Bind real sealed references without exposing held-out answers.",
+      "status": "planned"
+    },
+    {
+      "id": "R07",
+      "artifact": "ART-V13-QUALIFIED-MATRIX",
+      "depends": [
+        "R05",
+        "R06"
+      ],
+      "type": "live",
+      "goal": "Counted held-out qualification in 5-observation batches; frozen scorer/config.",
+      "status": "planned"
+    },
+    {
+      "id": "R08",
+      "artifact": "ART-V13-OVERHEAD-REPORT",
+      "depends": [
+        "R07"
+      ],
+      "type": "evidence",
+      "goal": "Compute actual planning/coordination/retry/review overhead.",
+      "status": "planned"
+    },
+    {
+      "id": "R09",
+      "artifact": "ART-V12-REMOTE-OVERLAP",
+      "depends": [
+        "R00"
+      ],
+      "type": "external_live",
+      "goal": "Admit at least two exact account-specific zero-charge remote routes or emit precise USER_ACTION blocker.",
+      "status": "planned"
+    },
+    {
+      "id": "R10",
+      "artifact": "ART-V12-REMOTE-OVERLAP",
+      "depends": [
+        "R09"
+      ],
+      "type": "live",
+      "goal": "Concurrent governed remote calls + reservation/settlement + disable-to-allowed-alternate.",
+      "status": "planned"
+    },
+    {
+      "id": "R11",
+      "artifact": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "depends": [
+        "R07",
+        "R10"
+      ],
+      "type": "live",
+      "goal": "Qualified adaptive multi-task mission with graph change/reviewer/bounded stop.",
+      "status": "planned"
+    },
+    {
+      "id": "R12",
+      "artifact": "ART-LIVE142-CAMPAIGN",
+      "depends": [
+        "R11"
+      ],
+      "type": "wall_clock",
+      "goal": "Start canonical wall-clock campaign immediately; run while later implementation continues.",
+      "status": "planned"
+    },
+    {
+      "id": "R13",
+      "artifact": "ART-V15-LEASE-FENCING",
+      "depends": [
+        "R00"
+      ],
+      "type": "transplant",
+      "goal": "Port durable lease schema/foundation donor source 630ab780 + 92f59faf source/tests only.",
+      "status": "planned"
+    },
+    {
+      "id": "R14",
+      "artifact": "ART-V15-LEASE-FENCING",
+      "depends": [
+        "R13"
+      ],
+      "type": "transplant",
+      "goal": "Port claim/renew/expire donor source 7dcefe4c + e764834a + 685810cc source/tests only.",
+      "status": "planned"
+    },
+    {
+      "id": "R15",
+      "artifact": "ART-V15-LEASE-FENCING",
+      "depends": [
+        "R14"
+      ],
+      "type": "code",
+      "goal": "Durable result acceptance fence with project/task/source/generation/lease/cancel/reservation/uniqueness negatives.",
+      "status": "planned"
+    },
+    {
+      "id": "R16",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R15"
+      ],
+      "type": "code",
+      "goal": "Durable worker enrollment/capability/claim/renew/drain/cancel/result service.",
+      "status": "planned"
+    },
+    {
+      "id": "R17",
+      "artifact": "ART-V15-RECOVERY-EVIDENCE",
+      "depends": [
+        "R16"
+      ],
+      "type": "live",
+      "goal": "Local separate-process kill/expiry/reassign/stale-result/exactly-one-accept proof.",
+      "checkpoint": "CP3",
+      "status": "planned"
+    },
+    {
+      "id": "R18",
+      "artifact": "ART-V15-MULTIHOST-EVIDENCE",
+      "depends": [
+        "R16"
+      ],
+      "type": "external_live",
+      "goal": "Actual second-host worker proof if accessible; otherwise exact blocker.",
+      "status": "planned"
+    },
+    {
+      "id": "R19",
+      "artifact": "ART-V16-PROVENANCE",
+      "depends": [
+        "R00"
+      ],
+      "type": "code",
+      "goal": "KnowledgeItem/KnowledgeLink/Tombstone versioned contracts.",
+      "status": "planned"
+    },
+    {
+      "id": "R20",
+      "artifact": "ART-V16-PROVENANCE",
+      "depends": [
+        "R19"
+      ],
+      "type": "code",
+      "goal": "Durable project-scoped versioned knowledge repository.",
+      "status": "planned"
+    },
+    {
+      "id": "R21",
+      "artifact": "ART-V16-PERMISSION-RETRIEVAL",
+      "depends": [
+        "R20"
+      ],
+      "type": "code",
+      "goal": "Permission candidate prefilter before ranking; no cross-project existence leak.",
+      "status": "planned"
+    },
+    {
+      "id": "R22",
+      "artifact": "ART-V16-PERMISSION-RETRIEVAL",
+      "depends": [
+        "R21"
+      ],
+      "type": "code",
+      "goal": "Permitted-only ranking/context + retrieval receipt/provenance/token cost.",
+      "status": "planned"
+    },
+    {
+      "id": "R23",
+      "artifact": "ART-V16-SUPERSESSION",
+      "depends": [
+        "R20"
+      ],
+      "type": "code",
+      "goal": "Contradiction/supersession/deletion/tombstone and dependent invalidation.",
+      "status": "planned"
+    },
+    {
+      "id": "R24",
+      "artifact": "ART-V16-PROVENANCE",
+      "depends": [
+        "R20",
+        "R23"
+      ],
+      "type": "code",
+      "goal": "Conservative legacy MemoryStore adapter; no auto accepted_fact promotion.",
+      "status": "planned"
+    },
+    {
+      "id": "R25",
+      "artifact": "ART-V16-CONTEXT-BUDGET-EVIDENCE",
+      "depends": [
+        "R21",
+        "R22",
+        "R23",
+        "R24"
+      ],
+      "type": "live",
+      "goal": "Two-project isolation + reuse + supersession/delete + token savings checkpoint.",
+      "checkpoint": "CP4",
+      "status": "planned"
+    },
+    {
+      "id": "R26",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R00"
+      ],
+      "type": "code",
+      "goal": "Define ActionEnvelope/ApprovalGrant/ActionReceipt V1.7 contracts only.",
+      "status": "planned"
+    },
+    {
+      "id": "R27",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R26"
+      ],
+      "type": "code",
+      "goal": "Durable approvals/effect reservations/action receipts + unique effect key.",
+      "status": "planned"
+    },
+    {
+      "id": "R28",
+      "artifact": "ART-V17-TOOL-CONTRACT",
+      "depends": [
+        "R27"
+      ],
+      "type": "code",
+      "goal": "Migrate ToolGateway sequence to durable V1.7 boundary; remove process-local idempotency authority.",
+      "status": "planned"
+    },
+    {
+      "id": "R29",
+      "artifact": "ART-V17-INTEGRATION-MANIFEST",
+      "depends": [
+        "R28"
+      ],
+      "type": "code",
+      "goal": "Adapter interface/version manifest + one local/sandbox adapter.",
+      "status": "planned"
+    },
+    {
+      "id": "R30",
+      "artifact": "ART-V17-INTEGRATION-MANIFEST",
+      "depends": [
+        "R29"
+      ],
+      "type": "code",
+      "goal": "One real API/MCP-style integration through same envelope.",
+      "status": "planned"
+    },
+    {
+      "id": "R31",
+      "artifact": "ART-V17-SESSION-RECOVERY",
+      "depends": [
+        "R29"
+      ],
+      "type": "code",
+      "goal": "Session-aware web adapter: expiry/signout/destination preserve/reauth/no auto-submit.",
+      "status": "planned"
+    },
+    {
+      "id": "R32",
+      "artifact": "ART-V17-PERMISSION-NEGATIVES",
+      "depends": [
+        "R28",
+        "R31"
+      ],
+      "type": "test",
+      "goal": "Wrong project/payload/destination/expiry/revocation/stale lease/cancel/duplicate/unknown/redirect negatives.",
+      "status": "planned"
+    },
+    {
+      "id": "R33",
+      "artifact": "V1.7-live-integration",
+      "depends": [
+        "R29",
+        "R30",
+        "R31",
+        "R32"
+      ],
+      "type": "live",
+      "goal": "Three integration classes through one shared action/effect boundary.",
+      "checkpoint": "CP5",
+      "status": "planned"
+    },
+    {
+      "id": "R34",
+      "artifact": "V1.7-integrated-audit",
+      "depends": [
+        "R02",
+        "R15",
+        "R25",
+        "R33"
+      ],
+      "type": "audit",
+      "goal": "Exact-tip CP6 artifact-by-artifact implementation/evidence/blocker report; formal acceptance only if all canonical gates done.",
+      "checkpoint": "CP6",
+      "status": "planned"
+    }
+  ]
+}
