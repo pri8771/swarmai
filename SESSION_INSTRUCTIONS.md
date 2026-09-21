@@ -65,6 +65,19 @@ After any bounded packet already in progress:
 
 The real E2E smoke does not replace G12/G13/G14. It proves the product actually works while those formal gates close in parallel.
 
+## Repo-driven autonomous execution — install once
+
+This branch now includes a self-waking Cursor CLI daemon. After pulling this revision:
+
+1. Verify Cursor CLI exists: `agent --version`.
+2. If CLI auth is missing, run the normal human login once: `agent login`.
+3. Install the daemon:
+   `bash scripts/coordination/install_autonomous_worker_macos.sh`
+
+The daemon polls `docs/coordination/assignments/HOST-MAC-DEV.json` through GitHub every minute, executes exactly one bounded assigned packet with `agent -p`, and stops after pushing that packet. Safe dependency-ready packets may be preloaded so it can continue without waiting for the hourly lead review. It never self-accepts or selects project priorities.
+
+Current preloaded queue: V14-REAL-001-R -> V2A-003c.
+
 ## Continuous work rule
 After every packet: push exact source/evidence, post CURSOR-A message, publish heartbeat `review_requested`, fetch coordination, and claim the next dependency-ready A packet.
 Only lead-reviewed slices enter `cursor/v2-integration`; never bulk-merge the runtime lane.
