@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T01:26:00Z",
+  "updated_at": "2026-09-21T01:35:05Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -789,18 +789,27 @@
     {
       "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
       "target_version": "1.5",
-      "owner": "Cursor Session A",
-      "status": "planned",
+      "owner": "Cursor Session A integration + HOST-WIN-DEV worker",
+      "status": "blocked",
       "path_or_source_ref": null,
       "dependencies": [
         "ART-V15-WORKER-PROTOCOL",
         "ART-V15-LEASE-FENCING"
       ],
-      "worker_packets": [],
-      "next_action": "execute after durable worker protocol is implemented on at least two authorized host aliases",
+      "worker_packets": [
+        "V2A-MULTIHOST-WIN"
+      ],
+      "next_action": "After durable worker protocol is reviewable, enroll Windows as real worker and prove heartbeat/dispatch/kill/reassign/stale-result/drain",
       "blockers": [
-        "durable protocol not implemented"
-      ]
+        "durable worker protocol not yet reviewable"
+      ],
+      "name": "Actual Mac + Windows multi-host worker evidence",
+      "kind": "live-private-evidence",
+      "lane": "runtime",
+      "acceptance_refs": [
+        "ART-V15-WORKER-PROTOCOL"
+      ],
+      "evidence_refs": []
     },
     {
       "artifact_id": "ART-V15-RECOVERY-EVIDENCE",
@@ -1576,6 +1585,29 @@
       ],
       "worker_packets": [],
       "next_action": "refine tenancy/audit after V2.3 fleet policy and observability",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V19-WINDOWS-CLEAN-INSTALL",
+      "name": "Fresh Windows developer/product installation and portability evidence",
+      "target_version": "1.9",
+      "kind": "integration-evidence",
+      "owner": "Cursor Session B / HOST-WIN-DEV",
+      "lane": "product",
+      "status": "planned",
+      "path_or_source_ref": "docs/coordination/CURSOR_WINDOWS_PRODUCT_BOOTSTRAP_PROMPT.md",
+      "dependencies": [
+        "ART-V19-INSTALL-UPGRADE"
+      ],
+      "acceptance_refs": [
+        "ART-V20-INSTALL_UPGRADE_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "WIN-B-BOOTSTRAP"
+      ],
+      "story_points_next": 2,
+      "next_action": "Bootstrap Git/GitHub/uv/Python/Node, clone product lane, sync dependencies, run baseline, record sanitized host/tool/test evidence",
       "blockers": []
     }
   ],
