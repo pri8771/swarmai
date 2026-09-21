@@ -56,5 +56,6 @@
     "result": "18 passed",
     "db": "swarmai_v17_r13"
   },
-  "note": "R16 verify-on-tip; enrollment/capability/claim/renew/drain/cancel/result service present. No invent-accept."
+  "note": "R16 verify-on-tip; enrollment/capability/claim/renew/drain/cancel/result service present. No invent-accept.",
+  "evidence_tip_sha": "b683ed7a3ab755181fb0ffc69833c7b34638dab7"
 }
