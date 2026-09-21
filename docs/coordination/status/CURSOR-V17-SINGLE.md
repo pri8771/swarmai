@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `5dd8e2be9670132f33ffac27a91686fff05c1cff`
-- Coordination SHA: `855950a57c19903de1707465e2fb11aacf5fe6c9`
-- Updated: `2026-09-21T18:48:27Z`
-- Trigger: `scheduler`
+- Branch SHA: `218a3fd40bab965499613fa26fe35ed2c28ab0fc`
+- Coordination SHA: `88ca637ab95f241b2ade6af2a546fc1ede168056`
+- Updated: `2026-09-21T18:49:45Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `V2A-004`
-- Current artifact: `ART-V15-WORKER-PROTOCOL`
-- Last meaningful activity: `2026-09-21T18:44:41Z`
+- Current packet: `V2B-003a`
+- Current artifact: `ART-V16-DURABLE-SCHEMA`
+- Last meaningful activity: `2026-09-21T18:49:44Z`
 - Spend USD: `0.0`
-- Blocker: G13/ART-V13-TASK-POOL: HOST-WIN-DEV unavailable on Darwin; ART-V14-REAL-E2E drafting pending independent review; B3 multi-host UNKNOWN
+- Blocker: G13 HOST-WIN-DEV blocked; ART-V14-REAL-E2E drafting; B3 live multi-host UNKNOWN pending second physical host
 
 ## Update
 
-B2/V2A-004 worker service+client landed (5dd8e2b); B1/V2A-003c done. ART-V14-REAL-E2E still drafting. G13 HOST-WIN-DEV blocked. B3 multi-host live UNKNOWN. HTTP transport still drafting.
+B3/V2A-005 harness landed (sim multi-worker; live multi-host UNKNOWN). C1/V2B-003a knowledge repo started (218a3fd). B1+B2 done. ART-V14 drafting; G13 HOST-WIN-DEV blocked.
 
 ## Next
 
