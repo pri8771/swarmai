@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T17:12:32+00:00",
-    "trigger": "install",
+    "observed_at": "2026-09-21T17:12:48+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "8fb35b4fac6cfbbdf1a3cbf447bba09fd6f9c597",
+    "coordination_sha": "41854494fb563cd92c76836d96630952f04d137b",
     "effective_cadence_minutes": 5,
-    "packet_id": null,
-    "artifact_id": null,
-    "status": "bootstrap",
-    "last_agent_activity_at": null,
-    "note": null
+    "packet_id": "V2B-002",
+    "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+    "status": "session_started",
+    "last_agent_activity_at": "2026-09-21T17:12:47+00:00",
+    "note": "session_epoch=reset-20260921-two-lanes-02; fresh coordinated Lane B started; current work V2B-002"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:43:13+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-      "coordination_sha": "2d9b1990c57869c1c2cb3cc5955345dd31fb338b",
-      "effective_cadence_minutes": 5,
-      "packet_id": "V2B-001-R4",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "status": "review_requested",
-      "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
-      "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
-    },
     {
       "observed_at": "2026-09-21T16:44:18+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "bootstrap",
       "last_agent_activity_at": null,
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T17:12:48+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "41854494fb563cd92c76836d96630952f04d137b",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "status": "session_started",
+      "last_agent_activity_at": "2026-09-21T17:12:47+00:00",
+      "note": "session_epoch=reset-20260921-two-lanes-02; fresh coordinated Lane B started; current work V2B-002"
     }
   ],
-  "status": "bootstrap"
+  "status": "session_started"
 }
