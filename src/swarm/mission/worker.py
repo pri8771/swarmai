@@ -105,6 +105,14 @@ def _normalize_python_source(text: str) -> str:
     return body
 
 
+def _valid_python_syntax(text: str) -> bool:
+    try:
+        compile(text, "<mission-implement>", "exec")
+    except SyntaxError:
+        return False
+    return True
+
+
 def _extract_python_file(text: str) -> str | None:
     """Extract full-file Python from a model response.
 
@@ -472,6 +480,27 @@ class RepoWorker:
                 task_family="implement",
                 ok=False,
                 summary="implement_failed_no_known_answer_fallback",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "used_model_fallback": False,
+                    "known_answer_forbidden": True,
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "target_file": str(target_rel),
+                    "model_output_excerpt": (inference.text or "")[:500],
+                },
+                inference=inference.to_dict(),
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
+        if not _valid_python_syntax(patched):
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_invalid_python_syntax",
                 artifacts={
                     "worktree": handle.to_dict(),
                     "changed_files": [],

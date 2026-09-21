@@ -1,0 +1,21 @@
+{
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-003",
+  "frozen_at": "2026-09-21T18:22:29Z",
+  "candidate_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <audit worktree.py> --model qwen3.5:4b --repo <this checkout>",
+  "execution_mode": "operational_local_ollama_governed_broker",
+  "selected_model": "qwen3.5:4b",
+  "zero_spend": true,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "prior_failed_run_ids": [
+    "v14-real-001",
+    "v14-real-002"
+  ],
+  "target_subsystem": "src/swarm/mission/worktree.py",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "note": "Retry after unclosed-fence extract + max_tokens=4096 repair at 4224b90",
+  "mission_id": "fcb364f061684619ba215769c4e8175b"
+}

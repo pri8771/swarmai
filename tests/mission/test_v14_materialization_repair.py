@@ -157,6 +157,46 @@ def test_malformed_output_rejected_without_write(tmp_path: Path) -> None:
     assert "value + 1" not in wt_target.read_text(encoding="utf-8")
 
 
+def test_invalid_syntax_rejected_without_write(tmp_path: Path) -> None:
+    repo = _init_temp_repo(tmp_path / "heldout_repo")
+    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    task = sample_task().model_copy(
+        update={
+            "task_family": "implement",
+            "id": "tsk_mat_syntax",
+            "inputs": {
+                "goal": "Make bump increment by one",
+                "target_file": "widgets/counter.py",
+            },
+        }
+    )
+    bad = (
+        '"""broken"""\n'
+        "\n"
+        "def bump(value: int) -> int:\n"
+        '    """unterminated\n'
+    )
+    inference = InferenceResult(
+        ok=True,
+        text=f"```python\n{bad}",
+        model="test-local",
+        route_id="rt_test",
+    )
+    with patch("swarm.mission.worker.local_chat", return_value=inference):
+        result, handle = worker._implement(
+            task, mission_id="mission_mat_syntax", shared=None
+        )
+    assert result.ok is False
+    assert result.summary == "implement_invalid_python_syntax"
+    assert not (result.artifacts.get("diff") or "").strip()
+    assert (handle.path / "widgets" / "counter.py").read_text(encoding="utf-8") == (
+        '"""Held-out widget counter used only by materialization regressions."""\n'
+        "\n"
+        "def bump(value: int) -> int:\n"
+        "    return value\n"
+    )
+
+
 def test_noop_candidate_not_summarized_as_implement_applied(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
     original = (repo / "widgets" / "counter.py").read_text(encoding="utf-8")

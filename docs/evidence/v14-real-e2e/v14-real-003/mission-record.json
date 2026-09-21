@@ -1,0 +1,621 @@
+{
+  "mission_id": "fcb364f061684619ba215769c4e8175b",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "status": "failed",
+  "created_at": "2026-09-21T18:22:29.823979+00:00",
+  "updated_at": "2026-09-21T18:22:29.824020+00:00",
+  "revision": 2,
+  "project_id": null,
+  "source": "mission_store",
+  "contract": {},
+  "plan": {
+    "proposal_id": "gp_6aed214b44d24ab7ab84f9ce2ccfab53",
+    "operation": "spawn",
+    "rationale": "V0.1 structured software mission: inspect \u2192 implement \u2192 verify \u2192 review",
+    "inspection": {
+      "root": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+      "git_head": "4224b9071360d52a8593f4b8cd16485d13778f80",
+      "has_pyproject": true,
+      "has_tests": true,
+      "top_entries": [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md",
+        "alembic.ini",
+        "apps",
+        "benchmarks",
+        "changes",
+        "config",
+        "deploy",
+        "docs",
+        "examples",
+        "migrations",
+        "packs",
+        "pyproject.toml",
+        "release",
+        "sandbox",
+        "schemas",
+        "scripts",
+        "src",
+        "tests",
+        "uv.lock",
+        "var"
+      ],
+      "notes": [
+        "selfdev_off_by_one_sample_present",
+        "swarm_package_present"
+      ]
+    },
+    "task_ids": [
+      "tsk_db1bf45cc6cc459d8778eb2ec0869ac7",
+      "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "tsk_e4df388f6f6e48eaa2485c119b20af89"
+    ],
+    "route_plan": {
+      "schema_version": "0.2.0",
+      "swarm_allow_paid": false,
+      "benchmark_run_id": null,
+      "available_models": [
+        "gemma3:4b",
+        "qwen3.5:4b",
+        "qwen3.5:9b",
+        "qwen2.5-coder:14b"
+      ],
+      "rationale_summary": "Evidence router assigned 4 roles across 4 model(s): planner=gemma3:4b, worker=qwen3.5:4b, verifier=qwen3.5:9b, reviewer=qwen2.5-coder:14b",
+      "kit_family_map": {
+        "planning": "dependency_planning",
+        "coding": "code_generation",
+        "extraction": "extraction",
+        "reasoning": "evidence_qa",
+        "review": "tool_selection",
+        "summarization": "context_compaction"
+      },
+      "assignments": {
+        "inspect": {
+          "role": "planner",
+          "task_family": "inspect",
+          "benchmark_family": "dependency_planning",
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "planner/inspect \u2192 benchmark family dependency_planning; selected gemma3:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "gemma3:4b"
+          }
+        },
+        "implement": {
+          "role": "worker",
+          "task_family": "implement",
+          "benchmark_family": "code_generation",
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "worker/implement \u2192 benchmark family code_generation; selected qwen3.5:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen3.5:4b"
+          }
+        },
+        "verify": {
+          "role": "verifier",
+          "task_family": "verify",
+          "benchmark_family": "tool_selection",
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "verifier/verify \u2192 benchmark family tool_selection; selected qwen3.5:9b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen3.5:9b"
+          }
+        },
+        "review": {
+          "role": "reviewer",
+          "task_family": "review",
+          "benchmark_family": "evidence_qa",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "reviewer/review \u2192 benchmark family evidence_qa; selected qwen2.5-coder:14b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen2.5-coder:14b"
+          }
+        }
+      },
+      "heterogeneous": true
+    }
+  },
+  "tasks": [
+    {
+      "id": "tsk_db1bf45cc6cc459d8778eb2ec0869ac7",
+      "task_family": "inspect",
+      "objective": "Inspect repository layout and identify files to change for the goal",
+      "dependency_ids": [],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "gemma3:4b",
+      "summary": "inspection_complete"
+    },
+    {
+      "id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "task_family": "implement",
+      "objective": "Implement the required change in an isolated worktree",
+      "dependency_ids": [
+        "tsk_db1bf45cc6cc459d8778eb2ec0869ac7"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen3.5:4b",
+      "summary": "implement_applied"
+    },
+    {
+      "id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "task_family": "verify",
+      "objective": "Run configured verification (tests/lint) in the worker worktree",
+      "dependency_ids": [
+        "tsk_54b86d8c939841c29afc3485e2ea7004"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen3.5:9b",
+      "summary": "verify_failed"
+    },
+    {
+      "id": "tsk_e4df388f6f6e48eaa2485c119b20af89",
+      "task_family": "review",
+      "objective": "Review diff, synthesize outcome, and accept or request repair",
+      "dependency_ids": [
+        "tsk_a4ee3da1644b429d8aadaec6c441bec8"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b"
+    }
+  ],
+  "timeline": [
+    {
+      "at": "2026-09-21T18:22:29.824019+00:00",
+      "event": "mission_started",
+      "detail": {
+        "revision": 2,
+        "model": "qwen3.5:4b",
+        "route_plan": {
+          "schema_version": "0.2.0",
+          "swarm_allow_paid": false,
+          "benchmark_run_id": null,
+          "available_models": [
+            "gemma3:4b",
+            "qwen3.5:4b",
+            "qwen3.5:9b",
+            "qwen2.5-coder:14b"
+          ],
+          "rationale_summary": "Evidence router assigned 4 roles across 4 model(s): planner=gemma3:4b, worker=qwen3.5:4b, verifier=qwen3.5:9b, reviewer=qwen2.5-coder:14b",
+          "kit_family_map": {
+            "planning": "dependency_planning",
+            "coding": "code_generation",
+            "extraction": "extraction",
+            "reasoning": "evidence_qa",
+            "review": "tool_selection",
+            "summarization": "context_compaction"
+          },
+          "assignments": {
+            "inspect": {
+              "role": "planner",
+              "task_family": "inspect",
+              "benchmark_family": "dependency_planning",
+              "model": "gemma3:4b",
+              "route_id": "rt_ollama_gemma3:4b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "planner/inspect \u2192 benchmark family dependency_planning; selected gemma3:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "gemma3:4b"
+              }
+            },
+            "implement": {
+              "role": "worker",
+              "task_family": "implement",
+              "benchmark_family": "code_generation",
+              "model": "qwen3.5:4b",
+              "route_id": "rt_ollama_qwen3.5:4b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "worker/implement \u2192 benchmark family code_generation; selected qwen3.5:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen3.5:4b"
+              }
+            },
+            "verify": {
+              "role": "verifier",
+              "task_family": "verify",
+              "benchmark_family": "tool_selection",
+              "model": "qwen3.5:9b",
+              "route_id": "rt_ollama_qwen3.5:9b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "verifier/verify \u2192 benchmark family tool_selection; selected qwen3.5:9b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen3.5:9b"
+              }
+            },
+            "review": {
+              "role": "reviewer",
+              "task_family": "review",
+              "benchmark_family": "evidence_qa",
+              "model": "qwen2.5-coder:14b",
+              "route_id": "rt_ollama_qwen2.5-coder:14b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "reviewer/review \u2192 benchmark family evidence_qa; selected qwen2.5-coder:14b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen2.5-coder:14b"
+              }
+            }
+          },
+          "heterogeneous": true
+        }
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:29.824414+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 0
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:29.824507+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_db1bf45cc6cc459d8778eb2ec0869ac7",
+        "family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:49.482592+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:52.196839+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:52.196880+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T18:22:52.196883+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:32.731800+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:33.647017+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:33.647061+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:33.647065+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:56.536423+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:57.442277+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc"
+      }
+    },
+    {
+      "at": "2026-09-21T18:23:57.442330+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 3
+      }
+    }
+  ],
+  "agents": [
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_db1bf45cc6cc459d8778eb2ec0869ac7",
+      "family": "inspect"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify"
+    }
+  ],
+  "artifacts": {
+    "worker_results": {
+      "tsk_db1bf45cc6cc459d8778eb2ec0869ac7": {
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+        "task_id": "tsk_db1bf45cc6cc459d8778eb2ec0869ac7",
+        "task_family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "artifacts": {
+          "findings": {
+            "mission_id": "fcb364f061684619ba215769c4e8175b",
+            "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+            "candidate_files": [
+              "src/swarm/mission/worktree.py"
+            ],
+            "strategy": "goal_path_scan",
+            "parser_dogfood_fixture": false,
+            "missing_cost_ledger": false
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:22:29.824504+00:00",
+        "finished_at": "2026-09-21T18:22:29.824502+00:00"
+      },
+      "tsk_54b86d8c939841c29afc3485e2ea7004": {
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+        "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "task_family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "artifacts": {
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+            "branch": "mission/fcb364f06168/tsk_54b86d8c939841c29afc3485e2ea7004/wd053bc5",
+            "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+            "mission_id": "fcb364f061684619ba215769c4e8175b",
+            "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004"
+          },
+          "changed_files": [
+            "src/swarm/mission/worktree.py"
+          ],
+          "diff": "diff --git a/src/swarm/mission/worktree.py b/src/swarm/mission/worktree.py\nindex c33c83e..7afa71d 100644\n--- a/src/swarm/mission/worktree.py\n+++ b/src/swarm/mission/worktree.py\n@@ -2,7 +2,6 @@\n \n from __future__ import annotations\n \n-import shutil\n import subprocess\n from dataclasses import dataclass\n from pathlib import Path\n@@ -11,6 +10,7 @@ from swarm.contracts.common import new_id\n \n \n class WorktreeError(RuntimeError):\n+    \"\"\"Raised when a worktree operation fails.\"\"\"\n     pass\n \n \n@@ -32,14 +32,33 @@ class WorktreeHandle:\n         }\n \n \n-def _run_git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:\n-    return subprocess.run(\n-        [\"git\", *args],\n-        cwd=str(repo),\n-        capture_output=True,\n-        text=True,\n-        check=check,\n-    )\n+def _run_git(repo: Path, *args: str, check: bool = True, env: dict | None = None) -> subprocess.CompletedProcess[str]:\n+    \"\"\"Execute a git command.\n+    \n+    Args:\n+        repo: Path to the git repository.\n+        args: Arguments to pass to git.\n+        check: If True, raise an exception on non-zero return code.\n+        env: Optional environment variables for isolation.\n+    \n+    Returns:\n+        CompletedProcess object.\n+    \n+    Raises:\n+        WorktreeError: If the command fails and check is True.\n+    \"\"\"\n+    try:\n+        result = subprocess.run(\n+            [\"git\", *args],\n+            cwd=str(repo),\n+            capture_output=True,\n+            text=True,\n+            check=check,\n+            env=env,\n+        )\n+    except FileNotFoundError:\n+        raise WorktreeError(\"git binary not found\")\n+    return result\n \n \n def create_worktree(\n@@ -50,57 +69,10 @@ def create_worktree(\n     worker_id: str,\n     base_dir: Path | None = None,\n ) -> WorktreeHandle:\n-    \"\"\"Create an isolated git worktree for one worker/task.\"\"\"\n-    repo = repo.resolve()\n-    if not (repo / \".git\").exists() and not (repo / \".git\").is_file():\n-        # Allow worktree from a linked gitdir (worktree itself).\n-        probe = _run_git(repo, \"rev-parse\", \"--is-inside-work-tree\", check=False)\n-        if probe.returncode != 0 or probe.stdout.strip() != \"true\":\n-            raise WorktreeError(f\"not a git repository: {repo}\")\n-\n-    root = base_dir or (repo / \"var\" / \"mission-worktrees\" / mission_id)\n-    root.mkdir(parents=True, exist_ok=True)\n-    safe_task = task_id.replace(\"/\", \"_\")[:48]\n-    branch = f\"mission/{mission_id[:12]}/{safe_task}/{new_id('w')[:8]}\"\n-    path = root / f\"{safe_task}-{worker_id}\"\n-    if path.exists():\n-        shutil.rmtree(path)\n-\n-    # Detached worktree from HEAD keeps the parent index clean.\n-    add = _run_git(\n-        repo,\n-        \"worktree\",\n-        \"add\",\n-        \"-b\",\n-        branch,\n-        str(path),\n-        \"HEAD\",\n-        check=False,\n-    )\n-    if add.returncode != 0:\n-        raise WorktreeError(add.stderr.strip() or add.stdout.strip() or \"worktree add failed\")\n-    return WorktreeHandle(\n-        path=path,\n-        branch=branch,\n-        worker_id=worker_id,\n-        mission_id=mission_id,\n-        task_id=task_id,\n-    )\n-\n-\n-def remove_worktree(repo: Path, handle: WorktreeHandle, *, force: bool = True) -> None:\n-    args = [\"worktree\", \"remove\"]\n-    if force:\n-        args.append(\"--force\")\n-    args.append(str(handle.path))\n-    result = _run_git(repo, *args, check=False)\n-    # Best-effort branch cleanup.\n-    _run_git(repo, \"branch\", \"-D\", handle.branch, check=False)\n-    if result.returncode != 0 and handle.path.exists():\n-        shutil.rmtree(handle.path, ignore_errors=True)\n-        _run_git(repo, \"worktree\", \"prune\", check=False)\n-\n-\n-def worktree_diff(handle: WorktreeHandle) -> str:\n-    result = _run_git(handle.path, \"diff\", \"--\", \".\", check=False)\n-    return result.stdout\n+    \"\"\"Create an isolated git worktree for one worker/task.\n+    \n+    Ensures the parent repository exists and is valid before creating the worktree.\n+    \n+    Reliability Fix:\n+        The original implementation relied on `check=True` and caught `WorktreeError` \n+        implicitly. However, `_run_git` does not expli\n",
+          "used_model_fallback": false,
+          "known_answer_forbidden": true,
+          "parser_dogfood_fixture": false
+        },
+        "inference": {
+          "ok": true,
+          "text": "```python\n\"\"\"Real git worktree isolation for mission workers.\"\"\"\n\nfrom __future__ import annotations\n\nimport subprocess\nfrom dataclasses import dataclass\nfrom pathlib import Path\n\nfrom swarm.contracts.common import new_id\n\n\nclass WorktreeError(RuntimeError):\n    \"\"\"Raised when a worktree operation fails.\"\"\"\n    pass\n\n\n@dataclass\nclass WorktreeHandle:\n    path: Path\n    branch: str\n    worker_id: str\n    mission_id: str\n    task_id: str\n\n    def to_dict(self) -> dict[str, str]:\n        return {\n            \"path\": str(self.path),\n            \"branch\": self.branch,\n            \"worker_id\": self.worker_id,\n            \"mission_id\": self.mission_id,\n            \"task_id\": self.task_id,\n        }\n\n\ndef _run_git(repo: Path, *args: str, check: bool = True, env: dict | None = None) -> subprocess.CompletedProcess[str]:\n    \"\"\"Execute a git command.\n    \n    Args:\n        repo: Path to the git repository.\n        args: Arguments to pass to git.\n        check: If True, raise an exception on non-zero return code.\n        env: Optional environment variables for isolation.\n    \n    Returns:\n        CompletedProcess object.\n    \n    Raises:\n        WorktreeError: If the command fails and check is True.\n    \"\"\"\n    try:\n        result = subprocess.run(\n            [\"git\", *args],\n            cwd=str(repo),\n            capture_output=True,\n            text=True,\n            check=check,\n            env=env,\n        )\n    except FileNotFoundError:\n        raise WorktreeError(\"git binary not found\")\n    return result\n\n\ndef create_worktree(\n    repo: Path,\n    *,\n    mission_id: str,\n    task_id: str,\n    worker_id: str,\n    base_dir: Path | None = None,\n) -> WorktreeHandle:\n    \"\"\"Create an isolated git worktree for one worker/task.\n    \n    Ensures the parent repository exists and is valid before creating the worktree.\n    \n    Reliability Fix:\n        The original implementation relied on `check=True` and caught `WorktreeError` \n        implicitly. However, `_run_git` does not expli",
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "prompt_tokens": 654,
+          "completion_tokens": 1007,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:23:56.536395+00:00",
+        "finished_at": "2026-09-21T18:23:56.536366+00:00"
+      },
+      "tsk_a4ee3da1644b429d8aadaec6c441bec8": {
+        "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+        "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+        "task_family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "artifacts": {
+          "commands": [
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/mission",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 2,
+              "ok": false,
+              "stdout": ", worktree_diff\nE     File \"/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc/src/swarm/mission/worktree.py\", line 72\nE       \"\"\"Create an isolated git worktree for one worker/task.\nE       ^\nE   SyntaxError: unterminated triple-quoted string literal (detected at line 78)\n_______ ERROR collecting tests/mission/test_no_known_answer_fallback.py ________\n.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n    mod = import_path(\n.venv/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path\n    importlib.import_module(module_name)\n/Users/pchordia/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1387: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1360: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:935: in _load_unlocked\n    ???\n.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module\n    exec(co, module.__dict__)\ntests/mission/test_no_known_answer_fallback.py:10: in <module>\n    from swarm.mission.worker import GOOD_FIX, RepoWorker\nsrc/swarm/mission/__init__.py:3: in <module>\n    from swarm.mission.runtime import MissionRuntime, run_mission\nsrc/swarm/mission/runtime.py:22: in <module>\n    from swarm.mission.worker import RepoWorker, WorkerResult\nsrc/swarm/mission/worker.py:15: in <module>\n    from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff\nE     File \"/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc/src/swarm/mission/worktree.py\", line 72\nE       \"\"\"Create an isolated git worktree for one worker/task.\nE       ^\nE   SyntaxError: unterminated triple-quoted string literal (detected at line 78)\n________ ERROR collecting tests/mission/test_parser_dogfood_fixture.py _________\n.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n    mod = import_path(\n.venv/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path\n    importlib.import_module(module_name)\n/Users/pchordia/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1387: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1360: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:935: in _load_unlocked\n    ???\n.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module\n    exec(co, module.__dict__)\ntests/mission/test_parser_dogfood_fixture.py:10: in <module>\n    from swarm.mission.worker import RepoWorker\nsrc/swarm/mission/__init__.py:3: in <module>\n    from swarm.mission.runtime import MissionRuntime, run_mission\nsrc/swarm/mission/runtime.py:22: in <module>\n    from swarm.mission.worker import RepoWorker, WorkerResult\nsrc/swarm/mission/worker.py:15: in <module>\n    from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff\nE     File \"/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc/src/swarm/mission/worktree.py\", line 72\nE       \"\"\"Create an isolated git worktree for one worker/task.\nE       ^\nE   SyntaxError: unterminated triple-quoted string literal (detected at line 78)\n_________________ ERROR collecting tests/mission/test_teams.py _________________\n.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n    mod = import_path(\n.venv/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path\n    importlib.import_module(module_name)\n/Users/pchordia/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1387: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1360: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:935: in _load_unlocked\n    ???\n.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module\n    exec(co, module.__dict__)\ntests/mission/test_teams.py:8: in <module>\n    from swarm.mission.teams import estimate_complexity, form_dynamic_team, plan_dynamic_task_graph\nsrc/swarm/mission/__init__.py:3: in <module>\n    from swarm.mission.runtime import MissionRuntime, run_mission\nsrc/swarm/mission/runtime.py:22: in <module>\n    from swarm.mission.worker import RepoWorker, WorkerResult\nsrc/swarm/mission/worker.py:15: in <module>\n    from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff\nE     File \"/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc/src/swarm/mission/worktree.py\", line 72\nE       \"\"\"Create an isolated git worktree for one worker/task.\nE       ^\nE   SyntaxError: unterminated triple-quoted string literal (detected at line 78)\n______ ERROR collecting tests/mission/test_v14_materialization_repair.py _______\n.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n    mod = import_path(\n.venv/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path\n    importlib.import_module(module_name)\n/Users/pchordia/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n<frozen importlib._bootstrap>:1387: in _gcd_import\n    ???\n<frozen importlib._bootstrap>:1360: in _find_and_load\n    ???\n<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked\n    ???\n<frozen importlib._bootstrap>:935: in _load_unlocked\n    ???\n.venv/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:188: in exec_module\n    exec(co, module.__dict__)\ntests/mission/test_v14_materialization_repair.py:11: in <module>\n    from swarm.mission.worker import (\nsrc/swarm/mission/__init__.py:3: in <module>\n    from swarm.mission.runtime import MissionRuntime, run_mission\nsrc/swarm/mission/runtime.py:22: in <module>\n    from swarm.mission.worker import RepoWorker, WorkerResult\nsrc/swarm/mission/worker.py:15: in <module>\n    from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff\nE     File \"/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc/src/swarm/mission/worktree.py\", line 72\nE       \"\"\"Create an isolated git worktree for one worker/task.\nE       ^\nE   SyntaxError: unterminated triple-quoted string literal (detected at line 78)\n=========================== short test summary info ============================\nERROR tests/mission/test_acceptance_controls.py\nERROR tests/mission/test_mission_runtime.py\nERROR tests/mission/test_no_auto_promote.py\nERROR tests/mission/test_no_known_answer_fallback.py\nERROR tests/mission/test_parser_dogfood_fixture.py\nERROR tests/mission/test_teams.py\nERROR tests/mission/test_v14_materialization_repair.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 7 errors during collection !!!!!!!!!!!!!!!!!!!!\n7 errors in 0.48s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            }
+          ],
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+            "branch": "mission/fcb364f06168/tsk_54b86d8c939841c29afc3485e2ea7004/wd053bc5",
+            "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+            "mission_id": "fcb364f061684619ba215769c4e8175b",
+            "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004"
+          },
+          "parser_dogfood_fixture": false
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:23:57.442252+00:00",
+        "finished_at": "2026-09-21T18:23:57.442221+00:00"
+      }
+    }
+  },
+  "validation": {
+    "accepted": false,
+    "review": null
+  },
+  "retries": [
+    {
+      "round": 0,
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify",
+      "reason": "verify_failed"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify",
+      "reason": "verify_failed"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_a4ee3da1644b429d8aadaec6c441bec8",
+      "family": "verify",
+      "reason": "verify_failed"
+    }
+  ],
+  "model_assignments": [
+    {
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    },
+    {
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    },
+    {
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    }
+  ],
+  "cost": {
+    "spend_policy": "zero",
+    "allow_paid": false,
+    "total_usd": 0.0,
+    "entries": [
+      {
+        "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 974,
+        "completion_tokens": 854,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:22:49.482620+00:00"
+      },
+      {
+        "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 654,
+        "completion_tokens": 1776,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:23:32.731837+00:00"
+      },
+      {
+        "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 654,
+        "completion_tokens": 1007,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:23:56.536437+00:00"
+      }
+    ],
+    "requests": 3
+  },
+  "result": {
+    "accepted": false,
+    "summary": "repair_required",
+    "changed_files": [
+      "src/swarm/mission/worktree.py"
+    ],
+    "worktree": {
+      "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/fcb364f061684619ba215769c4e8175b/tsk_54b86d8c939841c29afc3485e2ea7004-wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "branch": "mission/fcb364f06168/tsk_54b86d8c939841c29afc3485e2ea7004/wd053bc5",
+      "worker_id": "wrk_d6fdf7f631d043e1a4871c2989da6fdc",
+      "mission_id": "fcb364f061684619ba215769c4e8175b",
+      "task_id": "tsk_54b86d8c939841c29afc3485e2ea7004"
+    }
+  }
+}

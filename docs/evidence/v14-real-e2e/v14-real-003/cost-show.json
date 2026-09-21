@@ -1,0 +1,38 @@
+{
+  "spend_policy": "zero",
+  "allow_paid": false,
+  "total_usd": 0.0,
+  "entries": [
+    {
+      "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 974,
+      "completion_tokens": 854,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:22:49.482620+00:00"
+    },
+    {
+      "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 654,
+      "completion_tokens": 1776,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:23:32.731837+00:00"
+    },
+    {
+      "source": "tsk_54b86d8c939841c29afc3485e2ea7004",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 654,
+      "completion_tokens": 1007,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:23:56.536437+00:00"
+    }
+  ],
+  "requests": 3
+}
