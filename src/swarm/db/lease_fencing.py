@@ -246,6 +246,102 @@ class WorkerRegistrationRepository:
         self.session.flush()
         return row
 
+    def record_heartbeat(
+        self,
+        *,
+        worker_id: str,
+        membership_token: str,
+        generation: int,
+        worker_state: str | None = None,
+        active_lease_ids: list[str] | None = None,
+        available: dict[str, Any] | None = None,
+        health: dict[str, Any] | None = None,
+        observed_at: datetime | None = None,
+    ) -> WorkerLeaseRow:
+        """Record worker-side heartbeat (distinct from coordination heartbeat)."""
+        row = self.session.get(WorkerLeaseRow, worker_id)
+        if row is None:
+            raise WorkerNotEligibleError("worker_not_found")
+        if row.revoked_at is not None:
+            raise WorkerNotEligibleError("worker_revoked")
+        if not row.token_hash or not verify_membership_token(
+            token=membership_token, token_hash=row.token_hash
+        ):
+            raise WorkerNotEligibleError("invalid_membership_token")
+        if int(row.lease_generation) != int(generation):
+            raise WorkerNotEligibleError("worker_generation_mismatch")
+        if row.status == "quarantined":
+            raise WorkerNotEligibleError("worker_status:quarantined")
+        clock = observed_at or utc_now()
+        row.heartbeat_at = clock
+        row.updated_at = clock
+        if worker_state in {"active", "draining", "offline"}:
+            # Worker may request drain via heartbeat; cannot self-clear quarantine/revoke.
+            if worker_state == "draining" and row.status == "online":
+                row.status = "draining"
+                row.drain_requested_at = clock
+            elif worker_state == "offline" and row.status == "draining":
+                # Offline only after drain when no active work — caller enforces.
+                row.status = "offline"
+            elif worker_state == "active" and row.status == "offline":
+                row.status = "online"
+        payload = dict(row.resource_payload or {})
+        progress: dict[str, Any] = dict(payload.get("last_heartbeat_progress") or {})
+        if active_lease_ids is not None:
+            progress["active_lease_ids"] = list(active_lease_ids)
+        if available is not None:
+            progress["available"] = dict(available)
+        if health is not None:
+            progress["health"] = dict(health)
+        progress["observed_at"] = clock.isoformat()
+        payload["last_heartbeat_progress"] = progress
+        _assert_no_raw_token_fields(payload)
+        row.resource_payload = payload
+        self.session.flush()
+        return row
+
+    def advertise_capabilities(
+        self,
+        *,
+        worker_id: str,
+        membership_token: str,
+        generation: int,
+        capabilities: list[Any] | None = None,
+        capacity_units: float | None = None,
+        privacy_classes: list[Any] | None = None,
+    ) -> WorkerLeaseRow:
+        """Voluntary capability/capacity reduction only (ART-V15: no self-expansion)."""
+        row = self.session.get(WorkerLeaseRow, worker_id)
+        if row is None:
+            raise WorkerNotEligibleError("worker_not_found")
+        if row.revoked_at is not None:
+            raise WorkerNotEligibleError("worker_revoked")
+        if not row.token_hash or not verify_membership_token(
+            token=membership_token, token_hash=row.token_hash
+        ):
+            raise WorkerNotEligibleError("invalid_membership_token")
+        if int(row.lease_generation) != int(generation):
+            raise WorkerNotEligibleError("worker_generation_mismatch")
+        current_caps = set(str(c) for c in (row.capabilities or []))
+        if capabilities is not None:
+            requested = set(str(c) for c in capabilities)
+            if not requested.issubset(current_caps):
+                raise WorkerNotEligibleError("capability_expansion_forbidden")
+            row.capabilities = sorted(requested)
+        if capacity_units is not None:
+            if float(capacity_units) > float(row.capacity_units):
+                raise WorkerNotEligibleError("capacity_expansion_forbidden")
+            row.capacity_units = float(capacity_units)
+        if privacy_classes is not None:
+            current_privacy = set(str(p) for p in (row.privacy_classes or []))
+            requested_privacy = set(str(p) for p in privacy_classes)
+            if not requested_privacy.issubset(current_privacy):
+                raise WorkerNotEligibleError("privacy_expansion_forbidden")
+            row.privacy_classes = sorted(requested_privacy)
+        row.updated_at = utc_now()
+        self.session.flush()
+        return row
+
     def verify_membership(self, *, worker_id: str, membership_token: str) -> bool:
         """Return True only when the worker is not revoked and token matches durable hash."""
         row = self.session.get(WorkerLeaseRow, worker_id)
@@ -371,6 +467,17 @@ class TaskLeaseRepository:
         stmt = select(TaskLeaseRow).where(
             TaskLeaseRow.attempt_id == attempt_id,
             TaskLeaseRow.state.in_(("active", "renewed")),
+        )
+        return list(self.session.scalars(stmt))
+
+    def list_active_for_worker(self, worker_id: str) -> list[TaskLeaseRow]:
+        stmt = (
+            select(TaskLeaseRow)
+            .where(
+                TaskLeaseRow.worker_id == worker_id,
+                TaskLeaseRow.state.in_(("active", "renewed")),
+            )
+            .order_by(TaskLeaseRow.issued_at.asc(), TaskLeaseRow.lease_id.asc())
         )
         return list(self.session.scalars(stmt))
 
@@ -657,6 +764,12 @@ class LeaseLifecycleService:
 
     def get_lease(self, lease_id: str) -> TaskLeaseRow | None:
         return self.session.get(TaskLeaseRow, lease_id)
+
+    def list_active_leases_for_worker(self, worker_id: str) -> list[TaskLeaseRow]:
+        return self._leases.list_active_for_worker(worker_id)
+
+    def get_result(self, result_id: str) -> WorkerResultRow | None:
+        return self._results.get(result_id)
 
     def _require_claimable_worker(self, worker_id: str, membership_token: str) -> WorkerLeaseRow:
         worker = self._workers.get(worker_id)

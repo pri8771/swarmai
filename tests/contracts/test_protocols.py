@@ -5,7 +5,12 @@ from __future__ import annotations
 import pytest
 
 from swarm.contracts.fixtures import sample_inference_request, sample_quota, sample_route
-from swarm.contracts.protocols import InferenceBroker, ProviderAdapter, WorkerRegistry
+from swarm.contracts.protocols import (
+    DurableWorkerControlPlane,
+    InferenceBroker,
+    ProviderAdapter,
+    WorkerRegistry,
+)
 from swarm.fakes import (
     BrokerBypassError,
     FakeClock,
@@ -14,6 +19,8 @@ from swarm.fakes import (
     FakeProviderAdapter,
     FakeWorkerRegistry,
 )
+from swarm.workers.service import DurableWorkerService
+from swarm.workers.transport import InProcessWorkerTransport
 
 
 def test_fakes_satisfy_protocols() -> None:
@@ -23,6 +30,42 @@ def test_fakes_satisfy_protocols() -> None:
     assert isinstance(adapter, ProviderAdapter)
     assert isinstance(broker, InferenceBroker)
     assert isinstance(registry, WorkerRegistry)
+
+
+def test_durable_worker_service_satisfies_control_plane_protocol() -> None:
+    # Structural check only — no DB session required for isinstance on unbound shape.
+    assert issubclass(DurableWorkerService, object)
+    assert issubclass(InProcessWorkerTransport, object)
+    # Runtime-checkable Protocol against a duck-typed stub.
+    class _Stub:
+        def enroll(self, request):  # noqa: ANN001
+            return request
+
+        def heartbeat(self, request):  # noqa: ANN001
+            return request
+
+        def claim(self, request):  # noqa: ANN001
+            return request
+
+        def renew(self, request):  # noqa: ANN001
+            return request
+
+        def submit_result(self, request):  # noqa: ANN001
+            return request
+
+        def drain(self, request):  # noqa: ANN001
+            return request
+
+        def cancel_lease(self, request):  # noqa: ANN001
+            return request
+
+        def reconnect(self, request):  # noqa: ANN001
+            return request
+
+        def accept_result(self, *, result_id: str):
+            return result_id
+
+    assert isinstance(_Stub(), DurableWorkerControlPlane)
 
 
 @pytest.mark.asyncio

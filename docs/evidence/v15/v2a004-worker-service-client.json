@@ -1,0 +1,47 @@
+{
+  "artifact_id": "ART-V15-WORKER-PROTOCOL",
+  "packet_id": "V2A-004",
+  "scenario": "transport_independent_durable_worker_service_client",
+  "status": "pass_local",
+  "recorded_at": "2026-09-21T18:44:29Z",
+  "base_sha": "f06fd1f40963c8f1b33a9529413479b7fab6dc7d",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "b3_multi_host_live_evidence": "UNKNOWN_single_host_only",
+  "b1_result_acceptance": "landed_V2A-003c",
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest tests/workers/test_durable_worker_protocol.py tests/workers/test_workers.py tests/contracts/test_protocols.py tests/integration/db/test_lease_result_acceptance.py -q",
+    "PYTHONPATH=src .venv/bin/python -m ruff check src/swarm/workers/ src/swarm/contracts/protocols.py tests/workers/test_durable_worker_protocol.py tests/contracts/test_protocols.py",
+    "PYTHONPATH=src .venv/bin/python -m mypy src/swarm/workers/envelopes.py src/swarm/workers/service.py src/swarm/workers/client.py src/swarm/workers/transport.py"
+  ],
+  "results": {
+    "pytest": "33 passed",
+    "ruff": "All checks passed",
+    "mypy": "clean",
+    "enrollment": true,
+    "capability_trust_advertisement": true,
+    "dispatch_lease_renew": true,
+    "worker_side_heartbeat_progress": true,
+    "result_submit_wired_to_accept_fence": true,
+    "restart_reconnect": true,
+    "drain_cancel": true,
+    "http_queue_transport": false,
+    "multi_host_live": false
+  },
+  "landed": [
+    "DurableWorkerService control plane",
+    "WorkerClient + InProcessWorkerTransport",
+    "protocol envelopes (ART-V15-WORKER-PROTOCOL)",
+    "heartbeat/advertise/claim/renew/submit/drain/cancel/reconnect",
+    "submit path uses V2A-003c durable fence; no worker self-accept"
+  ],
+  "still_drafting": [
+    "HTTP/queue/push transport adapters (ADR-DISPATCH)",
+    "B3 multi-host/recovery live evidence",
+    "ART-V15-WORKER-PROTOCOL lead acceptance",
+    "ART-V15-LEASE-FENCING lead acceptance"
+  ],
+  "note": "V2A-004 B2 transport-independent service/client; ART-V14 drafting; G13 HOST-WIN-DEV blocked; B3 UNKNOWN"
+}
