@@ -1,0 +1,55 @@
+{
+  "packet_id": "R14",
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "status": "claim_renew_expire_verified_on_tip_no_retransplant",
+  "self_accept": false,
+  "donors": [
+    {
+      "sha": "7dcefe4c",
+      "summary": "V2A-003b atomic claim/renew/expire + H3 skip"
+    },
+    {
+      "sha": "e764834a",
+      "summary": "V2A-003b-R renew/expire authority and dep readiness"
+    },
+    {
+      "sha": "685810cc",
+      "summary": "V2A-003b-R2 terminal renew and lease-stamp expiry"
+    }
+  ],
+  "tip_sha_at_verify": "05fc3e8e783a0271754dd368bd9101226081207d",
+  "verified_at": "2026-09-21T19:54:30Z",
+  "foundation_files": [
+    {
+      "path": "tests/integration/db/test_lease_claim_renew_expire.py",
+      "donor_rev": "685810cc",
+      "local_sha256": "f0322e90fd53cd8308a777473efc2d58dc95961037d8dc35262cbd38c00e6c5e",
+      "donor_sha256": "f0322e90fd53cd8308a777473efc2d58dc95961037d8dc35262cbd38c00e6c5e",
+      "identical_to_donor": true
+    },
+    {
+      "path": "docs/evidence/v15/v2a003b-lease-claim-renew-expire.json",
+      "donor_rev": "685810cc",
+      "local_sha256": "18795d5cf97f6a86c196c8b9c54b917e2bda9cdca890a354108454b6e9a922f8",
+      "donor_sha256": "18795d5cf97f6a86c196c8b9c54b917e2bda9cdca890a354108454b6e9a922f8",
+      "identical_to_donor": true
+    }
+  ],
+  "lease_fencing_py": {
+    "note": "Tip already includes V2A-003c accept fence atop 685810cc claim/renew/expire; not overwritten.",
+    "local_sha256": "82340007108b4578597c1e840c1c79a0a4c2ef57822203afa7f9444d6ae33395",
+    "donor_685810cc_sha256": "01a94022cac9c9eaacf0494f634223e95938d849d22c14603df8aa9ac6d08b16",
+    "identical_to_685810cc": false
+  },
+  "excluded": [
+    "coordination heartbeat topology",
+    "autonomous-runner",
+    "downgrade of 003c result acceptance"
+  ],
+  "tests": {
+    "command": "pytest -q tests/integration/db/test_lease_claim_renew_expire.py",
+    "result": "17 passed",
+    "db": "swarmai_v17_r13"
+  },
+  "note": "R14 complete as verify-on-tip; no invent-accept of ART-V15."
+}
