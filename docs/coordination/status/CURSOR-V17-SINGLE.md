@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `26e9cc3292abe85782302fdde3bbe13a5d2440e0`
-- Coordination SHA: `48955f650bdce373b20e1217bc2918848d393481`
-- Updated: `2026-09-21T19:45:09Z`
-- Trigger: `scheduler`
+- Branch SHA: `6b728874c9621e2c67bf29ab3fc1e96e4aa1a55a`
+- Coordination SHA: `b7394434c0f22f0fc1c120ce63bd53557a2c9e76`
+- Updated: `2026-09-21T19:45:23Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `R03`
+- Current packet: `R04`
 - Current artifact: `ART-V13-TASK-POOL`
-- Last meaningful activity: `2026-09-21T19:44:12Z`
+- Last meaningful activity: `2026-09-21T19:45:22Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: restore GitHub Actions billing; ART-V14 await lead on v14-real-007
+- Blocker: USER_ACTION: Actions billing; ART-V14 lead review of v14-real-007; sealed digest unbound (R06)
 
 ## Update
 
-R03 pushed: G13 v3 corpus/freeze/verifier transplanted from 5344763; tip=26e9cc3292abe85782302fdde3bbe13a5d2440e0; 8 freeze tests green. No invent-accept. Starting R04 digest bind.
+R04 done: g13-pool-freeze-v3 verify OK on Mac (240 holdout, 15/cell, digests match). No invent-accept. Next R05 reviewer calibration.
 
 ## Next
 
-R04 current-topology generator/verifier + digest bind
+R05 reviewer input/scorer/calibration/contamination guard
