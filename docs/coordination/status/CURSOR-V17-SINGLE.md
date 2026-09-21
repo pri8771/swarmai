@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `4c7e06f35756fff91bae39e114b34b334cc331ad`
-- Coordination SHA: `94e818d62738d8b794fcd8698f527ecf5906510d`
-- Updated: `2026-09-21T19:43:38Z`
+- Branch SHA: `26e9cc3292abe85782302fdde3bbe13a5d2440e0`
+- Coordination SHA: `02262e4b113a0f8c19f236403e5067f63bc5aa13`
+- Updated: `2026-09-21T19:44:13Z`
 - Trigger: `manual`
 - Status: **working**
 - Current packet: `R03`
 - Current artifact: `ART-V13-TASK-POOL`
-- Last meaningful activity: `2026-09-21T19:43:37Z`
+- Last meaningful activity: `2026-09-21T19:44:12Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit; ART-V14-REAL-E2E await lead review of v14-real-007 (no invent-accept)
+- Blocker: USER_ACTION: restore GitHub Actions billing; ART-V14 await lead on v14-real-007
 
 ## Update
 
-R03: selectively transplanting G13 v3 corpus/freeze/verifier from product donor 5344763; excluding coordination/heartbeat topology. R02 left for lead.
+R03 pushed: G13 v3 corpus/freeze/verifier transplanted from 5344763; tip=26e9cc3292abe85782302fdde3bbe13a5d2440e0; 8 freeze tests green. No invent-accept. Starting R04 digest bind.
 
 ## Next
 
-Complete R03 transplant + smoke import; push; then R04 verification
+R04 current-topology generator/verifier + digest bind
