@@ -1,0 +1,38 @@
+{
+  "spend_policy": "zero",
+  "allow_paid": false,
+  "total_usd": 0.0,
+  "entries": [
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:40.693624+00:00"
+    },
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:44.143418+00:00"
+    },
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:45.621210+00:00"
+    }
+  ],
+  "requests": 3
+}

@@ -43,9 +43,15 @@ class MissionRuntime:
         self.controller = MissionController(inference_slots=2, worker_slots=2)
         self._broker: SharedInferenceBroker | None = None
 
-    def _mission_broker(self) -> SharedInferenceBroker:
+    def _mission_broker(self, *, models: list[str] | None = None) -> SharedInferenceBroker:
         if self._broker is None:
-            self._broker = build_local_mission_broker(repo_root=self.repo)
+            wanted = [self.model]
+            if models:
+                wanted.extend(models)
+            self._broker = build_local_mission_broker(
+                repo_root=self.repo,
+                models=wanted,
+            )
         return self._broker
 
     async def run(self, goal: str) -> MissionRecord:
@@ -117,7 +123,9 @@ class MissionRuntime:
             self.repo,
             model=default_model,
             model_by_family=model_by_family,
-            broker=self._mission_broker(),
+            broker=self._mission_broker(
+                models=[default_model, *model_by_family.values(), self.model]
+            ),
             project_id=mission.project_id,
             parser_dogfood_fixture=self.parser_dogfood_fixture,
             require_broker=True,

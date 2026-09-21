@@ -104,3 +104,43 @@ async def test_concurrent_brokered_calls_share_quota(tmp_path: Path) -> None:
     live = broker.ledger._buckets["qb_local_ollama_requests"]
     assert live.model.remaining == 1
     assert live.settled == 3
+
+
+def test_build_local_mission_broker_registers_requested_coder_route(tmp_path: Path) -> None:
+    broker = build_local_mission_broker(
+        repo_root=tmp_path,
+        models=["qwen2.5-coder:14b"],
+    )
+    assert "rt_ollama_qwen2.5-coder:14b" in broker._contexts
+
+
+@pytest.mark.asyncio
+async def test_brokered_chat_returns_full_text_over_2k(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import swarm.mission.brokered_inference as mod
+    from swarm.mission.inference import InferenceResult
+
+    long_text = "def foo():\n    return 1\n" + ("# pad\n" * 400)
+    assert len(long_text) > 2000
+
+    def _fake_local_chat(**kwargs):  # type: ignore[no-untyped-def]
+        return InferenceResult(
+            ok=True,
+            text=long_text,
+            model="gemma3:4b",
+            route_id="rt_ollama_gemma3:4b",
+            prompt_tokens=10,
+            completion_tokens=20,
+            cost_usd=0.0,
+        )
+
+    monkeypatch.setattr(mod, "local_chat", _fake_local_chat)
+    broker = build_local_mission_broker(repo_root=tmp_path, models=["gemma3:4b"])
+    result = await brokered_local_chat(
+        broker=broker,
+        messages=[{"role": "user", "content": "rewrite file"}],
+        model="gemma3:4b",
+        max_tokens=4096,
+    )
+    assert result.ok is True
+    assert result.text == long_text
+    assert len(result.text) > 2000

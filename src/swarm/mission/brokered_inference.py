@@ -72,7 +72,9 @@ class _LocalAdapter:
             output_tokens=result.completion_tokens or 0,
             total_tokens=(result.prompt_tokens or 0) + (result.completion_tokens or 0),
             extras={
-                "text": (result.text or "")[:2000],
+                # Do not truncate model text here: full-file mission rewrites
+                # routinely exceed a few KB and truncating caused SyntaxError patches.
+                "text": result.text or "",
                 "ok": result.ok,
                 "error": result.error,
                 "cost_usd": 0.0,
@@ -93,13 +95,37 @@ class _LocalAdapter:
         return type(exc).__name__
 
 
+def _discover_local_ollama_models() -> list[str]:
+    """Best-effort inventory of local Ollama tags (zero-spend loopback only)."""
+    try:
+        import json
+        import urllib.request
+
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=2) as resp:
+            payload = json.loads(resp.read().decode())
+    except Exception:
+        return []
+    names: list[str] = []
+    for row in payload.get("models") or []:
+        name = str(row.get("name") or "").strip()
+        if name and name not in names:
+            names.append(name)
+    return names
+
+
 def build_local_mission_broker(
     *,
     repo_root: Path | None = None,
     models: list[str] | None = None,
     request_limit: int = 50,
 ) -> SharedInferenceBroker:
-    models = models or ["gemma3:4b", "qwen3.5:4b"]
+    defaults = ["gemma3:4b", "qwen3.5:4b", "qwen3.5:9b", "qwen2.5-coder:14b"]
+    discovered = _discover_local_ollama_models()
+    merged: list[str] = []
+    for name in (models or []) + defaults + discovered:
+        if name and name not in merged:
+            merged.append(name)
+    models = merged or defaults
     routes: list[RouteSnapshot] = []
     contexts: dict[str, RoutePolicyContext] = {}
     for model in models:

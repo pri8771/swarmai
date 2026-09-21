@@ -1,0 +1,63 @@
+{
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-004",
+  "status": "fail",
+  "failure_class": "implement=implement_failed_no_known_answer_fallback;verify=verify_complete;review=reject",
+  "recorded_at": "2026-09-21T18:27:47Z",
+  "candidate_sha": "f079d5e3ca27f08bdbe7b5457a571e6bbb167882",
+  "mission_id": "b27b766f15f54f0893bb8ca129c99b86",
+  "spend_usd": 0.0,
+  "subsystem": "src/swarm/cost/ledger.py",
+  "changed_files": [],
+  "material_diff": false,
+  "g14_lead_accept_invented": false,
+  "public_deploy_claimed": false,
+  "main_merge": false,
+  "primary_checkout_modified": false,
+  "broker_receipts": [
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:40.693624+00:00"
+    },
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:44.143418+00:00"
+    },
+    {
+      "source": "tsk_cdec29682829473f9a6d6ea91d9e02ce",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b",
+      "requests": 1,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T18:27:45.621210+00:00"
+    }
+  ],
+  "models_used": [
+    "qwen2.5-coder:14b"
+  ],
+  "pass_criteria_snapshot": {
+    "mission_id": true,
+    "brokered_local_inference": true,
+    "cost_zero": true,
+    "material_diff": false,
+    "verify_ok": true,
+    "accepted": false
+  },
+  "root_cause": "route_not_registered_for_broker for qwen2.5-coder:14b; default broker only registered gemma3:4b/qwen3.5:4b",
+  "follow_up": "expand local broker model registration + stop truncating broker extras text at 2000 chars"
+}

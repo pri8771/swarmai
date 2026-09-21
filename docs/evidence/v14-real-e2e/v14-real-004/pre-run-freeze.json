@@ -1,0 +1,24 @@
+{
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-004",
+  "frozen_at": "2026-09-21T18:27:36Z",
+  "candidate_sha": "f079d5e3ca27f08bdbe7b5457a571e6bbb167882",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <audit ledger.py> --model qwen2.5-coder:14b --no-evidence-router --repo <checkout>",
+  "execution_mode": "operational_local_ollama_governed_broker",
+  "selected_model": "qwen2.5-coder:14b",
+  "evidence_router": false,
+  "zero_spend": true,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "prior_failed_run_ids": [
+    "v14-real-001",
+    "v14-real-002",
+    "v14-real-003"
+  ],
+  "target_subsystem": "src/swarm/cost/ledger.py",
+  "different_subsystem_from_prior": true,
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/cost/ledger.py and its call sites for one real correctness, reliability, or accounting defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "note": "After truncate-rewrite gate at f079d5e; use stronger local coder model single-route",
+  "mission_id": "b27b766f15f54f0893bb8ca129c99b86"
+}
