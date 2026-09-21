@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:24:47Z",
+  "updated_at": "2026-09-21T00:31:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -120,6 +120,8 @@
     },
     "2.0": {
       "required": [
+        "ART-V20-FOUNDATION-HARDENING",
+        "ART-V20-INTEGRATION-CONTRACT",
         "ART-V20-INTEGRATED-CANDIDATE",
         "ART-V20-SUPPORT-MATRIX",
         "ART-V20-INSTALL-JOURNEY",
@@ -1131,7 +1133,9 @@
         "ART-V16-PERMISSION-RETRIEVAL",
         "ART-V17-APPROVAL-BINDING",
         "ART-V18-SITE-EPOCH",
-        "ART-V19-EXTENSION-CONTRACT"
+        "ART-V19-EXTENSION-CONTRACT",
+        "ART-V20-INTEGRATION-CONTRACT",
+        "ART-V20-FOUNDATION-HARDENING"
       ],
       "acceptance_refs": [
         "docs/artifacts/future/ART-V20-ACCEPTANCE.md"
@@ -1198,7 +1202,7 @@
     },
     {
       "artifact_id": "ART-V20-RELIABILITY-PROTOCOL",
-      "name": "Integrated V2.0 reliability observation protocol",
+      "name": "Integrated V2 reliability observation protocol",
       "target_version": "2.0",
       "kind": "acceptance-protocol",
       "owner": "ChatGPT lead",
@@ -1207,7 +1211,7 @@
       "path_or_source_ref": "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md",
       "dependencies": [],
       "worker_packets": [],
-      "next_action": "freeze exact duration/candidate/config before final observation",
+      "next_action": "freeze final metric/candidate identities before reliability run",
       "blockers": [],
       "acceptance_refs": [
         "docs/artifacts/future/ART-V20-ACCEPTANCE.md"
@@ -1215,20 +1219,21 @@
     },
     {
       "artifact_id": "ART-V20-SECURITY-REVIEW",
-      "name": "Integrated V2.0 threat/security review",
+      "name": "Integrated V2 threat model and security review",
       "target_version": "2.0",
-      "kind": "review-and-negative-evidence",
+      "kind": "review",
       "owner": "ChatGPT lead",
       "lane": "lead",
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md",
       "dependencies": [
-        "ART-V20-INTEGRATED-CANDIDATE"
+        "ART-V20-INTEGRATED-CANDIDATE",
+        "ART-V20-FOUNDATION-HARDENING"
       ],
       "worker_packets": [],
-      "next_action": "derive/run integrated negative suites as lane artifacts land",
+      "next_action": "map every invariant to source/tests/evidence after integrated candidate",
       "blockers": [
-        "integrated candidate incomplete"
+        "integrated candidate not ready"
       ],
       "acceptance_refs": [
         "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md"
@@ -1439,6 +1444,68 @@
       ],
       "worker_packets": [],
       "next_action": "refine after V2.3 contracts",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V15-DBOS-REUSE",
+      "name": "DBOS durable execution/queue reuse decision",
+      "target_version": "1.5",
+      "kind": "architecture-decision",
+      "owner": "ChatGPT lead + Cursor Session A",
+      "lane": "runtime",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V15-DBOS_REUSE_DECISION.md",
+      "dependencies": [
+        "ART-V15-WORKER-PROTOCOL",
+        "ART-V15-LEASE-FENCING"
+      ],
+      "worker_packets": [
+        "V2A-003X"
+      ],
+      "next_action": "Session A confirm installed API/version and run isolated queue/restart/stale-fence spike after durable repository foundation",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
+      "name": "Inherited foundation security/durability hardening",
+      "target_version": "2.0",
+      "kind": "hardening-review",
+      "owner": "ChatGPT lead + Cursor sessions",
+      "lane": "cross-lane",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/current/ART-V20-FOUNDATION_HARDENING.md",
+      "dependencies": [
+        "ART-V20-INTEGRATION-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md"
+      ],
+      "worker_packets": [
+        "V2A-H2",
+        "V2A-H3",
+        "V2A-H6A",
+        "V2A-H8",
+        "V2B-H1",
+        "V2B-H4",
+        "V2B-H5",
+        "V2B-H9",
+        "V2B-H10"
+      ],
+      "next_action": "fold fixes into owning lane artifacts; lead verifies each H item",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V20-INTEGRATION-CONTRACT",
+      "name": "Cross-lane V2 service boundary contract",
+      "target_version": "2.0",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/artifacts/future/ART-V20-INTEGRATION_CONTRACT.md",
+      "dependencies": [],
+      "worker_packets": [],
+      "next_action": "enforce during lane review/integration",
       "blockers": []
     }
   ],
