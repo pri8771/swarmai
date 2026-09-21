@@ -11,5 +11,6 @@
     "command": "pytest -q tests/tools/test_v17_gateway_negatives.py -k effect/approval",
     "result": "4 passed"
   },
-  "note": "Durable approvals/effect reservations schema+gateway negatives on tip. No invent-accept."
+  "note": "Durable approvals/effect reservations schema+gateway negatives on tip. No invent-accept.",
+  "evidence_tip_sha": "c3a249882664f39afe0794229b03360d390f815a"
 }

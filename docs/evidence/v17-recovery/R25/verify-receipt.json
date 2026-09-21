@@ -14,5 +14,6 @@
   "still_unknown": [
     "live task quality eval"
   ],
-  "note": "CP4 budget/isolation math present; task quality remains UNKNOWN. No invent-accept."
+  "note": "CP4 budget/isolation math present; task quality remains UNKNOWN. No invent-accept.",
+  "evidence_tip_sha": "c3a249882664f39afe0794229b03360d390f815a"
 }
