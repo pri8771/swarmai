@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T00:38:00Z",
+  "updated_at": "2026-09-21T00:46:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "governance": {
@@ -738,7 +738,8 @@
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V15-LEASE_FENCING_ADR.md",
       "dependencies": [
-        "ART-V15-WORKER-PROTOCOL"
+        "ART-V15-WORKER-PROTOCOL",
+        "ART-V15-DURABLE-SCHEMA"
       ],
       "worker_packets": [
         "V2A-003a",
@@ -806,7 +807,8 @@
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V16-PROVENANCE_SCHEMA.md",
       "dependencies": [
-        "ART-V16-KNOWLEDGE-CONTRACT"
+        "ART-V16-KNOWLEDGE-CONTRACT",
+        "ART-V16-DURABLE-SCHEMA"
       ],
       "worker_packets": [
         "V2B-003a"
@@ -899,7 +901,8 @@
       "status": "drafting",
       "path_or_source_ref": "docs/artifacts/future/ART-V17-APPROVAL_BINDING.md",
       "dependencies": [
-        "ART-V17-TOOL-CONTRACT"
+        "ART-V17-TOOL-CONTRACT",
+        "ART-V17-DURABLE-EFFECT-SCHEMA"
       ],
       "worker_packets": [
         "V2B-004a",
@@ -1506,6 +1509,61 @@
       "dependencies": [],
       "worker_packets": [],
       "next_action": "enforce during lane review/integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V15-DURABLE-SCHEMA",
+      "target_version": "1.5",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/artifacts/future/ART-V15-DURABLE_SCHEMA_DELTA.md",
+      "dependencies": [
+        "ART-V15-LEASE-FENCING"
+      ],
+      "worker_packets": [
+        "V2A-003a",
+        "V2A-003b",
+        "V2A-003c"
+      ],
+      "next_action": "Session A extend existing TaskAttempt/WorkerLease/Outbox schema exactly; no duplicate persistence authority",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V16-DURABLE-SCHEMA",
+      "target_version": "1.6",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/artifacts/future/ART-V16-DURABLE_SCHEMA.md",
+      "dependencies": [
+        "ART-V16-PROVENANCE"
+      ],
+      "worker_packets": [
+        "V2B-003a",
+        "V2B-003b",
+        "V2B-003c"
+      ],
+      "next_action": "Session B domain/repository; Session A central Base/migration integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V17-DURABLE-EFFECT-SCHEMA",
+      "target_version": "1.7",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "lead",
+      "status": "accepted",
+      "path_or_source_ref": "docs/artifacts/future/ART-V17-DURABLE_EFFECT_SCHEMA.md",
+      "dependencies": [
+        "ART-V17-APPROVAL-BINDING"
+      ],
+      "worker_packets": [
+        "V2B-H5"
+      ],
+      "next_action": "Session B effect semantics; Session A DB/migration/repository integration",
       "blockers": []
     }
   ],
