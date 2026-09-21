@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `46f7a24792640da7686560bed6e3bead71a392cd`
-- Coordination SHA: `062383b8f9155618f9cc7bb9154ce8ddf3b8087c`
-- Updated: `2026-09-21T19:50:15Z`
-- Trigger: `scheduler`
+- Branch SHA: `da026d1d0ec610e226d56cdda796269fc1573d09`
+- Coordination SHA: `b14aa11dd37764c44f978076696ccbdb6f261f71`
+- Updated: `2026-09-21T19:51:50Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `R05`
-- Current artifact: `ART-V13-REVIEWER-QUALIFICATION`
-- Last meaningful activity: `2026-09-21T19:48:56Z`
+- Current packet: `R03`
+- Current artifact: `ART-V13-TASK-POOL`
+- Last meaningful activity: `2026-09-21T19:51:49Z`
 - Spend USD: `0.0`
 - Blocker: USER_ACTION: Actions billing; ART-V14 lead on v14-real-007; R06 sealed digest needs lead-held material
 
 ## Update
 
-R05 pushed: reviewer calibration v1 contract/scorer/contamination/receipt; 10/10 calib + negatives green. No held-out/invent-accept. Next R06 blocker or R09/R13.
+R03 Done: G13 v3 selective transplant from donor 5344763… byte-identical digests; 8/8 freeze tests; tip=da026d1d0ec610e226d56cdda796269fc1573d09. R02/v14-real-007 lead-pending no invent-accept. Next R13 verify or R09.
 
 ## Next
 
-R06 emit sealed-reference USER_ACTION blocker if needed; else R09/R13 dependency-independent
+R13 verify lease foundation already on tip vs donors 630ab780/92f59faf; else R09 remote admission
