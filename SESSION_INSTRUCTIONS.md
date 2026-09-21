@@ -45,6 +45,17 @@ Do not idle. Next independent packet is `V2A-H6A-R / SP1`: owner-only compose se
 If still waiting and no newer lead instruction, take `V2A-003X / SP2` isolated DBOS reuse spike only.
 Do not start V2A-003c before lead verification unless a newer lead message says so.
 
+## Owner priority override — real example first
+
+V1.4 is not complete until `ART-V14-REAL-E2E` is verified with one actual non-mock end-to-end SwarmAI mission.
+
+After any bounded packet already in progress:
+1. **V14-REAL-001** — run `docs/coordination/REAL_V14_E2E_PROTOCOL.md` immediately. Actual local model inference, governed broker, real repository/tool reads, isolated worktree, real check/test, no supplied defect/answer, $0, exact evidence.
+2. **V12-REMOTE-ADMIT-01** — unblock G12 by admitting exact zero-charge remote routes. Probe configured credential presence without printing secrets; prefer OpenRouter Free exact `:free`, Groq Free exact model, Gemini Free fallback. Public docs are not admission; exact account/tier/model/quota/health + bounded zero-charge canary required.
+3. Then continue H6A/DBOS/later V1.5 work unless a newer lead message changes order.
+
+The real E2E smoke does not replace G12/G13/G14. It proves the product actually works while those formal gates close in parallel.
+
 ## Continuous work rule
 After every packet: push exact source/evidence, post CURSOR-A message, publish heartbeat `review_requested`, fetch coordination, and claim the next dependency-ready A packet.
 Only lead-reviewed slices enter `cursor/v2-integration`; never bulk-merge the runtime lane.
