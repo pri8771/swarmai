@@ -88,6 +88,10 @@ Packets: 62 in the V1.7 queue (35 historical + 27 new; 21 fully specified, 6 med
 
 Proposed registry deltas for the lead (this pass did not edit the registry): refresh `updated_at`; point `governance.worker_backlog`/`execution_plan` at the two queue files; give `ART-V17-INTEGRATION-MANIFEST`, `ART-V17-SESSION-RECOVERY`, `ART-V17-PERMISSION-NEGATIVES` a `path_or_source_ref` (their specs are `packets/R29a.md`, `R31a.md`+`R31b.md`, `R32a.md`); add the claim-ladder fields of 0.2 per artifact.
 
+## Real-world proof rule
+
+`REAL_WORLD_ACCEPTANCE_POLICY.md` is binding: fixture/local integration evidence can prove mechanics but cannot justify a milestone "working" claim. V1.7 adds R33c (real GitHub external action); V2.3 and V3.0 checkpoints must also cross real physical/external boundaries.
+
 ## Product through-line
 
 SwarmAI should evolve by extending one authority model, not by layering unrelated frameworks:
