@@ -197,3 +197,45 @@ No universal bug-free claim is made.
 - independent lead disposition: accept reliability artifact / changes required / blocked.
 
 Today's engineering target may stop at an implementation-complete candidate with this protocol frozen and drills runnable. Do not call V2.0 accepted until the real observation and all other required acceptance artifacts complete.
+
+## 12. Campaign identity and reset matrix
+
+Every reliability attempt has a stable `campaign_id` and an immutable `campaign_manifest_sha256`. A new candidate SHA, material configuration digest, durable schema authority, admitted-route policy, worker fencing authority, knowledge-permission policy, tool/effect authority, extension trust policy or site epoch creates a **new campaign identity** unless the lead has preregistered that the field is intentionally variable for a specific drill.
+
+Before the first counted minute, classify every change category in a reset matrix:
+
+| Change class | Default effect on 7-day clock | Required follow-up |
+|---|---|---|
+| Runtime/source behavior | Full restart | New campaign manifest + all affected drills |
+| Auth/project isolation/effect fencing | Full restart | Security negatives + affected drills |
+| Durable schema/migration semantics | Full restart | Migration/restore + recovery drills |
+| Broker/admission/qualification policy | Full restart | Route/quota/fallback drills |
+| Knowledge permission/supersession logic | Full restart | Knowledge authorization/deletion drills |
+| Tool/approval/receipt semantics | Full restart | Tool response-loss/cancellation/duplicate drills |
+| Site epoch/backup/restore authority | Full restart | Backup/restore + stale-site drills |
+| Observability-only change proven behavior-neutral | Clock may continue after lead review | Rebind telemetry version; rerun visibility check |
+| Documentation-only change | No reset | Record commit and behavior-neutral rationale |
+| Test-only change outside shipped runtime | No reset by default | Record test change; rerun affected offline check |
+
+A narrower decision than the default requires a written lead decision **before** post-change reliability evidence is counted. The decision names the exact old/new SHA, why behavior is unaffected, and which evidence remains valid. This prevents retroactive preservation of a favorable clock.
+
+Campaign time is never spliced across incompatible identities. A failed campaign remains preserved as evidence and may inform defect repair, but its elapsed time cannot be transferred to a successor campaign.
+
+## 13. Checkpoints, gaps and campaign completion
+
+During the 7-day campaign, publish one immutable checkpoint at least every 24 wall-clock hours and at every mandatory drill or unexpected failure. Each checkpoint binds:
+- `campaign_id` and candidate/config manifest hash;
+- covered UTC interval;
+- service/worker availability observations;
+- monitoring coverage and explicit gaps;
+- missions/drills added since the prior checkpoint;
+- new unexpected events/defect IDs;
+- resource/provider accounting status including unknowns;
+- backup age / restore verification status;
+- whether the campaign is `counting`, `paused_for_unobservable_state`, `invalidated`, or `complete_candidate`.
+
+A monitoring gap does not automatically invalidate a campaign, but a gap that makes a release invariant unobservable cannot count toward that invariant. The lead must classify the gap before final acceptance. If the gap prevents establishing continuity of a required safety property, start a successor campaign rather than estimating or backfilling the missing interval.
+
+The seven-day clock completes only when `ended_at - started_at >= 168 hours` for one compatible campaign identity and the evidence ledger covers the required interval honestly. Scheduled-job timestamps, heartbeat cadence, CI duration, repeated short runs or manually edited dates cannot substitute for elapsed wall-clock time.
+
+Completion of the clock only makes the reliability artifact reviewable. It does not itself accept V2.0: all required drills, zero-tolerance invariants, defect disposition, support-matrix reconciliation, security review and independent release review must still pass.
