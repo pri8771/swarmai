@@ -1,10 +1,10 @@
 {
   "schema_version": "1.4",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-21T01:25:30Z",
+  "updated_at": "2026-09-21T01:33:00Z",
   "history": {
-    "previous_blob_sha": "474139239e59553c0dcc7a3f7ab76ee173a46afb",
-    "note": "Adds independent acceptance of V2A-003a-R repair packet. ART-V15-LEASE-FENCING remains drafting because V2A-003b still requires changes and V2A-003c is not implemented."
+    "previous_blob_sha": "44480fefd313b6668fe0551bc4f7d4b7ca983b3a",
+    "note": "Independent review accepts V2A-020a as a correctly bounded integration-start packet and requests a small hardening repair for V2A-H6A. Artifact-level V2.0 acceptance is unchanged."
   },
   "purpose": "Evidence-backed worker calibration by story-point complexity. Story points are not hours.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
@@ -16,20 +16,21 @@
   },
   "story_point_summary": {
     "1": {
-      "completed_lead_verified": 3,
-      "reviewed_packets": 3,
+      "completed_lead_verified": 4,
+      "reviewed_packets": 4,
       "first_lead_review_acceptance_rate": 1.0,
       "stable": false,
       "reviewed_packet_ids": [
         "W-131A",
         "V2A-002",
-        "V2A-003a-R"
+        "V2A-003a-R",
+        "V2A-020a"
       ]
     },
     "2": {
       "completed_lead_verified": 3,
-      "reviewed_packets": 6,
-      "first_lead_review_acceptance_rate": 0.5,
+      "reviewed_packets": 7,
+      "first_lead_review_acceptance_rate": 0.428571,
       "stable": false,
       "reviewed_packet_ids": [
         "W-111A",
@@ -37,7 +38,8 @@
         "W-121A",
         "V2A-001",
         "V2A-003a",
-        "V2A-003b"
+        "V2A-003b",
+        "V2A-H6A"
       ]
     },
     "3": {
@@ -186,6 +188,44 @@
       ],
       "artifact_status_after_review": "drafting",
       "next_packet": "V2A-003b-R"
+    },
+    {
+      "packet_id": "V2A-H6A",
+      "story_points": 2,
+      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "failure_35550624183_offline_pytest_then_success_35550769734",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": false,
+      "completion_sha": "77ef7e4c1675b74dbfcdeba27f8c955ae39f119c",
+      "evidence_sha": "99733dccd91fc2b8356f96ff755f9b9aab20f2b4",
+      "current_tip_sha": "7a2491a2840ef8381e275b05e11f3f76c7a522e6",
+      "positive_findings": [
+        "fixed swarm:swarm compose credential removed and runtime DSN rejects it",
+        "non-mock compose requires explicit DB password and DSN variables",
+        "API bind remains loopback-only and DB has no host port",
+        "exact-tip CI 35550769734 is green after fail-closed compose assertion repair"
+      ],
+      "changes_required": [
+        "generated deploy/compose/.env contains a database secret but is not explicitly written/chmod owner-only; set and test restrictive permissions",
+        "document/guard --force as fresh-config overwrite, not safe credential rotation for an already initialized Postgres volume"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V2A-H6A-R"
+    },
+    {
+      "packet_id": "V2A-020a",
+      "story_points": 1,
+      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35550653160",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
+      "code_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+      "note": "Integration candidate correctly includes only lead-verified V2A-001/V2A-002 lineage and explicitly excludes V15 changes whose ancestry still contains unreviewed V2A-003b behavior. Artifact remains drafting; this packet only establishes a clean reviewed integration baseline."
     }
   ],
   "superseded_duplicate_intents": [
@@ -201,32 +241,32 @@
   "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md",
   "packets": [
     {
-      "packet_id": "V2A-H6A",
+      "packet_id": "V2A-H6A-R",
       "artifact_id": "ART-V20-FOUNDATION-HARDENING",
-      "story_points": 2,
-      "gate": "V2.0",
-      "task_family": "deploy/integration",
-      "status": "submitted_reviewable",
-      "worker": "Cursor Session A",
-      "first_pass_ci": "35550769734",
-      "first_lead_review": null,
-      "rework_cycles": 0,
-      "reopened_defect": false,
-      "evidence_complete_first_submission": true
-    },
-    {
-      "packet_id": "V2A-020a",
-      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
       "story_points": 1,
       "gate": "V2.0",
-      "task_family": "integration",
-      "status": "submitted_drafting",
+      "task_family": "deploy/integration",
+      "status": "ready_repair",
       "worker": "Cursor Session A",
-      "first_pass_ci": "35550653160",
+      "first_pass_ci": null,
       "first_lead_review": null,
       "rework_cycles": 0,
       "reopened_defect": false,
-      "evidence_complete_first_submission": true
+      "evidence_complete_first_submission": false
+    },
+    {
+      "packet_id": "V2A-003b-R",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "story_points": 2,
+      "gate": "V1.5",
+      "task_family": "durable-worker-lease",
+      "status": "ready_repair",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": false
     }
   ]
 }
