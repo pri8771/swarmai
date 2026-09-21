@@ -1,14 +1,14 @@
 {
-  "schema_version": "1.2",
-  "updated_at": "2026-09-21T00:12:38Z",
+  "schema_version": "1.3",
+  "updated_at": "2026-09-21T00:18:09Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-  "implementation_authorized_through": "1.4",
-  "future_source_implementation_authorized": false,
+  "implementation_authorized_through": "3.0",
+  "future_source_implementation_authorized": true,
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -88,14 +88,21 @@
       "final_campaign": "preregistered_not_started"
     }
   },
-  "ready_worker_packets": [],
+  "ready_worker_packets": [
+    "V2A-001",
+    "V2A-002",
+    "V2A-003a",
+    "V2B-001",
+    "V2B-002",
+    "V2B-003a",
+    "V2B-004a"
+  ],
   "blocked_worker_packets": {
-    "W-041A": "human Cursor CLI login required",
-    "W-121B": "0 admissible remote routes plus broker contract drafting",
-    "W-131B": "qualification task/scorer/prompt/tool/model manifest not frozen",
-    "W-141A": "G13 not qualified",
-    "W-141B": "G12/G13 not ready",
-    "W-142A-D": "G10-G14 required artifacts incomplete"
+    "W-041A": "human Cursor CLI login required for V1.0 heartbeat acceptance",
+    "W-121B": "0 admissible remote routes and broker contract not yet closed",
+    "W-131B": "held-out task/scorer/prompt/tool/model manifest must freeze first",
+    "W-141A/B": "G12/G13 live prerequisites incomplete",
+    "W-142A-D": "time/live acceptance prerequisites incomplete"
   },
   "cursor_runner": {
     "scheduler_checkins_verified": true,
@@ -110,12 +117,13 @@
     "docs/artifacts/future/ART-V15-WORKER_PROTOCOL.md"
   ],
   "open_blockers": [
-    "OPERATOR ABRUPT STOP \u2014 no further V1.4 engineering until explicit resume",
-    "Cursor CLI authentication blocks ART-V10-WORKER-HEARTBEAT",
-    "G11 not lead-accepted; process restart evidence incomplete",
-    "Zero admissible remote routes; G12 dual-remote overlap blocked",
-    "G13 qualification_claimed=false; no qualified cells",
-    "G14 live adaptive proof and LIVE-142 campaign remain open"
+    "ART-V10-WORKER-HEARTBEAT requires live Cursor CLI authentication + real receipts",
+    "ART-V11-RESTART-EVIDENCE needs actual service process restart proof",
+    "ART-V12-BROKER-CONTRACT has operational generic execution bypass to direct local_chat",
+    "ART-V12-PROVIDER-ELIGIBILITY currently has 0 admissible remote routes",
+    "ART-V13 task pool/reviewer qualification/qualified matrix incomplete",
+    "V1.4 live adaptive proof and time-bound final campaign remain incomplete",
+    "V2.0 acceptance cannot be honestly completed until required wall-clock evidence elapses"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
@@ -125,21 +133,41 @@
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
   },
-  "product_status": "v1_4_abrupt_stop_mid_gate",
+  "product_status": "v2_acceleration_active_artifact_first",
   "implementation_stop": {
-    "status": "abrupt_operator_stop",
-    "recorded_at": "2026-09-21T00:12:38Z",
-    "message_id": "CURSOR-20260920-024",
-    "note_file": "docs/coordination/V1_4_ABRUPT_STOP.md",
-    "new_engineering_authorized": false,
-    "lead_016_packets_started_after_stop": false,
-    "incomplete_gates": [
-      "G10_FIX004_cli_login",
-      "G11_lead_accept",
-      "G12_remote_INF121",
-      "G13_EVAL_qualification",
-      "G14_live",
-      "LIVE-142"
-    ]
-  }
+    "status": "superseded_by_owner_resume",
+    "prior_stop_record": "docs/coordination/V1_4_ABRUPT_STOP.md",
+    "resume_record": "docs/coordination/OWNER_RESUME_TO_V3.md",
+    "resumed_at": "2026-09-21T00:18:09Z",
+    "new_engineering_authorized": true
+  },
+  "active_execution_target": "2.0_implementation_artifact_complete_candidate",
+  "major_milestones": [
+    "1.7",
+    "2.3",
+    "3.0"
+  ],
+  "today_target": {
+    "version": "2.0",
+    "type": "implementation_artifact_complete_candidate",
+    "acceptance_note": "Time-bound acceptance windows remain real wall-clock evidence and may finish later."
+  },
+  "team": {
+    "lead": "ChatGPT",
+    "cursor_sessions": 2,
+    "integration_branch": "cursor/v2-integration",
+    "session_a": {
+      "role": "runtime_control_plane_integration",
+      "branch": "cursor/v2-runtime-lane",
+      "prompt": "docs/coordination/CURSOR_SESSION_A_RUNTIME_PROMPT.md"
+    },
+    "session_b": {
+      "role": "knowledge_tools_product_beta",
+      "branch": "cursor/v2-product-lane",
+      "prompt": "docs/coordination/CURSOR_SESSION_B_PRODUCT_PROMPT.md"
+    },
+    "contract": "docs/coordination/TWO_CURSOR_TEAM.md"
+  },
+  "execution_plan": "docs/coordination/V2_EXECUTION_PLAN.md",
+  "artifact_registry": "docs/coordination/ARTIFACT_REGISTRY.json"
 }
