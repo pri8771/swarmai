@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from swarm.contracts.common import new_id, utc_now
@@ -221,6 +221,7 @@ class KnowledgeRepository:
         replacement_item_id: str | None = None,
         replacement_version: int | None = None,
         now: datetime | None = None,
+        invalidation_log: list[dict[str, Any]] | None = None,
     ) -> KnowledgeTombstone:
         clock = now or utc_now()
         latest = self.get_latest(project_id=project_id, item_id=item_id, include_deleted=True)
@@ -261,7 +262,220 @@ class KnowledgeRepository:
             )
         )
         self.session.flush()
+        self.invalidate_dependents(
+            project_id=project_id,
+            item_id=item_id,
+            version=deleted_version,
+            reason="tombstone",
+            invalidation_log=invalidation_log,
+        )
         return stone
+
+    def supersede(
+        self,
+        *,
+        project_id: str,
+        old_item_id: str,
+        old_version: int,
+        new_body: str,
+        reviewer_ref: str,
+        topic: str | None = None,
+        now: datetime | None = None,
+    ) -> KnowledgeItem:
+        """Explicit supersession: mark old superseded, create new version + link."""
+        clock = now or utc_now()
+        old = self.get_item(project_id=project_id, item_id=old_item_id, version=old_version)
+        if old is None:
+            raise KnowledgeWriteError("item_not_found")
+        if old.acceptance_state == "deleted":
+            raise KnowledgeWriteError("item_deleted")
+        row = self.session.scalar(
+            select(KnowledgeItemRow).where(
+                KnowledgeItemRow.project_id == project_id,
+                KnowledgeItemRow.item_id == old_item_id,
+                KnowledgeItemRow.version == old_version,
+            )
+        )
+        if row is None:
+            raise KnowledgeWriteError("version_not_found")
+        row.acceptance_state = "superseded"
+        row.superseded_at = clock
+        self.session.flush()
+        replacement = self.new_version(
+            project_id=project_id,
+            item_id=old_item_id,
+            body=new_body,
+            topic=topic or old.topic,
+            acceptance_state="accepted",
+            class_=(
+                "accepted_fact"
+                if old.class_ in {"observation", "hypothesis", "accepted_fact"}
+                else old.class_
+            ),
+            producer_type="reviewer",
+            producer_ref=reviewer_ref,
+            permission_labels=list(old.permission_labels),
+            retrieval_labels=list(old.retrieval_labels),
+            provenance_refs=[*old.provenance_refs, f"supersedes:v{old_version}"],
+            source_digests=list(old.source_digests),
+            confidence=old.confidence,
+            payload={**old.payload, "supersedes_version": old_version},
+        )
+        self.add_link(
+            KnowledgeLink(
+                project_id=project_id,
+                from_item_id=replacement.item_id,
+                from_version=replacement.version,
+                relation="supersedes",
+                to_item_id=old_item_id,
+                to_version=old_version,
+                evidence_ref=f"reviewer:{reviewer_ref}",
+            )
+        )
+        self.invalidate_dependents(
+            project_id=project_id,
+            item_id=old_item_id,
+            version=old_version,
+            reason="supersession",
+        )
+        return replacement
+
+    def record_contradiction(
+        self,
+        *,
+        project_id: str,
+        left_item_id: str,
+        left_version: int,
+        right_item_id: str,
+        right_version: int,
+        evidence_ref: str | None = None,
+    ) -> KnowledgeLink:
+        """Keep both observations; mark an explicit contradiction set via link."""
+        link = self.add_link(
+            KnowledgeLink(
+                project_id=project_id,
+                from_item_id=left_item_id,
+                from_version=left_version,
+                relation="contradicts",
+                to_item_id=right_item_id,
+                to_version=right_version,
+                evidence_ref=evidence_ref,
+            )
+        )
+        # Mark both as disputed if previously accepted — do not invent a single truth.
+        for item_id, version in ((left_item_id, left_version), (right_item_id, right_version)):
+            row = self.session.scalar(
+                select(KnowledgeItemRow).where(
+                    KnowledgeItemRow.project_id == project_id,
+                    KnowledgeItemRow.item_id == item_id,
+                    KnowledgeItemRow.version == version,
+                )
+            )
+            if row is not None and row.acceptance_state == "accepted":
+                row.acceptance_state = "disputed"
+        self.session.flush()
+        return link
+
+    def invalidate_dependents(
+        self,
+        *,
+        project_id: str,
+        item_id: str,
+        version: int,
+        reason: str,
+        invalidation_log: list[dict[str, Any]] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Invalidate dependent summaries and emit cache/export/prompt invalidation events."""
+        events: list[dict[str, Any]] = []
+        clock = utc_now()
+        # Summaries that summarize this item (from_item summarizes to_item or reverse).
+        links = self.list_links(project_id=project_id, relation="summarizes")
+        summary_ids: set[str] = set()
+        for link in links:
+            if link.to_item_id == item_id or link.from_item_id == item_id:
+                # The summary endpoint is typically the from_item for summarizes.
+                summary_ids.add(link.from_item_id)
+                summary_ids.add(link.to_item_id)
+        summary_ids.discard(item_id)
+        for sid in summary_ids:
+            latest = self.get_latest(project_id=project_id, item_id=sid, include_deleted=True)
+            if latest is None or latest.class_ != "summary":
+                continue
+            row = self.session.scalar(
+                select(KnowledgeItemRow).where(
+                    KnowledgeItemRow.project_id == project_id,
+                    KnowledgeItemRow.item_id == sid,
+                    KnowledgeItemRow.version == latest.version,
+                )
+            )
+            if row is None or row.deleted_at is not None:
+                continue
+            row.acceptance_state = "disputed"
+            payload = dict(row.payload or {})
+            payload["invalidated_because"] = {
+                "reason": reason,
+                "source_item_id": item_id,
+                "source_version": version,
+                "at": clock.isoformat(),
+            }
+            row.payload = payload
+            event = {
+                "kind": "summary_invalidated",
+                "project_id": project_id,
+                "item_id": sid,
+                "version": latest.version,
+                "reason": reason,
+                "at": clock.isoformat(),
+            }
+            events.append(event)
+        for kind in ("cache_invalidate", "export_invalidate", "prompt_assembly_invalidate"):
+            events.append(
+                {
+                    "kind": kind,
+                    "project_id": project_id,
+                    "item_id": item_id,
+                    "version": version,
+                    "reason": reason,
+                    "at": clock.isoformat(),
+                }
+            )
+        self.session.flush()
+        if invalidation_log is not None:
+            invalidation_log.extend(events)
+        return events
+
+    def list_links(
+        self,
+        *,
+        project_id: str,
+        relation: str | None = None,
+        item_id: str | None = None,
+    ) -> list[KnowledgeLink]:
+        stmt = select(KnowledgeLinkRow).where(KnowledgeLinkRow.project_id == project_id)
+        if relation is not None:
+            stmt = stmt.where(KnowledgeLinkRow.relation == relation)
+        if item_id is not None:
+            stmt = stmt.where(
+                or_(
+                    KnowledgeLinkRow.from_item_id == item_id,
+                    KnowledgeLinkRow.to_item_id == item_id,
+                )
+            )
+        rows = list(self.session.scalars(stmt))
+        return [
+            KnowledgeLink(
+                link_id=row.link_id,
+                project_id=row.project_id,
+                from_item_id=row.from_item_id,
+                from_version=row.from_version,
+                relation=row.relation,  # type: ignore[arg-type]
+                to_item_id=row.to_item_id,
+                to_version=row.to_version,
+                evidence_ref=row.evidence_ref,
+                created_at=row.created_at,
+            )
+            for row in rows
+        ]
 
     def get_item(
         self, *, project_id: str, item_id: str, version: int
@@ -327,7 +541,6 @@ class KnowledgeRepository:
         out: list[KnowledgeItem] = []
         for row in rows:
             labels = set(str(x) for x in (row.permission_labels or []))
-            # Permission-first: labeled items require intersecting actor labels.
             if labels and required and labels.isdisjoint(required):
                 continue
             if labels and not required:

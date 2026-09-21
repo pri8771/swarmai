@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-09-21T18:53:54Z",
+  "base_sha": "218a3fd40bab965499613fa26fe35ed2c28ab0fc",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "b3_live_multihost": "UNKNOWN",
+  "artifact_id": "ART-V16-SUPERSESSION",
+  "packet_id": "V2B-003c",
+  "status": "pass_local",
+  "landed": [
+    "supersede",
+    "contradiction sets",
+    "tombstone invalidates summaries/caches/exports/prompt assembly"
+  ]
+}

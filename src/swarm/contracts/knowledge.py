@@ -115,3 +115,68 @@ def assert_model_output_class(knowledge_class: str, *, producer_type: str) -> No
         and knowledge_class not in _MODEL_SAFE_CLASSES
     ):
         raise ValueError(f"model_output_class_forbidden:{knowledge_class}")
+
+
+QueryMode = Literal["default", "include_superseded", "audit_all_versions"]
+
+
+class RetrievalActor(StrictModel):
+    """Caller identity for permission-first retrieval (V2B-003b)."""
+
+    actor_id: str
+    project_id: str
+    permission_labels: list[str] = Field(default_factory=list)
+    scopes: list[str] = Field(default_factory=list)
+
+
+class RetrievalQuery(StrictModel):
+    schema_version: str = "1.0"
+    actor: RetrievalActor
+    query_text: str = ""
+    topics: list[str] = Field(default_factory=list)
+    retrieval_labels: list[str] = Field(default_factory=list)
+    classes: list[str] = Field(default_factory=list)
+    mode: QueryMode = "default"
+    token_budget: int = 512
+    max_items: int = 16
+    policy_version: str = "v16-retrieval-1"
+
+
+class SelectedKnowledgeRef(StrictModel):
+    item_id: str
+    version: int
+    class_: KnowledgeClass = Field(alias="class")
+    topic: str
+    acceptance_state: AcceptanceState
+    provenance_refs: list[str] = Field(default_factory=list)
+    content_digest: str
+    tokens_estimate: int
+    rank_score: float = 0.0
+    why_selected: str = ""
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
+
+
+class RetrievalReceipt(StrictModel):
+    """Versioned receipt for observability / ART-V16 retrieval contract."""
+
+    schema_version: str = "1.0"
+    receipt_id: str = Field(default_factory=lambda: new_id("krr_"))
+    project_id: str
+    actor_id: str
+    actor_scope_digest: str
+    query_digest: str
+    selected: list[SelectedKnowledgeRef] = Field(default_factory=list)
+    conflict_sets: list[list[str]] = Field(default_factory=list)
+    omitted_reason_counts: dict[str, int] = Field(default_factory=dict)
+    token_budget: int
+    tokens_used: int
+    tokens_avoided_estimate: int = 0
+    retrieval_policy_version: str = "v16-retrieval-1"
+    created_at: datetime = Field(default_factory=utc_now)
+    context_text: str = ""
+
+
+class KnowledgeContextBundle(StrictModel):
+    receipt: RetrievalReceipt
+    items: list[KnowledgeItem] = Field(default_factory=list)
