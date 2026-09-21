@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T17:02:02Z",
+  "updated_at": "2026-09-21T17:15:00Z",
   "mode": "stress_5m",
   "worker_effective_cadence_minutes": 5,
   "lead_effective_cadence_minutes": 60,
@@ -10,53 +10,57 @@
     "phase1": {
       "name": "5m_burst",
       "required_consecutive_per_session": 3,
-      "valid_gap_minutes": {"min": 3, "max": 8},
-      "requires_sessions": ["A", "B"],
+      "valid_gap_minutes": {
+        "min": 3,
+        "max": 8
+      },
+      "requires_sessions": [
+        "A",
+        "B"
+      ],
       "all_workers_verified": false,
       "verified_at": null,
       "verified_timestamps": {
         "A": [],
-        "B": [
-          "2026-09-21T16:17:56+00:00",
-          "2026-09-21T16:22:59+00:00",
-          "2026-09-21T16:28:03+00:00"
-        ]
+        "B": []
       }
     },
     "phase2": {
       "name": "15m_24h_soak",
       "required_duration_hours": 24,
-      "valid_gap_minutes": {"min": 10, "max": 25},
+      "valid_gap_minutes": {
+        "min": 10,
+        "max": 25
+      },
       "started_at": null,
       "ends_at": null,
       "completed": false,
       "verified_at": null,
       "miss_policy": "any unresolved >25m scheduler gap fails/restarts clean soak unless owner explicitly waives"
     },
-    "after_success": {"mode": "hourly", "worker_effective_cadence_minutes": 60}
+    "after_success": {
+      "mode": "hourly",
+      "worker_effective_cadence_minutes": 60
+    }
   },
   "sessions": {
     "A": {
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "last_heartbeat_at": "2026-09-21T16:52:23+00:00",
+      "last_heartbeat_at": null,
       "consecutive_valid_phase1": 0,
       "verified_timestamps": [],
       "stale": false,
-      "status": "ledger is fresh but fresh-session registration is absent; scheduler receipts remain historical/unqualified for epoch reset-20260921-new-lanes-01. Human-readable HOST-MAC-DEV status page is also stale, indicating the installed publisher is not the current reset-aware client."
+      "status": "awaiting fresh two-lane session registration for reset-20260921-two-lanes-02; all earlier receipts are history only"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T16:53:21+00:00",
-      "consecutive_valid_phase1": 3,
-      "verified_timestamps": [
-        "2026-09-21T16:17:56+00:00",
-        "2026-09-21T16:22:59+00:00",
-        "2026-09-21T16:28:03+00:00"
-      ],
+      "last_heartbeat_at": null,
+      "consecutive_valid_phase1": 0,
+      "verified_timestamps": [],
       "stale": false,
-      "status": "fresh lane registered; Phase-1 5m burst verified 3/3 on 16:17:56 -> 16:22:59 -> 16:28:03. Later duplicate/legacy scheduler-looking receipts do not revoke the completed burst but must not be treated as soak evidence. Human-readable status publishing is current."
+      "status": "awaiting fresh two-lane session registration for reset-20260921-two-lanes-02; all earlier receipts are history only"
     }
   },
   "prior_verified_hourly_graduation": {
@@ -68,13 +72,26 @@
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
     "last_review_at": "2026-09-21T17:02:02Z",
-    "note": "B Phase 1 remains verified. A has live ledger writes but no required fresh-session registration and its human-readable status page is stale, so A remains 0/3 and the 24h soak has not started."
+    "note": "All prior interactive lanes closed. Exactly two fresh implementation sessions are authorized. Only receipts after explicit reset-20260921-two-lanes-02 registration count."
   },
-  "stale_threshold_minutes": {"stress_5m": 12, "soak_15m_24h": 35, "hourly": 90},
-  "notifications": {"channel": "GitHub durable coordination -> hourly lead automation -> operator", "instant_push_guaranteed": false},
-  "active_session_epoch": "reset-20260921-new-lanes-01",
+  "stale_threshold_minutes": {
+    "stress_5m": 12,
+    "soak_15m_24h": 35,
+    "hourly": 90
+  },
+  "notifications": {
+    "channel": "GitHub durable coordination -> hourly lead automation -> operator",
+    "instant_push_guaranteed": false
+  },
+  "active_session_epoch": "reset-20260921-two-lanes-02",
   "session_epoch_registration": {
-    "A": {"registered": false, "registered_at": null},
-    "B": {"registered": true, "registered_at": "2026-09-21T16:11:06+00:00", "evidence": "manual fresh-lane heartbeat B-OPS-AUTO-SYNC-02 with new lane activity"}
+    "A": {
+      "registered": false,
+      "registered_at": null
+    },
+    "B": {
+      "registered": false,
+      "registered_at": null
+    }
   }
 }
