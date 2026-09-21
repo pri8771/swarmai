@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `218a3fd40bab965499613fa26fe35ed2c28ab0fc`
-- Coordination SHA: `4da41ff385580df66fd5f76e3de8706ab218c001`
-- Updated: `2026-09-21T18:53:33Z`
-- Trigger: `scheduler`
+- Branch SHA: `d4440bf20ed8218d7974411e6607bd668a890e1a`
+- Coordination SHA: `7b3d24fa9fd8b55b5cf3a18bec1af2cdfb8c90a6`
+- Updated: `2026-09-21T18:54:11Z`
+- Trigger: `manual`
 - Status: **working**
-- Current packet: `V2B-003a`
-- Current artifact: `ART-V16-DURABLE-SCHEMA`
-- Last meaningful activity: `2026-09-21T18:49:44Z`
+- Current packet: `V2B-003b`
+- Current artifact: `ART-V16-PERMISSION-RETRIEVAL`
+- Last meaningful activity: `2026-09-21T18:54:10Z`
 - Spend USD: `0.0`
-- Blocker: G13 HOST-WIN-DEV blocked; ART-V14-REAL-E2E drafting; B3 live multi-host UNKNOWN pending second physical host
+- Blocker: G13 HOST-WIN-DEV blocked; ART-V14-REAL-E2E drafting; B3 live multi-host UNKNOWN
 
 ## Update
 
-B3/V2A-005 harness landed (sim multi-worker; live multi-host UNKNOWN). C1/V2B-003a knowledge repo started (218a3fd). B1+B2 done. ART-V14 drafting; G13 HOST-WIN-DEV blocked.
+C2–C5 landed (d4440bf): V2B-003b retrieval, 003c lifecycle, 003d MemoryStore adapter, 003e budget math (task quality UNKNOWN). C1 prior. ART-V15/V16 drafting no self-accept. ART-V14 drafting; G13 HOST-WIN-DEV blocked; B3 live multi-host UNKNOWN.
 
 ## Next
 
