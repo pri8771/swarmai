@@ -12,6 +12,17 @@ Canonical lifecycle is `ARTIFACT_REGISTRY.json`. Immediate target remains a V2.0
 - `ART-OPS-HEARTBEAT` remains drafting until post-graduation behavior is observed; bootstrap graduation alone is not being overclaimed as lifecycle acceptance.
 - No repo-assigned autonomous self-launch plus attributable source push is verified from either A or B. Heartbeat liveness is not autonomous implementation evidence.
 
+## Heartbeat stress test — owner reset 2026-09-21
+
+The prior 15m bootstrap was verified and is preserved as historical evidence. The owner intentionally started a new reliability exercise:
+
+1. **Phase 1:** A and B publish scheduler heartbeats at effective 5-minute cadence. Each needs 3 consecutive counted scheduler receipts, with adjacent gaps 3–8 minutes.
+2. **Phase 2:** after both Phase-1 streaks are lead-verified, set effective cadence to 15 minutes for **24 real hours**. Preserve every miss; do not backfill.
+3. **After soak:** only after the full 24-hour window is verified may effective cadence return to hourly.
+
+OS scheduler installers now wake every 5 minutes; the heartbeat client self-throttles according to `HEARTBEAT_STATE.json`.
+ChatGPT lead automation remains hourly and validates the worker histories retrospectively.
+
 ## External worker-pc — G13 task-pool critical path
 
 `pri8771/remote-workers` is execution infrastructure only; SwarmAI remains project authority.
