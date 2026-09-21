@@ -3,6 +3,10 @@
 Date: 2026-09-21
 Status: PLANNING ONLY
 
+## REAL-WORLD RULE
+
+Per `REAL_WORLD_ACCEPTANCE_POLICY.md`, `live_local` fixture evidence is necessary for reproducible fault semantics but is not sufficient for a milestone working claim. Counted milestone evidence must also include the milestone-specific real external/physical proof: CP18 real outage/restore, CP19 fresh environment, CP20 real elapsed candidate campaign, CP23 physical multi-host + non-fixture external resource, and CP30 real elapsed objective + reversible external effect.
+
 Legend:
 - U = unit/deterministic
 - I = integration
@@ -11,6 +15,37 @@ Legend:
 - R = independent review
 
 Mocks/simulators may satisfy U/I development tests but never substitute for required L/W evidence.
+
+## V1.7 remainder (Fable planning pass; case IDs in `packets/R32a.md`)
+
+Levels: **U** unit/in-memory · **I** `integration` (real Postgres, real threads/processes) · **L** `live_local` (real HTTP fixture process, real Postgres) · **CP** live checkpoint run on the pushed tip. A skipped test is *not run*, never a pass.
+
+| Packet | Deterministic / negative tests | Live evidence | Exit rung |
+|---|---|---|---|
+| OPS-CI-01 | U: skip-ci suffix, workflow filters | run-count before/after, 20 observed minutes | ops |
+| R27a | I: receipt durability, replay identity, cross-project, single head | — | implementation |
+| R27b | I: 8-thread reserve/CAS single winner, binding mismatch ×3 (5 consecutive green runs) | — | implementation |
+| R27c | I: second-process visibility, one-shot approval concurrency, no row on denial, fence reader | — | implementation |
+| R27d | I: insert-only, monotonic revoke, legacy NULL rows, cross-project | — | implementation |
+| R27e | I: real child-process kills (before/after side effect), no takeover of live executor, irreversible re-arm | — | implementation |
+| R28a | U+I: unknown-by-default, exception→unknown, not-sent retry, timeout, durable store required | — | implementation |
+| R28b | U+I: under-classification, undeclared op, missing fence, provider-sourced fences, policy version, actor/project | — | implementation |
+| R28c | U+I: AST single-path guards, legacy delegation exactly-once across instances | — | implementation |
+| R29a | U: strict manifest, secret guard, digest, vocabulary subset | — | implementation |
+| R28d | U: path/command denials, AST no-direct-effects, receipts per effect | one real `$0` mission with receipts (not counted for V14) | wired |
+| R30a | L: fixture semantics (idempotency, faults, session TTL, no dedupe on submit) | — | infra |
+| R30b | L+I: response loss → one note, fail-before-commit → one retry, redirect denied, scope denial | — | implementation |
+| R31a | L+I: expiry, submit-unknown, reconcile while signed out never posts, cookies never persisted | — | implementation |
+| R31b | L+I: login issues zero submits, exactly one submission after recovery, unsafe `next`, restart survival | — | implementation |
+| R32a | matrix: every N17 case mapped to a collected test at the required level | full-suite run, zero skips | implementation |
+| R33a/R33b | harness guards | **CP5** three integrations through one gateway object + live negatives | live_checkpoint |
+| R17a | harness self-checks (steps can fail) | **CP3** 9/9 incl. cancellation fence, 20× concurrent accept | live_checkpoint |
+| R02a | U: temp-repo red→green cases incl. collection-error ≠ red | — | implementation |
+| R02b | — | **CP1** `v14-real-008`, lead review required | live_checkpoint → review |
+| R25a | I: indistinguishable not-found, no accepted_fact from missions, prompt isolation, AST guard | — | wired |
+| R25b | — | **CP4** real missions A/B, existence-inference negative, strict token savings | live_checkpoint |
+| R17b/R17c | I: expiry/cancel/duplicate through the mission path | CP3 rerun with a real mission task | wired |
+| R34a/R34b | — | **CP6** one mission with all four receipt families; audit package | live_checkpoint |
 
 ## V1.8
 
