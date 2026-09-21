@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `aa3a1a7cbe04b09e2f438d1abed14d4176ad9092`
-- Coordination SHA: `e33d268a02affaf2a9771994910d3a00d3e5bf50`
-- Updated: `2026-09-21T20:03:05Z`
+- Branch SHA: `aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a`
+- Coordination SHA: `bd1a687ce4f55346cdc8d751c572e266049e0ad1`
+- Updated: `2026-09-21T20:04:38Z`
 - Trigger: `manual`
 - Status: **working**
-- Current packet: `R20`
-- Current artifact: `ART-V16-PROVENANCE`
-- Last meaningful activity: `2026-09-21T20:03:04Z`
+- Current packet: `R26`
+- Current artifact: `ART-V17-APPROVAL-BINDING`
+- Last meaningful activity: `2026-09-21T20:04:37Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: Actions billing; ART-V14 needs new mission; R06 sealed digest; R18 2nd host; R09 zero-charge canaries for ≥2 remotes
+- Blocker: USER_ACTION: Actions billing; ART-V14 new mission required; R06 sealed digest; R18 2nd host; R09 zero-charge canaries ≥2 remotes
 
 ## Update
 
-R16-R20 progressed. R17 CP3 separate-process ok. R18/R09 USER_ACTION blockers (2nd host; 0 remote admits). Tip=aa3a1a7cbe04b09e2f438d1abed14d4176ad9092. No invent-accept ART-V14.
+R16-R24+R26 verify progressed; R17 CP3 live; R09/R18 USER_ACTION blockers. Tip=aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a. ART-V14 CHANGES REQUIRED preserved (no invent-accept).
 
 ## Next
 
-R21 permission prefilter verify
+R25 CP4 knowledge checkpoint or R27 durable approvals
