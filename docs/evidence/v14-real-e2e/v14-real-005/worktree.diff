@@ -1,0 +1,15 @@
+diff --git a/src/swarm/cost/ledger.py b/src/swarm/cost/ledger.py
+index 8cb6395..3b41224 100644
+--- a/src/swarm/cost/ledger.py
++++ b/src/swarm/cost/ledger.py
+@@ -71,8 +71,8 @@ def load_mission_costs(missions_dir: Path) -> CostLedger:
+         ledger.add(
+             CostEntry(
+                 source=str(data.get("mission_id") or path.name),
+-                route_id=None,
+-                model=None,
++                route_id=cost.get("route_id"),  # Added missing field
++                model=cost.get("model"),        # Added missing field
+                 requests=int(cost.get("requests") or 0),
+                 prompt_tokens=cost.get("prompt_tokens"),
+                 completion_tokens=cost.get("completion_tokens"),
