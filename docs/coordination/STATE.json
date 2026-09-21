@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T17:20:00Z",
+  "updated_at": "2026-09-21T18:18:53Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -75,7 +75,10 @@
       "from": "drafting",
       "to": "verified",
       "source": "cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb",
-      "review": "docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md"
+      "review": "docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md",
+      "superseded_by_registry": true,
+      "canonical_status": "reviewable",
+      "honesty_note": "Do not treat this derived transition as current; registry is authoritative."
     }
   ],
   "coordination_findings_this_heartbeat": {
@@ -89,7 +92,8 @@
     "lane_a": "tip 11a7e1d exact-tip CI 35615739781 green; no V14-REAL-001-R source push yet; reset-aware status/daemon refresh required",
     "lane_b": "tip 5344763 exact-tip CI 35625964121 green; ART-V13 task pool frozen; assignment advanced to generation 5 V2B-002 only",
     "g13_retry07": "real branch 02cd0a2 one commit above retry06, G13 scoped, CI 35625433324 green; useful support only",
-    "lane_c": "read-only task swarmai-v13-task-pool-v3-audit-01 dispatched at remote-workers 31b0234; workflow 35629554863 in progress"
+    "lane_c": "read-only task swarmai-v13-task-pool-v3-audit-01 dispatched at remote-workers 31b0234; workflow 35629554863 in progress",
+    "g13_honesty_reconcile_v17": "CURSOR-V17-SINGLE reconciled STATE task_pool from 'verified_frozen_g13_pool_freeze_v3' to reviewable-aligned; Windows executable verification remains blocker on Darwin host."
   },
   "version_state": {
     "1.0-repair": {
@@ -112,10 +116,14 @@
       "status": "not_accepted_critical_path",
       "protocol": "accepted_frozen",
       "screening": "verified_72_provisional_n5_cells",
-      "task_pool": "verified_frozen_g13_pool_freeze_v3",
+      "task_pool": "reviewable_not_frozen_awaiting_host_win_dev_executable_verification",
       "qualified_cells": 0,
       "sealed_reference_binding": "pending",
-      "reviewer_qualification": "drafting_V2B_002_assigned"
+      "reviewer_qualification": "drafting_V2B_002_assigned",
+      "task_pool_registry_status": "reviewable",
+      "task_pool_canonical_source": "docs/coordination/ARTIFACT_REGISTRY.json",
+      "task_pool_honesty_note": "Reconciled 2026-09-21 by CURSOR-V17-SINGLE: canonical ARTIFACT_REGISTRY has ART-V13-TASK-POOL=reviewable (not verified/frozen). Prior derived STATE verified_frozen_g13_pool_freeze_v3 overstated registry truth. This Darwin/macOS session cannot satisfy HOST-WIN-DEV final executable verification; record blocker honestly and continue dependency-independent work.",
+      "host_win_dev_executable_verification": "blocked_on_this_darwin_session"
     },
     "1.4": {
       "status": "not_accepted",
