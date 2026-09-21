@@ -76,6 +76,23 @@ If your artifact needs those changes:
 3. post exact commit;
 4. Session A wires shared surfaces.
 
+
+## New lead hardening findings — read before memory/tools/selfdev work
+
+Also read:
+- `docs/artifacts/current/ART-V20-FOUNDATION_HARDENING.md`
+- `docs/artifacts/future/ART-V20-INTEGRATION_CONTRACT.md`
+- `docs/coordination/V2_FOUNDATION_HARDENING_PACKETS.md`
+
+Fold these into your packets:
+- V2B-H1 SP2: existing MemoryStore retrieval/routing aggregation is not project-scoped; recovery memory can hard-code proj_local. V1.6 must make project/actor scope mandatory before ranking and prove no cross-project content/count/preference/existence leak.
+- V2B-H4 SP1: remove operational `proj_demo` approval default; project must be explicit.
+- V2B-H5 SP2: define durable effect-key/idempotency/reconciliation semantics; Session A can wire durable repository.
+- V2B-H9 SP3: V1.9 selfdev must use a non-demo issue/repo with no supplied fix; fixture GOOD_FIX path remains test-only.
+- V2B-H10 SP1: clean up stale mock/RC operator docs only after real integrated behavior exists.
+
+Expose KnowledgeService / ActionGateway / ExtensionRegistry-style boundaries from the integration contract. Do not ask Session A to depend on your internal storage classes.
+
 ## Rules
 
 - artifact-first; every commit names artifact + packet;
