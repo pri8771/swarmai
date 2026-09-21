@@ -1,85 +1,517 @@
 {
   "schema_version": "1.0",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-20T23:47:44Z",
+  "updated_at": "2026-09-21T00:18:09Z",
   "purpose": "Prospective evidence-backed worker performance calibration by story-point size. Story points measure complexity/risk, not time.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
-  "worker_types": ["Cursor"],
+  "worker_types": [
+    "Cursor"
+  ],
   "aggregation_policy": {
     "minimum_completed_packets_for_stable_bucket_summary": 5,
-    "metrics": ["completed_count", "first_lead_review_acceptance_rate", "first_pass_ci_rate_where_applicable", "median_rework_cycles", "reopened_defects", "evidence_complete_first_submission_rate", "blocker_distribution"],
+    "metrics": [
+      "completed_count",
+      "first_lead_review_acceptance_rate",
+      "first_pass_ci_rate_where_applicable",
+      "median_rework_cycles",
+      "reopened_defects",
+      "evidence_complete_first_submission_rate",
+      "blocker_distribution"
+    ],
     "historical_pre_protocol_work_counts_for_calibration": false
   },
   "story_point_summary": {
-    "1": {"completed": 1, "stable": false, "reviewed_packets": 1, "first_lead_review_acceptance_rate": 1.0},
-    "2": {"completed": 2, "stable": false, "reviewed_packets": 3, "first_lead_review_acceptance_rate": 0.6667},
-    "3": {"completed": 0, "stable": false},
-    "4": {"completed": 0, "stable": false},
-    "5": {"completed": 0, "stable": false}
+    "1": {
+      "completed": 1,
+      "stable": false,
+      "reviewed_packets": 1,
+      "first_lead_review_acceptance_rate": 1
+    },
+    "2": {
+      "completed": 2,
+      "stable": false,
+      "reviewed_packets": 3,
+      "first_lead_review_acceptance_rate": 0.6667
+    },
+    "3": {
+      "completed": 0,
+      "stable": false
+    },
+    "4": {
+      "completed": 0,
+      "stable": false
+    },
+    "5": {
+      "completed": 0,
+      "stable": false
+    }
   },
   "packets": [
     {
-      "packet_id": "W-041A", "story_points": 1, "gate": "G10", "artifact_id": "ART-V10-WORKER-HEARTBEAT", "task_family": "infra/auth", "status": "blocked_external_human_auth", "worker": "Cursor", "first_pass_ci": "not_applicable", "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-041A",
+      "story_points": 1,
+      "gate": "G10",
+      "artifact_id": "ART-V10-WORKER-HEARTBEAT",
+      "task_family": "infra/auth",
+      "status": "blocked_external_human_auth",
+      "worker": "Cursor",
+      "first_pass_ci": "not_applicable",
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-041B", "story_points": 2, "gate": "G10", "artifact_id": "ART-V10-WORKER-HEARTBEAT", "task_family": "infra/live-evidence", "status": "queued_blocked_on_w041a", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-041B",
+      "story_points": 2,
+      "gate": "G10",
+      "artifact_id": "ART-V10-WORKER-HEARTBEAT",
+      "task_family": "infra/live-evidence",
+      "status": "queued_blocked_on_w041a",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-041C", "story_points": 2, "gate": "G10", "artifact_id": "ART-V10-WORKER-HEARTBEAT", "task_family": "infra/live-evidence", "status": "queued_blocked_on_w041b", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-041C",
+      "story_points": 2,
+      "gate": "G10",
+      "artifact_id": "ART-V10-WORKER-HEARTBEAT",
+      "task_family": "infra/live-evidence",
+      "status": "queued_blocked_on_w041b",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-111A", "story_points": 2, "gate": "G11", "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE", "task_family": "ui/integration", "status": "completed_lead_verified", "worker": "Cursor", "first_pass_ci": "success_current_descendant_35545174895", "first_lead_review": "accepted", "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": true, "completion_note": "Actual Chromium console create and same durable mission ID through API/CLI independently verified; artifact moved reviewable->verified.", "base_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510", "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+      "packet_id": "W-111A",
+      "story_points": 2,
+      "gate": "G11",
+      "artifact_id": "ART-V11-MULTISURFACE-EVIDENCE",
+      "task_family": "ui/integration",
+      "status": "completed_lead_verified",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true,
+      "completion_note": "Actual Chromium console create and same durable mission ID through API/CLI independently verified; artifact moved reviewable->verified.",
+      "base_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
     },
     {
-      "packet_id": "W-111B", "story_points": 2, "gate": "G11", "artifact_id": "ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE", "task_family": "integration/live-evidence", "status": "changes_required_split_restart_followup", "worker": "Cursor", "first_pass_ci": "success_current_descendant_35545174895", "first_lead_review": "changes_required", "rework_cycles": 1, "reopened_defect": false, "evidence_complete_first_submission": true, "completion_note": "Control artifact verified, but restart artifact only recreates create_app/MissionStore in-process; acceptance plan requires actual service process restart. Follow-up isolated as W-111C.", "base_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510", "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+      "packet_id": "W-111B",
+      "story_points": 2,
+      "gate": "G11",
+      "artifact_id": "ART-V11-CONTROL-EVIDENCE+ART-V11-RESTART-EVIDENCE",
+      "task_family": "integration/live-evidence",
+      "status": "changes_required_split_restart_followup",
+      "worker": "Cursor",
+      "first_pass_ci": "success_current_descendant_35545174895",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true,
+      "completion_note": "Control artifact verified, but restart artifact only recreates create_app/MissionStore in-process; acceptance plan requires actual service process restart. Follow-up isolated as W-111C.",
+      "base_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
+      "completion_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
     },
     {
-      "packet_id": "W-111C", "story_points": 1, "gate": "G11", "artifact_id": "ART-V11-RESTART-EVIDENCE", "task_family": "integration/live-evidence", "status": "ready", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-111C",
+      "story_points": 1,
+      "gate": "G11",
+      "artifact_id": "ART-V11-RESTART-EVIDENCE",
+      "task_family": "integration/live-evidence",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-121A", "story_points": 2, "gate": "G12", "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY", "task_family": "provider/live-evidence", "status": "completed_lead_verified_blocked_result", "worker": "Cursor", "first_pass_ci": "success_35545174895", "first_lead_review": "accepted", "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": true, "completion_note": "Eligibility ledger independently verified as truthful: 0 admissible remote routes, candidates explicitly rejected/blocked, local routes probed. Packet succeeds as a state artifact but does not unblock W-121B.", "base_sha": "724a324b77d60fff143674feecec9239062e9c3c", "completion_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62"
+      "packet_id": "W-121A",
+      "story_points": 2,
+      "gate": "G12",
+      "artifact_id": "ART-V12-PROVIDER-ELIGIBILITY",
+      "task_family": "provider/live-evidence",
+      "status": "completed_lead_verified_blocked_result",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true,
+      "completion_note": "Eligibility ledger independently verified as truthful: 0 admissible remote routes, candidates explicitly rejected/blocked, local routes probed. Packet succeeds as a state artifact but does not unblock W-121B.",
+      "base_sha": "724a324b77d60fff143674feecec9239062e9c3c",
+      "completion_sha": "19b91ba89bfac5d670af0d766f21f4b9f2ca1a62"
     },
     {
-      "packet_id": "W-121B", "story_points": 3, "gate": "G12", "artifact_id": "ART-V12-REMOTE-OVERLAP", "task_family": "provider/integration", "status": "blocked_on_zero_admissible_remotes_and_broker_contract", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-121B",
+      "story_points": 3,
+      "gate": "G12",
+      "artifact_id": "ART-V12-REMOTE-OVERLAP",
+      "task_family": "provider/integration",
+      "status": "blocked_on_zero_admissible_remotes_and_broker_contract",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-122A", "story_points": 2, "gate": "G12", "artifact_id": "ART-V12-BROKER-CONTRACT", "task_family": "provider/runtime-integration", "status": "ready", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null, "assignment_note": "Wire ProductStore.execute_mission operational path through governed project-scoped broker; prove direct local_chat fallback cannot bypass admission."
+      "packet_id": "W-122A",
+      "story_points": 2,
+      "gate": "G12",
+      "artifact_id": "ART-V12-BROKER-CONTRACT",
+      "task_family": "provider/runtime-integration",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null,
+      "assignment_note": "Wire ProductStore.execute_mission operational path through governed project-scoped broker; prove direct local_chat fallback cannot bypass admission."
     },
     {
-      "packet_id": "W-131A", "story_points": 1, "gate": "G13", "artifact_id": "ART-V13-SCREENING-MATRIX", "task_family": "evaluation/data", "status": "completed_lead_verified", "worker": "Cursor", "first_pass_ci": "success_35545174895", "first_lead_review": "accepted", "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": true, "completion_note": "72-cell n=5 provisional screening/gap map independently reviewed; qualification_claimed=false preserved.", "base_sha": "724a324b77d60fff143674feecec9239062e9c3c", "completion_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d"
+      "packet_id": "W-131A",
+      "story_points": 1,
+      "gate": "G13",
+      "artifact_id": "ART-V13-SCREENING-MATRIX",
+      "task_family": "evaluation/data",
+      "status": "completed_lead_verified",
+      "worker": "Cursor",
+      "first_pass_ci": "success_35545174895",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": true,
+      "completion_note": "72-cell n=5 provisional screening/gap map independently reviewed; qualification_claimed=false preserved.",
+      "base_sha": "724a324b77d60fff143674feecec9239062e9c3c",
+      "completion_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d"
     },
     {
-      "packet_id": "W-131B", "story_points": 2, "gate": "G13", "artifact_id": "ART-V13-QUALIFIED-MATRIX", "task_family": "evaluation/live-evidence", "status": "blocked_on_task_pool_freeze", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null, "assignment_note": "After W-131C1 review, run bounded five-sample held-out batches. Lead initial cell priorities: planning/XL gemma3:4b; coding/XL qwen3.5:4b; reasoning/L qwen3.5:9b."
+      "packet_id": "W-131B",
+      "story_points": 2,
+      "gate": "G13",
+      "artifact_id": "ART-V13-QUALIFIED-MATRIX",
+      "task_family": "evaluation/live-evidence",
+      "status": "blocked_on_task_pool_freeze",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null,
+      "assignment_note": "After W-131C1 review, run bounded five-sample held-out batches. Lead initial cell priorities: planning/XL gemma3:4b; coding/XL qwen3.5:4b; reasoning/L qwen3.5:9b."
     },
     {
-      "packet_id": "W-131C1", "story_points": 2, "gate": "G13", "artifact_id": "ART-V13-TASK-POOL", "task_family": "evaluation/data-contract", "status": "ready", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-131C1",
+      "story_points": 2,
+      "gate": "G13",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "task_family": "evaluation/data-contract",
+      "status": "ready",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-131C2", "story_points": 3, "gate": "G13", "artifact_id": "ART-V13-REVIEWER-QUALIFICATION", "task_family": "evaluation/integration", "status": "ready_calibration_only", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-131C2",
+      "story_points": 3,
+      "gate": "G13",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "task_family": "evaluation/integration",
+      "status": "ready_calibration_only",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141A", "story_points": 1, "gate": "G14", "artifact_id": "ART-V14-ROLE-MANIFEST", "task_family": "orchestration/config", "status": "blocked_on_G13", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141A",
+      "story_points": 1,
+      "gate": "G14",
+      "artifact_id": "ART-V14-ROLE-MANIFEST",
+      "task_family": "orchestration/config",
+      "status": "blocked_on_G13",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141B1", "story_points": 2, "gate": "G14", "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF", "task_family": "orchestration/instrumentation", "status": "blocked_on_G13", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141B1",
+      "story_points": 2,
+      "gate": "G14",
+      "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "task_family": "orchestration/instrumentation",
+      "status": "blocked_on_G13",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141B2", "story_points": 3, "gate": "G14", "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF", "task_family": "orchestration/integration", "status": "blocked_on_G13_G12", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141B2",
+      "story_points": 3,
+      "gate": "G14",
+      "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "task_family": "orchestration/integration",
+      "status": "blocked_on_G13_G12",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141B3", "story_points": 3, "gate": "G14", "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF", "task_family": "orchestration/live-evidence", "status": "blocked_on_W-141B2", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141B3",
+      "story_points": 3,
+      "gate": "G14",
+      "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "task_family": "orchestration/live-evidence",
+      "status": "blocked_on_W-141B2",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141B4", "story_points": 2, "gate": "G14", "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF", "task_family": "observability/live-evidence", "status": "blocked_on_W-141B2", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141B4",
+      "story_points": 2,
+      "gate": "G14",
+      "artifact_id": "ART-V14-LIVE-ADAPTIVE-PROOF",
+      "task_family": "observability/live-evidence",
+      "status": "blocked_on_W-141B2",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "W-141C", "story_points": 3, "gate": "G14", "artifact_id": "ART-V14-MODE-COMPARISON", "task_family": "evaluation/integration", "status": "blocked_on_G14", "worker": "Cursor", "first_pass_ci": null, "first_lead_review": null, "rework_cycles": 0, "reopened_defect": false, "evidence_complete_first_submission": null
+      "packet_id": "W-141C",
+      "story_points": 3,
+      "gate": "G14",
+      "artifact_id": "ART-V14-MODE-COMPARISON",
+      "task_family": "evaluation/integration",
+      "status": "blocked_on_G14",
+      "worker": "Cursor",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-001",
+      "artifact_id": "ART-V12-BROKER-CONTRACT",
+      "story_points": 2,
+      "gate": "G12/V2 runtime",
+      "task_family": "code/integration",
+      "status": "ready",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-002",
+      "artifact_id": "ART-V11-RESTART-EVIDENCE",
+      "story_points": 1,
+      "gate": "G11",
+      "task_family": "live-evidence",
+      "status": "ready",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-003a",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "story_points": 2,
+      "gate": "V1.5",
+      "task_family": "code/db",
+      "status": "ready",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-003b",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "story_points": 2,
+      "gate": "V1.5",
+      "task_family": "code/integration",
+      "status": "blocked_on_V2A-003a",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-003c",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "story_points": 2,
+      "gate": "V1.5",
+      "task_family": "code/security",
+      "status": "blocked_on_V2A-003b",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2A-004",
+      "artifact_id": "ART-V15-WORKER-PROTOCOL",
+      "story_points": 3,
+      "gate": "V1.5",
+      "task_family": "integration",
+      "status": "blocked_on_V2A-003c",
+      "worker": "Cursor Session A",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-001",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "story_points": 2,
+      "gate": "G13",
+      "task_family": "evaluation/data",
+      "status": "ready",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "story_points": 3,
+      "gate": "G13",
+      "task_family": "evaluation/integration",
+      "status": "ready_calibration_only",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-003a",
+      "artifact_id": "ART-V16-PROVENANCE",
+      "story_points": 2,
+      "gate": "V1.6",
+      "task_family": "code/data",
+      "status": "ready",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-003b",
+      "artifact_id": "ART-V16-PERMISSION-RETRIEVAL",
+      "story_points": 2,
+      "gate": "V1.6",
+      "task_family": "code/retrieval",
+      "status": "blocked_on_V2B-003a",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-004a",
+      "artifact_id": "ART-V17-APPROVAL-BINDING",
+      "story_points": 2,
+      "gate": "V1.7",
+      "task_family": "code/contracts",
+      "status": "ready",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-004b",
+      "artifact_id": "ART-V17-APPROVAL-BINDING",
+      "story_points": 2,
+      "gate": "V1.7",
+      "task_family": "code/integration",
+      "status": "blocked_on_V2B-004a",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
     }
   ],
   "historical_context": [
-    {"work": "FIX-001", "note": "pre-protocol; do not use in calibrated aggregate"},
-    {"work": "FIX-002", "note": "pre-protocol; do not use in calibrated aggregate"},
-    {"work": "FIX-003", "note": "pre-protocol; do not use in calibrated aggregate"},
-    {"work": "FIX-005", "note": "pre-protocol; do not use in calibrated aggregate"}
+    {
+      "work": "FIX-001",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-002",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-003",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    },
+    {
+      "work": "FIX-005",
+      "note": "pre-protocol; do not use in calibrated aggregate"
+    }
   ]
 }
