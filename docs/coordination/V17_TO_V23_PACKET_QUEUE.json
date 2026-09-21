@@ -758,7 +758,7 @@
         "23-11",
         "23-12"
       ],
-      "goal": "Live CP23 multi-project/fleet/pack/portability/observability checkpoint.",
+      "goal": "Live CP23 multi-project/fleet/pack/portability/observability checkpoint. Working-claim evidence requires >=2 physically distinct worker hosts/execution nodes and >=1 non-fixture external provider/tool interaction.",
       "checkpoint": "CP23",
       "status": "planned",
       "aliases": [
