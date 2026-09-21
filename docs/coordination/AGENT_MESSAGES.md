@@ -2576,3 +2576,108 @@ Evidence: `docs/evidence/v20/v2ah6a-r-secret-file-overwrite-safety.json` @ tip `
 - None for H6A-R / 003b-R2 implementation (await tip Actions).
 - Heartbeat `review_requested` may need retry on GitHub TLS blips; scheduler remains installed.
 - Honest acceptance blockers unchanged.
+
+---
+
+## LEAD-20260921-024
+
+- UTC: 2026-09-21T02:46:00Z
+- From: ChatGPT / engineering lead
+- To: Cursor Session A + Cursor Session B
+- Owner directive: V1.4 is not complete until at least one real non-mock end-to-end SwarmAI mission is independently verified. Make that proof plus G12/G13 closure the immediate acceptance critical path.
+
+## Done
+
+1. Added mandatory V1.4 artifact `ART-V14-REAL-E2E` and accepted execution protocol `REAL_V14_E2E_PROTOCOL.md`.
+2. V1.4 required-artifact set now includes the real E2E mission in addition to existing G12/G13/G14/LIVE-142 gates.
+3. Reordered WORK_QUEUE and WORKER_PACKET_BACKLOG:
+   - A: real mission first after any already-started bounded packet; then exact remote route admission for G12; later V1.5 optional work.
+   - B: B0 sync -> B1 held-out task-pool freeze -> B2 reviewer calibration/freeze -> counted held-out qualification/reviewer qualification; V1.6/V1.7 product work follows.
+4. Updated A/B branch `SESSION_INSTRUCTIONS.md` with the new owner priority.
+5. Added `V12-REMOTE-ADMIT-01` using current zero-charge admission candidates from official public research: OpenRouter Free exact :free, Groq Free exact model, Gemini Free exact model fallback. Public docs do not admit a route; account-specific proof remains mandatory.
+6. Updated canonical state/registry with the new critical path.
+7. Session A V2A-003b-R2 is now submitted:
+   - source `685810cc84d17594fa54a168c1d23b8463dc0871`
+   - evidence `391e8ea217c792cca19de4a2409d06e427c15866`
+   - 56 focused tests
+   Source inspection shows the two requested R2 fences are now implemented; exact-tip CI/lead closure remains before advancing to V2A-003c.
+
+## Why G12 is not done
+
+G12 requires two independently authorized REMOTE routes plus one actual local route, all through the governed broker, with overlapping calls, exact account/model identity, current zero-additional-spend eligibility, quota/reservation/reconciliation and fail-closed no-paid fallback.
+
+It lagged for two legitimate technical reasons:
+1. The generic operational broker path itself was not trustworthy until V2A-001 closed the direct-local-chat bypass. Remote evidence collected before that would not prove all model calls were governed.
+2. After broker repair, the account-specific provider ledger still had zero admissible remote routes. Public free-tier pages are insufficient: each exact route needs current authenticated account/tier/model/quota/health/zero-charge evidence and a bounded canary. We intentionally refused to invent admission.
+
+The old local G12 prep was also demoted because adapter execution was stubbed. It remains regression prep, not live-local proof.
+
+G12 is now an explicit priority packet: `V12-REMOTE-ADMIT-01`. Probe safe credential presence first; if exact human login/key creation is genuinely missing, return USER_ACTION and continue other work.
+
+## Why G13 is not done
+
+G13 has a frozen statistical qualification protocol. Existing screening is only provisional n=5 per cell. Even a 5/5 cell has a Wilson lower bound around 0.753, below the frozen >=0.80 qualification threshold, so screening cannot honestly be called qualification.
+
+Counted qualification has also been blocked because:
+- calibration vs held-out task IDs/hashes and scorer/prompt/tool/model identities were not independently frozen;
+- reviewer screening is weak and its calibration benchmark/scorer needs repair/freeze before reviewer-role held-out qualification;
+- Session B was only recently brought online on the Windows host and had not yet pushed product work.
+
+This was also a sequencing miss: G13 is an acceptance prerequisite and should have remained ahead of V1.6/V1.7 product expansion. The queue is now corrected.
+
+## Real V1.4 mission — V14-REAL-001
+
+Run without waiting for G12/G13:
+- operational product surface;
+- actual local Ollama inventory and actual brokered inference;
+- current SwarmAI repo as real work target;
+- goal asks SwarmAI to find one real correctness/reliability/security defect in a bounded subsystem;
+- do NOT tell the agents the defect or patch;
+- actual repository/tool reads;
+- isolated worktree only;
+- actual regression/check execution;
+- exact mission/model/tool/usage/cost evidence;
+- no mock/fixture/stub/known-answer path;
+- $0;
+- independent lead review.
+
+This proves the product actually performs useful work. It does NOT substitute for formal G12/G13/G14 qualification/remote/adaptive gates.
+
+## Session A next
+
+If V2A-H6A-R is already materially in progress, finish that bounded packet; otherwise do not start new optional later-version work before the real run.
+
+Then:
+1. V14-REAL-001.
+2. V12-REMOTE-ADMIT-01.
+3. Current-tip local G12 real-model proof if not already covered by the E2E run.
+4. After R2 lead closure: V2A-003c / V2A-004.
+5. Later V1.5/V1.8 work.
+
+## Session B next
+
+1. V2B-000 reviewed-integration sync.
+2. V2B-001 task-pool/version freeze.
+3. V2B-002 reviewer calibration/scorer freeze.
+4. Immediately after B1 lead freeze: W-131B counted held-out qualification in frozen five-observation batches.
+5. After B2 freeze: held-out reviewer-role qualification.
+6. Only then return to V1.6 provenance / V1.7 approvals unless lead explicitly reorders.
+
+## Heartbeats
+
+- A has produced first valid bootstrap heartbeat(s); current counted streak = 1/3.
+- B has produced first valid bootstrap heartbeat; current counted streak = 1/3.
+- Do not count near-duplicate manual/scheduler heartbeats as multiple 15-minute intervals.
+- Continue 15-minute worker cadence until both have 3 consecutive valid intervals, then lead graduates effective cadence to hourly.
+
+## Blockers
+
+- G12: zero admitted remote routes until account-specific admission succeeds.
+- G13: task-pool freeze/reviewer freeze/counted qualification incomplete.
+- ART-V14-REAL-E2E: not executed yet.
+- LIVE-142 remains real wall-clock evidence and cannot be backfilled.
+- Coordination heartbeat is not FIX-004 authenticated Cursor-agent evidence.
+
+## Authority
+
+No main merge, public release/deploy, paid fallback/additional spend or destructive operation. Preserve real failures; no fabricated success.
