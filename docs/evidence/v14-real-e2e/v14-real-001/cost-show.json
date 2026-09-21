@@ -1,0 +1,89 @@
+{
+  "spend_policy": "zero",
+  "allow_paid": false,
+  "total_usd": 0.0,
+  "entry_count": 8,
+  "entries": [
+    {
+      "source": "d9379d69277644998353a9ca3614eba7",
+      "route_id": null,
+      "model": null,
+      "requests": 3,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T02:43:07.396196+00:00"
+    },
+    {
+      "source": "mission_cancel_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:08.915934+00:00"
+    },
+    {
+      "source": "mission_demo_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:09.166925+00:00"
+    },
+    {
+      "source": "mission_evt_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:08.883186+00:00"
+    },
+    {
+      "source": "mission_idem_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:08.868154+00:00"
+    },
+    {
+      "source": "mission_idem_scope_a",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:09.106054+00:00"
+    },
+    {
+      "source": "mission_idem_scope_c",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:09.107541+00:00"
+    },
+    {
+      "source": "mission_sse_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T00:44:09.051162+00:00"
+    }
+  ],
+  "note": "Zero-spend policy enforced; local inference recorded at $0.00"
+}

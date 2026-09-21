@@ -1,0 +1,141 @@
+{
+  "packet_id": "V14-REAL-001",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-001",
+  "status": "fail",
+  "failure_class": "implement_no_material_diff_review_rejected",
+  "recorded_at": "2026-09-21T02:44:17Z",
+  "candidate_sha": "d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42",
+  "mission_id": "d9379d69277644998353a9ca3614eba7",
+  "spend_usd": 0.0,
+  "g14_lead_accept_invented": false,
+  "public_deploy_claimed": false,
+  "main_merge": false,
+  "primary_checkout_modified": false,
+  "pass_criteria": {
+    "1_mission_created_with_id": true,
+    "2_actual_local_inference_via_broker": true,
+    "3_no_known_answer_supplied": true,
+    "4_repo_inspected": true,
+    "5_concrete_verified_issue": false,
+    "6_isolated_worktree_patch_and_test": "partial_worktree_created_but_empty_diff",
+    "7_no_auto_apply": true,
+    "8_cost_zero": true,
+    "9_evidence_bound": true,
+    "10_awaiting_lead_review": true
+  },
+  "broker_receipts": [
+    {
+      "source": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 336,
+      "completion_tokens": 192,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T02:42:55.218229+00:00"
+    },
+    {
+      "source": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 336,
+      "completion_tokens": 76,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T02:43:00.615866+00:00"
+    },
+    {
+      "source": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "requests": 1,
+      "prompt_tokens": 336,
+      "completion_tokens": 192,
+      "cost_usd": 0.0,
+      "at": "2026-09-21T02:43:06.421922+00:00"
+    }
+  ],
+  "models_used": [
+    "qwen3.5:4b"
+  ],
+  "route_ids": [
+    "rt_ollama_qwen3.5:4b"
+  ],
+  "review_decision": {
+    "decision": "reject",
+    "reasons": [
+      "implementation_missing",
+      "wrong_result_rejected"
+    ],
+    "diff_excerpt": "",
+    "competing_solutions": [
+      {
+        "worker_id": "wrk_4d71ac07a9cd4fd6948a626eebc62bd7",
+        "ok": false
+      }
+    ],
+    "review_notes": null,
+    "independent_review": {
+      "accepted": false,
+      "reasons": [
+        "wrong_result_rejected"
+      ],
+      "checks": {
+        "wrong_result": false
+      }
+    }
+  },
+  "retries": [
+    {
+      "round": 0,
+      "task_id": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "family": "implement",
+      "reason": "implement_applied"
+    },
+    {
+      "round": 0,
+      "task_id": "tsk_5e4f2e884b914e9b968eb00cf89a770e",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_5e4f2e884b914e9b968eb00cf89a770e",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_736b41ea419046ca8c20b7e1444996ab",
+      "family": "implement",
+      "reason": "implement_applied"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_5e4f2e884b914e9b968eb00cf89a770e",
+      "family": "review",
+      "reason": "reject"
+    }
+  ],
+  "commands": [
+    "ollama list",
+    "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 .venv/bin/swarm mission run --goal <audit token_hash> --model gemma3:4b --repo ."
+  ],
+  "notes": [
+    "Operational mission surface used (swarm mission run); not fixture/demo/test-mode.",
+    "Evidence router selected local Ollama models; 3 implement-path inferences on rt_ollama_qwen3.5:4b at $0.",
+    "Implement produced model text rewriting token_hash.py but recorded empty diff; review rejected (implementation_missing/wrong_result_rejected).",
+    "Known-answer fallback correctly forbidden (implement_failed_no_known_answer_fallback on round 1).",
+    "Primary checkout unmodified; worktree cleaned after failed mission.",
+    "ART-V14-REAL-E2E remains drafting; this is preserved failure evidence, not a pass.",
+    "Proposed repair packet: V14-REAL-001-R \u2014 investigate empty-diff after model output apply path; re-run preregistered attempt after fix."
+  ],
+  "proposed_repair_packet": "V14-REAL-001-R"
+}
