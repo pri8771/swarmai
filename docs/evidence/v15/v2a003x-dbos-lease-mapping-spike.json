@@ -1,0 +1,24 @@
+{
+  "artifact_id": "ART-V15-ARCH",
+  "packet_id": "V2A-003X",
+  "scenario": "dbos_lease_mapping_partial_reuse_spike",
+  "status": "pass",
+  "recorded_at": "2026-09-21T02:39:00Z",
+  "candidate_sha": "db31df37b9ab0955cd45ec49780d0457e441f694",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "public_deploy_claimed": false,
+  "main_merge": false,
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest tests/spikes/test_dbos_lease_mapping_spike.py -q",
+    "ruff check src/swarm/spike/dbos_lease_mapping.py tests/spikes/test_dbos_lease_mapping_spike.py"
+  ],
+  "results": {
+    "spike_tests": "3 passed",
+    "installed_dbos": "3.0.0",
+    "recommendation": "partial_reuse",
+    "production_schema_migrated": false,
+    "conductor_used": false,
+    "note": "Isolated spike only; Swarm lease authority remains Postgres; not self-accepted"
+  }
+}
