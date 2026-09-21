@@ -5,7 +5,7 @@
   "scenario": "legacy_alembic_upgrade_token_lifecycle_recursive_denial",
   "status": "pass",
   "recorded_at": "2026-09-21T01:13:53.795893+00:00",
-  "candidate_sha": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
+  "candidate_sha": "PENDING_COMMIT",
   "spend_usd": 0.0,
   "g15_lead_accept_invented": false,
   "commands": [

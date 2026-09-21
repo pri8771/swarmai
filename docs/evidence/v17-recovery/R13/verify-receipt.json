@@ -1,0 +1,91 @@
+{
+  "packet_id": "R13",
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "status": "foundation_verified_on_tip_selective_evidence_fill",
+  "self_accept": false,
+  "donors": [
+    {
+      "sha": "630ab780",
+      "summary": "V2A-003a durable lease fencing schema and repositories"
+    },
+    {
+      "sha": "92f59faf",
+      "summary": "V2A-003a-R legacy upgrade, token lifecycle, recursive denial"
+    }
+  ],
+  "tip_sha_at_verify": "da026d1d0ec610e226d56cdda796269fc1573d09",
+  "verified_at": "2026-09-21T19:53:23Z",
+  "actions": [
+    "Verified foundation migration/token_hash/tests already byte-identical",
+    "Selectively filled missing donor evidence docs/evidence/v15/v2a003a-r-lease-foundation-repair.json",
+    "Did not overwrite lease_fencing.py / models.py later-superset"
+  ],
+  "foundation_files": [
+    {
+      "path": "migrations/versions/a15lease003a0001_art_v15_lease_fencing_schema.py",
+      "local_sha256": "30b617aac4713292894ce4d13c32dd73ccff7363d68fb7924a58b6869fefec70",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "30b617aac4713292894ce4d13c32dd73ccff7363d68fb7924a58b6869fefec70",
+      "identical_to_donor": true,
+      "present_locally": true
+    },
+    {
+      "path": "src/swarm/db/token_hash.py",
+      "local_sha256": "de665bfbba5ad83325f0eaeec2764115a385307464323ff0430363add3330452",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "de665bfbba5ad83325f0eaeec2764115a385307464323ff0430363add3330452",
+      "identical_to_donor": true,
+      "present_locally": true
+    },
+    {
+      "path": "tests/db/test_token_hash.py",
+      "local_sha256": "fa126b82efb73853246de56dd961f02f1a624d8a6aaacd5ffb79b3865871e686",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "fa126b82efb73853246de56dd961f02f1a624d8a6aaacd5ffb79b3865871e686",
+      "identical_to_donor": true,
+      "present_locally": true
+    },
+    {
+      "path": "tests/integration/db/test_lease_fencing_schema.py",
+      "local_sha256": "70e0b4f8ac683f9fdbc42eccb40f55be02d12e78e2b9e7f78282c1100b6dfb74",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "70e0b4f8ac683f9fdbc42eccb40f55be02d12e78e2b9e7f78282c1100b6dfb74",
+      "identical_to_donor": true,
+      "present_locally": true
+    },
+    {
+      "path": "docs/evidence/v15/v2a003a-lease-fencing-schema.json",
+      "local_sha256": "22173bd1916f1da2679f226dc2063aea8c5c555423c003ee026c92f41815eb4f",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "22173bd1916f1da2679f226dc2063aea8c5c555423c003ee026c92f41815eb4f",
+      "identical_to_donor": true,
+      "present_locally": true
+    },
+    {
+      "path": "docs/evidence/v15/v2a003a-r-lease-foundation-repair.json",
+      "local_sha256": "edd45da9ca0f5fc19eb96ba85fd44497ea3d20e91c9ff2e7a6f59f4dd7fa4c33",
+      "donor_rev": "92f59faf",
+      "donor_sha256": "edd45da9ca0f5fc19eb96ba85fd44497ea3d20e91c9ff2e7a6f59f4dd7fa4c33",
+      "identical_to_donor": true,
+      "present_locally": true
+    }
+  ],
+  "lease_fencing_py": {
+    "note": "Intentional later-superset already includes V2A-003b/c claim/renew/accept; not overwritten with older donor bytes.",
+    "local_sha256": "82340007108b4578597c1e840c1c79a0a4c2ef57822203afa7f9444d6ae33395",
+    "donor_92f59faf_sha256": "b5b0beb68237f5ef843e9f9c3e1aa65af05bf2672bc93cb9093f4f0b1aa5e0f0",
+    "identical_to_92f59faf": false
+  },
+  "excluded": [
+    "coordination heartbeat topology",
+    "autonomous-runner",
+    "downgrade of lease_fencing.py / models.py later ART-V15/V17 extensions"
+  ],
+  "tests": {
+    "command": "SWARM_DATABASE_URL=postgresql+psycopg://pchordia@127.0.0.1:5432/swarmai_v17_r13 pytest -q tests/db/test_token_hash.py tests/integration/db/test_lease_fencing_schema.py",
+    "result": "11 passed",
+    "db": "local operator DB swarmai_v17_r13 (not swarm:swarm demo DSN)"
+  },
+  "alembic_head": "a17effect004a0001",
+  "note": "R13 complete: foundation on tip + missing repair evidence filled; no invent-accept of ART-V15."
+}
