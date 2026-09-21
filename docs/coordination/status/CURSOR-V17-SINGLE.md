@@ -4,8 +4,8 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`
-- Coordination SHA: `c8a708013519a283f2908ba539ed6f60cbef92c9`
-- Updated: `2026-09-21T23:49:24Z`
+- Coordination SHA: `0fb06be0012afd2e7f3e35d97239ebb7654da645`
+- Updated: `2026-09-21T23:54:29Z`
 - Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R27`
