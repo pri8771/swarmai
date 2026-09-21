@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T00:38:00Z",
+  "updated_at": "2026-09-21T00:54:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -158,7 +158,14 @@
     "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md",
     "docs/artifacts/future/ART-V20-INSTALL_UPGRADE_PROTOCOL.md",
     "docs/artifacts/future/ART-V20-PERFORMANCE_BASELINE.md",
-    "docs/artifacts/future/ART-V20-SUPPORT_MATRIX_TEMPLATE.md"
+    "docs/artifacts/future/ART-V20-SUPPORT_MATRIX_TEMPLATE.md",
+    "docs/artifacts/future/ART-V15-DURABLE_SCHEMA_DELTA.md",
+    "docs/artifacts/future/ART-V16-DURABLE_SCHEMA.md",
+    "docs/artifacts/future/ART-V17-DURABLE_EFFECT_SCHEMA.md",
+    "docs/artifacts/future/ART-V23-MULTIMISSION_SCHEDULER.md",
+    "docs/artifacts/future/ART-V23-PORTABILITY_BUNDLE.md",
+    "docs/artifacts/future/ART-V30-PERSISTENT_OBJECTIVE_CONTRACT.md",
+    "docs/artifacts/future/ART-V30-LEARNING_GOVERNANCE.md"
   ],
   "open_blockers": [
     "ART-V10-WORKER-HEARTBEAT requires live Cursor CLI authentication + real receipts",
