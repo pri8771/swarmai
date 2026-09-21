@@ -204,7 +204,7 @@ def main() -> int:
         require_ok(git(workspace, "pull", "--ff-only", "origin", args.branch, timeout=120), "git_pull")
         before = require_ok(git(workspace, "rev-parse", f"origin/{args.branch}"), "git_before").strip()
 
-        agent = shutil.which("agent") or shutil.which("cursor-agent")
+        agent = os.environ.get("SWARM_AGENT_PATH") or shutil.which("agent") or shutil.which("cursor-agent")
         if not agent:
             heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note="cursor_cli_missing_run_agent_install")
             return 3
