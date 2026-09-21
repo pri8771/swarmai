@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `0d1fd8e61040bfcc1f49f8a46e7cfe51bfe3d22f`
-- Coordination SHA: `0ace7fe0cd60a3b254b60473de5d6fe9210eeb24`
-- Updated: `2026-09-21T18:24:40Z`
+- Branch SHA: `314f25b71b9f82dc37b092b8fb931ae3196c457c`
+- Coordination SHA: `3059ac61c7fdc013e3ea7b2c96e151c94cd692df`
+- Updated: `2026-09-21T18:25:42Z`
 - Trigger: `manual`
-- Status: **working**
+- Status: **blocked**
 - Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T18:24:39Z`
+- Last meaningful activity: `2026-09-21T18:25:41Z`
 - Spend USD: `0.0`
-- Blocker: ART-V13-TASK-POOL final freeze requires HOST-WIN-DEV executable verification (this host is Darwin)
+- Blocker: awaiting_lead_review_of_failed_v14_real_002_and_auth_for_new_preregistered_rerun
 
 ## Update
 
-Bootstrap complete. Materialization repaired (raw/fenced/unclosed + syntax gate). v14-real-002/003 failed honestly with material progress on 003. G13 blocked on HOST-WIN-DEV. Next: another real mission or V1.5 result fencing.
+v14-real-002 fail-closed bind+diagnosis packaged at 314f25b; truncated fence root cause; repair on tip does not pass 002; awaiting lead auth for NEW rerun. No new mission started by this agent.
 
 ## Next
 
