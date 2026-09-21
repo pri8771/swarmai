@@ -83,6 +83,50 @@ def remote_sha(repo: str, ref: str) -> str:
     return str(data["sha"])
 
 
+def publish_human_status(repo: str, entry: dict) -> None:
+    path = f"docs/coordination/status/{entry['host_alias']}.md"
+    current = gh_api(contents_endpoint(repo, path, ref=COORD_BRANCH))
+    lane = (
+        "A — Runtime / Real Acceptance / Durable Workers"
+        if entry["session_id"] == "A"
+        else "B — Product / Evaluation / Knowledge / Tools"
+    )
+    note = entry.get("note") or "No additional note."
+    packet = entry.get("packet_id") or "none"
+    artifact = entry.get("artifact_id") or "none"
+    activity = entry.get("last_agent_activity_at") or "none recorded"
+    body = f"""# {entry['host_alias']} — live lane status
+
+Lane: {lane}  
+Session: {entry['session_id']}  
+Updated: {entry['observed_at']}  
+Heartbeat: {entry['trigger']}  
+Effective cadence: {entry['effective_cadence_minutes']} minutes  
+Branch: `{entry['branch']}`  
+Branch SHA: `{entry['branch_sha']}`  
+Coordination SHA: `{entry['coordination_sha']}`  
+Current packet: `{packet}`  
+Artifact: `{artifact}`  
+Status: **{entry.get('status') or 'unknown'}**  
+Last agent activity: {activity}
+
+## Update
+
+{note}
+"""
+    encoded = base64.b64encode(body.encode()).decode()
+    gh_api(
+        contents_endpoint(repo, path),
+        method="PUT",
+        payload={
+            "message": f"status({entry['host_alias']}): {entry['observed_at']}",
+            "content": encoded,
+            "branch": COORD_BRANCH,
+            "sha": str(current["sha"]),
+        },
+    )
+
+
 def state_root(host: str) -> Path:
     override = os.environ.get("SWARM_COORD_HEARTBEAT_STATE_DIR")
     if override:
@@ -228,6 +272,7 @@ def main() -> int:
         "sha": blob_sha,
     }
     gh_api(contents_endpoint(args.repo_slug, path), method="PUT", payload=body)
+    publish_human_status(args.repo_slug, entry)
 
     local_state.update(
         {
