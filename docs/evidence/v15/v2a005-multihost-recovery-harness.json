@@ -27,5 +27,6 @@
     "pytest": "pass",
     "live_mac_windows": false
   },
-  "note": "B3 harness complete on single Darwin host; do not treat as ART-V15-MULTIHOST-EVIDENCE acceptance"
+  "note": "B3 harness complete on single Darwin host; do not treat as ART-V15-MULTIHOST-EVIDENCE acceptance",
+  "candidate_sha": "ab6cd8d62e18ea025ac60351faf9a4d83416773a"
 }

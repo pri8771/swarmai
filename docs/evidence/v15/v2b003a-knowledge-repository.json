@@ -32,5 +32,6 @@
   "results": {
     "pytest": "pass"
   },
-  "note": "C1 repository foundation; ART-V16 artifacts remain drafting except accepted durable schema design"
+  "note": "C1 repository foundation; ART-V16 artifacts remain drafting except accepted durable schema design",
+  "candidate_sha": "7f8698159acc91eb5e6a2e41d4ad17031e9fbea1"
 }
