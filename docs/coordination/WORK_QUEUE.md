@@ -8,7 +8,7 @@ Canonical lifecycle: `ARTIFACT_REGISTRY.json`. This is a derived execution view.
 - B / `cursor/v2-product-lane`: `6b0e1277051ae90fe1d56825d3e771b042380755`, prior exact-tip CI red from the same shared source; console green.
 - Reviewed integration remains `9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
 - A scheduler heartbeats `03:47:19Z` -> `04:02:22Z`: valid pair, **2/3**, but A is stale at the >35m bootstrap threshold.
-- B scheduler heartbeats `03:43:40Z` -> `03:59:17Z` -> `04:14:17Z` -> `04:29:17Z` -> `04:44:18Z`: **5 consecutive valid**; B individually satisfies cadence proof and is fresh.
+- B scheduler heartbeats `03:43:40Z` -> `03:59:17Z` -> `04:14:17Z` -> `04:29:17Z` -> `04:44:18Z` -> `04:59:18Z`: **6 consecutive valid**; B individually satisfies cadence proof and is fresh.
 - No global hourly graduation until A also satisfies the requirement. ChatGPT lead remains hourly.
 - No new A/B implementation commit or autonomous repo-assigned self-launch/push was verified this run.
 
@@ -87,7 +87,7 @@ No bounded implementation packet reached lead review in LEAD-026; `WORKER_PERFOR
 
 ## Honest blocked acceptance artifacts
 
-- `ART-OPS-HEARTBEAT`: A 2/3 and stale; B 5 consecutive and individually complete; global still drafting.
+- `ART-OPS-HEARTBEAT`: A 2/3 and stale; B 6 consecutive and individually complete; global still drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - `ART-V10-WORKER-HEARTBEAT`: authenticated Cursor-agent receipts absent.
 - `ART-V12-REMOTE-OVERLAP`: 0 admitted remotes.
