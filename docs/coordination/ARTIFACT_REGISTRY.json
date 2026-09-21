@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T01:48:00Z",
+  "updated_at": "2026-09-21T02:12:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -434,7 +434,7 @@
     {
       "artifact_id": "ART-V12-LOCAL-FALLBACK",
       "target_version": "1.2",
-      "owner": "Cursor Session C + ChatGPT lead",
+      "owner": "Cursor Session A + ChatGPT lead",
       "status": "drafting",
       "path_or_source_ref": "docs/evidence/inf-121/",
       "dependencies": [
@@ -445,29 +445,29 @@
         "kill-route-local-fallback.json"
       ],
       "worker_packets": [
-        "V2C-001"
+        "V2A-G12LOCAL"
       ],
-      "next_action": "Re-prove exact-tip local route availability + route disable/fallback with actual local-model execution; historical stubbed broker artifacts remain prep only.",
+      "next_action": "After critical V15 repair or in a non-conflicting worktree, re-prove current integration local Ollama route availability, route disable -> actual permitted alternative, and reservation/settlement/quota-deny with exact candidate/model/config binding.",
       "blockers": [],
-      "lane": "verification",
-      "notes": "Lead review: concurrent-local/kill-route historical evidence is stale relative to current integration and does not establish actual local-model execution identity sufficiently for current artifact verification."
+      "lane": "runtime-verification",
+      "notes": "Lead review: concurrent-local/kill-route historical evidence is stale relative to current integration and does not establish actual local-model execution identity sufficiently for current artifact verification. Session C is dormant; current revalidation is assigned to active Session A or lead."
     },
     {
       "artifact_id": "ART-V12-ADMISSION-RECONCILIATION",
       "target_version": "1.2",
-      "owner": "Cursor Session C + ChatGPT lead",
+      "owner": "Cursor Session A + ChatGPT lead",
       "status": "drafting",
       "path_or_source_ref": "docs/evidence/inf-121/local-admission-reconcile.json",
       "dependencies": [
         "ART-V12-BROKER-CONTRACT"
       ],
       "worker_packets": [
-        "V2C-001"
+        "V2A-G12LOCAL"
       ],
-      "next_action": "Re-prove current-tip reservation/settlement/quota-deny behavior; deterministic stub proof may supplement but not substitute actual local-route proof.",
+      "next_action": "After critical V15 repair or in a non-conflicting worktree, re-prove current integration local Ollama route availability, route disable -> actual permitted alternative, and reservation/settlement/quota-deny with exact candidate/model/config binding.",
       "blockers": [],
-      "lane": "verification",
-      "notes": "Lead review: local-admission-reconcile uses a stubbed broker adapter and lacks current candidate/config binding; valid regression prep, not current live-local evidence."
+      "lane": "runtime-verification",
+      "notes": "Lead review: local-admission-reconcile uses a stubbed broker adapter and lacks current candidate/config binding; valid regression prep, not current live-local evidence. Session C is dormant; current revalidation is assigned to active Session A or lead."
     },
     {
       "artifact_id": "ART-V13-QUAL-PROTOCOL",
@@ -765,8 +765,8 @@
       "kind": "architecture-and-source",
       "owner": "Cursor Session A + ChatGPT lead",
       "lane": "runtime",
-      "status": "reviewable",
-      "path_or_source_ref": "cursor/v2-runtime-lane@92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
+      "status": "drafting",
+      "path_or_source_ref": "cursor/v2-runtime-lane@e764834a69315d1c2c85f00322c3392aa5037fd9",
       "dependencies": [
         "ART-V15-WORKER-PROTOCOL",
         "ART-V15-DURABLE-SCHEMA"
@@ -775,13 +775,16 @@
         "V2A-003a",
         "V2A-003b",
         "V2A-003c",
-        "V2A-003d"
+        "V2A-003d",
+        "V2A-003b-R",
+        "V2A-003b-R2"
       ],
-      "story_points_next": 2,
-      "next_action": "lead review V2A-003a-R foundation repair; then order V2A-003b already on tip",
+      "story_points_next": 1,
+      "next_action": "V2A-003b-R2: reject terminal task/attempt on renew and make expiry compare lease/attempt revision/source/cancellation authority before requeue; then lead review; V2A-003c still required.",
       "blockers": [
-        "lead review of V2A-003a-R still required",
-        "V2A-003c accept fence not implemented"
+        "renewal does not yet explicitly fence terminal/incompatible task or attempt state",
+        "expiry reconciliation is task-only and can miss lease/attempt source/revision/cancellation drift",
+        "V2A-003c result acceptance fence not implemented"
       ],
       "evidence_refs": [
         "docs/evidence/v15/v2a003a-lease-fencing-schema.json @ 37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b",
@@ -790,9 +793,11 @@
         "src/swarm/workers/registry.py",
         "tests/integration/db/test_lease_claim_renew_expire.py",
         "tests/workers/test_workers.py",
-        "docs/evidence/v15/v2a003a-r-lease-foundation-repair.json @ 8e2c9754c9f64aa0e68e4fe5de47d646713a5413"
+        "docs/evidence/v15/v2a003a-r-lease-foundation-repair.json @ 8e2c9754c9f64aa0e68e4fe5de47d646713a5413",
+        "V2A-003b-R source e764834a69315d1c2c85f00322c3392aa5037fd9",
+        "V2A-003b-R evidence c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6; focused suite 52 passed; lead changes-required"
       ],
-      "notes": "V2A-003a-R foundation repair reviewable (legacy Alembic upgrade + token rotate/revoke + recursive token denial) @ 92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2. V2A-003b claim/renew/expire also present on tip pending order."
+      "notes": "003a-R foundation repair verified. 003b-R materially improved claim/renew/expire but independent lead source review still requires terminal task/attempt renewal fences plus lease/attempt-bound expiry authority before this slice is reviewable."
     },
     {
       "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
@@ -1624,6 +1629,32 @@
       "story_points_next": 2,
       "next_action": "Bootstrap Git/GitHub/uv/Python/Node, clone product lane, sync dependencies, run baseline, record sanitized host/tool/test evidence",
       "blockers": []
+    },
+    {
+      "artifact_id": "ART-OPS-HEARTBEAT",
+      "target_version": "cross-version",
+      "kind": "coordination-system",
+      "name": "Two-worker durable coordination heartbeat",
+      "owner": "ChatGPT lead + Cursor Sessions A/B",
+      "lane": "coordination",
+      "status": "drafting",
+      "path_or_source_ref": "docs/coordination/HEARTBEAT_PROTOCOL.md",
+      "dependencies": [],
+      "evidence_refs": [
+        "docs/coordination/HEARTBEAT_STATE.json",
+        "docs/coordination/heartbeats/HOST-MAC-DEV.json",
+        "docs/coordination/heartbeats/HOST-WIN-DEV.json"
+      ],
+      "worker_packets": [
+        "HB-A-BOOTSTRAP",
+        "HB-B-BOOTSTRAP"
+      ],
+      "next_action": "A and B pull branch instructions, install local 15-minute heartbeat schedulers, produce 3 consecutive valid 15-minute heartbeats each; lead verifies and graduates effective cadence to hourly.",
+      "blockers": [
+        "awaiting first durable heartbeat from A",
+        "awaiting first durable heartbeat from B"
+      ],
+      "notes": "This coordination heartbeat is not ART-V10 authenticated Cursor-agent worker evidence and must not be used to satisfy FIX-004."
     }
   ],
   "major_milestones": {
