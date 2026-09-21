@@ -6,7 +6,7 @@
   "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
   "bound_at": "2026-09-21T18:25:02Z",
   "candidate_sha_at_run": "17bf3a1c939df291023048b59bfcec6c2805eae6",
-  "evidence_packaged_on_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
+  "evidence_packaged_on_sha": "27f4a591eec07b0cd9051cf08fd07552ea63d95e",
   "status": "fail",
   "accepted": false,
   "summary": "repair_required",

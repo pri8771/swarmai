@@ -108,5 +108,6 @@
   "self_accepted": false,
   "follow_up_repair_sha": "4224b9071360d52a8593f4b8cd16485d13778f80",
   "follow_up_repair_converts_this_run_to_pass": false,
-  "bind_packaging_note": "bind.json added fail-closed; packaging commit will bind itself by tip SHA"
+  "bind_packaging_note": "bind.json added fail-closed; packaging commit will bind itself by tip SHA",
+  "bind_packaging_sha": "27f4a591eec07b0cd9051cf08fd07552ea63d95e"
 }
