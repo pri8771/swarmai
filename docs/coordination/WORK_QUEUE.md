@@ -12,7 +12,7 @@ Branch: `cursor/v2-runtime-lane`
 Current observed tip: `11a7e1d51c4c4d630c7d83c1af65e380c32ad80f`; exact-tip CI `35615739781` green.
 Assignment: `A-RESET-BATCH-04`, generation 4.
 
-1. `V14-REAL-001-R` — generic materialization repair + new real end-to-end mission.
+1. `V14-REAL-001-R` — generic materialization repair + new real end-to-end mission. Independent read-only diagnosis is now available at `docs/coordination/reviews/ART-V14-MATERIALIZATION-AUDIT-01-LEAD-REVIEW.md`.
 2. `V2A-003c` — durable result acceptance fencing.
 3. After lead review: reviewed-slice integration receipt -> `V2A-004` durable worker service -> real multi-host/recovery.
 
@@ -29,13 +29,21 @@ Assignment: `B-RESET-BATCH-04`, generation 4.
 ### Lane C — worker-pc / independent support
 Infrastructure: `pri8771/remote-workers` only; no SwarmAI acceptance authority.
 
-Current execution:
-- `swarmai-v14-materialization-audit-01` — read-only diagnostic support for Lane A; workflow `35616202805` is in progress.
+Completed support:
+- `swarmai-v14-materialization-audit-01` — read-only diagnostic workflow `35616202805` completed successfully as transport at `15:09:06Z`; no branch/commit was expected. Lead independently verified the generic parser/materialization findings. It is diagnostic evidence only and does not change `ART-V14-REAL-E2E` lifecycle.
 
-Queued transport:
-- `swarmai-v13-task-pool-freeze-07` — workflow `35616363073` is pending behind the occupied capacity-1 worker. Because Windows B is now the executable/final G13 owner, any retry-07 output is reference evidence only: no automatic integration and no acceptance claim.
+Current execution:
+- `swarmai-v13-task-pool-freeze-07` — workflow `35616363073` began after the capacity-1 V14 audit released the worker. Because Windows B is now the executable/final G13 owner, retry-07 output is reference/independent evidence only: no automatic integration and no acceptance claim.
 
 Lane C does not own Python/test-dependent acceptance gates when its Claude executor cannot run the required repository verification.
+
+## V14 current diagnosis
+
+The independent read-only audit plus lead source inspection confirmed two generic repair targets in `src/swarm/mission/worker.py`:
+- `_implement` asks the model for raw full-file source, while `_extract_python_file` generically accepts only fenced code; its raw-source fallback is fixture-specific to `inclusive_range_count`;
+- `_implement` always labels the result `implement_applied` after a write attempt even when the isolated git diff is empty, obscuring a no-op/failure condition.
+
+Lane A must fix these generically, preserve git diff as material-result authority, add unrelated temporary-repo regressions, then run the separately preregistered new real mission. No known-answer or token_hash-specific patching is allowed.
 
 ## G13 current decision
 
@@ -54,8 +62,7 @@ Phase 1 is active:
 - A/B effective cadence 5m.
 - only scheduler heartbeats count.
 - each host needs 3 consecutive receipts; adjacent valid gaps are 3–8m.
-- current lead-reconciled state: A **1/3** at `15:07:07Z`; B **1/3** at `14:59:17Z`.
-- both prior adjacent gaps were outside the 3–8m window, so neither earlier receipt can extend the current chain.
+- latest reconciled chain anchors: A `15:07:07Z`, B `14:59:17Z`; both are currently 1/3 because their immediately preceding gaps were outside the valid window.
 
 Phase 2:
 - starts only after both pass Phase 1;
