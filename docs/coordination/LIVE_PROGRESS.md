@@ -1,10 +1,8 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21T18:18:53Z
+Updated: 2026-09-21T18:25:28Z
 
 ## Current operating model
-
-Repository authority is the active single-session directive:
 
 | Role | Identity | Scope |
 |---|---|---|
@@ -13,36 +11,42 @@ Repository authority is the active single-session directive:
 | Operator | owner | Final authority |
 | ChatGPT | planning / coordination / independent review | No competing implementation lane |
 
-Implementation branch: `cursor/v17-single-session` @ `ed0888046a07b0d7fb422d4e1b58f1950869debf`.
-Legacy A/B assignments remain disabled; donor branches only.
+Implementation branch: `cursor/v17-single-session` @ `314f25b71b9f82dc37b092b8fb931ae3196c457c`.
+Legacy A/B assignments remain disabled.
 
 ## Heartbeat
 
-- Protocol: `SINGLE_SESSION_HEARTBEAT.md`.
-- Epoch: `single-v17-20260921-01`.
-- Producer: `com.swarmai.coord-heartbeat-v17` (exactly one).
-- Session registered: **yes** (`session_started` at `2026-09-21T18:16:46Z`; scheduler receipt `2026-09-21T18:17:57Z`).
-- Legacy HOST-MAC-DEV / HOST-WIN-DEV publishers: stopped on this Mac (LaunchAgents archived; HOST-MAC runner dir renamed disabled). Post-registration HOST-MAC publishes: none observed.
-- Heartbeat is liveness/progress only; does not accept artifacts.
+- Protocol: `SINGLE_SESSION_HEARTBEAT.md`; epoch `single-v17-20260921-01`; producer registered.
+- Heartbeat is liveness/progress only; this update does not invent scheduler receipts.
 
-## Current artifact truth
+## ART-V14-REAL-E2E — honest failed run packaged
 
-Canonical source is `ARTIFACT_REGISTRY.json`.
+- Run: **`v14-real-002`** / mission `18b9b59bd8a8479cb2152c13d3240d1b` @ candidate `17bf3a1c939df291023048b59bfcec6c2805eae6`.
+- Outcome: **failed** / `accepted=false` / `<|separator|>=repair_required` / `changed_files=[]` / spend **$0**.
+- Evidence (fail-closed, bound): `docs/evidence/v14-real-e2e/v14-real-002/` including `pre-run-freeze.json`, `mission-run.stdout.json`, `mission-record.json`, `cost-show.json`, `manifest.json`, `DIAGNOSIS.md`, **`bind.json`**.
+- Packaging tip: `314f25b71b9f82dc37b092b8fb931ae3196c457c` (bind stamped to `27f4a591eec07b0cd9051cf08fd07552ea63d95e`).
+- **Not accepted. Not V1.4 complete. No self-accept.**
 
-- `ART-V13-TASK-POOL` is **reviewable, not verified/frozen** at `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`.
-- Derived `STATE.json` was reconciled by `CURSOR-V17-SINGLE` so `version_state.1.3.task_pool` no longer claims verified/frozen ahead of the registry.
-- Remaining G13 gate: actual **HOST-WIN-DEV** generator/verifier/Ruff/mypy/offline-pytest evidence, then independent lead freeze; sealed-reference content binding pending. W-131B counted qualification prohibited.
-- This session runs on **Darwin/macOS** and therefore records HOST-WIN-DEV executable verification as an honest environment blocker (no Windows impersonation).
-- `ART-V14-REAL-E2E` remains incomplete: generic materialization repair + new genuine real mission required.
-- G12 remote overlap remains blocked at 0 admitted remote routes.
-- V1.5 durable result acceptance/worker/recovery evidence remains incomplete.
+### Root cause (v14-real-002)
+
+Implement path at run tip used `max_tokens=800`; Ollama returned `completion_tokens=800` with an **unclosed** ` ```python ` fence. Closed-fence-only `_extract_python_file` returned `None` → `implement_failed_no_known_answer_fallback` (known-answer path correctly refused) → empty material diff / review reject.
+
+### Repair candidate (does not convert 002 to pass)
+
+Branch tip includes unclosed-fence extract + higher implement `max_tokens` (see `4224b90` / later commits). A **new** preregistered freeze/run is required after lead authorization. Do not rewrite `v14-real-002`.
+
+## Other artifact truth
+
+- `ART-V13-TASK-POOL` remains **reviewable** (not verified/frozen); HOST-WIN-DEV executable verification blocked on Darwin.
+- G12 remote overlap remains 0 admitted routes.
+- Incomplete local `v14-real-003` scratch (if present) is **not** a counted/packaged pass attempt under this update.
 
 ## Top next actions
 
-1. Continue G13 reviewer/qualification machinery without claiming freeze; keep Windows verification blocker explicit.
-2. Repair V1.4 generic materialization and rerun a genuine real mission when prerequisites allow.
-3. Continue dependency-independent V1.5–V1.7 implementation work.
+1. Lead review of fail-closed `v14-real-002` bind + diagnosis.
+2. If repair candidate accepted: authorize **new** freeze/run id for genuine mission rerun (not a parallel duplicate of 002).
+3. Continue G13 honesty / dependency-independent V1.5–V1.7 work without inventing V14 acceptance.
 
 ## Human action
 
-Provide HOST-WIN-DEV executable verification environment when G13 freeze is required. No main merge, public release/deploy, force push, or additional spend is authorized.
+No main merge, public release/deploy, force push, or additional spend authorized.
