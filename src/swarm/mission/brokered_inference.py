@@ -211,4 +211,13 @@ async def brokered_local_chat(
 
 
 def brokered_local_chat_sync(**kwargs: Any) -> InferenceResult:
-    return asyncio.run(brokered_local_chat(**kwargs))
+    """Sync wrapper safe for both CLI and already-running asyncio loops (API)."""
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(brokered_local_chat(**kwargs))
+    # ProductStore.execute_mission is async; never nest asyncio.run in that loop.
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(lambda: asyncio.run(brokered_local_chat(**kwargs))).result()

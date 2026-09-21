@@ -20,6 +20,11 @@ from swarm.tools.sandbox_runner import self_test as sandbox_self_test
 
 
 def _repo_root() -> Path:
+    import os
+
+    env_root = (os.environ.get("SWARM_REPO_ROOT") or "").strip()
+    if env_root:
+        return Path(env_root).expanduser().resolve()
     return Path(__file__).resolve().parents[2]
 
 

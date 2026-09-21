@@ -1,0 +1,64 @@
+{
+  "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+  "packet_id": "V2A-020a",
+  "scenario": "v2_integration_from_verified_001_002_only",
+  "status": "pass",
+  "recorded_at": "2026-09-21T01:21:48.637351+00:00",
+  "integration_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+  "base_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
+  "branch": "cursor/v2-integration",
+  "spend_usd": 0.0,
+  "g20_lead_accept_invented": false,
+  "main_merge": false,
+  "public_deploy_claimed": false,
+  "included_sources": [
+    {
+      "packet": "V2A-001",
+      "sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+      "status": "lead_verified"
+    },
+    {
+      "packet": "V2A-002",
+      "sha": "48a02e3daae13f8fb569225e2d030097229f4780",
+      "status": "lead_verified"
+    },
+    {
+      "packet": "V2A-002-evidence",
+      "sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
+      "status": "lead_verified_evidence_bind"
+    }
+  ],
+  "excluded_sources": [
+    {
+      "packet": "V2A-003a-R",
+      "sha": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
+      "reason": "003a-R ancestry includes unreviewed V2A-003b (7dcefe4); backlog requires leaving V15 foundation out until 003b-R rather than importing unreviewed claim code"
+    },
+    {
+      "packet": "V2A-003b",
+      "sha": "7dcefe4c72ae9ada2ff512adeaf65eefa28632e2",
+      "reason": "lead changes-required; not verified; must not enter integration"
+    },
+    {
+      "packet": "V2A-H6A",
+      "note": "landed on cursor/v2-runtime-lane only this turn; not pulled into integration yet (separate deploy surfaces; optional later once reviewed)"
+    }
+  ],
+  "conflict_decisions": [
+    "fast-forward origin/cursor/v2-integration (2c08f96) to ee5a066; no merge conflicts",
+    "do not cherry-pick 92f59fa because it is a descendant of unrepaired 003b"
+  ],
+  "commands": [
+    "git merge --ff-only ee5a06612aa2e4409fa8bbfd1969225c16887615",
+    "PYTHONPATH=src python -m pytest tests/api/test_art_v12_broker_contract.py tests/api/test_art_v11_process_restart.py -q"
+  ],
+  "results": {
+    "ff_merge": true,
+    "broker_and_restart_tests": "6 passed",
+    "contains_v2a001": true,
+    "contains_v2a002": true,
+    "contains_v2a003b": false,
+    "contains_v2a003a_r": false,
+    "intended_transition": "planned -> drafting"
+  }
+}

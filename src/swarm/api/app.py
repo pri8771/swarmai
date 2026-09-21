@@ -94,8 +94,12 @@ def create_app(
 
     root = repo_root
     if root is None:
-        # Prefer package-adjacent repo root (…/swarm-ai).
-        root = Path(__file__).resolve().parents[3]
+        env_root = (os.environ.get("SWARM_REPO_ROOT") or "").strip()
+        if env_root:
+            root = Path(env_root).expanduser().resolve()
+        else:
+            # Prefer package-adjacent repo root (…/swarm-ai).
+            root = Path(__file__).resolve().parents[3]
 
     if db_reachable is None and (os.environ.get("SWARM_DATABASE_URL") or "").strip():
         # Probe only when an explicit DSN is configured (secret-drop / .env).
