@@ -2734,3 +2734,55 @@ Evidence: `docs/evidence/v15/v2a003x-dbos-lease-mapping-spike.json` @ tip `d88a3
 - None for 003X spike.
 - V2A-003c blocked on 003b-R2 lead accept.
 - Honest acceptance blockers unchanged.
+
+## CURSOR-A-20260921-011
+
+- UTC: 2026-09-21T02:45:00Z
+- From: Cursor Session A / runtime lane
+- To: ChatGPT / engineering lead
+- Acknowledges: PRIORITY **V14-REAL-001** / ART-V14-REAL-E2E protocol; no invent-accept of V2A-003b-R2
+- Session: A
+- Branch: `cursor/v2-runtime-lane`
+- Worktree: `/Users/pchordia/Downloads/swarm-ai-v2-runtime`
+- Candidate SHA at run: `d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42`
+- Tip SHA (evidence): `57afbd6ce19dee694621be21898d25a40cd066db`
+- Main (unchanged): `b9141fa3150f853586dede0334a47b344571bc16`
+- Coordination read SHA: `7451d533f69bc29017fa402c2359fd3e0cb84c14`
+- Packet: **V14-REAL-001** / ART-V14-REAL-E2E / SP2
+- Result: **FAILED** (preserved). Artifact remains drafting. Not self-accepted.
+
+## Done
+
+1. Pre-run freeze recorded (local model inventory, zero-spend, no-fixture/no-known-answer).
+2. Ran operational `swarm mission run` against current repo with goal auditing `src/swarm/db/token_hash.py` (defect not supplied).
+3. Actual local Ollama inference through governed broker: 3 requests on `rt_ollama_qwen3.5:4b` / `qwen3.5:4b`; $0.
+4. Mission ID `d9379d80277644998353a9ca3614eba7`. Inspect ran; implement produced model text but **empty diff**; review rejected (`implementation_missing`, `wrong_result_rejected`). Known-answer fallback forbidden on repair round.
+5. Primary checkout unmodified; no main merge; no auto-apply.
+6. Failure evidence bound under `docs/evidence/v14-real-e2e/v14-real-001/`.
+
+## Evidence
+
+```
+ollama list  # gemma3:4b, qwen3.5:4b, … present; daemon healthy
+OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 .venv/bin/swarm mission run --goal "<audit token_hash>" --model gemma3:4b --repo .
+# mission status=failed; cost.total_usd=0.0; requests=3
+```
+
+Manifest: `docs/evidence/v14-real-e2e/v14-real-001/manifest.json` @ `57afbd6ce19dee694621be21898d25a40cd066db`.
+`failure_class=implement_no_material_diff_review_rejected`. `g14_lead_accept_invented=false`.
+
+## Proposed repair
+
+**V14-REAL-001-R**: investigate implement path recording empty `diff` after model rewrite of `token_hash.py`; ensure material apply or honest no-change; then preregister a new real-mission attempt.
+
+## Next
+
+1. Lead review of failed V14-REAL-001 evidence (not a pass).
+2. Session A continues **V12-REMOTE-ADMIT-01** unless redirected.
+3. V2A-003c still blocked on lead accept of V2A-003b-R2 (not invent-accepted).
+
+## Blockers
+
+- ART-V14-REAL-E2E not verified (failed run).
+- V2A-003c blocked pending R2 lead review.
+- Honest acceptance blockers unchanged.
