@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T15:52:14Z",
+  "updated_at": "2026-09-21T16:10:00Z",
   "mode": "stress_5m",
   "worker_effective_cadence_minutes": 5,
   "lead_effective_cadence_minutes": 60,
@@ -21,12 +21,8 @@
       "all_workers_verified": false,
       "verified_at": null,
       "verified_timestamps": {
-        "A": [
-          "2026-09-21T15:52:14+00:00"
-        ],
-        "B": [
-          "2026-09-21T15:44:17+00:00"
-        ]
+        "A": [],
+        "B": []
       }
     },
     "phase2": {
@@ -51,24 +47,20 @@
     "A": {
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "last_heartbeat_at": "2026-09-21T15:52:14+00:00",
-      "consecutive_valid_phase1": 1,
-      "verified_timestamps": [
-        "2026-09-21T15:52:14+00:00"
-      ],
+      "last_heartbeat_at": null,
+      "consecutive_valid_phase1": 0,
+      "verified_timestamps": [],
       "stale": false,
-      "status": "Phase-1 chain is 1/3: 15:37:12Z -> 15:52:14Z is about 15m02s, above the required 8m maximum, so 15:52:14Z starts a fresh chain. The ledger is fresh, but recent scheduler spacing still looks like the old ~15m job despite effective cadence=5m."
+      "status": "awaiting fresh-session registration for reset-20260921-new-lanes-01; old scheduler entries ignored"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T15:44:17+00:00",
-      "consecutive_valid_phase1": 1,
-      "verified_timestamps": [
-        "2026-09-21T15:44:17+00:00"
-      ],
+      "last_heartbeat_at": null,
+      "consecutive_valid_phase1": 0,
+      "verified_timestamps": [],
       "stale": false,
-      "status": "Phase-1 chain is 1/3: recent scheduler receipts remain about 15m apart (15:29:17Z -> 15:44:17Z), above the required 8m maximum. The ledger is fresh, but the installed scheduler does not appear to be honoring the current 5m wake interval."
+      "status": "awaiting fresh-session registration for reset-20260921-new-lanes-01; old scheduler entries ignored"
     }
   },
   "prior_verified_hourly_graduation": {
@@ -80,7 +72,7 @@
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
     "last_review_at": "2026-09-21T15:52:14Z",
-    "note": "Stress Phase 1 remains active. A=1/3 at 15:52:14Z and B=1/3 at 15:44:17Z. Both are fresh at the evidence cutoff, but both show invalid ~15m spacing for a 5m burst. Phase 2 has not started. Host human-readable status pages are also stale despite scheduler ledger writes, so the current heartbeat installation needs refresh/verification."
+    "note": "Owner closed all previous A/B sessions. Current test counts only fresh-session scheduler receipts after explicit epoch registration for reset-20260921-new-lanes-01."
   },
   "stale_threshold_minutes": {
     "stress_5m": 12,
@@ -90,5 +82,16 @@
   "notifications": {
     "channel": "GitHub durable coordination -> hourly lead automation -> operator",
     "instant_push_guaranteed": false
+  },
+  "active_session_epoch": "reset-20260921-new-lanes-01",
+  "session_epoch_registration": {
+    "A": {
+      "registered": false,
+      "registered_at": null
+    },
+    "B": {
+      "registered": false,
+      "registered_at": null
+    }
   }
 }
