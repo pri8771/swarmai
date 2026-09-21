@@ -1,5 +1,31 @@
 # SwarmAI execution plan — current state -> V2.0 candidate -> V2.3 -> V3.0
 
+## Current operating mode — pull-driven A/B team
+
+Active implementation lanes:
+- Session A / HOST-MAC-DEV / `cursor/v2-runtime-lane`
+- Session B / HOST-WIN-DEV / `cursor/v2-product-lane`
+
+Reserve verification branch exists but is dormant. Do not activate it merely because capacity exists.
+
+Each active branch contains `SESSION_INSTRUCTIONS.md`. The operator should only need to tell a session to pull and continue. The branch instructions require it to fetch canonical coordination state, install/verify the durable heartbeat, claim the next dependency-ready packet, push exact evidence, then fetch coordination and continue without waiting unnecessarily.
+
+Heartbeat:
+- worker bootstrap effective cadence = 15 minutes;
+- three consecutive valid 15-minute heartbeats required from A and B;
+- lead scheduled review = hourly platform minimum;
+- lead validates the full worker heartbeat history and then changes worker effective cadence to hourly;
+- heartbeat is coordination liveness only, not artifact acceptance or FIX-004 worker evidence.
+
+Current reviewed source:
+- integration = `9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615`;
+- A latest implementation under review = `e764834a69315d1c2c85f00322c3392aa5037fd9`;
+- A V2A-003b-R review = changes required; follow-up `V2A-003b-R2`;
+- B has no product implementation yet; first packet `V2B-000` merges reviewed integration into the product lane.
+
+Canonical detail remains in `ARTIFACT_REGISTRY.json`, `WORK_QUEUE.md`, `WORKER_PACKET_BACKLOG.md`, and `HEARTBEAT_STATE.json`.
+
+
 Adopted: 2026-09-20
 Owner direction: resume engineering, work as one lead + two Cursor implementation sessions, artifact-first. Major milestones are V1.7, V2.3 and V3.0. Immediate target is at least a V2.0 implementation/artifact-complete candidate today.
 
