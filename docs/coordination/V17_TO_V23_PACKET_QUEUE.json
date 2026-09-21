@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "status": "cemented_future_plan_not_active__proposed_revision_by_fable_planning_pass",
+  "status": "cemented_future_plan_lead_approved_not_active_until_v17_handoff",
   "active_after": "V1.7 recovery completion + operator authorization",
   "architecture_plan": "docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md",
   "live_checkpoints": "docs/coordination/V17_TO_V23_LIVE_CHECKPOINTS.md",
@@ -861,5 +861,6 @@
         "23-12 counted evidence"
       ]
     }
-  ]
+  ],
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
 }
