@@ -1,5 +1,7 @@
 # SwarmAI worker packet backlog — current
 
+> **SUPERSEDED (2026-09-21, proposed by Fable planning pass):** two-lane backlog, history only. It also still says `ART-V13-TASK-POOL verified/frozen`, which contradicts the registry (`reviewable`). Canonical: `V17_RECOVERY_PACKET_QUEUE.json`.
+
 Updated by `LEAD-20260921-037`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file tracks bounded execution state only. `WORK_QUEUE.md`, assignment files, and artifact acceptance contracts control ordering and scope.
 
 ## A / HOST-MAC-DEV / `cursor/v2-runtime-lane`
