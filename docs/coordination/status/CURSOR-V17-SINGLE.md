@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `4eb3f1c620df35d2ebb2b0998fea5e6c4a839ead`
-- Coordination SHA: `8499471a6ba496b728c13cdaf6ba816bda157e15`
-- Updated: `2026-09-21T19:24:47Z`
-- Trigger: `scheduler`
-- Status: **session_started**
-- Current packet: `BOOTSTRAP`
-- Current artifact: `cross-version`
-- Last meaningful activity: `2026-09-21T19:19:41Z`
+- Branch SHA: `561b4aff082988a753b7d95815b8867acc05498b`
+- Coordination SHA: `cfdda926f019f0d9422e45aa7370ce0257aad51f`
+- Updated: `2026-09-21T19:29:29Z`
+- Trigger: `manual`
+- Status: **working**
+- Current packet: `R00`
+- Current artifact: `cross-version-verification`
+- Last meaningful activity: `2026-09-21T19:29:28Z`
 - Spend USD: `0.0`
-- Blocker: none
+- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit before exact-tip CI can start jobs
 
 ## Update
 
-CURSOR-V17-SINGLE session_started; legacy A/B LaunchAgents stopped; exactly one v17 producer installed.
+R00/CP0 done: Actions billing/spend-limit blocker classified (run 35642708049); local ruff+mypy+94 pytest green on Mac. No CI spam.
 
 ## Next
 
-Await independent lead review; session implementation scope complete through V1.7; no V1.8+ unless operator expands scope.
+R01 ART-V14-REAL-E2E reviewer grounding guard; dependency-independent recovery continues
