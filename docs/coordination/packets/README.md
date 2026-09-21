@@ -1,6 +1,6 @@
 # Packet spec conventions (read once per session)
 
-Status: PROPOSED by Fable planning pass 2026-09-21 — active only after lead review.
+Status: LEAD APPROVED 2026-09-21. Execute only packets that the active queue marks dependency-ready; future-version packets remain inactive until their handoff/dependencies.
 Applies to every spec in this directory whose ID appears in `../V17_RECOVERY_PACKET_QUEUE.json`.
 Older files here (`V2B-*`, `EXT-WORKER-*`, `OPS-AUTO-*`, `HB-CI-001`, `V14-REAL-001-R`, `B-OPS-*`) are historical two-lane packets; do not execute them.
 
