@@ -1,20 +1,14 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T03:04:30Z",
+  "updated_at": "2026-09-21T03:12:24Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
   "lead_platform_minimum_minutes": 60,
   "graduation": {
     "required_consecutive_per_session": 3,
-    "valid_gap_minutes": {
-      "min": 10,
-      "max": 25
-    },
-    "requires_sessions": [
-      "A",
-      "B"
-    ],
+    "valid_gap_minutes": {"min": 10, "max": 25},
+    "requires_sessions": ["A", "B"],
     "all_workers_verified": false,
     "graduated_at": null,
     "counted_trigger": "scheduler_only"
@@ -25,10 +19,9 @@
       "branch": "cursor/v2-runtime-lane",
       "last_heartbeat_at": "2026-09-21T02:31:51+00:00",
       "consecutive_valid_15m": 1,
-      "verified_timestamps": [
-        "2026-09-21T02:31:49+00:00"
-      ],
-      "status": "scheduler_heartbeat_1_of_3_then_manual_updates_suppressed_old_scheduler_clock_bug_fixed_reinstall_required"
+      "verified_timestamps": ["2026-09-21T02:31:49+00:00"],
+      "stale": true,
+      "status": "stale_after_scheduler_heartbeat_1_of_3; corrected_client_reinstall_required; later_manual_updates_do_not_count"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
@@ -36,23 +29,21 @@
       "last_heartbeat_at": "2026-09-21T02:29:19+00:00",
       "consecutive_valid_15m": 0,
       "verified_timestamps": [],
-      "status": "install_heartbeat_only_no_scheduler_heartbeat_observed_reinstall_with_diagnostics_required"
+      "stale": true,
+      "status": "stale_no_scheduler_heartbeat_observed; install_event_only; reinstall_with_diagnostics_required"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T03:04:00Z",
+    "last_review_at": "2026-09-21T03:12:24Z",
     "last_notified_worker_sha": {
       "A": "f393f7fa0ed62d5233350740515ed77069fd4eef",
       "B": "770c80b6ccbcef8f442696508ab95f3696aa3176"
     },
-    "note": "Only trigger=scheduler counts toward 15m proof. Manual/install heartbeats are coordination notifications only. A remains 1/3 scheduler heartbeats; B remains 0/3. Cadence bug fixed in branch heartbeat clients; both workers must pull/reinstall. No graduation."
+    "note": "Only trigger=scheduler counts. At 03:12:24Z A's last valid scheduler receipt is >35m old and B has never emitted a scheduler receipt; both are stale under bootstrap rules. No graduation."
   },
-  "stale_threshold_minutes": {
-    "bootstrap_15m": 35,
-    "hourly": 90
-  },
+  "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
   "notifications": {
     "channel": "GitHub durable coordination -> hourly lead automation -> operator",
     "instant_push_guaranteed": false
