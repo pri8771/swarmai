@@ -113,6 +113,43 @@ def _valid_python_syntax(text: str) -> bool:
     return True
 
 
+def _top_level_defs(text: str) -> set[str]:
+    """Names of top-level def/class statements (best-effort, indentation-based)."""
+    names: set[str] = set()
+    for line in text.splitlines():
+        if not line or line[0].isspace():
+            continue
+        m = re.match(r"^(?:async\s+)?def\s+(\w+)\s*\(", line)
+        if m:
+            names.add(m.group(1))
+            continue
+        m = re.match(r"^class\s+(\w+)\s*[:\(]", line)
+        if m:
+            names.add(m.group(1))
+    return names
+
+
+def _looks_truncated_rewrite(original: str, patched: str) -> bool:
+    """Reject incomplete full-file rewrites that drop most of the original API.
+
+    Truncation at max_tokens often yields a syntactically-invalid file (caught
+    elsewhere) or a shorter valid-looking prefix that omits trailing defs.
+    """
+    if not original.strip():
+        return False
+    orig_lines = [ln for ln in original.splitlines() if ln.strip()]
+    patch_lines = [ln for ln in patched.splitlines() if ln.strip()]
+    if len(orig_lines) >= 40 and len(patch_lines) < max(20, int(0.6 * len(orig_lines))):
+        return True
+    orig_defs = _top_level_defs(original)
+    patch_defs = _top_level_defs(patched)
+    if len(orig_defs) >= 3 and len(patch_defs) < max(1, int(0.6 * len(orig_defs))):
+        missing = orig_defs - patch_defs
+        if len(missing) >= max(2, int(0.4 * len(orig_defs))):
+            return True
+    return False
+
+
 def _extract_python_file(text: str) -> str | None:
     """Extract full-file Python from a model response.
 
@@ -456,13 +493,22 @@ class RepoWorker:
             prompt = (
                 f"You are editing {target_rel} in a software mission. "
                 f"Goal: {goal}\n"
-                "Return ONLY the full corrected file contents.\n\n"
+                "Return ONLY the COMPLETE corrected file contents as valid Python. "
+                "Do not truncate. Do not omit trailing functions or classes. "
+                "Do not wrap the answer in commentary outside a single optional "
+                "```python fenced block.\n\n"
                 f"Current file:\n{original}"
             )
             require_inclusive = False
         inference = self._chat(
             messages=[
-                {"role": "system", "content": "Return only valid Python source for the file."},
+                {
+                    "role": "system",
+                    "content": (
+                        "Return only complete, syntactically valid Python source for the "
+                        "entire file. Never truncate mid-function."
+                    ),
+                },
                 {"role": "user", "content": prompt},
             ],
             model=self._model_for("implement"),
@@ -509,6 +555,29 @@ class RepoWorker:
                     "known_answer_forbidden": True,
                     "parser_dogfood_fixture": self.parser_dogfood_fixture,
                     "target_file": str(target_rel),
+                    "model_output_excerpt": (inference.text or "")[:500],
+                },
+                inference=inference.to_dict(),
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
+        if _looks_truncated_rewrite(original, patched):
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_truncated_rewrite",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "used_model_fallback": False,
+                    "known_answer_forbidden": True,
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "target_file": str(target_rel),
+                    "original_top_level_defs": sorted(_top_level_defs(original)),
+                    "patched_top_level_defs": sorted(_top_level_defs(patched)),
                     "model_output_excerpt": (inference.text or "")[:500],
                 },
                 inference=inference.to_dict(),

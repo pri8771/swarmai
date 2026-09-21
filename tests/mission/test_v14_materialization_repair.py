@@ -157,6 +157,65 @@ def test_malformed_output_rejected_without_write(tmp_path: Path) -> None:
     assert "value + 1" not in wt_target.read_text(encoding="utf-8")
 
 
+def test_truncated_rewrite_rejected_without_write(tmp_path: Path) -> None:
+    repo = _init_temp_repo(tmp_path / "heldout_repo")
+    # Expand fixture with several top-level defs so truncation is detectable.
+    target = repo / "widgets" / "counter.py"
+    full = (
+        '"""Held-out widget counter used only by materialization regressions."""\n'
+        "\n"
+        "def bump(value: int) -> int:\n"
+        "    return value\n"
+        "\n"
+        "def reset() -> int:\n"
+        "    return 0\n"
+        "\n"
+        "def twice(value: int) -> int:\n"
+        "    return value * 2\n"
+        "\n"
+        "def label() -> str:\n"
+        "    return 'counter'\n"
+    )
+    target.write_text(full, encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "commit", "-m", "expand counter"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    task = sample_task().model_copy(
+        update={
+            "task_family": "implement",
+            "id": "tsk_mat_trunc",
+            "inputs": {
+                "goal": "Make bump increment by one",
+                "target_file": "widgets/counter.py",
+            },
+        }
+    )
+    truncated = (
+        '"""Held-out widget counter used only by materialization regressions."""\n'
+        "\n"
+        "def bump(value: int) -> int:\n"
+        "    return value + 1\n"
+    )
+    inference = InferenceResult(
+        ok=True,
+        text=truncated,
+        model="test-local",
+        route_id="rt_test",
+    )
+    with patch("swarm.mission.worker.local_chat", return_value=inference):
+        result, handle = worker._implement(
+            task, mission_id="mission_mat_trunc", shared=None
+        )
+    assert result.ok is False
+    assert result.summary == "implement_truncated_rewrite"
+    assert (handle.path / "widgets" / "counter.py").read_text(encoding="utf-8") == full
+
+
 def test_invalid_syntax_rejected_without_write(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
     worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
