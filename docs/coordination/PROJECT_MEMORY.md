@@ -1,59 +1,47 @@
 # SwarmAI compact project memory
 
-Curated 2026-09-20 after LEAD-20260920-016. `ARTIFACT_REGISTRY.json` is canonical; this is a short derived orientation only. Read registry/state and unread message pointer before deeper files.
+Curated 2026-09-21 after `LEAD-20260921-019`. `ARTIFACT_REGISTRY.json` is canonical; this is only a compact orientation. Read registry/state and unread messages before deeper evidence.
 
 ## Authority and operating model
 
-Owner resumed engineering after the abrupt V1.4 stop and authorized source implementation through V3.0. Major milestones are V1.7, V2.3 and V3.0; immediate target is a V2.0 implementation/artifact-complete candidate. Main merge/public release/additional spend remain separately gated. Required live/time-bound evidence remains honest wall-clock evidence and may finish after implementation.
+Owner authorizes source implementation through V3.0. Major milestones: V1.7, V2.3, V3.0. Immediate target: a V2.0 implementation/artifact-complete candidate. Main merge, public release/deployment, additional spend/paid fallback and destructive actions remain separately gated. Live/time-bound acceptance is real wall-clock evidence and is never backfilled.
 
-Project management is artifact-oriented. ChatGPT leads architecture/contracts/research/review and stays one artifact ahead. Two Cursor sessions do most implementation:
-- Session A: runtime/control plane/distributed/recovery + integration owner on `cursor/v2-runtime-lane` / `cursor/v2-integration`.
-- Session B: evaluation pools/knowledge/tools/product/beta on `cursor/v2-product-lane`.
+Management is artifact-oriented. ChatGPT owns architecture/contracts/research/decomposition/independent review. Cursor does most SP1-SP3 implementation/test work. Session A owns runtime/control-plane/distributed/recovery plus integration on `cursor/v2-runtime-lane` / `cursor/v2-integration`. Session B owns eval/knowledge/tools/product/beta on `cursor/v2-product-lane`. Shared API/store/routes/schemas/CLI/lockfile/migrations belong to Session A.
 
-Execution: `V2_EXECUTION_PLAN.md` and `TWO_CURSOR_TEAM.md`.
+## Current refs and reviewed progress
 
-## Current source
+Main remains `b9141fa3150f853586dede0334a47b344571bc16`; V1.4 base and both V2 integration/product branches currently start at `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`. Session A runtime tip observed this heartbeat: `37f95fe63a1bf451f5dad4075be143cfa145e975f`; CI `35549624046` is green. No Session B source commit was observed in this heartbeat.
 
-Main `b9141fa…`. Draft PR #14 `cursor/v1.4-live-integration-11e2` @ `03d85540e36c36fa3a5c92a3082be9959d93f66d`. Application tree last materially changed at `d9da26c…`; later candidate changes are evidence/docs. Actions `35545174895` is green for offline+console. DB integration is honestly skipped without `SWARM_DATABASE_URL`; live-gated CI is notice-only, not live evidence.
+Lead independently verified:
+- `ART-V12-BROKER-CONTRACT`: source `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3`, CI `35548643473`. ProductStore generic execution now injects the governed project-scoped broker; broker-required missing/denied/unregistered paths fail closed instead of falling through to direct local inference.
+- `ART-V11-RESTART-EVIDENCE`: source `48a02e3daae13f8fb569225e2d030097229f4780`, evidence `ee5a06612aa2e4409fa8bbfd1969225c16887615`, CI `35549111809`. Actual uvicorn PID stop/start, first process exit, same durable mission ID/status/disk hash reopened through HTTP and separate CLI.
 
-## V2 acceleration
+Session A also produced V2A-003a durable worker schema/repositories at `630ab780ab45858c5dad4075be143cfa145e975f`, evidence tip `37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b`. Lead review requested changes; `ART-V15-LEASE-FENCING` stays drafting. Useful schema/repo work exists, but the current “legacy migration” test creates current metadata then inserts nullable legacy-shaped rows instead of upgrading a populated previous Alembic schema. V2A-H2 also lacks revoke/rotation lifecycle proof, and token-sensitive free-form metadata needs a recursive/typed boundary.
 
-Three branches were created from the frozen V1.4 tip `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`: `cursor/v2-integration`, `cursor/v2-runtime-lane`, `cursor/v2-product-lane`.
+## Gate truth
 
-Session A first packets: close operational broker bypass (V2A-001 SP2), actual service process restart (V2A-002 SP1), durable worker lease schema/repository (V2A-003a SP2).
+V1.0 repair: candidate/security/evidence/runtime artifacts verified; worker-heartbeat artifact blocked because `cursor agent` auth/real receipts remain absent.
 
-Session B first packets: freeze G13 held-out/version manifest (V2B-001 SP2), reviewer calibration/freeze (V2B-002 SP3), provenance repository (V2B-003a SP2), action/approval/receipt contracts (V2B-004a SP2).
+V1.1: all required artifacts are now verified, including real process restart, but version artifacts have not been promoted to accepted as a set.
 
-Lead implementation-ready artifacts now exist for durable lease/fencing, provenance, approval binding, site authority/backup, extension contracts and V2.0 acceptance. Lead also drafted V2.3 operational-platform and V3 persistent-objective/learning architectures.
+V1.2: broker and provider-eligibility artifacts verified. Provider ledger still has **0 admissible remote routes**; remote overlap blocked. Local fallback/admission-reconciliation artifacts remain reviewable and need rebind/review against the verified broker.
 
-Important reuse findings: worker generation/fencing already exists in memory; V1.5 is primarily durability/CAS + real multi-host proof. Memory already has bounded retrieval; V1.6 extends provenance/permissions/versioning. ToolGateway already has scope/payload approval/receipt primitives; V1.7 normalizes and extends them. Standalone Postgres/Alembic is enough for first recovery implementation.
+V1.3: frozen qualification protocol accepted; screening matrix verified as 72 provisional n=5 cells across three local configs and S/M/L/XL. Task-pool/version manifest not frozen; zero qualified cells; reviewer benchmark still drafting.
 
-## Artifact truth
+V1.4: graph/load work remains offline preparation. Qualified-role manifest and live adaptive proof blocked on G12/G13. LIVE-142 is preregistered but not started; mandatory wall-clock observation remains future truth.
 
-**V1.0 repair:** candidate/security/evidence/runtime artifacts are verified. `ART-V10-WORKER-HEARTBEAT` is blocked because Cursor CLI `status/whoami` remain Not logged in; scheduler probes are not authenticated worker receipts.
+V1.5 implementation is active. Durable lease/fencing foundation needs V2A-003a-R repair before atomic claim/renew/expire and result fencing. V1.6/V1.7 implementation packets are ready for Session B but no product-lane source activity was observed yet.
 
-**V1.1:** mission path, actual Chromium console/API/CLI same-ID evidence, wrong-output/unsupported/cancel controls and explicit apply boundary are verified. Restart artifact was demoted to drafting: current evidence recreates app/store objects but does not stop/start the actual service process. W-111C SP1 ready.
+## Current ready queues
 
-**V1.2:** provider-eligibility ledger is verified as truthful and currently yields **0 admissible remote routes**. Independent source review found `ProductStore.execute_mission()` creates a `RepoWorker` without broker/project ID, allowing direct local inference fallback; broker contract is drafting and W-122A SP2 is ready. Dual-remote overlap remains blocked. Lead created `ART-V12-REMOTE-ADMISSION-RESEARCH.md`; public docs only narrow OpenRouter/Groq/Gemini candidates and never admit an account route by themselves.
+Session A: `V2A-003a-R` SP1 (true legacy migration + token rotate/revoke + nested metadata boundary), `V2A-H6A` SP2 (deployment secret/runtime default hardening), `V2A-020a` SP1 (start V2 integration with verified V2A-001/V2A-002 only). Then V2A-003b/c and durable worker protocol.
 
-**V1.3:** frozen qualification protocol accepted. Screening matrix verified: 72 provisional n=5 cells, three local models, S/M/L/XL, six families, no qualification claim. Qualification task/scorer/prompt/tool/model identity manifest is not frozen; W-131C1 SP2 ready. No qualified cells. First candidate batches after freeze: planning/XL gemma3:4b; coding/XL qwen3.5:4b; reasoning/L qwen3.5:9b. Reviewer screening is weak; W-131C2 SP3 calibration-only benchmark repair/freeze ready.
+Session B: `V2B-001` SP2 task-pool/version freeze, `V2B-002` SP3 calibration-only reviewer benchmark repair/freeze, `V2B-003a+H1` SP2 project-scoped provenance, `V2B-004a+H4` SP2 ActionEnvelope/ApprovalGrant/ActionReceipt contracts.
 
-**V1.4:** graph/load artifacts are offline preparation only. Qualified role manifest, real dual-remote adaptive proof, mode comparison and LIVE-142 remain blocked/not started.
+## Lead future lane
 
-## Worker calibration
+`ART-V23-MULTIMISSION-OPS` was materially advanced: durable project/mission queue state, weighted-deficit fairness, anti-gaming invariants, bounded urgency/aging, cross-resource `DispatchIntent` compensation, scheduler-epoch fencing, explain receipts and proposed preregistered fairness metrics. It remains drafting; no V2.3 acceptance claim.
 
-Reviewed artifact-oriented packets: W-111A SP2 accepted first review; W-111B SP2 changes-required only for process restart and split to W-111C; W-121A SP2 accepted as truthful blocked-state evidence; W-131A SP1 accepted. Buckets have fewer than five completed packets, so performance estimates remain unstable.
+## Human/live blockers
 
-Ready Cursor queue: W-111C SP1, W-122A SP2, W-131C1 SP2, W-131C2 SP3. W-131B/W-121B/G14/live campaign remain dependency-blocked.
-
-## Future artifact progress
-
-Lead drafted substantive V1.5 distributed-worker architecture and `ART-V15-WORKER_PROTOCOL.md` covering enrollment, generation fencing, heartbeat, durable lease CAS, renewal/expiry, result envelopes, acceptance fencing and duplicate-effect recovery. This is design only; no V1.5 code authorization.
-
-## Human action
-
-Only immediate human step for G10 is completing a live `cursor agent login` while its CLI waiter remains active, then confirming `cursor agent status` and `cursor agent whoami` authenticate. Do not clear the probe skip before that.
-
-## Historical abrupt stop
-
-The 2026-09-21T00:12:38Z V1.4 stop remains historical evidence only and is superseded by the owner's explicit resume through V3.0. See `OWNER_RESUME_TO_V3.md`.
+Cursor CLI authentication remains the only immediate human-auth blocker for `ART-V10-WORKER-HEARTBEAT`: complete a live `cursor agent login` only when an actual CLI waiter is active, then status/whoami must verify. G12 remote overlap requires fresh exact-route account/tier/zero-charge/quota/health evidence for two remote routes; public provider docs do not self-admit an account. Do not fabricate provider eligibility, cost, timing or worker activity.
