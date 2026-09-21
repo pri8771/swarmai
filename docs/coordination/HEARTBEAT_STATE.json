@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "updated_at": "2026-09-21T16:31:00Z",
+  "updated_at": "2026-09-21T17:02:02Z",
   "mode": "stress_5m",
   "worker_effective_cadence_minutes": 5,
   "lead_effective_cadence_minutes": 60,
@@ -10,14 +10,8 @@
     "phase1": {
       "name": "5m_burst",
       "required_consecutive_per_session": 3,
-      "valid_gap_minutes": {
-        "min": 3,
-        "max": 8
-      },
-      "requires_sessions": [
-        "A",
-        "B"
-      ],
+      "valid_gap_minutes": {"min": 3, "max": 8},
+      "requires_sessions": ["A", "B"],
       "all_workers_verified": false,
       "verified_at": null,
       "verified_timestamps": {
@@ -32,44 +26,37 @@
     "phase2": {
       "name": "15m_24h_soak",
       "required_duration_hours": 24,
-      "valid_gap_minutes": {
-        "min": 10,
-        "max": 25
-      },
+      "valid_gap_minutes": {"min": 10, "max": 25},
       "started_at": null,
       "ends_at": null,
       "completed": false,
       "verified_at": null,
       "miss_policy": "any unresolved >25m scheduler gap fails/restarts clean soak unless owner explicitly waives"
     },
-    "after_success": {
-      "mode": "hourly",
-      "worker_effective_cadence_minutes": 60
-    }
+    "after_success": {"mode": "hourly", "worker_effective_cadence_minutes": 60}
   },
   "sessions": {
     "A": {
       "host_alias": "HOST-MAC-DEV",
       "branch": "cursor/v2-runtime-lane",
-      "last_heartbeat_at": null,
+      "last_heartbeat_at": "2026-09-21T16:52:23+00:00",
       "consecutive_valid_phase1": 0,
       "verified_timestamps": [],
       "stale": false,
-      "status": "fresh-session registration still not proven; recent scheduler gaps do not form a valid 3-8m chain"
+      "status": "ledger is fresh but fresh-session registration is absent; scheduler receipts remain historical/unqualified for epoch reset-20260921-new-lanes-01. Human-readable HOST-MAC-DEV status page is also stale, indicating the installed publisher is not the current reset-aware client."
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T16:28:03+00:00",
-      "consecutive_valid_phase1": 4,
+      "last_heartbeat_at": "2026-09-21T16:53:21+00:00",
+      "consecutive_valid_phase1": 3,
       "verified_timestamps": [
-        "2026-09-21T16:14:17+00:00",
         "2026-09-21T16:17:56+00:00",
         "2026-09-21T16:22:59+00:00",
         "2026-09-21T16:28:03+00:00"
       ],
       "stale": false,
-      "status": "fresh lane registered; Phase-1 5m burst verified at least 3/3 with valid gaps 3m39s, 5m03s, 5m04s"
+      "status": "fresh lane registered; Phase-1 5m burst verified 3/3 on 16:17:56 -> 16:22:59 -> 16:28:03. Later duplicate/legacy scheduler-looking receipts do not revoke the completed burst but must not be treated as soak evidence. Human-readable status publishing is current."
     }
   },
   "prior_verified_hourly_graduation": {
@@ -80,28 +67,14 @@
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T15:52:14Z",
-    "note": "Reconciled fresh-session evidence: B is registered and has a valid 5m Phase-1 chain (>=3 consecutive). A is not yet registered/qualified, so Phase 2 has not started."
+    "last_review_at": "2026-09-21T17:02:02Z",
+    "note": "B Phase 1 remains verified. A has live ledger writes but no required fresh-session registration and its human-readable status page is stale, so A remains 0/3 and the 24h soak has not started."
   },
-  "stale_threshold_minutes": {
-    "stress_5m": 12,
-    "soak_15m_24h": 35,
-    "hourly": 90
-  },
-  "notifications": {
-    "channel": "GitHub durable coordination -> hourly lead automation -> operator",
-    "instant_push_guaranteed": false
-  },
+  "stale_threshold_minutes": {"stress_5m": 12, "soak_15m_24h": 35, "hourly": 90},
+  "notifications": {"channel": "GitHub durable coordination -> hourly lead automation -> operator", "instant_push_guaranteed": false},
   "active_session_epoch": "reset-20260921-new-lanes-01",
   "session_epoch_registration": {
-    "A": {
-      "registered": false,
-      "registered_at": null
-    },
-    "B": {
-      "registered": true,
-      "registered_at": "2026-09-21T16:11:06+00:00",
-      "evidence": "manual fresh-lane heartbeat B-OPS-AUTO-SYNC-02 with new lane activity"
-    }
+    "A": {"registered": false, "registered_at": null},
+    "B": {"registered": true, "registered_at": "2026-09-21T16:11:06+00:00", "evidence": "manual fresh-lane heartbeat B-OPS-AUTO-SYNC-02 with new lane activity"}
   }
 }
