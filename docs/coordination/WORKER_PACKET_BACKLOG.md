@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated after `LEAD-20260921-031`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
+Updated after `LEAD-20260921-032`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
 
 ## Shared local execution blocker
 
@@ -15,42 +15,55 @@ Assignment `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled.
 
 Fix coordination-script Ruff failures without weakening one-packet/generation, dirty-worktree, branch, no-remote-change, no-force-push or no-self-accept safety. Add focused regressions and return exact-tip CI. Intended parent artifact transition remains `drafting -> drafting` with the source blocker removed; host proof is still required later.
 
-A's scheduler is stale and the packet has not self-launched. The local Mac LaunchAgents must be restored before expecting autonomous execution. B's autonomous assignment remains disabled until this shared repair is independently reviewed and safely propagated. Do not replay generation 1.
+A's scheduler is stale and the packet has not self-launched. Restore the local Mac LaunchAgents before expecting autonomous execution. B's autonomous assignment remains disabled until this shared repair is independently reviewed and safely propagated. Do not replay generation 1.
 
 ## Heartbeat bootstrap
 
 Only `trigger=scheduler` counts.
 
 - A: `03:47:19Z -> 04:02:22Z` = **2/3**, stale.
-- B: `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z -> 08:59:27Z -> 09:14:18Z -> 09:29:17Z -> 09:44:17Z` = **10 consecutive valid receipts**, individually complete.
-- Global cadence stays at 15 minutes until A also has a current 3/3 qualifying chain. ChatGPT lead remains hourly.
+- B: previous chain reached `10:14:17Z`; the next receipt at `10:44:17Z` was **30 minutes later**, so the current chain resets to **1/3**. B is fresh.
+- Global cadence stays at 15 minutes until both have a current 3/3 qualifying chain. ChatGPT lead remains hourly.
 
 ## External worker-pc / G13 task pool
 
-Retry 02 remains the last independently reviewable source branch:
-- `worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692`
-- disposition: **changes required** for visible hidden references, insufficient independent held-out depth, seed-isomorphic variants and absent executed verification.
+### REVIEWED CHANGES-REQUIRED — EXT-WORKER-PC-V2B-001-R2 / ART-V13-TASK-POOL / SP2
 
-Retry 03 (`swarmai-v13-task-pool-freeze-03`, run `35566726945`) is closed as non-evidence: execution was cancelled, result JSON is absent, and no worker branch exists.
-
-### ACTIVE EXTERNAL REPAIR — EXT-WORKER-PC-V2B-001-R2 / ART-V13-TASK-POOL / SP2
-
-Bounded contract: `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R2.md`.
-
-Dispatch:
+Retry 04 produced real source:
 - task: `swarmai-v13-task-pool-freeze-04`
-- target: `worker-pc`
-- executor: Claude branch mode
-- base: `worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692`
-- expected branch: `worker/swarmai-v13-task-pool-freeze-04`
-- remote-workers dispatch commit: `f3eeb62f836ece720f80e5e79a0a8a461c8e39cc`
-- workflow run: `35580580156`
-- workflow job: `106272271934`
-- review observation: still `in_progress` in `Execute submitted tasks`; result JSON absent; expected SwarmAI branch absent.
+- branch: `worker/swarmai-v13-task-pool-freeze-04`
+- commit: `6467552f86e40964e5bd26d85e3b3a74d03aa059`
+- parent: `bbe41b7770123fef4eb03c4f03f95fc18eefc692`
+- remote-workers run/job: `35580580156` / `106272271934`
+- SwarmAI exact-tip CI: `35587202715`.
 
-Required core output: versioned freeze-v2 input-only held-out corpus; >=15 independent inputs in all 16 coding/planning/reasoning/extraction × S/M/L/XL cells; opaque sealed-reference identity only; fail-closed independence/contamination checker; pinned non-floating identities; focused negative tests and actually executed focused verification. Preserve v1/retry02 historical evidence. Do not run counted W-131B qualification and do not self-accept.
+The remote task execution step succeeded and the branch was pushed, but sanitized result publication failed, so no result JSON exists. SwarmAI static/type/package/Alembic checks pass and console CI passes, but the offline pytest step fails.
 
-Local B must not duplicate this external packet.
+Independent lead review additionally found that the current `5 task variants x 3 structural loads` construction does not mechanically establish 15 semantic-independent observations per cell: ordinary scenario/domain substitutions and incremental clause variants can evade the current normalizer. The evidence document also contains stale provenance saying the branch was never committed/pushed. Finally, the lead-controlled sealed reference bundle/content digest is not bound and counted readiness remains false.
+
+Disposition: **changes required; ART-V13-TASK-POOL stays drafting; no W-131B**.
+Review: `docs/coordination/reviews/ART-V13-TASK-POOL-RETRY04-LEAD-REVIEW.md`.
+
+### READY-WHEN-CAPACITY-FREE — EXT-WORKER-PC-V2B-001-R3 / ART-V13-TASK-POOL / SP2
+
+Contract: `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R3.md`.
+Base: `worker/swarmai-v13-task-pool-freeze-04@6467552f86e40964e5bd26d85e3b3a74d03aa059`.
+Expected branch: `worker/swarmai-v13-task-pool-freeze-05`.
+
+Required repair:
+- reproduce/fix exact-tip offline pytest while preserving existing negative assertions and green Ruff/mypy/package/Alembic;
+- rebind evidence provenance to actual commit/CI;
+- require >=15 distinct semantic independence groups/archetypes per required family/size cell; scenario-noun, seed-ID or cumulative-clause variations alone cannot count as independent;
+- add negative tests proving semantic/template siblings are rejected;
+- preserve input-only worker-visible records and opaque hidden-reference IDs;
+- keep `counted_qualification_ready=false` until lead-controlled sealed bundle binding exists;
+- do not run counted W-131B; request lead review only.
+
+**Do not dispatch yet.** `worker-pc` capacity 1 is currently occupied by unrelated remote-workers run `35590523591`. Dispatch R3 only after that worker is free.
+
+Lead-owned sealed-reference contract: `docs/coordination/G13_SEALED_REFERENCE_BINDING_PROTOCOL.md`.
+
+Local B must not duplicate the external task-pool packet.
 
 ## Session A — runtime/control-plane/integration
 
@@ -80,13 +93,13 @@ Autonomous product execution remains held until A0 is reviewed/propagated. Keep 
 After safe re-enable, sync only reviewed integration baseline, preserve host/session files, run Windows Python+console baseline, return exact evidence.
 
 ### EXTERNAL B1 — ART-V13-TASK-POOL / SP2
-Retry 04 is active/unreviewed. Local B must not duplicate. No counted qualification before lead freeze.
+R3 is prepared but not dispatched while worker-pc is occupied. Local B must not duplicate. No counted qualification before lead freeze + real sealed-reference binding.
 
 ### LOCAL B2 — V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3
 Calibration-only reviewer benchmark/scorer repair/freeze after B0 and safe autonomy re-enable. No held-out qualification claim.
 
 ### B3 — W-131B / ART-V13-QUALIFIED-MATRIX / SP2 batches
-Starts only after repaired B1 is independently frozen. Preserve all outcomes and full workflow overhead; no post-result threshold changes.
+Starts only after repaired B1 is independently frozen and sealed-reference binding is real. Preserve all outcomes and full workflow overhead; no post-result threshold changes.
 
 ### B4 — reviewer held-out qualification
 Starts only after B2 design freeze. Required before G14 role manifest.
@@ -106,20 +119,17 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 - A5-LOCAL-G12-CURRENT-TIP / SP2 — accepted live-local evidence only; no remote claim.
 - EXT-WORKER-PC-V2B-001-02 / ART-V13-TASK-POOL / SP2 — changes required.
 - EXT-WORKER-PC-V2B-001-R1 / retry 03 — cancelled without result/branch; not scored as reviewed implementation.
+- EXT-WORKER-PC-V2B-001-R2 / retry 04 — changes required at `6467552f86e40964e5bd26d85e3b3a74d03aa059`.
 
-`WORKER_PERFORMANCE.json` is unchanged because no new bounded source packet reached independent review.
-
-## Lead-owned parallel artifact
-
-`ART-V20-PERFORMANCE-BASELINE` remains drafting, but its protocol was advanced at coordination commit `ddfc8f969ab66684697fa822279da441a197421e`. The contract now freezes campaign identity, separates warm-up/counted samples and queue/inference/end-to-end latency, defines sample/percentile semantics, requires raw reproducible records and fail-closed pathology criteria, and explicitly prevents performance evidence from substituting for reliability/security/G12/G13/LIVE-142 acceptance.
+`WORKER_PERFORMANCE.json` summary counts remain unchanged because retry 04 is a repair of the same already-reviewed V2B-001 packet intent and duplicate packet intents are counted once. Exact repair evidence is captured in the lead review.
 
 ## Acceptance blockers — do not relabel
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B individually complete at 10 valid receipts; global drafting.
+- `ART-OPS-HEARTBEAT`: A 2/3 stale; B current chain 1/3; global drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - G12 remote overlap = 0 admitted routes.
-- `ART-V13-TASK-POOL`: retry 04 active/unreviewed; not frozen.
+- `ART-V13-TASK-POOL`: retry 04 changes-required; R3 waiting for worker-pc capacity; not frozen.
 - G13 reviewer not frozen; zero qualified cells.
 - V14 real E2E first attempt failed; repair/rerun queued after autonomous source repair.
 - G14 live adaptation blocked on G12/G13.
