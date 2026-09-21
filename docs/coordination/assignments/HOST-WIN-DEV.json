@@ -1,12 +1,12 @@
 {
   "schema_version": "1.1",
-  "assignment_id": "B-AUTONOMY-BATCH-01",
-  "generation": 1,
-  "enabled": true,
+  "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
+  "generation": 2,
+  "enabled": false,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
-  "priority": "immediate",
+  "priority": "blocked_shared_runner_source",
   "max_runtime_seconds": 2400,
   "boundaries": {
     "additional_spend": false,
@@ -20,23 +20,23 @@
       "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
       "instruction_path": "docs/coordination/packets/V2B-000.md",
       "max_runtime_seconds": 1800,
-      "note": "Sync only reviewed integration baseline and run Windows baseline."
+      "note": "Queued behind lead review/propagation of OPS-AUTO-001-R; do not autonomously execute from the current red source baseline."
     },
     {
       "packet_id": "V2B-001",
       "artifact_id": "ART-V13-TASK-POOL",
       "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
       "max_runtime_seconds": 2400,
-      "note": "Freeze G13 calibration/held-out task and version manifest."
+      "note": "Next after B0 once autonomous runner source is repaired/re-enabled."
     },
     {
       "packet_id": "V2B-002",
       "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
       "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
       "max_runtime_seconds": 2400,
-      "note": "Calibration-only reviewer benchmark/scorer repair and freeze."
+      "note": "Calibration-only reviewer benchmark/scorer repair after B1; no held-out qualification before lead freeze."
     }
   ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Execute items in order, one bounded packet per autonomous invocation, pushing each separately. Stop before counted held-out qualification until lead freezes B1."
+  "note": "Disabled because exact-tip B CI run 35558073323 is red from the shared autonomous-runner source. Previous generation was not observed as autonomously started. Keep scheduler heartbeat running. Lead will issue a new enabled generation after OPS-AUTO-001-R is independently reviewed and propagated to B."
 }
