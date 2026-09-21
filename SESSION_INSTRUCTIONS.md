@@ -19,6 +19,15 @@ Lead: ChatGPT via `coordination/swarm-control`.
    - newest `docs/coordination/AGENT_MESSAGES.md`.
 5. Newest coordination state overrides older prompt text.
 
+## Heartbeat client update — reinstall once
+
+The heartbeat client was corrected so manual/forced packet updates no longer reset or suppress the scheduler's 15-minute proof clock.
+
+After pulling this revision, rerun once:
+`bash scripts/coordination/install_heartbeat_macos.sh`
+
+Then leave the scheduler alone. Manual packet heartbeats may continue, but only scheduler heartbeats count toward the 3-consecutive 15-minute bootstrap proof.
+
 ## Heartbeat — required
 Install/verify once: `bash scripts/coordination/install_heartbeat_macos.sh`.
 Before a packet, publish context with:
