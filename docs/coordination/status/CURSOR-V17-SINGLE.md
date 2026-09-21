@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `4224b9071360d52a8593f4b8cd16485d13778f80`
-- Coordination SHA: `174aa15c599aa6cc971b33ea7338dd6e749fc146`
-- Updated: `2026-09-21T18:23:03Z`
-- Trigger: `scheduler`
-- Status: **testing**
+- Branch SHA: `0d1fd8e61040bfcc1f49f8a46e7cfe51bfe3d22f`
+- Coordination SHA: `0ace7fe0cd60a3b254b60473de5d6fe9210eeb24`
+- Updated: `2026-09-21T18:24:40Z`
+- Trigger: `manual`
+- Status: **working**
 - Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T18:20:01Z`
+- Last meaningful activity: `2026-09-21T18:24:39Z`
 - Spend USD: `0.0`
-- Blocker: HOST-WIN-DEV final executable verification unavailable on this Darwin host
+- Blocker: ART-V13-TASK-POOL final freeze requires HOST-WIN-DEV executable verification (this host is Darwin)
 
 ## Update
 
-Materialization repair at tip; G13 Mac HOST-WIN-DEV blocker recorded; starting v14-real-002 pre-run freeze then genuine local Ollama mission on worktree.py (not token_hash).
+Bootstrap complete. Materialization repaired (raw/fenced/unclosed + syntax gate). v14-real-002/003 failed honestly with material progress on 003. G13 blocked on HOST-WIN-DEV. Next: another real mission or V1.5 result fencing.
 
 ## Next
 
