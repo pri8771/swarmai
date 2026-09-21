@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T14:50:00Z",
+  "updated_at": "2026-09-21T15:05:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -162,15 +162,15 @@
     }
   },
   "session_a_next": [
-    "fresh session: pull current runtime lane; reinstall 5m heartbeat scheduler",
-    "generation 3: V14-REAL-001-R real E2E materialization repair+rereun",
-    "then V2A-003c durable result acceptance"
+    "V14-REAL-001-R",
+    "V2A-003c",
+    "after lead review: integration receipt -> V2A-004"
   ],
   "session_b_next": [
-    "fresh session: pull current product lane; reinstall 5m heartbeat scheduler",
-    "generation 3: B-OPS-AUTO-SYNC-01 propagate reviewed runner repair",
-    "then V2B-000 integration sync",
-    "then V2B-002 reviewer calibration/freeze; do not duplicate external V2B-001"
+    "B-OPS-AUTO-SYNC-02",
+    "V2B-000",
+    "V2B-001-R4",
+    "after lead freeze: reviewer calibration + counted qualification"
   ],
   "lead_parallel": [
     "retry05 / EXT-WORKER-PC-V2B-001-R3 is running; independently review only after branch/result/evidence exists",
@@ -182,16 +182,13 @@
     "continue V2 security/recovery and V2.3/V3 architecture without taking routine SP1-SP3 implementation from workers"
   ],
   "open_blockers": [
-    "Heartbeat stress test reset: A 0/3 and B 0/3 at 5-minute phase; then 24-hour 15-minute soak required",
-    "A/B active lane exact-tip offline CI red due shared autonomous-runner coordination scripts",
-    "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
-    "ART-V10 authenticated Cursor-agent evidence blocked on authenticated Cursor-agent receipts",
-    "G12 remote overlap: zero admitted routes; account-specific free tier/zero-charge admission missing",
-    "G13 retry04 exact-tip offline pytest red; semantic independence not mechanically strong enough; evidence provenance stale; lead-controlled sealed bundle/content digest unbound; zero qualified cells",
-    "worker-pc capacity 1 occupied by SwarmAI retry05 run 35596577823; no result/branch yet",
-    "V1.4 real E2E repair/rerun waiting behind runner source repair",
-    "G14 live adaptive proof and LIVE-142 remain blocked/not started",
-    "V2.0 integrated artifact set incomplete; 7-day reliability wall-clock campaign has not started"
+    "Heartbeat stress test Phase 1 reset: new 5-minute 3/3 proof for A and B, followed by 24-hour 15-minute soak",
+    "Autonomous self-launch not yet proven on A or B",
+    "V1.4 real E2E requires successful generic materialization repair + new real mission",
+    "G13 task pool requires >=15 genuine semantic archetypes per required cell and executable freeze verification",
+    "G12 remote overlap still has 0 admitted remote routes",
+    "V1.5 result acceptance / durable worker service / multi-host evidence incomplete",
+    "V2.0 integrated candidate and elapsed reliability campaign incomplete"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
@@ -203,15 +200,15 @@
   },
   "autonomous_workers": {
     "protocol": "docs/coordination/AUTONOMOUS_WORKER_PROTOCOL.md",
-    "status": "runner_repair_A_reviewed_B_sync_pending_self_launch_proof_pending",
+    "status": "fresh_generation_4_issued_self_launch_proof_pending",
     "poll_seconds": 60,
     "active_hosts": {
       "A": {
         "host": "HOST-MAC-DEV",
         "branch": "cursor/v2-runtime-lane",
         "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
-        "assignment_id": "A-EXECUTION-BATCH-03",
-        "generation": 3,
+        "assignment_id": "A-RESET-BATCH-04",
+        "generation": 4,
         "enabled": true,
         "queued_packets": [
           "V14-REAL-001-R",
@@ -223,13 +220,13 @@
         "host": "HOST-WIN-DEV",
         "branch": "cursor/v2-product-lane",
         "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "assignment_id": "B-EXECUTION-BATCH-03",
-        "generation": 3,
+        "assignment_id": "B-RESET-BATCH-04",
+        "generation": 4,
         "enabled": true,
         "queued_packets": [
-          "B-OPS-AUTO-SYNC-01",
+          "B-OPS-AUTO-SYNC-02",
           "V2B-000",
-          "V2B-002"
+          "V2B-001-R4"
         ],
         "proven": false
       }
@@ -241,70 +238,37 @@
     "infrastructure_repo": "pri8771/remote-workers",
     "project_authority": false,
     "worker": "worker-pc",
-    "worker_status": "online_capacity_1_occupied_by_swarmai_retry05_run_35596577823",
-    "attempts": [
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-01",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "V2B-001",
-        "dispatch_run": 35559390335,
-        "status": "cancelled_before_result_or_worker_branch",
-        "result_present": false,
-        "worker_branch_present": false
+    "role": "independent_audit_review_support",
+    "current_task": "swarmai-v14-materialization-audit-01",
+    "rule": "never final owner of Python/test-dependent acceptance when executor cannot run required verification"
+  },
+  "execution_reset": {
+    "audit": "docs/coordination/FULL_AUDIT_2026-09-21.md",
+    "plan": "docs/coordination/EXECUTION_RESET_PLAN.md",
+    "topology": "three_execution_lanes_plus_chatgpt_lead",
+    "lanes": {
+      "A": {
+        "owner": "HOST-MAC-DEV / Cursor",
+        "branch": "cursor/v2-runtime-lane",
+        "scope": "runtime_real_acceptance_durable_workers_recovery_integration",
+        "assignment": "A-RESET-BATCH-04"
       },
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-02",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "V2B-001",
-        "status": "completed_changes_required",
-        "worker_branch": "worker/swarmai-v13-task-pool-freeze-02",
-        "worker_commit": "bbe41b7770123fef4eb03c4f03f95fc18eefc692",
-        "merge_authorized": false
+      "B": {
+        "owner": "HOST-WIN-DEV / Cursor",
+        "branch": "cursor/v2-product-lane",
+        "scope": "product_evaluation_g13_reviewer_knowledge_tools",
+        "assignment": "B-RESET-BATCH-04"
       },
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-03",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "EXT-WORKER-PC-V2B-001-R1",
-        "dispatch_commit": "cbdaaab46142e2165084a15157f1aabd8180483d",
-        "dispatch_run": 35566726945,
-        "status": "cancelled_no_result_no_branch",
-        "result_present": false,
-        "worker_branch_present": false,
-        "merge_authorized": false
-      },
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-04",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "EXT-WORKER-PC-V2B-001-R2",
-        "dispatch_commit": "f3eeb62f836ece720f80e5e79a0a8a461c8e39cc",
-        "dispatch_run": 35580580156,
-        "dispatch_job": 106272271934,
-        "status": "completed_changes_required_result_publication_failed",
-        "result_present": false,
-        "worker_branch_present": true,
-        "worker_branch": "worker/swarmai-v13-task-pool-freeze-04",
-        "worker_commit": "6467552f86e40964e5bd26d85e3b3a74d03aa059",
-        "swarmai_ci_run": 35587202715,
-        "swarmai_ci": "failure_offline_pytest",
-        "merge_authorized": false
-      },
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-05",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "EXT-WORKER-PC-V2B-001-R3",
-        "dispatch_commit": "d12ec01e9d741f4ac117c074190811a4d48d0e41",
-        "dispatch_run": 35596577823,
-        "dispatch_job": 106322668369,
-        "status": "in_progress_no_result_no_branch_at_lead_cutoff",
-        "result_present": false,
-        "worker_branch_present": false,
-        "expected_branch": "worker/swarmai-v13-task-pool-freeze-05",
-        "merge_authorized": false
+      "C": {
+        "owner": "worker-pc / Claude via pri8771/remote-workers",
+        "scope": "independent_audit_review_support",
+        "current_task": "swarmai-v14-materialization-audit-01"
       }
-    ],
-    "next_packet": null,
-    "next_expected_branch": "worker/swarmai-v13-task-pool-freeze-05",
-    "next_action": "wait for retry05 to close; then independently review exact branch/commit, CI, independence groups, hidden-reference boundary and evidence provenance before any artifact promotion or new dispatch",
-    "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
+    },
+    "dashboard": "docs/coordination/LIVE_PROGRESS.md",
+    "host_status": [
+      "docs/coordination/status/HOST-MAC-DEV.md",
+      "docs/coordination/status/HOST-WIN-DEV.md"
+    ]
   }
 }
