@@ -17,5 +17,6 @@
   ],
   "commands": [
     "pytest tests/knowledge/ -q"
-  ]
+  ],
+  "candidate_sha": "198df7fb11cfd11abe42141af827c744b33a8d84"
 }
