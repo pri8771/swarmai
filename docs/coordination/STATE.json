@@ -1,381 +1,117 @@
 {
-  "schema_version": "1.1",
-  "updated_at": "2026-09-20T23:36:55Z",
+  "schema_version": "1.2",
+  "updated_at": "2026-09-20T23:51:30Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
+  "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
+  "management_model": "artifact_oriented",
   "source_default_branch": "main",
   "audited_main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-  "audit_date": "2026-09-20",
-  "package_version_at_audit": "1.0.0rc1",
-  "product_status": "v1_g10_blocked_fix004_login_w121a_w131a_packaged",
-  "current_checkpoint": "1.0-repair",
-  "roadmap_status": "owner_approved_direction_through_3.0",
-  "next_checkpoint_after_gate_pass": "1.1",
-  "implementation_authorization": {
-    "recorded_on": "2026-09-20",
-    "source": "Owner approved the plan and instructed implementation now through V1.4 with real live behavior",
-    "first_checkpoint": "1.0-repair",
-    "ceiling": "1.4",
-    "approved_checkpoints": [
-      "1.0-repair",
-      "1.1",
-      "1.2",
-      "1.3",
-      "1.4"
-    ],
-    "repeat_operator_start_approval_required": false,
-    "independent_evidence_review_required_for_acceptance": true,
-    "ready_independent_branch_work_may_continue_while_review_pending": true,
-    "stop_feature_work_after": "1.4",
-    "future_1.5_to_3.0_implementation_authorized": false,
-    "contract_file": "docs/coordination/V1_4_EXECUTION_CONTRACT.md",
-    "cursor_prompt_file": "docs/coordination/START_CURSOR_TO_V1_4.md"
-  },
-  "public_launch_authorized": false,
-  "public_deployment_authorized": false,
+  "implementation_authorized_through": "1.4",
+  "future_source_implementation_authorized": false,
   "main_merge_authorized": false,
-  "checkpoint_merge_authorized": false,
+  "public_release_authorized": false,
   "additional_spend_authorized": false,
-  "paid_fallback_authorized": false,
-  "live_validation": {
-    "authorized": true,
-    "scope": "Bounded verified-zero-charge calls and real tools in authorized protected local/private environments; no public deployment or private-data transfer outside approved scope",
-    "policy_file": "docs/coordination/V1_4_EXECUTION_CONTRACT.md",
-    "initial_remote_attempts_per_rolling_24h_if_no_stricter_existing_policy": 100,
-    "initial_remote_input_output_tokens_per_rolling_24h_if_no_stricter_existing_policy": 200000,
-    "validation_limits_are_product_scalability_limits": false,
-    "final_positive_missions_required": 12,
-    "final_negative_scenarios_required": 6,
-    "final_observed_window_hours": 24,
-    "campaign_status": "preregistered_not_started",
-    "supported_scope_open_defect_target": 0,
-    "universal_bug_free_guarantee": false,
-    "campaign_protocol": "docs/coordination/LIVE_142_CAMPAIGN_PROTOCOL.md",
-    "campaign_preregistered": true
-  },
-  "roles": {
-    "lead": "ChatGPT",
-    "implementation": "Cursor",
-    "final_authority": "operator"
-  },
-  "last_lead_message_id": "LEAD-20260920-015",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-012.md",
+  "roles": {"lead":"ChatGPT","implementation_workhorse":"Cursor","final_authority":"operator"},
+  "last_lead_message_id": "LEAD-20260920-016",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-016.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-023",
-  "last_lead_heartbeat_at": "2026-09-20T23:28:00Z",
+  "last_lead_heartbeat_at": "2026-09-20T23:51:30Z",
   "last_cursor_heartbeat_at": "2026-09-20T23:36:55Z",
-  "last_completed_assignment_id": null,
-  "lead_automation": {
-    "status": "scheduled_confirmed",
-    "title": "SwarmAI engineering check-in",
-    "cadence": "hourly",
-    "scope": "GitHub review/messages/compact state through V1.4; not local Cursor control or live model execution",
-    "last_run_at": "2026-09-20T22:57:51Z",
-    "last_run_age_minutes_at_review": 0
-  },
-  "cursor_runner": {
-    "status": "scheduler_checkins_verified_agent_auth_blocked",
-    "requested_cadence_seconds": 3600,
-    "preferred_mode": "supported_local_CLI_if_no_extra_spend_verified",
-    "active_mechanism": "com.swarmai.hourly_probe_only_skip_cursor",
-    "cursor_probe_disabled": true,
-    "cursor_agent_authenticated": false,
-    "consecutive_verified_heartbeats": 2,
-    "lease": null,
-    "blocker": "cursor agent status/whoami remain Not logged in; agent spawn disabled until live CLI login verifies",
-    "last_verified_invocation_at": null,
-    "recurring_verified": true,
-    "scheduler_samples_verified": 6,
-    "last_committed_checkin_at": "2026-09-20T20:41:08Z",
-    "last_committed_checkin_trigger": "manual",
-    "authenticated_worker_hourly_receipts": 0
-  },
-  "latest_ci_at_audit": {
-    "run_id": 35529361557,
-    "job_id": 106127102217,
-    "head_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-    "conclusion": "failure",
-    "failed_step": "uv run ruff check .",
-    "ruff_findings": 33,
-    "mypy_executed": false,
-    "pytest_executed": false,
-    "full_suite_independently_rerun": false
-  },
-  "assignments": [
-    {
-      "id": "FIX-001",
-      "owner": "Cursor",
-      "status": "tests_verified_current_tip",
-      "scope": "Full CI and honest baseline",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "verified",
-      "evidence": "Actions 35543156880 success on docs-only tip; same application tree as 6669d378 where PR CI 35543013930 showed console install/lint/test/build success, Ruff success, mypy 139 files, install success, Alembic head, 267 passed 2 skipped. CI DB integration honestly skipped without SWARM_DATABASE_URL."
-    },
-    {
-      "id": "FIX-002",
-      "owner": "Cursor",
-      "status": "lead_verified_per_lead012",
-      "scope": "Authentication, project isolation and idempotency",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "verified",
-      "blocker": null,
-      "evidence": "Operational bootstrap install-local project; project-scoped worker/approval operations; scoped idempotency/auth-before-cache reviewed. c1ebf20 is docs-only over reviewed code tip 6669d378."
-    },
-    {
-      "id": "FIX-003",
-      "owner": "Cursor",
-      "status": "lead_verified_per_lead012",
-      "scope": "Actual behavioral evidence and readiness",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "verified",
-      "blocker": "closed by LEAD-012; G10 still blocked on FIX-004",
-      "evidence": "Exact candidate SHA + command/result + mode + freshness + evidence-kind identity requirements and negative regressions reviewed in verify.py/test_fix003_evidence_binding.py; current exact-tip CI 35543156880 green."
-    },
-    {
-      "id": "FIX-004",
-      "owner": "Cursor",
-      "status": "scheduler_verified_authenticated_worker_blocked",
-      "scope": "Login/session records and verified hourly worker",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "changes_required",
-      "blocker": "cursor agent status/whoami Not logged in; no authenticated manual invocation or two genuine hourly worker receipts"
-    },
-    {
-      "id": "FIX-005",
-      "owner": "Cursor",
-      "status": "lead_verified_per_lead012",
-      "scope": "Remove operational fixtures, known answers and admission bypasses",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "verified",
-      "blocker": null,
-      "evidence": "Operational ProductStore/capacity/API/console are honest live/empty; fixtures explicit; demo route fixture-gated; parser dogfood opt-in; no mock fallback reviewed."
-    },
-    {
-      "id": "RUN-111",
-      "owner": "Cursor",
-      "status": "lead012_evidence_rerun_posted_not_accepted",
-      "scope": "G11 unified generic mission runtime",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
-      "review_status": "changes_required_after_g10",
-      "blocker": "browser+hidden+controls+restart posted; lead accept not invented",
-      "evidence": "g11/browser-console-create.json + hidden-acceptance-three-tasks.json + controls-operational.json + restart-reopen-operational.json"
-    },
-    {
-      "id": "INF-121",
-      "owner": "Cursor",
-      "status": "local_ready_remote_eligibility_ledger_zero_admissible",
-      "scope": "G12 governed concurrent inference pool",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "not_accepted",
-      "blocker": "W-121A ledger: 0 admissible remote routes (charge_prevention_unverified); dual remote not claimed",
-      "evidence": "inf-121/w121a-remote-eligibility-ledger.json + local admission + g12 plan"
-    },
-    {
-      "id": "EVAL-131",
-      "owner": "Cursor",
-      "status": "third_model_L_XL_screening_filled_not_qualified",
-      "scope": "G13 measured model/family/size qualification",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "484647ce1156a3227d60bb8d990cfd2a6f949bf6",
-      "review_status": "not_accepted",
-      "blocker": "screening complete incl third-model L/XL; W-131B n>=15 not run; qualification_claimed=false",
-      "evidence": "72-cell aggregated matrix + w131a gap map; L/XL third-model summaries"
-    },
-    {
-      "id": "SWARM-141",
-      "owner": "Cursor",
-      "status": "offline_admission_gated_expand_prep_not_accepted",
-      "scope": "G14 elastic evidence-driven task graph",
-      "source_branch": "cursor/v1.4-live-integration-11e2",
-      "source_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-      "review_status": "not_accepted",
-      "blocker": "live multi-planner adaptive expansion/contraction evidence absent",
-      "evidence": "Offline expand -> max_graph_nodes deny -> contract -> expand proof is preparation only and explicitly live_claimed=false."
-    },
-    {
-      "id": "LIVE-142",
-      "owner": "Cursor",
-      "status": "campaign_preregistered_not_started",
-      "scope": "Final actual V1.4 live campaign and review",
-      "source_branch": null,
-      "source_sha": null,
-      "review_status": "pending",
-      "blocker": "Starts only after integrated G10-G14 and candidate freeze."
-    }
-  ],
-  "gates": {
-    "G10": {
-      "checkpoint": "1.0-repair",
-      "status": "near_acceptance_fix004_only",
-      "evidence": "LEAD-012 verified FIX-002/003/005; tip 724a324b77d60fff143674feecec9239062e9c3c; FIX-004 login receipts remain",
-      "review": "changes_required_fix004"
-    },
-    "G11": {
-      "checkpoint": "1.1",
-      "status": "lead012_evidence_posted_not_accepted",
-      "evidence": "browser UI create + hidden acceptance 3/3 $0 + operational controls/restart",
-      "review": "pending_lead_revalidation"
-    },
-    "G12": {
-      "checkpoint": "1.2",
-      "status": "in_progress_local_only_remote_ledger_zero_admissible",
-      "evidence": "W-121A ledger 0 admissible remotes; local artifacts + dual-remote plan only",
-      "review": "not_accepted"
-    },
-    "G13": {
-      "checkpoint": "1.3",
-      "status": "screening_complete_third_model_L_XL_not_qualified",
-      "evidence": "72 provisional n>=5 cells; third-model L/XL filled; qualification_claimed=false",
-      "review": "not_accepted"
-    },
-    "G14": {
-      "checkpoint": "1.4",
-      "status": "offline_prep_not_accepted",
-      "evidence": "Offline graph/load + admission-gated expand/contract only; live adaptive multi-planner proof absent",
-      "review": "not_accepted"
-    }
-  },
-  "context_policy": {
-    "memory_file": "docs/coordination/PROJECT_MEMORY.md",
-    "messages_file": "docs/coordination/AGENT_MESSAGES.md",
-    "queue_file": "docs/coordination/WORK_QUEUE.md",
-    "real_data_policy_file": "docs/coordination/REAL_DATA_POLICY.md",
-    "cursor_start_file": "docs/coordination/START_CURSOR_TO_V1_4.md",
-    "normal_memory_word_limit": 1200,
-    "read_entire_history_by_default": false,
-    "secrets_in_git": false,
-    "private_identity_mapping_in_git": false,
-    "lead_acceptance_plan": "docs/coordination/V1_4_LEAD_ACCEPTANCE_PLAN.md",
-    "eval131_protocol": "docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md",
-    "live142_protocol": "docs/coordination/LIVE_142_CAMPAIGN_PROTOCOL.md"
-  },
-  "data_policy": {
-    "runtime_demo_data_allowed": false,
-    "runtime_mock_fallback_allowed": false,
-    "known_answer_substitution_allowed": false,
-    "isolated_existing_regression_doubles_count_as_live_evidence": false,
-    "unknown_observations_must_remain_unknown": true
-  },
-  "open_blockers": [
-    "Cursor agent CLI Not logged in; FIX-004 authenticated hourly receipts absent",
-    "G11 LEAD-012 evidence posted \u2014 awaiting lead revalidation (not auto-accepted)",
-    "W-121A: 0 admissible remote routes; W-121B dual remote blocked",
-    "G13 screening complete; W-131B qualification / live G14 / LIVE-142 remain open"
-  ],
   "current_source_verification": {
-    "verified_at": "2026-09-20T23:36:55Z",
+    "verified_at": "2026-09-20T23:47:44Z",
     "main_sha": "b9141fa3150f853586dede0334a47b344571bc16",
-    "open_candidate_pr": 14,
+    "candidate_pr": 14,
     "candidate_branch": "cursor/v1.4-live-integration-11e2",
     "candidate_sha": "03d85540e36c36fa3a5c92a3082be9959d93f66d",
-    "latest_verified_ci_run_id": 35545174895,
-    "latest_verified_ci_conclusion": "success",
-    "offline_job_id": null,
-    "offline_conclusion": "success",
-    "console_job_id": null,
-    "console_conclusion": "success",
-    "live_gated_job_id": null,
-    "live_gated_conclusion": "success_blocked_notice_only",
-    "db_integration_ci": "skipped_honestly_without_SWARM_DATABASE_URL",
-    "live_acceptance_executed": false,
-    "lead_reviewed_code_sha": "6669d37827d487206ee6c71734d4e2c64b475906",
-    "candidate_docs_only_sha": "c1ebf20abb10c53c0209dcc15bfa5bf89efba510",
-    "worker_reported_feature_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+    "application_tree_last_changed_sha": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce",
+    "ci_run_id": 35545174895,
+    "ci_conclusion": "success",
+    "offline": "success",
+    "console": "success",
+    "database_integration": "skipped_no_SWARM_DATABASE_URL",
+    "live_gated": "notice_only_not_live_evidence"
   },
-  "implementation_notes": {
-    "cursor_tip": "03d85540e36c36fa3a5c92a3082be9959d93f66d",
-    "optional_db": "local_postgres_evidence_reported_8_integration_tests_passed_not_reexecuted_by_lead; GitHub CI integration still honestly skipped",
-    "optional_cursor_login": "not_logged_in_skip_uncleared",
-    "run111_accept_evidence": "three real local tasks evidenced; actual browser console + current-tip operational revalidation still required",
-    "inf121": "W-121A ledger: 0 admissible remotes; local leg ready; dual remote not claimed",
-    "eval131": "72 provisional cells; third-model L/XL n5 filled; qualification_claimed=false; W-131B not run",
-    "swarm141": "offline admission-gated expand/contract prep only",
-    "lead_findings": [
-      "LEAD-013/014 ACK via CURSOR-022",
-      "W-121A honest zero-admissible remote ledger; W-131A gap map packaged",
-      "QUALIFICATION_CRITERION aligned to LEAD-013; SKIP uncleared"
-    ],
-    "ci_run": "35545174895_pr_35545173248_push_success",
-    "g10_review": "LEAD-20260920-012_source_ci_verified_fix004_blocked",
-    "feature_tip": "d9da26c7a8b47d1ffeabf866250cdbf30d14ffce"
+  "version_state": {
+    "1.0-repair": {
+      "status": "not_accepted",
+      "verified_artifacts": ["ART-V10-CANDIDATE","ART-V10-SECURITY","ART-V10-EVIDENCE-CONTRACT","ART-V10-RUNTIME-TRUTH"],
+      "blocker": "ART-V10-WORKER-HEARTBEAT: Cursor CLI not authenticated; zero authenticated unattended worker receipts"
+    },
+    "1.1": {
+      "status": "not_accepted_one_artifact_drafting",
+      "verified_artifacts": ["ART-V11-MISSION-PATH","ART-V11-MULTISURFACE-EVIDENCE","ART-V11-CONTROL-EVIDENCE","ART-V11-APPLY-BOUNDARY"],
+      "drafting_artifact": "ART-V11-RESTART-EVIDENCE",
+      "next_packet": "W-111C"
+    },
+    "1.2": {
+      "status": "not_accepted",
+      "verified_artifact": "ART-V12-PROVIDER-ELIGIBILITY",
+      "broker_contract": "drafting_operational_bypass_found",
+      "admissible_remote_routes": 0,
+      "next_packet": "W-122A",
+      "remote_overlap": "blocked"
+    },
+    "1.3": {
+      "status": "not_accepted",
+      "protocol": "accepted_frozen",
+      "screening_matrix": "verified_72_provisional_n5_cells",
+      "task_pool": "drafting_not_frozen",
+      "qualified_cells": 0,
+      "reviewer_qualification": "drafting_current_screening_weak",
+      "next_packets": ["W-131C1","W-131C2"],
+      "qualification_packet": "W-131B_blocked_until_W-131C1_review"
+    },
+    "1.4": {
+      "status": "not_accepted",
+      "graph_contract": "reviewable",
+      "logical_load": "reviewable_offline_only",
+      "role_manifest": "blocked_on_G13",
+      "live_adaptive_proof": "blocked_on_G12_G13",
+      "final_campaign": "preregistered_not_started"
+    }
   },
-  "worker_management": {
-    "protocol": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
-    "backlog": "docs/coordination/WORKER_PACKET_BACKLOG.md",
-    "performance_ledger": "docs/coordination/WORKER_PERFORMANCE.json",
-    "default_worker_packet_points": [
-      1,
-      2,
-      3
-    ],
-    "split_story_points_at_or_above": 4,
-    "target_ready_packets_when_practical": 3,
-    "bulk_easy_work_to_worker": true,
-    "lead_focus": [
-      "architecture",
-      "decomposition",
-      "hard_debugging",
-      "research",
-      "independent_review",
-      "acceptance",
-      "statistical_analysis"
-    ],
-    "current_ready_packets": [
-      "W-131B_optional_after_lead_selects_cells",
-      "W-131C_calibration_only"
-    ],
-    "external_blocked_packets": [
-      "W-041A",
-      "W-121B"
-    ],
-    "future_prep_allowed_when_current_lead_work_exhausted": true,
-    "future_implementation_version_gated": true
+  "ready_worker_packets": [
+    {"id":"W-111C","sp":1,"artifact":"ART-V11-RESTART-EVIDENCE","transition":"drafting_to_reviewable"},
+    {"id":"W-122A","sp":2,"artifact":"ART-V12-BROKER-CONTRACT","transition":"drafting_to_reviewable"},
+    {"id":"W-131C1","sp":2,"artifact":"ART-V13-TASK-POOL","transition":"drafting_to_reviewable"},
+    {"id":"W-131C2","sp":3,"artifact":"ART-V13-REVIEWER-QUALIFICATION","transition":"drafting_to_reviewable_benchmark_only"}
+  ],
+  "blocked_worker_packets": {
+    "W-041A":"human Cursor CLI login required",
+    "W-121B":"0 admissible remote routes plus broker contract drafting",
+    "W-131B":"qualification task/scorer/prompt/tool/model manifest not frozen",
+    "W-141A":"G13 not qualified",
+    "W-141B":"G12/G13 not ready",
+    "W-142A-D":"G10-G14 required artifacts incomplete"
   },
-  "future_work_policy": {
-    "directive": "advance useful future artifacts directly whenever possible, not only prepare TODOs",
-    "implementation_ceiling": "1.4 until next tranche explicitly activated",
-    "preparation_backlog": [
-      "FUT-151",
-      "FUT-161",
-      "FUT-171",
-      "FUT-181",
-      "FUT-191"
-    ],
-    "lead_future_artifact_work_authorized": true,
-    "future_design_research_acceptance_artifacts_may_progress_continuously": true,
-    "active_candidate_destabilizing_implementation_requires_explicit_coordination": true,
-    "initial_future_artifacts": [
-      "ART-V15-ARCH",
-      "ART-V16-KNOWLEDGE-CONTRACT",
-      "ART-V17-TOOL-CONTRACT",
-      "ART-V18-RECOVERY-ARCH",
-      "ART-V19-BETA-ACCEPTANCE"
-    ]
+  "cursor_runner": {
+    "scheduler_checkins_verified": true,
+    "cursor_agent_authenticated": false,
+    "cursor_probe_disabled": true,
+    "authenticated_manual_worker_receipts": 0,
+    "authenticated_hourly_worker_receipts": 0,
+    "blocker": "cursor agent status/whoami Not logged in"
   },
-  "project_management": {
-    "model": "artifact_oriented",
-    "canonical_registry": "docs/coordination/ARTIFACT_REGISTRY.json",
-    "policy": "docs/coordination/ARTIFACT_MANAGEMENT.md",
-    "version_matrix": "docs/coordination/VERSION_ARTIFACT_MATRIX.md",
-    "task_queue_role": "derived_execution_view",
-    "story_points_role": "secondary_worker_complexity_metric",
-    "owner_directive": "Lead may advance useful future artifacts proactively; Cursor retains bulk routine implementation.",
-    "artifact_lifecycle": [
-      "planned",
-      "drafting",
-      "reviewable",
-      "verified",
-      "accepted",
-      "blocked",
-      "rejected",
-      "superseded"
-    ],
-    "queue_is_derived": true
+  "lead_artifacts_advanced_this_heartbeat": [
+    "docs/artifacts/current/ART-V12-REMOTE-ADMISSION-RESEARCH.md",
+    "docs/artifacts/future/ART-V15-WORKER_PROTOCOL.md"
+  ],
+  "open_blockers": [
+    "Cursor CLI authentication blocks ART-V10-WORKER-HEARTBEAT",
+    "Actual process-level restart proof missing for ART-V11-RESTART-EVIDENCE",
+    "ProductStore.execute_mission bypasses governed broker; W-122A required",
+    "Zero currently admissible remote routes; G12 dual-remote overlap blocked",
+    "G13 qualification held-out pool/version manifest not frozen and no qualified cells",
+    "Reviewer screening is weak and requires calibration/freeze before held-out qualification",
+    "G14 live adaptive proof and LIVE-142 campaign remain upstream-blocked"
+  ],
+  "protected_boundaries": {
+    "runtime_demo_data_allowed": false,
+    "mock_success_allowed": false,
+    "known_answer_substitution_allowed": false,
+    "isolated_tests_count_as_live": false,
+    "credentials_or_private_identity_in_git": false,
+    "paid_fallback_authorized": false
   }
 }
