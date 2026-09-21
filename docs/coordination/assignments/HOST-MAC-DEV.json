@@ -1,14 +1,11 @@
 {
-  "schema_version": "1.0",
-  "assignment_id": "A-V14-REAL-001-R",
+  "schema_version": "1.1",
+  "assignment_id": "A-AUTONOMY-BATCH-01",
   "generation": 1,
   "enabled": true,
   "host_alias": "HOST-MAC-DEV",
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
-  "packet_id": "V14-REAL-001-R",
-  "artifact_id": "ART-V14-REAL-E2E",
-  "instruction_path": "docs/coordination/packets/V14-REAL-001-R.md",
   "priority": "immediate",
   "max_runtime_seconds": 2400,
   "boundaries": {
@@ -17,6 +14,22 @@
     "public_deploy": false,
     "force_push": false
   },
+  "items": [
+    {
+      "packet_id": "V14-REAL-001-R",
+      "artifact_id": "ART-V14-REAL-E2E",
+      "instruction_path": "docs/coordination/packets/V14-REAL-001-R.md",
+      "max_runtime_seconds": 2400,
+      "note": "Repair generic materialization and run a new real non-mock mission."
+    },
+    {
+      "packet_id": "V2A-003c",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+      "max_runtime_seconds": 2400,
+      "note": "Implement durable result-acceptance fencing and race/negative evidence."
+    }
+  ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Execute exactly this bounded repair+real-rerun packet, push evidence, then stop for lead review."
+  "note": "Execute items in order, one bounded packet per autonomous invocation, pushing each separately. Stop after queue exhaustion."
 }
