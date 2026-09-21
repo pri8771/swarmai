@@ -43,5 +43,6 @@
     "ART-V15-WORKER-PROTOCOL lead acceptance",
     "ART-V15-LEASE-FENCING lead acceptance"
   ],
-  "note": "V2A-004 B2 transport-independent service/client; ART-V14 drafting; G13 HOST-WIN-DEV blocked; B3 UNKNOWN"
+  "note": "V2A-004 B2 transport-independent service/client; ART-V14 drafting; G13 HOST-WIN-DEV blocked; B3 UNKNOWN",
+  "candidate_sha": "a26f21ab94ee784ce26423eac9ee3d28d15311a0"
 }
