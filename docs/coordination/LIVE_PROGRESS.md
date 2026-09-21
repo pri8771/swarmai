@@ -1,6 +1,6 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21T21:53:02Z
+Updated: 2026-09-21T22:48:21Z
 
 ## Current operating model
 
@@ -17,10 +17,10 @@ Legacy A/B assignment JSONs remain generation 7, disabled, with empty queues. Re
 ## Heartbeat
 
 - Protocol: `SINGLE_SESSION_HEARTBEAT.md`; epoch `single-v17-20260921-01`; producer registered.
-- Latest counted scheduler heartbeat observed: `2026-09-21T21:52:25Z` at branch SHA `f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
+- Latest counted scheduler heartbeat observed: `2026-09-21T22:48:21Z` at branch SHA `f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
 - Status: `working`; current packet `R27`; current artifact `ART-V17-APPROVAL-BINDING`.
-- Session remains fresh under the 12-minute stale threshold.
-- Heartbeat is liveness/progress only and does not accept artifacts.
+- Five-minute scheduler publication remains healthy and fresh under the 12-minute stale threshold.
+- Last meaningful implementation activity remains `2026-09-21T20:05:50Z`; heartbeat liveness is not implementation acceptance.
 
 ## Current review decisions
 
@@ -52,7 +52,7 @@ No new implementation commit landed since the previous lead run. Current retaine
 
 ## CI / blockers
 
-- Exact-tip GitHub Actions run `35648897892` remains marked failure without usable runner execution evidence. Treat it as external Actions availability/billing non-evidence, not a source/test pass or failure.
+- Exact-tip GitHub Actions run `35648897892` remains marked failure with `offline`, `console`, and `live-gated` all showing zero executed steps and runner_id 0. Treat it as external Actions availability/billing non-evidence, not a source/test pass or failure.
 - Human action: restore GitHub Actions availability only within the existing/no-additional-spend entitlement. Do not authorize new charges or raise a paid spending limit without separate approval.
 - `ART-V14-REAL-E2E` remains drafting / changes required.
 - G13 Windows executable verification + sealed-reference binding remain unresolved.
@@ -69,4 +69,4 @@ No new implementation commit landed since the previous lead run. Current retaine
 
 Restore GitHub Actions billing/spending-limit availability under existing/no-additional-spend entitlement. No main merge, public release/deploy, force push, or additional spend is authorized.
 
-Latest lead record: `docs/coordination/messages/LEAD-20260921-041.md` (`2ffd087209533b604bb58960be260a709313c7ee`).
+Latest lead record: `docs/coordination/messages/LEAD-20260921-042.md` (`910f0f11e4b46535b6fc768f18fa39ba5d7a3dcf`).
