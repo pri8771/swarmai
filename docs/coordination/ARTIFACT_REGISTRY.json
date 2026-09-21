@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T03:20:00Z",
+  "updated_at": "2026-09-21T03:58:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -585,11 +585,13 @@
       ],
       "worker_packets": [
         "V2B-001",
-        "W-131C1"
+        "W-131C1",
+        "EXT-WORKER-PC-V2B-001"
       ],
       "story_points_next": 2,
-      "next_action": "B freezes IDs/hashes/scorer/size/prompt/tool/model configs after B0; lead review before counted qualification",
-      "blockers": []
+      "next_action": "External worker-pc task swarmai-v13-task-pool-freeze-01 is dispatched from reviewed cursor/v2-integration; independently review its worker branch/result before any artifact promotion or counted qualification.",
+      "blockers": [],
+      "notes": "External worker infrastructure is transport only; SwarmAI project governance remains authoritative."
     },
     {
       "artifact_id": "ART-V13-SCREENING-MATRIX",
