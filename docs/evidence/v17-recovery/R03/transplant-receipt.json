@@ -3,7 +3,8 @@
   "artifact_id": "ART-V13-TASK-POOL",
   "donor_branch": "cursor/v2-product-lane",
   "donor_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-  "transplant_at": "2026-09-21T19:44:11Z",
+  "transplant_commit": "26e9cc3292abe85782302fdde3bbe13a5d2440e0",
+  "transplant_at": "2026-09-21T19:44:44Z",
   "excluded": [
     "coordination heartbeat topology",
     "autonomous-runner",
@@ -75,5 +76,5 @@
     "mypy_g13_modules": "clean"
   },
   "self_accept": false,
-  "note": "Selective checkout only; no invent-accept of ART-V13-TASK-POOL. R04 will bind digests on current topology."
+  "note": "Selective checkout only; no invent-accept of ART-V13-TASK-POOL."
 }

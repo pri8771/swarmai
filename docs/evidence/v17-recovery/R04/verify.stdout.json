@@ -1,0 +1,39 @@
+g13-pool-freeze-v3 OK
+{
+  "answer_leak_count": 0,
+  "calibration_record_count": 16,
+  "canonical_json_probe": "{\"ok\":true}",
+  "counted_qualification_ready_computed": false,
+  "distinct_record_digests": 240,
+  "freeze_id": "g13-pool-freeze-v3",
+  "held_out_record_count": 240,
+  "independence": {
+    "checker_id": "g13-independence-checker-v3",
+    "checker_version": 3,
+    "distinct_held_out_scenario_stems": 240,
+    "distinct_held_out_semantic_archetypes": 240,
+    "distinct_held_out_templates": 240,
+    "foreign_count": 16,
+    "held_out_clause_sibling_pairs": 0,
+    "held_out_count": 240
+  },
+  "independent_per_required_cell": {
+    "coding/L": 15,
+    "coding/M": 15,
+    "coding/S": 15,
+    "coding/XL": 15,
+    "extraction/L": 15,
+    "extraction/M": 15,
+    "extraction/S": 15,
+    "extraction/XL": 15,
+    "planning/L": 15,
+    "planning/M": 15,
+    "planning/S": 15,
+    "planning/XL": 15,
+    "reasoning/L": 15,
+    "reasoning/M": 15,
+    "reasoning/S": 15,
+    "reasoning/XL": 15
+  },
+  "sealed_bundle_content_digest_bound": false
+}
