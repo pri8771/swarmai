@@ -1,0 +1,22 @@
+{
+  "packet_id": "R19",
+  "artifact_id": "ART-V16-PROVENANCE",
+  "status": "knowledge_contracts_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "37fd070cf466127a194acd3e406fc8954a37868b",
+  "verified_at": "2026-09-21T20:02:26Z",
+  "contracts_module": "src/swarm/contracts/knowledge.py",
+  "types_present": [
+    "KnowledgeItem",
+    "KnowledgeLink",
+    "KnowledgeTombstone",
+    "AcceptanceState",
+    "permission_labels",
+    "content_digest"
+  ],
+  "tests": {
+    "command": "pytest -q tests/knowledge/ tests/contracts/",
+    "result": "25 passed"
+  },
+  "note": "R19 contracts already on tip (V2B-003a lineage). No invent-accept of ART-V16."
+}
