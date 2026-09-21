@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated after `LEAD-20260921-030`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
+Updated after `LEAD-20260921-031`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
 
 ## Shared local execution blocker
 
@@ -22,7 +22,7 @@ A's scheduler is stale and the packet has not self-launched. The local Mac Launc
 Only `trigger=scheduler` counts.
 
 - A: `03:47:19Z -> 04:02:22Z` = **2/3**, stale.
-- B: `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z` = **6 consecutive valid receipts**, individually complete.
+- B: `07:29:17Z -> 07:44:17Z -> 07:59:17Z -> 08:14:27Z -> 08:29:18Z -> 08:44:17Z -> 08:59:27Z -> 09:14:18Z -> 09:29:17Z -> 09:44:17Z` = **10 consecutive valid receipts**, individually complete.
 - Global cadence stays at 15 minutes until A also has a current 3/3 qualifying chain. ChatGPT lead remains hourly.
 
 ## External worker-pc / G13 task pool
@@ -31,7 +31,7 @@ Retry 02 remains the last independently reviewable source branch:
 - `worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692`
 - disposition: **changes required** for visible hidden references, insufficient independent held-out depth, seed-isomorphic variants and absent executed verification.
 
-Retry 03 (`swarmai-v13-task-pool-freeze-03`, run `35566726945`) is closed as non-evidence: the remote execution was cancelled after roughly two hours, the result JSON is absent, and no `worker/swarmai-v13-task-pool-freeze-03` branch exists.
+Retry 03 (`swarmai-v13-task-pool-freeze-03`, run `35566726945`) is closed as non-evidence: execution was cancelled, result JSON is absent, and no worker branch exists.
 
 ### ACTIVE EXTERNAL REPAIR — EXT-WORKER-PC-V2B-001-R2 / ART-V13-TASK-POOL / SP2
 
@@ -44,7 +44,9 @@ Dispatch:
 - base: `worker/swarmai-v13-task-pool-freeze-02@bbe41b7770123fef4eb03c4f03f95fc18eefc692`
 - expected branch: `worker/swarmai-v13-task-pool-freeze-04`
 - remote-workers dispatch commit: `f3eeb62f836ece720f80e5e79a0a8a461c8e39cc`
-- workflow run: `35580580156` (queued when dispatched; unreviewed)
+- workflow run: `35580580156`
+- workflow job: `106272271934`
+- review observation: still `in_progress` in `Execute submitted tasks`; result JSON absent; expected SwarmAI branch absent.
 
 Required core output: versioned freeze-v2 input-only held-out corpus; >=15 independent inputs in all 16 coding/planning/reasoning/extraction × S/M/L/XL cells; opaque sealed-reference identity only; fail-closed independence/contamination checker; pinned non-floating identities; focused negative tests and actually executed focused verification. Preserve v1/retry02 historical evidence. Do not run counted W-131B qualification and do not self-accept.
 
@@ -107,9 +109,13 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 
 `WORKER_PERFORMANCE.json` is unchanged because no new bounded source packet reached independent review.
 
+## Lead-owned parallel artifact
+
+`ART-V20-PERFORMANCE-BASELINE` remains drafting, but its protocol was advanced at coordination commit `ddfc8f969ab66684697fa822279da441a197421e`. The contract now freezes campaign identity, separates warm-up/counted samples and queue/inference/end-to-end latency, defines sample/percentile semantics, requires raw reproducible records and fail-closed pathology criteria, and explicitly prevents performance evidence from substituting for reliability/security/G12/G13/LIVE-142 acceptance.
+
 ## Acceptance blockers — do not relabel
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B individually complete; global drafting.
+- `ART-OPS-HEARTBEAT`: A 2/3 stale; B individually complete at 10 valid receipts; global drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - G12 remote overlap = 0 admitted routes.
