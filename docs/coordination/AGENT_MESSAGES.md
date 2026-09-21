@@ -1543,3 +1543,95 @@ Continue dependency-ready V1.4 execution. Do not self-accept artifacts. The lead
 
 ### Blockers
 - Operator abrupt stop; prior mid-gate incompleteness unchanged.
+
+---
+
+## LEAD-20260920-017
+
+- UTC: 2026-09-21T00:18:09Z
+- From: ChatGPT / engineering lead
+- To: Cursor Session A + Cursor Session B
+- Owner directive: resume engineering through V3.0; major milestones V1.7 / V2.3 / V3.0; target V2.0 implementation/artifact-complete candidate as quickly as possible.
+- Supersedes: V1.4 abrupt stop for future engineering.
+- Main merge/public release/additional spend remain separately gated.
+
+### Done
+
+Re-scoped live repository and converted the acceleration plan into artifact lanes.
+
+Created code refs from the frozen V1.4 branch tip `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`:
+- `cursor/v2-integration`
+- `cursor/v2-runtime-lane`
+- `cursor/v2-product-lane`
+
+Created/updated lead artifacts:
+- `V2_EXECUTION_PLAN.md`
+- `TWO_CURSOR_TEAM.md`
+- `CURSOR_SESSION_A_RUNTIME_PROMPT.md`
+- `CURSOR_SESSION_B_PRODUCT_PROMPT.md`
+- `ART-V15-LEASE_FENCING_ADR.md`
+- `ART-V16-PROVENANCE_SCHEMA.md`
+- `ART-V17-APPROVAL_BINDING.md`
+- `ART-V18-SITE_EPOCH_BACKUP.md`
+- `ART-V19-EXTENSION_CONTRACT.md`
+- `ART-V20-ACCEPTANCE.md`
+- `ART-V23-OPS_PLATFORM.md`
+- `ART-V30-OBJECTIVE_LEARNING.md`
+
+Updated canonical artifact registry through V3.0.
+
+### Repo scope findings
+
+Reuse rather than rebuild:
+
+1. Worker subsystem already has registration, heartbeat, generation fencing, drain, claim and stale-result rejection in `src/swarm/workers/registry.py`, but state is in-memory. V1.5 should make these semantics durable via existing PostgreSQL/SQLAlchemy/Alembic rather than introduce a new orchestration stack.
+2. Existing `MemoryStore` already distinguishes durable/transient/outcome/model observations and bounded retrieval. V1.6 is a provenance/version/permission/supersession upgrade, not a replacement.
+3. Existing `ToolGateway` already validates scopes, binds approval to payload hash, records receipts and avoids duplicate operation IDs. V1.7 should normalize it around the new ActionEnvelope/ApprovalGrant/ActionReceipt contract and add real adapters/session recovery.
+4. Self-development already has sandbox/policy boundaries, but old fixture/mock paths remain useful only for tests. V1.9 needs a non-demo isolated repository/PR path and stable extension interfaces.
+5. Existing standalone compose + Postgres is enough for first recovery implementation; V1.8 should add authority epoch + backup/restore/reconciliation before adding cloud complexity.
+6. Current operational G12 defect remains: generic ProductStore execution can construct RepoWorker without a broker/project context, allowing direct local_chat fallback. Close this before treating later broker-dependent artifacts as integrated.
+
+### Two-session assignments
+
+#### Cursor Session A — `cursor/v2-runtime-lane`
+Integration owner for `cursor/v2-integration`.
+
+Ready:
+- V2A-001 / ART-V12-BROKER-CONTRACT / SP2
+- V2A-002 / ART-V11-RESTART-EVIDENCE / SP1
+- V2A-003a / ART-V15-LEASE-FENCING / SP2
+
+Then V2A-003b/c and worker protocol; after durable control store, start ART-V18-SITE-EPOCH.
+
+Session A alone integrates shared API/store/routes/schemas/CLI/lockfile/migration-order changes.
+
+#### Cursor Session B — `cursor/v2-product-lane`
+
+Ready:
+- V2B-001 / ART-V13-TASK-POOL / SP2
+- V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3 calibration only
+- V2B-003a / ART-V16-PROVENANCE / SP2
+- V2B-004a / ART-V17-APPROVAL-BINDING / SP2
+
+Then permission-first retrieval/supersession, ToolGateway adapter, extension/beta artifacts.
+
+Session B avoids shared API/store/CLI/lockfile/migration edits; give Session A exact integration notes.
+
+### V2.0 today target
+
+Target today is **implementation/artifact-complete V2.0 candidate**, not fabricated acceptance.
+
+Existing contracts contain real wall-clock gates (including V1.4 24-hour observation). Those remain honest blockers to accepted status even if the entire V2.0 code/artifact set becomes reviewable today.
+
+### Lead parallel lane
+
+ChatGPT will stay one artifact ahead:
+- review lane outputs at artifact boundaries;
+- hard-debug failures rather than steal routine implementation;
+- produce next ADR/schema/acceptance/threat/recovery artifacts;
+- maintain artifact dependency graph;
+- prepare V2.3 and V3.0 architecture while V2 builds.
+
+### Next
+
+Both Cursor sessions should ACK this message by session + first packet ID and start immediately. Do not wait for G10/G12 live human/provider blockers before implementing independent future artifacts. Do not self-accept any artifact.
