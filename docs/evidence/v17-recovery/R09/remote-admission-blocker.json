@@ -1,0 +1,34 @@
+{
+  "code": "USER_ACTION",
+  "artifact_id": "ART-V12-REMOTE-OVERLAP",
+  "packet_id": "R09",
+  "summary": "Zero-charge remote route admission not established; key presence is not admission",
+  "required": [
+    "For at least two distinct remote providers: operator-confirmed zero-charge/free-tier entitlement with remaining quota",
+    "Fresh metadata+canary at $0 with exact route_id/model/cost=0 receipt (SWARM_ALLOW_PAID=false)",
+    "Do not treat API key presence or stale historical canaries as admission"
+  ],
+  "observed": {
+    "SWARM_ALLOW_PAID": "false",
+    "key_presence_only": {
+      "OPENAI_API_KEY": false,
+      "ANTHROPIC_API_KEY": true,
+      "GROQ_API_KEY": true,
+      "GEMINI_API_KEY": true,
+      "GOOGLE_API_KEY": false,
+      "OPENROUTER_API_KEY": true,
+      "TOGETHER_API_KEY": true,
+      "FIREWORKS_API_KEY": true,
+      "DEEPINFRA_API_KEY": true,
+      "MISTRAL_API_KEY": true,
+      "COHERE_API_KEY": true
+    },
+    "keys_present_count": 9,
+    "prior_w121a_admissible_routes": 0,
+    "live_inference_attempted": false,
+    "spend_usd": 0.0
+  },
+  "admitted_routes": [],
+  "self_accept_forbidden": true,
+  "recorded_at": "2026-09-21T20:02:47Z"
+}
