@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `d4440bf20ed8218d7974411e6607bd668a890e1a`
-- Coordination SHA: `7b3d24fa9fd8b55b5cf3a18bec1af2cdfb8c90a6`
-- Updated: `2026-09-21T18:54:11Z`
-- Trigger: `manual`
+- Coordination SHA: `0214382098e03a89776c3dd8252f3e04741db11a`
+- Updated: `2026-09-21T18:58:38Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `V2B-003b`
 - Current artifact: `ART-V16-PERMISSION-RETRIEVAL`
