@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T01:16:00Z",
+  "updated_at": "2026-09-21T01:14:30Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -757,8 +757,8 @@
       "kind": "architecture-and-source",
       "owner": "Cursor Session A + ChatGPT lead",
       "lane": "runtime",
-      "status": "drafting",
-      "path_or_source_ref": "cursor/v2-runtime-lane@f55f8078b73597892b6dcddc2e41ac947d3c904e",
+      "status": "reviewable",
+      "path_or_source_ref": "cursor/v2-runtime-lane@92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
       "dependencies": [
         "ART-V15-WORKER-PROTOCOL",
         "ART-V15-DURABLE-SCHEMA"
@@ -770,10 +770,9 @@
         "V2A-003d"
       ],
       "story_points_next": 2,
-      "next_action": "Session A executes V2A-003a-R repair; V2A-003b source already on tip pending 003a-R review order",
+      "next_action": "lead review V2A-003a-R foundation repair; then order V2A-003b already on tip",
       "blockers": [
-        "V2A-003a-R required: legacy Alembic upgrade proof, token rotate/revoke, recursive token metadata denial",
-        "V2A-003b implemented on tip but not review-ordered until 003a-R",
+        "lead review of V2A-003a-R still required",
         "V2A-003c accept fence not implemented"
       ],
       "evidence_refs": [
@@ -782,9 +781,10 @@
         "src/swarm/db/lease_fencing.py",
         "src/swarm/workers/registry.py",
         "tests/integration/db/test_lease_claim_renew_expire.py",
-        "tests/workers/test_workers.py"
+        "tests/workers/test_workers.py",
+        "docs/evidence/v15/v2a003a-r-lease-foundation-repair.json @ 8e2c9754c9f64aa0e68e4fe5de47d646713a5413"
       ],
-      "notes": "LEAD-019: foundation changes required. Session A also pushed V2A-003b claim/renew/expire+H3 @ 7dcefe4c72ae9ada2ff512adeaf65eefa28632e2; review order resumes after V2A-003a-R."
+      "notes": "V2A-003a-R foundation repair reviewable (legacy Alembic upgrade + token rotate/revoke + recursive token denial) @ 92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2. V2A-003b claim/renew/expire also present on tip pending order."
     },
     {
       "artifact_id": "ART-V15-MULTIHOST-EVIDENCE",

@@ -13,9 +13,10 @@ Updated: 2026-09-21T01:12:30Z. `ARTIFACT_REGISTRY.json` is canonical. Packets on
 
 Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store/routes/schemas/CLI/lockfile/migrations.
 
-### READY A0 — V2A-003a-R — repair durable worker foundation
+### SUBMITTED A0 — V2A-003a-R — repair durable worker foundation
 - Artifact: `ART-V15-LEASE-FENCING` + `ART-V20-FOUNDATION-HARDENING`
 - SP1
+- Status: **submitted reviewable** @ `92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2` / tip `8e2c9754c9f64aa0e68e4fe5de47d646713a5413` (not self-accepted).
 - Intended artifact state: remain `drafting`; produce a reviewable **foundation slice**, not full fencing acceptance.
 - Base: current runtime lane descendant of `37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b`.
 - Required changes:
