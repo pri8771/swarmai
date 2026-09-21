@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T08:47:22Z",
+  "updated_at": "2026-09-21T08:59:27Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -29,29 +29,30 @@
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T08:44:17+00:00",
-      "consecutive_valid_15m": 6,
+      "last_heartbeat_at": "2026-09-21T08:59:27+00:00",
+      "consecutive_valid_15m": 7,
       "verified_timestamps": [
         "2026-09-21T07:29:17+00:00",
         "2026-09-21T07:44:17+00:00",
         "2026-09-21T07:59:17+00:00",
         "2026-09-21T08:14:27+00:00",
         "2026-09-21T08:29:18+00:00",
-        "2026-09-21T08:44:17+00:00"
+        "2026-09-21T08:44:17+00:00",
+        "2026-09-21T08:59:27+00:00"
       ],
       "stale": false,
-      "status": "current scheduler chain is 6 consecutive valid 10-25 minute intervals from 07:29:17Z through 08:44:17Z; B individually satisfies the bootstrap requirement but global graduation still waits for A"
+      "status": "current scheduler chain is 7 consecutive valid 10-25 minute intervals from 07:29:17Z through 08:59:27Z; B individually satisfies the bootstrap requirement but global graduation still waits for A"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T08:47:22Z",
+    "last_review_at": "2026-09-21T08:59:27Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Only scheduler heartbeats count. A remains stale at 2/3. B now has six consecutive valid receipts through 08:44:17Z and individually meets the 3/3 requirement. Global worker cadence remains 15 minutes because both workers must qualify; ChatGPT lead remains hourly."
+    "note": "Only scheduler heartbeats count. A remains stale at 2/3. B now has seven consecutive valid receipts through 08:59:27Z and individually meets the 3/3 requirement. Global worker cadence remains 15 minutes because both workers must qualify; ChatGPT lead remains hourly."
   },
   "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
   "notifications": {
