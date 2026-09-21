@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog
 
-Updated: 2026-09-21T01:34:00Z. `ARTIFACT_REGISTRY.json` is canonical. Packets only advance artifacts; story points describe complexity/risk, never hours. Workers do not self-accept artifacts.
+Updated: 2026-09-21T02:12:00Z.
 
 ## Latest lead reviews
 
@@ -9,6 +9,7 @@ Updated: 2026-09-21T01:34:00Z. `ARTIFACT_REGISTRY.json` is canonical. Packets on
 - **V2A-003a / ART-V15-LEASE-FENCING / SP2 — first review changes required.** Source `630ab780ab45858c5dad4075be143cfa145e975f`; evidence `37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b`. Required real previous-schema migration proof, token rotate/revoke lifecycle and recursive token-metadata protection.
 - **V2A-003a-R / SP1 — repair packet lead verified.** Source `92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2`; evidence tip `8e2c9754c9f64aa0e68e4fe5de47d646713a5413`. Source/evidence prove Alembic upgrade from populated `9eb193b10f4e`, unknown project ownership remains null, token rotation invalidates the old credential, revocation fences the new credential, and nested token metadata is rejected. This verifies the foundation repair packet, not the whole lease-fencing artifact.
 - **V2A-003b / ART-V15-LEASE-FENCING / SP2 — changes required.** Source `7dcefe4c72ae9ada2ff512adeaf65eefa28632e2`; evidence bind `f55f8078b73597892b6dcddc2e41ac947d3c904e`. Source-review defects remain: claim does not validate current mission cancellation/status/source authority; renew does not require current worker project == lease project; fixed 32-row candidate scan can still block eligible task #33. Artifact remains drafting.
+- **V2A-003b-R / ART-V15-LEASE-FENCING / SP2 — changes required after completed repair review.** Source `e764834a69315d1c2c85f00322c3392aa5037fd9`; evidence `c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6`; focused suite 52 passed. Lead confirmed claim authority/dependency/HOL/renew-horizon improvements but found two remaining defects: renew does not explicitly fence terminal task/attempt state, and expiry authority is task-only so it can miss lease/attempt source/revision/cancellation drift. Follow-up is V2A-003b-R2; artifact remains drafting.
 - **V2A-H6A / ART-V20-FOUNDATION-HARDENING / SP2 — changes required.** Implementation `77ef7e4c1675b74dbfcdeba27f8c955ae39f119c`; evidence bind `99733dccd91fc2b8356f96ff755f9b9aab20f2b4`; current tip `7a2491a2840ef8381e275b05e11f3f76c7a522e6`; CI `35550769734` green. Fixed credentials were removed and compose fails closed, but the generated secret-bearing `deploy/compose/.env` is not explicitly owner-only and `--force` is not guarded/documented against initialized-volume credential mismatch. Repair is V2A-H6A-R.
 - **V2A-020a / ART-V20-INTEGRATED-CANDIDATE / SP1 — lead accepted.** Integration receipt `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code baseline `ee5a06612aa2e4409fa8bbfd1969225c16887615`, CI `35550653160` green. It correctly integrated only lead-reviewed V2A-001/V2A-002 lineage and left V15 out because its ancestry still contains unreviewed 003b behavior. The artifact remains **drafting**; this packet only establishes a clean reviewed integration baseline.
 - Legacy intents `W-122A` and `W-111C` are superseded by V2A-001/V2A-002; do not double-count.
@@ -17,22 +18,19 @@ Updated: 2026-09-21T01:34:00Z. `ARTIFACT_REGISTRY.json` is canonical. Packets on
 
 Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store/routes/schemas/CLI/lockfile/migrations. Current runtime tip: `7a2491a2840ef8381e275b05e11f3f76c7a522e6`, CI `35550769734` green. Current integration tip: `9ce727842446b98cfa55c28c7e70808f57f17d7b`, CI `35550653160` green. **Do not treat V2A-003b as accepted merely because descendants are green.** Integration must continue to import only independently reviewed slices.
 
-### READY A0 — V2A-003b-R — repair claim/renew/expire fencing
+### READY A0 — V2A-003b-R2 — terminal/expiry authority final repair
 - Artifact: `ART-V15-LEASE-FENCING`
-- SP2
-- Intended artifact state: remain `drafting`; produce a reviewable claim/renew/expire slice. Full artifact still requires V2A-003c result-acceptance fencing.
-- Base: current runtime-lane descendant containing verified V2A-003a-R.
+- SP1
+- Base: current runtime branch descendant containing V2A-003b-R source `e764834a...`; do not restart earlier work.
+- Intended artifact state: remain `drafting`; make the claim/renew/expire slice genuinely reviewable. V2A-003c result acceptance still follows.
 - Required changes:
-  1. Before creating an attempt/lease, validate current mission exists, is runnable/not cancelled, and task mission/project/graph/source/cancellation authority is still current. Failing any check must leave task/attempt/lease state unmutated.
-  2. `renew_lease` must require the durable worker's current project to equal the lease project as well as matching worker ID, generation and token; project reassignment cannot renew an old-project lease.
-  3. Remove the `_CLAIM_CANDIDATE_BATCH=32` head-of-line correctness limit. Safely paginate/filter until an eligible row is found or the current eligible set is exhausted; add a regression with >32 incompatible higher-priority rows followed by an eligible row.
-  4. Renewal must re-check current task/mission authority before extension: mission still runnable/not cancelled, task/mission/project/revision/source/cancellation generation still match the lease/attempt. A lease must not be extended merely because worker/project/generation/token still match.
-5. Expiry/requeue must not revive a cancelled/superseded/stale-authority task as runnable work. Reconcile the task to an honest terminal/superseded/cancelled state or otherwise keep it non-dispatchable when mission/task authority is no longer current.
-6. Enforce durable dependency readiness before claim: every dependency in the current task graph must be in an allowed completed/accepted terminal state for the same mission/project/current graph. A stale `ready` flag alone is not sufficient. Unresolved/stale dependencies leave the task unmutated and the scan continues to another eligible task.
-7. Renewal must enforce `renewable_until` as a hard upper bound. A renewal may not set `expires_at` beyond the renewable horizon, may not accidentally shorten a currently later valid expiry, and must fail when no positive renewal window remains. Add boundary regressions.
-8. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
-- Acceptance: direct negative tests for cancellation/source/project staleness, >32 HOL regression, focused DB tests, and full exact-tip CI green. No result acceptance fence or API route wiring is silently folded in.
-
+  1. Renewal must explicitly reject a terminal/incompatible TaskRow even if MissionRow remains runnable. Fence accepted/rejected/failed/cancelled/superseded or equivalent terminal task states.
+  2. Renewal must reject a terminal/incompatible TaskAttemptRow, including terminal status, `terminal_at`, completed/accepted result state, or `accepted_result_id` when present.
+  3. Expiry/requeue must compare TaskLeaseRow/TaskAttemptRow stored task revision, source revision and cancellation generation against current durable mission/task authority before returning a task to ready. The current task-only `_expire_task_status(task)` check is insufficient when source authority changed after claim but TaskRow payload lacks the old source marker.
+  4. Add direct DB-backed regressions for terminal task renew, terminal/accepted attempt renew, post-claim source drift at expiry, cancellation/revision drift at expiry, and prove stale work is non-dispatchable.
+  5. Preserve the existing 52-test behaviors: current claim authority, dependency readiness, >32 pagination, race, project-scoped renew, renewable horizon, cancelled-mission no-revive.
+  6. Rebind evidence to the new implementation SHA and run exact-tip CI.
+- Acceptance: no source/evidence ambiguity; do not self-accept. Lead review required before V2A-003c.
 ### READY A1 — V2A-H6A-R — secret-file and overwrite-safety repair
 - Artifacts: `ART-V20-FOUNDATION-HARDENING`, `ART-V18-DEPLOYMENT-MANIFEST`, `ART-V19-INSTALL-UPGRADE`
 - SP1
@@ -70,6 +68,12 @@ Site epoch, backup, restore/reconcile and stale-site fence; blocked on durable w
 
 Owns `cursor/v2-product-lane`. Current branch remains `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`; **no Session B source change or worker message was observed in this heartbeat.** Do not fabricate activity. Session B must not edit shared Session-A API/store/routes/schemas/CLI/lockfile/migration surfaces; hand central migration deltas to Session A.
 
+### READY B0 — V2B-000 — sync reviewed integration baseline
+- Artifact: `ART-V20-INTEGRATED-CANDIDATE` support packet
+- SP1
+- Product branch has no product implementation yet, so merge only `origin/cursor/v2-integration` into `cursor/v2-product-lane` before B1.
+- Preserve branch-local heartbeat/session instruction files; do not import unreviewed runtime-lane V15 work.
+- Run baseline Ruff/mypy/pytest and console lint/test/build as available; push exact merge SHA and report Windows-specific results.
 ### READY B1 — V2B-001 / W-131C1 — freeze qualification pool/version manifest
 - Artifact: `ART-V13-TASK-POOL`; SP2; `drafting -> reviewable`.
 - Freeze calibration vs held-out IDs/hashes for coding/planning/reasoning/extraction × S/M/L/XL plus source/license, size-classifier, scorer/grader, prompt, tool and exact model config versions. Hidden answers not worker-visible. No counted qualification before lead freeze.
@@ -108,41 +112,17 @@ Lead continues architecture/acceptance/research rather than routine source imple
 Take dependency-ready work before waiting on human auth/provider/live gates. Keep >=3 ready packets per lane where practical. If a Session-B packet needs a shared Session-A-owned file, stop and hand off the delta. Every return names artifact ID, intended transition, base/completion SHA, exact tests/evidence and remaining blockers.
 
 
-## Session C — verification/reliability/spikes
+## Reserve verification branch — dormant
 
-Owns `cursor/v2-verification-lane`, branched from the reviewed `cursor/v2-integration` baseline. This is NOT a third general production-code lane.
+`cursor/v2-verification-lane` exists only as a reserve branch. Do **not** start Session C merely because capacity exists.
+Verification/review remains lead-owned while review capacity is healthy.
+Previously drafted V2C packets are reserve ideas only and are not active worker assignments.
+Current-tip G12 local revalidation is assigned to active Session A/lead after the critical V15 repair or in a non-conflicting A worktree.
 
-Default writable surfaces: tests/verification, tests/security, tests/reliability, tests/performance, scripts/verification, scripts/acceptance, scripts/spikes, spike-only modules and its own evidence files. Production defects are handed to Session A/B.
+## Heartbeat bootstrap packets
 
-### READY C1 — V2C-001 — integrated broker/admission revalidation
-- Artifacts: `ART-V12-LOCAL-FALLBACK`, `ART-V12-ADMISSION-RECONCILIATION`, V2 integrated verification
-- SP2
-- Base: current verification lane from reviewed integration
-- Historical broker artifacts were demoted by lead because adapter execution was stubbed and source binding is stale.
-- Rebind local broker admission/quota/reconciliation/fallback evidence to exact integrated source/config using **actual local Ollama inference** if the exact installed models are available.
-- Inventory exact local models first; do not assume gemma/qwen availability.
-- Actually execute the permitted alternative after a controlled local route disable.
-- Keep stubbed harnesses only as clearly deterministic regression evidence.
-- No remote calls, no dual-remote claim, no production broker edits.
-- Acceptance: reproducible verification tests/scripts, exact candidate/config/model identity, actual local inference where claimed, honest evidence mode, failures retained.
-
-### READY C2 — V2C-002 — DBOS reuse spike
-- Artifact: `ART-V15-DBOS-REUSE`
-- SP2
-- Isolated spike only; no production queue/dependency migration.
-- Inspect actual installed DBOS version/API; prove durable workflow/queue restart and duplicate semantics; map attempt IDs to workflow IDs; demonstrate Swarm stale-fence rejection remains independent; recommend reuse/partial/do-not-adopt.
-
-### READY C3 — V2C-003 — V2 security-negative harness
-- Artifact: `ART-V20-SECURITY-REVIEW`
-- SP2
-- Convert currently integrated threat-model invariants to negative tests.
-- Future-not-integrated capabilities get a versioned blocked/test manifest, not fake green tests.
-- Any discovered production defect is reported to owning lane with a failing regression.
-
-### READY C4 — V2C-004 — reliability/performance runner scaffold
-- Artifacts: `ART-V20-RELIABILITY-PROTOCOL`, `ART-V20-PERFORMANCE-BASELINE`
-- SP2
-- Candidate-bound reusable runner; wall-clock/latency/resources/model calls; preserve failures/retries; blocked vs unsupported vs unexpected; no fake elapsed time or universal thresholds.
-
-### Session C rule
-If Session C needs to modify production source to make a test pass, STOP and hand the defect to Session A/B unless the lead explicitly transfers that file/packet.
+- **HB-A-BOOTSTRAP** — Session A pulls `SESSION_INSTRUCTIONS.md`, installs Mac heartbeat scheduler, publishes 3 consecutive valid 15-minute heartbeats.
+- **HB-B-BOOTSTRAP** — Session B pulls `SESSION_INSTRUCTIONS.md`, installs Windows heartbeat scheduler, publishes 3 consecutive valid 15-minute heartbeats.
+- Canonical protocol/state: `HEARTBEAT_PROTOCOL.md` + `HEARTBEAT_STATE.json`.
+- After BOTH A and B have 3 valid 15-minute heartbeats, lead changes effective worker heartbeat cadence to hourly.
+- This coordination heartbeat is not authenticated Cursor-agent FIX-004 evidence.
