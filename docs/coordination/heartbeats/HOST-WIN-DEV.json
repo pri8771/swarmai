@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:59:17+00:00",
-    "trigger": "scheduler",
+    "observed_at": "2026-09-21T17:03:24+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "c5d396bec01faf8c0be955f7a99d6d9a73841bce",
+    "coordination_sha": "0c4fa5ff87af14cbad878ad588f5b97fa43205ab",
     "effective_cadence_minutes": 5,
-    "packet_id": null,
-    "artifact_id": null,
-    "status": "bootstrap",
-    "last_agent_activity_at": null,
-    "note": null
+    "packet_id": "V2B-002",
+    "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+    "status": "autonomous_working",
+    "last_agent_activity_at": "2026-09-21T17:03:23+00:00",
+    "note": "assignment=B-RESET-BATCH-05:5:V2B-002"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:22:59+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
-      "coordination_sha": "2f6b50350e0788ac613c566b05c009a960abf2f7",
-      "effective_cadence_minutes": 5,
-      "packet_id": "V2B-001-R4",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "status": "blocked",
-      "last_agent_activity_at": "2026-09-21T16:17:01+00:00",
-      "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
-    },
     {
       "observed_at": "2026-09-21T16:28:03+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "bootstrap",
       "last_agent_activity_at": null,
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T17:03:24+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "0c4fa5ff87af14cbad878ad588f5b97fa43205ab",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "status": "autonomous_working",
+      "last_agent_activity_at": "2026-09-21T17:03:23+00:00",
+      "note": "assignment=B-RESET-BATCH-05:5:V2B-002"
     }
   ],
-  "status": "bootstrap"
+  "status": "autonomous_working"
 }
