@@ -1,150 +1,71 @@
 # SwarmAI artifact-derived execution queue — V2 acceleration
 
-> Canonical state: `ARTIFACT_REGISTRY.json`.
-> Owner resumed implementation through V3.0. Major milestones: V1.7, V2.3, V3.0. Immediate target: V2.0 implementation/artifact-complete candidate.
-> Main merge/public release/additional spend remain separately gated.
+Canonical state: `ARTIFACT_REGISTRY.json`. Detailed packet contracts: `WORKER_PACKET_BACKLOG.md`. Owner authorizes source implementation through V3.0; immediate target is a V2.0 implementation/artifact-complete candidate. Main merge/public release/additional spend remain separately gated.
 
-## Two-session active lanes
+## Current reviewed source truth
 
-### Cursor Session A — runtime/control plane/integration
-Branch: `cursor/v2-runtime-lane`
-Integration owner: `cursor/v2-integration`
+- Session A runtime tip observed: `37f95fe63a1bf451f5dad4075be143cfa145e975f`; Actions `35549624046` green.
+- Session B product lane: `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`; no new source activity observed this heartbeat.
+- Integration lane: `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`; no V2 reviewed commits integrated yet.
+- Main unchanged: `b9141fa3150f853586dede0334a47b344571bc16`.
+
+## Independently reviewed this heartbeat
+
+### Verified
+
+- **V2A-001 / ART-V12-BROKER-CONTRACT / SP2** — `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3`; CI `35548643473`. Generic ProductStore execution now uses the governed project-scoped broker; broker-required denial/missing/unregistered route does not fall through to direct `local_chat`.
+- **V2A-002 / ART-V11-RESTART-EVIDENCE / SP1** — source `48a02e3daae13f8fb569225e2d030097229f4780`, evidence `ee5a06612aa2e4409fa8bbfd1969225c16887615`; CI `35549111809`. Real uvicorn process restart and durable same-mission reopen proved.
+
+### Changes required
+
+- **V2A-003a / ART-V15-LEASE-FENCING / SP2** — source `630ab780ab45858c5dad4075be143cfa145e975f`, evidence `37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b`; CI `35549624046` green. Schema/repositories are useful, but artifact remains drafting because:
+  1. representative legacy-row migration test does not actually upgrade a populated previous Alembic schema;
+  2. V2A-H2 revoke/rotation lifecycle evidence is missing;
+  3. token-sensitive free-form metadata validation is top-level only.
+
+## Session A — runtime/control plane/integration
+
+Branch `cursor/v2-runtime-lane`; integration owner `cursor/v2-integration`.
 
 Ready now:
-1. V2A-001 / ART-V12-BROKER-CONTRACT / SP2 — close generic operational broker bypass.
-2. V2A-002 / ART-V11-RESTART-EVIDENCE / SP1 — actual service process restart/reopen.
-3. V2A-003a / ART-V15-LEASE-FENCING / SP2 — durable worker/attempt/lease/result DB schema/repository.
+1. **V2A-003a-R / ART-V15-LEASE-FENCING / SP1** — repair true legacy migration proof + token rotate/revoke + recursive/typed token-sensitive metadata boundary.
+2. **V2A-H6A / V2 hardening + V1.8/V1.9 deployment artifacts / SP2** — remove unsafe normal DB secret/default assumptions; private/operational default; compose health smoke.
+3. **V2A-020a / ART-V20-INTEGRATED-CANDIDATE / SP1** — start integration lane with only lead-verified V2A-001/V2A-002 source/evidence; full available integrated CI; do not integrate unreviewed V2A-003a.
 
-Then: V2A-003b/c -> worker protocol -> V1.8 site authority/backup/recovery.
+After V2A-003a-R lead review: V2A-003b+H3 atomic eligible claim/renew/expire -> V2A-003c result fence -> V2A-004 durable worker protocol -> DBOS reuse spike -> site epoch/backup/restore.
 
-### Cursor Session B — knowledge/tools/product/beta
-Branch: `cursor/v2-product-lane`
+## Session B — evaluation/knowledge/tools/product/beta
+
+Branch `cursor/v2-product-lane`. Keep off Session-A-owned API/store/routes/schemas/CLI/lockfile/migrations.
 
 Ready now:
-1. V2B-001 / ART-V13-TASK-POOL / SP2 — freeze held-out/calibration/version manifest.
-2. V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3 — calibration-only reviewer benchmark repair/freeze.
-3. V2B-003a / ART-V16-PROVENANCE / SP2 — versioned provenance repository.
-4. V2B-004a / ART-V17-APPROVAL-BINDING / SP2 — unified action/approval/receipt contracts.
+1. **V2B-001 / ART-V13-TASK-POOL / SP2** — freeze calibration vs held-out task/version manifest. No counted qualification before lead freeze.
+2. **V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3** — calibration-only benchmark/scorer repair and freeze; no qualification claim.
+3. **V2B-003a+H1 / ART-V16-PROVENANCE / SP2** — versioned project-scoped provenance/permission labels/tombstones and two-project non-leak tests; hand central migration delta to Session A.
+4. **V2B-004a+H4 / ART-V17-APPROVAL-BINDING / SP2** — ActionEnvelope/ApprovalGrant/ActionReceipt contracts; mandatory operational project binding and no demo default.
 
-Then: retrieval/supersession -> ToolGateway adapter -> extension/beta artifacts.
+Then: permission-first retrieval/supersession -> ToolGateway/effect-key semantics -> extension manifest/beta evidence.
 
-## Lead lane — stay one artifact ahead
+## Earlier acceptance gates remain honest
 
-ChatGPT is actively providing:
-- ART-V15-LEASE-FENCING ADR;
-- ART-V16-PROVENANCE schema;
-- ART-V17-APPROVAL-BINDING contract;
-- ART-V18-SITE-EPOCH/backup contract;
-- ART-V19-EXTENSION contract;
-- ART-V20-ACCEPTANCE contract;
-- next: V2.3 operational-platform artifacts and V3 objective/learning governance.
+- **V1.0:** all repair artifacts except `ART-V10-WORKER-HEARTBEAT` verified. Heartbeat still blocked on actual Cursor CLI authentication and real receipts.
+- **V1.1:** all required artifacts now verified, including process restart; version artifact set not promoted to accepted in this heartbeat.
+- **V1.2:** broker + provider eligibility verified; 0 admissible remote routes means `ART-V12-REMOTE-OVERLAP` remains blocked. Local fallback/reconciliation remain reviewable.
+- **V1.3:** protocol accepted; screening verified provisional; task pool not frozen, zero qualified cells, reviewer benchmark drafting.
+- **V1.4:** role manifest/live adaptive proof blocked on G12/G13; logical load is offline-only; LIVE-142 not started.
 
-Lead should review lane outputs at artifact boundaries, create punch lists, and immediately advance the next architecture/acceptance artifact instead of waiting.
+Do not call blocked live/time artifacts accepted merely because later implementation continues.
 
-## Critical truth
+## Human/live blockers
 
-An accepted V2.0 cannot honestly be completed today if mandatory wall-clock observation has not elapsed. Today's success target is a green, integrated, implementation/artifact-complete V2.0 candidate with time-bound acceptance artifacts running or explicitly blocked.
+- `ART-V10-WORKER-HEARTBEAT`: `cursor agent status/whoami` not authenticated; only exact login/passkey/MFA/consent step may require operator involvement.
+- `ART-V12-REMOTE-OVERLAP`: zero admitted remote routes; fresh exact account/model zero-charge/auth/quota/health evidence required before any live remote proof.
+- LIVE-142 and later reliability windows: real wall-clock evidence only; no acceleration or backfill.
 
-## Highest-priority ready Cursor packets
+## Lead lane
 
-Cursor should work the highest-priority non-conflicting packet and keep routine SP1-SP3 execution. Do not wait idle on human auth or remote eligibility.
+Lead continues architecture/research/review while workers implement. `ART-V23-MULTIMISSION-OPS` was advanced with durable queue state, weighted-deficit fairness/anti-gaming, `DispatchIntent` reservation compensation, restart/scheduler-epoch fencing, decision receipts and a proposed preregistered fairness acceptance design. V1.8 recovery, V2.0 security/reliability and V3 objective/learning artifacts remain parallel lead work.
 
-### W-111C / SP1 — actual process restart -> ART-V11-RESTART-EVIDENCE
+## Worker directive
 
-Transition: `drafting -> reviewable`.
-
-Current evidence proves a fresh `create_app`/MissionStore object can reopen the mission, but not an actual service-process restart. Start the real API service process against the durable store, create/observe one operational mission, stop the process, start a new process, then reopen the exact mission ID/status/artifacts from API or CLI. Bind PIDs/process-instance evidence, commands, timestamps, candidate/code-tree SHA, config/store alias and artifact hash. No model rerun is required just to prove reopen.
-
-Acceptance by worker packet does not accept V1.1; lead reviews the artifact.
-
-### W-122A / SP2 — close generic operational broker bypass -> ART-V12-BROKER-CONTRACT
-
-Transition: `drafting -> reviewable`.
-
-Independent lead source finding: `ProductStore.execute_mission()` currently creates `RepoWorker(..., model=model)` without broker/project ID, while `RepoWorker._chat()` falls back to direct `local_chat`. This violates G12's every-model-attempt-through-broker rule.
-
-Wire/reuse the existing governed project-scoped broker for the operational generic API/CLI execution path; do not invent a second broker. Add a negative regression proving broker denial/no eligible route prevents model execution, plus a positive admitted-local-route test and exact route/usage evidence. Search supported operational model-call sites for equivalent bypasses. Finish with current-tip Ruff/mypy/offline/console CI green.
-
-### W-131C1 / SP2 — freeze qualification data/version manifest -> ART-V13-TASK-POOL
-
-Transition: `drafting -> reviewable`.
-
-Produce a machine-readable manifest separating calibration/screening IDs from qualification-held-out IDs for required product families `coding/planning/reasoning/extraction` × S/M/L/XL. Bind dataset/task hashes, source/license metadata, size-classifier version, scorer/grader version, prompt version, tool contract/version, exact model config IDs and qualification protocol v1.0. Hidden answers must not be available to worker prompts. Future W-131B attempts must be rejectable if identities drift.
-
-### W-131C2 / SP3 — reviewer benchmark calibration/freeze -> ART-V13-REVIEWER-QUALIFICATION
-
-Transition: `drafting -> reviewable benchmark design only`; **not** reviewer qualification.
-
-Current reviewer screening is unusably weak (best S about 0.2; M/L/XL 0). Debug only on calibration data: task construction, expected decision schema, evidence bundle, grader/scorer and size classification. Include wrong-result rejection, evidence/acceptance consistency and forbidden-action detection. Version/freeze the corrected benchmark/scorer and its held-out IDs after calibration. Do not spend held-out qualification samples before lead review/freeze.
-
-## Human-blocked G10 packet
-
-### W-041A/B/C -> ART-V10-WORKER-HEARTBEAT
-
-Current: scheduler invocation mechanism exists, but Cursor CLI `status/whoami` still report Not logged in; authenticated manual/hourly worker receipts = 0.
-
-Human step: complete a live `cursor agent login` while the CLI waiter remains active, then verify both status commands authenticate. Only after that:
-- W-041B SP2: one bounded authenticated manual worker receipt;
-- W-041C SP2: two distinct genuine hourly scheduler-triggered authenticated worker receipts with no overlap/lease violation.
-
-Do not accelerate hourly timing, prewrite receipts, or clear probe skip before auth.
-
-## G11 status
-
-Verified artifacts:
-- ART-V11-MISSION-PATH
-- ART-V11-MULTISURFACE-EVIDENCE
-- ART-V11-CONTROL-EVIDENCE
-- ART-V11-APPLY-BOUNDARY
-
-Drafting: ART-V11-RESTART-EVIDENCE. V1.1 remains unaccepted until W-111C is independently reviewed and all required artifacts become accepted in order.
-
-## G12 status
-
-- ART-V12-PROVIDER-ELIGIBILITY: verified as truthful current state; **0 admissible remote routes**.
-- ART-V12-BROKER-CONTRACT: drafting due the ProductStore generic-execution bypass; W-122A ready.
-- ART-V12-REMOTE-OVERLAP: blocked.
-- ART-V12-LOCAL-FALLBACK / ADMISSION-RECONCILIATION: reviewable but must be rebound/reviewed after W-122A.
-
-Lead research `docs/artifacts/current/ART-V12-REMOTE-ADMISSION-RESEARCH.md` narrows candidate admission work to exact OpenRouter `:free`, Groq Free-plan exact model and Gemini exact Flash Free-tier routes. Public docs alone never prove the operator's account is eligible. Before W-121B, each exact route needs current account/tier, zero-additional-spend price/charge prevention, quota/health, privacy suitability and bounded canary evidence. No paid fallback or generic auto-router.
-
-## G13 status
-
-Frozen qualification protocol is accepted. Screening matrix is independently verified as **provisional only**: 72 n=5 cells, three local model configs, S/M/L/XL, six families, `qualification_claimed=false`.
-
-W-131B qualification is blocked until W-131C1 is independently reviewed/frozen. Then run one five-observation held-out batch per packet, following the frozen min n=15 / max n=60 / one-sided 90% Wilson lower bound >=0.80 criterion with zero forbidden actions and full overhead/provenance.
-
-Initial lead-selected candidate order after freeze:
-1. planning / XL / `gemma3:4b`;
-2. coding / XL / `qwen3.5:4b`;
-3. reasoning / L / `qwen3.5:9b`.
-
-Do not blanket-expand all cells. Extraction XL screening is weak; reviewer qualification has its own repaired benchmark path.
-
-## G14 and LIVE-142
-
-G14 graph/load artifacts remain offline preparation. Qualified role manifest and live adaptive proof are blocked on G12/G13. Do not treat 10/50/100 logical assignment load as real model concurrency.
-
-LIVE-142 campaign is preregistered but **not started**. It starts only after integrated required artifacts are ready and candidate is frozen. Exact hidden payloads are lead-selected after freeze. Twelve positive slots, six negative scenarios and actual 24-hour observation remain mandatory; no time acceleration or cherry-picking.
-
-## Worker performance
-
-Reviewed packets recorded this heartbeat:
-- W-111A SP2: first-review accepted.
-- W-111B SP2: changes required for restart portion; one rework cycle; W-111C split created.
-- W-121A SP2: first-review accepted as truthful blocked-state provider ledger.
-- W-131A SP1: first-review accepted screening/gap artifact.
-
-Each SP bucket still has <5 completed packets; do not call performance estimates stable.
-
-## Lead-side current/future artifacts
-
-Lead advanced:
-- `ART-V12-REMOTE-ADMISSION-RESEARCH.md` — current G12 public-doc/checklist research, not account admission.
-- `ART-V15-WORKER_PROTOCOL.md` — future distributed-worker enrollment/generation/heartbeat/lease/result/acceptance-fence design.
-
-Future design work may continue, but Cursor must not implement V1.5+ source while V1.4 tranche is active unless owner explicitly authorizes it.
-
-## Immediate worker directive
-
-ACK LEAD-20260920-016 and claim one of W-111C, W-122A, W-131C1 or W-131C2 with artifact ID, intended transition, base SHA/worktree and first test. If one packet conflicts with active files or becomes blocked, move to another ready packet. Do not self-accept artifact transitions; return exact source/evidence SHA and current-tip checks for lead review.
+Read `LEAD-20260921-019` plus the canonical registry/backlog. Claim one ready packet with artifact ID, intended transition, base SHA/worktree and first test. Return exact source/evidence SHA and checks. Do not self-accept. If human auth/provider eligibility blocks a packet, switch to another dependency-ready packet rather than idling.
