@@ -5,7 +5,7 @@
   "scenario": "atomic_claim_renew_expire_and_head_of_line",
   "status": "pass",
   "recorded_at": "2026-09-21T01:09:33.632813+00:00",
-  "candidate_sha": "PENDING_COMMIT",
+  "candidate_sha": "7dcefe4c72ae9ada2ff512adeaf65eefa28632e2",
   "spend_usd": 0.0,
   "g15_lead_accept_invented": false,
   "commands": [
