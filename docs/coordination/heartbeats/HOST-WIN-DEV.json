@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T16:15:53+00:00",
+    "observed_at": "2026-09-21T16:16:54+00:00",
     "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
-    "branch_sha": "2693bb59d9142a753546ed55ccb787223572ea94",
-    "coordination_sha": "ba43af7ed834abf8626eb4b5d80062faa4033488",
+    "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
+    "coordination_sha": "57017a76ef3786986f98aabea8994591e33cdada",
     "effective_cadence_minutes": 5,
     "packet_id": "V2B-000",
     "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-    "status": "blocked",
-    "last_agent_activity_at": "2026-09-21T16:15:51+00:00",
-    "note": "autonomous_runner_dirty_worktree"
+    "status": "review_requested",
+    "last_agent_activity_at": "2026-09-21T16:16:53+00:00",
+    "note": "V2B-000 merged reviewed 9ce7278; tip 3de9688; Linux ruff/mypy/287 pytest/console green; 8 integration DB errors no postgres. Not accepted."
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T14:59:17+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "a908a0e1ff023743892ecb10cfb7bd8df4b53d53",
-      "coordination_sha": "913b519dc18bbd5851efbe305681affb8db8f461",
-      "effective_cadence_minutes": 5,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T15:14:18+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "blocked",
       "last_agent_activity_at": "2026-09-21T16:15:51+00:00",
       "note": "autonomous_runner_dirty_worktree"
+    },
+    {
+      "observed_at": "2026-09-21T16:16:54+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "3de96880e3cf220ee6993fe605353055a561614c",
+      "coordination_sha": "57017a76ef3786986f98aabea8994591e33cdada",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-000",
+      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T16:16:53+00:00",
+      "note": "V2B-000 merged reviewed 9ce7278; tip 3de9688; Linux ruff/mypy/287 pytest/console green; 8 integration DB errors no postgres. Not accepted."
     }
   ],
-  "status": "blocked"
+  "status": "review_requested"
 }
