@@ -1,17 +1,13 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T04:00:00Z",
+  "updated_at": "2026-09-21T04:50:04Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "implementation_authorized_through": "3.0",
   "active_execution_target": "2.0_implementation_artifact_complete_candidate",
-  "major_milestones": [
-    "1.7",
-    "2.3",
-    "3.0"
-  ],
+  "major_milestones": ["1.7", "2.3", "3.0"],
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -21,20 +17,20 @@
     "session_b": "Cursor B / HOST-WIN-DEV / product+evaluation",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260921-025",
-  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-025.md",
+  "last_lead_message_id": "LEAD-20260921-026",
+  "last_lead_message_path": "docs/coordination/messages/LEAD-20260921-026.md",
   "last_seen_cursor_message_id": "CURSOR-A-20260921-013",
-  "last_lead_heartbeat_at": "2026-09-21T03:48:22Z",
+  "last_lead_heartbeat_at": "2026-09-21T04:50:04Z",
   "source_refs": {
     "main": "b9141fa3150f853586dede0334a47b344571bc16",
     "runtime_branch": "cursor/v2-runtime-lane",
     "runtime_tip": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
     "runtime_ci_run": 35558067148,
-    "runtime_ci": "failure_offline_ruff_32_coordination_script_findings_console_green",
+    "runtime_ci": "failure_offline_ruff_shared_autonomous_runner_source_console_green",
     "product_branch": "cursor/v2-product-lane",
     "product_tip": "6b0e1277051ae90fe1d56825d3e771b042380755",
     "product_ci_run": 35558073323,
-    "product_ci": "failure_offline_ruff_shared_coordination_source_console_green",
+    "product_ci": "failure_offline_ruff_shared_autonomous_runner_source_console_green",
     "integration_branch": "cursor/v2-integration",
     "integration_tip": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
     "integration_code_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
@@ -49,24 +45,24 @@
     "counted_trigger": "scheduler_only",
     "a": {
       "host": "HOST-MAC-DEV",
-      "streak": 1,
+      "streak": 2,
       "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T03:47:19Z",
+      "last_counted_scheduler_at": "2026-09-21T04:02:22Z",
       "verified": false,
-      "stale": false,
-      "status": "post-reinstall scheduler streak 1/3"
+      "stale": true,
+      "status": "two valid consecutive receipts; stale at bootstrap threshold"
     },
     "b": {
       "host": "HOST-WIN-DEV",
-      "streak": 2,
+      "streak": 5,
       "required": 3,
-      "last_counted_scheduler_at": "2026-09-21T03:59:17Z",
-      "verified": false,
+      "last_counted_scheduler_at": "2026-09-21T04:44:18Z",
+      "verified": true,
       "stale": false,
-      "status": "post-reinstall scheduler streak 2/3"
+      "status": "individual bootstrap cadence requirement met; waiting A for global graduation"
     },
     "graduated_to_hourly": false,
-    "note": "Both workers are fresh at this lead run but only 1/3. Only future scheduler receipts 10-25m apart advance proof. Lead platform cadence remains hourly."
+    "note": "B individually satisfies the 3-heartbeat requirement. A is 2/3 and stale. Global worker publication cadence remains 15 minutes; ChatGPT lead remains hourly."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -77,73 +73,26 @@
   },
   "verified_artifact_transitions_this_heartbeat": [],
   "coordination_findings_this_heartbeat": {
-    "messages": "no new CURSOR message file since LEAD-024",
-    "autonomous_runner_source": "new source present on A/B but exact-tip offline CI red at Ruff",
-    "runtime_ruff_job": 106205483700,
-    "runtime_ruff_findings": 32,
-    "shared_failure_classes": [
-      "E501 in scripts/coordination/autonomous_worker.py",
-      "F841 unused last_sent in scripts/coordination/heartbeat.py"
-    ],
+    "messages": "no new CURSOR message/source packet since LEAD-025",
+    "autonomous_runner_source": "A/B exact-tip source unchanged and still red at shared runner Ruff failure",
     "autonomous_self_launch_proven_a": false,
     "autonomous_self_launch_proven_b": false,
-    "worker_performance_updated": false
+    "worker_performance_updated": false,
+    "remote_worker_task": "swarmai-v13-task-pool-freeze-01 dispatch run 35559390335 cancelled before result or worker branch creation",
+    "remote_worker_capacity": "worker-pc online capacity=1; unrelated dispatch run 35560103791 observed in_progress, so SwarmAI retry deferred"
   },
   "version_state": {
-    "1.0-repair": {
-      "status": "not_accepted",
-      "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"
-    },
-    "1.1": {
-      "status": "required_artifacts_verified_set_not_promoted"
-    },
-    "1.2": {
-      "status": "not_accepted",
-      "broker_contract": "verified",
-      "provider_eligibility": "verified_zero_admissible_remotes",
-      "local_fallback": "verified",
-      "admission_reconciliation": "verified",
-      "admissible_remote_routes": 0,
-      "remote_overlap": "blocked"
-    },
-    "1.3": {
-      "status": "not_accepted_critical_path",
-      "protocol": "accepted_frozen",
-      "screening": "verified_72_provisional_n5_cells",
-      "task_pool": "drafting_not_frozen",
-      "qualified_cells": 0,
-      "reviewer_qualification": "drafting"
-    },
-    "1.4": {
-      "status": "not_accepted",
-      "real_e2e": "first_real_attempt_failed_usefully_repair_waiting_after_autonomy_runner_repair",
-      "role_manifest": "blocked_on_G13",
-      "live_adaptive": "blocked_on_G12_G13",
-      "LIVE142": "not_started"
-    },
-    "1.5": {
-      "status": "implementation_active",
-      "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_waiting_after_autonomy_runner_repair",
-      "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"
-    },
-    "1.6": {
-      "status": "implementation_ready_waiting_session_b"
-    },
-    "1.7": {
-      "status": "implementation_ready_waiting_session_b"
-    },
-    "2.0": {
-      "status": "implementation_target_active",
-      "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
-      "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
-      "reliability_protocol": "drafting_no_elapsed_time_claimed"
-    },
-    "2.3": {
-      "status": "lead_architecture_drafting_multimission_fairness_contract_advanced"
-    },
-    "3.0": {
-      "status": "lead_architecture_drafting"
-    }
+    "1.0-repair": {"status": "not_accepted", "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"},
+    "1.1": {"status": "required_artifacts_verified_set_not_promoted"},
+    "1.2": {"status": "not_accepted", "broker_contract": "verified", "provider_eligibility": "verified_zero_admissible_remotes", "local_fallback": "verified", "admission_reconciliation": "verified", "admissible_remote_routes": 0, "remote_overlap": "blocked"},
+    "1.3": {"status": "not_accepted_critical_path", "protocol": "accepted_frozen", "screening": "verified_72_provisional_n5_cells", "task_pool": "drafting_external_attempt_cancelled_before_execution", "qualified_cells": 0, "reviewer_qualification": "drafting"},
+    "1.4": {"status": "not_accepted", "real_e2e": "first_real_attempt_failed_usefully_repair_waiting_after_autonomy_runner_repair", "role_manifest": "blocked_on_G13", "live_adaptive": "blocked_on_G12_G13", "LIVE142": "not_started"},
+    "1.5": {"status": "implementation_active", "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_waiting_after_autonomy_runner_repair", "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"},
+    "1.6": {"status": "implementation_ready_waiting_session_b"},
+    "1.7": {"status": "implementation_ready_waiting_session_b"},
+    "2.0": {"status": "implementation_target_active", "integrated_candidate": "drafting_reviewed_baseline_001_002_only", "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining", "reliability_protocol": "drafting_campaign_identity_reset_checkpoint_rules_advanced_no_elapsed_time_claimed"},
+    "2.3": {"status": "lead_architecture_drafting_multimission_fairness_contract_advanced"},
+    "3.0": {"status": "lead_architecture_drafting"}
   },
   "session_a_next": [
     "OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1",
@@ -151,24 +100,25 @@
     "then V2A-003c / ART-V15-LEASE-FENCING / SP2"
   ],
   "session_b_next": [
-    "worker-pc independently executes V2B-001 task-pool freeze on worker branch; lead reviews when result arrives",
-    "local Windows Cursor B remains focused on heartbeat/autonomous-runner recovery and then B0/B2 as assigned",
-    "counted qualification still waits for lead freeze of ART-V13-TASK-POOL"
+    "keep current autonomous assignment disabled until shared runner repair is independently reviewed and propagated",
+    "after new generation: V2B-000 locally; V2B-002 locally while external worker handles retried V2B-001 to avoid duplicate ownership",
+    "counted qualification waits for lead freeze of ART-V13-TASK-POOL"
   ],
   "lead_parallel": [
-    "ART-V23-OPS-PLATFORM advanced with weighted-deficit fairness, SchedulerDecisionReceipt, anti-amplification/restart/drain/fleet/portability acceptance contract",
-    "continue V2 security/recovery and V3 architecture without taking routine SP1-SP3 implementation from Cursor"
+    "ART-V20-RELIABILITY-PROTOCOL advanced at 170d0b8c72a89e698cdc15cbeb86901c0cecab1b with campaign identity/reset/checkpoint/gap rules",
+    "continue V2 security/recovery and V2.3/V3 architecture without taking routine SP1-SP3 implementation from workers"
   ],
   "open_blockers": [
-    "A/B active lane exact-tip offline CI red due new autonomous-runner coordination scripts",
+    "A heartbeat stale after valid 2/3 scheduler streak; no global hourly graduation",
+    "A/B active lane exact-tip offline CI red due shared autonomous-runner coordination scripts",
     "ART-OPS-AUTONOMOUS-WORKERS has no repo-assigned autonomous self-launch/push proof from A or B",
-    "heartbeat cadence proof A 1/3 and B 1/3; no hourly graduation",
     "ART-V10 authenticated Cursor-agent evidence blocked on cursor agent authentication/receipts",
     "G12 remote overlap: zero admitted routes; account-specific free tier/zero-charge admission missing",
-    "G13 held-out task/version pool and reviewer design not frozen; counted qualification not started",
+    "G13 task pool external task was cancelled before execution; no frozen task pool; reviewer design not frozen; counted qualification not started",
+    "worker-pc currently occupied by unrelated remote-worker dispatch; retry V2B-001 only after capacity is idle",
     "V1.4 real E2E repair/rerun waiting behind runner source repair",
     "G14 live adaptive proof and LIVE-142 remain blocked/not started",
-    "V2.0 integrated artifact set incomplete; reliability wall-clock campaign has not started"
+    "V2.0 integrated artifact set incomplete; 7-day reliability wall-clock campaign has not started"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
@@ -183,55 +133,30 @@
     "status": "source_present_ci_repair_required_no_self_launch_proof",
     "poll_seconds": 60,
     "active_hosts": {
-      "A": {
-        "host": "HOST-MAC-DEV",
-        "branch": "cursor/v2-runtime-lane",
-        "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
-        "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02",
-        "generation": 2,
-        "enabled": true,
-        "queued_packets": [
-          "OPS-AUTO-001-R"
-        ],
-        "proven": false
-      },
-      "B": {
-        "host": "HOST-WIN-DEV",
-        "branch": "cursor/v2-product-lane",
-        "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
-        "generation": 2,
-        "enabled": false,
-        "queued_packets_after_reenable": [
-          "V2B-000",
-          "V2B-001",
-          "V2B-002"
-        ],
-        "proven": false
-      }
+      "A": {"host": "HOST-MAC-DEV", "branch": "cursor/v2-runtime-lane", "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json", "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02", "generation": 2, "enabled": true, "queued_packets": ["OPS-AUTO-001-R"], "proven": false},
+      "B": {"host": "HOST-WIN-DEV", "branch": "cursor/v2-product-lane", "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json", "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02", "generation": 2, "enabled": false, "queued_packets_after_reenable": ["V2B-000", "V2B-002"], "external_packet_reserved": "V2B-001", "proven": false}
     },
-    "lead_behavior": "Review runner repair first, then publish new non-replay assignment generations. Artifact verifies only after both hosts self-launch one repo-assigned packet and push exact evidence.",
+    "lead_behavior": "Review A runner repair first, then publish new non-replay assignment generations. Artifact verifies only after both hosts self-launch one repo-assigned packet and push exact evidence.",
     "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
   },
   "external_workers": {
     "infrastructure_repo": "pri8771/remote-workers",
     "project_authority": false,
-    "active_tasks": [
-      {
-        "task_id": "swarmai-v13-task-pool-freeze-01",
-        "worker": "worker-pc",
-        "executor": "claude",
-        "mode": "branch",
-        "repository": "pri8771/swarmai",
-        "base_branch": "cursor/v2-integration",
-        "worker_branch": "worker/swarmai-v13-task-pool-freeze-01",
-        "artifact_id": "ART-V13-TASK-POOL",
-        "packet_id": "V2B-001",
-        "status": "dispatched_running_or_waiting_result",
-        "result_path": "pri8771/remote-workers:results/swarmai-v13-task-pool-freeze-01.json",
-        "merge_authorized": false
-      }
-    ],
+    "worker": "worker-pc",
+    "worker_status": "online_capacity_1_but_dispatch_lane_observed_busy",
+    "task_attempt": {
+      "task_id": "swarmai-v13-task-pool-freeze-01",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "packet_id": "V2B-001",
+      "dispatch_commit": "7e17163e7fc85455a8eb0180d3cb2173711dc978",
+      "dispatch_run": 35559390335,
+      "status": "cancelled_before_result_or_worker_branch",
+      "result_present": false,
+      "worker_branch_present": false,
+      "merge_authorized": false
+    },
+    "capacity_blocker": "unrelated remote-workers run 35560103791 observed in_progress; defer new unique SwarmAI retry until worker-pc is idle",
+    "next_action": "when idle, dispatch new unique V2B-001 retry task; independently review result branch before any SwarmAI artifact transition",
     "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
   }
 }
