@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `ed0888046a07b0d7fb422d4e1b58f1950869debf`
-- Coordination SHA: `485afdeaea8644267cced72a169a72c3faf6aafa`
-- Updated: `2026-09-21T18:17:22Z`
-- Trigger: `manual`
+- Coordination SHA: `0a64f3f295155dae408ea06adecf78dbb6722a14`
+- Updated: `2026-09-21T18:17:57Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `BOOTSTRAP+A1/A2`
 - Current artifact: `ART-V13-TASK-POOL,ART-V14-REAL-E2E`
