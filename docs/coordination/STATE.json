@@ -1,13 +1,17 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T17:05:00Z",
+  "updated_at": "2026-09-21T17:15:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "implementation_authorized_through": "3.0",
   "active_execution_target": "2.0_implementation_artifact_complete_candidate",
-  "major_milestones": ["1.7", "2.3", "3.0"],
+  "major_milestones": [
+    "1.7",
+    "2.3",
+    "3.0"
+  ],
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -46,17 +50,34 @@
     "state": "docs/coordination/HEARTBEAT_STATE.json",
     "mode": "stress_5m",
     "counted_trigger": "scheduler_only",
-    "active_session_epoch": "reset-20260921-new-lanes-01",
+    "active_session_epoch": "reset-20260921-two-lanes-02",
     "phase1": {
       "cadence_minutes": 5,
       "required_consecutive": 3,
-      "valid_gap_minutes": {"min": 3, "max": 8},
-      "a": {"streak": 0, "verified": false, "registered": false, "last_ledger_receipt": "2026-09-21T16:52:23+00:00"},
-      "b": {"streak": 3, "verified": true, "registered": true, "proof": ["2026-09-21T16:17:56+00:00", "2026-09-21T16:22:59+00:00", "2026-09-21T16:28:03+00:00"], "last_ledger_receipt": "2026-09-21T16:53:21+00:00"}
+      "valid_gap_minutes": {
+        "min": 3,
+        "max": 8
+      },
+      "a": {
+        "streak": 0,
+        "verified": false,
+        "registered": false
+      },
+      "b": {
+        "streak": 0,
+        "verified": false,
+        "registered": false
+      }
     },
-    "phase2": {"cadence_minutes": 15, "duration_hours": 24, "started_at": null, "ends_at": null, "completed": false},
+    "phase2": {
+      "cadence_minutes": 15,
+      "duration_hours": 24,
+      "started_at": null,
+      "ends_at": null,
+      "completed": false
+    },
     "after_success": "return to hourly only after full 24h lead verification",
-    "note": "B Phase 1 is verified. A ledger liveness is not countable because the fresh epoch was never registered and its status publisher is stale. No soak time has begun or been backfilled."
+    "note": "All old session receipts ignored. Only the two fresh sessions registered to reset-20260921-two-lanes-02 count."
   },
   "review_decisions_retained": {
     "V2A-003b-R2": "accepted_packet_parent_ART-V15-LEASE-FENCING_still_drafting_pending_V2A-003c",
@@ -71,7 +92,13 @@
     "EXT-WORKER-PC-V14-MATERIALIZATION-AUDIT-01": "useful_read_only_diagnostic_no_artifact_transition"
   },
   "verified_artifact_transitions_this_heartbeat": [
-    {"artifact_id": "ART-V13-TASK-POOL", "from": "drafting", "to": "verified", "source": "cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb", "review": "docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md"}
+    {
+      "artifact_id": "ART-V13-TASK-POOL",
+      "from": "drafting",
+      "to": "verified",
+      "source": "cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "review": "docs/coordination/reviews/ART-V13-TASK-POOL-V3-LEAD-REVIEW.md"
+    }
   ],
   "coordination_findings_this_heartbeat": {
     "registry": "updated first; ART-V13-TASK-POOL promoted drafting -> verified/frozen",
@@ -87,21 +114,82 @@
     "lane_c": "read-only task swarmai-v13-task-pool-v3-audit-01 dispatched at remote-workers 31b0234; workflow 35629554863 in progress"
   },
   "version_state": {
-    "1.0-repair": {"status": "not_accepted", "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated Cursor-agent receipts"},
-    "1.1": {"status": "required_artifacts_verified_set_not_promoted"},
-    "1.2": {"status": "not_accepted", "broker_contract": "verified", "provider_eligibility": "verified_zero_admissible_remotes", "local_fallback": "verified", "admission_reconciliation": "verified", "admissible_remote_routes": 0, "remote_overlap": "blocked"},
-    "1.3": {"status": "not_accepted_critical_path", "protocol": "accepted_frozen", "screening": "verified_72_provisional_n5_cells", "task_pool": "verified_frozen_g13_pool_freeze_v3", "qualified_cells": 0, "sealed_reference_binding": "pending", "reviewer_qualification": "drafting_V2B_002_assigned"},
-    "1.4": {"status": "not_accepted", "real_e2e": "first_real_attempt_failed_usefully_generic_repair_assigned", "role_manifest": "blocked_on_G13_qualification", "live_adaptive": "blocked_on_G12_G13", "LIVE142": "not_started"},
-    "1.5": {"status": "implementation_active", "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_queued_after_V14", "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"},
-    "1.6": {"status": "implementation_ready_waiting_session_b_after_G13_qualification"},
-    "1.7": {"status": "implementation_ready_waiting_session_b_after_G13_qualification"},
-    "2.0": {"status": "implementation_target_active", "integrated_candidate": "drafting_reviewed_baseline_001_002_only", "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining", "install_journey": "drafting_protocol_only_no_executed_clean_install_evidence", "upgrade_rollback": "drafting_protocol_only_no_executed_evidence", "reliability_protocol": "drafting_no_elapsed_time_claimed", "security_review": "drafting_no_candidate_acceptance_claim", "performance_baseline": "drafting_no_benchmark_execution"},
-    "2.3": {"status": "lead_architecture_drafting"},
-    "3.0": {"status": "lead_architecture_drafting"}
+    "1.0-repair": {
+      "status": "not_accepted",
+      "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated Cursor-agent receipts"
+    },
+    "1.1": {
+      "status": "required_artifacts_verified_set_not_promoted"
+    },
+    "1.2": {
+      "status": "not_accepted",
+      "broker_contract": "verified",
+      "provider_eligibility": "verified_zero_admissible_remotes",
+      "local_fallback": "verified",
+      "admission_reconciliation": "verified",
+      "admissible_remote_routes": 0,
+      "remote_overlap": "blocked"
+    },
+    "1.3": {
+      "status": "not_accepted_critical_path",
+      "protocol": "accepted_frozen",
+      "screening": "verified_72_provisional_n5_cells",
+      "task_pool": "verified_frozen_g13_pool_freeze_v3",
+      "qualified_cells": 0,
+      "sealed_reference_binding": "pending",
+      "reviewer_qualification": "drafting_V2B_002_assigned"
+    },
+    "1.4": {
+      "status": "not_accepted",
+      "real_e2e": "first_real_attempt_failed_usefully_generic_repair_assigned",
+      "role_manifest": "blocked_on_G13_qualification",
+      "live_adaptive": "blocked_on_G12_G13",
+      "LIVE142": "not_started"
+    },
+    "1.5": {
+      "status": "implementation_active",
+      "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_queued_after_V14",
+      "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"
+    },
+    "1.6": {
+      "status": "implementation_ready_waiting_session_b_after_G13_qualification"
+    },
+    "1.7": {
+      "status": "implementation_ready_waiting_session_b_after_G13_qualification"
+    },
+    "2.0": {
+      "status": "implementation_target_active",
+      "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
+      "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
+      "install_journey": "drafting_protocol_only_no_executed_clean_install_evidence",
+      "upgrade_rollback": "drafting_protocol_only_no_executed_evidence",
+      "reliability_protocol": "drafting_no_elapsed_time_claimed",
+      "security_review": "drafting_no_candidate_acceptance_claim",
+      "performance_baseline": "drafting_no_benchmark_execution"
+    },
+    "2.3": {
+      "status": "lead_architecture_drafting"
+    },
+    "3.0": {
+      "status": "lead_architecture_drafting"
+    }
   },
-  "session_a_next": ["restore/reset-register current daemon", "V14-REAL-001-R", "V2A-003c", "after lead review: integration receipt -> V2A-004"],
-  "session_b_next": ["V2B-002 reviewer calibration/freeze candidate", "after reviewer freeze + real sealed reference binding: W-131B product qualification and reviewer held-out qualification", "then V16/V17"],
-  "lead_parallel": ["monitor read-only Lane-C G13 v3 audit", "author/bind a real sealed-reference bundle for frozen g13-pool-freeze-v3 without worker leakage", "review A/B autonomous pushes when they appear", "recompute heartbeat stress phase from scheduler-only ledger history each run"],
+  "session_a_next": [
+    "register fresh epoch + single heartbeat producer",
+    "V14-REAL-001-R",
+    "V2A-003c"
+  ],
+  "session_b_next": [
+    "register fresh epoch + single heartbeat producer",
+    "V2B-002 reviewer calibration/freeze",
+    "wait for lead generation"
+  ],
+  "lead_parallel": [
+    "monitor read-only Lane-C G13 v3 audit",
+    "author/bind a real sealed-reference bundle for frozen g13-pool-freeze-v3 without worker leakage",
+    "review A/B autonomous pushes when they appear",
+    "recompute heartbeat stress phase from scheduler-only ledger history each run"
+  ],
   "open_blockers": [
     "Heartbeat stress Phase1: A is not fresh-epoch registered; B is verified; 24h soak not started",
     "Autonomous self-launch + attributable source push not yet proven on A or B",
@@ -125,8 +213,31 @@
     "status": "A_generation_4_pending_reset_registration; B_generation_5_issued_self_launch_proof_pending",
     "poll_seconds": 60,
     "active_hosts": {
-      "A": {"host": "HOST-MAC-DEV", "branch": "cursor/v2-runtime-lane", "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json", "assignment_id": "A-RESET-BATCH-04", "generation": 4, "enabled": true, "queued_packets": ["V14-REAL-001-R", "V2A-003c"], "proven": false},
-      "B": {"host": "HOST-WIN-DEV", "branch": "cursor/v2-product-lane", "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json", "assignment_id": "B-RESET-BATCH-05", "generation": 5, "enabled": true, "queued_packets": ["V2B-002"], "proven": false}
+      "A": {
+        "host": "HOST-MAC-DEV",
+        "branch": "cursor/v2-runtime-lane",
+        "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
+        "assignment_id": "A-RESET-BATCH-04",
+        "generation": 4,
+        "enabled": true,
+        "queued_packets": [
+          "V14-REAL-001-R",
+          "V2A-003c"
+        ],
+        "proven": false
+      },
+      "B": {
+        "host": "HOST-WIN-DEV",
+        "branch": "cursor/v2-product-lane",
+        "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
+        "assignment_id": "B-RESET-BATCH-05",
+        "generation": 5,
+        "enabled": true,
+        "queued_packets": [
+          "V2B-002"
+        ],
+        "proven": false
+      }
     },
     "lead_behavior": "Do not replay completed packets. Review attributable autonomous source push before advancing generation. Artifact verifies only after both hosts self-launch one repo-assigned packet without a human Cursor prompt.",
     "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
@@ -146,15 +257,31 @@
   "execution_reset": {
     "audit": "docs/coordination/FULL_AUDIT_2026-09-21.md",
     "plan": "docs/coordination/EXECUTION_RESET_PLAN.md",
-    "topology": "three_execution_lanes_plus_chatgpt_lead",
+    "topology": "two_fresh_implementation_sessions_plus_chatgpt_lead",
     "lanes": {
-      "A": {"owner": "HOST-MAC-DEV / Cursor", "branch": "cursor/v2-runtime-lane", "scope": "runtime_real_acceptance_durable_workers_recovery_integration", "assignment": "A-RESET-BATCH-04"},
-      "B": {"owner": "HOST-WIN-DEV identity / Cursor", "branch": "cursor/v2-product-lane", "scope": "product_evaluation_g13_reviewer_knowledge_tools", "assignment": "B-RESET-BATCH-05", "platform_note": "current implementation session reported Linux; do not claim Windows-specific evidence"},
-      "C": {"owner": "worker-pc / Claude via pri8771/remote-workers", "scope": "independent_audit_review_support", "current_task": "swarmai-v13-task-pool-v3-audit-01"}
+      "A": {
+        "owner": "HOST-MAC-DEV / Cursor",
+        "branch": "cursor/v2-runtime-lane",
+        "scope": "runtime_real_acceptance_durable_workers_recovery_integration",
+        "assignment": "A-TWO-LANE-01"
+      },
+      "B": {
+        "owner": "HOST-WIN-DEV / Cursor",
+        "branch": "cursor/v2-product-lane",
+        "scope": "product_evaluation_reviewer_qualification_knowledge_tools",
+        "assignment": "B-TWO-LANE-01"
+      }
     },
     "dashboard": "docs/coordination/LIVE_PROGRESS.md",
-    "host_status": ["docs/coordination/status/HOST-MAC-DEV.md", "docs/coordination/status/HOST-WIN-DEV.md"],
-    "active_session_epoch": "reset-20260921-new-lanes-01",
-    "old_sessions_closed": true
+    "host_status": [
+      "docs/coordination/status/HOST-MAC-DEV.md",
+      "docs/coordination/status/HOST-WIN-DEV.md"
+    ],
+    "active_session_epoch": "reset-20260921-two-lanes-02",
+    "old_sessions_closed": true,
+    "background_worker": {
+      "owner": "worker-pc / Claude via remote-workers",
+      "scope": "lead-controlled independent audit/support only"
+    }
   }
 }
