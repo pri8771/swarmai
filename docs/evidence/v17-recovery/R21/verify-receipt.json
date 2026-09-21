@@ -1,0 +1,14 @@
+{
+  "packet_id": "R21",
+  "artifact_id": "ART-V16-PERMISSION-RETRIEVAL",
+  "status": "permission_prefilter_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "aa3a1a7cbe04b09e2f438d1abed14d4176ad9092",
+  "verified_at": "2026-09-21T20:03:35Z",
+  "tests": {
+    "command": "pytest -q tests/knowledge/test_knowledge_retrieval_lifecycle.py",
+    "result": "7 passed"
+  },
+  "module": "src/swarm/knowledge/retrieval.py",
+  "note": "R21 verify-on-tip; no invent-accept."
+}
