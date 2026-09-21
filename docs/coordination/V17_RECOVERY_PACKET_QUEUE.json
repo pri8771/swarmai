@@ -448,11 +448,30 @@
       "goal": "Three integration classes through one shared action/effect boundary.",
       "checkpoint": "CP5",
       "status": "split",
-      "audit": "No CP5 evidence exists (V4).",
+      "audit": "No CP5 evidence exists (V4). Lead amendment: CP5 live-local is not sufficient for a working claim; R33c crosses a real external boundary.",
       "split_into": [
         "R33a",
-        "R33b"
+        "R33b",
+        "R33c"
       ]
+    },
+    {
+      "id": "R33c",
+      "artifact": "V1.7-live-integration",
+      "artifacts_also": [
+        "ART-V17-INTEGRATION-MANIFEST",
+        "ART-V17-PERMISSION-NEGATIVES"
+      ],
+      "depends": [
+        "R33b"
+      ],
+      "type": "external_live",
+      "goal": "Real-world reversible GitHub issue/comment/close through the V1.7 action boundary; no duplicate external effects.",
+      "sp": 2,
+      "tier": "small-mid",
+      "spec": "docs/coordination/packets/R33c.md",
+      "status": "planned",
+      "gate": "EXT-V17-REALWORLD-GITHUB"
     },
     {
       "id": "R34",
@@ -1049,6 +1068,17 @@
         "ART-LIVE142-CAMPAIGN",
         "ART-LIVE142-FINAL-REPORT",
         "V1.4 accepted"
+      ]
+    },
+    {
+      "id": "EXT-V17-REALWORLD-GITHUB",
+      "kind": "external",
+      "owner": "operator",
+      "status": "preauthorized_if_existing_gh_session_available",
+      "action": "Use existing authenticated GitHub identity for R33c; if unavailable, record blocker rather than substituting fixture evidence.",
+      "blocks": [
+        "R33c",
+        "V1.7 working claim"
       ]
     }
   ]
