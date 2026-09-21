@@ -3,20 +3,20 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `d4440bf20ed8218d7974411e6607bd668a890e1a`
-- Coordination SHA: `0214382098e03a89776c3dd8252f3e04741db11a`
-- Updated: `2026-09-21T18:58:38Z`
-- Trigger: `scheduler`
-- Status: **working**
-- Current packet: `V2B-003b`
-- Current artifact: `ART-V16-PERMISSION-RETRIEVAL`
-- Last meaningful activity: `2026-09-21T18:54:10Z`
+- Branch SHA: `546a2cc8545154bb28cb70c785682162385bbc0c`
+- Coordination SHA: `830321f3f3dbe40c38c4094ace75978ab0bafeba`
+- Updated: `2026-09-21T19:02:42Z`
+- Trigger: `manual`
+- Status: **review_requested**
+- Current packet: `V2B-004a,V2B-004b,V2B-004c,V2B-004d,V2B-004e`
+- Current artifact: `ART-V17-TOOL_PERMISSION_CONTRACT,ART-V17-APPROVAL_BINDING,ART-V17-DURABLE_EFFECT_SCHEMA`
+- Last meaningful activity: `2026-09-21T19:02:41Z`
 - Spend USD: `0.0`
-- Blocker: G13 HOST-WIN-DEV blocked; ART-V14-REAL-E2E drafting; B3 live multi-host UNKNOWN
+- Blocker: none
 
 ## Update
 
-C2–C5 landed (d4440bf): V2B-003b retrieval, 003c lifecycle, 003d MemoryStore adapter, 003e budget math (task quality UNKNOWN). C1 prior. ART-V15/V16 drafting no self-accept. ART-V14 drafting; G13 HOST-WIN-DEV blocked; B3 live multi-host UNKNOWN.
+V1.7 Phase D1–D5 reviewable candidate tip=546a2cc feat=1b1050d; local+durable gateway/adapters/recovery/negatives pass; no self-accept; frozen: ART-V14 drafting, G13 HOST-WIN-DEV blocked, B3 live multi-host UNKNOWN
 
 ## Next
 
