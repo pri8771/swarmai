@@ -1,22 +1,42 @@
 {
-  "schema_version": "1.0",
-  "assignment_id": "B-V2B-000",
+  "schema_version": "1.1",
+  "assignment_id": "B-AUTONOMY-BATCH-01",
   "generation": 1,
   "enabled": true,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
-  "packet_id": "V2B-000",
-  "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
-  "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
   "priority": "immediate",
-  "max_runtime_seconds": 1800,
+  "max_runtime_seconds": 2400,
   "boundaries": {
     "additional_spend": false,
     "main_merge": false,
     "public_deploy": false,
     "force_push": false
   },
+  "items": [
+    {
+      "packet_id": "V2B-000",
+      "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+      "instruction_path": "docs/coordination/packets/V2B-000.md",
+      "max_runtime_seconds": 1800,
+      "note": "Sync only reviewed integration baseline and run Windows baseline."
+    },
+    {
+      "packet_id": "V2B-001",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+      "max_runtime_seconds": 2400,
+      "note": "Freeze G13 calibration/held-out task and version manifest."
+    },
+    {
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+      "max_runtime_seconds": 2400,
+      "note": "Calibration-only reviewer benchmark/scorer repair and freeze."
+    }
+  ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Sync only the reviewed integration baseline into the product lane, run Windows baseline, push evidence, then stop for lead review."
+  "note": "Execute items in order, one bounded packet per autonomous invocation, pushing each separately. Stop before counted held-out qualification until lead freezes B1."
 }
