@@ -111,6 +111,10 @@ def _extract_python_file(text: str) -> str | None:
     Accepts Markdown fences or raw source matching the implement prompt contract
     ("Return ONLY the full corrected file contents"). Fixture-specific
     ``inclusive_range_count`` recovery remains for the dogfood sample only.
+
+    Unclosed/truncated fences (common when generation hits max_tokens) are accepted
+    when the body still looks like Python; callers must still require a material
+    git diff before success.
     """
     if not text or not str(text).strip():
         return None
@@ -118,6 +122,10 @@ def _extract_python_file(text: str) -> str | None:
     fence = re.search(r"```(?:python)?\n(.*?)```", raw, re.S)
     if fence:
         body = _normalize_python_source(fence.group(1))
+        return body if _looks_like_python_source(body) else None
+    open_fence = re.search(r"```(?:python)?\n(.*)\Z", raw, re.S)
+    if open_fence:
+        body = _normalize_python_source(open_fence.group(1))
         return body if _looks_like_python_source(body) else None
     stripped = raw.strip()
     if _looks_like_python_source(stripped):
@@ -450,6 +458,8 @@ class RepoWorker:
                 {"role": "user", "content": prompt},
             ],
             model=self._model_for("implement"),
+            # Full-file rewrites need headroom; 800 often truncates mid-fence.
+            max_tokens=4096,
         )
         patched = _extract_python_file(inference.text) if inference.ok else None
         # Operational path: never substitute a known-answer GOOD_FIX. Failed or

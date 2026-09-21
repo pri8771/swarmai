@@ -1,0 +1,757 @@
+{
+  "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "status": "failed",
+  "created_at": "2026-09-21T18:20:13.670451+00:00",
+  "updated_at": "2026-09-21T18:20:13.670491+00:00",
+  "revision": 2,
+  "project_id": null,
+  "source": "mission_store",
+  "contract": {},
+  "plan": {
+    "proposal_id": "gp_201c720a98154dd1a7854641dacb10cf",
+    "operation": "spawn",
+    "rationale": "V0.1 structured software mission: inspect \u2192 implement \u2192 verify \u2192 review",
+    "inspection": {
+      "root": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+      "git_head": "17bf3a1c939df291023048b59bfcec6c2805eae6",
+      "has_pyproject": true,
+      "has_tests": true,
+      "top_entries": [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md",
+        "alembic.ini",
+        "apps",
+        "benchmarks",
+        "changes",
+        "config",
+        "deploy",
+        "docs",
+        "examples",
+        "migrations",
+        "packs",
+        "pyproject.toml",
+        "release",
+        "sandbox",
+        "schemas",
+        "scripts",
+        "src",
+        "tests",
+        "uv.lock",
+        "var"
+      ],
+      "notes": [
+        "selfdev_off_by_one_sample_present",
+        "swarm_package_present"
+      ]
+    },
+    "task_ids": [
+      "tsk_7a781a57bc384112a0a83b41a586ba8e",
+      "tsk_b5cff16357504b6595e66731d54ee96b",
+      "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+      "tsk_cd5da1d3128343d59f0e341f8c39fe1e"
+    ],
+    "route_plan": {
+      "schema_version": "0.2.0",
+      "swarm_allow_paid": false,
+      "benchmark_run_id": null,
+      "available_models": [
+        "gemma3:4b",
+        "qwen3.5:4b",
+        "qwen3.5:9b",
+        "qwen2.5-coder:14b"
+      ],
+      "rationale_summary": "Evidence router assigned 4 roles across 4 model(s): planner=gemma3:4b, worker=qwen3.5:4b, verifier=qwen3.5:9b, reviewer=qwen2.5-coder:14b",
+      "kit_family_map": {
+        "planning": "dependency_planning",
+        "coding": "code_generation",
+        "extraction": "extraction",
+        "reasoning": "evidence_qa",
+        "review": "tool_selection",
+        "summarization": "context_compaction"
+      },
+      "assignments": {
+        "inspect": {
+          "role": "planner",
+          "task_family": "inspect",
+          "benchmark_family": "dependency_planning",
+          "model": "gemma3:4b",
+          "route_id": "rt_ollama_gemma3:4b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "planner/inspect \u2192 benchmark family dependency_planning; selected gemma3:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "gemma3:4b"
+          }
+        },
+        "implement": {
+          "role": "worker",
+          "task_family": "implement",
+          "benchmark_family": "code_generation",
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "worker/implement \u2192 benchmark family code_generation; selected qwen3.5:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen3.5:4b"
+          }
+        },
+        "verify": {
+          "role": "verifier",
+          "task_family": "verify",
+          "benchmark_family": "tool_selection",
+          "model": "qwen3.5:9b",
+          "route_id": "rt_ollama_qwen3.5:9b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "verifier/verify \u2192 benchmark family tool_selection; selected qwen3.5:9b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen3.5:9b"
+          }
+        },
+        "review": {
+          "role": "reviewer",
+          "task_family": "review",
+          "benchmark_family": "evidence_qa",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "provider_id": "ollama",
+          "cost_policy": "zero_spend_ok",
+          "rationale": "reviewer/review \u2192 benchmark family evidence_qa; selected qwen2.5-coder:14b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+          "evidence": {
+            "source": "preferred_available",
+            "model": "qwen2.5-coder:14b"
+          }
+        }
+      },
+      "heterogeneous": true
+    }
+  },
+  "tasks": [
+    {
+      "id": "tsk_7a781a57bc384112a0a83b41a586ba8e",
+      "task_family": "inspect",
+      "objective": "Inspect repository layout and identify files to change for the goal",
+      "dependency_ids": [],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "gemma3:4b",
+      "summary": "inspection_complete"
+    },
+    {
+      "id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "task_family": "implement",
+      "objective": "Implement the required change in an isolated worktree",
+      "dependency_ids": [
+        "tsk_7a781a57bc384112a0a83b41a586ba8e"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen3.5:4b",
+      "summary": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+      "task_family": "verify",
+      "objective": "Run configured verification (tests/lint) in the worker worktree",
+      "dependency_ids": [
+        "tsk_b5cff16357504b6595e66731d54ee96b"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen3.5:9b",
+      "summary": "verify_complete"
+    },
+    {
+      "id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "task_family": "review",
+      "objective": "Review diff, synthesize outcome, and accept or request repair",
+      "dependency_ids": [
+        "tsk_3364bb7334bf486bad4d3be01a2e7cf5"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "reject"
+    }
+  ],
+  "timeline": [
+    {
+      "at": "2026-09-21T18:20:13.670489+00:00",
+      "event": "mission_started",
+      "detail": {
+        "revision": 2,
+        "model": "qwen3.5:4b",
+        "route_plan": {
+          "schema_version": "0.2.0",
+          "swarm_allow_paid": false,
+          "benchmark_run_id": null,
+          "available_models": [
+            "gemma3:4b",
+            "qwen3.5:4b",
+            "qwen3.5:9b",
+            "qwen2.5-coder:14b"
+          ],
+          "rationale_summary": "Evidence router assigned 4 roles across 4 model(s): planner=gemma3:4b, worker=qwen3.5:4b, verifier=qwen3.5:9b, reviewer=qwen2.5-coder:14b",
+          "kit_family_map": {
+            "planning": "dependency_planning",
+            "coding": "code_generation",
+            "extraction": "extraction",
+            "reasoning": "evidence_qa",
+            "review": "tool_selection",
+            "summarization": "context_compaction"
+          },
+          "assignments": {
+            "inspect": {
+              "role": "planner",
+              "task_family": "inspect",
+              "benchmark_family": "dependency_planning",
+              "model": "gemma3:4b",
+              "route_id": "rt_ollama_gemma3:4b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "planner/inspect \u2192 benchmark family dependency_planning; selected gemma3:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "gemma3:4b"
+              }
+            },
+            "implement": {
+              "role": "worker",
+              "task_family": "implement",
+              "benchmark_family": "code_generation",
+              "model": "qwen3.5:4b",
+              "route_id": "rt_ollama_qwen3.5:4b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "worker/implement \u2192 benchmark family code_generation; selected qwen3.5:4b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen3.5:4b"
+              }
+            },
+            "verify": {
+              "role": "verifier",
+              "task_family": "verify",
+              "benchmark_family": "tool_selection",
+              "model": "qwen3.5:9b",
+              "route_id": "rt_ollama_qwen3.5:9b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "verifier/verify \u2192 benchmark family tool_selection; selected qwen3.5:9b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen3.5:9b"
+              }
+            },
+            "review": {
+              "role": "reviewer",
+              "task_family": "review",
+              "benchmark_family": "evidence_qa",
+              "model": "qwen2.5-coder:14b",
+              "route_id": "rt_ollama_qwen2.5-coder:14b",
+              "provider_id": "ollama",
+              "cost_policy": "zero_spend_ok",
+              "rationale": "reviewer/review \u2192 benchmark family evidence_qa; selected qwen2.5-coder:14b via preferred_available under zero_spend_ok (SWARM_ALLOW_PAID=False)",
+              "evidence": {
+                "source": "preferred_available",
+                "model": "qwen2.5-coder:14b"
+              }
+            }
+          },
+          "heterogeneous": true
+        }
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:13.671034+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 0
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:13.671133+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_7a781a57bc384112a0a83b41a586ba8e",
+        "family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:35.919196+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:39.397444+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:39.433479+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:39.433506+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:39.433510+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:57.603370+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:58.874766+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:58.891765+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:58.891786+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T18:20:58.891788+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T18:21:17.072099+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:21:18.314110+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:21:18.331284+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b"
+      }
+    },
+    {
+      "at": "2026-09-21T18:21:18.331330+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 3
+      }
+    }
+  ],
+  "agents": [
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_7a781a57bc384112a0a83b41a586ba8e",
+      "family": "inspect"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review"
+    }
+  ],
+  "artifacts": {
+    "worker_results": {
+      "tsk_7a781a57bc384112a0a83b41a586ba8e": {
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+        "task_id": "tsk_7a781a57bc384112a0a83b41a586ba8e",
+        "task_family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "artifacts": {
+          "findings": {
+            "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+            "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+            "candidate_files": [
+              "src/swarm/mission/worktree.py"
+            ],
+            "strategy": "goal_path_scan",
+            "parser_dogfood_fixture": false,
+            "missing_cost_ledger": false
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:20:13.671131+00:00",
+        "finished_at": "2026-09-21T18:20:13.671128+00:00"
+      },
+      "tsk_b5cff16357504b6595e66731d54ee96b": {
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+        "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "task_family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "artifacts": {
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/18b9b59bd8a8479cb2152c13d3240d1b/tsk_b5cff16357504b6595e66731d54ee96b-wrk_6b8516aaca434190b8dac88bc27f731b",
+            "branch": "mission/18b9b59bd8a8/tsk_b5cff16357504b6595e66731d54ee96b/wd67dcf9",
+            "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+            "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+            "task_id": "tsk_b5cff16357504b6595e66731d54ee96b"
+          },
+          "changed_files": [],
+          "diff": "",
+          "used_model_fallback": false,
+          "known_answer_forbidden": true,
+          "parser_dogfood_fixture": false,
+          "target_file": "src/swarm/mission/worktree.py",
+          "model_output_excerpt": "```python\n\"\"\"Real git worktree isolation for mission workers.\"\"\"\n\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\nfrom dataclasses import dataclass\nfrom pathlib import Path\n\nfrom swarm.contracts.common import new_id\n\n\nclass WorktreeError(RuntimeError):\n    pass\n\n\n@dataclass\nclass WorktreeHandle:\n    path: Path\n    branch: str\n    worker_id: str\n    mission_id: str\n    task_id: str\n\n    def to_dict(self) -> dict[str, str]:\n        return {\n            \"path\": str(self.path),\n "
+        },
+        "inference": {
+          "ok": true,
+          "text": "```python\n\"\"\"Real git worktree isolation for mission workers.\"\"\"\n\nfrom __future__ import annotations\n\nimport shutil\nimport subprocess\nfrom dataclasses import dataclass\nfrom pathlib import Path\n\nfrom swarm.contracts.common import new_id\n\n\nclass WorktreeError(RuntimeError):\n    pass\n\n\n@dataclass\nclass WorktreeHandle:\n    path: Path\n    branch: str\n    worker_id: str\n    mission_id: str\n    task_id: str\n\n    def to_dict(self) -> dict[str, str]:\n        return {\n            \"path\": str(self.path),\n            \"branch\": self.branch,\n            \"worker_id\": self.worker_id,\n            \"mission_id\": self.mission_id,\n            \"task_id\": self.task_id,\n        }\n\n\ndef _run_git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:\n    return subprocess.run(\n        [\"git\", *args],\n        cwd=str(repo),\n        capture_output=True,\n        text=True,\n        check=check,\n    )\n\n\ndef create_worktree(\n    repo: Path,\n    *,\n    mission_id: str,\n    task_id: str,\n    worker_id: str,\n    base_dir: Path | None = None,\n) -> WorktreeHandle:\n    \"\"\"Create an isolated git worktree for one worker/task.\"\"\"\n    repo = repo.resolve()\n    # Ensure the repository itself is a valid git repository before creating worktrees.\n    # This check is critical for isolation to prevent corruption from non-git directories.\n    is_git_repo = _run_git(repo, \"rev-parse\", \"--is-inside-work-tree\", check=False)\n    if is_git_repo.returncode != 0 or is_git_repo.stdout.strip() != \"true\":\n        raise WorktreeError(f\"not a git repository: {repo}\")\n\n    root = base_dir or (repo / \"var\" / \"mission-worktrees\" / mission_id)\n    root.mkdir(parents=True, exist_ok=True)\n    safe_task = task_id.replace(\"/\", \"_\")[:48]\n    branch = f\"mission/{mission_id[:12]}/{safe_task}/{new_id('w')[:8]}\"\n    path = root / f\"{safe_task}-{worker_id}\"\n    if path.exists():\n        shutil.rmtree(path)\n\n    # Detached worktree from HEAD keeps the parent index clean.\n    # Note: \"HEAD\" argument is required for ",
+          "model": "qwen3.5:4b",
+          "route_id": "rt_ollama_qwen3.5:4b",
+          "prompt_tokens": 974,
+          "completion_tokens": 800,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:21:17.072078+00:00",
+        "finished_at": "2026-09-21T18:21:17.072050+00:00"
+      },
+      "tsk_3364bb7334bf486bad4d3be01a2e7cf5": {
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+        "task_id": "tsk_3364bb7334bf486bad4d3be01a2e7cf5",
+        "task_family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "artifacts": {
+          "commands": [
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/mission",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": ".................................                                        [100%]\n33 passed in 0.94s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            }
+          ],
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/18b9b59bd8a8479cb2152c13d3240d1b/tsk_b5cff16357504b6595e66731d54ee96b-wrk_6b8516aaca434190b8dac88bc27f731b",
+            "branch": "mission/18b9b59bd8a8/tsk_b5cff16357504b6595e66731d54ee96b/wd67dcf9",
+            "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+            "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+            "task_id": "tsk_b5cff16357504b6595e66731d54ee96b"
+          },
+          "parser_dogfood_fixture": false
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:21:18.314063+00:00",
+        "finished_at": "2026-09-21T18:21:18.314033+00:00"
+      },
+      "tsk_cd5da1d3128343d59f0e341f8c39fe1e": {
+        "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+        "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+        "task_family": "review",
+        "ok": false,
+        "summary": "reject",
+        "artifacts": {
+          "decision": "reject",
+          "reasons": [
+            "no_material_diff",
+            "implementation_missing",
+            "wrong_result_rejected"
+          ],
+          "diff_excerpt": "",
+          "competing_solutions": [
+            {
+              "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+              "ok": false
+            }
+          ],
+          "review_notes": null,
+          "independent_review": {
+            "accepted": false,
+            "reasons": [
+              "wrong_result_rejected"
+            ],
+            "checks": {
+              "wrong_result": false
+            }
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T18:21:18.331272+00:00",
+        "finished_at": "2026-09-21T18:21:18.331222+00:00"
+      }
+    }
+  },
+  "validation": {
+    "accepted": false,
+    "review": {
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "task_family": "review",
+      "ok": false,
+      "summary": "reject",
+      "artifacts": {
+        "decision": "reject",
+        "reasons": [
+          "no_material_diff",
+          "implementation_missing",
+          "wrong_result_rejected"
+        ],
+        "diff_excerpt": "",
+        "competing_solutions": [
+          {
+            "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+            "ok": false
+          }
+        ],
+        "review_notes": null,
+        "independent_review": {
+          "accepted": false,
+          "reasons": [
+            "wrong_result_rejected"
+          ],
+          "checks": {
+            "wrong_result": false
+          }
+        }
+      },
+      "inference": null,
+      "cost_usd": 0.0,
+      "started_at": "2026-09-21T18:21:18.331272+00:00",
+      "finished_at": "2026-09-21T18:21:18.331222+00:00"
+    }
+  },
+  "retries": [
+    {
+      "round": 0,
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 0,
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_cd5da1d3128343d59f0e341f8c39fe1e",
+      "family": "review",
+      "reason": "reject"
+    }
+  ],
+  "model_assignments": [
+    {
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    },
+    {
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    },
+    {
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b",
+      "route_id": "rt_ollama_qwen3.5:4b",
+      "model": "qwen3.5:4b"
+    }
+  ],
+  "cost": {
+    "spend_policy": "zero",
+    "allow_paid": false,
+    "total_usd": 0.0,
+    "entries": [
+      {
+        "source": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 974,
+        "completion_tokens": 800,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:20:35.919216+00:00"
+      },
+      {
+        "source": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 974,
+        "completion_tokens": 800,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:20:57.603385+00:00"
+      },
+      {
+        "source": "tsk_b5cff16357504b6595e66731d54ee96b",
+        "route_id": "rt_ollama_qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "requests": 1,
+        "prompt_tokens": 974,
+        "completion_tokens": 800,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T18:21:17.072112+00:00"
+      }
+    ],
+    "requests": 3
+  },
+  "result": {
+    "accepted": false,
+    "summary": "repair_required",
+    "changed_files": [],
+    "worktree": {
+      "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/18b9b59bd8a8479cb2152c13d3240d1b/tsk_b5cff16357504b6595e66731d54ee96b-wrk_6b8516aaca434190b8dac88bc27f731b",
+      "branch": "mission/18b9b59bd8a8/tsk_b5cff16357504b6595e66731d54ee96b/wd67dcf9",
+      "worker_id": "wrk_6b8516aaca434190b8dac88bc27f731b",
+      "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+      "task_id": "tsk_b5cff16357504b6595e66731d54ee96b"
+    }
+  }
+}

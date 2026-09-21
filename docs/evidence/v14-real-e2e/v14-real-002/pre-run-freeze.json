@@ -1,0 +1,42 @@
+{
+  "packet_id": "V14-REAL-001-R",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-002",
+  "frozen_at": "2026-09-21T18:19:56Z",
+  "candidate_sha": "17bf3a1c939df291023048b59bfcec6c2805eae6",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <audit worktree.py> --model qwen3.5:4b --repo <this checkout>",
+  "execution_mode": "operational_local_ollama_governed_broker",
+  "project_id": null,
+  "mission_id": "18b9b59bd8a8479cb2152c13d3240d1b",
+  "local_models_available": [
+    "qwen3.5:4b",
+    "qwen3.5:9b",
+    "deepseek-coder-v2:16b",
+    "qwen2.5-coder:14b",
+    "gemma3:4b",
+    "qwen2.5vl:3b"
+  ],
+  "selected_model": "qwen3.5:4b",
+  "ollama_base_url": "http://127.0.0.1:11434/v1",
+  "broker_identity": "swarm_mission_runtime_default_local_ollama",
+  "allowed_tools_scopes": [
+    "repo_read",
+    "worktree_edit",
+    "local_test",
+    "no_primary_apply"
+  ],
+  "max_model_calls": "runtime_default",
+  "max_wall_time": "bounded_by_mission_runtime",
+  "max_graph_nodes": "runtime_default",
+  "expected_output_contract": "mission report with issue references, isolated worktree diff if patched, test/check result, cost USD 0",
+  "zero_spend": true,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "fixture_parser_dogfood": false,
+  "different_subsystem_from_v14_real_001": true,
+  "prior_failed_run_id": "v14-real-001",
+  "prior_failed_subsystem": "src/swarm/db/token_hash.py",
+  "target_subsystem": "src/swarm/mission/worktree.py",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/mission/worktree.py and its call sites for one real correctness, reliability, or isolation defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "pass_criteria_frozen_before_output": true
+}

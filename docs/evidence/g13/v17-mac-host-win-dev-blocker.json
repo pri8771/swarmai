@@ -1,0 +1,23 @@
+{
+  "packet_id": "V17-G13-ENV-HONESTY",
+  "artifact_id": "ART-V13-TASK-POOL",
+  "recorded_at": "2026-09-21T18:19:56Z",
+  "execution_host": {
+    "os": "Darwin",
+    "machine": "arm64",
+    "identity": "HOST-MAC-DEV-environment",
+    "is_host_win_dev": false
+  },
+  "registry_status_authoritative": "reviewable",
+  "state_json_overstatement": "STATE.json previously claimed verified_frozen; ARTIFACT_REGISTRY remains reviewable pending HOST-WIN-DEV",
+  "blocker": "Required final executable verification (generator/verifier/Ruff/mypy/offline pytest) has not been captured from actual HOST-WIN-DEV. This CURSOR-V17-SINGLE session is Darwin/arm64 and must not impersonate Windows.",
+  "held_out_answers": "preserved_sealed_not_opened_by_this_session",
+  "counted_qualification": "prohibited_until_lead_freeze_and_sealed_reference_binding",
+  "local_mac_actions_allowed": [
+    "inspect_donor_product_lane_pool_freeze_v3_source",
+    "prepare_reviewer_calibration_machinery_without_held_out_answers",
+    "record_honest_environment_blocker"
+  ],
+  "candidate_source_ref": "cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb",
+  "spend_usd": 0.0
+}

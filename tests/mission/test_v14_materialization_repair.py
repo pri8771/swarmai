@@ -63,6 +63,8 @@ def test_extract_accepts_raw_and_fenced_python() -> None:
     assert raw == FIXED_COUNTER
     fenced = _extract_python_file(f"```python\n{FIXED_COUNTER}```\n")
     assert fenced == FIXED_COUNTER
+    truncated = _extract_python_file(f"```python\n{FIXED_COUNTER}")
+    assert truncated == FIXED_COUNTER
     assert _extract_python_file("definitely not a python fix") is None
     assert _extract_python_file("") is None
 
