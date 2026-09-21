@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T03:58:00Z",
+  "updated_at": "2026-09-21T04:00:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -196,10 +196,10 @@
         "HB-B-BOOTSTRAP"
       ],
       "story_points_next": 1,
-      "next_action": "A/B pull corrected heartbeat client and reinstall; obtain 3 consecutive scheduler heartbeats 10-25m apart each, then graduate worker cadence to hourly",
+      "next_action": "Continue 15-minute scheduler proof until A and B each reach 3 consecutive counted receipts; then lead graduates effective cadence to hourly.",
       "blockers": [
         "A scheduler streak 1/3",
-        "B scheduler streak 0/3; install event only"
+        "B scheduler streak 2/3"
       ],
       "notes": "Only trigger=scheduler counts. Coordination heartbeat is not ART-V10 authenticated Cursor-agent evidence."
     },
