@@ -1,0 +1,653 @@
+{
+  "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/artifacts.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "status": "failed",
+  "created_at": "2026-09-21T19:36:25.418047+00:00",
+  "updated_at": "2026-09-21T19:37:52.980682+00:00",
+  "revision": 2,
+  "project_id": null,
+  "source": "mission_store",
+  "contract": {},
+  "plan": {
+    "proposal_id": "gp_9ed64eaf71b040159bcbc6a6fb403170",
+    "operation": "spawn",
+    "rationale": "V0.1 structured software mission: inspect \u2192 implement \u2192 verify \u2192 review",
+    "inspection": {
+      "root": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+      "git_head": "acd80b8c82634b0cf75afd63b53d5f6af5a17144",
+      "has_pyproject": true,
+      "has_tests": true,
+      "top_entries": [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md",
+        "alembic.ini",
+        "apps",
+        "benchmarks",
+        "changes",
+        "config",
+        "deploy",
+        "docs",
+        "examples",
+        "migrations",
+        "packs",
+        "pyproject.toml",
+        "release",
+        "sandbox",
+        "schemas",
+        "scripts",
+        "src",
+        "tests",
+        "uv.lock",
+        "var"
+      ],
+      "notes": [
+        "selfdev_off_by_one_sample_present",
+        "swarm_package_present"
+      ]
+    },
+    "task_ids": [
+      "tsk_7d3da195b6f040dca415828e449aeb6b",
+      "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "tsk_497759a0a0284ebd867c5de8f2582f97",
+      "tsk_3813a2b3d0d642e4992e8d6db85f3f0c"
+    ],
+    "route_plan": null
+  },
+  "tasks": [
+    {
+      "id": "tsk_7d3da195b6f040dca415828e449aeb6b",
+      "task_family": "inspect",
+      "objective": "Inspect repository layout and identify files to change for the goal",
+      "dependency_ids": [],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "inspection_complete"
+    },
+    {
+      "id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "task_family": "implement",
+      "objective": "Implement the required change in an isolated worktree",
+      "dependency_ids": [
+        "tsk_7d3da195b6f040dca415828e449aeb6b"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "implement_no_material_diff"
+    },
+    {
+      "id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+      "task_family": "verify",
+      "objective": "Run configured verification (tests/lint) in the worker worktree",
+      "dependency_ids": [
+        "tsk_5f265d66e43540d5b37ccde9ee3b9d26"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "verify_complete"
+    },
+    {
+      "id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "task_family": "review",
+      "objective": "Review diff, synthesize outcome, and accept or request repair",
+      "dependency_ids": [
+        "tsk_497759a0a0284ebd867c5de8f2582f97"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "reject"
+    }
+  ],
+  "timeline": [
+    {
+      "at": "2026-09-21T19:36:25.418065+00:00",
+      "event": "mission_started",
+      "detail": {
+        "revision": 2,
+        "model": "qwen2.5-coder:14b",
+        "route_plan": null
+      }
+    },
+    {
+      "at": "2026-09-21T19:36:25.426647+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 0
+      }
+    },
+    {
+      "at": "2026-09-21T19:36:25.426774+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_7d3da195b6f040dca415828e449aeb6b",
+        "family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:36:59.049430+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_no_material_diff",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:01.710185+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:01.717673+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:01.717698+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:01.717704+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:25.994878+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_no_material_diff",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:26.914273+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:26.921896+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:26.921918+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:26.921923+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:52.130381+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_no_material_diff",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:52.969970+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:52.977666+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+        "family": "review",
+        "ok": false,
+        "summary": "reject",
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4"
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:52.977689+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 3
+      }
+    },
+    {
+      "at": "2026-09-21T19:37:52.980676+00:00",
+      "event": "mission_finished",
+      "detail": {
+        "accepted": false
+      }
+    }
+  ],
+  "agents": [
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_7d3da195b6f040dca415828e449aeb6b",
+      "family": "inspect"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review"
+    }
+  ],
+  "artifacts": {
+    "worker_results": {
+      "tsk_7d3da195b6f040dca415828e449aeb6b": {
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+        "task_id": "tsk_7d3da195b6f040dca415828e449aeb6b",
+        "task_family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "artifacts": {
+          "findings": {
+            "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+            "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/artifacts.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+            "candidate_files": [
+              "src/swarm/workspace/artifacts.py",
+              "tests/workspace/test_workspace.py"
+            ],
+            "strategy": "goal_path_scan",
+            "parser_dogfood_fixture": false,
+            "missing_cost_ledger": false
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:36:25.426771+00:00",
+        "finished_at": "2026-09-21T19:36:25.426766+00:00"
+      },
+      "tsk_5f265d66e43540d5b37ccde9ee3b9d26": {
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+        "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "task_family": "implement",
+        "ok": false,
+        "summary": "implement_no_material_diff",
+        "artifacts": {
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/68bad894a21b4255acf1e9c53e99d521/tsk_5f265d66e43540d5b37ccde9ee3b9d26-wrk_35fc417eabae460e8817f5aedec970e4",
+            "branch": "mission/68bad894a21b/tsk_5f265d66e43540d5b37ccde9ee3b9d26/w051649b",
+            "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+            "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+            "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26"
+          },
+          "changed_files": [],
+          "diff": "",
+          "used_model_fallback": false,
+          "known_answer_forbidden": true,
+          "parser_dogfood_fixture": false,
+          "target_file": "src/swarm/workspace/artifacts.py",
+          "noop_or_untracked": true,
+          "model_output_excerpt": "```python\n\"\"\"Content-addressed artifact store with checksum verification.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nfrom pathlib import Path\n\nfrom swarm.contracts.workspace import ArtifactRef\n\n\nclass ChecksumMismatchError(ValueError):\n    pass\n\n\nclass ArtifactStore:\n    \"\"\"Durable-by-hash blob store. Worker temp files stay outside this store.\"\"\"\n\n    def __init__(self, root: Path) -> None:\n        self.root = root.resolve()\n        self.root.mkdir(parents=True, exist_ok=True)\n      "
+        },
+        "inference": {
+          "ok": true,
+          "text": "```python\n\"\"\"Content-addressed artifact store with checksum verification.\"\"\"\n\nfrom __future__ import annotations\n\nimport hashlib\nfrom pathlib import Path\n\nfrom swarm.contracts.workspace import ArtifactRef\n\n\nclass ChecksumMismatchError(ValueError):\n    pass\n\n\nclass ArtifactStore:\n    \"\"\"Durable-by-hash blob store. Worker temp files stay outside this store.\"\"\"\n\n    def __init__(self, root: Path) -> None:\n        self.root = root.resolve()\n        self.root.mkdir(parents=True, exist_ok=True)\n        self._meta: dict[str, ArtifactRef] = {}\n        self._deleted: set[str] = set()\n\n    @staticmethod\n    def content_hash(content: bytes) -> str:\n        return hashlib.sha256(content).hexdigest()\n\n    def put(\n        self,\n        content: bytes,\n        *,\n        media_type: str,\n        owner_scope: str,\n        retention_class: str = \"mission\",\n        expected_hash: str | None = None,\n    ) -> ArtifactRef:\n        digest = self.content_hash(content)\n        if expected_hash is not None and expected_hash != digest:\n            raise ChecksumMismatchError(\n                f\"expected={expected_hash} actual={digest}\"\n            )\n        path = self.root / digest[:2] / digest\n        path.parent.mkdir(parents=True, exist_ok=True)\n        if not path.exists():\n            path.write_bytes(content)\n        else:\n            # Verify existing blob still matches.\n            if self.content_hash(path.read_bytes()) != digest:\n                raise ChecksumMismatchError(\"corrupt_on_disk\")\n        ref = ArtifactRef(\n            content_hash=digest,\n            uri=f\"file://{path}\",\n            media_type=media_type,\n            byte_length=len(content),\n            owner_scope=owner_scope,\n            retention_class=retention_class,\n        )\n        self._meta[ref.id] = ref\n        self._deleted.discard(ref.id)\n        return ref\n\n    def get_bytes(self, artifact_id: str, *, allowed_scopes: set[str]) -> bytes:\n        ref = self.resolve(artifact_id, allowed_scopes=allowed_scopes)\n        path = Path(ref.uri.removeprefix(\"file://\"))\n        data = path.read_bytes()\n        if self.content_hash(data) != ref.content_hash:\n            raise ChecksumMismatchError(\"read_checksum_failed\")\n        return data\n\n    def resolve(self, artifact_id: str, *, allowed_scopes: set[str]) -> ArtifactRef:\n        if artifact_id in self._deleted:\n            raise FileNotFoundError(f\"artifact_deleted:{artifact_id}\")\n        ref = self._meta.get(artifact_id)\n        if ref is None:\n            raise KeyError(artifact_id)\n        if ref.owner_scope not in allowed_scopes and \"*\" not in allowed_scopes:\n            raise PermissionError(f\"artifact_scope_denied:{ref.owner_scope}\")\n        return ref\n\n    def put_ref(self, ref: ArtifactRef) -> None:\n        self._meta[ref.id] = ref\n        self._deleted.discard(ref.id)\n\n    def delete(self, artifact_id: str, *, retention_ok: bool = False) -> None:\n        ref = self._meta.get(artifact_id)\n        if ref is None:\n            return\n        if ref.retention_class == \"legal_hold\" and not retention_ok:\n            raise PermissionError(\"retention_blocks_delete\")\n        self._deleted.add(artifact_id)\n```",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "prompt_tokens": 876,
+          "completion_tokens": 690,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:37:52.130343+00:00",
+        "finished_at": "2026-09-21T19:37:52.130314+00:00"
+      },
+      "tsk_497759a0a0284ebd867c5de8f2582f97": {
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+        "task_id": "tsk_497759a0a0284ebd867c5de8f2582f97",
+        "task_family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "artifacts": {
+          "commands": [
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/workspace/test_workspace.py",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": ".........                                                                [100%]\n9 passed in 0.07s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            },
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/workspace",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": ".........                                                                [100%]\n9 passed in 0.06s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            }
+          ],
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/68bad894a21b4255acf1e9c53e99d521/tsk_5f265d66e43540d5b37ccde9ee3b9d26-wrk_35fc417eabae460e8817f5aedec970e4",
+            "branch": "mission/68bad894a21b/tsk_5f265d66e43540d5b37ccde9ee3b9d26/w051649b",
+            "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+            "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+            "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26"
+          },
+          "parser_dogfood_fixture": false,
+          "focused_check_paths": [
+            "tests/workspace/test_workspace.py"
+          ]
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:37:52.969950+00:00",
+        "finished_at": "2026-09-21T19:37:52.969922+00:00"
+      },
+      "tsk_3813a2b3d0d642e4992e8d6db85f3f0c": {
+        "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+        "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+        "task_family": "review",
+        "ok": false,
+        "summary": "reject",
+        "artifacts": {
+          "decision": "reject",
+          "reasons": [
+            "no_material_diff",
+            "implementation_missing",
+            "wrong_result_rejected"
+          ],
+          "diff_excerpt": "",
+          "changed_paths": [],
+          "competing_solutions": [
+            {
+              "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+              "ok": false
+            }
+          ],
+          "review_notes": null,
+          "independent_review": {
+            "accepted": false,
+            "reasons": [
+              "wrong_result_rejected"
+            ],
+            "checks": {
+              "wrong_result": false
+            }
+          },
+          "review_grounding": {
+            "grounded": false,
+            "reasons": [
+              "review_ungrounded:no_material_diff_paths"
+            ],
+            "checks": {
+              "material_diff_present": false
+            },
+            "changed_paths": []
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:37:52.977656+00:00",
+        "finished_at": "2026-09-21T19:37:52.977638+00:00"
+      }
+    },
+    "reports": {
+      "machine": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/reports/missions/68bad894a21b4255acf1e9c53e99d521/mission-report.json",
+      "human": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/reports/missions/68bad894a21b4255acf1e9c53e99d521/MISSION_REPORT.md"
+    }
+  },
+  "validation": {
+    "accepted": false,
+    "review": {
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "task_family": "review",
+      "ok": false,
+      "summary": "reject",
+      "artifacts": {
+        "decision": "reject",
+        "reasons": [
+          "no_material_diff",
+          "implementation_missing",
+          "wrong_result_rejected"
+        ],
+        "diff_excerpt": "",
+        "changed_paths": [],
+        "competing_solutions": [
+          {
+            "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+            "ok": false
+          }
+        ],
+        "review_notes": null,
+        "independent_review": {
+          "accepted": false,
+          "reasons": [
+            "wrong_result_rejected"
+          ],
+          "checks": {
+            "wrong_result": false
+          }
+        },
+        "review_grounding": {
+          "grounded": false,
+          "reasons": [
+            "review_ungrounded:no_material_diff_paths"
+          ],
+          "checks": {
+            "material_diff_present": false
+          },
+          "changed_paths": []
+        }
+      },
+      "inference": null,
+      "cost_usd": 0.0,
+      "started_at": "2026-09-21T19:37:52.977656+00:00",
+      "finished_at": "2026-09-21T19:37:52.977638+00:00"
+    }
+  },
+  "retries": [
+    {
+      "round": 0,
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement",
+      "reason": "implement_no_material_diff"
+    },
+    {
+      "round": 0,
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement",
+      "reason": "implement_no_material_diff"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review",
+      "reason": "reject"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "family": "implement",
+      "reason": "implement_no_material_diff"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_3813a2b3d0d642e4992e8d6db85f3f0c",
+      "family": "review",
+      "reason": "reject"
+    }
+  ],
+  "model_assignments": [
+    {
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    },
+    {
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    },
+    {
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    }
+  ],
+  "cost": {
+    "spend_policy": "zero",
+    "allow_paid": false,
+    "total_usd": 0.0,
+    "entries": [
+      {
+        "source": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 876,
+        "completion_tokens": 690,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T19:36:59.049441+00:00"
+      },
+      {
+        "source": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 876,
+        "completion_tokens": 690,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T19:37:25.994893+00:00"
+      },
+      {
+        "source": "tsk_5f265d66e43540d5b37ccde9ee3b9d26",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 876,
+        "completion_tokens": 690,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T19:37:52.130393+00:00"
+      }
+    ],
+    "requests": 3
+  },
+  "result": {
+    "accepted": false,
+    "summary": "repair_required",
+    "changed_files": [],
+    "worktree": {
+      "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/68bad894a21b4255acf1e9c53e99d521/tsk_5f265d66e43540d5b37ccde9ee3b9d26-wrk_35fc417eabae460e8817f5aedec970e4",
+      "branch": "mission/68bad894a21b/tsk_5f265d66e43540d5b37ccde9ee3b9d26/w051649b",
+      "worker_id": "wrk_35fc417eabae460e8817f5aedec970e4",
+      "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+      "task_id": "tsk_5f265d66e43540d5b37ccde9ee3b9d26"
+    }
+  }
+}

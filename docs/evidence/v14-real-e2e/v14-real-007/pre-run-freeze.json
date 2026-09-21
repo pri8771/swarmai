@@ -1,0 +1,26 @@
+{
+  "packet_id": "R02",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-007",
+  "frozen_at": "2026-09-21T19:39:16Z",
+  "candidate_sha": "acd80b8c82634b0cf75afd63b53d5f6af5a17144",
+  "checkpoint": "CP1",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <context.py audit> --model qwen2.5-coder:14b --no-evidence-router",
+  "selected_model": "qwen2.5-coder:14b",
+  "evidence_router": false,
+  "zero_spend": true,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "target_subsystem": "src/swarm/workspace/context.py",
+  "focused_check": "tests/workspace/test_workspace.py",
+  "prior_run_ids": [
+    "v14-real-001",
+    "v14-real-002",
+    "v14-real-003",
+    "v14-real-004",
+    "v14-real-005",
+    "v14-real-006"
+  ],
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/context.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "note": "R02 attempt 2 after 006 noop failure; still not ledger"
+}

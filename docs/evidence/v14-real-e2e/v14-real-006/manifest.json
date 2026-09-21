@@ -1,0 +1,23 @@
+{
+  "packet_id": "R02",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-006",
+  "status": "failed",
+  "failure_class": "implement_no_material_diff_noop_rewrite",
+  "recorded_at": "2026-09-21T19:39:16Z",
+  "candidate_sha": "acd80b8c82634b0cf75afd63b53d5f6af5a17144",
+  "mission_id": "68bad894a21b4255acf1e9c53e99d521",
+  "spend_usd": 0.0,
+  "subsystem": "src/swarm/workspace/artifacts.py",
+  "changed_files": [],
+  "material_diff": false,
+  "brokered_local_inference": true,
+  "model": "qwen2.5-coder:14b",
+  "self_accept": false,
+  "notes": [
+    "Genuine brokered local run at $0; 3 implement rounds; model returned same-file rewrite (noop_or_untracked=true)",
+    "Focused verify path wired (tests/workspace) but review correctly rejected no_material_diff",
+    "Preserve as failed attempt 1; second attempt on different workspace file planned as v14-real-007",
+    "v14-real-005 remains CHANGES REQUIRED; do not invent-accept"
+  ]
+}
