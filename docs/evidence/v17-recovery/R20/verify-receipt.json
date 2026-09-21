@@ -10,5 +10,6 @@
     "command": "pytest -q tests/knowledge/test_knowledge_repository.py",
     "result": "7 passed"
   },
-  "note": "R20 durable project-scoped knowledge repository present (V2B-003a). No invent-accept."
+  "note": "R20 durable project-scoped knowledge repository present (V2B-003a). No invent-accept.",
+  "evidence_tip_sha": "d6e033c5202d4404364ac5a766e20dbf24778c9a"
 }

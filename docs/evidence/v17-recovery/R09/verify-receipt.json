@@ -39,5 +39,6 @@
     "self_accept_forbidden": true,
     "recorded_at": "2026-09-21T20:02:47Z"
   },
-  "note": "Honest non-admission; key presence \u2260 eligibility. No live spend."
+  "note": "Honest non-admission; key presence \u2260 eligibility. No live spend.",
+  "evidence_tip_sha": "d6e033c5202d4404364ac5a766e20dbf24778c9a"
 }

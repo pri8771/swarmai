@@ -11,3 +11,5 @@ Keys may be present in operator env, but recovery protocol forbids admitting fro
 Confirm zero-charge entitlement + fresh `$0` canary for ≥2 distinct remote providers with `SWARM_ALLOW_PAID=false`, then re-run admission.
 
 No invent-accept of `ART-V12-REMOTE-OVERLAP`.
+
+Evidence tip: `d6e033c5202d4404364ac5a766e20dbf24778c9a`.
