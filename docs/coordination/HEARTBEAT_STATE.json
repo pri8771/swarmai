@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T17:47:50Z",
+  "updated_at": "2026-09-21T18:16:46Z",
   "mode": "single_session_5m",
   "worker_effective_cadence_minutes": 5,
   "active_session_epoch": "single-v17-20260921-01",
@@ -10,9 +10,9 @@
     "branch": "cursor/v17-single-session",
     "ledger": "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json",
     "status_page": "docs/coordination/status/CURSOR-V17-SINGLE.md",
-    "registered": false,
-    "last_heartbeat_at": null,
-    "status": "awaiting_session_start"
+    "registered": true,
+    "last_heartbeat_at": "2026-09-21T18:16:46Z",
+    "status": "session_started"
   },
   "legacy": {
     "two_lane_stress_test": "superseded_by_owner_directive",
@@ -42,5 +42,5 @@
   },
   "stale_threshold_minutes": 12,
   "lead_heartbeat_automation": false,
-  "note": "One active Cursor implementation session and one 5-minute heartbeat producer. The single-session producer is not registered yet; legacy A/B publishers were still writing after supersession and must be stopped."
+  "note": "CURSOR-V17-SINGLE producer registered; legacy A/B ledgers are historical only."
 }
