@@ -203,7 +203,9 @@ def test_generate_compose_env_and_compose_config_smoke() -> None:
                 env=bare_env,
             )
             assert bare.returncode != 0
-            assert "SWARM_POSTGRES_PASSWORD" in (bare.stderr + bare.stdout)
+            combined = bare.stderr + bare.stdout
+            assert "required variable" in combined
+            assert "SWARM_DATABASE_URL" in combined or "SWARM_POSTGRES_PASSWORD" in combined
         finally:
             if sidelined.exists():
                 sidelined.replace(env_path)
