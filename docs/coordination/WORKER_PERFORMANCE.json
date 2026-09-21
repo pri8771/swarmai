@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-21T03:04:00Z",
+  "updated_at": "2026-09-21T05:54:00Z",
   "history": {
-    "previous_blob_sha": "36c7d03ac8eb1e9c933aedf4a9a5f1ce28c3bead",
-    "note": "Lead independently reviewed V2A-003b-R2, V2A-H6A-R and V2A-003X as accepted bounded packets; reviewed V14-REAL-001 as changes-required because the real mission correctly failed on an empty material diff; reviewed A5 current-tip local G12 proof as accepted live-local evidence only. Whole parent artifacts remain separately gated. Heartbeat/session coordination commits do not count as implementation performance."
+    "previous_blob_sha": "ac14eec141f6ace4afefaef3e876867effe0746d",
+    "note": "Lead independently reviewed external worker-pc task swarmai-v13-task-pool-freeze-02 at bbe41b7770123fef4eb03c4f03f95fc18eefc692. The branch/commit is real and correctly based on reviewed integration, but V2B-001 requires changes: the proposed held-out pool exposes hidden references to workers, has only five distinct held-out cases per required cell instead of the protocol minimum fifteen, reports seed-isomorphic variants, and was never executed under pytest/ruff/mypy/CI. ART-V13-TASK-POOL remains drafting. Prior Cursor packet dispositions are preserved."
   },
   "purpose": "Evidence-backed worker calibration by story-point complexity. Story points are not hours.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
@@ -31,8 +31,8 @@
     },
     "2": {
       "completed_lead_verified": 5,
-      "reviewed_packets": 11,
-      "first_lead_review_acceptance_rate": 0.4545454545,
+      "reviewed_packets": 12,
+      "first_lead_review_acceptance_rate": 0.4166666667,
       "stable": true,
       "reviewed_packet_ids": [
         "W-111A",
@@ -45,7 +45,8 @@
         "V2A-003b-R",
         "V2A-003X",
         "V14-REAL-001",
-        "A5-LOCAL-G12-CURRENT-TIP"
+        "A5-LOCAL-G12-CURRENT-TIP",
+        "EXT-WORKER-PC-V2B-001-02"
       ]
     },
     "3": {
@@ -367,6 +368,32 @@
       ],
       "artifact_status_after_review": "drafting",
       "note": "Live-local packet accepted. Canonical artifact lifecycle remains drafting until the registry is rebound to this evidence/current integration lineage; G12 remote overlap remains blocked."
+    },
+    {
+      "packet_id": "EXT-WORKER-PC-V2B-001-02",
+      "story_points": 2,
+      "artifact_id": "ART-V13-TASK-POOL",
+      "worker": "worker-pc / Claude",
+      "first_pass_ci": "not_run_remote_worker_policy_denied_python_pytest_ruff_mypy; no GitHub workflow at commit",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": false,
+      "completion_sha": "bbe41b7770123fef4eb03c4f03f95fc18eefc692",
+      "positive_findings": [
+        "worker branch exists and is exactly one commit ahead of reviewed cursor/v2-integration base 9ce727842446b98cfa55c28c7e70808f57f17d7b",
+        "diff is scoped to evaluation/benchmark/evidence/test paths and does not touch Session-A-owned shared API/store/schema/CLI/migration/lockfile paths",
+        "manifest pins pool bytes, per-record hashes, size-classifier/scorer/prompt/tool/model-config identities and explicitly makes no qualification claim",
+        "source adds deterministic contamination/drift verifier and focused negative tests"
+      ],
+      "changes_required": [
+        "counted held-out inputs must not expose plaintext hidden answers/grader/reference fields to workers; current benchmarks/starter.jsonl does",
+        "minimum qualification depth is 15 independent held-out observations per required family/size cell; current freeze has only 5",
+        "seed-isomorphic held-out variants must not be counted as independent; regenerate or enforce an independence boundary",
+        "run the verifier/tests plus relevant lint/type checks on the reviewable repair commit; current worker commit has no executed Python/pytest/ruff/mypy or CI evidence"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "EXT-WORKER-PC-V2B-001-R1",
+      "note": "Useful implementation, but it does not satisfy the frozen task-pool acceptance contract. Preserve this failed/reviewed branch as evidence; do not count qualification from it."
     }
   ],
   "superseded_duplicate_intents": [
@@ -429,13 +456,13 @@
       "story_points": 2,
       "gate": "V1.3",
       "task_family": "evaluation-pool-freeze",
-      "status": "ready_after_B0",
-      "worker": "Cursor Session B",
-      "first_pass_ci": null,
-      "first_lead_review": null,
-      "rework_cycles": 0,
+      "status": "changes_required_external_retry",
+      "worker": "worker-pc / Claude",
+      "first_pass_ci": "not_run",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
       "reopened_defect": false,
-      "evidence_complete_first_submission": null
+      "evidence_complete_first_submission": false
     }
   ]
 }
