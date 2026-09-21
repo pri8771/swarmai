@@ -1,13 +1,49 @@
-# SwarmAI lead work queue — **OPERATOR ABRUPT STOP**
+# SwarmAI artifact-derived execution queue — V2 acceleration
 
-> **STOP (UTC 2026-09-21T00:12:38Z):** Operator directed abrupt halt of V1.4 implementation. Cursor must not continue G10–G14 engineering. See `V1_4_ABRUPT_STOP.md` and `CURSOR-20260920-024`. LEAD-016 packets below are **frozen / not to be started** until an explicit resume directive. Incomplete gates remain open; do not invent completions.
+> Canonical state: `ARTIFACT_REGISTRY.json`.
+> Owner resumed implementation through V3.0. Major milestones: V1.7, V2.3, V3.0. Immediate target: V2.0 implementation/artifact-complete candidate.
+> Main merge/public release/additional spend remain separately gated.
 
+## Two-session active lanes
 
-Updated 2026-09-20T23:51:30Z after LEAD-20260920-016. `ARTIFACT_REGISTRY.json` is canonical. This file is only the current execution view; packet detail lives in `WORKER_PACKET_BACKLOG.md`, performance in `WORKER_PERFORMANCE.json`.
+### Cursor Session A — runtime/control plane/integration
+Branch: `cursor/v2-runtime-lane`
+Integration owner: `cursor/v2-integration`
 
-Owner authorization: implementation through V1.4 inclusive. Independent review gates acceptance. Main merge/release/public exposure/additional spend/destructive actions/V1.5+ source work remain unauthorized.
+Ready now:
+1. V2A-001 / ART-V12-BROKER-CONTRACT / SP2 — close generic operational broker bypass.
+2. V2A-002 / ART-V11-RESTART-EVIDENCE / SP1 — actual service process restart/reopen.
+3. V2A-003a / ART-V15-LEASE-FENCING / SP2 — durable worker/attempt/lease/result DB schema/repository.
 
-Current PR #14: `cursor/v1.4-live-integration-11e2` @ `03d85540e36c36fa3a5c92a3082be9959d93f66d`. Actions `35545174895` is green offline+console; DB integration is skipped without DSN; live-gated job is a notice only. Application tree is unchanged after `d9da26c…` except evidence/docs.
+Then: V2A-003b/c -> worker protocol -> V1.8 site authority/backup/recovery.
+
+### Cursor Session B — knowledge/tools/product/beta
+Branch: `cursor/v2-product-lane`
+
+Ready now:
+1. V2B-001 / ART-V13-TASK-POOL / SP2 — freeze held-out/calibration/version manifest.
+2. V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3 — calibration-only reviewer benchmark repair/freeze.
+3. V2B-003a / ART-V16-PROVENANCE / SP2 — versioned provenance repository.
+4. V2B-004a / ART-V17-APPROVAL-BINDING / SP2 — unified action/approval/receipt contracts.
+
+Then: retrieval/supersession -> ToolGateway adapter -> extension/beta artifacts.
+
+## Lead lane — stay one artifact ahead
+
+ChatGPT is actively providing:
+- ART-V15-LEASE-FENCING ADR;
+- ART-V16-PROVENANCE schema;
+- ART-V17-APPROVAL-BINDING contract;
+- ART-V18-SITE-EPOCH/backup contract;
+- ART-V19-EXTENSION contract;
+- ART-V20-ACCEPTANCE contract;
+- next: V2.3 operational-platform artifacts and V3 objective/learning governance.
+
+Lead should review lane outputs at artifact boundaries, create punch lists, and immediately advance the next architecture/acceptance artifact instead of waiting.
+
+## Critical truth
+
+An accepted V2.0 cannot honestly be completed today if mandatory wall-clock observation has not elapsed. Today's success target is a green, integrated, implementation/artifact-complete V2.0 candidate with time-bound acceptance artifacts running or explicitly blocked.
 
 ## Highest-priority ready Cursor packets
 
