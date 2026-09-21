@@ -4,19 +4,19 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `314f25b71b9f82dc37b092b8fb931ae3196c457c`
-- Coordination SHA: `3059ac61c7fdc013e3ea7b2c96e151c94cd692df`
-- Updated: `2026-09-21T18:25:42Z`
+- Coordination SHA: `7073f6543246dc84cdc027697e181738c0712e01`
+- Updated: `2026-09-21T18:26:00Z`
 - Trigger: `manual`
-- Status: **blocked**
+- Status: **working**
 - Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T18:25:41Z`
+- Last meaningful activity: `2026-09-21T18:25:59Z`
 - Spend USD: `0.0`
-- Blocker: awaiting_lead_review_of_failed_v14_real_002_and_auth_for_new_preregistered_rerun
+- Blocker: ART-V13-TASK-POOL freeze needs HOST-WIN-DEV
 
 ## Update
 
-v14-real-002 fail-closed bind+diagnosis packaged at 314f25b; truncated fence root cause; repair on tip does not pass 002; awaiting lead auth for NEW rerun. No new mission started by this agent.
+Resumed at 314f25b; heartbeat healthy. Hardening truncated-file reject then launching v14-real-004 on a smaller different subsystem.
 
 ## Next
 
