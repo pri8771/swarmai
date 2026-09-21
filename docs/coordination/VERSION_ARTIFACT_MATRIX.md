@@ -1,75 +1,150 @@
-# SwarmAI version artifact matrix
+# Version / artifact matrix
 
-Derived human view of `ARTIFACT_REGISTRY.json`. The registry is canonical. Updated 2026-09-20T23:51:30Z.
+Artifact registry is canonical. This file is the compact human view.
 
-Legend: `A` accepted · `V` verified · `R` reviewable · `D` drafting · `B` blocked · `P` planned.
+## Major milestones
 
-## Current authorized tranche
+### V1.7 — core platform milestone
+Includes the accepted/reviewable artifact sets for:
+- V1.4 elastic swarm foundation;
+- V1.5 distributed workers;
+- V1.6 scoped reusable knowledge;
+- V1.7 unified tools/browser permissions/session recovery.
 
-| Version | Artifact | State | Current truth / next transition |
-|---|---|---:|---|
-| V1.0 repair | ART-V10-CANDIDATE | V | PR #14 exact tip `03d85540…`; Actions 35545174895 green for offline+console; DB integration skipped honestly; live CI gate not executed. |
-|  | ART-V10-SECURITY | V | Source/regressions lead-verified; retain. |
-|  | ART-V10-EVIDENCE-CONTRACT | V | Evidence binding/readiness truth lead-verified; reuse. |
-|  | ART-V10-RUNTIME-TRUTH | V | Operational no-mock/no-known-answer boundary lead-verified. |
-|  | ART-V10-WORKER-HEARTBEAT | **B** | Scheduler probe exists but CLI `status/whoami` still Not logged in. Human login -> W-041B manual authenticated receipt -> W-041C two genuine hourly receipts. |
-| V1.1 | ART-V11-MISSION-PATH | **V** | Generic durable extract/triage/plan execution and same durable store independently reviewed. |
-|  | ART-V11-MULTISURFACE-EVIDENCE | **V** | Actual Chromium console UI create; API/CLI same ID; three unfamiliar tasks across extract/triage. |
-|  | ART-V11-CONTROL-EVIDENCE | **V** | Unsupported task, deliberate wrong output and cancellation evidence independently verified. |
-|  | ART-V11-RESTART-EVIDENCE | **D** | Current proof recreates `create_app`/MissionStore but does not stop/start the actual service process. W-111C is ready. |
-|  | ART-V11-APPLY-BOUNDARY | V | Explicit reviewed apply boundary retained. |
-| V1.2 | ART-V12-BROKER-CONTRACT | **D** | MissionRuntime is brokered, but `ProductStore.execute_mission` still creates `RepoWorker` without broker/project ID and can fall back to direct `local_chat`. W-122A ready. |
-|  | ART-V12-PROVIDER-ELIGIBILITY | **V** | W-121A ledger truthfully proves **0 admissible remotes** and local routes available. |
-|  | ART-V12-REMOTE-ADMISSION-RESEARCH | D | Lead public-doc checklist narrows OpenRouter/Groq/Gemini checks; account-specific evidence still required. |
-|  | ART-V12-REMOTE-OVERLAP | **B** | Needs W-122A plus two current exact zero-additional-spend remote routes. |
-|  | ART-V12-LOCAL-FALLBACK | R | Local evidence exists; re-review/rebind after broker bypass closes. |
-|  | ART-V12-ADMISSION-RECONCILIATION | R | Local reservation evidence exists; re-review after broker integration and extend during remote proof. |
-| V1.3 | ART-V13-QUAL-PROTOCOL | **A** | Frozen protocol v1.0; no post-hoc threshold changes. |
-|  | ART-V13-TASK-POOL | **D** | Qualification/calibration pool IDs/hashes and scorer/prompt/tool/model manifest must be frozen before W-131B. W-131C1 ready. |
-|  | ART-V13-SCREENING-MATRIX | **V** | 72 provisional n=5 cells across three local models × S/M/L/XL × six families; no qualification claim. |
-|  | ART-V13-QUALIFIED-MATRIX | D | No n>=15 qualified cell. After task-pool freeze, first lead-selected batches: planning/XL `gemma3:4b`; coding/XL `qwen3.5:4b`; reasoning/L `qwen3.5:9b`. |
-|  | ART-V13-OVERHEAD-REPORT | P | Collect during real qualification. |
-|  | ART-V13-REVIEWER-QUALIFICATION | D | Existing reviewer screening weak; W-131C2 calibration/freeze ready. |
-| V1.4 | ART-V14-GRAPH-CONTRACT | R | Offline graph contract only; review after broker boundary closes. |
-|  | ART-V14-ROLE-MANIFEST | B | Depends on qualified product + reviewer routes. |
-|  | ART-V14-LIVE-ADAPTIVE-PROOF | B | Depends on G12 remote overlap and G13 qualified roles. |
-|  | ART-V14-LOAD-10-50-100 | R | Offline logical-assignment load evidence only; not real model concurrency. |
-|  | ART-V14-MODE-COMPARISON | P | After live adaptive proof. |
-|  | ART-LIVE142-PROTOCOL | **A** | Frozen final campaign protocol. |
-|  | ART-LIVE142-CAMPAIGN | B | G10-G14 dependencies incomplete. |
-|  | ART-LIVE142-FINAL-REPORT | P | Lead-owned after campaign. |
+### V2.0 — immediate implementation target
+Adds:
+- V1.8 recovery/backup/site authority;
+- V1.9 extensions/beta/controlled self-development;
+- integrated V2.0 candidate/install/support/reliability/review artifacts.
 
-### Current version-level truth
+Implementation-complete and accepted are distinct. Time-bound acceptance may finish later.
 
-- **V1.0 repair is not accepted**: worker heartbeat artifact remains blocked by Cursor CLI authentication.
-- **V1.1 is not accepted**: four required artifacts are verified, but actual process restart/reopen remains drafting.
-- **V1.2 is not accepted**: broker boundary has a concrete operational bypass and there are zero admissible remote routes.
-- **V1.3 is not accepted**: screening is complete/provisional; held-out qualification has not begun under a frozen qualification pool.
-- **V1.4 is not accepted**: qualified roles, remote overlap, live adaptive proof, comparison and final campaign remain absent.
+### V2.3 — next major milestone
+Planned artifact families:
+- ART-V23-MULTIMISSION-OPS
+- ART-V23-CAPABILITY-PACKS
+- ART-V23-PORTABILITY
+- ART-V23-OBSERVABILITY
+- ART-V23-FLEET-POLICY
 
-## Ready Cursor work
+### V3.0 — persistent learning operations
+Planned artifact families:
+- ART-V30-OBJECTIVE-CONTRACT
+- ART-V30-LEARNING-GOVERNANCE
+- ART-V30-RESOURCE-ALLOCATOR
+- ART-V30-CONTROLLED-SELFDEV
+- ART-V30-CAPABILITY-ECOSYSTEM
+- ART-V30-FLEET-TENANCY-AUDIT
 
-At least four dependency-ready bounded packets now exist:
+## Current through V1.4
 
-1. **W-111C / SP1** -> `ART-V11-RESTART-EVIDENCE`: actual service-process stop/start + same mission reopen from another surface.
-2. **W-122A / SP2** -> `ART-V12-BROKER-CONTRACT`: broker `ProductStore.execute_mission` and prove no direct inference bypass.
-3. **W-131C1 / SP2** -> `ART-V13-TASK-POOL`: freeze qualification task/scorer/prompt/tool/model identities and separate calibration from held-out data.
-4. **W-131C2 / SP3** -> `ART-V13-REVIEWER-QUALIFICATION`: calibration-only benchmark/scorer repair, then freeze new reviewer benchmark; no held-out qualification before freeze.
+### V1.0 repair
+Required:
+- ART-V10-CANDIDATE
+- ART-V10-SECURITY
+- ART-V10-EVIDENCE-CONTRACT
+- ART-V10-RUNTIME-TRUTH
+- ART-V10-WORKER-HEARTBEAT
 
-W-131B becomes ready only after W-131C1 review. W-121B remains blocked until two remotes are independently admissible and the broker boundary is reviewable.
+### V1.1 generic mission
+Required:
+- ART-V11-MISSION-PATH
+- ART-V11-MULTISURFACE-EVIDENCE
+- ART-V11-CONTROL-EVIDENCE
+- ART-V11-RESTART-EVIDENCE
+- ART-V11-APPLY-BOUNDARY
 
-## Future artifact progress — no future code authorization
+### V1.2 inference
+Required:
+- ART-V12-BROKER-CONTRACT
+- ART-V12-PROVIDER-ELIGIBILITY
+- ART-V12-REMOTE-OVERLAP
+- ART-V12-LOCAL-FALLBACK
+- ART-V12-ADMISSION-RECONCILIATION
 
-| Version | Lead artifacts advanced | State |
-|---|---|---:|
-| V1.5 | ART-V15-ARCH | D |
-|  | **ART-V15-WORKER-PROTOCOL** | **D — enrollment/generation/heartbeat/lease/result/acceptance-fence protocol drafted** |
-|  | ART-V15-LEASE-FENCING | P |
-|  | ART-V15-MULTIHOST-EVIDENCE | P / implementation not authorized |
-|  | ART-V15-RECOVERY-EVIDENCE | P / implementation not authorized |
-| V1.6 | ART-V16-KNOWLEDGE-CONTRACT | D |
-| V1.7 | ART-V17-TOOL-CONTRACT | D |
-| V1.8 | ART-V18-RECOVERY-ARCH | D |
-| V1.9 | ART-V19-BETA-ACCEPTANCE | D |
+### V1.3 qualification
+Required:
+- ART-V13-QUAL-PROTOCOL
+- ART-V13-TASK-POOL
+- ART-V13-SCREENING-MATRIX
+- ART-V13-QUALIFIED-MATRIX
+- ART-V13-OVERHEAD-REPORT
+- ART-V13-REVIEWER-QUALIFICATION
 
-Future design artifacts are isolated from PR #14. They do not authorize V1.5+ source work, merge, deployment, spend or release.
+### V1.4 elastic swarm
+Required:
+- ART-V14-GRAPH-CONTRACT
+- ART-V14-ROLE-MANIFEST
+- ART-V14-LIVE-ADAPTIVE-PROOF
+- ART-V14-LOAD-10-50-100
+- ART-V14-MODE-COMPARISON
+- ART-LIVE142-PROTOCOL
+- ART-LIVE142-CAMPAIGN
+- ART-LIVE142-FINAL-REPORT
+
+## V1.5 capability group — distributed workers
+- ART-V15-ARCH
+- ART-V15-WORKER-PROTOCOL
+- ART-V15-LEASE-FENCING
+- ART-V15-MULTIHOST-EVIDENCE
+- ART-V15-RECOVERY-EVIDENCE
+
+## V1.6 capability group — scoped knowledge
+- ART-V16-KNOWLEDGE-CONTRACT
+- ART-V16-PROVENANCE
+- ART-V16-PERMISSION-RETRIEVAL
+- ART-V16-SUPERSESSION
+- ART-V16-CONTEXT-BUDGET-EVIDENCE
+
+## V1.7 capability group — tools/browser
+- ART-V17-TOOL-CONTRACT
+- ART-V17-APPROVAL-BINDING
+- ART-V17-INTEGRATION-MANIFEST
+- ART-V17-SESSION-RECOVERY
+- ART-V17-PERMISSION-NEGATIVES
+
+## V1.8 capability group — recovery
+- ART-V18-RECOVERY-ARCH
+- ART-V18-SITE-EPOCH
+- ART-V18-DEPLOYMENT-MANIFEST
+- ART-V18-BACKUP-RESTORE
+- ART-V18-SPLIT-BRAIN-SAFETY
+- ART-V18-OUTAGE-DRILL
+
+## V1.9 capability group — beta/extensions/self-development
+- ART-V19-BETA-ACCEPTANCE
+- ART-V19-EXTENSION-CONTRACT
+- ART-V19-INSTALL-UPGRADE
+- ART-V19-EXTERNAL-INSTALLS
+- ART-V19-SELFDEV-PR-EVIDENCE
+
+## V2.0 integrated product candidate
+- ART-V20-INTEGRATED-CANDIDATE
+- ART-V20-SUPPORT-MATRIX
+- ART-V20-INSTALL-JOURNEY
+- ART-V20-UPGRADE-ROLLBACK
+- ART-V20-RELIABILITY-PROTOCOL
+- ART-V20-SECURITY-REVIEW
+- ART-V20-PERFORMANCE-BASELINE
+- ART-V20-RELEASE-REVIEW
+
+## Lane ownership
+
+Session A / runtime:
+- V1.2 broker closure
+- V1.5 distributed workers
+- V1.8 recovery
+- shared integration and V2.0 candidate
+
+Session B / product:
+- V1.3 task/reviewer artifacts
+- V1.6 knowledge
+- V1.7 tools/browser
+- V1.9 beta/extensions
+- product-side V2.0 install/support journeys
+
+ChatGPT:
+- architecture/ADR/acceptance/security/research artifacts across all versions
+- artifact verification and dependency graph
+- V2.3/V3.0 design work ahead of implementation
+
