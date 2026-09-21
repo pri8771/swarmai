@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated after `LEAD-20260921-033`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
+Updated after `LEAD-20260921-034`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this file is bounded execution state only.
 
 ## Shared local execution blocker
 
@@ -15,14 +15,14 @@ Assignment `A-AUTONOMY-RUNNER-REPAIR-02`, generation 2, enabled.
 
 Fix coordination-script Ruff failures without weakening one-packet/generation, dirty-worktree, branch, no-remote-change, no-force-push or no-self-accept safety. Add focused regressions and return exact-tip CI. Intended parent artifact transition remains `drafting -> drafting` with the source blocker removed; host proof is still required later.
 
-A's scheduler has resumed at `11:55:14Z`, but the long outage broke its old chain and no autonomous-start/push is present. Keep generation 2 unchanged. B's autonomous assignment remains disabled until this shared repair is independently reviewed and safely propagated. Do not replay generation 1.
+A scheduler now has a current valid `12:36:39Z -> 12:51:41Z` chain (**2/3**), but no autonomous-start/push is present. Keep generation 2 unchanged. B's autonomous assignment remains disabled until this shared repair is independently reviewed and safely propagated. Do not replay generation 1.
 
 ## Heartbeat bootstrap
 
 Only `trigger=scheduler` counts.
 
-- A: fresh scheduler receipt at `11:55:14Z` after a multi-hour gap; old chain is broken, so current chain is **1/3** and A is fresh.
-- B: `11:14:17Z -> 11:29:17Z -> 11:44:27Z` = **3/3**, with valid 10–25 minute gaps. B individually satisfies bootstrap cadence.
+- A: `12:36:39Z -> 12:51:41Z` = **2/3**. The prior ~41-minute gap from `11:55:14Z` reset the chain. A is fresh.
+- B: current chain is **1/3** at `12:29:17Z`; the prior `11:59:17Z -> 12:29:17Z` 30-minute gap reset its earlier streak. B is fresh at the lead cutoff.
 - Global cadence stays at 15 minutes until both have a current 3/3 qualifying chain. ChatGPT lead remains hourly.
 
 ## External worker-pc / G13 task pool
@@ -39,23 +39,24 @@ Retry 04 produced real source:
 
 The remote task execution step succeeded and the branch was pushed, but sanitized result publication failed, so no result JSON exists. SwarmAI static/type/package/Alembic checks pass and console CI passes, but the offline pytest step fails.
 
-Independent lead review additionally found that the current `5 task variants x 3 structural loads` construction does not mechanically establish 15 semantic-independent observations per cell: ordinary scenario/domain substitutions and incremental clause variants can evade the current normalizer. The evidence document also contains stale provenance saying the branch was never committed/pushed. Finally, the lead-controlled sealed reference bundle/content digest is not bound and counted readiness remains false.
+Independent lead review additionally found that the current `5 task variants x 3 structural loads` construction does not mechanically establish 15 semantic-independent observations per cell; evidence provenance is stale; and no lead-controlled sealed reference bundle/content digest is bound.
 
 Disposition: **changes required; ART-V13-TASK-POOL stays drafting; no W-131B**.
 Review: `docs/coordination/reviews/ART-V13-TASK-POOL-RETRY04-LEAD-REVIEW.md`.
 
-### DISPATCHED — EXT-WORKER-PC-V2B-001-R3 / ART-V13-TASK-POOL / SP2
+### RUNNING — EXT-WORKER-PC-V2B-001-R3 / ART-V13-TASK-POOL / SP2
 
 Contract: `docs/coordination/packets/EXT-WORKER-PC-V2B-001-R3.md`.
 Base: `worker/swarmai-v13-task-pool-freeze-04@6467552f86e40964e5bd26d85e3b3a74d03aa059`.
 Expected branch: `worker/swarmai-v13-task-pool-freeze-05`.
 Remote-workers task: `swarmai-v13-task-pool-freeze-05`.
 Dispatch commit: `d12ec01e9d741f4ac117c074190811a4d48d0e41`.
-Workflow run: `35596577823` (queued at lead review; no result/worker05 source claimed yet).
+Workflow run/job: `35596577823` / `106322668369`.
+State at lead cutoff: **in progress**, execution step active; result JSON absent and expected worker branch not yet present.
 
 Required repair:
 - reproduce/fix exact-tip offline pytest while preserving existing negative assertions and green Ruff/mypy/package/Alembic;
-- rebind evidence provenance to actual commit/CI;
+- rebind evidence provenance to actual commit/CI and exact executed commands;
 - require >=15 distinct semantic independence groups/archetypes per required family/size cell; scenario-noun, seed-ID or cumulative-clause variations alone cannot count as independent;
 - add negative tests proving semantic/template siblings are rejected;
 - preserve input-only worker-visible records and opaque hidden-reference IDs;
@@ -64,7 +65,7 @@ Required repair:
 
 Lead-owned sealed-reference contract: `docs/coordination/G13_SEALED_REFERENCE_BINDING_PROTOCOL.md`.
 
-Local B must not duplicate the external task-pool packet.
+Capacity 1 is occupied by retry 05. Do not submit another remote-worker task until this run closes. Local B must not duplicate the external task-pool packet.
 
 ## Session A — runtime/control-plane/integration
 
@@ -94,7 +95,7 @@ Autonomous product execution remains held until A0 is reviewed/propagated. Keep 
 After safe re-enable, sync only reviewed integration baseline, preserve host/session files, run Windows Python+console baseline, return exact evidence.
 
 ### EXTERNAL B1 — ART-V13-TASK-POOL / SP2
-R3 is dispatched as retry 05 through `worker-pc`. Local B must not duplicate. No counted qualification before lead freeze + real sealed-reference binding.
+R3 is running as retry 05 through `worker-pc`. Local B must not duplicate. No counted qualification before lead freeze + real sealed-reference binding.
 
 ### LOCAL B2 — V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3
 Calibration-only reviewer benchmark/scorer repair/freeze after B0 and safe autonomy re-enable. No held-out qualification claim.
@@ -111,6 +112,12 @@ Project-scoped versioned provenance/tombstones/non-leak tests; B owns domain/rep
 ### B6 — V2B-004a+H4 / ART-V17-APPROVAL-BINDING / SP2
 ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity and exact operation/destination/payload digest, expiry/revocation and explicit test fixtures only.
 
+## Lead parallel artifact
+
+`ART-V20-UPGRADE-ROLLBACK` protocol advanced at coordination commit `0c74cb9db6bcf26583b234c33566573c9f8f42e7`. It now preregisters exact candidate/predecessor identity, pre-upgrade manifests and backup digests, quiesce/fencing, support-matrix-bound upgrade paths, code/downgrade/restore rollback classes, partial-migration/crash/stale-authority negatives, semantic integrity checks, measurements and immutable review evidence.
+
+This is drafting protocol work only. No executable upgrade/rollback/restore evidence or lifecycle transition is claimed.
+
 ## Retained review dispositions
 
 - V2A-003b-R2 / ART-V15-LEASE-FENCING / SP1 — accepted packet; parent remains drafting pending result acceptance.
@@ -122,15 +129,15 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 - EXT-WORKER-PC-V2B-001-R1 / retry 03 — cancelled without result/branch; not scored as reviewed implementation.
 - EXT-WORKER-PC-V2B-001-R2 / retry 04 — changes required at `6467552f86e40964e5bd26d85e3b3a74d03aa059`.
 
-`WORKER_PERFORMANCE.json` summary counts remain unchanged because no new bounded implementation packet reached independent review. Retry 05 dispatch is work scheduling, not review evidence.
+`WORKER_PERFORMANCE.json` summary counts remain unchanged because no new bounded implementation packet reached independent review. Retry 05 execution is scheduling/runtime state, not review evidence.
 
 ## Acceptance blockers — do not relabel
 
-- `ART-OPS-HEARTBEAT`: A current 1/3 after scheduler recovery; B current 3/3; global drafting.
+- `ART-OPS-HEARTBEAT`: A current 2/3; B current 1/3; global drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - G12 remote overlap = 0 admitted routes.
-- `ART-V13-TASK-POOL`: retry 04 changes-required; retry 05 dispatched/queued; not frozen.
+- `ART-V13-TASK-POOL`: retry 04 changes-required; retry 05 running; not frozen.
 - G13 reviewer not frozen; zero qualified cells.
 - V14 real E2E first attempt failed; repair/rerun queued after autonomous source repair.
 - G14 live adaptation blocked on G12/G13.
