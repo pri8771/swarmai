@@ -16,7 +16,7 @@ import os
 import secrets
 import stat
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -60,7 +60,7 @@ def generate(
             "separately if you intend a fresh database, or edit credentials manually."
         )
     if force and ENV_PATH.exists():
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         backup = ENV_PATH.with_name(f".env.pre-force-{stamp}")
         ENV_PATH.replace(backup)
         _chmod_owner_only(backup)
