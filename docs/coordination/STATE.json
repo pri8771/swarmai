@@ -1,13 +1,17 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T03:48:22Z",
+  "updated_at": "2026-09-21T03:58:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
   "management_model": "artifact_oriented",
   "implementation_authorized_through": "3.0",
   "active_execution_target": "2.0_implementation_artifact_complete_candidate",
-  "major_milestones": ["1.7", "2.3", "3.0"],
+  "major_milestones": [
+    "1.7",
+    "2.3",
+    "3.0"
+  ],
   "main_merge_authorized": false,
   "public_release_authorized": false,
   "additional_spend_authorized": false,
@@ -90,7 +94,9 @@
       "status": "not_accepted",
       "blocker": "ART-V10-WORKER-HEARTBEAT separately requires authenticated cursor-agent receipts"
     },
-    "1.1": {"status": "required_artifacts_verified_set_not_promoted"},
+    "1.1": {
+      "status": "required_artifacts_verified_set_not_promoted"
+    },
     "1.2": {
       "status": "not_accepted",
       "broker_contract": "verified",
@@ -120,16 +126,24 @@
       "lease_fencing": "claim_renew_expire_packet_accepted_result_acceptance_V2A-003c_waiting_after_autonomy_runner_repair",
       "DBOS_reuse": "verified_partial_reuse_decision_no_production_adoption"
     },
-    "1.6": {"status": "implementation_ready_waiting_session_b"},
-    "1.7": {"status": "implementation_ready_waiting_session_b"},
+    "1.6": {
+      "status": "implementation_ready_waiting_session_b"
+    },
+    "1.7": {
+      "status": "implementation_ready_waiting_session_b"
+    },
     "2.0": {
       "status": "implementation_target_active",
       "integrated_candidate": "drafting_reviewed_baseline_001_002_only",
       "foundation_hardening": "drafting_H6A_R_packet_accepted_other_items_remaining",
       "reliability_protocol": "drafting_no_elapsed_time_claimed"
     },
-    "2.3": {"status": "lead_architecture_drafting_multimission_fairness_contract_advanced"},
-    "3.0": {"status": "lead_architecture_drafting"}
+    "2.3": {
+      "status": "lead_architecture_drafting_multimission_fairness_contract_advanced"
+    },
+    "3.0": {
+      "status": "lead_architecture_drafting"
+    }
   },
   "session_a_next": [
     "OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1",
@@ -137,10 +151,9 @@
     "then V2A-003c / ART-V15-LEASE-FENCING / SP2"
   ],
   "session_b_next": [
-    "keep scheduler heartbeat active; autonomous assignment held behind shared runner repair",
-    "after repair propagation/new enabled generation: V2B-000 / integration sync / SP1",
-    "then V2B-001 / task+version pool freeze / SP2",
-    "then V2B-002 / reviewer calibration+freeze / SP3"
+    "worker-pc independently executes V2B-001 task-pool freeze on worker branch; lead reviews when result arrives",
+    "local Windows Cursor B remains focused on heartbeat/autonomous-runner recovery and then B0/B2 as assigned",
+    "counted qualification still waits for lead freeze of ART-V13-TASK-POOL"
   ],
   "lead_parallel": [
     "ART-V23-OPS-PLATFORM advanced with weighted-deficit fairness, SchedulerDecisionReceipt, anti-amplification/restart/drain/fleet/portability acceptance contract",
@@ -177,7 +190,9 @@
         "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02",
         "generation": 2,
         "enabled": true,
-        "queued_packets": ["OPS-AUTO-001-R"],
+        "queued_packets": [
+          "OPS-AUTO-001-R"
+        ],
         "proven": false
       },
       "B": {
@@ -187,11 +202,36 @@
         "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
         "generation": 2,
         "enabled": false,
-        "queued_packets_after_reenable": ["V2B-000", "V2B-001", "V2B-002"],
+        "queued_packets_after_reenable": [
+          "V2B-000",
+          "V2B-001",
+          "V2B-002"
+        ],
         "proven": false
       }
     },
     "lead_behavior": "Review runner repair first, then publish new non-replay assignment generations. Artifact verifies only after both hosts self-launch one repo-assigned packet and push exact evidence.",
     "safety": "one bounded packet per invocation; no self-acceptance/main merge/public deploy/additional spend/force push"
+  },
+  "external_workers": {
+    "infrastructure_repo": "pri8771/remote-workers",
+    "project_authority": false,
+    "active_tasks": [
+      {
+        "task_id": "swarmai-v13-task-pool-freeze-01",
+        "worker": "worker-pc",
+        "executor": "claude",
+        "mode": "branch",
+        "repository": "pri8771/swarmai",
+        "base_branch": "cursor/v2-integration",
+        "worker_branch": "worker/swarmai-v13-task-pool-freeze-01",
+        "artifact_id": "ART-V13-TASK-POOL",
+        "packet_id": "V2B-001",
+        "status": "dispatched_waiting_result",
+        "result_path": "pri8771/remote-workers:results/swarmai-v13-task-pool-freeze-01.json",
+        "merge_authorized": false
+      }
+    ],
+    "rule": "remote-workers is infrastructure only; SwarmAI roadmap/state/reviews/acceptance remain canonical here"
   }
 }
