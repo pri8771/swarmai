@@ -1,5 +1,26 @@
 # SwarmAI roadmap: V1 repair -> V2.0 -> V3.0
 
+## Owner acceleration directive — 2026-09-20
+
+This supersedes the prior "implementation through V1.4 only" execution ceiling and the later abrupt stop.
+
+- Source implementation is authorized through V3.0.
+- Major milestones are **V1.7**, **V2.3**, and **V3.0**.
+- Immediate target is a **V2.0 implementation/artifact-complete candidate** as quickly as possible.
+- Project management is artifact-oriented.
+- Team is ChatGPT lead + two Cursor implementation sessions in parallel.
+- Main merge/public release/additional spend remain separately gated.
+- Time-bound acceptance evidence remains real wall-clock evidence; implementation completion and version acceptance are distinct.
+
+### Milestone grouping
+
+- **V1.7 milestone:** completes capability groups V1.5 distributed workers + V1.6 scoped reusable knowledge + V1.7 unified tools/browser sessions, while retaining V1.4 elastic swarm requirements.
+- **V2.0 target:** adds V1.8 cloud/local recovery + V1.9 independent beta/extensions/self-development + integrated V2.0 candidate artifacts.
+- **V2.3 milestone:** operational platform tranche—multi-mission operations/resource fairness, capability-pack lifecycle, portability, stronger observability/admin and fleet policy.
+- **V3.0 milestone:** persistent authorized objectives, governed learning, controlled self-development, cross-project resource allocation and capability/fleet ecosystem.
+
+Execution details: `V2_EXECUTION_PLAN.md` and `TWO_CURSOR_TEAM.md`.
+
 ## Owner decision — 2026-09-20
 
 The operator approved this roadmap direction through V3.0 and authorized immediate implementation through V1.4 inclusive. Read `V1_4_EXECUTION_CONTRACT.md` and `START_CURSOR_TO_V1_4.md` for the executable mandate. Older repair-only/per-increment implementation stops are superseded within that range. Evidence and independent review remain required. Main merge, release/publication, public deployment and additional spending are not authorized by this roadmap.
