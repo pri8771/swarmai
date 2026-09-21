@@ -51,17 +51,20 @@ Live checkpoint protocol:
 `docs/coordination/V17_LIVE_CHECKPOINT_PROTOCOL.md`
 
 Latest serious code audit:
-`docs/coordination/V17_CODE_AUDIT_20260921_1432.md`
+`docs/coordination/V17_CODE_AUDIT_20260921_2030_FABLE.md`
+(finding IDs `W*`/`E*`/`A*`/`I*`/`V*`/`O*` are cited by packet specs; the 14:32 audit is history)
 
 Read these only when the current packet needs them; do not reread all three every turn.
 
 ## 4. Active packet routing
 
-From `V17_RECOVERY_PACKET_QUEUE.json`:
-1. find the current/incomplete dependency-ready packet;
-2. read its artifact ID;
-3. use `docs/coordination/DOC_ROUTER.md` to locate only relevant contracts/evidence;
+From `V17_RECOVERY_PACKET_QUEUE.json` (schema 1.1):
+1. run `python3 docs/coordination/tools/validate_plan.py --ready` (or apply the file's `selection_rule`) and take the first ready packet;
+2. read `docs/coordination/packets/README.md` once per session, then ONLY that packet's `spec` file;
+3. use `docs/coordination/DOC_ROUTER.md` for anything the spec points to;
 4. inspect live source before coding.
+
+Truth about what V1.5–V1.7 really is today: libraries not yet on the mission path. Do not report "V1.7 implementation-complete" before `R34b`.
 
 Packet execution rule:
 one small packet -> focused tests -> commit -> push -> heartbeat -> next ready packet.
@@ -71,15 +74,18 @@ one small packet -> focused tests -> commit -> push -> heartbeat -> next ready p
 After the V1.7 authorized handoff:
 - V1.8–V2.3: `docs/coordination/V17_TO_V23_PACKET_QUEUE.json`
 - V1.8–V2.3 architecture: `docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md`
-- V3 preparation/execution DAG: `docs/coordination/FUTURE_EXECUTION_GRAPH_V18_TO_V30.json`
+- V3 preparation/execution DAG: `docs/coordination/FUTURE_EXECUTION_GRAPH_V18_TO_V30.json` (`v30_packets`, `v3_invariants`)
+- whole-program summary, claim ladder, critical paths, model routing: `docs/coordination/MASTER_PLAN_V17_TO_V30_20260921.md` section 0
 - future prep index: `docs/coordination/FUTURE_PREP_INDEX_20260921.md`
 
 Do NOT open all future planning files at startup.
 
 ## 6. Current known blockers / caveats
 
+External and wall-clock gates are machine-readable: the `gates` arrays in the three DAG files (summary table: `MASTER_PLAN_V17_TO_V30_20260921.md` section 0.4).
+
 Always verify live before repeating:
-- GitHub Actions billing/startup has been a USER_ACTION blocker.
+- GitHub Actions billing/startup has been a USER_ACTION blocker. Land `OPS-CI-01` BEFORE billing is restored: heartbeat commits were triggering about 1,000 workflow runs per day.
 - External provider credentials/entitlements may block remote evidence.
 - Some physical multi-host/Windows/wall-clock evidence may remain externally gated.
 - Blocked external evidence must not idle dependency-independent implementation.
