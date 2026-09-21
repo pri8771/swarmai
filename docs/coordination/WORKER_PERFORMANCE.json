@@ -20,18 +20,39 @@
       "reviewed_packets": 2,
       "first_lead_review_acceptance_rate": 1.0,
       "stable": false,
-      "reviewed_packet_ids": ["W-131A", "V2A-002"]
+      "reviewed_packet_ids": [
+        "W-131A",
+        "V2A-002"
+      ]
     },
     "2": {
       "completed_lead_verified": 3,
       "reviewed_packets": 5,
       "first_lead_review_acceptance_rate": 0.6,
       "stable": false,
-      "reviewed_packet_ids": ["W-111A", "W-111B", "W-121A", "V2A-001", "V2A-003a"]
+      "reviewed_packet_ids": [
+        "W-111A",
+        "W-111B",
+        "W-121A",
+        "V2A-001",
+        "V2A-003a"
+      ]
     },
-    "3": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false},
-    "4": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false},
-    "5": {"completed_lead_verified": 0, "reviewed_packets": 0, "stable": false}
+    "3": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    },
+    "4": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    },
+    "5": {
+      "completed_lead_verified": 0,
+      "reviewed_packets": 0,
+      "stable": false
+    }
   },
   "reviewed_packets": [
     {
@@ -132,8 +153,14 @@
     }
   ],
   "superseded_duplicate_intents": [
-    {"packet_id":"W-111C","superseded_by":"V2A-002"},
-    {"packet_id":"W-122A","superseded_by":"V2A-001"}
+    {
+      "packet_id": "W-111C",
+      "superseded_by": "V2A-002"
+    },
+    {
+      "packet_id": "W-122A",
+      "superseded_by": "V2A-001"
+    }
   ],
   "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md"
 }

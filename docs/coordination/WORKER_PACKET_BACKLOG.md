@@ -42,6 +42,7 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
 - Artifact: `ART-V15-LEASE-FENCING`
 - SP2
 - Blocked until A0 is lead-reviewable.
+- Note: Session A already pushed implementation @ `7dcefe4c72ae9ada2ff512adeaf65eefa28632e2` / tip `f55f8078b73597892b6dcddc2e41ac947d3c904e` overlapping LEAD-019; **not review-ordered** until V2A-003a-R.
 - Transactional single-winner eligible-task claim; incompatible head cannot block later eligible task; fairness; renewal/expiry/CAS race tests.
 
 ### FOLLOW-ON A4 — V2A-003c — result acceptance fence
