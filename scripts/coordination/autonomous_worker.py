@@ -175,17 +175,38 @@ def main() -> int:
     state = load_json(state_path, {})
 
     assignment_path = f"docs/coordination/assignments/{args.host}.json"
-    assignment = read_coord_json(args.repo_slug, assignment_path)
-    if not assignment.get("enabled"):
+    root_assignment = read_coord_json(args.repo_slug, assignment_path)
+    if not root_assignment.get("enabled"):
         return 0
-    if assignment.get("host_alias") != args.host or assignment.get("session_id") != args.session or assignment.get("branch") != args.branch:
+    if root_assignment.get("host_alias") != args.host or root_assignment.get("session_id") != args.session or root_assignment.get("branch") != args.branch:
         raise RuntimeError("assignment_identity_mismatch")
 
-    key = f"{assignment.get('assignment_id')}:{assignment.get('generation')}"
-    if state.get("last_completed_key") == key or state.get("last_started_key") == key:
-        return 0
+    completed_items = set(state.get("completed_item_keys") or [])
+    items = root_assignment.get("items")
+    if isinstance(items, list) and items:
+        assignment = None
+        key = None
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            candidate = f"{root_assignment.get('assignment_id')}:{root_assignment.get('generation')}:{item.get('packet_id')}"
+            if candidate in completed_items:
+                continue
+            if state.get("last_started_key") == candidate and state.get("last_completed_key") != candidate:
+                # A failed/blocked item requires an explicit new assignment generation.
+                return 0
+            assignment = {**root_assignment, **item}
+            key = candidate
+            break
+        if assignment is None or key is None:
+            return 0
+    else:
+        assignment = root_assignment
+        key = f"{assignment.get('assignment_id')}:{assignment.get('generation')}"
+        if state.get("last_completed_key") == key or state.get("last_started_key") == key:
+            return 0
 
-    max_seconds = int(assignment.get("max_runtime_seconds") or 1800)
+    max_seconds = int(assignment.get("max_runtime_seconds") or root_assignment.get("max_runtime_seconds") or 1800)
     if not acquire_lock(lock_path, max_seconds + 900):
         return 0
 
@@ -241,7 +262,16 @@ def main() -> int:
             write_private(state_path, state)
             return 6
 
-        state.update({"last_completed_key": key, "last_completed_at": utc_now(), "remote_sha": after, "last_exit_code": 0})
+        completed_items = list(state.get("completed_item_keys") or [])
+        if key not in completed_items:
+            completed_items.append(key)
+        state.update({
+            "last_completed_key": key,
+            "completed_item_keys": completed_items,
+            "last_completed_at": utc_now(),
+            "remote_sha": after,
+            "last_exit_code": 0,
+        })
         write_private(state_path, state)
         heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="review_requested", note=f"autonomous assignment complete remote_sha={after[:12]}")
         return 0
