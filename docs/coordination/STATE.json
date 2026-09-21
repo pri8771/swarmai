@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T01:45:00Z",
+  "updated_at": "2026-09-21T01:48:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -83,7 +83,7 @@
       "provider_eligibility": "verified_zero_admissible_remotes",
       "admissible_remote_routes": 0,
       "remote_overlap": "blocked",
-      "local_fallback_and_reconciliation": "reviewable_needs_rebind_review"
+      "local_fallback_and_reconciliation": "drafting_historical_stubbed_evidence_demoted_current_tip_real_local_revalidation_assigned_V2C-001"
     },
     "1.3": {
       "status": "not_accepted",
@@ -148,7 +148,9 @@
   ],
   "reviewed_this_heartbeat": {
     "V2A-020a": "accepted_packet_artifact_remains_drafting",
-    "V2A-H6A": "changes_required_secret_file_permissions_and_force_overwrite_semantics"
+    "V2A-H6A": "changes_required_secret_file_permissions_and_force_overwrite_semantics",
+    "ART-V12-LOCAL-FALLBACK": "demoted_to_drafting_stale_stubbed_evidence",
+    "ART-V12-ADMISSION-RECONCILIATION": "demoted_to_drafting_stale_stubbed_evidence"
   },
   "blocked_worker_packets": {
     "W-041A": "human Cursor CLI login required for V1.0 heartbeat acceptance",
@@ -176,7 +178,8 @@
     "ART-V15-LEASE-FENCING needs V2A-003b-R then result-acceptance fencing",
     "ART-V20 foundation hardening H6A needs secret-file permission and overwrite/rotation semantics repair",
     "Session B has ready work but no new source activity was observed",
-    "V2.0 acceptance cannot be honestly completed until all required artifacts and wall-clock evidence exist"
+    "V2.0 acceptance cannot be honestly completed until all required artifacts and wall-clock evidence exist",
+    "ART-V12 local fallback/reconciliation require current-tip actual local-model revalidation; historical stubbed broker evidence is prep only"
   ],
   "protected_boundaries": {
     "runtime_demo_data_allowed": false,
