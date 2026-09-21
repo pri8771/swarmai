@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T02:08:00Z",
+  "updated_at": "2026-09-21T02:22:30Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
@@ -25,7 +25,7 @@
       "last_heartbeat_at": null,
       "consecutive_valid_15m": 0,
       "verified_timestamps": [],
-      "status": "awaiting_heartbeat"
+      "status": "awaiting_first_heartbeat_after_pull"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
@@ -33,15 +33,15 @@
       "last_heartbeat_at": null,
       "consecutive_valid_15m": 0,
       "verified_timestamps": [],
-      "status": "awaiting_heartbeat"
+      "status": "awaiting_first_heartbeat_after_pull"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": null,
+    "last_review_at": "2026-09-21T02:22:30Z",
     "last_notified_worker_sha": {
-      "A": null,
+      "A": "e764834a69315d1c2c85f00322c3392aa5037fd9",
       "B": null
     },
     "note": "Lead cannot be scheduled every 15 minutes; it validates complete worker heartbeat history hourly."
