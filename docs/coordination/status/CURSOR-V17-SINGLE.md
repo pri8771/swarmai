@@ -3,10 +3,10 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `17bf3a1c939df291023048b59bfcec6c2805eae6`
-- Coordination SHA: `6a2dfb66539ed7cc6f190f354830036cd2131c9b`
-- Updated: `2026-09-21T18:20:02Z`
-- Trigger: `manual`
+- Branch SHA: `4224b9071360d52a8593f4b8cd16485d13778f80`
+- Coordination SHA: `174aa15c599aa6cc971b33ea7338dd6e749fc146`
+- Updated: `2026-09-21T18:23:03Z`
+- Trigger: `scheduler`
 - Status: **testing**
 - Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
