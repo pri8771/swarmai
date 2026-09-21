@@ -1,19 +1,21 @@
 # SwarmAI worker packet backlog
 
-Updated: 2026-09-21T01:24:30Z. `ARTIFACT_REGISTRY.json` is canonical. Packets only advance artifacts; story points describe complexity/risk, never hours. Workers do not self-accept artifacts.
+Updated: 2026-09-21T01:34:00Z. `ARTIFACT_REGISTRY.json` is canonical. Packets only advance artifacts; story points describe complexity/risk, never hours. Workers do not self-accept artifacts.
 
 ## Latest lead reviews
 
 - **V2A-001 / ART-V12-BROKER-CONTRACT / SP2 — lead verified.** Source `c3df96ef074568e7a92dd2f6c6bfd070fe5374f3`; CI `35548643473` green.
 - **V2A-002 / ART-V11-RESTART-EVIDENCE / SP1 — lead verified.** Source `48a02e3daae13f8fb569225e2d030097229f4780`; evidence `ee5a06612aa2e4409fa8bbfd1969225c16887615`; CI `35549111809` green.
 - **V2A-003a / ART-V15-LEASE-FENCING / SP2 — first review changes required.** Source `630ab780ab45858c5dad4075be143cfa145e975f`; evidence `37f95fe63a1bf451f5d513855a7fcf1bb37d3d9b`. Required real previous-schema migration proof, token rotate/revoke lifecycle and recursive token-metadata protection.
-- **V2A-003a-R / SP1 — repair packet lead verified.** Source `92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2`; evidence tip `8e2c9754c9f64aa0e68e4fe5de47d646713a5413`. Source/evidence prove Alembic upgrade from populated `9eb193b10f4e`, unknown project ownership remains null, token rotation invalidates the old credential, revocation fences the new credential, and nested token metadata is rejected. Current descendant tip `2ea443395590f047b3e2889787250084433f7f31` has CI `35550277430` green. This verifies the **foundation repair packet**, not the whole lease-fencing artifact.
-- **V2A-003b / ART-V15-LEASE-FENCING / SP2 — changes required.** Source `7dcefe4c72ae9ada2ff512adeaf65eefa28632e2`; evidence bind `f55f8078b73597892b6dcddc2e41ac947d3c904e`. The later `2ea4433...` import-only fix made current-tip CI green, but source-review defects remain: claim does not validate current mission cancellation/status/source authority; renew does not require current worker project == lease project; fixed 32-row candidate scan can still block eligible task #33. Artifact remains drafting.
+- **V2A-003a-R / SP1 — repair packet lead verified.** Source `92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2`; evidence tip `8e2c9754c9f64aa0e68e4fe5de47d646713a5413`. Source/evidence prove Alembic upgrade from populated `9eb193b10f4e`, unknown project ownership remains null, token rotation invalidates the old credential, revocation fences the new credential, and nested token metadata is rejected. This verifies the foundation repair packet, not the whole lease-fencing artifact.
+- **V2A-003b / ART-V15-LEASE-FENCING / SP2 — changes required.** Source `7dcefe4c72ae9ada2ff512adeaf65eefa28632e2`; evidence bind `f55f8078b73597892b6dcddc2e41ac947d3c904e`. Source-review defects remain: claim does not validate current mission cancellation/status/source authority; renew does not require current worker project == lease project; fixed 32-row candidate scan can still block eligible task #33. Artifact remains drafting.
+- **V2A-H6A / ART-V20-FOUNDATION-HARDENING / SP2 — changes required.** Implementation `77ef7e4c1675b74dbfcdeba27f8c955ae39f119c`; evidence bind `99733dccd91fc2b8356f96ff755f9b9aab20f2b4`; current tip `7a2491a2840ef8381e275b05e11f3f76c7a522e6`; CI `35550769734` green. Fixed credentials were removed and compose fails closed, but the generated secret-bearing `deploy/compose/.env` is not explicitly owner-only and `--force` is not guarded/documented against initialized-volume credential mismatch. Repair is V2A-H6A-R.
+- **V2A-020a / ART-V20-INTEGRATED-CANDIDATE / SP1 — lead accepted.** Integration receipt `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code baseline `ee5a06612aa2e4409fa8bbfd1969225c16887615`, CI `35550653160` green. It correctly integrated only lead-reviewed V2A-001/V2A-002 lineage and left V15 out because its ancestry still contains unreviewed 003b behavior. The artifact remains **drafting**; this packet only establishes a clean reviewed integration baseline.
 - Legacy intents `W-122A` and `W-111C` are superseded by V2A-001/V2A-002; do not double-count.
 
 ## Session A — runtime/control-plane/integration
 
-Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store/routes/schemas/CLI/lockfile/migrations. Current reviewed runtime descendant: `2ea443395590f047b3e2889787250084433f7f31`; CI `35550277430` green. **Do not treat V2A-003b as accepted just because CI is green.**
+Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store/routes/schemas/CLI/lockfile/migrations. Current runtime tip: `7a2491a2840ef8381e275b05e11f3f76c7a522e6`, CI `35550769734` green. Current integration tip: `9ce727842446b98cfa55c28c7e70808f57f17d7b`, CI `35550653160` green. **Do not treat V2A-003b as accepted merely because descendants are green.** Integration must continue to import only independently reviewed slices.
 
 ### READY A0 — V2A-003b-R — repair claim/renew/expire fencing
 - Artifact: `ART-V15-LEASE-FENCING`
@@ -22,42 +24,47 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
 - Base: current runtime-lane descendant containing verified V2A-003a-R.
 - Required changes:
   1. Before creating an attempt/lease, validate current mission exists, is runnable/not cancelled, and task mission/project/graph/source/cancellation authority is still current. Failing any check must leave task/attempt/lease state unmutated.
-  2. `renew_lease` must require the durable worker's **current project** to equal the lease project as well as matching worker ID, generation and token; project reassignment cannot renew an old-project lease.
+  2. `renew_lease` must require the durable worker's current project to equal the lease project as well as matching worker ID, generation and token; project reassignment cannot renew an old-project lease.
   3. Remove the `_CLAIM_CANDIDATE_BATCH=32` head-of-line correctness limit. Safely paginate/filter until an eligible row is found or the current eligible set is exhausted; add a regression with >32 incompatible higher-priority rows followed by an eligible row.
   4. Preserve exactly-one-winner race, capability/privacy skip, renew/expire persistence and fail-closed behavior.
 - Acceptance: direct negative tests for cancellation/source/project staleness, >32 HOL regression, focused DB tests, and full exact-tip CI green. No result acceptance fence or API route wiring is silently folded in.
 
-### SUBMITTED A1 — V2A-H6A — deployment secret/runtime-mode hardening
-- Status: **submitted reviewable** @ `77ef7e4c1675b74dbfcdeba27f8c955ae39f119c` / tip `7a2491a2840ef8381e275b05e11f3f76c7a522e6` CI `35550769734` (not self-accepted).
+### READY A1 — V2A-H6A-R — secret-file and overwrite-safety repair
 - Artifacts: `ART-V20-FOUNDATION-HARDENING`, `ART-V18-DEPLOYMENT-MANIFEST`, `ART-V19-INSTALL-UPGRADE`
-- SP2
-- Separate write surfaces from A0: deploy/compose/runtime config and focused deploy tests/docs.
-- Remove fixed normal-mode DB password; explicit generated/operator secret/ref; operational empty/unconfigured default; explicit private/loopback exposure; real compose config/health smoke without public-deployment claim.
-
-### SUBMITTED A2 — V2A-020a — start V2 integration candidate from verified commits only
-- Status: **submitted drafting** @ `9ce727842446b98cfa55c28c7e70808f57f17d7b` (code `ee5a06612aa2e4409fa8bbfd1969225c16887615`) CI `35550653160`; excluded 003a-R/003b.
-- Artifact: `ART-V20-INTEGRATED-CANDIDATE`
 - SP1
-- Intended transition: `planned -> drafting`.
-- Branch: `cursor/v2-integration`.
-- Integrate only lead-verified V2A-001 `c3df96e`, V2A-002 `48a02e3` + evidence `ee5a066`, and verified V2A-003a-R foundation source `92f59fa` **without** importing unreviewed V2A-003b behavior. If selective integration cannot separate the repair cleanly from 003b ancestry, leave the V15 foundation out until 003b-R is reviewed rather than importing unreviewed code.
-- Run full available offline/backend/console/migration CI and record integration receipt with source commits/conflict decisions/exact integration SHA. No main merge.
+- Base: H6A source slice `77ef7e4c...` / current runtime descendant `7a2491a...`; keep this deploy/config repair separable from unreviewed V15 behavior for later cherry-pick/integration.
+- Required changes:
+  1. Generated `deploy/compose/.env` contains a database credential. Write it owner-only (`0600` on POSIX) and verify permissions in a deterministic test. Existing secret files repaired/overwritten by this helper must not remain group/world-readable.
+  2. `--force` must not imply safe credential rotation for an already initialized Postgres volume. Guard or explicitly rename/require acknowledgement so a fresh generated password cannot silently desynchronize the DSN/container env from an existing database role. Never print the secret.
+  3. Preserve current fail-closed DSN, loopback API bind, no host DB port, required compose vars and green compose-config smoke.
+  4. Rebind sanitized evidence to the repaired source and exact-tip CI.
+- Acceptance: focused deployment tests plus full exact-tip CI green; evidence says local/private hardening only and makes no public deployment/rotation claim.
 
-### FOLLOW-ON A3 — V2A-003c — result acceptance fence
+### READY A2 — V2A-003X — DBOS reuse spike
+- Artifact: `ART-V15-ARCH` / implementation-choice evidence for durable execution
+- SP2
+- Isolated spike only; no production queue replacement in this packet. Keep writes outside Session-A shared production schema unless the spike produces a reviewed delta.
+- Inspect the installed DBOS version/API actually pinned in the environment, then build a minimal isolated proof for durable enqueue/claim or workflow restart semantics, crash/restart behavior, duplicate delivery expectations, and how Swarm lease/source/cancellation fences would map to it.
+- Compare reuse against the existing SQLAlchemy/Postgres durable repository on complexity, recovery semantics, observability and migration risk. Do not claim DBOS solves Swarm-specific fencing without evidence.
+- Acceptance: exact installed version/API refs, reproducible isolated tests, restart/stale-fence observations, and an ADR recommendation (`reuse`, `partial reuse`, or `do not adopt`) with explicit gaps. No source migration or V1.5 acceptance in this spike.
+
+### REVIEWED A3 — V2A-020a — integration baseline
+- Packet lead accepted at `9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
+- Artifact remains `ART-V20-INTEGRATED-CANDIDATE = drafting`.
+- Next integration packet should only import newly lead-reviewed slices. Do not merge the runtime branch wholesale while 003b remains unreviewed.
+
+### FOLLOW-ON A4 — V2A-003c — result acceptance fence
 SP2; depends A0 review. Reject stale worker generation/lease/task revision/input/source/cancellation and duplicates; exactly one accepted result.
 
-### FOLLOW-ON A4 — V2A-004 — durable worker service/client
-SP3; depends A3. Registration/heartbeat/claim/result/drain against durable store with restart-safe tests.
-
-### FOLLOW-ON A5 — V2A-003X — DBOS reuse spike
-SP2; may proceed after stable repaired durable repository foundation. Verify installed DBOS API/version and isolated queue/restart/stale-fence behavior before ADR decision.
+### FOLLOW-ON A5 — V2A-004 — durable worker service/client
+SP3; depends A4. Registration/heartbeat/claim/result/drain against durable store with restart-safe tests.
 
 ### LATER A6 — V2A-018a/b/c/d
 Site epoch, backup, restore/reconcile and stale-site fence; blocked on durable worker/control store. Source implementation is authorized, public deployment is not.
 
 ## Session B — evaluation/knowledge/tools/product/beta
 
-Owns `cursor/v2-product-lane`. Do not edit shared Session-A API/store/routes/schemas/CLI/lockfile/migration surfaces; hand central migration deltas to Session A. No Session B source change was observed in this lead heartbeat.
+Owns `cursor/v2-product-lane`. Current branch remains `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea`; **no Session B source change or worker message was observed in this heartbeat.** Do not fabricate activity. Session B must not edit shared Session-A API/store/routes/schemas/CLI/lockfile/migration surfaces; hand central migration deltas to Session A.
 
 ### READY B1 — V2B-001 / W-131C1 — freeze qualification pool/version manifest
 - Artifact: `ART-V13-TASK-POOL`; SP2; `drafting -> reviewable`.
@@ -88,7 +95,9 @@ Permission-first retrieval -> supersession/deletion -> ToolGateway/effect-key se
 
 ## Lead parallel artifacts
 
-Lead continues architecture/acceptance/research rather than routine source implementation. `ART-V23-MULTIMISSION-OPS` now includes durable queue state, weighted-deficit invariants, anti-gaming, cross-resource DispatchIntent compensation, scheduler-epoch fencing, explain receipts and a preregisterable fairness design. V1.8 recovery, V2.0 security/reliability and V3 objective/learning contracts remain active lead lanes.
+Lead continues architecture/acceptance/research rather than routine source implementation. `ART-V30-LEARNING-GOVERNANCE` was advanced this heartbeat with a formal proposal state machine, held-out contamination rules, preregistered selection/statistical discipline, protected-authority boundaries, deterministic rollback/fencing requirements, drift/revalidation rules and an explicit governance acceptance protocol. This is future architecture, not V3 acceptance or source implementation.
+
+`ART-V23-MULTIMISSION-OPS`, V1.8 recovery, V2.0 security/reliability and V3 persistent-objective contracts remain active lead lanes.
 
 ## Queue rule
 
