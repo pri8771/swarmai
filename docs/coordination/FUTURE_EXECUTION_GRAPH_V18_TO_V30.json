@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1",
   "generated_at": "2026-09-21",
-  "status": "planning_only__proposed_revision_by_fable_planning_pass",
+  "status": "planning_only_lead_approved_not_active_until_dependencies",
   "scope": "V1.8_to_V3.0",
   "note": "Not an active queue. `packets` are coarse phase groups; each lists `maps_to` execution IDs. Execution IDs for V1.8-V2.3 live in V17_TO_V23_PACKET_QUEUE.json; execution IDs for V3.0 are `v30_packets` below. V30A-* are canonical (ART-V30-OBJECTIVE-CONTRACT). Entries with proposed=true are a proposed packetization that the lead must freeze before assignment. Canonical ARTIFACT_REGISTRY and current source must be reread before execution.",
   "packets": [
@@ -1088,5 +1088,6 @@
         "V3.0 accepted"
       ]
     }
-  ]
+  ],
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
 }
