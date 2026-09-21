@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T01:48:00Z",
+  "updated_at": "2026-09-21T01:52:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -142,9 +142,7 @@
     "V2B-001",
     "V2B-002",
     "V2B-003a",
-    "V2B-004a",
-    "V2C-001",
-    "V2C-002"
+    "V2B-004a"
   ],
   "reviewed_this_heartbeat": {
     "V2A-020a": "accepted_packet_artifact_remains_drafting",
@@ -189,7 +187,7 @@
     "credentials_or_private_identity_in_git": false,
     "paid_fallback_authorized": false
   },
-  "product_status": "v2_acceleration_three_lane_ready_artifact_first",
+  "product_status": "v2_acceleration_two_active_lanes_lead_verification",
   "implementation_stop": {
     "status": "superseded_by_owner_resume",
     "prior_stop_record": "docs/coordination/V1_4_ABRUPT_STOP.md",
@@ -210,7 +208,7 @@
   },
   "team": {
     "lead": "ChatGPT",
-    "cursor_sessions": 3,
+    "cursor_sessions": 2,
     "integration_branch": "cursor/v2-integration",
     "session_a": {
       "role": "runtime_control_plane_integration",
@@ -226,16 +224,18 @@
       "bootstrap_state": "fresh_windows_no_repo_or_toolchain_assumed"
     },
     "contract": "docs/coordination/TWO_CURSOR_TEAM.md",
-    "active_or_available_sessions": 3,
+    "active_or_available_sessions": 2,
     "session_c": {
       "role": "verification_reliability_security_spikes",
       "host_alias": "HOST-MAC-VERIFY",
       "branch": "cursor/v2-verification-lane",
       "prompt": "docs/coordination/CURSOR_MAC_VERIFICATION_PROMPT.md",
       "source_ownership": "tests_scripts_spikes_evidence_only_by_default",
-      "status": "ready_to_start"
+      "status": "dormant_available_not_started",
+      "activation_rule": "Start only when a concrete independent bottleneck/task justifies it; do not start merely to fill capacity."
     }
   },
   "execution_plan": "docs/coordination/V2_EXECUTION_PLAN.md",
-  "artifact_registry": "docs/coordination/ARTIFACT_REGISTRY.json"
+  "artifact_registry": "docs/coordination/ARTIFACT_REGISTRY.json",
+  "lead_operating_rule": "ChatGPT handles verification/review directly while Mac A and Windows B implement. A third Cursor session stays dormant until there is a concrete need."
 }
