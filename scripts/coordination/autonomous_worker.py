@@ -27,8 +27,12 @@ def utc_now() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
-def run(argv: list[str], *, cwd: Path | None = None, timeout: int = 60, stdin: str | None = None) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(argv, cwd=cwd, input=stdin, text=True, capture_output=True, timeout=timeout, check=False)
+def run(
+    argv: list[str], *, cwd: Path | None = None, timeout: int = 60, stdin: str | None = None
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        argv, cwd=cwd, input=stdin, text=True, capture_output=True, timeout=timeout, check=False
+    )
 
 
 def require_ok(proc: subprocess.CompletedProcess[str], label: str) -> str:
@@ -109,16 +113,37 @@ def acquire_lock(path: Path, stale_seconds: int) -> bool:
     return True
 
 
-def heartbeat(workspace: Path, *, host: str, session: str, branch: str, assignment: dict, status: str, note: str) -> None:
+def heartbeat(
+    workspace: Path,
+    *,
+    host: str,
+    session: str,
+    branch: str,
+    assignment: dict,
+    status: str,
+    note: str,
+) -> None:
     hb = workspace / "scripts" / "coordination" / "heartbeat.py"
     if not hb.exists():
         return
     argv = [
-        sys.executable, str(hb),
-        "--host", host, "--session", session, "--branch", branch,
-        "--packet", str(assignment.get("packet_id") or assignment.get("assignment_id") or "autonomous"),
-        "--artifact", str(assignment.get("artifact_id") or "ART-OPS-AUTONOMY"),
-        "--status", status, "--note", note[:280], "--force",
+        sys.executable,
+        str(hb),
+        "--host",
+        host,
+        "--session",
+        session,
+        "--branch",
+        branch,
+        "--packet",
+        str(assignment.get("packet_id") or assignment.get("assignment_id") or "autonomous"),
+        "--artifact",
+        str(assignment.get("artifact_id") or "ART-OPS-AUTONOMY"),
+        "--status",
+        status,
+        "--note",
+        note[:280],
+        "--force",
     ]
     run(argv, cwd=workspace, timeout=60)
 
@@ -127,35 +152,127 @@ def git(workspace: Path, *args: str, timeout: int = 90) -> subprocess.CompletedP
     return run(["git", "-C", str(workspace), *args], timeout=timeout)
 
 
+def assignment_identity_ok(root: dict, host: str, session: str, branch: str) -> bool:
+    return (
+        root.get("host_alias") == host
+        and root.get("session_id") == session
+        and root.get("branch") == branch
+    )
+
+
+def item_key(root_assignment: dict, packet_id: object | None = None) -> str:
+    aid = root_assignment.get("assignment_id")
+    gen = root_assignment.get("generation")
+    if packet_id is None:
+        return f"{aid}:{gen}"
+    return f"{aid}:{gen}:{packet_id}"
+
+
+def select_next_item(root_assignment: dict, state: dict) -> tuple[dict | None, str | None, str]:
+    """Select at most one packet. reason: selected|exhausted|wait_generation|disabled."""
+    if not root_assignment.get("enabled"):
+        return None, None, "disabled"
+    completed_items = set(state.get("completed_item_keys") or [])
+    items = root_assignment.get("items")
+    if isinstance(items, list) and items:
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            candidate = item_key(root_assignment, item.get("packet_id"))
+            if candidate in completed_items:
+                continue
+            started = state.get("last_started_key") == candidate
+            finished = state.get("last_completed_key") == candidate
+            if started and not finished:
+                return None, candidate, "wait_generation"
+            return {**root_assignment, **item}, candidate, "selected"
+        return None, None, "exhausted"
+    assignment = root_assignment
+    key = item_key(assignment)
+    if state.get("last_completed_key") == key:
+        return None, key, "exhausted"
+    if state.get("last_started_key") == key:
+        return None, key, "wait_generation"
+    return assignment, key, "selected"
+
+
+def preflight_block_reason(branch_now: str, expected_branch: str, dirty: str) -> str | None:
+    if branch_now != expected_branch:
+        return f"wrong_branch:{branch_now}"
+    if dirty.strip():
+        return "autonomous_runner_dirty_worktree"
+    return None
+
+
+def post_agent_block_reason(*, dirty_after: str, after: str, before: str) -> str | None:
+    if dirty_after.strip():
+        return "dirty_after_agent"
+    if after == before:
+        return "no_remote_change"
+    return None
+
+
 def build_prompt(assignment: dict, host: str, session: str, branch: str) -> str:
-    instruction = str(assignment.get("instruction_path") or "docs/coordination/WORKER_PACKET_BACKLOG.md")
-    return f"""You are SwarmAI Cursor Session {session} on {host}. Execute exactly ONE repo-assigned packet and then stop.
-
-ASSIGNMENT ID: {assignment.get('assignment_id')}
-GENERATION: {assignment.get('generation')}
-PACKET: {assignment.get('packet_id')}
-ARTIFACT: {assignment.get('artifact_id')}
-BRANCH: {branch}
-INSTRUCTION PATH: {instruction}
-
-Start by reading SESSION_INSTRUCTIONS.md in this branch and fetching current coordination state. Read the assignment source with:
-git show origin/{COORD_BRANCH}:{instruction}
-Also read current ARTIFACT_REGISTRY.json, WORK_QUEUE.md, WORKER_PACKET_BACKLOG.md, HEARTBEAT_STATE.json, and newest AGENT_MESSAGES.md from origin/{COORD_BRANCH}.
-
-Rules:
-- execute exactly this assignment generation; do not choose a second packet;
-- preserve existing work and ownership boundaries;
-- no main merge, force push, public deploy, release, paid fallback or additional spend;
-- no mock success, known-answer substitution, hidden-answer leakage or fabricated evidence;
-- run the focused checks/tests required by the packet;
-- if a human-only login/MFA/consent barrier exists, do not bypass it; report the precise blocker;
-- do not self-accept any artifact;
-- commit only owned files with artifact/packet in the commit message;
-- push to the assigned branch {branch};
-- leave the worktree clean after a successful push;
-- produce exact source/evidence refs in your final response.
-
-Do not ask the operator routine questions. Make the best bounded implementation possible and stop after this one packet."""
+    instruction = str(
+        assignment.get("instruction_path") or "docs/coordination/WORKER_PACKET_BACKLOG.md"
+    )
+    intro = (
+        f"You are SwarmAI Cursor Session {session} on {host}. "
+        "Execute exactly ONE repo-assigned packet and then stop."
+    )
+    start = (
+        "Start by reading SESSION_INSTRUCTIONS.md in this branch and fetching "
+        "current coordination state. Read the assignment source with:"
+    )
+    also = (
+        "Also read current ARTIFACT_REGISTRY.json, WORK_QUEUE.md, "
+        "WORKER_PACKET_BACKLOG.md, HEARTBEAT_STATE.json, and newest "
+        f"AGENT_MESSAGES.md from origin/{COORD_BRANCH}."
+    )
+    close = (
+        "Do not ask the operator routine questions. Make the best bounded "
+        "implementation possible and stop after this one packet."
+    )
+    return "\n".join(
+        [
+            intro,
+            "",
+            f"ASSIGNMENT ID: {assignment.get('assignment_id')}",
+            f"GENERATION: {assignment.get('generation')}",
+            f"PACKET: {assignment.get('packet_id')}",
+            f"ARTIFACT: {assignment.get('artifact_id')}",
+            f"BRANCH: {branch}",
+            f"INSTRUCTION PATH: {instruction}",
+            "",
+            start,
+            f"git show origin/{COORD_BRANCH}:{instruction}",
+            also,
+            "",
+            "Rules:",
+            "- execute exactly this assignment generation; do not choose a second packet;",
+            "- preserve existing work and ownership boundaries;",
+            (
+                "- no main merge, force push, public deploy, release, paid fallback "
+                "or additional spend;"
+            ),
+            (
+                "- no mock success, known-answer substitution, hidden-answer leakage "
+                "or fabricated evidence;"
+            ),
+            "- run the focused checks/tests required by the packet;",
+            (
+                "- if a human-only login/MFA/consent barrier exists, do not bypass it; "
+                "report the precise blocker;"
+            ),
+            "- do not self-accept any artifact;",
+            "- commit only owned files with artifact/packet in the commit message;",
+            f"- push to the assigned branch {branch};",
+            "- leave the worktree clean after a successful push;",
+            "- produce exact source/evidence refs in your final response.",
+            "",
+            close,
+        ]
+    )
 
 
 def main() -> int:
@@ -178,102 +295,164 @@ def main() -> int:
     root_assignment = read_coord_json(args.repo_slug, assignment_path)
     if not root_assignment.get("enabled"):
         return 0
-    if root_assignment.get("host_alias") != args.host or root_assignment.get("session_id") != args.session or root_assignment.get("branch") != args.branch:
+    if not assignment_identity_ok(root_assignment, args.host, args.session, args.branch):
         raise RuntimeError("assignment_identity_mismatch")
+    assignment, key, reason = select_next_item(root_assignment, state)
+    if reason != "selected" or assignment is None or key is None:
+        return 0
 
-    completed_items = set(state.get("completed_item_keys") or [])
-    items = root_assignment.get("items")
-    if isinstance(items, list) and items:
-        assignment = None
-        key = None
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            candidate = f"{root_assignment.get('assignment_id')}:{root_assignment.get('generation')}:{item.get('packet_id')}"
-            if candidate in completed_items:
-                continue
-            if state.get("last_started_key") == candidate and state.get("last_completed_key") != candidate:
-                # A failed/blocked item requires an explicit new assignment generation.
-                return 0
-            assignment = {**root_assignment, **item}
-            key = candidate
-            break
-        if assignment is None or key is None:
-            return 0
-    else:
-        assignment = root_assignment
-        key = f"{assignment.get('assignment_id')}:{assignment.get('generation')}"
-        if state.get("last_completed_key") == key or state.get("last_started_key") == key:
-            return 0
-
-    max_seconds = int(assignment.get("max_runtime_seconds") or root_assignment.get("max_runtime_seconds") or 1800)
+    max_seconds = int(
+        assignment.get("max_runtime_seconds") or root_assignment.get("max_runtime_seconds") or 1800
+    )
     if not acquire_lock(lock_path, max_seconds + 900):
         return 0
 
     try:
         branch_now = require_ok(git(workspace, "branch", "--show-current"), "git_branch").strip()
-        if branch_now != args.branch:
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note=f"wrong_branch:{branch_now}")
-            return 2
-
         dirty = require_ok(git(workspace, "status", "--porcelain"), "git_status").strip()
-        if dirty:
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note="autonomous_runner_dirty_worktree")
+        blocked = preflight_block_reason(branch_now, args.branch, dirty)
+        if blocked:
+            heartbeat(
+                workspace,
+                host=args.host,
+                session=args.session,
+                branch=args.branch,
+                assignment=assignment,
+                status="blocked",
+                note=blocked,
+            )
             return 2
 
         require_ok(git(workspace, "fetch", "--all", "--prune", timeout=120), "git_fetch")
-        require_ok(git(workspace, "pull", "--ff-only", "origin", args.branch, timeout=120), "git_pull")
-        before = require_ok(git(workspace, "rev-parse", f"origin/{args.branch}"), "git_before").strip()
+        require_ok(
+            git(workspace, "pull", "--ff-only", "origin", args.branch, timeout=120), "git_pull"
+        )
+        before = require_ok(
+            git(workspace, "rev-parse", f"origin/{args.branch}"), "git_before"
+        ).strip()
 
-        agent = os.environ.get("SWARM_AGENT_PATH") or shutil.which("agent") or shutil.which("cursor-agent")
+        agent = (
+            os.environ.get("SWARM_AGENT_PATH")
+            or shutil.which("agent")
+            or shutil.which("cursor-agent")
+        )
         if not agent:
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note="cursor_cli_missing_run_agent_install")
+            heartbeat(
+                workspace,
+                host=args.host,
+                session=args.session,
+                branch=args.branch,
+                assignment=assignment,
+                status="blocked",
+                note="cursor_cli_missing_run_agent_install",
+            )
             return 3
 
-        state.update({"last_started_key": key, "last_started_at": utc_now(), "assignment": assignment})
+        state.update(
+            {"last_started_key": key, "last_started_at": utc_now(), "assignment": assignment}
+        )
         write_private(state_path, state)
-        heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="autonomous_working", note=f"assignment={key}")
+        heartbeat(
+            workspace,
+            host=args.host,
+            session=args.session,
+            branch=args.branch,
+            assignment=assignment,
+            status="autonomous_working",
+            note=f"assignment={key}",
+        )
 
         prompt = build_prompt(assignment, args.host, args.session, args.branch)
-        proc = run([agent, "-p", "--workspace", str(workspace), "--output-format", "json", prompt], cwd=workspace, timeout=max_seconds)
-        write_private(log_path, {"at": utc_now(), "returncode": proc.returncode, "stdout": (proc.stdout or "")[-12000:], "stderr": (proc.stderr or "")[-4000:]})
+        proc = run(
+            [agent, "-p", "--workspace", str(workspace), "--output-format", "json", prompt],
+            cwd=workspace,
+            timeout=max_seconds,
+        )
+        write_private(
+            log_path,
+            {
+                "at": utc_now(),
+                "returncode": proc.returncode,
+                "stdout": (proc.stdout or "")[-12000:],
+                "stderr": (proc.stderr or "")[-4000:],
+            },
+        )
 
         if proc.returncode != 0:
             state.update({"last_exit_code": proc.returncode, "last_failed_at": utc_now()})
             write_private(state_path, state)
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note=f"cursor_agent_exit_{proc.returncode}; check local runner log; lead may increment generation")
+            heartbeat(
+                workspace,
+                host=args.host,
+                session=args.session,
+                branch=args.branch,
+                assignment=assignment,
+                status="blocked",
+                note=(
+                    f"cursor_agent_exit_{proc.returncode}; "
+                    "check local runner log; lead may increment generation"
+                ),
+            )
             return proc.returncode or 4
 
         # The agent is responsible for committing/pushing. Verify that it left a clean
         # worktree and that the remote worker branch advanced.
         require_ok(git(workspace, "fetch", "origin", args.branch, timeout=120), "git_fetch_after")
-        after = require_ok(git(workspace, "rev-parse", f"origin/{args.branch}"), "git_after").strip()
-        dirty_after = require_ok(git(workspace, "status", "--porcelain"), "git_status_after").strip()
+        after = require_ok(
+            git(workspace, "rev-parse", f"origin/{args.branch}"), "git_after"
+        ).strip()
+        dirty_after = require_ok(
+            git(workspace, "status", "--porcelain"), "git_status_after"
+        ).strip()
 
-        if dirty_after:
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note="agent_left_uncommitted_changes; manual_or_lead_review_required")
-            state.update({"last_exit_code": 0, "last_blocked_at": utc_now(), "blocked_reason": "dirty_after_agent"})
+        blocked_after = post_agent_block_reason(dirty_after=dirty_after, after=after, before=before)
+        if blocked_after:
+            note = (
+                "agent_left_uncommitted_changes; manual_or_lead_review_required"
+                if blocked_after == "dirty_after_agent"
+                else "agent_completed_without_remote_branch_change"
+            )
+            heartbeat(
+                workspace,
+                host=args.host,
+                session=args.session,
+                branch=args.branch,
+                assignment=assignment,
+                status="blocked",
+                note=note,
+            )
+            state.update(
+                {
+                    "last_exit_code": 0,
+                    "last_blocked_at": utc_now(),
+                    "blocked_reason": blocked_after,
+                }
+            )
             write_private(state_path, state)
-            return 5
-
-        if after == before:
-            heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="blocked", note="agent_completed_without_remote_branch_change")
-            state.update({"last_exit_code": 0, "last_blocked_at": utc_now(), "blocked_reason": "no_remote_change"})
-            write_private(state_path, state)
-            return 6
+            return 5 if blocked_after == "dirty_after_agent" else 6
 
         completed_items = list(state.get("completed_item_keys") or [])
         if key not in completed_items:
             completed_items.append(key)
-        state.update({
-            "last_completed_key": key,
-            "completed_item_keys": completed_items,
-            "last_completed_at": utc_now(),
-            "remote_sha": after,
-            "last_exit_code": 0,
-        })
+        state.update(
+            {
+                "last_completed_key": key,
+                "completed_item_keys": completed_items,
+                "last_completed_at": utc_now(),
+                "remote_sha": after,
+                "last_exit_code": 0,
+            }
+        )
         write_private(state_path, state)
-        heartbeat(workspace, host=args.host, session=args.session, branch=args.branch, assignment=assignment, status="review_requested", note=f"autonomous assignment complete remote_sha={after[:12]}")
+        heartbeat(
+            workspace,
+            host=args.host,
+            session=args.session,
+            branch=args.branch,
+            assignment=assignment,
+            status="review_requested",
+            note=f"autonomous assignment complete remote_sha={after[:12]}",
+        )
         return 0
     finally:
         lock_path.unlink(missing_ok=True)

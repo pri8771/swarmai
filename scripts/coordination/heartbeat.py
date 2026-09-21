@@ -153,9 +153,7 @@ def main() -> int:
         context["last_agent_activity_at"] = utc_now()
         write_json_private(context_path, context)
 
-    _, hb_state = read_json_file(
-        args.repo_slug, "docs/coordination/HEARTBEAT_STATE.json"
-    )
+    _, hb_state = read_json_file(args.repo_slug, "docs/coordination/HEARTBEAT_STATE.json")
     cadence = int(hb_state.get("worker_effective_cadence_minutes") or 15)
 
     # Scheduler cadence is tracked independently from manual/work heartbeats.
@@ -166,7 +164,6 @@ def main() -> int:
         {"last_sent_epoch": 0.0, "last_scheduler_sent_epoch": 0.0},
     )
     now_epoch = time.time()
-    last_sent = float(local_state.get("last_sent_epoch") or 0.0)
     last_scheduler_sent = float(local_state.get("last_scheduler_sent_epoch") or 0.0)
     if (
         args.trigger == "scheduler"
@@ -218,9 +215,7 @@ def main() -> int:
         "history": history,
         "status": entry["status"],
     }
-    encoded = base64.b64encode(
-        (json.dumps(document, indent=2) + "\n").encode()
-    ).decode()
+    encoded = base64.b64encode((json.dumps(document, indent=2) + "\n").encode()).decode()
     body = {
         "message": f"heartbeat({args.host}): {observed_at}",
         "content": encoded,
