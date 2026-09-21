@@ -1,6 +1,6 @@
 {
   "schema_version": "1.3",
-  "updated_at": "2026-09-21T14:20:00Z",
+  "updated_at": "2026-09-21T14:50:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -1952,19 +1952,21 @@
       "evidence_refs": [
         "docs/coordination/assignments/HOST-MAC-DEV.json",
         "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "scripts/coordination/autonomous_worker.py on active worker branches"
+        "scripts/coordination/autonomous_worker.py on active worker branches",
+        "OPS-AUTO-001-R impl 0d71520de72338b3ae38dca00258a07c134e2b2a",
+        "OPS-AUTO-001-R exact-tip 39bba630306729b64ad4679346b1eb900f44ccaf; CI 35609579398 success"
       ],
       "worker_packets": [
         "AUTO-A-INSTALL",
         "AUTO-B-INSTALL",
-        "OPS-AUTO-001-R"
+        "OPS-AUTO-001-R",
+        "B-OPS-AUTO-SYNC-01"
       ],
       "story_points_next": 1,
-      "next_action": "A must execute generation-2 OPS-AUTO-001-R and push a green fail-closed runner repair; then lead publishes fresh non-replay generations and each A/B host must self-launch one repo-assigned packet and push attributable evidence. B remains held until the shared source repair is reviewed/propagated.",
+      "next_action": "Propagate reviewed runner repair to B, then prove one repo-assigned self-launch+push from A and B. A generation 3 is V14-REAL-001-R -> V2A-003c; B generation 3 is B-OPS-AUTO-SYNC-01 -> V2B-000 -> V2B-002.",
       "blockers": [
-        "A generation-2 runner repair has not produced a new source commit and A host is stale",
-        "B autonomous assignment intentionally disabled pending shared source repair",
-        "zero verified repo-assigned autonomous self-launch + source push on either host"
+        "A repair was human-prompted; A autonomous self-launch+push not yet proven",
+        "B runner repair propagation pending; B autonomous self-launch+push not yet proven"
       ],
       "notes": "Heartbeat scheduler liveness is separate from autonomous implementation proof. Assignment files may preload dependency-safe packets only after preceding acceptance dependencies are satisfied."
     }
