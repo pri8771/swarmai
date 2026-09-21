@@ -1,0 +1,15 @@
+{
+  "packet_id": "R24",
+  "artifact_id": "ART-V16-PROVENANCE",
+  "status": "memorystore_adapter_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "ccff399627987ae9be188e2b9d32bce2c0abe4be",
+  "verified_at": "2026-09-21T20:04:35Z",
+  "module": "src/swarm/knowledge/memory_adapter.py",
+  "no_auto_accepted_fact": true,
+  "tests": {
+    "command": "pytest -q tests/memory/test_memory.py",
+    "result": "3 passed"
+  },
+  "note": "Conservative MemoryStore adapter; never auto-promotes to accepted_fact."
+}
