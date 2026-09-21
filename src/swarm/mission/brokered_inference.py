@@ -120,12 +120,19 @@ def build_local_mission_broker(
     request_limit: int = 50,
 ) -> SharedInferenceBroker:
     defaults = ["gemma3:4b", "qwen3.5:4b", "qwen3.5:9b", "qwen2.5-coder:14b"]
-    discovered = _discover_local_ollama_models()
-    merged: list[str] = []
-    for name in (models or []) + defaults + discovered:
-        if name and name not in merged:
-            merged.append(name)
-    models = merged or defaults
+    if models is None:
+        # Auto inventory only when caller did not pin an explicit allow-list
+        # (tests rely on explicit lists for unregistered-route denial).
+        discovered = _discover_local_ollama_models()
+        merged: list[str] = []
+        for name in defaults + discovered:
+            if name and name not in merged:
+                merged.append(name)
+        models = merged
+    else:
+        models = list(dict.fromkeys(m for m in models if m))
+        if not models:
+            models = list(defaults)
     routes: list[RouteSnapshot] = []
     contexts: dict[str, RoutePolicyContext] = {}
     for model in models:

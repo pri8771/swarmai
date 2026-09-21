@@ -45,12 +45,11 @@ class MissionRuntime:
 
     def _mission_broker(self, *, models: list[str] | None = None) -> SharedInferenceBroker:
         if self._broker is None:
-            wanted = [self.model]
-            if models:
-                wanted.extend(models)
+            # None => defaults + local Ollama inventory. Explicit list is an
+            # allow-list that must include every model the worker will request.
             self._broker = build_local_mission_broker(
                 repo_root=self.repo,
-                models=wanted,
+                models=models,
             )
         return self._broker
 
@@ -119,13 +118,13 @@ class MissionRuntime:
         )
         self.store.save(record)
 
+        # Pass None so broker loads defaults + discovered local Ollama tags,
+        # ensuring route coverage for evidence-router and --model selections.
         worker = RepoWorker(
             self.repo,
             model=default_model,
             model_by_family=model_by_family,
-            broker=self._mission_broker(
-                models=[default_model, *model_by_family.values(), self.model]
-            ),
+            broker=self._mission_broker(models=None),
             project_id=mission.project_id,
             parser_dogfood_fixture=self.parser_dogfood_fixture,
             require_broker=True,
