@@ -1,0 +1,14 @@
+{
+  "packet_id": "R17",
+  "artifact_id": "ART-V15-RECOVERY-EVIDENCE",
+  "status": "cp3_separate_process_pass_multihost_UNKNOWN",
+  "self_accept": false,
+  "tip_sha_at_verify": "f322672c24db3aae513c1b3301b005d4673419b6",
+  "verified_at": "2026-09-21T20:01:23Z",
+  "cp3_ok": true,
+  "mode": "separate_os_processes_shared_postgres",
+  "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host",
+  "harness_pytest": "1 passed (simulated_multi_worker_single_process)",
+  "script": "scripts/r17_cp3_separate_process_recovery.py",
+  "note": "CP3 separate-OS-process proof green; R18 multi-host still UNKNOWN. No invent-accept."
+}

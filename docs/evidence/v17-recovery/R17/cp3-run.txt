@@ -1,0 +1,46 @@
+{
+  "packet_id": "R17",
+  "artifact_id": "ART-V15-RECOVERY-EVIDENCE",
+  "checkpoint": "CP3",
+  "mode": "separate_os_processes_shared_postgres",
+  "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host",
+  "self_accept": false,
+  "spend_usd": 0.0,
+  "dsn_note": "operator DB via SWARM_DATABASE_URL (not swarm:swarm)",
+  "project_id": "proj_demo",
+  "mission_id": "msn_dd302cf1960e4858ba9aba3fee1e3c27",
+  "task_id": "tsk_fc15dfdef6d04d51acb49c4f95d94c2b",
+  "steps": {
+    "victim_claim": {
+      "pid": 46373,
+      "lease_id": "tls_510097cc7b1f43248b406918113283c9",
+      "attempt_id": "att_e2606cdac2404cc4b78f78cf3152f945",
+      "killed": true
+    },
+    "expire_reassign": {
+      "expired_leases": [
+        "tls_510097cc7b1f43248b406918113283c9"
+      ]
+    },
+    "survivor_submit": {
+      "pid": 46375,
+      "lease_id": "tls_2c513178966e47e2ba96633f9d4dd253",
+      "result_id": "wres_985dd5ba7cca422495e86507b1820bdf"
+    },
+    "stale_reject": {
+      "pid": 46377,
+      "result_id": "wres_60d4e98afedb43e2a71c004f87404a04",
+      "accept_rejected": true,
+      "reason": "lease_not_current:expired"
+    },
+    "exactly_one_accept": {
+      "accepted_result_id": "wres_985dd5ba7cca422495e86507b1820bdf",
+      "accepted_attempt_id": "att_5cf0117afccd4822873a51914a378adf",
+      "competing_stale_accept_rejected": true,
+      "competing_reason": "result_terminal:rejected",
+      "accepted_count_for_task": 1,
+      "exactly_one_accepted": true
+    }
+  },
+  "ok": true
+}
