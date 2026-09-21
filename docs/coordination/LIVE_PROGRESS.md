@@ -22,7 +22,7 @@ Legacy A/B assignments remain disabled.
 ## ART-V14-REAL-E2E — honest failed run packaged
 
 - Run: **`v14-real-002`** / mission `18b9b59bd8a8479cb2152c13d3240d1b` @ candidate `17bf3a1c939df291023048b59bfcec6c2805eae6`.
-- Outcome: **failed** / `accepted=false` / `<|separator|>=repair_required` / `changed_files=[]` / spend **$0**.
+- Outcome: **failed** / `accepted=false` / `summary=repair_required` / `changed_files=[]` / spend **$0**.
 - Evidence (fail-closed, bound): `docs/evidence/v14-real-e2e/v14-real-002/` including `pre-run-freeze.json`, `mission-run.stdout.json`, `mission-record.json`, `cost-show.json`, `manifest.json`, `DIAGNOSIS.md`, **`bind.json`**.
 - Packaging tip: `314f25b71b9f82dc37b092b8fb931ae3196c457c` (bind stamped to `27f4a591eec07b0cd9051cf08fd07552ea63d95e`).
 - **Not accepted. Not V1.4 complete. No self-accept.**
