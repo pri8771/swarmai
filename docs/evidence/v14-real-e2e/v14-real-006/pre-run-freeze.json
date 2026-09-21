@@ -2,8 +2,8 @@
   "packet_id": "R02",
   "artifact_id": "ART-V14-REAL-E2E",
   "run_id": "v14-real-006",
-  "frozen_at": "2026-09-21T19:35:35Z",
-  "candidate_sha": "bb54517cd7b5f12a39adb91954a8c8e0ac5a83ce",
+  "frozen_at": "2026-09-21T19:36:30Z",
+  "candidate_sha": "2be0cc49793cf9f46f1f9fb663e80f49b54c3a6b",
   "checkpoint": "CP1",
   "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false uv run swarm mission run --goal <workspace artifacts audit> --model qwen2.5-coder:14b --no-evidence-router --repo <checkout>",
   "selected_model": "qwen2.5-coder:14b",
@@ -13,8 +13,14 @@
   "no_fixture": true,
   "target_subsystem": "src/swarm/workspace/artifacts.py",
   "focused_check": "tests/workspace/test_workspace.py",
-  "prior_failed_or_changes_required_run_ids": ["v14-real-001","v14-real-002","v14-real-003","v14-real-004","v14-real-005"],
-  "goal": ,
+  "prior_failed_or_changes_required_run_ids": [
+    "v14-real-001",
+    "v14-real-002",
+    "v14-real-003",
+    "v14-real-004",
+    "v14-real-005"
+  ],
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/artifacts.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
   "note": "R02 after R01 grounding guard; different subsystem from ledger; focused workspace tests required",
   "pass_criteria_frozen": [
     "brokered_local_inference",
