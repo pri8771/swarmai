@@ -2,7 +2,7 @@
 
 **Session:** `CURSOR-V17-SINGLE`  
 **Branch:** `cursor/v17-single-session`  
-**Report tip (this document commit):** *bound after commit*  
+**Report tip (this document commit):** `7587d0264c04d41b368d836249cad0b6c66d7541`  
 **V1.7 implementation tip:** `546a2cc8545154bb28cb70c785682162385bbc0c` (docs bind) / feat `1b1050d8087cb80ceb8e6706d93f8747f2504427`  
 **Spend:** `$0.00` · `SWARM_ALLOW_PAID=false` · **no self-accept** · **no main merge** · **no V1.8+ in this session**
 
