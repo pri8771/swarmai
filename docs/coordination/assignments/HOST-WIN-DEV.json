@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.1",
-  "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
-  "generation": 2,
-  "enabled": false,
+  "schema_version": "1.2",
+  "assignment_id": "B-EXECUTION-BATCH-03",
+  "generation": 3,
+  "enabled": true,
   "host_alias": "HOST-WIN-DEV",
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
-  "priority": "blocked_shared_runner_source",
+  "priority": "critical",
   "max_runtime_seconds": 2400,
   "boundaries": {
     "additional_spend": false,
@@ -16,27 +16,27 @@
   },
   "items": [
     {
+      "packet_id": "B-OPS-AUTO-SYNC-01",
+      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
+      "instruction_path": "docs/coordination/packets/B-OPS-AUTO-SYNC-01.md",
+      "max_runtime_seconds": 1800,
+      "note": "Propagate reviewed autonomous-runner repair to Windows product lane and restore clean baseline."
+    },
+    {
       "packet_id": "V2B-000",
       "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
       "instruction_path": "docs/coordination/packets/V2B-000.md",
       "max_runtime_seconds": 1800,
-      "note": "Queued behind lead review/propagation of OPS-AUTO-001-R; do not autonomously execute from the current red source baseline."
-    },
-    {
-      "packet_id": "V2B-001",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
-      "max_runtime_seconds": 2400,
-      "note": "Next after B0 once autonomous runner source is repaired/re-enabled."
+      "note": "Sync reviewed integration baseline only."
     },
     {
       "packet_id": "V2B-002",
       "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
       "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
       "max_runtime_seconds": 2400,
-      "note": "Calibration-only reviewer benchmark/scorer repair after B1; no held-out qualification before lead freeze."
+      "note": "Calibration-only reviewer benchmark/scorer repair and freeze. Do not duplicate external task-pool work."
     }
   ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Disabled because exact-tip B CI run 35558073323 is red from the shared autonomous-runner source. Previous generation was not observed as autonomously started. Keep scheduler heartbeat running. Lead will issue a new enabled generation after OPS-AUTO-001-R is independently reviewed and propagated to B."
+  "note": "External worker-pc owns ART-V13-TASK-POOL repair. Local B must not duplicate V2B-001. Execute B runner sync -> B0 -> B2."
 }
