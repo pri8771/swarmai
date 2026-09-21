@@ -1,6 +1,6 @@
 {
   "schema_version": "1.5",
-  "updated_at": "2026-09-21T14:20:00Z",
+  "updated_at": "2026-09-21T14:50:00Z",
   "repository": "pri8771/swarmai",
   "coordination_branch": "coordination/swarm-control",
   "canonical_project_state": "docs/coordination/ARTIFACT_REGISTRY.json",
@@ -84,7 +84,8 @@
     "A5-LOCAL-G12-CURRENT-TIP": "accepted_live_local_only_no_remote_claim",
     "EXT-WORKER-PC-V2B-001-02": "changes_required_real_branch_useful_freeze_v1_but_hidden_refs_visible_depth_5_and_no_executed_tests",
     "EXT-WORKER-PC-V2B-001-R1": "cancelled_no_result_no_branch_not_scored_as_reviewed_implementation",
-    "EXT-WORKER-PC-V2B-001-R2": "changes_required_real_retry04_branch_scoped_but_offline_pytest_red_evidence_provenance_stale_independence_groups_insufficient_and_sealed_bundle_unbound"
+    "EXT-WORKER-PC-V2B-001-R2": "changes_required_real_retry04_branch_scoped_but_offline_pytest_red_evidence_provenance_stale_independence_groups_insufficient_and_sealed_bundle_unbound",
+    "OPS-AUTO-001-R": "accepted_bounded_repair_impl_0d71520_exact_tip_39bba630_ci_35609579398_success_human_prompted_not_autonomous_proof"
   },
   "verified_artifact_transitions_this_heartbeat": [],
   "coordination_findings_this_heartbeat": {
@@ -161,15 +162,15 @@
     }
   },
   "session_a_next": [
-    "OPS-AUTO-001-R / ART-OPS-AUTONOMOUS-WORKERS / SP1",
-    "after lead review/new generation: V14-REAL-001-R / ART-V14-REAL-E2E / SP2",
-    "then V2A-003c / ART-V15-LEASE-FENCING / SP2"
+    "fresh session: pull current runtime lane; reinstall 5m heartbeat scheduler",
+    "generation 3: V14-REAL-001-R real E2E materialization repair+rereun",
+    "then V2A-003c durable result acceptance"
   ],
   "session_b_next": [
-    "keep current autonomous assignment disabled until shared runner repair is independently reviewed and propagated",
-    "do not duplicate external ART-V13-TASK-POOL repair",
-    "after new generation: V2B-000 locally and V2B-002 reviewer calibration/freeze where file ownership is independent",
-    "W-131B counted qualification waits for lead freeze plus real sealed-reference binding"
+    "fresh session: pull current product lane; reinstall 5m heartbeat scheduler",
+    "generation 3: B-OPS-AUTO-SYNC-01 propagate reviewed runner repair",
+    "then V2B-000 integration sync",
+    "then V2B-002 reviewer calibration/freeze; do not duplicate external V2B-001"
   ],
   "lead_parallel": [
     "retry05 / EXT-WORKER-PC-V2B-001-R3 is running; independently review only after branch/result/evidence exists",
@@ -202,18 +203,19 @@
   },
   "autonomous_workers": {
     "protocol": "docs/coordination/AUTONOMOUS_WORKER_PROTOCOL.md",
-    "status": "source_present_ci_repair_required_no_self_launch_proof",
+    "status": "runner_repair_A_reviewed_B_sync_pending_self_launch_proof_pending",
     "poll_seconds": 60,
     "active_hosts": {
       "A": {
         "host": "HOST-MAC-DEV",
         "branch": "cursor/v2-runtime-lane",
         "assignment": "docs/coordination/assignments/HOST-MAC-DEV.json",
-        "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02",
-        "generation": 2,
+        "assignment_id": "A-EXECUTION-BATCH-03",
+        "generation": 3,
         "enabled": true,
         "queued_packets": [
-          "OPS-AUTO-001-R"
+          "V14-REAL-001-R",
+          "V2A-003c"
         ],
         "proven": false
       },
@@ -221,14 +223,14 @@
         "host": "HOST-WIN-DEV",
         "branch": "cursor/v2-product-lane",
         "assignment": "docs/coordination/assignments/HOST-WIN-DEV.json",
-        "assignment_id": "B-AUTONOMY-HOLD-RUNNER-02",
-        "generation": 2,
-        "enabled": false,
-        "queued_packets_after_reenable": [
+        "assignment_id": "B-EXECUTION-BATCH-03",
+        "generation": 3,
+        "enabled": true,
+        "queued_packets": [
+          "B-OPS-AUTO-SYNC-01",
           "V2B-000",
           "V2B-002"
         ],
-        "external_packet_reserved": "V2B-001",
         "proven": false
       }
     },
