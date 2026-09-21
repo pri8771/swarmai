@@ -1,10 +1,10 @@
 {
   "schema_version": "1.4",
   "started_at": "2026-09-20T23:07:47Z",
-  "updated_at": "2026-09-21T02:12:00Z",
+  "updated_at": "2026-09-21T03:04:00Z",
   "history": {
-    "previous_blob_sha": "ebe70cc8a8b28586f312db2d3546f1e0ca11c828",
-    "note": "Independent review of V2A-003b-R at e764834 found two remaining fencing defects despite 52 focused tests: terminal task/attempt renewal fence and lease/attempt-bound authority on expiry. Heartbeat/session-coordination commits are operational and do not count as implementation performance."
+    "previous_blob_sha": "36c7d03ac8eb1e9c933aedf4a9a5f1ce28c3bead",
+    "note": "Lead independently reviewed V2A-003b-R2, V2A-H6A-R and V2A-003X as accepted bounded packets; reviewed V14-REAL-001 as changes-required because the real mission correctly failed on an empty material diff; reviewed A5 current-tip local G12 proof as accepted live-local evidence only. Whole parent artifacts remain separately gated. Heartbeat/session coordination commits do not count as implementation performance."
   },
   "purpose": "Evidence-backed worker calibration by story-point complexity. Story points are not hours.",
   "protocol_file": "docs/coordination/WORKER_STORY_POINT_PROTOCOL.md",
@@ -16,21 +16,23 @@
   },
   "story_point_summary": {
     "1": {
-      "completed_lead_verified": 4,
-      "reviewed_packets": 4,
-      "first_lead_review_acceptance_rate": 1,
-      "stable": false,
+      "completed_lead_verified": 6,
+      "reviewed_packets": 6,
+      "first_lead_review_acceptance_rate": 1.0,
+      "stable": true,
       "reviewed_packet_ids": [
         "W-131A",
         "V2A-002",
         "V2A-003a-R",
-        "V2A-020a"
+        "V2A-020a",
+        "V2A-003b-R2",
+        "V2A-H6A-R"
       ]
     },
     "2": {
-      "completed_lead_verified": 3,
-      "reviewed_packets": 8,
-      "first_lead_review_acceptance_rate": 0.375,
+      "completed_lead_verified": 5,
+      "reviewed_packets": 11,
+      "first_lead_review_acceptance_rate": 0.4545454545,
       "stable": true,
       "reviewed_packet_ids": [
         "W-111A",
@@ -40,7 +42,10 @@
         "V2A-003a",
         "V2A-003b",
         "V2A-H6A",
-        "V2A-003b-R"
+        "V2A-003b-R",
+        "V2A-003X",
+        "V14-REAL-001",
+        "A5-LOCAL-G12-CURRENT-TIP"
       ]
     },
     "3": {
@@ -161,7 +166,7 @@
       "evidence_complete_first_submission": true,
       "completion_sha": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
       "evidence_sha": "8e2c9754c9f64aa0e68e4fe5de47d646713a5413",
-      "note": "Lead source/evidence review confirmed real Alembic upgrade from populated 9eb193b10f4e legacy schema, null unknown project ownership, token rotate/revoke fencing and recursive nested token-metadata denial. Whole ART-V15-LEASE-FENCING remains drafting."
+      "note": "Lead source/evidence review confirmed real Alembic upgrade from populated 9eb193b10f4e legacy schema, null unknown project ownership remains null, token rotate/revoke fencing and recursive nested token-metadata denial. Whole ART-V15-LEASE-FENCING remains drafting."
     },
     {
       "packet_id": "V2A-003b",
@@ -226,7 +231,7 @@
       "evidence_complete_first_submission": true,
       "completion_sha": "9ce727842446b98cfa55c28c7e70808f57f17d7b",
       "code_sha": "ee5a06612aa2e4409fa8bbfd1969225c16887615",
-      "note": "Integration candidate correctly includes only lead-verified V2A-001/V2A-002 lineage and explicitly excludes V15 changes whose ancestry still contains unreviewed V2A-003b behavior. Artifact remains drafting; this packet only establishes a clean reviewed integration baseline."
+      "note": "Integration candidate correctly includes only lead-reviewed V2A-001/V2A-002 lineage and explicitly excludes V15 changes whose ancestry still contains unreviewed V2A-003b behavior. Artifact remains drafting; this packet only establishes a clean reviewed integration baseline."
     },
     {
       "packet_id": "V2A-003b-R",
@@ -253,6 +258,115 @@
       ],
       "artifact_status_after_review": "drafting",
       "next_packet": "V2A-003b-R2"
+    },
+    {
+      "packet_id": "V2A-003b-R2",
+      "story_points": 1,
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "focused_local_56_pass_current_descendant_35555605844_green",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "685810cc84d17594fa54a168c1d23b8463dc0871",
+      "evidence_sha": "391e8ea217c792cca19de4a2409d06e427c15866",
+      "positive_findings": [
+        "renew rejects terminal task status and terminal/completed/accepted attempt state",
+        "renew revalidates task/attempt revision/source/cancellation authority",
+        "expiry compares lease/attempt revision/source/cancellation stamps before requeue",
+        "direct regressions cover terminal renew and post-claim source/cancellation/revision drift",
+        "current descendant f393f7fa exact-tip CI 35555605844 green with unchanged lease_fencing source"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V2A-003c",
+      "note": "Repair packet accepted; whole ART-V15-LEASE-FENCING remains drafting until result-acceptance fencing is implemented/reviewed."
+    },
+    {
+      "packet_id": "V2A-H6A-R",
+      "story_points": 1,
+      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "focused_local_12_pass_current_descendant_35555605844_green",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d40c1fd420cd489e30c9ef567691c9fc0d1638e5",
+      "evidence_sha": "b1a8eeeaf2235c02c12750a7a93a7dd713eabe92",
+      "positive_findings": [
+        "generated compose secret file is chmod 0600 on POSIX and deterministic tests cover mode",
+        "plain --force fails closed on existing config and requires explicit --acknowledge-fresh-config",
+        "prior env is renamed aside and restricted before fresh config generation",
+        "runbook explicitly says fresh config is not safe initialized-Postgres credential rotation",
+        "current descendant f393f7fa exact-tip CI 35555605844 green"
+      ],
+      "artifact_status_after_review": "drafting",
+      "note": "Repair slice accepted; whole ART-V20-FOUNDATION-HARDENING remains drafting because other hardening items remain."
+    },
+    {
+      "packet_id": "V2A-003X",
+      "story_points": 2,
+      "artifact_id": "ART-V15-DBOS-REUSE",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "focused_local_3_pass_current_descendant_35555605844_green",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "0fe0831a642039feae48e63076b6889a195f6036",
+      "evidence_sha": "d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42",
+      "positive_findings": [
+        "DBOS 3.0.0 SetWorkflowID/step idempotency demonstrated in isolated private SQLite spike",
+        "spike explicitly shows Swarm-specific source/cancel/project/lease authority remains caller-owned",
+        "ADR recommends partial reuse only after Swarm lease fencing is lead-verified",
+        "no production schema migration or Conductor dependency claimed"
+      ],
+      "artifact_status_after_review": "drafting",
+      "note": "Architecture-spike packet accepted; parent ART-V15-DBOS-REUSE remains drafting and is not production adoption."
+    },
+    {
+      "packet_id": "V14-REAL-001",
+      "story_points": 2,
+      "artifact_id": "ART-V14-REAL-E2E",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "not_applicable_live_mission_failure_preserved",
+      "first_lead_review": "changes_required",
+      "rework_cycles": 1,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "d88a3a6d11dfa7ffe4c4edb57d14633fdf1c1d42",
+      "evidence_sha": "57afbd6ce19dee694621be21898d25a40cd066db",
+      "positive_findings": [
+        "actual operational mission ID d9379d80277644998353a9ca3614eba7",
+        "three actual qwen3.5:4b local model requests through governed broker at $0",
+        "model was not supplied a defect/patch answer",
+        "primary checkout remained unmodified and review rejected unsupported result"
+      ],
+      "changes_required": [
+        "generic implement materialization produced no worktree diff despite model implementation text",
+        "repair generic model-output to isolated-worktree materialization without target-specific/known-answer logic",
+        "add unrelated deterministic regression and run a new preregistered real mission on a different bounded subsystem"
+      ],
+      "artifact_status_after_review": "drafting",
+      "next_packet": "V14-REAL-001-R"
+    },
+    {
+      "packet_id": "A5-LOCAL-G12-CURRENT-TIP",
+      "story_points": 2,
+      "artifact_id": "ART-V12-LOCAL-FALLBACK+ART-V12-ADMISSION-RECONCILIATION",
+      "worker": "Cursor Session A",
+      "first_pass_ci": "success_35555605844",
+      "first_lead_review": "accepted",
+      "rework_cycles": 0,
+      "evidence_complete_first_submission": true,
+      "completion_sha": "84df040b6ac5981856ab7f32b66966cc0cf38894",
+      "evidence_sha": "f393f7fa0ed62d5233350740515ed77069fd4eef",
+      "positive_findings": [
+        "actual Ollama 0.21.0 inventory observed with six local models",
+        "actual governed broker calls succeeded on gemma3:4b and qwen3.5:4b with token usage and $0 spend",
+        "controlled route disable denied the killed route and actual permitted alternate local route executed",
+        "request bucket settled to zero remaining and fourth request was denied by QuotaExhaustedError",
+        "script/evidence explicitly makes no remote-provider or dual-remote claim"
+      ],
+      "artifact_status_after_review": "drafting",
+      "note": "Live-local packet accepted. Canonical artifact lifecycle remains drafting until the registry is rebound to this evidence/current integration lineage; G12 remote overlap remains blocked."
     }
   ],
   "superseded_duplicate_intents": [
@@ -268,40 +382,26 @@
   "unreviewed_active_packets_source": "docs/coordination/WORKER_PACKET_BACKLOG.md",
   "packets": [
     {
-      "packet_id": "V2A-H6A-R",
-      "artifact_id": "ART-V20-FOUNDATION-HARDENING",
-      "story_points": 1,
-      "gate": "V2.0",
-      "task_family": "deploy/integration",
+      "packet_id": "V14-REAL-001-R",
+      "artifact_id": "ART-V14-REAL-E2E",
+      "story_points": 2,
+      "gate": "V1.4",
+      "task_family": "real-e2e-runtime-repair",
       "status": "ready_repair",
       "worker": "Cursor Session A",
       "first_pass_ci": null,
       "first_lead_review": null,
       "rework_cycles": 0,
-      "reopened_defect": false,
-      "evidence_complete_first_submission": false
+      "reopened_defect": true,
+      "evidence_complete_first_submission": null
     },
     {
-      "packet_id": "V2A-003b-R",
+      "packet_id": "V2A-003c",
       "artifact_id": "ART-V15-LEASE-FENCING",
       "story_points": 2,
       "gate": "V1.5",
-      "task_family": "durable-worker-lease",
-      "status": "ready_repair",
-      "worker": "Cursor Session A",
-      "first_pass_ci": null,
-      "first_lead_review": null,
-      "rework_cycles": 0,
-      "reopened_defect": false,
-      "evidence_complete_first_submission": false
-    },
-    {
-      "packet_id": "V2A-003b-R2",
-      "artifact_id": "ART-V15-LEASE-FENCING",
-      "story_points": 1,
-      "gate": "V1.5",
-      "task_family": "durable-worker-lease",
-      "status": "ready_repair",
+      "task_family": "durable-result-acceptance",
+      "status": "ready",
       "worker": "Cursor Session A",
       "first_pass_ci": null,
       "first_lead_review": null,
@@ -316,6 +416,20 @@
       "gate": "V2.0",
       "task_family": "integration-sync",
       "status": "ready",
+      "worker": "Cursor Session B",
+      "first_pass_ci": null,
+      "first_lead_review": null,
+      "rework_cycles": 0,
+      "reopened_defect": false,
+      "evidence_complete_first_submission": null
+    },
+    {
+      "packet_id": "V2B-001",
+      "artifact_id": "ART-V13-TASK-POOL",
+      "story_points": 2,
+      "gate": "V1.3",
+      "task_family": "evaluation-pool-freeze",
+      "status": "ready_after_B0",
       "worker": "Cursor Session B",
       "first_pass_ci": null,
       "first_lead_review": null,
