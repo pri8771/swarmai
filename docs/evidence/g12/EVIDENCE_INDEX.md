@@ -16,3 +16,16 @@
 **LEAD-012:** [`DUAL_REMOTE_TEST_PLAN.md`](./DUAL_REMOTE_TEST_PLAN.md) prepared; remote dual **not** executed/claimed.
 
 **W-121A:** [`../inf-121/w121a-remote-eligibility-ledger.json`](../inf-121/w121a-remote-eligibility-ledger.json) — metadata-only inspect + stale historical canary review; **0 admissible remote routes**; local Ollama leg ready; W-121B dual-remote overlap remains blocked. No spend / no invented eligibility.
+
+## V12-REMOTE-ADMIT-01 (2026-09-21)
+
+Packet status: **blocked_user_action_account_tier_canary** — **0 admissible remote routes** (no invented admission).
+
+| Evidence | Path | Result |
+|---|---|---|
+| Credential presence (sibling `.env` consulted; secrets not printed) | `v12-remote-admit-01-credential-probe.json` | openrouter/groq/gemini keys present when sibling env loaded; runtime process alone was UNSET |
+| Live capability-report (auth probes; no paid inference) | `v12-remote-admit-01-capability-report.json` | auth_ok for openrouter/groq/gemini; cost_policy `price_unverified`; only ollama `available`/`zero_spend_ok` |
+| Metadata-only models/pricing + canary denies | `v12-remote-admit-01-admission.json` | OpenRouter lists exact `:free` zero API-price models; account Free-plan / Groq Free-tier / Gemini Free project **not** dashboard-verified; cloud canaries fail-closed; USER_ACTION recorded |
+| Local Ollama canary (known-zero loopback) | `v12-remote-admit-01-ollama-canary.json` | `rt_ollama_gemma3:4b` canaried/settled; local only — not a remote admit |
+
+USER_ACTION required before remote admit: operator confirms Free-plan/tier in OpenRouter, Groq, and Gemini dashboards and authorizes one bounded zero-charge canary per exact route. Public docs / API price metadata alone never admit.

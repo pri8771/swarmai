@@ -1,0 +1,260 @@
+{
+  "packet_id": "V12-REMOTE-ADMIT-01",
+  "probe": "metadata_only_no_inference",
+  "generated_at": "2026-09-21T02:50:30.822035+00:00",
+  "candidates": {
+    "openrouter": {
+      "auth_models_list_ok": true,
+      "models_total": 446,
+      "free_suffix_or_zero_price_count": 24,
+      "exact_free_suffix_and_zero_price_count": 21,
+      "sample_exact_free_zero_price": [
+        {
+          "id": "inclusionai/ling-3.0-flash-vl:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "nex-agi/nex-n2.5-mini:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "nex-agi/nex-n2.5-pro:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "inclusionai/ling-3.0-flash-sante:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "inclusionai/ling-3.0-flash-fin:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "qwen/qwen3.8-27b:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "dots-studio/dots-3-note-preview:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        },
+        {
+          "id": "liquid/lfm-2.5-2.6b:free",
+          "prompt_price": "0",
+          "completion_price": "0",
+          "zero_api_price": true,
+          "free_suffix": true
+        }
+      ],
+      "account_tier_verified": false,
+      "canary_executed": false,
+      "admitted": false,
+      "reason": "API lists :free zero-price models; account Free-plan / no-credit-fallback not dashboard-verified; live canary not executed (no invent billing_known_zero)"
+    },
+    "groq": {
+      "auth_models_list_ok": true,
+      "models_total": 13,
+      "model_ids_sample": [
+        "whisper-large-v3-turbo",
+        "openai/gpt-oss-120b",
+        "groq/compound",
+        "canopylabs/orpheus-arabic-saudi",
+        "qwen/qwen3.8-27b",
+        "canopylabs/orpheus-v1-english",
+        "groq/compound-mini",
+        "whisper-large-v3",
+        "openai/gpt-oss-safeguard-20b",
+        "allam-2-7b",
+        "openai/gpt-oss-20b",
+        "meta-llama/llama-prompt-guard-2-22m",
+        "meta-llama/llama-prompt-guard-2-86m"
+      ],
+      "preferred_candidate_ids_present": [],
+      "account_tier_verified": false,
+      "canary_executed": false,
+      "admitted": false,
+      "reason": "Models list auth ok; Free-tier vs Developer billing not dashboard-verified; live canary not executed",
+      "note_models": "Account model inventory sample lacks classic documented free-tier llama chat ids (llama-3.1-8b-instant etc.); do not invent eligibility from alternate ids without Free-tier dashboard proof"
+    },
+    "gemini": {
+      "auth_models_list_ok": true,
+      "models_total": 50,
+      "flash_family_sample": [
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-preview-tts",
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash-image",
+        "gemini-3-flash-preview",
+        "gemini-3.1-flash-lite-preview",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-image-preview",
+        "gemini-3.1-flash-image",
+        "gemini-3.1-flash-lite-image"
+      ],
+      "account_tier_verified": false,
+      "canary_executed": false,
+      "admitted": false,
+      "reason": "Models list auth ok; Free-tier project / no billing link not dashboard-verified; live canary not executed"
+    }
+  },
+  "user_action_required": [
+    {
+      "provider": "openrouter",
+      "blocker": "account_free_plan_and_zero_charge_canary_unproven",
+      "human_steps": [
+        "In OpenRouter dashboard confirm the authenticated account is on Free plan with no payment method / credits that enable paid fallback",
+        "Pick one exact model id ending in :free from the API list (see sample_exact_free_zero_price)",
+        "Authorize Session A to run one bounded canary on that exact :free route only (SWARM_ALLOW_PAID=false, no fallback)",
+        "After canary, confirm credit debit / billed amount is 0 in the dashboard"
+      ]
+    },
+    {
+      "provider": "groq",
+      "blocker": "free_tier_vs_developer_unverified",
+      "human_steps": [
+        "In Groq console confirm organization is still Free tier (not Developer/paid) and note Limits RPD/RPM for one exact chat model",
+        "Authorize Session A to run one bounded canary on that exact model with no Flex/paid service tier",
+        "Confirm 429 on quota exhaustion (not auto-upgrade) and no billed amount"
+      ]
+    },
+    {
+      "provider": "gemini",
+      "blocker": "free_tier_project_billing_unverified",
+      "human_steps": [
+        "In Google AI Studio confirm the project/key is Free tier with no linked paid billing for Gemini API",
+        "Select one exact Flash-family model with Free-tier $0 input/output on current pricing page",
+        "Authorize Session A to run one bounded text-only canary (no grounding/maps/image tools)",
+        "Confirm observed usage charge is 0"
+      ]
+    }
+  ],
+  "admitted_routes": [],
+  "canary_attempts_note": "Cloud live canaries run without --billing-known-zero (honest deny: unknown_or_paid_cost_cannot_canary). Only loopback Ollama used --billing-known-zero and succeeded. No remote route admitted.",
+  "canary_attempts": [
+    {
+      "route": "rt_openrouter_default",
+      "flags": [
+        "--mode",
+        "live"
+      ],
+      "returncode": 0,
+      "result": {
+        "route_id": "rt_openrouter_default",
+        "status": "unknown_cost_denied",
+        "denied": true,
+        "reason": "unknown_or_paid_cost_cannot_canary",
+        "mock_vs_live": "live_blocked",
+        "consumed_allowance": 0
+      },
+      "billing_known_zero_asserted": false,
+      "invented_zero_charge": false
+    },
+    {
+      "route": "rt_groq_default",
+      "flags": [
+        "--mode",
+        "live"
+      ],
+      "returncode": 0,
+      "result": {
+        "route_id": "rt_groq_default",
+        "status": "unknown_cost_denied",
+        "denied": true,
+        "reason": "unknown_or_paid_cost_cannot_canary",
+        "mock_vs_live": "live_blocked",
+        "consumed_allowance": 0
+      },
+      "billing_known_zero_asserted": false,
+      "invented_zero_charge": false
+    },
+    {
+      "route": "rt_gemini_default",
+      "flags": [
+        "--mode",
+        "live"
+      ],
+      "returncode": 0,
+      "result": {
+        "route_id": "rt_gemini_default",
+        "status": "unknown_cost_denied",
+        "denied": true,
+        "reason": "unknown_or_paid_cost_cannot_canary",
+        "mock_vs_live": "live_blocked",
+        "consumed_allowance": 0
+      },
+      "billing_known_zero_asserted": false,
+      "invented_zero_charge": false
+    },
+    {
+      "route": "rt_ollama_default",
+      "flags": [
+        "--mode",
+        "live",
+        "--billing-known-zero"
+      ],
+      "returncode": 0,
+      "result": {
+        "route_id": "rt_ollama_gemma3:4b",
+        "requested_route_id": "rt_ollama_default",
+        "provider_id": "ollama",
+        "model_id": "gemma3:4b",
+        "status": "canaried",
+        "denied": false,
+        "probe_counted": true,
+        "consumed_allowance": 1,
+        "mock_vs_live": "live_local_zero_cost",
+        "billing_known_zero": true,
+        "endpoint_loopback": true,
+        "purpose": "prototype",
+        "settlement_state": "settled",
+        "error_class": null,
+        "provider_request_id": "chatcmpl-912",
+        "model_fingerprint": "gemma3:4b",
+        "layers": {
+          "cataloged": true,
+          "configured": true,
+          "authenticated": true,
+          "inference_tested": true
+        },
+        "evidence_path": "var/onboarding/canaries/rt_ollama_gemma3_4b.json"
+      },
+      "billing_known_zero_asserted": true,
+      "invented_zero_charge": false
+    }
+  ],
+  "summary": {
+    "admissible_remote_routes": 0,
+    "auth_ok_candidates": [
+      "openrouter",
+      "groq",
+      "gemini"
+    ],
+    "openrouter_exact_free_zero_price_models_listed": 21,
+    "local_ollama_canary_ok": true,
+    "local_ollama_route": "rt_ollama_gemma3:4b",
+    "invented_admission": false,
+    "packet_status": "blocked_user_action_account_tier_canary"
+  }
+}

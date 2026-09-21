@@ -1,0 +1,752 @@
+{
+  "schema_version": "0.2.0",
+  "generated_at": "2026-09-21T02:46:14.162597+00:00",
+  "swarm_allow_paid": false,
+  "provider_count": 32,
+  "available_for_routing": 1,
+  "auth_ok": 13,
+  "providers": [
+    {
+      "provider_id": "openrouter",
+      "name": "OpenRouter",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "OPENROUTER_API_KEY"
+      ],
+      "base_url": "https://openrouter.ai/api/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 252.7799999952549,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 446,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "groq",
+      "name": "Groq",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "GROQ_API_KEY"
+      ],
+      "base_url": "https://api.groq.com/openai/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 182.95470799785107,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 13,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "gemini",
+      "name": "Google AI Studio / Gemini API",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "GEMINI_API_KEY"
+      ],
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 182.32725000416394,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 1,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "cloudflare_workers_ai",
+      "name": "Cloudflare Workers AI",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID"
+      ],
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient; account+token may be configured; models.search deferred; unprobed remains unqualified",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "huggingface_inference",
+      "name": "Hugging Face Inference Providers",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "HF_TOKEN"
+      ],
+      "base_url": "https://router.huggingface.co/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 146.1730000009993,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 1,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "nvidia_nim",
+      "name": "NVIDIA API Catalog / hosted NIM",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "NVIDIA_API_KEY"
+      ],
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 96.02112499123905,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 82,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "mistral",
+      "name": "Mistral API / Studio",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "MISTRAL_API_KEY"
+      ],
+      "base_url": "https://api.mistral.ai/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 892.9516670032172,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 46,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "cohere",
+      "name": "Cohere",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "COHERE_API_KEY"
+      ],
+      "base_url": "https://api.cohere.com/v2",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 1300.2759169903584,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 20,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "cerebras",
+      "name": "Cerebras",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "CEREBRAS_API_KEY"
+      ],
+      "base_url": "https://api.cerebras.ai/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "github_models",
+      "name": "GitHub Models",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "retired",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "blocked",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "retired",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "together",
+      "name": "Together AI",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "TOGETHER_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "paid_blocked",
+      "rate_limits": {},
+      "latency_ms": 376.54679200204555,
+      "health": "healthy",
+      "qualification_status": "auth_ok_inference_blocked",
+      "context_window": null,
+      "model_count": 274,
+      "notes": "auth probe ok; key may exist; paid inference blocked under SWARM_ALLOW_PAID=false",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "fireworks",
+      "name": "Fireworks AI",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "FIREWORKS_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "paid_blocked",
+      "rate_limits": {},
+      "latency_ms": 295.57337499863934,
+      "health": "healthy",
+      "qualification_status": "auth_ok_inference_blocked",
+      "context_window": null,
+      "model_count": 26,
+      "notes": "auth probe ok; key may exist; paid inference blocked under SWARM_ALLOW_PAID=false",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "deepinfra",
+      "name": "DeepInfra",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "DEEPINFRA_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 482.3238749959273,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 192,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "replicate",
+      "name": "Replicate",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "REPLICATE_API_TOKEN"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 387.0101659995271,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 1,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "perplexity",
+      "name": "Perplexity API",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "PERPLEXITY_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "openai",
+      "name": "OpenAI API",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "OPENAI_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "deferred",
+      "cost_policy": "deferred",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "deferred",
+      "qualification_status": "deferred",
+      "context_window": null,
+      "model_count": null,
+      "notes": "payment-gated deferred",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "anthropic",
+      "name": "Anthropic API",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "ANTHROPIC_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": 5176.0067909926875,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 11,
+      "notes": "auth probe ok; free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "aws_bedrock",
+      "name": "Amazon Bedrock",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "AWS_PROFILE",
+        "AWS_REGION"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "azure_ai_foundry",
+      "name": "Azure AI Foundry",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "AZURE_AI_ENDPOINT",
+        "AZURE_AI_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "hyperbolic",
+      "name": "Hyperbolic",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "HYPERBOLIC_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "sambanova",
+      "name": "SambaNova",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "SAMBANOVA_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "novita",
+      "name": "Novita AI",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "NOVITA_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "requesty",
+      "name": "Requesty",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "REQUESTY_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "vercel_ai_gateway",
+      "name": "Vercel AI Gateway",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "VERCEL_AI_GATEWAY_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "portkey_cloud",
+      "name": "Portkey Cloud",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "PORTKEY_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "cloudflare_ai_gateway",
+      "name": "Cloudflare AI Gateway",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID",
+        "CLOUDFLARE_GATEWAY_ID"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "huggingface_dedicated",
+      "name": "Hugging Face dedicated Inference Endpoints",
+      "available": false,
+      "key_configured": true,
+      "env_refs": [
+        "HF_TOKEN"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "ollama",
+      "name": "Ollama",
+      "available": true,
+      "key_configured": true,
+      "env_refs": [
+        "OLLAMA_BASE_URL"
+      ],
+      "base_url": "http://127.0.0.1:11434/v1",
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "zero_spend_ok",
+      "rate_limits": {},
+      "latency_ms": 9.465708993957378,
+      "health": "healthy",
+      "qualification_status": "auth_ok",
+      "context_window": null,
+      "model_count": 6,
+      "notes": "auth probe ok; local free route verified by healthy probe",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "vllm",
+      "name": "vLLM",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "VLLM_BASE_URL",
+        "VLLM_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "mlx_lm",
+      "name": "MLX-LM",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "MLX_LM_BASE_URL"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "llama_cpp",
+      "name": "llama.cpp server",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "LLAMA_CPP_BASE_URL",
+        "LLAMA_CPP_API_KEY"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    },
+    {
+      "provider_id": "llamafile",
+      "name": "llamafile",
+      "available": false,
+      "key_configured": false,
+      "env_refs": [
+        "LLAMAFILE_BASE_URL"
+      ],
+      "base_url": null,
+      "modalities": [
+        "chat"
+      ],
+      "coding_suitability": "unknown",
+      "cost_policy": "price_unverified",
+      "rate_limits": {},
+      "latency_ms": null,
+      "health": "unprobed",
+      "qualification_status": "unqualified",
+      "context_window": null,
+      "model_count": null,
+      "notes": "free eligibility not proven; paid-mode=false is not sufficient",
+      "probed_at": "2026-09-21T02:46:14.162597+00:00"
+    }
+  ],
+  "saved_to": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/providers/capability-registry.json"
+}
