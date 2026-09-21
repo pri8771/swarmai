@@ -64,6 +64,19 @@ Preserve all failures and all overhead. No held-out contamination, threshold cha
 Do NOT edit without explicit handoff: `src/swarm/api/store.py`, `routes_v1.py`, `schemas.py`, `cli.py`, `src/swarm/db/models.py`, `migrations/**`, `pyproject.toml`, `uv.lock`.
 Implement owned domain modules/tests and send Session A an integration note.
 
+## Repo-driven autonomous execution — install once
+
+This branch now includes a self-waking Cursor CLI daemon. After pulling this revision:
+
+1. Verify Cursor CLI exists: `agent --version`.
+2. If CLI auth is missing, run the normal human login once: `agent login`.
+3. Install the daemon:
+   `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_autonomous_worker_windows.ps1`
+
+The daemon polls `docs/coordination/assignments/HOST-WIN-DEV.json` through GitHub every minute, executes exactly one bounded assigned packet with `agent -p`, and stops after pushing that packet. Safe dependency-ready packets may be preloaded so it can continue without waiting for the hourly lead review. It never self-accepts or selects project priorities.
+
+Current preloaded queue: V2B-000 -> V2B-001 -> V2B-002.
+
 ## Continuous work rule
 After every packet: push exact source/evidence, post CURSOR-B message, publish heartbeat `review_requested`, fetch coordination, and claim the next dependency-ready B packet.
 Do not wait on remote-provider/G10/live gates when independent B work exists.
