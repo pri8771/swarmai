@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `46f7a24792640da7686560bed6e3bead71a392cd`
-- Coordination SHA: `f4e057415c2b65233114dc10751c3f9e15b65059`
-- Updated: `2026-09-21T19:48:57Z`
-- Trigger: `manual`
+- Coordination SHA: `062383b8f9155618f9cc7bb9154ce8ddf3b8087c`
+- Updated: `2026-09-21T19:50:15Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R05`
 - Current artifact: `ART-V13-REVIEWER-QUALIFICATION`
