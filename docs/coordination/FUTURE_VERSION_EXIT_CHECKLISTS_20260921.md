@@ -5,6 +5,19 @@ Status: PLANNING ONLY
 
 These checklists distinguish implementation-complete from accepted.
 
+## Mandatory claim checks at every exit
+
+The generated packet catalog gives per-packet proof; master-plan section 0.2 defines the final private operator deliverable. Check implementation, operational wiring, live-local, real-world, independent review, external and elapsed states separately. A passing plan validator is not product evidence.
+
+- V1.7: R17b/c durable operational path, R27d approval integrity, R28s real isolation, R25b knowledge/quality disposition, CP5 local and R33c-2 real external proof, CP6 identity crosswalk. Browser-specific registry requirements cannot be replaced by GitHub proof without explicit independent disposition.
+- V1.8: actual outage/restore and externally verified old-site fencing, not merely incrementing a restored epoch.
+- V1.9: real fresh install and own-runtime selfdev; supported OS only with actual environment evidence.
+- V2.0: exact supported frozen candidate, real 168h observation and lower required artifact disposition; no implied publish/merge.
+- V2.3: actual distinct nodes and non-fixture external resource under constrained capacity; pack/portability/operator readback.
+- V3: all objective/learning/allocation/selfdev/ecosystem/tenancy artifacts, real elapsed trigger->mission->external effect and canary/rollback; full private runbook and independent review. A failed learning proposal is evidence, not promotion.
+
+An external-pending row permits independent implementation, but never turns its required acceptance checkbox into a pass. Source support reductions/waivers require explicit versioned governance, not an executor's convenience.
+
 ## V1.8 implementation-complete
 
 - [ ] SiteAuthority/SiteEpoch durable state exists.

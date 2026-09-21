@@ -82,3 +82,13 @@ Kept for history only; where they conflict with the files above, the files above
 
 ## Rule
 If a large doc is unchanged and the active packet does not depend on it, do not reread it.
+
+
+## Final closure and precise contract authority
+
+- `MASTER_PLAN_V17_TO_V30_20260921.md` section 0 is the end-state, sequencing and two-sweep completion contract.
+- `FABLE_51_PLANNING_PROMPT.md` is the final finite architecture audit prompt.
+- Future packet JSON contains behavior/surfaces/negative/evidence/exit metadata; `FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md` is generated, never independently edited.
+- Near-term additions: R28s enforces actual sandbox isolation; R17b/c split durable mission mapping, loop, transport and CLI; R33c-1/2 split typed credentialed adapter and real proof.
+- Latest baseline approval is the **independent** review on coordination, not the older worker-authored review still present in historical planning ancestry. Do not edit historic reviews to manufacture approval.
+- `entry_gates` need evidence before execution; `exit_gates` restrict claims. Every new closure change awaits independent review even though the previous baseline was approved.

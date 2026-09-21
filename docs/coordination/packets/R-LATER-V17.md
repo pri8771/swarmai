@@ -1,50 +1,73 @@
-# Later V1.7 packets — medium detail
+# Remaining V1.7 execution contracts
 
-These six packets are not dependency-ready yet. Each gets a full spec (same template as `R27a.md`) from the lead or a planning pass **before** it becomes `ready`; the constraints below are already binding. Shared conventions: `README.md`.
+These are executable specifications after their JSON dependencies/gates and reviewed adoption. Common commands and evidence format are in `README.md`; no blanket future planning pass is needed.
 
-## R02b — new preregistered real mission `v14-real-008`
+## R02b — genuine preregistered mission
 
-- Artifact ART-V14-REAL-E2E · SP1 · live · depends R02a · gate `EXT-V14-LEAD-REVIEW` for the result.
-- Preregister per `REAL_V14_E2E_PROTOCOL.md` before running: candidate SHA, entrypoint, model routes, limits, zero-spend, no-known-answer declaration.
-- Target: one bounded operational subsystem that **no audit or packet has described a defect in**. `src/swarm/tools/**`, `src/swarm/knowledge/**`, `src/swarm/workers/**`, `src/swarm/db/lease_fencing.py`, `src/swarm/workspace/artifacts.py` and `src/swarm/workspace/context.py` are excluded (audited, or used by 006/007). Candidates: `src/swarm/runtime/backpressure.py`, `src/swarm/controller/graph.py`, `src/swarm/cost/`. The worker records why the chosen target leaks no known answer.
-- Pass needs `defect_proof.proven == true` (R02a) plus every existing CP1 criterion. At most two attempts; each attempt is preserved whatever its outcome. A run whose gate reports `no_defect_demonstrated` is an honest negative result, not a failure to hide.
-- Exit: evidence under `docs/evidence/v14-real-e2e/v14-real-008/`; status `review_pending`. Only the lead can move the artifact.
+Artifact ART-V14-REAL-E2E. Depends R02a; result requires independent semantic review. Own `scripts/` existing real-mission entrypoint invocation and `docs/evidence/v14-real-e2e/<new-run-id>/`; no product patch authored by the harness. Read REAL_V14_E2E_PROTOCOL and lead review of 007 first.
 
-## R17b — leased execution mode for `MissionRuntime`
+Before starting: freeze candidate, goal, bounded unaudited subsystem, real brokered local route, budget/retry limits, verifier and no-known-answer declaration. Do not re-use the already audited tool/knowledge/lease defects as a discovery test. At most two new attempts. Each creates an isolated diff through SwarmAI, shows a real pre-patch failing regression or objective defect proof, passes the post-patch targeted check and receives independent review. An honest no-defect/failed run stays a failed run and may require a bounded runtime repair. Never pick a prewritten answer and call it discovery.
 
-- Artifact ART-V15-WORKER-PROTOCOL · SP3 (split into service-loop and runtime-mode packets when specified) · depends R17a, R28d.
-- Fixes W4 (first half). `MissionRuntime(execution_mode="direct" | "leased")`. In `leased` mode each task attempt is persisted, then claimed through `DurableWorkerService.claim` by an in-process worker loop built on `WorkerClient`; `RepoWorker.run_task` runs under that lease; the result goes through `submit_result`; the controller accepts through `accept_result` and its existing fence. `MissionController.reconcile_leases` (`controller/mission.py:142`) stops being a no-op: it calls `expire_leases` and re-queues expired attempts.
-- The gateway's `StaticFenceProvider` is replaced by `LeaseFenceProvider` in leased mode (R28b), which makes tool effects cancellable by the same generation that fences results.
-- Operational entrypoints (API `POST /missions/{id}/execute`, CLI `swarm mission run`) default to `leased` when `SWARM_DATABASE_URL` is set. `direct` stays for database-less local runs and is labeled in the mission record.
-- Negatives: lease expiry mid-task → attempt re-queued and late result rejected; cancel mid-task → tool effect denied by `fence_changed_before_execute` and result rejected; duplicate accept → one accepted.
-- No second scheduler: `controller/scheduler.py` remains the only place that decides what runs next.
+Negatives: no-op/typing-only patch, unrelated review, collection failure masquerading as red test, unrelated passing suite and changed acceptance after output. Evidence includes mission ID, route/usage, before/after diff and test artifacts. Exit: new evidence review_pending; CP1 passes only after the separate lead decision. No invented zero usage.
 
-## R17c — separate-process worker + single worker-state authority
+## R17b — leased runtime aggregate
 
-- Artifacts ART-V15-WORKER-PROTOCOL, ART-V15-RECOVERY-EVIDENCE · SP2 · depends R17b.
-- `swarm worker run --project <id>`: a separate OS process that enrolls, heartbeats, claims, runs and submits through `WorkerClient`. No provider secrets on the worker: inference still goes through the control plane's broker.
-- Fixes W4 (second half): `api/store.py:53` stops owning an in-memory `WorkerRegistryService` for operational routes; `/workers`, `/workers/enroll`, `/workers/heartbeat` read and write through `DurableWorkerService`. The in-memory class remains only for `load/` and `chaos/` simulations and is named as such in its docstring.
-- Live gate: rerun CP3 with a real mission task instead of a synthetic one (kill the worker process mid-task; a second worker finishes it; exactly one accepted result).
+Completion requires R17b-1 and R17b-2. The current `MissionRuntime` creates a file-backed MissionStore and MissionController; a new DurableWorkerService constructor alone cannot put DB leases on that path. Do not keep parallel writable mission authorities.
 
-## R25b — CP4 live knowledge checkpoint through real missions
+### R17b-1 — durable mission/attempt mapping
 
-- Artifact ART-V16-CONTEXT-BUDGET-EVIDENCE · SP2 · live · depends R25a.
-- Fixes V3. Harness `scripts/r25_cp4_knowledge_missions.py`, zero spend, real brokered local inference, real Postgres, projects A and B:
-  1. mission A1 appends an observation; the harness, acting as `operator` with scope `knowledge.accept`, promotes it to `accepted_fact`;
-  2. mission A2's prompt contains that fact and its receipt lists the item id and version;
-  3. mission B1 with the same query: the prompt contains no A text; the actor-visible receipt has no A ids and no count that changes when A's corpus size changes (run B1 twice with A holding 1 and then 50 items; receipts must be identical except ids and timestamps) — this is the existence-inference negative;
-  4. supersede → mission A3 sees the new version only; tombstone → A4 sees neither, and the dependent summary is `disputed`;
-  5. token evidence: on the frozen mission set, bounded context tokens **strictly less than** the whole-history baseline for every mission, otherwise the run reports `fail`. `tokens_avoided_estimate >= 0` is not acceptance evidence.
-- `task_quality` stays `UNKNOWN` unless a frozen scorer measures it. Do not invent a quality number.
+Artifact ART-V15-WORKER-PROTOCOL. SP2. Depends R17a/R28b. Own `src/swarm/db/repositories.py`, new `src/swarm/mission/durable_bridge.py`, `src/swarm/mission/store.py`; tests `tests/integration/db/test_mission_durable_bridge.py`.
 
-## R34a — integrated operational mission (CP6 precondition)
+Map existing mission/project/task/graph-revision/attempt IDs into current MissionRow/TaskRow/TaskAttemptRow through existing repositories. Persist immutable source/input/config/acceptance digests and cancellation generation. Use stable command IDs and transactional outbox; replay of identical admission returns the same IDs, changed payload with same ID conflicts. File MissionStore becomes a derived export/cache in leased mode; never writes authoritative status independently. Import legacy development records explicitly as historical, not fresh authority. Keep DB-backed source of truth across reopen.
 
-- Artifact V1.7-integrated-audit · SP2 · live · depends R33b, R25a, R17b.
-- One real `$0` mission whose record proves every V1.5–V1.7 subsystem was **on the path**: broker reservation and settlement receipts, a lease id with claim/accept receipts, a knowledge retrieval receipt id, action receipt ids for every file write and command. The harness fails if any of the four receipt families is empty.
-- Negatives run inside the same harness: cancel mid-mission (no further effects, result rejected) and kill + restart the control process (mission resumes; no duplicate effect).
+Negatives: crash after commit before file export, duplicate admission, changed graph/input, wrong project, cache edited to fake success. Clean/restart on real Postgres yields one graph and original IDs. No migration guessed: inspect current columns; any actual schema gap must be a named bounded migration before this packet exits. Evidence contains source/schema and two-process readback; no live qualification claim.
 
-## R34b — exact-tip V1.7 audit package (CP6)
+### R17b-2 — claim/run/submit/accept loop
 
-- Artifact V1.7-integrated-audit · SP2 · audit · depends R34a, R02b, R25b, R17a and every open gate listed as open, not hidden.
-- Deliverable: `docs/evidence/v17-checkpoints/CP6/<run-id>/` binding source SHA, single migration head, complete configured deterministic checks (every skipped test listed by name), CP0–CP5 run ids, artifact-by-artifact status V1.0-repair → V1.7 on the claim ladder (`implementation`, `wired`, `live_checkpoint`, `independent_review`, `external_gate`, `wall_clock_gate`), and the open external and wall-clock gates.
-- The only label this packet may assert is **V1.7 IMPLEMENTATION-COMPLETE / LIVE-CHECKPOINTED / FORMAL-ACCEPTANCE-PENDING**. "Accepted V1.7" is reserved for the registry.
+SP2. Depends R17b-1. Own `src/swarm/mission/runtime.py`, `src/swarm/controller/mission.py`, `src/swarm/mission/durable_bridge.py`; tests `tests/mission/test_leased_runtime.py` with real DB cases.
+
+Operational mode is explicitly leased, requiring configured DB and authenticated principal. Controller schedules eligible existing tasks; WorkerClient claims from DurableWorkerService, performs bounded work under returned immutable lease, renews until finish, submits result, and an independently authorized controller accepts it through existing acceptance fences. WorkerClient.control_plane_accept must not become worker authority. Controller.reconcile_leases invokes existing expiry/reassignment service and does not schedule from file cache. Connect LeaseFenceProvider to later R28d effects. Until R28d is complete, use no-effect test tasks for integration evidence; do not claim ungatewayed worker writes operationally complete. Database-less mode is labeled simulation and cannot perform operational effects.
+
+Negatives: expiry before/during task, cancellation between renew and submit, changed input revision, duplicate result, worker attempting acceptance and process restart. One result accepted by control-plane identity, stale result retained and rejected. No second scheduler/thread timer authority.
+
+## R17c — separate worker and API aggregate
+
+Completion requires R17c-1/R17c-2. Both use the same authoritative rows and services from R17b.
+
+### R17c-1 — authenticated transport and worker read model
+
+SP2. Depends R17b. Own `src/swarm/workers/transport.py`, `src/swarm/api/routes_v1.py`, `src/swarm/api/store.py`; tests `tests/workers/test_worker_http_transport.py` and API authorization tests.
+
+Wire existing enrollment/heartbeat/claim/renew/submit/drain DTOs through authenticated HTTP transport. Bind principal/project and enrolled worker generation on the server; request fields cannot impersonate another worker. Worker credentials allow claims/submission only, never accept_result or approval creation. ProductStore reads worker state from DurableWorkerService; legacy WorkerRegistryService remains explicitly simulation-only. Local control-plane calls use the same service and independent acceptance identity. Preserve protocol errors and immutable request IDs; no provider credential reaches worker.
+
+Negatives: forged project/worker/generation, revoked worker, duplicate submit, worker calling acceptance/admin API, stale transport reconnect and server restart. Real service transport tests retain rejection receipts; no in-memory operational authority fallback.
+
+### R17c-2 — separate-process CLI
+
+SP2. Depends R17c-1. Own `src/swarm/cli.py`, new `src/swarm/workers/runner.py`, `scripts/r17_cp3_separate_process_recovery.py`; tests `tests/workers/test_runner.py` plus real CP3 run.
+
+`swarm worker run --project <id>` uses scoped worker enrollment credential and WorkerClient. Claim, renew, execute approved task, submit; control plane accepts independently. Inference requests go to control-plane broker, never provider SDK credentials on worker. Termination stops renewal and lets durable expiry/reassignment handle recovery; no local task database/scheduler.
+
+Kill worker during a real bounded mission; launch replacement process, prove stale submit rejection and one accepted result. Also concurrent duplicate accept, cancellation and reconnect. Capture real process IDs/UTC times; second process on same host is not physical multi-host evidence. Exit CP3 complete for local process recovery; R18 physical gate remains.
+
+## R25b — CP4 scoped knowledge in real missions
+
+Artifact ART-V16-CONTEXT-BUDGET-EVIDENCE. Depends R25a. Own new `scripts/r25_cp4_knowledge_missions.py` and its focused harness checks. Real Postgres, real zero-paid brokered local inference, fixed A/B mission set and scorer/route manifest.
+
+A1 produces observation; separately authenticated operator with knowledge.accept grants accepted_fact (worker cannot). A2 reuses permitted item/version, with exact prompt and retrieval receipt refs. B's identical query cannot see A content or infer it through IDs/counts when A's hidden corpus changes from 1 to 50 items. Compare semantic actor-visible fields, excluding declared run IDs/timestamps. Supersession then tombstone remove old content and invalidate dependent summaries. Knowledge text is untrusted data, never a system directive.
+
+Token comparison uses same permitted full-history baseline and identical token estimator/tokenizer version, excluding cross-project content. Require a nontrivial frozen workload with relevant context and strict reduction; empty baseline is invalid, not a free pass. Correctness scorer must prove retained useful information; if quality is UNKNOWN, explicitly block the quality claim rather than silently calling the whole artifact complete. Negative controls include prompt injection, stale cached summary and direct cross-project lookup. Preserve every failed run; CP4 reviewable only when its own required properties are demonstrated.
+
+## R34a — integrated operational mission
+
+Artifact V1.7-integrated-audit. Depends R33b/R25a/R17c/R27d. Own new `scripts/r34_cp6_integrated_mission.py` and focused harness tests. One real zero-paid mission from API/CLI must contain broker reservation/settlement, DB lease claim/accept, knowledge retrieval and action receipts. Harness fails on any missing family or disconnected mission/task IDs. Use actual enforced sandbox for code tasks.
+
+Cancel after admission but before a new effect: prove new admission denied and stale result rejected; already-issued remote effect may require reconciliation, never promise it was undone. Kill/restart control process: same durable graph/operation identities resume without duplicate effects. Evidence must show operational service calls, not manually assembled receipt lists. CP5-REALWORLD may be pending separately; do not substitute these local runs for it.
+
+## R34b — CP6 exact candidate claim matrix
+
+Artifact V1.7-integrated-audit. Depends all entries in JSON, including R17c/R27d. Own `docs/evidence/v17-checkpoints/CP6/<run-id>/`; no source refactor. Freeze pushed source/schema/lock/config and protocol identities, complete configured check commands/exits/skips, CP0–CP5 refs plus real-world result, every V1.0–V1.7 registry artifact and its evidence disposition.
+
+Compute dimensions independently: implementation, wired, live_local, real_world, independently reviewed, external_pending, wall_clock_pending. Implementation-complete requires every core wiring/source row; live-checkpointed only for actual passed required checkpoints. Working requires R33c-2 plus relevant real-world policy. Accepted requires canonical governance and lower-version acceptance; no blanket label is allowed merely because a harness ran. Missing CP2, task quality, CI, provider, physical host or elapsed gate remains explicit.
+
+Negatives: mix candidate SHAs, hidden required skips, missing subsystem receipt, failed real-world run relabeled fixture pass, stale lead decision or self-review. Exit: internally consistent reviewable CP6 package and exact next independent packet/gate, whether or not all claims can be made.

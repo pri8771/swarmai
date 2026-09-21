@@ -1,12 +1,13 @@
-# SwarmAI future schema contracts — preparation draft
+# SwarmAI future schema contracts — closure proposal
 
 Date: 2026-09-21
 Status: PLANNING ONLY
-These are implementation-neutral fields/invariants, not final DB column definitions.
+These are planning contracts. The packet JSON, migration ownership sequence and transaction algorithms define the implementation order. Final Fable must reconcile concrete types/backfills against source before freezing the plan; no new source migration is authored by this document.
 
 ## V1.8 SiteAuthority
 
 ### SiteAuthority
+- authority_domain_id
 - site_id
 - epoch: monotonic integer
 - state: active|recovering|fenced|retired
@@ -15,6 +16,8 @@ These are implementation-neutral fields/invariants, not final DB column definiti
 - source_site_id optional
 - recovery_id optional
 - policy_version
+- policy_digest
+- proof_ref: independently verifiable old-site fencing evidence
 - content_digest
 
 Invariant:
@@ -22,11 +25,12 @@ Only one authoritative epoch may authorize new consequential work for a deployme
 
 ### AuthorityBinding
 Attach to dispatch/lease/result/effect:
+- authority_domain_id
 - site_id
 - site_epoch
 - authority_digest
 
-Reject stale epoch at:
+Compare the complete domain/site/epoch/digest binding, not epoch alone. A restored DB cannot self-certify globally current authority. Reject absent, stale or mismatched binding at:
 - task dispatch;
 - lease renewal where contract requires;
 - result acceptance;
@@ -91,6 +95,7 @@ Reject stale epoch at:
 - approval ref
 - enabled_at
 - revoked/draining state
+- grant_generation (monotonic; included in in-flight execution bindings)
 
 Invariant:
 Effective permission = intersection(manifest declaration, project grant, actor policy, global policy).
@@ -132,8 +137,12 @@ All counted candidate evidence binds to candidate_id.
 - queued_work
 - last_service_at
 - policy_version
+- round_number and round_cursor
+- last_credited_round
 
-### ResourceReservationIntent
+Credit accrues once per persisted round, with bounded restart catch-up; never per API poll.
+
+### DispatchIntent (earlier prose alias: ResourceReservationIntent)
 - intent_id
 - project_id/mission_id/task_id
 - attempt_id optional
@@ -141,6 +150,9 @@ All counted candidate evidence binds to candidate_id.
 - status: preparing|ready|released|expired|unknown
 - created_at/expires_at
 - site_epoch
+- authority_domain_id/site_id/authority_digest
+- scheduler_generation
+- dispatch_id: stable across restart/redelivery
 - policy_version
 
 Each resource entry:
@@ -149,8 +161,10 @@ Each resource entry:
 - amount
 - reservation_ref
 - state
+- settlement_receipt_ref (idempotent debit/refund/reconciliation)
 
 Task dispatch only after intent is ready.
+Reuse existing worker/provider/tool reservation owners; this intent coordinates their references and does not create another capacity or budget authority.
 
 ### SchedulerDecisionReceipt
 - decision_id
@@ -321,3 +335,5 @@ Allocation never authorizes a denied tool/provider/data scope.
 ## Audit invariant across all versions
 
 Every consequential state transition should be reconstructible from immutable or append-only receipts/references without needing private model chain-of-thought or secret material.
+
+V1.7 prerequisite: execution attempt number and receipt sequence are separate; every finalize carries executor/attempt/execution_generation. Shared authority storage is introduced/backfilled by 18-02 and enforced by 18-03/04. Keep legacy rows nonauthoritative until explicit reconciliation. Candidate manifests remain artifact manifests rather than a mandatory new DB table.

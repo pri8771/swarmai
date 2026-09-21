@@ -15,9 +15,9 @@ Current reusable seams:
 - outbox: `src/swarm/db/outbox.py`
 - mission scheduler: `src/swarm/controller/scheduler.py`
 - mission/controller: `src/swarm/controller/**`
-- worker registry: `src/swarm/workers/registry.py`
+- operational workers: `src/swarm/workers/service.py`; `registry.py` remains simulation-only after R17c
 - runtime checkpoints/session: `src/swarm/runtime/**`
-- knowledge/memory: `src/swarm/memory/**`
+- operational knowledge: `src/swarm/knowledge/**`; legacy `memory/**` is migration/simulation input
 - tools/actions: `src/swarm/tools/**`
 - contracts: `src/swarm/contracts/**`
 - self-development: `src/swarm/selfdev/**`
@@ -213,3 +213,12 @@ Current stack already includes the major needed primitives:
 - pytest/mypy/Ruff for verification.
 
 Prefer these over adding commodity infrastructure during the critical implementation path.
+
+
+## Closure-sweep source corrections
+
+`mission/runtime.py` currently constructs file-backed MissionStore, so R17b-1 explicitly maps durable mission/task/attempt state and makes file output a projection; R17b-2 wires leased execution. R17c-1 authenticates transport/worker routes and prohibits worker acceptance; R17c-2 supplies separate-process CLI. These are not merely constructor injection.
+
+`tools/sandbox_runner.py` at f2b8d5f executes host Python; network=False checks a flag, not OS network isolation. R28s owns enforced runtime integration before R28d can claim isolation. GitHub R33c-1 is a separate typed trusted-control-plane adapter and never widens the worker subprocess allowlist.
+
+Future exact owned paths and proposed new paths are recorded per packet in JSON and the generated catalog. Verify imports before assignment; current-source directories are not permission for broad rewrites.

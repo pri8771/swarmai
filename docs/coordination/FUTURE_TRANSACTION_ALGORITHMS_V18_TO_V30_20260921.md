@@ -93,7 +93,7 @@ transaction:
     eligible_projects = query admitted projects with runnable eligible work
 
     for each eligible project:
-        increment bounded deficit by base_quantum * weight
+        once per persisted scheduler ROUND (not each poll/call), increment bounded deficit by base_quantum * weight
         apply bounded urgency/aging bonus
         cap accumulated credit after downtime
 
@@ -303,3 +303,20 @@ if changed_paths intersects protected_paths:
 ```
 
 A separate externally authorized governance change may still be possible; it is not part of the selfdev proposal that benefits from it.
+
+
+## Closure-sweep safety contract (proposed; required input to final Fable audit)
+
+A17 effect invariants: exactly one execution admission wins per effect/generation. This is not a universal exactly-once external API guarantee. Lack of destination idempotency means an ambiguous result may remain unknown indefinitely rather than duplicating a write. Recompute semantic payload/destination binding before replay; require current authenticated identity and read permission to return a prior receipt. All mutating operational actions use durable state and current leases, including idempotent writes.
+
+Execution attempts and receipt events differ: attempt_number counts attempts; receipt_sequence orders immutable observations/transitions; transition_key deduplicates receipt append; one attempt can have many reconciliation observations. CAS state writes require the matching executor/attempt/execution_generation. Late observations never overwrite a successor attempt.
+
+A17 cancellation linearizes at durable execution admission. It prohibits future admissions, not an already-issued remote effect. Timeout is not proof of termination; absence in a listing is not proof of non-application. Reconciliation grants safe retry only when old send capability is quiescent and destination proof is definitive, or the destination itself enforces idempotency. Irreversible retry also needs a separately authenticated operator disposition and new approval. No arbitrary daemon/thread takes over on wall-clock expiry alone.
+
+A18 first supported profile: one private deployment, same primary authority DB for normal restart; backup restore starts read-only. Writability requires externally observed isolation of the old site's compute/credentials/network path as defined by a signed deployment fencing record. A restored DB cannot prove global freshness. Automatic multi-site failover remains unsupported without an approved independent fencing mechanism. Fable must trace the chosen mechanism against two writable copies before closing this design.
+
+A23 scheduling detail: persisted round number and round cursor grant bounded quantum once per eligible project per round, weighted by policy. Deficit cost is estimated frozen service units, debit exactly once when DispatchIntent becomes ready, reconcile actual usage once by settlement receipt; all retries remain charged to the origin. Failed admission without service refunds once; unknown usage remains conservatively reserved. Task tie break: bounded urgency/aging, enqueue time, task ID. Cap max credited rounds on restart; do not accrue by API polling. All capacities reuse existing owners. State-machine fixtures must demonstrate no credit minting, duplicate debit or quota bypass.
+
+A30 runtime authority: objective trigger/lifecycle transactions reference immutable version plus mutable revocation generation. Event uniqueness includes authenticated source and project; schedule identity includes exact UTC due instant and schedule version with explicit DST policy. Proposal-to-mission is transactional/idempotent with outbox; duplicate deliveries find the existing mission. Active slot and remaining objective budget are reserved atomically, with terminal release idempotency. Model-suggested stop conditions are advisory until deterministic authorized policy acts.
+
+A30 learning review: static -> calibration -> freeze -> sealed evaluation -> independent review -> bounded canary -> accepted runtime version. These runtime learned-version states are distinct from repository artifact acceptance. Protected authority cannot be a learnable target. Refusal to improve is a valid learning result; it cannot be relabeled as a successful promotion. Private digest-pinned packs are the initial ecosystem scope; public marketplace/signing distribution is deferred, with explicit schema/trust interface.

@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.1",
-  "status": "lead_approved_active_recovery_plan",
+  "schema_version": "1.2",
+  "status": "closure_revision_proposed_not_canonical",
   "generated_at": "2026-09-21T20:30:00Z",
   "branch": "cursor/v17-single-session",
   "session": "CURSOR-V17-SINGLE",
@@ -20,9 +20,12 @@
       "checkpoint": "CP0",
       "status": "review_pending",
       "audit": "CP0 local health green (ruff, mypy, 94 tests). Exact-tip CI blocked: gate EXT-ACTIONS-BILLING. Probable root cause O1; fix first with OPS-CI-01.",
-      "gate": "EXT-ACTIONS-BILLING",
       "remediation": [
         "OPS-CI-01"
+      ],
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-ACTIONS-BILLING"
       ]
     },
     {
@@ -34,7 +37,9 @@
       "type": "code",
       "goal": "Ground reviewer in actual diff/target/focused regression; reject stale unrelated review.",
       "status": "impl_complete",
-      "audit": "Source + 5 focused tests at bb54517. No evidence folder (finding V5)."
+      "audit": "Source + 5 focused tests at bb54517. No evidence folder (finding V5).",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R02",
@@ -51,7 +56,10 @@
         "R02a",
         "R02b"
       ],
-      "gate": "EXT-V14-LEAD-REVIEW"
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-V14-LEAD-REVIEW"
+      ]
     },
     {
       "id": "R03",
@@ -62,7 +70,9 @@
       "type": "transplant",
       "goal": "Selectively transplant G13 v3 corpus/freeze/verifier source+tests from product donor; exclude coordination daemons.",
       "status": "impl_complete",
-      "audit": "Selective G13 v3 transplant at 26e9cc3; 8 focused tests."
+      "audit": "Selective G13 v3 transplant at 26e9cc3; 8 focused tests.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R04",
@@ -74,7 +84,10 @@
       "goal": "Run current-topology generator/verifier/Ruff/mypy/offline tests and bind frozen digests.",
       "status": "evidence_only",
       "audit": "Mac verification of 240 held-out inputs + digests. Registry still requires HOST-WIN-DEV verification or a lead governance change.",
-      "gate": "EXT-G13-WIN-VERIFY"
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-G13-WIN-VERIFY"
+      ]
     },
     {
       "id": "R05",
@@ -85,7 +98,9 @@
       "type": "code",
       "goal": "Reviewer input/scorer/calibration/contamination guard only.",
       "status": "review_pending",
-      "audit": "Calibration contract + scorer at 7687753; 10/10 calibration receipt; no held-out run."
+      "audit": "Calibration contract + scorer at 7687753; 10/10 calibration receipt; no held-out run.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R06",
@@ -97,7 +112,11 @@
       "goal": "Bind real sealed references without exposing held-out answers.",
       "status": "blocked_external",
       "audit": "Needs the lead-held sealed reference bundle digest.",
-      "gate": "EXT-G13-SEALED-DIGEST"
+      "entry_gates": [
+        "EXT-G13-WIN-VERIFY",
+        "EXT-G13-SEALED-DIGEST"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R07",
@@ -108,7 +127,12 @@
       ],
       "type": "live",
       "goal": "Counted held-out qualification in 5-observation batches; frozen scorer/config.",
-      "status": "planned"
+      "status": "planned",
+      "entry_gates": [
+        "EXT-G13-WIN-VERIFY",
+        "EXT-G13-SEALED-DIGEST"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R08",
@@ -118,7 +142,9 @@
       ],
       "type": "evidence",
       "goal": "Compute actual planning/coordination/retry/review overhead.",
-      "status": "planned"
+      "status": "planned",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R09",
@@ -130,7 +156,10 @@
       "goal": "Admit at least two exact account-specific zero-charge remote routes or emit precise USER_ACTION blocker.",
       "status": "blocked_external",
       "audit": "0 admitted remote routes. Needs operator-confirmed zero-charge entitlement + fresh $0 canaries for >= 2 providers.",
-      "gate": "EXT-G12-REMOTE-ROUTES"
+      "entry_gates": [
+        "EXT-G12-REMOTE-ROUTES"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R10",
@@ -140,7 +169,9 @@
       ],
       "type": "live",
       "goal": "Concurrent governed remote calls + reservation/settlement + disable-to-allowed-alternate.",
-      "status": "planned"
+      "status": "planned",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R11",
@@ -151,7 +182,9 @@
       ],
       "type": "live",
       "goal": "Qualified adaptive multi-task mission with graph change/reviewer/bounded stop.",
-      "status": "planned"
+      "status": "planned",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R12",
@@ -163,7 +196,12 @@
       "goal": "Start canonical wall-clock campaign immediately; run while later implementation continues.",
       "status": "planned",
       "audit": "24h wall-clock window; cannot start until R11 and lead prerequisite confirmation.",
-      "gate": "WC-LIVE142-24H"
+      "entry_gates": [
+        "REV-LIVE142-START"
+      ],
+      "exit_gates": [
+        "WC-LIVE142-24H"
+      ]
     },
     {
       "id": "R13",
@@ -174,7 +212,9 @@
       "type": "transplant",
       "goal": "Port durable lease schema/foundation donor source 630ab780 + 92f59faf source/tests only.",
       "status": "evidence_only",
-      "audit": "Re-verification only: source landed earlier in V2A-003a/003a-R commits. 11 tests on real Postgres."
+      "audit": "Re-verification only: source landed earlier in V2A-003a/003a-R commits. 11 tests on real Postgres.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R14",
@@ -185,7 +225,9 @@
       "type": "transplant",
       "goal": "Port claim/renew/expire donor source 7dcefe4c + e764834a + 685810cc source/tests only.",
       "status": "evidence_only",
-      "audit": "Re-verification only (V2A-003b). 17 tests on real Postgres."
+      "audit": "Re-verification only (V2A-003b). 17 tests on real Postgres.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R15",
@@ -196,7 +238,9 @@
       "type": "code",
       "goal": "Durable result acceptance fence with project/task/source/generation/lease/cancel/reservation/uniqueness negatives.",
       "status": "evidence_only",
-      "audit": "Re-verification only (V2A-003c ddd96a6). 10 tests on real Postgres."
+      "audit": "Re-verification only (V2A-003c ddd96a6). 10 tests on real Postgres.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R16",
@@ -211,7 +255,9 @@
       "remediation": [
         "R17b",
         "R17c"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R17",
@@ -226,7 +272,9 @@
       "audit": "CP3 genuinely live; 7 of 9 requirements shown. Missing cancellation-generation rejection; duplicate race sequential (finding V2).",
       "remediation": [
         "R17a"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R18",
@@ -238,7 +286,10 @@
       "goal": "Actual second-host worker proof if accessible; otherwise exact blocker.",
       "status": "blocked_external",
       "audit": "No second physical host.",
-      "gate": "EXT-V15-SECOND-HOST"
+      "entry_gates": [
+        "EXT-V15-SECOND-HOST"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R19",
@@ -249,7 +300,9 @@
       "type": "code",
       "goal": "KnowledgeItem/KnowledgeLink/Tombstone versioned contracts.",
       "status": "evidence_only",
-      "audit": "Re-verification only (V2B-003a 7f86981)."
+      "audit": "Re-verification only (V2B-003a 7f86981).",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R20",
@@ -260,7 +313,9 @@
       "type": "code",
       "goal": "Durable project-scoped versioned knowledge repository.",
       "status": "evidence_only",
-      "audit": "Re-verification only."
+      "audit": "Re-verification only.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R21",
@@ -271,7 +326,9 @@
       "type": "code",
       "goal": "Permission candidate prefilter before ranking; no cross-project existence leak.",
       "status": "evidence_only",
-      "audit": "Re-verification only. pytest output byte-identical to R22 and R23 (finding V1)."
+      "audit": "Re-verification only. pytest output byte-identical to R22 and R23 (finding V1).",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R22",
@@ -282,7 +339,9 @@
       "type": "code",
       "goal": "Permitted-only ranking/context + retrieval receipt/provenance/token cost.",
       "status": "evidence_only",
-      "audit": "Re-verification only. Shares R21's pytest output (finding V1)."
+      "audit": "Re-verification only. Shares R21's pytest output (finding V1).",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R23",
@@ -293,7 +352,9 @@
       "type": "code",
       "goal": "Contradiction/supersession/deletion/tombstone and dependent invalidation.",
       "status": "evidence_only",
-      "audit": "Re-verification only. Shares R21's pytest output (finding V1)."
+      "audit": "Re-verification only. Shares R21's pytest output (finding V1).",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R24",
@@ -305,7 +366,9 @@
       "type": "code",
       "goal": "Conservative legacy MemoryStore adapter; no auto accepted_fact promotion.",
       "status": "evidence_only",
-      "audit": "Re-verification only; 3 memory tests."
+      "audit": "Re-verification only; 3 memory tests.",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R25",
@@ -324,7 +387,9 @@
       "remediation": [
         "R25a",
         "R25b"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R26",
@@ -338,7 +403,9 @@
       "audit": "No test executed. Contracts trust envelope classification and default the fences (findings A1, A2).",
       "remediation": [
         "R28b"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R27",
@@ -356,7 +423,9 @@
         "R27c",
         "R27d",
         "R27e"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R28",
@@ -373,7 +442,9 @@
         "R28b",
         "R28c",
         "R28d"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R29",
@@ -388,7 +459,9 @@
       "split_into": [
         "R29a",
         "R28d"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R30",
@@ -403,7 +476,9 @@
       "split_into": [
         "R30a",
         "R30b"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R31",
@@ -418,7 +493,9 @@
       "split_into": [
         "R31a",
         "R31b"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R32",
@@ -433,7 +510,9 @@
       "audit": "Negatives exist piecemeal; matrix missing.",
       "split_into": [
         "R32a"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R33",
@@ -453,7 +532,9 @@
         "R33a",
         "R33b",
         "R33c"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R33c",
@@ -470,8 +551,13 @@
       "sp": 2,
       "tier": "small-mid",
       "spec": "docs/coordination/packets/R33c.md",
-      "status": "planned",
-      "gate": "EXT-V17-REALWORLD-GITHUB"
+      "status": "split",
+      "split_into": [
+        "R33c-1",
+        "R33c-2"
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R34",
@@ -490,7 +576,9 @@
       "split_into": [
         "R34a",
         "R34b"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "OPS-CI-01",
@@ -504,14 +592,14 @@
       "status": "ready",
       "fixes": [
         "O1"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R27a",
       "artifact": "ART-V17-APPROVAL-BINDING",
-      "depends": [
-        "R27"
-      ],
+      "depends": [],
       "type": "code",
       "goal": "Durable immutable action_receipts table + effect bookkeeping columns; replay returns the original receipt.",
       "sp": 2,
@@ -522,7 +610,12 @@
         "E1",
         "E9",
         "E10"
-      ]
+      ],
+      "basis": [
+        "R27"
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R27b",
@@ -540,7 +633,13 @@
         "E2",
         "E3",
         "E8"
-      ]
+      ],
+      "surfaces": [
+        "src/swarm/tools/effects.py",
+        "src/swarm/tools/v17_gateway.py"
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R27c",
@@ -558,7 +657,9 @@
         "E4",
         "A3"
       ],
-      "review_hold": "lead reviews diff before R27e"
+      "review_hold": "Independent review of transaction/lock/fence diff before dependants start",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R27d",
@@ -575,13 +676,18 @@
       "fixes": [
         "A4",
         "A5"
-      ]
+      ],
+      "entry_gates": [
+        "REV-R27C"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R27e",
       "artifact": "ART-V17-APPROVAL-BINDING",
       "depends": [
-        "R27c"
+        "R27c",
+        "R27d"
       ],
       "type": "code",
       "goal": "Orphaned executing -> unknown (never reserved); reconcile verdict gating by side-effect class; real kill tests.",
@@ -593,13 +699,18 @@
         "E5",
         "E10"
       ],
-      "review_hold": "lead reviews diff"
+      "review_hold": "lead reviews diff",
+      "entry_gates": [
+        "REV-R27C"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R28a",
       "artifact": "ART-V17-TOOL-CONTRACT",
       "depends": [
-        "R27e"
+        "R27e",
+        "R27d"
       ],
       "type": "code",
       "goal": "Fail-closed outcome mapping, adapter deadline, durable store required for consequential effects.",
@@ -612,7 +723,11 @@
         "E7",
         "E11",
         "I4"
-      ]
+      ],
+      "entry_gates": [
+        "REV-R27E"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R28b",
@@ -630,7 +745,9 @@
         "A1",
         "A2",
         "A6"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R28c",
@@ -647,7 +764,9 @@
       "fixes": [
         "W2",
         "I1"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R29a",
@@ -663,13 +782,17 @@
       "status": "planned",
       "fixes": [
         "I3"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R28d",
       "artifact": "ART-V17-TOOL-CONTRACT",
       "depends": [
-        "R29a"
+        "R29a",
+        "R17b",
+        "R28s"
       ],
       "type": "code",
       "goal": "Mission RepoWorker file writes and commands go through the boundary (local.sandbox); no direct effects.",
@@ -679,6 +802,10 @@
       "status": "planned",
       "fixes": [
         "W1"
+      ],
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-LOCAL-SANDBOX"
       ]
     },
     {
@@ -694,7 +821,9 @@
       "fixes": [
         "I2",
         "O3"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R30b",
@@ -712,7 +841,9 @@
       "status": "planned",
       "fixes": [
         "I2"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R31a",
@@ -730,7 +861,9 @@
       "status": "planned",
       "fixes": [
         "I2"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R31b",
@@ -747,7 +880,9 @@
       "status": "planned",
       "fixes": [
         "I2"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R32a",
@@ -762,7 +897,9 @@
       "sp": 2,
       "tier": "small",
       "spec": "docs/coordination/packets/R32a.md",
-      "status": "planned"
+      "status": "planned",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R33a",
@@ -779,7 +916,9 @@
       "tier": "mid",
       "spec": "docs/coordination/packets/R33a.md",
       "status": "planned",
-      "checkpoint": "CP5"
+      "checkpoint": "CP5",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R33b",
@@ -793,14 +932,16 @@
       "tier": "small",
       "spec": "docs/coordination/packets/R33a.md",
       "status": "planned",
-      "checkpoint": "CP5"
+      "checkpoint": "CP5",
+      "entry_gates": [
+        "EXT-LOCAL-SANDBOX"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R17a",
       "artifact": "ART-V15-RECOVERY-EVIDENCE",
-      "depends": [
-        "R17"
-      ],
+      "depends": [],
       "type": "live",
       "goal": "Close CP3 gaps: cancellation-generation rejection and truly concurrent duplicate accept; rerun CP3.",
       "sp": 2,
@@ -810,7 +951,12 @@
       "fixes": [
         "V2"
       ],
-      "checkpoint": "CP3"
+      "checkpoint": "CP3",
+      "basis": [
+        "R17"
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R02a",
@@ -823,7 +969,9 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R02a.md",
-      "status": "ready"
+      "status": "ready",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R02b",
@@ -838,7 +986,10 @@
       "spec": "docs/coordination/packets/R-LATER-V17.md",
       "status": "planned",
       "checkpoint": "CP1",
-      "gate": "EXT-V14-LEAD-REVIEW"
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-V14-LEAD-REVIEW"
+      ]
     },
     {
       "id": "R25a",
@@ -854,7 +1005,9 @@
       "status": "planned",
       "fixes": [
         "W3"
-      ]
+      ],
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R25b",
@@ -871,23 +1024,31 @@
       "fixes": [
         "V3"
       ],
-      "checkpoint": "CP4"
+      "checkpoint": "CP4",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "R17b",
       "artifact": "ART-V15-WORKER-PROTOCOL",
       "depends": [
         "R17a",
-        "R28d"
+        "R28b"
       ],
       "type": "code",
       "goal": "Leased execution mode for MissionRuntime; reconcile_leases implemented; LeaseFenceProvider on the gateway.",
       "sp": 3,
       "tier": "high",
       "spec": "docs/coordination/packets/R-LATER-V17.md",
-      "status": "planned",
+      "status": "split",
       "fixes": [
         "W4"
+      ],
+      "entry_gates": [],
+      "exit_gates": [],
+      "split_into": [
+        "R17b-1",
+        "R17b-2"
       ]
     },
     {
@@ -901,9 +1062,15 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R-LATER-V17.md",
-      "status": "planned",
+      "status": "split",
       "fixes": [
         "W4"
+      ],
+      "entry_gates": [],
+      "exit_gates": [],
+      "split_into": [
+        "R17c-1",
+        "R17c-2"
       ]
     },
     {
@@ -912,7 +1079,8 @@
       "depends": [
         "R33b",
         "R25a",
-        "R17b"
+        "R17c",
+        "R27d"
       ],
       "type": "live",
       "goal": "One real $0 mission proving broker, lease, knowledge and action receipts are all on the path; cancel and restart negatives.",
@@ -920,7 +1088,11 @@
       "tier": "mid",
       "spec": "docs/coordination/packets/R-LATER-V17.md",
       "status": "planned",
-      "checkpoint": "CP6"
+      "checkpoint": "CP6",
+      "entry_gates": [
+        "EXT-LOCAL-SANDBOX"
+      ],
+      "exit_gates": []
     },
     {
       "id": "R34b",
@@ -929,22 +1101,173 @@
         "R34a",
         "R02b",
         "R25b",
-        "R17a"
+        "R17a",
+        "R17c",
+        "R27d"
       ],
       "type": "audit",
-      "goal": "Exact-tip CP6 package on the claim ladder; open gates listed; label limited to IMPLEMENTATION-COMPLETE / LIVE-CHECKPOINTED / FORMAL-ACCEPTANCE-PENDING.",
+      "goal": "Produce truthful CP6 claim matrix: implementation, wiring, live-local, real-world, independent review, external and elapsed gates independently. Never assert blanket completion if any required row is missing.",
       "sp": 2,
       "tier": "high",
       "spec": "docs/coordination/packets/R-LATER-V17.md",
       "status": "planned",
-      "checkpoint": "CP6"
+      "checkpoint": "CP6",
+      "claim_requirements": {
+        "implementation": [
+          "R27d",
+          "R28d",
+          "R25a",
+          "R17c",
+          "R32a",
+          "R28s"
+        ],
+        "live_local": [
+          "R17a",
+          "R25b",
+          "R33b",
+          "R34a"
+        ],
+        "real_world": [
+          "R33c"
+        ],
+        "independent_review": [
+          "EXT-V14-LEAD-REVIEW"
+        ],
+        "formal_acceptance": "Every required registry artifact and lower-version gate; a queue state cannot grant acceptance."
+      },
+      "entry_gates": [],
+      "exit_gates": []
+    },
+    {
+      "id": "R33c-1",
+      "artifact": "V1.7-live-integration",
+      "artifacts_also": [
+        "ART-V17-INTEGRATION-MANIFEST",
+        "ART-V17-PERMISSION-NEGATIVES"
+      ],
+      "depends": [
+        "R28b",
+        "R29a",
+        "R17c"
+      ],
+      "spec": "docs/coordination/packets/R33c.md#adapter",
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Typed least-privilege GitHub adapter",
+      "entry_gates": [],
+      "exit_gates": []
+    },
+    {
+      "id": "R33c-2",
+      "artifact": "V1.7-live-integration",
+      "artifacts_also": [
+        "ART-V17-INTEGRATION-MANIFEST",
+        "ART-V17-PERMISSION-NEGATIVES"
+      ],
+      "depends": [
+        "R33c-1",
+        "R33b"
+      ],
+      "spec": "docs/coordination/packets/R33c.md#harness",
+      "type": "external_live",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Run approved real issue/comment/close and replay through the operational gateway",
+      "entry_gates": [
+        "EXT-V17-REALWORLD-GITHUB"
+      ],
+      "exit_gates": []
+    },
+    {
+      "id": "R28s",
+      "artifact": "ART-V17-TOOL-CONTRACT",
+      "artifacts_also": [
+        "ART-V17-PERMISSION-NEGATIVES"
+      ],
+      "depends": [
+        "R28b"
+      ],
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "spec": "docs/coordination/packets/R28s.md",
+      "goal": "Enforce container development isolation; the current runner is host subprocess, not a network/filesystem sandbox.",
+      "entry_gates": [],
+      "exit_gates": [
+        "EXT-LOCAL-SANDBOX"
+      ]
+    },
+    {
+      "id": "R17b-1",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17a",
+        "R28b"
+      ],
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Durable mission/attempt mapping; file store is a projection",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "entry_gates": [],
+      "exit_gates": []
+    },
+    {
+      "id": "R17b-2",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17b-1"
+      ],
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Leased controller/runtime loop and real authority fences",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "entry_gates": [],
+      "exit_gates": []
+    },
+    {
+      "id": "R17c-1",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17b"
+      ],
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Authenticated worker transport and durable API read model",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "entry_gates": [],
+      "exit_gates": []
+    },
+    {
+      "id": "R17c-2",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17c-1"
+      ],
+      "type": "code",
+      "sp": 2,
+      "tier": "mid",
+      "status": "planned",
+      "goal": "Separate-process CLI worker; real mission recovery CP3",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "entry_gates": [],
+      "exit_gates": []
     }
   ],
   "audited_implementation_tip": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
   "previous_audit": "docs/coordination/V17_CODE_AUDIT_20260921_1432.md",
   "spec_dir": "docs/coordination/packets/",
   "spec_conventions": "docs/coordination/packets/README.md",
-  "selection_rule": "First packet in file order with status ready, or planned with every dependency satisfied. Satisfied = impl_complete, live_checkpointed, evidence_only or review_pending. A split packet is satisfied when every id in split_into is satisfied. A gaps_found or changes_required packet is satisfied for the packets listed in its own remediation, and for everyone else only once all of that remediation is satisfied. blocked_external packets are skipped, never waited on. `gate` on a planned packet names what must clear before its artifact can advance, not before work can start. Compute the ready set with: python3 docs/coordination/tools/validate_plan.py --ready",
+  "selection_rule": "tools/validate_plan.py --ready resolves executable edges and split/remediation completion, then blocks unmet entry_gates. basis is audit provenance only. exit_gates limit claims, not implementation. Printed readiness is conditional on independently reviewed adoption.",
   "status_vocabulary": [
     "planned",
     "ready",
@@ -963,10 +1286,12 @@
   "claim_ladder": [
     "implementation",
     "wired",
-    "live_checkpoint",
+    "live_local",
+    "real_world",
     "independent_review",
-    "external_gate",
-    "wall_clock_gate"
+    "external_pending",
+    "wall_clock_pending",
+    "accepted_by_registry_only"
   ],
   "tiers": {
     "small": "Haiku-class or equivalent, low effort",
@@ -983,7 +1308,9 @@
       "action": "Restore GitHub Actions billing / spending limit under Billing & plans.",
       "blocks": [
         "exact-tip CI line of CP0 and CP6"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V14-LEAD-REVIEW",
@@ -994,7 +1321,9 @@
       "blocks": [
         "ART-V14-REAL-E2E verified",
         "CP1"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-G13-WIN-VERIFY",
@@ -1006,7 +1335,9 @@
         "ART-V13-TASK-POOL verified",
         "R06",
         "R07"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-G13-SEALED-DIGEST",
@@ -1019,7 +1350,9 @@
         "R07",
         "R08",
         "R11"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-G12-REMOTE-ROUTES",
@@ -1032,7 +1365,9 @@
         "R10",
         "R11",
         "R12"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V15-SECOND-HOST",
@@ -1043,7 +1378,9 @@
       "blocks": [
         "R18",
         "ART-V15-MULTIHOST-EVIDENCE"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V10-WORKER-HEARTBEAT",
@@ -1054,7 +1391,9 @@
       "blocks": [
         "V1.0-repair accepted",
         "LIVE-142 prerequisites"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "WC-LIVE142-24H",
@@ -1068,7 +1407,9 @@
         "ART-LIVE142-CAMPAIGN",
         "ART-LIVE142-FINAL-REPORT",
         "V1.4 accepted"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V17-REALWORLD-GITHUB",
@@ -1079,8 +1420,53 @@
       "blocks": [
         "R33c",
         "V1.7 working claim"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
+    },
+    {
+      "id": "REV-R27C",
+      "kind": "review",
+      "owner": "independent lead",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Review exact R27c diff and race evidence before R27d/R27e; no self-review."
+    },
+    {
+      "id": "REV-R27E",
+      "kind": "review",
+      "owner": "independent lead",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Review unknown outcome, late executor and irreversible retry semantics before R28a."
+    },
+    {
+      "id": "REV-LIVE142-START",
+      "kind": "review",
+      "owner": "independent lead",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Confirm frozen G10-G14 candidate and protocol prerequisites, including authentic qualification/remote routes, before actual 24h campaign start."
+    },
+    {
+      "id": "EXT-LOCAL-SANDBOX",
+      "kind": "external",
+      "owner": "operator/runtime preflight",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Verify local container runtime and pinned test image enforce filesystem/network/resource restrictions; no host fallback. Availability is unverified by this planning pass."
     }
   ],
-  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_INDEPENDENT_LEAD_REVIEW_20260921.md on coordination/swarm-control (prior baseline only)",
+  "planning_revision": "closure-sweep-20260921-proposed",
+  "activation": {
+    "state": "pending_independent_review",
+    "scope": "This closure revision only; prior canonical approval is not approval of these amendments. Planning branch is not the worker queue until reviewed adoption."
+  },
+  "observed_baseline": {
+    "planning": "390ab1def9b3596fecb3c13b3501774770aa89ef",
+    "implementation": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
+    "coordination": "4764087c19d3fb0e0ea26b3eded9c1d1807afcd7",
+    "heartbeat_at": "2026-09-21T22:02:36Z"
+  }
 }

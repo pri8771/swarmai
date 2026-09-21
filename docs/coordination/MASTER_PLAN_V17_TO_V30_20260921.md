@@ -1,96 +1,133 @@
-# SwarmAI master plan — V1.7 core platform -> V3.0
+# SwarmAI execution plan through V3.0
 
-Date: 2026-09-21
-Status: PLANNING ONLY — section 0 revised by the Fable planning pass (proposed, pending lead review)
+Status: closure-sweep proposal on `fable/v3-planning`; final Fable audit and independent lead review remain. This document does not accept product artifacts or promote itself into coordination.
 
-## 0. Execution system — audited truth and how work flows (Fable planning pass, 2026-09-21T20:30Z, PROPOSED — pending lead review)
+## 0. Finish planning in two sweeps
 
-This section is the single human entry point for planning. Machine-readable truth lives in three DAG files checked by `tools/validate_plan.py`; this section summarizes them and must not contradict them.
+The user wants this sweep plus one final Fable sweep to complete the plan. “Planning complete” means the executable roadmap below has no missing architecture decisions, packet contracts, dependency edges, evidence gates or ownership rules. It does not mean implementation or elapsed campaigns have happened.
 
-### 0.1 Audited position (implementation tip `f2b8d5f`, coordination `eebd59a`)
+**This sweep:** reconcile live state, repair unsafe/incomplete packet semantics, detail all V1.8–V3.0 execution nodes, define terminal deliverables, and make human/JSON plans mechanically agree. **Final Fable sweep:** adversarially check those contracts against current source, split remaining broad packets, close contradictions in place, run the closure checks and return a reviewable commit. No third general planning pass is intended; future changes are bounded defect/source-drift amendments.
 
-- No version ≥ 1.0 is formally accepted. The highest fully `verified` required set is V1.1.
-- The operational product path is V1.4-in-repair: real `$0` brokered missions run; `v14-real-005` and `-007` both failed independent review.
-- V1.5, V1.6 and V1.7 exist as **standalone libraries**. The mission path calls none of them. The V1.7 effect boundary has fail-open defects. Packets R13–R16 and R19–R27 were docs-only re-verification.
-- Live checkpoints: CP0 local-only (CI blocked), CP1 failed review, CP3 7/9, CP2/CP4/CP5/CP6 absent.
-- Full findings: `V17_CODE_AUDIT_20260921_2030_FABLE.md`.
+### 0.1 Observed baseline and intent
 
-### 0.2 Claim ladder (never collapse these)
+- Repo: `pri8771/swarmai`. Source inspected: `cursor/v17-single-session@f2b8d5f7dfd65530e73c63438c229b9fa428f922`.
+- Coordination observed: `4764087c19d3fb0e0ea26b3eded9c1d1807afcd7`; heartbeat at `2026-09-21T22:02:36Z`, packet R27, last meaningful activity `20:05:50Z`. Its scalar says working while next-action text says paused on blockers. Treat that as liveness, not implementation progress.
+- Planning baseline: `390ab1def9b3596fecb3c13b3501774770aa89ef`. Read the **independent** review at `coordination/swarm-control:docs/coordination/reviews/FABLE_V3_PLANNING_INDEPENDENT_LEAD_REVIEW_20260921.md`; the older similarly named worker-authored review is superseded on coordination.
+- Registry: 86 artifacts, `updated_at=2026-09-21T17:08:54Z`; its states have not been advanced by this sweep. Source/history corroborates library-to-runtime wiring gaps and in-memory action receipts. No new product test pass is claimed.
+- Product intent recovered from prior context: several bounded crews cooperate on a shared goal across isolated projects; one kernel controls execution, resources and acceptance. Durable artifacts/evidence, efficient scoped context and genuine SwarmAI self-development are the product, with private self-hosted operation first.
 
-| Rung | Meaning | Who sets it |
+### 0.2 What “the end” delivers
+
+The V3.0 private operational candidate must let an operator install, create scoped projects, declare a bounded objective and then observe authenticated schedule/event triggers producing normally admitted missions. Those missions use qualified zero-spend routes, fair shared capacity, durable workers, scoped knowledge and the single action/approval boundary. Restart, worker loss, restore, cancellation and unknown remote outcomes preserve safety and evidence. Learning can propose/evaluate/canary/roll back a version; self-development can produce an isolated independently reviewed candidate. Packs and audit exports remain tenant scoped.
+
+The operator receives versioned deployment/install/upgrade/rollback/restore runbooks, a support matrix, source/lock/schema/config manifests, artifact/evidence crosswalk and open incident/gate report. No required artifact or safety defect may disappear behind an overall percentage. Public distribution/marketplace, paid fallback, production rollout, main merge and autonomous governance changes remain separate operator decisions.
+
+**End-state predicates:** (a) source implementation and operational wiring complete; (b) required deterministic/DB/adversarial tests passed with no hidden required skips; (c) actual real-world checkpoints completed; (d) all required elapsed windows observed on compatible candidates; (e) independent review and registry acceptance for every required artifact, or an explicit versioned waiver by authorized governance; (f) private operator handoff verified. If (c)–(e) are externally blocked, report exactly which predicates remain false rather than “done.”
+
+### 0.3 Evidence and execution state model
+
+| Dimension | Evidence required | Authority |
 |---|---|---|
-| `implementation` | source + deterministic/real-DB negatives pushed | worker (`impl_complete`) |
-| `wired` | reachable from the operational path (API/CLI/mission), not only from tests | worker, proven by an AST or receipt check |
-| `live_checkpoint` | CPx run on the pushed tip with real processes/DB/HTTP/inference, failures preserved | worker (`live_checkpointed`) |
-| `independent_review` | lead reviewed source + evidence | lead (`verified`) |
-| `external_gate` | human/external input outstanding (`EXT-*`) | operator/lead |
-| `wall_clock_gate` | real elapsed time outstanding (`WC-*`) | clock; never backfilled |
-| `accepted` | artifact fills its milestone role | lead, in `ARTIFACT_REGISTRY.json` only |
+| Implemented | exact pushed source and focused tests | worker report |
+| Wired | operational API/CLI/mission invokes the service, receipt trace | worker report |
+| Live-local | real DB/process/fixture mechanics, correctly labeled | worker report |
+| Real-world | relevant real service/physical host/outage/fresh install | independent checkpoint review |
+| Verified | independent source/evidence review | lead |
+| Accepted | every required role/criterion satisfied | registry governance |
+| External-pending | named owner, action, blocked claim and next runnable work | operator/lead |
+| Wall-clock-pending | actual start/end/identity/monitor continuity | observed time + reviewer |
 
-A version label is a summary of accepted artifact sets. "V1.7 implementation-complete + live-checkpointed" means rungs 1–3 for every V1.5–V1.7 required artifact, with rungs 4–7 reported as open.
+Packet `depends` are executable prerequisites. `basis` is historical audit provenance. `entry_gates` prevent starting that packet until evidenced; `exit_gates` prevent the corresponding claim, while allowing independent implementation. Split/remediation parents complete only when their children complete. Review holds are explicit gates. Readiness printed from the planning branch is conditional on reviewed adoption, never dispatch authorization.
 
-### 0.3 Critical paths
+### 0.4 Detailed delivery sequence
 
-**To V1.7 implementation-complete + live-checkpointed** (27 packets, 5 ready now):
-`OPS-CI-01` → `R27a → R27b → R27c → {R27d, R27e}` → `R28a → R28b → R28c → R29a → R28d` → (`R30a` ∥) `{R30b, R31a → R31b}` → `R32a` → `R33a → R33b (CP5)`; in parallel lanes of the same single worker: `R17a (CP3)`, `R02a → R02b (CP1)`; then `R25a → R25b (CP4)`, `R17b → R17c`, `R34a → R34b (CP6)`.
-Longest chain: R27a … R28d … R33b … R34b. Nothing on it needs an external gate. Formal V1.7 *acceptance* additionally needs every `EXT-*`/`WC-*` gate below.
+| Stage | Exact work and dependency path | Deliverable and completion proof |
+|---|---|---|
+| 0 — stabilize execution truth | OPS-CI-01; R02a; R17a; R30a are independent foundations. Keep source/review/CI infrastructure failures separate. | CI churn corrected before account restoration; pre-patch defect proof; complete CP3 negatives; reproducible HTTP fault fixture. |
+| 1 — durable effects | R27a→R27b→R27c; independent transaction review; R27d→R27e; independent crash review; R28a→R28b. | Ordered durable receipts, exact payload binding, one execution admission, atomic approval use, current lease/cancel checks, unknown outcomes never blindly replayed. |
+| 2 — operational wiring | R28c→R29a; R17a+R28b→R17b; R17b+R29a+R28s→R28d; R17b→R17c; R28d→R25a→R25b. | One adapter registry, true leased worker path, sandboxed task effects, durable worker API, scoped knowledge on real prompts. No static/in-memory operational authority fallback. |
+| 3 — V1.7 proof | R30a+R29a+R28a→R30b and R31a→R31b; R32a→R33a→R33b. R33c-1 typed GitHub adapter; R33c-2 real issue/comment/close. R02a→R02b authentic mission. R34a→R34b integrated CP6 matrix. | CP1/CP3/CP4/CP5/CP5-REALWORLD/CP6 each tied to candidate; CP2 and lower acceptance gates listed honestly. Implementation can finish while real-world gate remains pending, but “working” cannot. |
+| 4 — V1.8 recovery | 18-00 reviewed handoff; 18-00a freeze supported fencing profile; 18-01/02 authority contracts+storage; 18-03/04 dispatch/result/effect fences; 18-05/06 manifest+backup; 18-07 restore; 18-08 negative matrix; 18-09 actual outage. | Restore starts read-only, old site externally fenced before new writes, unknown effects preserved, measured RPO/RTO. Restored DB epoch alone never establishes authority. |
+| 5 — V1.9 productization | 19-00 beta criteria; 19-01/02/03 manifests+grant lifecycle+gateway; 19-04/05/06 install/upgrade/rollback+diagnostics; 19-07 own-runtime selfdev; 19-08 combined CP19; 19-09 external install, 19-10 real Windows. | Fresh operator can run/recover a mission; extension cannot widen authority; selfdev yields independently reviewable isolated candidate. Support only evidenced environments. |
+| 6 — V2.0 candidate | 20-01 integration/hardening; 20-02 candidate freeze; 20-03 exact checks; 20-04–07 install/rollback/security/performance. 20-08a frozen protocol; 20-08b start after reviewed preflight; 20-08c seven-day completion; 20-09 independent release review. | One supported integrated private candidate; 168h compatible observation, required drills and lower acceptance gates. No release/merge implied by review. |
+| 7 — V2.3 operations | 23-01–03 durable fair selection; 23-04/05 reservations/recovery; 23-06 drain/cancel; 23-07 single scheduler restart; 23-08 explain UI; 23-09 packs; 23-10 portability; 23-11 trust/locality placement; 23-12 frozen fairness; 23-13 real fleet CP23; 23-14 review. | At least two physically distinct nodes, constrained capacity, non-fixture external action/provider, restart/drain/reassignment, zero tenant leakage. No second scheduler or budget authority. |
+| 8 — V3 objectives | V30A-001–008: immutable versions, explicit missed-run policy, authenticated events, idempotent proposals, normal admission, stop/revoke, shared fairness, governed version bridge and operator views. | Real recurring/event objective is bounded and observable; no trigger grants new authority or duplicates a mission. |
+| 9 — V3 learning and ecosystem | V30B-001–005 validation/calibration/freeze/sealed eval/review/canary/rollback/drift; V30C allocator inputs; V30D own-runtime selfdev; V30E private publisher/revocation; V30F scoped causal audit. | Promotion uses independent evidence and deterministic rollback; learning cannot change permissions/spend/reviewer/evidence rules. Existing packs/grants/scheduler reused. |
+| 10 — V3 closure | V30X-001 freeze workload and thresholds; V30X-002 real elapsed objective+external effect+canary/rollback; V30X-003 independent all-artifact audit and operator handoff. | All six V3 artifacts, lower-version gates, exact candidate evidence, runbooks and required elapsed evidence reconciled. No self-acceptance. |
 
-**To V2.3:** `R34b` → `18-00 … 18-09 (CP18)` and `19-01 … 19-08 (CP19)` → `20-01 → 20-02 → 20-03` → start `WC-V20-RELIABILITY-168H` at `20-08b` **immediately**, run `20-04 … 20-07` during the clock → `23-01 … 23-12` on a descendant branch while the clock runs (owner authorization required) → `23-13 (CP23)` → `23-14`; `20-09` after 168 real hours.
+Every future row is decomposed into individual contracts in `FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md`, generated from the two future JSON files. Those **71 contracts** contain source surfaces, exact behavior, negative cases, evidence and exit conditions. Near-term V1.7 detail stays in `packets/`. No packet is executed from this overview alone.
 
-**To V3.0:** `23-14` → `V30A-001 … V30A-008` ∥ `V30B-001 … V30B-005` → `V30C/D/E/F` → `V30X-001` (freeze) → `V30X-002` (wall clock) → `V30X-003`.
+### 0.5 Start clocks early without invalidating them
 
-### 0.4 Gates (machine-readable in the `gates` arrays)
+- LIVE-142: start after frozen G10–G14 prerequisites and lead start review. It needs **24 actual hours**. G12/G13 eligibility/qualification are the upstream operator levers; a passing local tool fixture does not remove those requirements.
+- V2.0: prepare 20-08a while V1.7 implementation proceeds; start 20-08b at the earliest point the frozen protocol/start review permits. It needs **168 actual consecutive hours**. Compatible drills may overlap; identity/behavior changes follow invalidation rules. Remove the prior unsupported assertion that early failed starts cost nothing.
+- Keep campaign source/config immutable on a deployment snapshot. The same single implementation worker can continue later-version code in its authorized checkout; that must not mutate the running campaign. One campaign monitor is not a second implementation worker/heartbeat producer.
+- V3: freeze target-specific canary count/duration/guardrails before the canary and schedule observation. No invented universal learning threshold or fake elapsed time. Failed/contaminated learning is preserved and cannot be relabeled as promotion.
 
-| Gate | Owner | Unblocks | Note |
+### 0.6 Architecture freeze and boundaries
+
+The required decisions now have implementation defaults in `FUTURE_OPEN_DECISIONS_FREEZE_POINTS_20260921.md` and transaction algorithms in `FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md`. Final Fable must confirm these are implementable on the actual source.
+
+1. PostgreSQL/SQLAlchemy/Alembic retain all runtime authority; receipts and artifact refs carry provenance. No new scheduler, authority DB, permission system or generic framework.
+2. Attempts and receipt sequence are different identities. Late execution completion cannot replace a newer attempt. A timeout stops waiting, not necessarily a thread/remote action; unknown blocks retry absent definitive safe-retry evidence.
+3. Every mutating operational action, including idempotent writes, uses durable authority. Test commands run untrusted code only through the R28s enforced sandbox; a prefix allowlist is insufficient. Credentialed GitHub is a narrow typed control-plane adapter, never arbitrary `proc.run`.
+4. The observed sandbox runner only invokes host subprocess; R28s adds actual private-development container enforcement, with environment availability gated. Leases must validate identity, status, expiry, revisions and generations. Authenticated actor context is not a string supplied by the worker. Cancellation serializes execution admission, without promising rollback of an already-issued external effect.
+5. Knowledge is untrusted data in prompts, permission-filtered before ranking; imported/learned content never becomes system authority. No denied-item count leakage.
+6. Recovery defaults to externally fenced manual activation after restore. Automatic multi-site failover/public publisher trust are explicitly unsupported until separately designed/approved; their interfaces are preserved without pretending proof exists.
+7. Fairness credits accrue once per persisted round, not once per poll. DispatchIntent reserves existing capacities and reconciles conservatively. Packs reuse extension lifecycle; candidate manifests use existing artifacts rather than gratuitous new tables.
+8. Objective proposals enter existing mission admission. Learning/selfdev preserve protected policy and independent review. A private digest-pinned ecosystem is the first V3 completion scope; public marketplace/signature distribution remains separate.
+
+### 0.7 Remaining human/environment inputs
+
+| Input | Owner | Blocks | Work proceeds meanwhile |
 |---|---|---|---|
-| `EXT-ACTIONS-BILLING` | operator | exact-tip CI | **only after `OPS-CI-01`** — heartbeat commits caused ~1,000 runs/day |
-| `EXT-V14-LEAD-REVIEW` | lead | ART-V14-REAL-E2E, CP1 | after `R02b` |
-| `EXT-G13-WIN-VERIFY` | operator or lead | ART-V13-TASK-POOL | Windows run, or a governance decision that corpus verification is platform-neutral |
-| `EXT-G13-SEALED-DIGEST` | lead | R06 → R07 → R08, R11 | |
-| `EXT-G12-REMOTE-ROUTES` | operator | R09 → R10 → R11 → R12 | ≥ 2 zero-charge providers |
-| `EXT-V15-SECOND-HOST` | operator | R18 | physical host |
-| `EXT-V10-WORKER-HEARTBEAT` | lead | V1.0-repair acceptance | decide what evidence still counts |
-| `WC-LIVE142-24H` | lead/clock | V1.4 acceptance | blocked behind G12 + G13 gates — **the earliest lever is operator action on those two gates now** |
-| `EXT-D18-01`, `EXT-D18-02` | operator + lead | split-site V1.8 acceptance, counted recovery evidence | local drill does not wait |
-| `EXT-V19-FRESH-ENVIRONMENTS`, `EXT-V19-WINDOWS-HOST` | operator | 19-09, 19-10, support-matrix rows | |
-| `WC-V20-RELIABILITY-168H` | lead/clock | 20-08c → 20-09 | protocol freeze `20-08a` can be done today |
-| `EXT-D23-FAIRNESS` | lead | 23-12 counted evidence | freeze before counting |
-| `WC-V30-CANARY`, `WC-V30-SCHEDULE` | lead/clock | V30B-004, V30X-002 | |
+| Actions account availability | operator | exact-tip hosted CI claims | OPS-CI-01, local source/tests |
+| Authentic sealed references and corpus review disposition | lead/evaluator | counted G13, downstream adaptive/learning evidence | evaluator mechanics and other implementation |
+| >=2 admitted zero-charge remote routes | operator + eligibility probes | G12 overlap and G14/LIVE-142 prerequisite | local qualified execution and tool wiring |
+| Second physical node / real Windows / fresh install environment | operator | R18, CP23, environment support claims | durable worker and packaging code |
+| Existing GitHub identity + exact real action approvals | authorized runtime/operator | R33c-2 and CP30 real effect | adapter mechanics and local fault tests |
+| Deployment fencing, backup retention/encryption/key ownership, RPO/RTO targets | operator + lead | counted recovery deployment | fail-closed interfaces, local dry run |
+| Independent reviews and frozen fairness/learning thresholds | independent lead | named review/counting gates | dependency-independent packets |
+| Actual elapsed 24h / 168h / declared canary/schedule duration | observed clock | respective accepted claims | later implementation on unchanged campaign base |
 
-### 0.5 Model routing and delegation
+Defaults never fabricate these inputs. Each pending input has an owner/action in JSON. Lead must disposition contradictory G13 Windows language without silently editing the artifact registry here.
 
-| Work | Tier | Notes |
-|---|---|---|
-| SP1–SP2 packets with a full spec (`small`/`mid` in the queue) | Sonnet 4.6-class, medium effort | the benchmark worker; spec gives names, error strings, tests |
-| SP3 and concurrency/transaction packets (`high`: R27c, R27e, R17b, R34b) | Sonnet 4.6 at high effort, or Opus-class | lead reviews the diff before dependants start |
-| Evidence packaging, SHA binding, matrix bookkeeping, file/ID audits | Haiku-class, low effort | never for fence, approval or transaction code |
-| Architecture, security review, acceptance design, distributed-state debugging, planning passes | Fable/Opus-class or the ChatGPT lead | output is specs and reviews, not packet code |
+### 0.8 Final Fable audit — finite completion checklist
 
-Topology is unchanged: one implementation worker, one heartbeat producer. Sub-agents inside that session are for read-only audits only.
+- [ ] Re-fetch exact coordination/planning/implementation tips; distinguish source drift from heartbeat-only commits. Read independent lead review, not obsolete worker-authored approval.
+- [ ] Trace near-term operational entrypoints end-to-end and confirm every proposed service exists or is explicitly introduced by an upstream packet.
+- [ ] Adversarially audit effect/hash/replay, timeout/late-writer, atomic approval, lease expiry/revocation, sandbox/credential isolation and Github unknown-outcome semantics.
+- [ ] Confirm receipt schema, migration ownership, lock order and rollback are mutually consistent. Split source packets >3 production files unless a documented inseparable transaction is independently reviewed.
+- [ ] Ensure all 71 future contracts have executable artifact/dependency/surface/behavior/negative/evidence/exit definitions; fill thin contracts rather than adding roadmaps. Preserve stable IDs via split aggregates where required.
+- [ ] Match every required registry artifact to producing packets, required checkpoint/review/gates and terminal claim; fix missing dependencies such as objective-learning integration before CP30.
+- [ ] Check real-world proof at CP5/18/19/20/23/30 and wall-clock start/restart rules; no fixture substitution.
+- [ ] Run plan validator and its negative tests; render catalog and prove no drift. Review diff against planning base: no source, worker state, registry acceptance or canonical writes.
+- [ ] Commit/push only `fable/v3-planning`; return exact SHA, remaining external inputs, first executable queue, and per-check closure evidence. No self-approval/promotion.
 
-### 0.6 Counts
+Final status: `PLAN_COMPLETE_REVIEW_PENDING` only when every checklist item is supported and no unowned architecture gap remains; still finish `READY_FOR_LEAD_REVIEW`. If a genuine new architectural blocker remains, name it and its exact dependency instead of requesting another vague sweep.
 
-Packets: 62 in the V1.7 queue (35 historical + 27 new; 21 fully specified, 6 medium detail), 47 for V1.8–V2.3, 24 coarse phase groups, 24 V3.0 fine packets (8 canonical `V30A-*`, 16 proposed). Registry artifacts: 86. Gates: 16. Run `python3 docs/coordination/tools/validate_plan.py --ready` for live numbers.
+### 0.9 First executable handoff and validation
 
-### 0.7 Document map (consolidation)
+Candidate-ready now, after reviewed adoption: **OPS-CI-01, R27a, R30a, R17a, R02a**. Prefer the R27 durability chain; while an independent review is pending, use the other ready foundations. After R28b, leased runtime R17b must precede operational R28d; do not restore the former circular/static-fence shortcut. R27d and separate-process R17c are mandatory CP6 implementation inputs. R33c is mandatory for working/real-world claims.
 
-| Need | Canonical file |
-|---|---|
-| start a session | `SESSION_START.md` → `DOC_ROUTER.md` |
-| artifact state | `ARTIFACT_REGISTRY.json` (lead only) |
-| what to do next, V1.7 | `V17_RECOVERY_PACKET_QUEUE.json` + `packets/<ID>.md` |
-| what to do next, V1.8–V2.3 | `V17_TO_V23_PACKET_QUEUE.json` + `V17_TO_V23_CEMENTED_EXECUTION_PLAN.md` |
-| V3.0 packets and invariants | `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json` (`v30_packets`, `v3_invariants`) |
-| why / product sequence | this file |
-| live gates | `V17_LIVE_CHECKPOINT_PROTOCOL.md`, `V17_TO_V23_LIVE_CHECKPOINTS.md` |
-| schemas, migrations, code map, tests, decisions | the five `FUTURE_*` reference files named in `DOC_ROUTER.md` |
-| superseded, do not load | `V16_TO_V30_FORWARD_PLAN_20260921.md`, `V16_TO_V30_TASK_BACKLOG_20260921.md`, `WORKER_PACKET_BACKLOG.md`, `V2_EXECUTION_PLAN.md`, two-lane prompts (`TWO_CURSOR_TEAM.md`, `CURSOR_SESSION_*`, `CURSOR_*_PROMPT.md`) |
+```sh
+python3 docs/coordination/tools/validate_plan.py --ready
+python3 -m unittest discover -s docs/coordination/tools -p 'test_validate_plan.py' -v
+# After a reviewed JSON contract edit:
+python3 docs/coordination/tools/validate_plan.py --render
+```
 
-Proposed registry deltas for the lead (this pass did not edit the registry): refresh `updated_at`; point `governance.worker_backlog`/`execution_plan` at the two queue files; give `ART-V17-INTEGRATION-MANIFEST`, `ART-V17-SESSION-RECOVERY`, `ART-V17-PERMISSION-NEGATIVES` a `path_or_source_ref` (their specs are `packets/R29a.md`, `R31a.md`+`R31b.md`, `R32a.md`); add the claim-ladder fields of 0.2 per artifact.
+Counts in this revision: **70 V1.7 nodes** (historical/aggregate included), **47 V1.8–V2.3**, **24 V3 execution contracts**, **24 coarse groups**, **25 gates**, **86 registry artifacts**. Counts are inventory, not progress. Model routing is guidance: Sonnet 4.6 medium for bounded routine code; high effort plus independent review for state/security/recovery; lower tier for read-only indexing and evidence packaging. Fable's last sweep is planning only.
 
-## Real-world proof rule
+### 0.10 This sweep's retained evidence
 
-`REAL_WORLD_ACCEPTANCE_POLICY.md` is binding: fixture/local integration evidence can prove mechanics but cannot justify a milestone "working" claim. V1.7 adds R33c (real GitHub external action); V2.3 and V3.0 checkpoints must also cross real physical/external boundaries.
+- Initial coordination snapshot was 96eb563; refresh to 4764087 contained heartbeat/status/progress plus LEAD-20260921-041 only. Source remains f2b8d5f; planning base remains 390ab1d; main remains b9141fa3150f853586dede0334a47b344571bc16. The active canonical packet is still broad R27; this proposed queue has not dispatched or replaced Cursor's assignment.
+- Source inspections: durable effect repository/gateway, worker result fence, mission runtime/controller/store, worker transport and sandbox runner. The host subprocess runner's environment scrubbing does not enforce network/filesystem isolation; R28s is the missing prerequisite.
+- Standalone Python timeout experiment: cancellation of wait_for(to_thread(...)) returned timeout while the underlying thread later performed its effect. This is language-behavior evidence, not SwarmAI runtime validation; R27e/R28a require managed execution and conservative remote-outcome handling.
+- Plan validation: dependency and split/remediation DAGs, artifact coverage, defined typed gates, catalog digest and 14 negative tests pass. git diff --check passes. These checks validate planning consistency only; no product suite or real-world checkpoint was run in this sweep.
+- Scope: planning documents and their validation tools only. Cursor source/state, registry acceptance, historical reviews and canonical coordination are unchanged by this sweep. Independent baseline approval does not approve this revision.
+
+The older product-through-line below remains context. Packet JSON/specs and this closure section replace conflicting execution-order prose. Registry acceptance and the independent real-world policy are not weakened.
 
 ## Product through-line
 

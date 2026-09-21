@@ -1,74 +1,57 @@
-# Fable 5.1 planning assignment — V1.7 through V3.0
+# Fable final planning closure sweep — through V3.0
 
-Use this file as the authoritative short launch prompt.
+Work in `pri8771/swarmai`, on **`fable/v3-planning`**. This is the final architecture/planning sweep after the user's requested closure pass. Finish an executable plan; do not start competing implementation. Cursor remains the sole implementation worker and heartbeat producer.
 
-Work in `pri8771/swarmai`.
+## Start and authority
 
-PLANNING BRANCH: `fable/v3-planning`
+1. Read root `CLAUDE.md`; fetch origin and inspect branch/cleanliness. Continue the current planning branch tip without force push. Do not merge it anywhere.
+2. Recover relevant past memory for intent only. On `origin/coordination/swarm-control`, read SESSION_START, current heartbeat/status, active packet/queue, ARTIFACT_REGISTRY and the latest **independent** lead review. Read `reviews/FABLE_V3_PLANNING_INDEPENDENT_LEAD_REVIEW_20260921.md`; the older similarly named worker-authored review is not approval authority.
+3. Verify current implementation ref from the router, actual source/history and any movement since the snapshot in `MASTER_PLAN_V17_TO_V30_20260921.md` section 0. Do not use heartbeat freshness as implementation progress.
+4. Read section 0 of that master plan, `REAL_WORLD_ACCEPTANCE_POLICY.md`, the three machine-readable DAGs and packet conventions. Read additional source/contracts only for the specific audit boundary.
 
-Do all planning/consolidation commits on `fable/v3-planning`. Treat `coordination/swarm-control` as read-mostly live truth during this pass because the active implementation worker is still heartbeating there. Do NOT edit the active Cursor implementation branch or its heartbeat/status files. At finish, leave the planning branch ready for ChatGPT lead review; do not merge it yourself.
+## Exact assignment
 
-Follow the root `CLAUDE.md` and the canonical coordination branch. First recover relevant past Claude/Fable/ChatGPT conversation memory for SwarmAI intent, then verify every current-status claim against live Git. Check the active heartbeat, latest lead review, artifact registry, and current packet before planning.
+Close the checklist in master-plan section **0.8**. The prior sweep supplies 71 detailed future packet contracts plus V1.7 specs; improve those in place. Do not write another roadmap, duplicate backlog, third-sweep prompt or generic “future work” list.
 
-## Assignment
+Audit and repair, in this order:
 
-You are the architecture/planning worker for this pass. Do NOT start broad V1.7–V3 implementation.
+1. **Near-term execution safety:** recomputed payload/destination binding before successful replay; authenticated actor; active lease identity/status/expiry/revision/generation; atomic one-shot approval; receipt sequence distinct from execution attempt; generation-fenced finalize; cancellation linearization; late thread/process/remote completion; unknown-outcome retry restrictions; irreversible operator rearm.
+2. **Real product path:** API/CLI -> mission -> durable worker -> broker -> scoped knowledge -> action gateway -> independent results. Every operational write must use durable current authority. No memory/static fence fallback. Sandbox arbitrary test code; protect host credentials. GitHub is the narrow typed R33c adapter, not unrestricted privileged subprocess.
+3. **Cross-version closure:** one scheduler and DB; externally fenced restore; migration/backfill compatibility; extension/pack permission intersections; fair-share reservation/settlement and restart; objective dedupe/normal admission; governed learning/rollback; protected selfdev; tenant-scoped audit. Fix missing concrete interfaces/ownership now.
+4. **Packet executability:** inspect every future contract in the generated catalog/JSON, not just its title. Each needs artifact, executable dependencies, upstream interfaces, 1–3 owned production surfaces, exact behavior, negative cases, evidence, exit and rollback. Split overly broad packets with stable aggregate IDs; make the next ~20 especially precise. Resolve proposed paths against brownfield code. Avoid new packages/tables when existing services suffice.
+5. **Claims/gates:** validate dependency completion vs audit basis; source completion vs review hold; implementation gates vs real-world/elapsed gates. Real external/physical evidence is mandatory for “working”; 24h LIVE-142 and 168h V2 reliability are actual clocks. Prepare/start campaigns at earliest protocol-valid time, keep frozen deployment unchanged while later code proceeds.
+6. **End-state coverage:** every required artifact through V3.0 maps to implementation, wiring, tests, live evidence, independent review and acceptance disposition. No external dependency may be quietly waived or idle independent work. Unknown provider usage stays unknown. No held-out answer exposure.
 
-Create/refine the definitive artifact-oriented execution system that lets a less-capable worker (benchmark: Sonnet 4.6) implement packets correctly without inventing architecture.
+## Stop expanding scope
 
-Priorities:
-1. shortest truthful path to V1.7 implementation-complete + live-checkpointed;
-2. cement V1.8–V2.3 so V1.7 work will not cause rearchitecture;
-3. define V3 contracts/invariants/interfaces enough to preserve compatibility;
-4. fully specify the next ~20 dependency-ready micro-packets; progressively less detail farther out.
+Freeze safe implementation defaults for reversible architecture choices. Retain genuine environment/operator inputs as explicit gates with owner/action/evidence and blocked claims. Do not invent hardware, credentials, fencing proof, paid services, performance results, support rows, test passes or learning thresholds. If source has changed, adjust only affected contracts. This sweep should finish planning; future execution may produce narrow defect-driven amendments, not require another broad architecture pass.
 
-## Requirements
+Use cheap read-only helpers for indexing/consistency if available. Keep architecture/security/final synthesis with Fable. Do not spawn a second implementation worker. Keep enough capacity for validation, commits and handoff.
 
-- Reuse existing repo plans; consolidate rather than duplicate.
-- Keep tasks predominantly tiny/SP1–SP2-like: one artifact concern, ~1–3 production files, focused tests.
-- Every packet needs: artifact, dependencies, likely code surfaces, exact behavior, negative tests, evidence/live gate, exit condition.
-- Separate implementation-complete, live-checkpointed, verified, accepted, external-pending, and wall-clock-pending.
-- Start time-bound campaigns as early as dependencies permit; never backfill time.
-- Preserve one IMPLEMENTATION-worker/one-heartbeat topology unless operator changes it. This Fable pass is planning-only and may run while Cursor implements because Fable must not touch product implementation or the active heartbeat.
-- Use donor branches selectively; never wholesale-merge legacy coordination.
-- Default zero spend; no main merge/public release/destructive production action.
-- No second scheduler/authority DB/permission system unless a documented gap proves it necessary.
-- Keep machine-readable DAGs in sync with human plans.
-- Do not self-accept artifacts.
+## Validation and delivery
 
-## Token/model efficiency
+Run from the planning checkout:
 
-- Read `SESSION_START.md`, heartbeat/status, active queue, and router first.
-- Do not reread unchanged large docs unless routed by the active task.
-- Prefer Git search/diff/targeted reads.
-- If subagents/models are available, use cheaper/lower models for bounded mechanical audits, indexing, file mapping, or consistency checks. Reserve Fable 5.1 for architecture, cross-system reasoning, safety, acceptance design, and final synthesis.
+```sh
+python3 docs/coordination/tools/validate_plan.py --render
+python3 docs/coordination/tools/validate_plan.py --ready
+python3 -m unittest discover -s docs/coordination/tools -p 'test_validate_plan.py' -v
+git diff --check
+```
 
-## Deliverables in Git
+Strengthen validator tests when repairing graph/gate logic. These are plan checks; do not report them as product validation. Keep catalog generated from packet JSON and human critical paths synchronized.
 
-On the isolated planning branch, update/consolidate the proposed canonical coordination system so it contains:
-- concise current-state/handoff truth;
-- artifact DAG through V3.0;
-- detailed next ~20 micro-packets;
-- dependency graph;
-- code ownership/surface map;
-- migration ordering;
-- test/negative/live-evidence matrix;
-- wall-clock/external gates;
-- model-routing/delegation recommendations;
-- open decisions/freeze points;
-- first executable worker queue after planning review.
+Record closure evidence against each master checklist item. Commit all planning/consolidation changes to `fable/v3-planning`, push normally, verify remote SHA. Do not edit Cursor's implementation branch, heartbeat/status, canonical registry acceptance or canonical coordination. Do not author your own lead review, use `lead:` commit prefixes, merge/promote, self-verify or self-accept. Prior independent approval of the baseline does not approve this new revision.
 
-Do not create duplicate plan files when an existing canonical file can be updated.
+## Return only a concise handoff
 
-## Finish
+- branch + exact pushed SHA;
+- `PLAN_COMPLETE_REVIEW_PENDING` if checklist closed, otherwise exact unresolved architecture issue;
+- materially changed contracts / validation results;
+- critical path through V1.7, V2.3 and V3.0;
+- first five executable packets after independent adoption;
+- named external/elapsed inputs still outstanding;
+- worker model/effort recommendation;
+- **READY_FOR_LEAD_REVIEW**.
 
-When the planning branch is coherent, stop broad planning work and return only:
-- planning branch name and exact Git SHA(s);
-- audited current version position;
-- files updated/consolidated;
-- packet/artifact counts;
-- critical path to V1.7, V2.3, V3.0;
-- first 5 executable micro-packets;
-- human/external blockers;
-- recommended worker model + effort for execution;
-- `READY_FOR_LEAD_REVIEW`.
+Do not claim SwarmAI V3 is implemented or accepted because its plan is complete.

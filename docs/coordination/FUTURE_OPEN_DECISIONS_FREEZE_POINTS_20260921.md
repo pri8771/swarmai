@@ -1,190 +1,31 @@
-# SwarmAI future open decisions and freeze points
-
-Date: 2026-09-21
-Status: PLANNING ONLY
-
-These are intentionally NOT decided by prep work. Each has a latest-safe decision point and evidence required.
-
-## Decisions raised by the V1.7 depth audit (Fable planning pass, 2026-09-21)
-
-Each has a fail-closed default already written into the packet specs so work is not blocked; the lead may change the default before the named freeze point.
-
-### D17-01 Does "V1.7 implementation-complete" require operational wiring?
-Default: **yes**. A subsystem no mission can reach is `implementation` but not `wired` (claim ladder, master plan 0.2). Cemented decision 3 and ART-V20-INTEGRATION-CONTRACT ("no duplicate persistence authorities") already imply it. Freeze: before `R34b`.
-
-### D17-02 Must leased execution (`R17b`/`R17c`) land before the V1.7 handoff or may it move to `20-01`?
-Default: before the handoff, because CP6 claims durable workers. Alternative: move both to V2.0 integration and label V1.5 `wired: standalone` in CP6. Freeze: before `R34a`.
-
-### D17-03 `reconciled` as an effect state
-The accepted schema lists `reconciled` as a state. Specs keep terminal states `succeeded`/`failed` and record reconciliation in `reconciled_at` + receipt `reconciliation_state`, so "was it applied?" stays a single-column question. Freeze: before `R27e` review.
-
-### D17-04 Is real-HTTP cookie-session evidence enough for ART-V17-SESSION-RECOVERY?
-The registry kind is `live-browser-evidence`; CP5 says "browser-like". Default: real HTTP sessions satisfy V1.7 live-checkpointed; a real browser engine would be a new dependency and, if required, becomes a separate external-pending evidence item. Freeze: before `R33b`.
-
-### D17-05 G13 Windows verification
-Recovery plan R04 argues semantic corpus verification is platform-neutral; the registry still requires HOST-WIN-DEV. Only lead governance can change that. Freeze: whenever the lead next updates the registry (gate `EXT-G13-WIN-VERIFY`).
-
-### D16-01 Are permission-denied counts visible to the requesting actor?
-`RetrievalReceipt.omitted_reason_counts` includes `permission_denied`, which reveals that hidden items exist. Default in `R25a`: the actor-visible bundle carries only `budget_truncated` and `ranked_out`; the full counts stay in the audit receipt. Freeze: before `R25b`.
-
-### D20-02 May `20-05`/`20-07` run on the reliability-campaign deployment?
-Needed by `20-08a`. Default: separate deployment of the same frozen candidate unless the protocol declares the load windows up front.
-
-## D18-01 SiteEpoch fencing authority mechanism
-
-Need:
-A restored copy of the application database cannot simply assume it has globally newer authority if the old site may still exist.
-
-Options may include:
-- an approved external/shared authority store/lease;
-- infrastructure-level fencing plus DB epoch proof;
-- another reviewed mechanism.
-
-Do not freeze until:
-- target deployment topology is known;
-- zero/paid infrastructure constraints are known;
-- threat model demonstrates stale-site fencing.
-
-Latest safe freeze:
-before V2A-018a implementation becomes candidate-bound.
-
-## D18-02 backup storage/encryption target
-
-Do not assume cloud storage or paid service.
-
-Need:
-- actual deployment/storage environment;
-- retention requirements;
-- encryption/key ownership;
-- restore speed target.
-
-Latest safe freeze:
-before counted V1.8 recovery evidence.
-
-## D19-01 supported OS/install matrix
-
-Current product can develop across macOS/Linux/Windows, but support claims require real evidence.
-
-Do not promise an OS until clean-install evidence exists.
-
-Latest safe freeze:
-V2.0 support matrix.
-
-## D19-02 extension trust/signature mechanism
-
-Need:
-- threat model;
-- distribution model (local/private/public);
-- publisher identity model.
-
-Early versions may rely on exact digest + locally approved source while keeping schema signature-ready.
-
-Latest safe freeze:
-before any public/shared capability ecosystem claim.
-
-## D20-01 V2 reliability duration/tolerance
-
-The existing reliability protocol is canonical when frozen.
-
-Do not shorten elapsed windows to meet schedule.
-
-Latest safe freeze:
-before campaign start.
-
-## D23-01 fairness acceptance tolerance
-
-Current ART-V23 draft proposes approximately +/-15% after >=200 successful scheduling decisions under controlled equal-cost synthetic load, explicitly as a proposed default.
-
-Freeze or replace before counted V2.3 evidence.
-Do not tune after seeing counted results.
-
-## D23-02 normalized service cost function
-
-Need to choose how worker/provider/tool classes map to scheduler service units.
-
-Constraint:
-It is a fairness abstraction, not billing and not permission.
-
-Freeze before:
-counted fairness workload.
-
-## D23-03 OpenTelemetry adoption
-
-Proposal:
-optional traces/metrics exporter only, Swarm-native receipts remain source of truth.
-
-Need:
-actual operator observability needs and dependency cost/complexity.
-
-No blocker:
-V2.3 can implement normalized observability without OTEL first.
-
-## D23-04 capability pack packaging format
-
-Need:
-extension substrate from V1.9, migration needs, portability needs.
-
-Freeze after:
-V1.9 extension contract implementation is stable.
-
-## D30-01 schedule missed-run default
-
-Each objective policy must explicitly choose skip_missed, coalesce_latest, or bounded catch-up.
-
-Do not create one universal hidden default that can cause unbounded mission creation.
-
-Freeze:
-per objective/template policy.
-
-## D30-02 objective semantic stop conditions
-
-Deterministic predicates are preferred.
-If model semantic evaluation is used, it remains advisory until deterministic policy consumes it.
-
-Need:
-actual objective use cases before adding semantic stop evaluator.
-
-## D30-03 learning statistical thresholds
-
-Sample sizes/confidence/effect-size thresholds are target-specific.
-
-Do not set universal magic numbers now.
-
-Freeze:
-per LearningProposal/evaluation protocol before held-out execution.
-
-## D30-04 canary size/duration
-
-Target-specific by risk and effect class.
-
-Safety-critical rollback triggers must be deterministic regardless of canary size.
-
-Freeze:
-before candidate canary begins.
-
-## D30-05 capability publisher trust model
-
-Depends on whether ecosystem is:
-- single-owner/private;
-- team/organization;
-- public third-party.
-
-Schema should support provenance/revocation now; trust policy freezes later.
-
-## D30-06 autonomous promotion authority
-
-Current default:
-models propose; software/review accepts according to frozen policy.
-No self-release/merge/deploy/spend/permission expansion.
-
-Any future relaxation requires explicit operator governance change, not an inference from V3 completion.
-
-## Freeze discipline
-
-For every open decision:
-1. record decision ID;
-2. list candidate options;
-3. record evidence/input used;
-4. freeze before counted evidence;
-5. hash/version the selected policy;
-6. invalidate counted evidence if the policy materially changes afterward.
+# Decision register for final planning closure
+
+Status: closure proposal, subject to final Fable audit and independent review. Implementation defaults below remove architectural ambiguity; they do not forge operator/environment inputs or relax accepted protocols. Fable should repair conflicts now, not create another general planning backlog.
+
+| ID | Proposed implementation decision | What genuinely remains gated / latest freeze |
+|---|---|---|
+| D16-01 | Permission filtering before ranking; actor-visible receipts omit denied/hidden item counts. Knowledge is untrusted prompt data. | Actual leakage/quality evidence at CP4; never claim constant-time behavior from error-text parity. |
+| D17-01 | Implementation-complete requires operational wiring, not standalone libraries. | Independent CP6 review. |
+| D17-02 | Durable mission mapping, leased loop and separate worker transport/CLI land in V1.7 (R17b/c children); no move to V2.0 merely to improve a version label. | Brownfield mapping/schema verification in final Fable sweep. |
+| D17-03 | Effect state records outcome; separate immutable receipt events record reconciliation. receipt_sequence != attempt_number; finalize uses exact execution token. | Reconcile with existing accepted schema before R27 diff review; do not silently override accepted contract. |
+| D17-04 | HTTP cookie fixture proves session mechanics only. R33c proves real GitHub actions, not a real browser engine. | Registry's browser-specific criterion needs real supported browser/session evidence or explicit independent criterion disposition; neither Fable nor Cursor may waive it. Keep claim pending if required. |
+| D17-05 | Mac semantic corpus checks are evidence; platform requirements follow registry. | Lead explicitly resolves Windows corpus-verification conflict, or actual Windows proof. |
+| D17-06 | Operational mutating tools use durable authority; test code uses enforced private-development container boundary. Typed GitHub control-plane adapter owns credentials. | Container/image availability and real isolation tests; no fallback to host. Hostile multi-tenant execution is outside this profile. |
+| D18-01 | Same-primary-DB restart uses epoch CAS; restoring primary DB starts read-only until independent deployment isolation proof. No automatic cross-site failover without separate reviewed fencing mechanism. | Operator deployment topology and observable old-site isolation. If no valid fence mechanism exists, leave recovery write activation unavailable; do not invent an authority service. |
+| D18-02 | Consistent pg_dump plus immutable artifact manifest, encrypted operator-owned private backup destination; reference key IDs, never values. | Actual destination/key ownership, retention and RPO/RTO targets before counted restore. No assumed paid cloud. |
+| D19-01 | Private self-hosted support matrix enumerates tested combinations only. | Actual fresh OS/environment evidence; unknown rows stay unknown. |
+| D19-02 | Private extensions are immutable digest-pinned packages from locally approved sources; reuse existing grants/lifecycle. Schema supports later signing. | Public/shared publisher trust/signature distribution is unsupported until explicit scope and trust policy; not a V3 private-candidate prerequisite. |
+| D20-01 | Preserve canonical seven consecutive days, invariant tolerances and invalidation protocol. Prepare freeze early; start only after reviewed preflight. | Actual source/config/support profile, monitoring and start approval before counted clock. No shortening to meet schedule. |
+| D20-02 | Install/upgrade/destructive drills run on an isolated copy of the frozen candidate unless protocol preregisters them on campaign deployment. | Capacity/topology for that copy; no competing implementation worker needed. |
+| D23-01 | Freeze fairness metric, equal-cost >=200-decision workload and tolerance before counted run; prior draft suggests +/-15%, not an already observed result. | Independent workload-specific tolerance freeze before 23-12. Failure does not authorize tuning. |
+| D23-02 | Weighted-deficit persisted rounds/cursor; credits once per round, charge ready dispatch once and settle actual usage once. Service units explicitly mapped from resource profile; budgets/permissions remain separate. | Cost-unit table from supported resource classes before counted benchmark; no universal invented token-to-time conversion. |
+| D23-03 | Swarm receipt read model is audit truth. No new OTEL dependency required; exporter can be optional later. | None for private V2.3 implementation. |
+| D23-04 | Capability pack is an extension kind with manifest, version/digest, dependency graph and project grants. Portability is manifest+content-addressed refs; no copied authority. | Freeze canonical archive/path/digest encoding before import implementation; final Fable must specify supported archive format (prefer existing repo artifact format). |
+| D30-01 | Objective explicitly chooses skip_missed/coalesce_latest/bounded_catchup with max count. Occurrence identity includes UTC instant/schedule version; timezone/DST behavior explicit. | Per objective policy; unspecified policy denies activation. |
+| D30-02 | Deterministic stop/revoke/expiry predicates are authoritative; model semantic stop suggestion is advisory. | Actual objective goal and allowed templates, never inferred permanent permission. |
+| D30-03 | Learning freezes candidate/scorer/sample/metric/guardrail/stop digests before sealed evaluation. No retuning or sequential peeking. | Independent target-specific sample/threshold/confidence policy; absent values deny counted evaluation, not harness implementation. |
+| D30-04 | Canary isolated by candidate version/generation and scope; deterministic safety breach activates exact safe parent and fences candidate. | Target-specific count/duration/guardrails and actual elapsed evidence; not a universal magic number. |
+| D30-05 | Initial ecosystem is single-owner/private digest-pinned trust with revocation. | Team/public distribution is separately scoped and cannot be inferred from private V3 completion. |
+| D30-06 | Models propose; authorized deterministic promotion plus independent review decide. Selfdev cannot modify governing reviewers, hidden evaluators, permission/spend/release or evidence rules. | Any relaxation needs explicit operator governance change outside self-benefiting proposal. |
+
+Every frozen decision records source/policy version, alternatives rejected, evidence/input, owner and affected packets. A changed decision invalidates affected counted evidence. Environment and measured-threshold gates are not unfinished software architecture: their interfaces and deny behavior must be fully specified now.

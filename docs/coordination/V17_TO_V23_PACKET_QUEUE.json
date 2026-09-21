@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "status": "cemented_future_plan_lead_approved_not_active_until_v17_handoff",
   "active_after": "V1.7 recovery completion + operator authorization",
   "architecture_plan": "docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md",
@@ -12,11 +12,38 @@
       "version": "1.8",
       "artifact": "handoff",
       "depends": [
-        "R34"
+        "R34b"
       ],
       "goal": "Bind exact V1.7 CP6 source/evidence as V1.8 base manifest.",
       "status": "planned",
-      "sp": 1
+      "sp": 1,
+      "surfaces": [
+        "docs/evidence/v18/base-manifest.json (new)"
+      ],
+      "behavior": "Bind CP6 source, migrations, policy, artifact claim matrix and unresolved gate IDs; identify the reviewed source base, never copy acceptance from a branch label.",
+      "negative_tests": "Reject dirty/unpushed source or mismatched CP6 hashes; an open gate remains open.",
+      "evidence": "Read-only manifest verification; V1.8 base is reproducible and does not claim V1.7 acceptance.",
+      "exit_condition": "Read-only manifest verification; V1.8 base is reproducible and does not claim V1.7 acceptance.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-00",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-00/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "REV-V18-HANDOFF"
+      ],
+      "exit_gates": []
     },
     {
       "id": "18-00a",
@@ -27,7 +54,33 @@
       "type": "lead_decision",
       "sp": 2,
       "goal": "Freeze ART-V18-RECOVERY-ARCH and decision D18-01 (SiteEpoch fencing authority mechanism) for the single-site/local topology actually available; record what stays blocked for split-site acceptance. Contract work: may be done now.",
-      "status": "planned"
+      "status": "planned",
+      "surfaces": [
+        "docs/artifacts/future/ART-V18-RECOVERY_ARCHITECTURE.md",
+        "docs/coordination/FUTURE_OPEN_DECISIONS_FREEZE_POINTS_20260921.md"
+      ],
+      "behavior": "Freeze the supported recovery mode: same authority DB may use transactional epoch CAS; restoring that DB requires independent proof that the old deployment cannot write or reach effect destinations. Unknown old-site isolation keeps recovery read-only.",
+      "negative_tests": "A larger integer in a restored DB is insufficient; stale or missing fencing proof denies activation.",
+      "evidence": "Architecture decision with threat trace and recovery profile; cross-site automatic failover remains unsupported until independently fenced.",
+      "exit_condition": "Architecture decision with threat trace and recovery profile; cross-site automatic failover remains unsupported until independently fenced.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-00a",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-00a/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-01",
@@ -45,8 +98,30 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/contracts/ (new site_authority.py)"
-      ]
+        "src/swarm/contracts/site_authority.py (new)"
+      ],
+      "behavior": "Define authority_domain_id, site_id, epoch, state, proof_ref, policy_digest and immutable AuthorityBinding. transition(expected_epoch, target, proof_ref) returns receipt; a missing binding denies new dispatch/effects.",
+      "negative_tests": "Unknown state, epoch regression, domain mismatch and missing proof fail validation.",
+      "evidence": "Focused contract tests and serialized fixtures; one vocabulary consumed by all fences.",
+      "exit_condition": "Focused contract tests and serialized fixtures; one vocabulary consumed by all fences.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-01",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-01/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-02",
@@ -63,10 +138,32 @@
       ],
       "sp": 2,
       "surfaces": [
-        "migrations/versions/ (one revision after a17effect004b0001)",
         "src/swarm/db/models.py",
-        "src/swarm/db/ (new site_authority.py repository)"
-      ]
+        "src/swarm/db/site_authority.py (new)",
+        "migrations/versions/ (new revision)"
+      ],
+      "behavior": "Implement transition CAS under the domain row lock; unique(domain,epoch), one active owner per domain. Install nullable authority binding on lease/result/effect records here, not in three later competing migrations. Legacy rows cannot authorize fresh work.",
+      "negative_tests": "Concurrent activation has one winner; duplicate transition is idempotent; legacy NULL fence denies.",
+      "evidence": "Real Postgres race and upgrade with existing data; one migration head; restart retains owner.",
+      "exit_condition": "Real Postgres race and upgrade with existing data; one migration head; restart retains owner.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-02",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-02/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-03",
@@ -84,8 +181,30 @@
       "sp": 2,
       "surfaces": [
         "src/swarm/controller/scheduler.py",
-        "src/swarm/db/lease_fencing.py (claim path reads authority binding)"
-      ]
+        "src/swarm/db/lease_fencing.py"
+      ],
+      "behavior": "Claim dispatch and lease renewal against the active domain/epoch in their existing transaction. Propagate immutable binding into attempts; workers cannot replace it.",
+      "negative_tests": "Old epoch, expired authority proof, renewal after fencing and missing binding deny without a dispatch.",
+      "evidence": "Two-connection race at transition/claim; dispatch receipt pins the selected binding.",
+      "exit_condition": "Two-connection race at transition/claim; dispatch receipt pins the selected binding.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-03",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-03/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-04",
@@ -102,10 +221,32 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/db/lease_fencing.py (_assert_accept_fence)",
-        "src/swarm/tools/fences.py (FenceState.authority + reader key site_epoch)",
-        "src/swarm/tools/effects.py (begin_execution step 2 compares site_epoch)"
-      ]
+        "src/swarm/db/lease_fencing.py",
+        "src/swarm/tools/fences.py",
+        "src/swarm/tools/effects.py"
+      ],
+      "behavior": "Add domain/epoch checks to current result acceptance and effect begin/reconcile transitions. Use rows introduced by 18-02 and same lock order as cancellation. Fence local finalization separately from external outcome observations.",
+      "negative_tests": "Stale-site result and effect rejected; a late executor cannot finalize a newer execution token; unknown external outcome remains unknown.",
+      "evidence": "Real-DB negatives across two processes; no second gateway, result repository or authority store.",
+      "exit_condition": "Real-DB negatives across two processes; no second gateway, result repository or authority store.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-04",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-04/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-05",
@@ -122,9 +263,31 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/contracts/ (backup manifest)",
-        "src/swarm/deploy/"
-      ]
+        "src/swarm/contracts/recovery.py (new)",
+        "src/swarm/deploy/manifest.py (new)"
+      ],
+      "behavior": "Define DeploymentManifest and BackupManifest with source/schema/lock/config/component digests, consistency point, artifact inventory, exclusions, encryption/key references and timestamps. Secret values excluded; encrypted payload is not committed.",
+      "negative_tests": "Missing component, secret value, mismatched policy digest and noncanonical digest rejected.",
+      "evidence": "Redacted manifest fixtures and digest verification; all durable state contributors enumerated.",
+      "exit_condition": "Redacted manifest fixtures and digest verification; all durable state contributors enumerated.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-05",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-05/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-06",
@@ -141,9 +304,31 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/cli.py (recovery group)",
-        "src/swarm/deploy/"
-      ]
+        "src/swarm/deploy/backup.py (new)",
+        "src/swarm/cli.py"
+      ],
+      "behavior": "Reuse pg_dump plus immutable artifact inventory under a declared consistency barrier; content is staged privately then manifest published atomically. Verify hashes before calling backup usable. In-flight effects retain their state.",
+      "negative_tests": "Interrupted dump, missing blob, bit corruption and unreadable key produce unusable backup; no partial manifest accepted.",
+      "evidence": "Real disposable DB backup and restore-readback; sanitized commands/durations; secret-bearing backups outside Git.",
+      "exit_condition": "Real disposable DB backup and restore-readback; sanitized commands/durations; secret-bearing backups outside Git.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-06",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-06/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-07",
@@ -161,10 +346,32 @@
       ],
       "sp": 3,
       "surfaces": [
-        "src/swarm/cli.py (recovery group)",
-        "src/swarm/tools/effects.py (executing -> unknown at consistency point; reuse R27e)",
-        "src/swarm/db/lease_fencing.py (expire in-flight leases)"
-      ]
+        "src/swarm/deploy/recovery.py (new)",
+        "src/swarm/deploy/backup.py",
+        "src/swarm/cli.py"
+      ],
+      "behavior": "Restore into isolated read-only recovery mode, validate digests/migration head, expire old leases, reconcile reservations, preserve unknown effects. Acquire authority through 18-00a proof before enabling writes; reuse subsystem services.",
+      "negative_tests": "Unfenced old site, corrupt snapshot, incompatible head or unresolved effect cannot silently activate or replay writes.",
+      "evidence": "Real DB restore twice is idempotent; receipt lists every reconciled state class and required operator action.",
+      "exit_condition": "Real DB restore twice is idempotent; receipt lists every reconciled state class and required operator action.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-07",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-07/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-08",
@@ -181,7 +388,32 @@
         "V2A-018d",
         "V18-01"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "tests/integration/recovery/ (new tests)"
+      ],
+      "behavior": "Exercise old/new deployment authority with independent DB connections/processes, including restore-copy divergence. Verify stale process cannot dispatch, accept result or start effects after isolation proof.",
+      "negative_tests": "Two restored DB copies incrementing epoch must still fail activation without external fencing; interrupted activation does not create two owners.",
+      "evidence": "Adversarial authority matrix with exact denial receipts; all five authority boundaries covered.",
+      "exit_condition": "Adversarial authority matrix with exact denial receipts; all five authority boundaries covered.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-08",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-08/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "18-09",
@@ -196,7 +428,33 @@
       "aliases": [
         "V18-03"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "scripts/cp18_recovery.py (new)",
+        "docs/evidence/v18/ (new run directory)"
+      ],
+      "behavior": "Run backup, actual deployment stop, restore and fenced activation on declared topology. Calculate RPO from committed watermark loss and RTO from observed usable-service times; retain pending external outcomes.",
+      "negative_tests": "Old process resumed, missing blob, recovery interrupted and duplicate activation tested; unknown topology is not a pass.",
+      "evidence": "CP18 real outage/recovery bundle and independent review; second-site claims only with actual isolation evidence.",
+      "exit_condition": "CP18 real outage/recovery bundle and independent review; second-site claims only with actual isolation evidence.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#18-09",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/18-09/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-00",
@@ -207,14 +465,40 @@
       "type": "lead_decision",
       "sp": 1,
       "goal": "Freeze the beta acceptance protocol before any counted V1.9 evidence. Contract work: may be done now.",
-      "status": "planned"
+      "status": "planned",
+      "surfaces": [
+        "docs/artifacts/future/ART-V19-BETA_SELFDEV_ACCEPTANCE.md"
+      ],
+      "behavior": "Freeze private beta journeys, supported capability claims, environment matrix and defect severity rubric. Separate candidate issue/PR preparation from approval to publish/merge.",
+      "negative_tests": "Unsupported OS must remain unknown; fixture install cannot count as external user install.",
+      "evidence": "Versioned acceptance contract and run IDs required before any counted CP19 run.",
+      "exit_condition": "Versioned acceptance contract and run IDs required before any counted CP19 run.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-00",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-00/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-01",
       "version": "1.9",
       "artifact": "ART-V19-EXTENSION-CONTRACT",
       "depends": [
-        "R33"
+        "R28d",
+        "R27d"
       ],
       "goal": "ExtensionManifest contracts.",
       "status": "planned",
@@ -224,8 +508,30 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/contracts/ (new extensions.py; superset of AdapterManifest from R29a)"
-      ]
+        "src/swarm/contracts/extensions.py (new)"
+      ],
+      "behavior": "ExtensionManifest is a superset of AdapterManifest; exact digest, core compatibility range, entrypoints, permission/data/resource declarations and dependency digests. Manifest parsing performs no imports.",
+      "negative_tests": "Unknown executable entrypoint, undeclared scope, dependency cycle and incompatible core reject before loading.",
+      "evidence": "Contract tests with versioned manifests; R29a vocabulary preserved.",
+      "exit_condition": "Contract tests with versioned manifests; R29a vocabulary preserved.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-01",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-01/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-02",
@@ -243,10 +549,32 @@
       ],
       "sp": 2,
       "surfaces": [
-        "migrations/versions/",
+        "src/swarm/extensions/registry.py (new)",
         "src/swarm/db/models.py",
-        "src/swarm/ (new extensions/ package: registry + grants)"
-      ]
+        "migrations/versions/ (new revision)"
+      ],
+      "behavior": "Persist install separately from project grant. Lifecycle installed->enabled->draining->disabled or quarantined; grant changes bump generation. Immutable digest/version binding and transactional transition receipt.",
+      "negative_tests": "Concurrent enable/disable, package digest substitution, cross-project lookup and stale grant replay fail closed.",
+      "evidence": "Real-DB lifecycle/restart tests and migration; disabled installation grants zero authority.",
+      "exit_condition": "Real-DB lifecycle/restart tests and migration; disabled installation grants zero authority.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-02",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-02/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-03",
@@ -263,9 +591,32 @@
       ],
       "sp": 2,
       "surfaces": [
-        "src/swarm/tools/adapter_registry.py (register validated extension adapters)",
-        "src/swarm/tools/fences.py (PolicyProvider intersects project grant)"
-      ]
+        "src/swarm/tools/adapter_registry.py",
+        "src/swarm/tools/fences.py",
+        "src/swarm/extensions/registry.py"
+      ],
+      "behavior": "Load only approved digest-pinned built-ins/private extensions through AdapterRegistry. Effective permission is intersection with the current project grant; revocation rechecked before every new action. Untrusted code uses existing sandbox, never host import.",
+      "negative_tests": "Extension requests denied provider, network, filesystem or project scope; disabled/revoked package cannot execute from cache.",
+      "evidence": "Gateway integration with one real builtin migrated; no independent extension scheduler or policy engine.",
+      "exit_condition": "Gateway integration with one real builtin migrated; no independent extension scheduler or policy engine.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-03",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-03/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-04",
@@ -280,7 +631,34 @@
       "aliases": [
         "V19-02"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/product/install.py (new)",
+        "src/swarm/cli.py",
+        "deploy/ (existing private deployment configuration)"
+      ],
+      "behavior": "Doctor inspects supported Python/DB/artifact store/config without guessing credentials. Init creates explicit project/operator identity, runs migrations once and checks authenticated readiness; no demo project fallback.",
+      "negative_tests": "Existing installation not overwritten; insufficient permissions, dirty config and missing DB yield actionable failure.",
+      "evidence": "Fresh isolated environment transcript; setup rerun idempotent; operator can start/inspect/stop a mission.",
+      "exit_condition": "Fresh isolated environment transcript; setup rerun idempotent; operator can start/inspect/stop a mission.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-04",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-04/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-05",
@@ -294,7 +672,33 @@
       "aliases": [
         "V19-02"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/product/upgrade.py (new)",
+        "src/swarm/cli.py"
+      ],
+      "behavior": "Upgrade preflight pins old/new manifests, drains writes, makes verified backup, applies one migration chain, runs readiness and records outcome. Resume interrupted upgrade from durable phase receipt.",
+      "negative_tests": "Concurrent upgrade, missing backup, failed migration and mixed binaries leave service fenced and recovery instructions intact.",
+      "evidence": "Real predecessor-to-candidate upgrade with representative data; evidence binds both versions.",
+      "exit_condition": "Real predecessor-to-candidate upgrade with representative data; evidence binds both versions.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-05",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-05/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-06",
@@ -308,7 +712,33 @@
       "aliases": [
         "V19-02"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/product/upgrade.py",
+        "src/swarm/product/support_bundle.py (new)"
+      ],
+      "behavior": "Rollback uses supported backward compatibility or restores exact prior snapshot and binary; never assumes destructive downgrade. Support bundle uses an allowlist and redacts credentials/content.",
+      "negative_tests": "Rollback across incompatible schema requires restore; seeded secret, cookie and token-bearing URL never export.",
+      "evidence": "Real rollback/readback plus secret-sentinel scan; operational state and unknown effects preserved.",
+      "exit_condition": "Real rollback/readback plus secret-sentinel scan; operational state and unknown effects preserved.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-06",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-06/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-07",
@@ -316,7 +746,9 @@
       "artifact": "ART-V19-SELFDEV-PR-EVIDENCE",
       "depends": [
         "19-03",
-        "R33"
+        "R02a",
+        "R17c",
+        "R28d"
       ],
       "goal": "Bounded isolated selfdev PR-candidate path; no self-merge/release.",
       "status": "planned",
@@ -326,8 +758,30 @@
       "sp": 3,
       "surfaces": [
         "src/swarm/selfdev/runner.py",
-        "src/swarm/mission/acceptance.py (reuse prove_defect from R02a)"
-      ]
+        "src/swarm/mission/acceptance.py"
+      ],
+      "behavior": "Use SwarmAI's brokered leased mission path for inspect->isolated patch->red/green defect proof->protected verifier->independent review candidate. Output local commit/PR description; publishing PR only under active explicit authority.",
+      "negative_tests": "Governance/test-oracle edits, direct primary-checkout write, self-review, merge or release denied.",
+      "evidence": "One real bounded selfdev candidate from original goal with source/evidence refs; external IDE work does not count.",
+      "exit_condition": "One real bounded selfdev candidate from original goal with source/evidence refs; external IDE work does not count.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-07",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-07/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-08",
@@ -345,7 +799,33 @@
         "V19-02",
         "V19-04"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "scripts/cp19_productization.py (new)",
+        "docs/evidence/v19/ (new run directory)"
+      ],
+      "behavior": "Run install, extension grant for project A, denial for B, drain, upgrade, rollback and selfdev journey through CLI/API on one candidate identity.",
+      "negative_tests": "Stale grant, restart during upgrade and support bundle leaks included; partial journey cannot count as complete.",
+      "evidence": "CP19 candidate bundle; independent review and environment-specific results, no fabricated support rows.",
+      "exit_condition": "CP19 candidate bundle; independent review and environment-specific results, no fabricated support rows.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-08",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-08/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "19-09",
@@ -358,10 +838,36 @@
       "sp": 1,
       "goal": "Fresh external-environment install evidence. Implementation-complete does not wait on it.",
       "status": "planned",
-      "gate": "EXT-V19-FRESH-ENVIRONMENTS",
       "aliases": [
         "V19-03"
-      ]
+      ],
+      "surfaces": [
+        "docs/evidence/v19/external-installs/ (new run directory)"
+      ],
+      "behavior": "Run 19-04..19-06 on a genuinely fresh operator-provided environment using the written runbook. Record assistance and failures as usability evidence.",
+      "negative_tests": "No inherited DB/env/container volume; copied developer state disqualifies fresh install.",
+      "evidence": "External install transcript, environment identity and resulting mission receipts; blocked when environment unavailable.",
+      "exit_condition": "External install transcript, environment identity and resulting mission receipts; blocked when environment unavailable.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-09",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-09/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "EXT-V19-FRESH-ENVIRONMENTS"
+      ],
+      "exit_gates": []
     },
     {
       "id": "19-10",
@@ -374,18 +880,46 @@
       "sp": 1,
       "goal": "Clean install on a real Windows host. No OS appears in the support matrix without this evidence (D19-01).",
       "status": "planned",
-      "gate": "EXT-V19-WINDOWS-HOST",
       "aliases": [
         "V19-03"
-      ]
+      ],
+      "surfaces": [
+        "docs/evidence/v19/windows/ (new run directory)"
+      ],
+      "behavior": "Run the same private install/upgrade/rollback journey on real Windows with declared runtime/sandbox prerequisites; record platform deltas in support matrix.",
+      "negative_tests": "Path quoting, drive letters, permissions, process teardown and newline handling tested; emulation is not Windows evidence.",
+      "evidence": "Windows environment and source bound readback; no Windows support claim without pass.",
+      "exit_condition": "Windows environment and source bound readback; no Windows support claim without pass.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#19-10",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/19-10/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "EXT-V19-WINDOWS-HOST"
+      ],
+      "exit_gates": []
     },
     {
       "id": "20-01",
       "version": "2.0",
       "artifact": "ART-V20-INTEGRATED-CANDIDATE",
       "depends": [
-        "18-09",
-        "19-08"
+        "18-08",
+        "19-03",
+        "19-06",
+        "19-07"
       ],
       "goal": "Integrate reviewed lower-version slices; one migration head.",
       "status": "planned",
@@ -395,7 +929,33 @@
       "sp": 3,
       "artifacts_also": [
         "ART-V20-FOUNDATION-HARDENING"
-      ]
+      ],
+      "surfaces": [
+        "docs/evidence/v20/integration/ (new report)",
+        "docs/coordination/V2_FOUNDATION_HARDENING_PACKETS.md"
+      ],
+      "behavior": "Inventory reviewed lower-version commits and unresolved hardening defects; verify one service authority and migration head. Existing defect fixes become bounded packets with exact surfaces; this packet cannot authorize a broad refactor.",
+      "negative_tests": "Unreviewed donor source, duplicate authority, stale manifests and silently dropped required artifact block candidate freeze.",
+      "evidence": "Integration report with source graph and every finding disposition; zero unresolved release-blocking implementation defects.",
+      "exit_condition": "Integration report with source graph and every finding disposition; zero unresolved release-blocking implementation defects.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-01",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-01/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-02",
@@ -409,7 +969,33 @@
       "aliases": [
         "V20-01"
       ],
-      "sp": 1
+      "sp": 1,
+      "surfaces": [
+        "src/swarm/release/candidate.py (new)",
+        "src/swarm/cli.py"
+      ],
+      "behavior": "Freeze content-addressed CandidateManifest (source/schema/lock/config/policy/model/tool/protocol/registry snapshot digests) in existing artifacts; later review refs append separately. No candidate database required.",
+      "negative_tests": "Mutated source/config invalidates identity; evidence commit SHA is not misrepresented as execution SHA.",
+      "evidence": "Manifest validation and repeatable digest; exact run deployment can be reconstructed.",
+      "exit_condition": "Manifest validation and repeatable digest; exact run deployment can be reconstructed.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-02",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-02/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-03",
@@ -423,7 +1009,33 @@
       "aliases": [
         "V20-01"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "scripts/cp20_checks.py (new)",
+        "docs/evidence/v20/ (new run directory)"
+      ],
+      "behavior": "Run configured lint/type/unit/integration/security/migration checks on candidate source, recording command, exit, duration and skip names. Confirm operational wiring and clean upgrade.",
+      "negative_tests": "Required skipped tests, wrong source, divergent migration head or unavailable CI cannot be labeled green.",
+      "evidence": "Exact candidate deterministic report; infrastructure blockage distinct from product test failure.",
+      "exit_condition": "Exact candidate deterministic report; infrastructure blockage distinct from product test failure.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-03",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-03/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-04",
@@ -440,7 +1052,33 @@
       "sp": 2,
       "artifacts_also": [
         "ART-V20-INSTALL-JOURNEY"
-      ]
+      ],
+      "surfaces": [
+        "docs/artifacts/future/ART-V20-SUPPORT_MATRIX_TEMPLATE.md",
+        "docs/evidence/v20/install/ (new run directory)"
+      ],
+      "behavior": "Populate only evidenced OS/runtime/provider/tool/extension combinations; perform real fresh operator install to completed mission and diagnostic recovery.",
+      "negative_tests": "Unsupported combination fails with clear error; no inference of Linux/Windows support from macOS pass.",
+      "evidence": "Candidate-bound install journey and truthful supported/unknown/unsupported matrix.",
+      "exit_condition": "Candidate-bound install journey and truthful supported/unknown/unsupported matrix.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-04",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-04/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-05",
@@ -454,7 +1092,33 @@
       "aliases": [
         "V20-02"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "scripts/cp20_upgrade.py (new)",
+        "docs/evidence/v20/upgrade/ (new run directory)"
+      ],
+      "behavior": "Run prior supported version->candidate->prior state recovery with real missions, knowledge, approvals and uncertain effects. Keep reliability campaign deployment separate unless preregistered.",
+      "negative_tests": "Pending external effect not replayed after rollback; old binaries cannot write incompatible schema.",
+      "evidence": "Candidate-bound upgrade/rollback bundle and measured downtime/data preservation.",
+      "exit_condition": "Candidate-bound upgrade/rollback bundle and measured downtime/data preservation.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-05",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-05/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-06",
@@ -468,7 +1132,33 @@
       "aliases": [
         "V20-03"
       ],
-      "sp": 3
+      "sp": 3,
+      "surfaces": [
+        "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md",
+        "docs/evidence/v20/security/ (new report)"
+      ],
+      "behavior": "Independent reviewer traces authentication, project scope, model/tool inputs, sandbox, tokens, approvals, restore and supply-chain loading through operational entrypoints; bind each invariant to a negative test.",
+      "negative_tests": "Cross-project existence leak, stale authority and adversarial extension/selfdev paths tested; no test waiver without explicit disposition.",
+      "evidence": "Security review for exact candidate; release-blocking findings cause successor candidate and affected evidence rerun.",
+      "exit_condition": "Security review for exact candidate; release-blocking findings cause successor candidate and affected evidence rerun.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-06",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-06/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-07",
@@ -482,7 +1172,33 @@
       "aliases": [
         "V20-03"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "benchmarks/ (bounded candidate profile)",
+        "docs/evidence/v20/performance/ (new run directory)"
+      ],
+      "behavior": "Freeze workload/resource envelope before measuring throughput, p50/p95 latency, memory and orchestration/token overhead vs single-worker baseline. Exclude warmup explicitly; preserve all repetitions.",
+      "negative_tests": "No dropping slow failures, mixing different route/model configs or treating unknown usage as zero.",
+      "evidence": "Resource-normalized performance report with limits, baseline and environment; claims restricted to measured setup.",
+      "exit_condition": "Resource-normalized performance report with limits, baseline and environment; claims restricted to measured setup.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-07",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-07/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-08a",
@@ -496,7 +1212,32 @@
       "status": "planned",
       "aliases": [
         "V20-04"
-      ]
+      ],
+      "surfaces": [
+        "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md"
+      ],
+      "behavior": "Freeze seven-day protocol, supported profile, fault schedule, monitoring gaps, zero-tolerance invariants and restart rules. Specify which drills run on campaign or cloned deployment.",
+      "negative_tests": "Do not shorten duration or tune thresholds after results; missing support/security preflight blocks start.",
+      "evidence": "Lead-reviewed protocol digest and independent candidate-start checklist; planning may complete while clock remains unstarted.",
+      "exit_condition": "Lead-reviewed protocol digest and independent candidate-start checklist; planning may complete while clock remains unstarted.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-08a",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-08a/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "20-08b",
@@ -508,11 +1249,39 @@
       ],
       "type": "wall_clock_start",
       "sp": 1,
-      "goal": "Start the 168h campaign on the frozen CandidateManifest immediately after the deterministic matrix passes. Do not wait for 20-04..20-07; if any of them forces a candidate-invalidating change, the campaign restarts under a new identity (accepted risk: costs no more than having waited).",
+      "goal": "Start 168h observation at earliest point AFTER independent frozen-candidate/protocol preflight; later compatible drills may overlap on approved deployment. No blanket claim that early restart costs nothing.",
       "status": "planned",
-      "gate": "WC-V20-RELIABILITY-168H",
       "aliases": [
         "V20-04"
+      ],
+      "surfaces": [
+        "docs/evidence/v20/reliability/ (new start manifest)"
+      ],
+      "behavior": "After all frozen protocol prerequisites and start review, launch actual frozen deployment; observe started_at, attach read-only monitors and immutable 24h checkpoints. Implementation continues on a descendant checkout only.",
+      "negative_tests": "Missing monitoring, ambiguous identity or unapproved profile prevents counted start; heartbeat timestamp is not campaign start.",
+      "evidence": "Campaign ID and observed start evidence; earliest start consistent with policy, not unconditional start after unit tests.",
+      "exit_condition": "Campaign ID and observed start evidence; earliest start consistent with policy, not unconditional start after unit tests.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-08b",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-08b/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "REV-V20-CAMPAIGN-START"
+      ],
+      "exit_gates": [
+        "WC-V20-RELIABILITY-168H"
       ]
     },
     {
@@ -526,9 +1295,35 @@
       "sp": 1,
       "goal": "Campaign elapsed: ended_at - started_at >= 168h for one compatible identity, 24h checkpoints published, gaps classified by lead.",
       "status": "planned",
-      "gate": "WC-V20-RELIABILITY-168H",
       "aliases": [
         "V20-04"
+      ],
+      "surfaces": [
+        "docs/evidence/v20/reliability/ (new completion evidence)"
+      ],
+      "behavior": "Observe >=168 consecutive hours of one compatible candidate; execute preregistered drills, retain downtime and gaps, verify identity continuity. No elapsed time borrowed from predecessor.",
+      "negative_tests": "Changed behavior restarts affected identity; missing continuity may require successor campaign; backdated timestamps invalid.",
+      "evidence": "Completed real campaign and gap dispositions are reviewable, not automatic acceptance.",
+      "exit_condition": "Completed real campaign and gap dispositions are reviewable, not automatic acceptance.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-08c",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-08c/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": [
+        "WC-V20-RELIABILITY-168H"
       ]
     },
     {
@@ -540,7 +1335,9 @@
         "20-05",
         "20-06",
         "20-07",
-        "20-08c"
+        "20-08c",
+        "18-09",
+        "19-08"
       ],
       "goal": "After actual elapsed campaign, independent release review.",
       "checkpoint": "CP20-final",
@@ -548,7 +1345,32 @@
       "aliases": [
         "V20-04"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "docs/evidence/v20/release-review/ (new report)"
+      ],
+      "behavior": "Independent artifact-by-artifact release review reconciles lower-version requirements, real campaigns, support/security/performance/install evidence and remaining gates. Produce private candidate handoff/runbooks.",
+      "negative_tests": "Open required acceptance gate, mismatched source or self-review prevents accepted/release recommendation.",
+      "evidence": "Review receipt and operator decision package; main merge/public release remain separate actions requiring authorization.",
+      "exit_condition": "Review receipt and operator decision package; main merge/public release remain separate actions requiring authorization.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#20-09",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/20-09/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-01",
@@ -565,10 +1387,32 @@
       ],
       "sp": 2,
       "surfaces": [
-        "migrations/versions/",
-        "src/swarm/controller/scheduler.py",
-        "src/swarm/db/models.py"
-      ]
+        "src/swarm/contracts/scheduling.py (new)",
+        "src/swarm/db/models.py",
+        "migrations/versions/ (new revision)"
+      ],
+      "behavior": "Add versioned SchedulerPolicy, project credits/round cursor, scheduler generation, decision receipt and unique dispatch identity. Keep existing controller scheduler as owner.",
+      "negative_tests": "Negative weights, duplicate receipt/dispatch IDs and legacy rows creating fresh authority rejected.",
+      "evidence": "Real-DB migration/restart tests; fields support algorithm A23-01 without a parallel scheduler.",
+      "exit_condition": "Real-DB migration/restart tests; fields support algorithm A23-01 without a parallel scheduler.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-01",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-01/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-02",
@@ -583,7 +1427,33 @@
         "V23A-002a",
         "V23-01"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/contracts/scheduling.py"
+      ],
+      "behavior": "Implement weighted-deficit round-robin using persisted round/cursor, bounded credit, deterministic project tie break. Credit accrues once per round, debit once per dispatched service unit, atomic receipt.",
+      "negative_tests": "Polling frequency cannot mint credit; idle backlog cannot hoard unbounded credit; equal inputs yield equal choice.",
+      "evidence": "Frozen equal-cost trace plus weighted tests; implement algorithm independently from later counted tolerance evidence.",
+      "exit_condition": "Frozen equal-cost trace plus weighted tests; implement algorithm independently from later counted tolerance evidence.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-02",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-02/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-03",
@@ -598,7 +1468,33 @@
         "V23A-002b",
         "V23-01"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/controller/graph.py"
+      ],
+      "behavior": "Inside selected project choose dependency-ready task by bounded aging/deadline bonus then enqueue time/id; skip blocked head work and inspect next eligible project. Scope/privacy/resource checks precede ranking.",
+      "negative_tests": "Blocked large job cannot hide small eligible jobs; child tasks cannot reset project credit; unmet DAG dependency denies.",
+      "evidence": "Deterministic anti-head-of-line/starvation/cancellation tests and explain receipts.",
+      "exit_condition": "Deterministic anti-head-of-line/starvation/cancellation tests and explain receipts.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-03",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-03/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-04",
@@ -615,10 +1511,32 @@
       ],
       "sp": 3,
       "surfaces": [
-        "src/swarm/controller/scheduler.py",
-        "src/swarm/broker/broker.py (reservation component)",
-        "src/swarm/tools/effects.py (reservation component via reserve/created flag)"
-      ]
+        "src/swarm/controller/reservations.py (new)",
+        "src/swarm/db/models.py",
+        "migrations/versions/ (new revision)"
+      ],
+      "behavior": "Durable DispatchIntent and components reserve existing worker/broker/tool capacity in frozen order with key(intent,component). Ready only after all reserved and current fences verified; compensate only components acquired by this intent.",
+      "negative_tests": "Failure at every acquisition boundary; repeated compensate; ready before all components; leaked shared reservation.",
+      "evidence": "Real-DB/provider-fake boundary tests; no effect execution inside reservation transaction and no second budget ledger.",
+      "exit_condition": "Real-DB/provider-fake boundary tests; no effect execution inside reservation transaction and no second budget ledger.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-04",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-04/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-05",
@@ -633,7 +1551,33 @@
         "V23A-003b",
         "V23-01"
       ],
-      "sp": 3
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/controller/reservations.py",
+        "src/swarm/controller/scheduler.py"
+      ],
+      "behavior": "On restart reconcile preparing/ready/unknown intents using existing component receipts; unknown capacity remains charged until resolved. Stable dispatch ID handles crash after commit before delivery.",
+      "negative_tests": "Lost reservation response, crash mid-compensation, duplicate delivery and expired intent cannot oversubscribe or issue fresh duplicate intent.",
+      "evidence": "Multi-process kill/restart tests for every phase; complete disposition receipt per component.",
+      "exit_condition": "Multi-process kill/restart tests for every phase; complete disposition receipt per component.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-05",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-05/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-06",
@@ -648,7 +1592,33 @@
         "V23A-003a",
         "V23-01"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/runtime/backpressure.py"
+      ],
+      "behavior": "Persist project/site/worker drain state and reject new dispatch; cancellation increments existing generation before notifications. Bounded queues with explicit rejection reason; draining lets authorized in-flight work settle.",
+      "negative_tests": "Cancel racing with ready, nested fanout, full queue and drain resume cannot bypass fences or starve others.",
+      "evidence": "Deterministic plus real-DB cancellation races; no new timers/scheduler ownership.",
+      "exit_condition": "Deterministic plus real-DB cancellation races; no new timers/scheduler ownership.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-06",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-06/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-07",
@@ -664,7 +1634,33 @@
         "V23A-003b",
         "V23-01"
       ],
-      "sp": 3
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/db/site_authority.py (new by 18-02)"
+      ],
+      "behavior": "Recover round cursor, credits and reservations under current site epoch; take one scheduler generation and reject stale instance CAS. Do not mint catch-up credits on restart.",
+      "negative_tests": "Dual schedulers, stale epoch, restart mid-debit and paused clock produce no duplicate dispatch or doubled credit.",
+      "evidence": "Two scheduler process race and crash test; same persisted workload remains fair after restart.",
+      "exit_condition": "Two scheduler process race and crash test; same persisted workload remains fair after restart.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-07",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-07/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-08",
@@ -680,14 +1676,42 @@
         "V23B-003",
         "V23-04"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/observability/read_model.py (new)",
+        "src/swarm/api/routes_v1.py",
+        "apps/console/ (bounded read view)"
+      ],
+      "behavior": "Expose scoped receipt graph and queue decisions with denied/deferred reasons, freshness and usage unknowns; cursor-pagination. Console mutations use authenticated command/action boundary.",
+      "negative_tests": "Cross-project IDs/counts, stale cursor, raw prompt/secret export and write from read endpoint denied.",
+      "evidence": "API schema/permission tests plus console journey to inspect/retry via permitted boundary.",
+      "exit_condition": "API schema/permission tests plus console journey to inspect/retry via permitted boundary.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-08",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-08/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-09",
       "version": "2.3",
       "artifact": "ART-V23-CAPABILITY-PACKS",
       "depends": [
-        "19-03"
+        "19-03",
+        "20-03"
       ],
       "goal": "Capability pack manifest/lifecycle/project scoping.",
       "status": "planned",
@@ -695,7 +1719,33 @@
         "V23B-001",
         "V23-02"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/extensions/registry.py (new by 19-02)",
+        "src/swarm/contracts/extensions.py (new by 19-01)"
+      ],
+      "behavior": "Represent capability pack as extension kind with exact dependency DAG, procedures and adapters. Reuse install/grant/drain/revoke tables; project enablement distinct from installed bytes.",
+      "negative_tests": "Pack cycle, transitive digest substitution, disabled dependency and migration on untrusted import denied.",
+      "evidence": "Lifecycle tests with two projects, existing extension semantics and no competing pack authority.",
+      "exit_condition": "Lifecycle tests with two projects, existing extension semantics and no competing pack authority.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-09",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-09/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-10",
@@ -703,7 +1753,8 @@
       "artifact": "ART-V23-PORTABILITY",
       "depends": [
         "19-03",
-        "R25"
+        "R25b",
+        "20-03"
       ],
       "goal": "Secret-free export/import bundle + reconciliation.",
       "status": "planned",
@@ -711,7 +1762,34 @@
         "V23B-002",
         "V23-03"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/knowledge/service.py (new by R25a)",
+        "src/swarm/product/portability.py (new)",
+        "src/swarm/cli.py"
+      ],
+      "behavior": "Export permitted immutable refs/content and provenance to versioned manifest. Import into target project with fresh IDs/mapping and fresh grants; strip approvals, leases, cookies, secrets and accepted authority. Imported facts are untrusted pending validation.",
+      "negative_tests": "Path traversal/symlink archive, missing blob, wrong tenant, replay duplicate and copied grant rejected.",
+      "evidence": "Roundtrip to fresh project with digest/provenance checks, zero permission carryover and deterministic import receipt.",
+      "exit_condition": "Roundtrip to fresh project with digest/provenance checks, zero permission carryover and deterministic import receipt.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-10",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-10/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-11",
@@ -719,7 +1797,7 @@
       "artifact": "ART-V23-FLEET-POLICY",
       "depends": [
         "23-07",
-        "18-09"
+        "18-08"
       ],
       "goal": "Trust/locality/privacy/capability placement + drain/migration/stale fencing.",
       "status": "planned",
@@ -727,7 +1805,34 @@
         "V23A-004",
         "V23-05"
       ],
-      "sp": 3
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/workers/service.py",
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/contracts/scheduling.py (new by 23-01)"
+      ],
+      "behavior": "Placement intersects worker trust/capability, privacy/locality and free capacity; draining yields replacement attempt only after fence. Broker credentials remain control-plane owned.",
+      "negative_tests": "Worker claims higher trust, wrong site, stale generation and forbidden data egress rejected; no copying auth to workers.",
+      "evidence": "Physical host placement/drain evidence at CP23 plus deterministic policy matrix.",
+      "exit_condition": "Physical host placement/drain evidence at CP23 plus deterministic policy matrix.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-11",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-11/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     },
     {
       "id": "23-12",
@@ -745,7 +1850,35 @@
         "V23-01",
         "V23-06"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "benchmarks/ (frozen fairness profile)",
+        "docs/coordination/FUTURE_ACCEPTANCE_WORKLOADS_V23_V30.json"
+      ],
+      "behavior": "Preregister service-unit cost, weights, tolerance and sample boundary; exercise >=200 decisions for the proposed equal-cost profile plus unequal-cost, retries, backpressure and gaming cases. Freeze before counted execution.",
+      "negative_tests": "Post-hoc tolerance changes invalidate run; retries charged to origin project; polling cannot bias service.",
+      "evidence": "All preregistered traces incl. failures, expected/observed shares; lead freezes D23 tolerances before counting.",
+      "exit_condition": "All preregistered traces incl. failures, expected/observed shares; lead freezes D23 tolerances before counting.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-12",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-12/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "EXT-D23-FAIRNESS"
+      ],
+      "exit_gates": []
     },
     {
       "id": "23-13",
@@ -764,7 +1897,36 @@
       "aliases": [
         "V23-06"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "scripts/cp23_operations.py (new)",
+        "docs/evidence/v23/ (new run directory)"
+      ],
+      "behavior": "On >=2 physical nodes run competing projects under constrained real capacity; use non-fixture external action/provider, restart scheduler, drain worker, enable pack and export/import scoped knowledge.",
+      "negative_tests": "No cross-project content/effect/receipt leakage; lost host and duplicate delivery do not duplicate external action.",
+      "evidence": "CP23 physical identities, commands and exact policy/config/source refs; unavailable host/route blocks this claim only.",
+      "exit_condition": "CP23 physical identities, commands and exact policy/config/source refs; unavailable host/route blocks this claim only.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-13",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-13/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [
+        "EXT-V15-SECOND-HOST",
+        "EXT-V23-EXTERNAL-RESOURCE"
+      ],
+      "exit_gates": []
     },
     {
       "id": "23-14",
@@ -778,7 +1940,32 @@
       "aliases": [
         "V23-06"
       ],
-      "sp": 2
+      "sp": 2,
+      "surfaces": [
+        "docs/evidence/v23/independent-review/ (new report)"
+      ],
+      "behavior": "Independently reconcile scheduler/pack/portability/observability/fleet artifacts, lower candidate compatibility and external gates; freeze V3 source base.",
+      "negative_tests": "Synthetic fleet cannot satisfy physical gate; open lower release gate remains visible; no worker self-review.",
+      "evidence": "V2.3 review and V3 base handoff; formal acceptance only via canonical registry.",
+      "exit_condition": "V2.3 review and V3 base handoff; formal acceptance only via canonical registry.",
+      "spec": "docs/coordination/FUTURE_PACKET_CATALOG_V18_TO_V30_20260921.md#23-14",
+      "protocol": "docs/coordination/FUTURE_TRANSACTION_ALGORITHMS_V18_TO_V30_20260921.md",
+      "verification": {
+        "focused": "Use the packet negative cases against listed surfaces; collect exact commands, exits and skips.",
+        "integration": "Real PostgreSQL and process boundaries for concurrency/durability; fixtures label mechanics only.",
+        "baseline": [
+          "uv run ruff check .",
+          "uv run mypy src/swarm",
+          "uv run pytest <packet-focused-files> -q"
+        ],
+        "evidence_root": "docs/evidence/packets/23-14/<run-id>/",
+        "binding": "pushed source SHA + schema/lock/config/policy/route/protocol digests; separate evidence commit"
+      },
+      "rollback": "Preserve failing run; disable new path/grant or restore preceding compatible snapshot. Never erase unknown effects or downgrade authority generations.",
+      "implementation_owner": "Cursor single active implementation session; independent reviewer owns review-only work",
+      "detail_level": "execution_contract",
+      "entry_gates": [],
+      "exit_gates": []
     }
   ],
   "id_authority": "Execution IDs in this file are canonical for V1.8-V2.3. `aliases` list the contract-embedded IDs (V2A-018a, V2B-019a, V23A-001 ...) and the coarse phase IDs of FUTURE_EXECUTION_GRAPH_V18_TO_V30.json so every name resolves to one node.",
@@ -804,7 +1991,9 @@
       "blocks": [
         "formal split-site acceptance of ART-V18-SPLIT-BRAIN-SAFETY and ART-V18-OUTAGE-DRILL"
       ],
-      "note": "Local single-site drill (18-09) can become reviewable without it."
+      "note": "Local single-site drill (18-09) can become reviewable without it.",
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-D18-02",
@@ -814,7 +2003,9 @@
       "action": "Choose backup storage / encryption / retention target. Zero-spend default: local encrypted directory.",
       "blocks": [
         "counted V1.8 recovery evidence"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V19-FRESH-ENVIRONMENTS",
@@ -824,7 +2015,9 @@
       "action": "Provide fresh external install environment(s).",
       "blocks": [
         "19-09"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-V19-WINDOWS-HOST",
@@ -835,7 +2028,9 @@
       "blocks": [
         "19-10",
         "Windows row of ART-V20-SUPPORT-MATRIX"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "WC-V20-RELIABILITY-168H",
@@ -849,7 +2044,9 @@
         "20-08c",
         "20-09",
         "V2.0 accepted"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
     },
     {
       "id": "EXT-D23-FAIRNESS",
@@ -859,8 +2056,39 @@
       "action": "Freeze fairness tolerance (D23-01) and the normalized service-cost function (D23-02) before 23-12 counted runs.",
       "blocks": [
         "23-12 counted evidence"
-      ]
+      ],
+      "satisfied_by": "Independent review/environment readback/observed elapsed evidence bound to candidate; absence of blocker is insufficient.",
+      "evidence_refs": []
+    },
+    {
+      "id": "REV-V18-HANDOFF",
+      "kind": "review",
+      "owner": "independent lead",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Review CP6 source/wiring/claim matrix; authorize using that candidate as V1.8 implementation base, with lower acceptance gates still explicit."
+    },
+    {
+      "id": "REV-V20-CAMPAIGN-START",
+      "kind": "review",
+      "owner": "independent lead",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Verify frozen source/config/support profile, real monitoring, security preflight and every reliability protocol prerequisite before counting elapsed time."
+    },
+    {
+      "id": "EXT-V23-EXTERNAL-RESOURCE",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "evidence_refs": [],
+      "action": "Verify a real authorized zero-spend provider/tool for CP23; GitHub acceptance adapter is permitted where protocol accepts it, not a substitute for remote-inference qualification."
     }
   ],
-  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_INDEPENDENT_LEAD_REVIEW_20260921.md on coordination/swarm-control (prior baseline only)",
+  "planning_revision": "closure-sweep-20260921-proposed",
+  "activation": {
+    "state": "pending_independent_review",
+    "scope": "This closure revision only; prior canonical approval is not approval of these amendments. Planning branch is not the worker queue until reviewed adoption."
+  }
 }

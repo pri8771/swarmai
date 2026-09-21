@@ -6,9 +6,10 @@ Older files here (`V2B-*`, `EXT-WORKER-*`, `OPS-AUTO-*`, `HB-CI-001`, `V14-REAL-
 
 ## How to pick work
 
-1. Read `../V17_RECOVERY_PACKET_QUEUE.json`. Take the first packet, in file order, whose `status` is `ready`, or `planned` with every `depends` entry at `impl_complete` or later.
-2. Read **only** that packet's spec file plus the source files it lists under *Surfaces*.
-3. A packet with an unmet `gate` is not yours to unblock. Record the blocker once, then take the next dependency-independent packet.
+1. Read canonical coordination for the active adopted plan; closure amendments on the planning branch remain proposed.
+2. Run `python3 docs/coordination/tools/validate_plan.py --ready`; its list is candidate-ready after adoption, not authorization. `depends` requires completed implementation; split/remediation nodes resolve through children. `basis` is provenance only.
+3. `entry_gates` require bound evidence before starting; `exit_gates` restrict the resulting claim. Source complete is not independent review. If a gate blocks, continue another ready packet.
+4. Read only that packet's spec and named source/contracts. Future cards are generated from their JSON contracts.
 
 ## Hard rules for every packet
 
@@ -46,3 +47,8 @@ SWARM_LIVE_LOCAL=1 SWARM_DATABASE_URL=... uv run pytest -m live_local <files> -q
 ## Spec template
 
 `Artifact` · `Advances` · `SP` · `Depends` · `Fixes` (finding IDs from `../V17_CODE_AUDIT_20260921_2030_FABLE.md`) · `Tier` — then sections *Why*, *Surfaces*, *Exact behavior*, *Negative tests*, *Evidence gate*, *Exit*, *Do not*, and *Forward-compat* where a later version depends on a seam.
+
+
+## Closure-sweep mandatory corrections (proposed)
+
+All operational mutations require durable storage and current authenticated lease/policy, even when idempotent. No host subprocess fallback if sandbox unavailable. Runtime scoped knowledge is untrusted context, never system authority. Timeout does not terminate a thread/remote request; absence in an external listing cannot establish non-application. Receipt sequence is distinct from execution attempt; late writes are generation-fenced. Current specs/transaction algorithms replace older implied exactly-once claims.

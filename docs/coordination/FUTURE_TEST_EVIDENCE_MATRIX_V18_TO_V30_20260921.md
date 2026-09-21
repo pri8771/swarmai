@@ -208,3 +208,18 @@ Do not include:
 - cookies;
 - hidden held-out answers on worker-visible paths;
 - private chain-of-thought.
+
+
+## Closure-sweep additions and corrected evidence interpretations
+
+- R27a: receipt sequence vs execution attempt, multiple reconcile receipts, idempotent transition replay and conflicting transition bytes.
+- R27b/c: recomputed binding before succeeded replay; authenticated identity; canonical lock order; exact executor/generation finalization; cancellation admission race without remote-rollback claims.
+- R27e/R28a: thread completes AFTER timeout; delayed remote commit after empty listing; stale finalizer; irreversible retry requires disposition plus current approval. Missing proof keeps UNKNOWN.
+- R28b: same generation but expired/revoked lease, changed source/input/task revision and forged actor. Static fences are unit/simulation only.
+- R28s: real container attempts network/host-file/credential/control-socket access and descendant survival. Current host subprocess runner does not prove isolation.
+- R17b-1/2: DB admission vs file projection crash and replay, one graph/attempt authority. R17c-1/2: worker cannot accept itself, authenticated transport, real separate-process mission recovery.
+- R25a/b: prompt injection in stored knowledge remains untrusted data; useful context/quality disposition, not token savings alone.
+- R33c-1/2: narrow GitHub destination/argv/credential boundary, ambiguous observation never authorizes blind create/comment retry; real externally observed object identity and cleanup.
+- V1.8–V3.0: exact per-packet negative/evidence fields are in the JSON and generated catalog; this file groups evidence classes and does not duplicate their normative contracts.
+
+Plan-tool validation lives under docs/coordination/tools. Its tests exercise dependency/completion cycles, gate evidence, review holds, detail coverage and catalog drift. They are not SwarmAI runtime tests.

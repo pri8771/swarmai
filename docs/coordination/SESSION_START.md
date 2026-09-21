@@ -2,6 +2,8 @@
 
 This is the compact entry point for every Claude/Fable/agent session.
 
+On `fable/v3-planning`, closure-sweep changes remain proposed. The active worker must read canonical coordination; this branch does not dispatch itself. For final architecture closure read `FABLE_51_PLANNING_PROMPT.md` and master-plan section 0.8.
+
 ## 1. Current execution truth
 
 Repository: `pri8771/swarmai`
@@ -58,7 +60,7 @@ Read these only when the current packet needs them; do not reread all three ever
 
 ## 4. Active packet routing
 
-From `V17_RECOVERY_PACKET_QUEUE.json` (schema 1.1):
+From `V17_RECOVERY_PACKET_QUEUE.json` (schema 1.2 on the proposed closure branch):
 1. run `python3 docs/coordination/tools/validate_plan.py --ready` (or apply the file's `selection_rule`) and take the first ready packet;
 2. read `docs/coordination/packets/README.md` once per session, then ONLY that packet's `spec` file;
 3. use `docs/coordination/DOC_ROUTER.md` for anything the spec points to;
