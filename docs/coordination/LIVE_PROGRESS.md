@@ -1,6 +1,6 @@
 # SwarmAI live progress
 
-Updated: 2026-09-21T19:54:00Z
+Updated: 2026-09-21T19:55:00Z
 
 ## Current operating model
 
@@ -11,7 +11,7 @@ Updated: 2026-09-21T19:54:00Z
 | Operator | owner | Final authority |
 | ChatGPT | planning / coordination / independent review | No competing implementation lane |
 
-Implementation branch: `cursor/v17-single-session` @ `a0e1a882a2da6980ac03a513a97bb1f28e787a01` at this lead review.
+Implementation branch: `cursor/v17-single-session` @ `dbac43017e3773ed600249b329a9ba9a3a0c56f8` at lead closeout observation.
 Legacy A/B assignments remain generation 7, disabled, with empty queues. Repository owner directive continues to supersede older two-lane reset text.
 
 ## Heartbeat
@@ -37,14 +37,14 @@ Canonical review: `docs/coordination/reviews/ART-V14-REAL-E2E-V14-REAL-007-LEAD-
 
 - R03 selectively transplanted the G13 v3 pool implementation from donor `534476393257794c4e8ebf8d65f44fd090ab28eb` without the retired coordination topology.
 - R04 Mac verification reported 240 held-out inputs, 15 semantic archetypes per required cell, digest match, Ruff/mypy clean, and 11 focused tests green. This is useful current-environment evidence, but the canonical registry still requires actual HOST-WIN-DEV executable verification before lead freeze; Mac verification does not impersonate Windows.
-- R05 reviewer-calibration implementation is now pushed: evidence tip `6529f408b4aefd23a8129aa84a66a2d5ecb27ec7`, current descendant `da026d1d0ec610e226d56cdda796269fc1573d09`; receipt claims 10/10 calibration cases and negatives green. No held-out qualification started and no qualification acceptance is claimed.
+- R05 reviewer-calibration implementation is pushed: evidence tip `6529f408b4aefd23a8129aa84a66a2d5ecb27ec7`, descendant lineage on the current branch; receipt claims 10/10 calibration cases and negatives green. No held-out qualification started and no qualification acceptance is claimed.
 - Real sealed-reference content digest remains unbound. Counted qualification remains prohibited until canonical prerequisites are legitimately satisfied.
 
 ## V1.5 / recovery progress
 
-- R13 confirmed the durable lease schema/token-hash foundation is already present on the single-session branch without downgrading later V2A-003b/c or V17 effect work.
-- Evidence at `a0e1a882a2da6980ac03a513a97bb1f28e787a01` reports 11 focused lease-foundation tests passed against the local operator DB and Alembic head `a17effect004a0001`.
-- This is verification/recovery progress only; `ART-V15-LEASE-FENCING` is not self-accepted and live Mac+Windows multi-host evidence remains incomplete.
+- R13 confirmed the durable lease schema/token-hash foundation is already present without downgrading later V2A-003b/c or V17 effect work. Evidence at `a0e1a882a2da6980ac03a513a97bb1f28e787a01` reports 11 focused lease-foundation tests passed against the local operator DB and Alembic head `a17effect004a0001`.
+- R14 confirmed claim/renew/expire behavior is already present as a later superset. Evidence tip `297e6aeb0ee448a3b680e3ba2bb984b5199c2437` reports 17 focused integration tests passed; branch descendant `dbac43017e3773ed600249b329a9ba9a3a0c56f8` only rebinds evidence after summary repair.
+- These are verification/recovery advances only; `ART-V15-LEASE-FENCING` is not self-accepted and live Mac+Windows multi-host evidence remains incomplete.
 
 ## CI / blockers
 
