@@ -1,7 +1,8 @@
 """Synthetic unit tests for handoff tooling; NOT SwarmAI live/product evidence."""
 import copy
 import unittest
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from execution_guard import evaluate, heartbeat_assessment
 
 
@@ -20,7 +21,8 @@ class GuardTests(unittest.TestCase):
 
     def test_ready_label_does_not_override_missing_dependency(self):
         r = evaluate(docs(packet('A', 'ready', depends=['MISSING'])), {})
-        self.assertFalse(r['ok']); self.assertEqual(r['ready'], [])
+        self.assertFalse(r['ok'])
+        self.assertEqual(r['ready'], [])
 
     def test_plain_dependency_cycle(self):
         r = evaluate(docs(packet('A', depends=['B']), packet('B', depends=['A'])), {})
@@ -28,14 +30,18 @@ class GuardTests(unittest.TestCase):
 
     def test_split_expansion_cycle(self):
         r = evaluate(docs(packet('P', 'split', split_into=['A']), packet('A', depends=['P'])), {})
-        self.assertFalse(r['ok']); self.assertEqual(r['ready'], [])
+        self.assertFalse(r['ok'])
+        self.assertEqual(r['ready'], [])
 
     def test_empty_split_rejected(self):
         self.assertFalse(evaluate(docs(packet('P', 'split')), {})['ok'])
 
     def test_repair_can_consume_audited_parent(self):
-        r = evaluate(docs(packet('P', 'gaps_found', remediation=['A']), packet('A', depends=['P'])), {})
-        self.assertTrue(r['ok']); self.assertEqual(r['ready'], ['A'])
+        r = evaluate(docs(
+            packet('P', 'gaps_found', remediation=['A']), packet('A', depends=['P'])
+        ), {})
+        self.assertTrue(r['ok'])
+        self.assertEqual(r['ready'], ['A'])
 
     def test_successor_waits_for_all_repairs(self):
         d = docs(packet('P', 'gaps_found', remediation=['A', 'B']),
@@ -44,15 +50,18 @@ class GuardTests(unittest.TestCase):
 
     def test_completed_repairs_satisfy_successor(self):
         d = docs(packet('P', 'gaps_found', remediation=['A', 'B']),
-                 packet('A', 'impl_complete'), packet('B', 'impl_complete'), packet('C', depends=['P']))
+                 packet('A', 'impl_complete'), packet('B', 'impl_complete'),
+                 packet('C', depends=['P']))
         self.assertIn('C', evaluate(d, {})['ready'])
 
     def test_evidence_only_not_live_checkpoint_dependency(self):
-        d = docs(packet('A', 'evidence_only', audit='historical source'), packet('B', kind='live', depends=['A']))
+        d = docs(packet('A', 'evidence_only', audit='historical source'),
+                 packet('B', kind='live', depends=['A']))
         self.assertNotIn('B', evaluate(d, {})['ready'])
 
     def test_documented_baseline_can_enable_repair_code(self):
-        d = docs(packet('A', 'evidence_only', audit='historical source'), packet('B', depends=['A']))
+        d = docs(packet('A', 'evidence_only', audit='historical source'),
+                 packet('B', depends=['A']))
         self.assertIn('B', evaluate(d, {})['ready'])
 
     def test_unsubstantiated_evidence_only_not_satisfied(self):
@@ -60,7 +69,8 @@ class GuardTests(unittest.TestCase):
         self.assertNotIn('B', evaluate(d, {})['ready'])
 
     def test_review_pending_not_live_pass(self):
-        d = docs(packet('A', 'review_pending', audit='submitted'), packet('B', kind='live', depends=['A']))
+        d = docs(packet('A', 'review_pending', audit='submitted'),
+                 packet('B', kind='live', depends=['A']))
         self.assertNotIn('B', evaluate(d, {})['ready'])
 
     def test_open_external_gate_blocks_live(self):
@@ -76,13 +86,17 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(evaluate(d, {})['ready'], [])
 
     def test_closed_gate_with_evidence_can_run(self):
-        d = docs(packet('A', kind='live', gate='G'), gates=[dict(id='G', status='closed', evidence_refs=['receipt'])])
+        d = docs(packet('A', kind='live', gate='G'),
+                 gates=[dict(id='G', status='closed', evidence_refs=['receipt'])])
         self.assertEqual(evaluate(d, {})['ready'], ['A'])
 
     def test_preauthorized_account_requires_local_probe(self):
-        d = docs(packet('A', kind='external_live', gate='G'), gates=[dict(id='G', status='preauthorized_if_existing_gh_session_available')])
+        d = docs(packet('A', kind='external_live', gate='G'), gates=[
+            dict(id='G', status='preauthorized_if_existing_gh_session_available')
+        ])
         r = evaluate(d, {'runtime_probe_gates': ['G']})
-        self.assertEqual(r['ready'], []); self.assertEqual(r['preflight_only'][0]['packet'], 'A')
+        self.assertEqual(r['ready'], [])
+        self.assertEqual(r['preflight_only'][0]['packet'], 'A')
 
     def test_result_review_gate_does_not_prevent_collecting_evidence(self):
         d = docs(packet('A', kind='live', gate='G'), gates=[dict(id='G', status='open')])
@@ -109,7 +123,8 @@ class GuardTests(unittest.TestCase):
 
     def test_overlay_missing_target_fails_closed(self):
         r = evaluate(docs(packet('A')), {'dependency_additions': {'missing': ['A']}})
-        self.assertFalse(r['ok']); self.assertEqual(r['ready'], [])
+        self.assertFalse(r['ok'])
+        self.assertEqual(r['ready'], [])
 
     def test_lead_decision_not_worker_work(self):
         self.assertEqual(evaluate(docs(packet('A', kind='lead_decision')), {})['ready'], [])
@@ -131,7 +146,8 @@ class GuardTests(unittest.TestCase):
 
     def test_one_active_packet_reported_not_restarted(self):
         r = evaluate(docs(packet('A', 'in_progress')), {})
-        self.assertEqual(r['in_progress'], ['A']); self.assertEqual(r['ready'], [])
+        self.assertEqual(r['in_progress'], ['A'])
+        self.assertEqual(r['ready'], [])
 
     def test_undefined_gate_rejected(self):
         self.assertFalse(evaluate(docs(packet('A', gate='bad')), {})['ok'])
@@ -140,17 +156,19 @@ class GuardTests(unittest.TestCase):
         h = {'last_heartbeat': {'timestamp_utc': '2026-09-21T23:23:56Z',
                                'last_meaningful_activity_at': '2026-09-21T20:05:50Z',
                                'status': 'working', 'current_packet': 'R27'}}
-        r = heartbeat_assessment(h, datetime(2026, 9, 21, 23, 24, tzinfo=timezone.utc))
+        r = heartbeat_assessment(h, datetime(2026, 9, 21, 23, 24, tzinfo=UTC))
         self.assertEqual(r['state'], 'daemon_alive_activity_stale_verify_process_or_long_job')
         self.assertEqual(r['activity_age_seconds'], 11890)
 
     def test_future_timestamp_not_fresh(self):
         h = {'timestamp_utc': '2099-01-01T00:00:00Z'}
-        self.assertEqual(heartbeat_assessment(h, datetime.now(timezone.utc))['state'], 'unknown_or_invalid_timestamp')
+        self.assertEqual(heartbeat_assessment(h, datetime.now(UTC))['state'],
+                         'unknown_or_invalid_timestamp')
 
     def test_missing_activity_is_unknown(self):
-        n = datetime.now(timezone.utc)
-        self.assertEqual(heartbeat_assessment({'timestamp_utc': n.isoformat()}, n)['state'], 'daemon_alive_activity_unknown')
+        n = datetime.now(UTC)
+        self.assertEqual(heartbeat_assessment({'timestamp_utc': n.isoformat()}, n)['state'],
+                         'daemon_alive_activity_unknown')
 
 
 if __name__ == '__main__':
