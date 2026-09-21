@@ -1,10 +1,10 @@
-# ART-V13-TASK-POOL v3 — independent lead freeze review
+# ART-V13-TASK-POOL v3 — independent lead review
 
-Decision: **VERIFIED / FROZEN TASK-POOL CONTRACT**  
+Decision: **REVIEWABLE / FREEZE WITHHELD**  
 Lead review: LEAD-20260921-037  
 Reviewed source: `cursor/v2-product-lane@534476393257794c4e8ebf8d65f44fd090ab28eb`  
 Exact-tip CI: Actions `35625964121` — success  
-Freeze: `g13-pool-freeze-v3`
+Candidate identity: `g13-pool-freeze-v3`
 
 ## Scope reviewed
 
@@ -17,32 +17,26 @@ Freeze: `g13-pool-freeze-v3`
 - `src/swarm/evals/task_pool_freeze_v3.py`
 - `scripts/g13_freeze_task_pool_v3.py`
 - `tests/evals/test_task_pool_freeze_v3.py`
-- `docs/coordination/EVAL_131_QUALIFICATION_PROTOCOL.md`
-- `docs/coordination/packets/V2B-001-R4.md`
+- frozen EVAL-131 protocol and `V2B-001-R4` packet.
 
-## Acceptance findings
+## Semantic findings
 
-1. The frozen v3 corpus declares and verifies the required four product families (`coding`, `planning`, `reasoning`, `extraction`) across S/M/L/XL.
-2. There are 240 held-out inputs total and the implementation requires exactly 15 distinct semantic archetypes in every required cell.
-3. Independent source inspection of the authored objective catalogue shows materially different objectives rather than the retry-06 pattern of five recipes expanded by scenario substitutions/cumulative clauses. Examples span distinct algorithms/data structures, distinct operational planning problems, distinct reasoning problem classes, and distinct extraction document/field contracts.
-4. The v3 independence checker fails closed on duplicate case/payload/prompt/template identity, duplicate semantic-archetype identity, scenario-substitution stems, clause-prefix/containment siblings, and cross-partition contamination. Per-cell archetype depth is mechanically enforced.
-5. Direct tests cover scenario-substitution siblings, digest/template reseed collision, cumulative clause siblings, a 15-record/5-archetype failure, hidden-answer-key refusal, and fail-closed sealed-reference resolution.
-6. Calibration and held-out records are separately identified; v3 reports 16 calibration records and 240 held-out records.
-7. Worker-visible held-out records contain opaque hidden-reference handles only. Plaintext expected outputs, grader fixtures, rubrics and reference solutions are rejected by the prompt boundary.
-8. The sealed reference bundle content digest is intentionally **not** fabricated or bound in this source slice. The manifest therefore keeps `counted_qualification_ready=false` and `w131b_started=false`.
-9. The one-sided 90% Wilson z value remains `1.2815515655446004`; this packet does not alter the frozen threshold policy.
-10. B reported executable verification: generator and verifier successful; Ruff clean; mypy clean over 145 source files; focused G13/coordination tests 17 passed; offline pytest excluding integration 295 passed. The exact source tip independently passed GitHub Actions run `35625964121`.
+The v3 candidate is materially stronger than retry06. It contains 240 held-out inputs over all 16 required family x size cells and mechanically requires 15 distinct semantic archetypes per cell. Source inspection found materially different objectives rather than the rejected pattern of five recipes expanded by scenario substitution, numeric reseeding or cumulative clauses. The independence checker fails closed on duplicate case/payload/prompt/template identity, duplicate semantic-archetype identity, scenario-substitution stems, clause-prefix/containment siblings and cross-partition contamination.
 
-## Platform truth
+Direct tests cover scenario siblings, digest/template reseed collision, cumulative clauses, a 15-record/5-archetype failure, hidden-answer-key refusal and fail-closed sealed-reference resolution. Calibration and held-out identities are separate. Worker-visible held-out records expose opaque reference handles only. The sealed reference content digest is intentionally not fabricated, so `counted_qualification_ready=false` and `w131b_started=false` remain correct. The frozen one-sided 90% Wilson policy is unchanged.
 
-The active B implementation session explicitly reported a **Linux** execution host while using the `HOST-WIN-DEV` coordination identity. This does not invalidate this platform-neutral evaluation-contract freeze because exact-tip CI independently passed and the gate is corpus/scorer/identity semantics, not Windows runtime behavior. It **does** mean this work must not be cited as Windows-specific install/runtime/multi-host evidence.
+B reported generator/verifier success, Ruff clean, mypy clean over 145 source files, 17 focused tests passed and 295 offline tests passed. Exact-tip GitHub Actions `35625964121` independently succeeded.
 
-## External retry-07 disposition
+## Why freeze is withheld
 
-`worker/swarmai-v13-task-pool-freeze-07@02cd0a2ea23342c331e83efd78b7682617dd16d3` is a real, one-commit, G13-scoped support branch from retry 06; Actions `35625433324` is green. It repairs the older v2 design with a semantic-group axis and 15 groups/cell, but Windows-B/local-B v3 remains the authoritative final implementation for the frozen task pool. No retry-07 code is auto-merged or substituted for v3.
+`V2B-001-R4` and the fixed execution topology make **actual HOST-WIN-DEV** the final implementation/test owner of this gate. The implementation session that produced the above executable report explicitly identified its host OS as Linux while using the HOST-WIN-DEV coordination identity. Green GitHub CI and the strong source review do not substitute for the required final executable Windows-lane evidence.
 
-## Freeze decision and remaining gate
+Therefore `ART-V13-TASK-POOL` is **reviewable**, not yet verified/frozen. Packet `V2B-001-R5` now defines the bounded actual-Windows verification gate. If the real Windows run exposes no portability defect, the v3 bytes should remain unchanged and the lead can freeze the existing candidate. Any semantic v3 change requires a new version and new independent review.
 
-`ART-V13-TASK-POOL` transitions **drafting -> verified** and `g13-pool-freeze-v3` is frozen for the next qualification tranche. Do not mutate v3 in place; any semantic change requires a new freeze/version and a new lead review.
+## External retry07
 
-This decision does **not** authorize W-131B counted qualification yet. Before the first counted observation, the lead must bind a real sealed-reference bundle content digest to the frozen reference IDs without exposing answers to workers. Reviewer-role calibration/freeze is separately required before reviewer held-out qualification.
+`worker/swarmai-v13-task-pool-freeze-07@02cd0a2ea23342c331e83efd78b7682617dd16d3` is a real one-commit G13 support branch with Actions `35625433324` green. It remains support/reference evidence only and is not auto-merged or substituted for local-B v3.
+
+## Remaining gates
+
+No W-131B counted qualification is authorized. First obtain actual HOST-WIN-DEV executable verification and independent lead freeze. Then bind a real lead-controlled sealed-reference bundle content digest without exposing answers. Reviewer calibration may be developed separately, but reviewer held-out qualification also remains gated by its own benchmark/scorer freeze.
