@@ -3,7 +3,37 @@
   "host_alias": "HOST-MAC-DEV",
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
-  "last_heartbeat": null,
-  "history": [],
-  "status": "not_started"
+  "last_heartbeat": {
+    "observed_at": "2026-09-21T02:31:49+00:00",
+    "trigger": "scheduler",
+    "host_alias": "HOST-MAC-DEV",
+    "session_id": "A",
+    "branch": "cursor/v2-runtime-lane",
+    "branch_sha": "859271e7adfec892a1fdf1a5dcb6c2612846606d",
+    "coordination_sha": "5ed45ec13c402ce80387ab04d5caf464f44e4ac0",
+    "effective_cadence_minutes": 15,
+    "packet_id": null,
+    "artifact_id": null,
+    "status": "bootstrap",
+    "last_agent_activity_at": null,
+    "note": null
+  },
+  "history": [
+    {
+      "observed_at": "2026-09-21T02:31:49+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-MAC-DEV",
+      "session_id": "A",
+      "branch": "cursor/v2-runtime-lane",
+      "branch_sha": "859271e7adfec892a1fdf1a5dcb6c2612846606d",
+      "coordination_sha": "5ed45ec13c402ce80387ab04d5caf464f44e4ac0",
+      "effective_cadence_minutes": 15,
+      "packet_id": null,
+      "artifact_id": null,
+      "status": "bootstrap",
+      "last_agent_activity_at": null,
+      "note": null
+    }
+  ],
+  "status": "bootstrap"
 }
