@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T17:12:48+00:00",
-    "trigger": "manual",
+    "observed_at": "2026-09-21T17:13:36+00:00",
+    "trigger": "scheduler",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "41854494fb563cd92c76836d96630952f04d137b",
+    "coordination_sha": "ef4b2ddf0e943dcabe38e84093bada1dc5044005",
     "effective_cadence_minutes": 5,
     "packet_id": "V2B-002",
     "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
-    "status": "session_started",
-    "last_agent_activity_at": "2026-09-21T17:12:47+00:00",
-    "note": "session_epoch=reset-20260921-two-lanes-02; fresh coordinated Lane B started; current work V2B-002"
+    "status": "blocked",
+    "last_agent_activity_at": "2026-09-21T17:09:41+00:00",
+    "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:44:18+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-      "coordination_sha": "19fc82ec8c163b26cfa83363d4c4693766405e6e",
-      "effective_cadence_minutes": 5,
-      "packet_id": null,
-      "artifact_id": null,
-      "status": "bootstrap",
-      "last_agent_activity_at": null,
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T16:48:17+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "session_started",
       "last_agent_activity_at": "2026-09-21T17:12:47+00:00",
       "note": "session_epoch=reset-20260921-two-lanes-02; fresh coordinated Lane B started; current work V2B-002"
+    },
+    {
+      "observed_at": "2026-09-21T17:13:36+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "ef4b2ddf0e943dcabe38e84093bada1dc5044005",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "status": "blocked",
+      "last_agent_activity_at": "2026-09-21T17:09:41+00:00",
+      "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
     }
   ],
-  "status": "session_started"
+  "status": "blocked"
 }
