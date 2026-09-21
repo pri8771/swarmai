@@ -1,87 +1,67 @@
 # SwarmAI compact project memory
 
-Curated 2026-09-21 after LEAD-20260921-023. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation.
+Curated 2026-09-21 after `LEAD-20260921-024`. `ARTIFACT_REGISTRY.json` is canonical; this is a compact derived orientation, not proof by itself.
 
-## Current operating model
+## Authority and team
 
-Owner authorizes source implementation through V3.0; major milestones V1.7, V2.3 and V3.0; immediate target is a V2.0 implementation/artifact-complete candidate. Main merge/public release/additional spend remain separately gated.
+Owner authorizes source implementation through V3.0. Major milestones: V1.7, V2.3, V3.0. Immediate target: V2.0 implementation/artifact-complete candidate. Main merge, public release/deployment and additional spend remain separately gated.
 
-Active team is exactly two Cursor implementation sessions plus ChatGPT lead:
-- A / HOST-MAC-DEV / `cursor/v2-runtime-lane`: runtime/control-plane/distributed/recovery and integration ownership.
-- B / HOST-WIN-DEV / `cursor/v2-product-lane`: evals/knowledge/tools/product/beta.
-- reserve verification branch is dormant.
+Active implementation team:
+- ChatGPT: lead/architect/independent reviewer/artifact owner.
+- Cursor A / HOST-MAC-DEV / `cursor/v2-runtime-lane`: runtime, control plane, distributed/recovery + integration owner on `cursor/v2-integration`.
+- Cursor B / HOST-WIN-DEV / `cursor/v2-product-lane`: evaluation, knowledge, tools, product, beta.
+- verification lane is dormant reserve.
 
-Each active branch now has `SESSION_INSTRUCTIONS.md`; operator handoff is simply pull/read/continue. Workers fetch canonical coordination after every packet and continue dependency-ready work automatically.
-
-Heartbeat:
-- protocol/state in `HEARTBEAT_PROTOCOL.md` / `HEARTBEAT_STATE.json`;
-- workers bootstrap at effective 15-minute cadence;
-- A and B each require 3 consecutive valid 15-minute heartbeats;
-- ChatGPT scheduled lead review remains hourly due platform minimum;
-- after lead verifies both histories, worker effective cadence becomes hourly;
-- coordination heartbeat is not FIX-004 authenticated Cursor-agent evidence.
-- As of LEAD-023 neither worker heartbeat has been observed yet; system is configured but not verified.
-
-## Current source/audit
-
-Reviewed integration `cursor/v2-integration@9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615` contains only verified V2A-001 broker closure + V2A-002 real process restart.
-
-A latest meaningful source `e764834a69315d1c2c85f00322c3392aa5037fd9` / evidence `c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6`: V2A-003b-R has 52 focused passes and useful claim/dependency/HOL/renew-horizon repairs, but lead still requires V2A-003b-R2: terminal task/attempt renewal fence + lease/attempt-bound expiry revision/source/cancellation authority. ART-V15 remains drafting; V2A-003c still follows.
-
-B has no product implementation visible remotely. First packet V2B-000 merges only reviewed `cursor/v2-integration` into product lane, then B1 task-pool freeze, B2 reviewer calibration, B3 scoped provenance, B4 action/approval contracts.
-
-V2A-H6A still needs owner-only secret file + safe fresh-config overwrite semantics. Remote dual-provider G12 still has 0 admissible routes. G13 qualification, G14 live proof and LIVE-142 remain honestly blocked/incomplete.
-
-## Lead automation
-
-Automation `6ab02943e168819192c9c5672b2a6578` is enabled hourly. It reads worker heartbeat histories, validates bootstrap streaks, graduates worker cadence, reviews all new A/B commits/evidence, updates registry/performance/queues, and notifies the operator on meaningful changes, stale heartbeat, blockers, review decisions or human action.
-
-GitHub updates do not instantly wake ChatGPT; durable review/notification latency is bounded by the hourly lead automation.
-
+Artifacts are primary; packets advance artifact states. Cursor should do routine SP1-SP3 work. Lead reviews independently and advances contracts/recovery/security/evaluation/future artifacts in parallel.
 
 ## Current source truth
 
-Main remains `b9141fa3150f853586dede0334a47b344571bc16`. Historical V1.4 base/PR #14 remains draft at `2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea` and is not the V2 integration target.
+Main: `b9141fa3150f853586dede0334a47b344571bc16`.
+A runtime: `f393f7fa0ed62d5233350740515ed77069fd4eef`, Actions `35555605844` green.
+B product: `5ede4bf39734462bbaff6dc9e13a5255f58af80d`, Actions `35554834325` green, but no product implementation packet yet.
+Reviewed integration baseline: `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code `ee5a06612aa2e4409fa8bbfd1969225c16887615`.
 
-Session A runtime WIP: `5f3388b1b9ebded8de532e86ee6fcd6c34c99ea6`; Actions `35551159907` green for offline/backend + console checks, with DB integration skipped without `SWARM_DATABASE_URL` and live gates not run. V2 integration remains `9ce727842446b98cfa55c28c7e70808f57f17d7b`, code baseline `ee5a06612aa2e4409fa8bbfd1969225c16887615`; Actions `35550653160` green. Session B remains `2c08f...`; no Session-B source commit/message was observed in LEAD-022.
+## Heartbeat truth
 
-Lead-reviewed Session-A results:
-- V2A-001 / `ART-V12-BROKER-CONTRACT` verified: generic ProductStore execution injects the governed project broker; broker-required paths cannot fall through to direct local inference.
-- V2A-002 / `ART-V11-RESTART-EVIDENCE` verified: actual uvicorn process stop/start and same durable mission reopen through HTTP and separate CLI.
-- V2A-003a-R durable schema/token-foundation repair verified, but the overall lease-fencing artifact is not accepted.
-- V2A-020a SP1 accepted as a bounded integration baseline: only reviewed V2A-001/002 lineage is present. `ART-V20-INTEGRATED-CANDIDATE` remains drafting.
-- V2A-H6A needs a small repair: owner-only permissions for generated secret-bearing compose env and explicit fresh-config overwrite semantics rather than implying safe live DB credential rotation.
+`HEARTBEAT_PROTOCOL.md` controls. Only `trigger=scheduler` counts toward bootstrap proof; manual/install work-status updates do not. Need 3 consecutive scheduler heartbeats 10–25 minutes apart for BOTH workers before effective cadence graduates to hourly.
 
-V2A-003b-R is currently **WIP, not evidence-bound**. Source at `5f3388b...` fixes claim-time mission/project/graph/source/cancellation authority, worker-project renewal check and keyset pagination past the old 32-row HOL ceiling. Lead review found two remaining packet-contract gaps: lease renewal does not re-check current mission/task/source/cancellation authority, and expiry can still set a stale/cancelled/superseded leased task back to `ready`. Direct regressions for those paths are missing. Finish the WIP; do not restart or integrate it yet.
+At LEAD-024:
+- A: **1/3** counted scheduler heartbeats, timestamp `2026-09-21T02:31:49Z`. Later A heartbeats are manual and do not advance streak.
+- B: **0/3**. One `trigger=install` event at `2026-09-21T02:29:19Z`; no scheduler event.
+- Old heartbeat client let manual updates suppress scheduler timing; branch fix exists. A/B must pull/reinstall; B needs diagnostics.
+- No graduation. Coordination heartbeat is not `ART-V10-WORKER-HEARTBEAT` authenticated Cursor-agent evidence.
 
-## Acceptance/gate truth
+## Lead-reviewed new work
 
-V1.0 repair: candidate/security/evidence/runtime artifacts verified; worker-heartbeat blocked because Cursor CLI auth/real authenticated receipts remain absent.
+**V2A-003b-R2 / SP1 accepted packet.** Source `685810cc84d17594fa54a168c1d23b8463dc0871`, evidence `391e8ea...`; current descendant CI green. Renewal now fences terminal task/attempt and current revision/source/cancellation authority; expiry compares lease/attempt stamps before requeue. Whole `ART-V15-LEASE-FENCING` stays drafting until V2A-003c result-acceptance fencing.
 
-V1.1: required artifacts verified, including real process restart; artifact-set promotion remains separate.
+**V2A-H6A-R / SP1 accepted packet.** Source `d40c1fd420cd489e30c9ef567691c9fc0d1638e5`. Generated compose secret file gets POSIX 0600; overwrite requires explicit fresh-config acknowledgement and is documented as not live Postgres credential rotation. Parent V2 hardening artifact stays drafting.
 
-V1.2: broker and provider eligibility verified, but **0 admissible remote routes** means remote overlap is blocked. Historical local fallback/reconciliation evidence used stubs and is insufficient for current live-local proof; Session A + lead must revalidate current-tip real local execution/admission before promotion.
+**V2A-003X / SP2 accepted architecture spike.** Source `0fe0831a642039feae48e63076b6889a195f6036`. DBOS 3.0.0 demonstrates workflow/step durability/idempotency but not Swarm source/cancel/project/lease authority. Recommendation: partial reuse for worker execution only after Swarm fencing; keep durable authority in Postgres. No production migration.
 
-V1.3: qualification protocol accepted; screening matrix = 72 provisional n=5 cells across three local configs and S/M/L/XL. Task/version pool not frozen; zero qualified cells; reviewer qualification drafting.
+**V14-REAL-001 was a genuine failed mission, not a pass.** Mission `d9379d80277644998353a9ca3614eba7` used 3 actual brokered `qwen3.5:4b` calls at $0 with real repo inspection, but model implementation text created no material worktree diff; review correctly rejected it. Failure is preserved. Immediate repair packet: `V14-REAL-001-R` in `docs/coordination/packets/`.
 
-V1.4: graph/load work is offline preparation. Qualified roles/live adaptive proof remain blocked on G12/G13. LIVE-142 is preregistered but not started; mandatory wall-clock observation remains future truth.
+**A5 local G12 proof accepted as live-local packet.** Execution `84df040...`, evidence/branch `f393f7fa...`: actual Ollama 0.21.0 inventory, real brokered gemma3:4b + qwen3.5:4b calls with tokens/$0, killed-route denial -> real alternate route, quota settlement -> fourth request denied. No remote claim. Broader G12 remains blocked.
 
-V1.5 source implementation is active. `ART-V15-LEASE-FENCING` still needs completed V2A-003b-R plus V2A-003c result acceptance fencing. V1.6/V1.7 Session-B packets are ready but no Session-B source activity has been observed.
+Remote admission probe reports OpenRouter/Groq/Gemini credentials present/auth metadata OK, but exact account free tier/zero-charge eligibility is unverified; canaries correctly fail closed. G12 remote overlap remains **0 admitted routes**.
 
-V2.0 integration has a clean drafting baseline (V2A-001/002 only). Foundation hardening remains drafting. Do not wholesale-merge runtime lineage containing unreviewed V15 behavior.
+## Immediate queues
 
-## Ready queues
+A priority:
+1. `V14-REAL-001-R` SP2 — generic model-output -> isolated-worktree materialization repair + unrelated regression + new preregistered real mission on a different subsystem.
+2. `V2A-003c` SP2 — durable result acceptance: stale generation/lease/task/source/cancellation and duplicate result denial; exactly one accepted result.
+3. integrate only newly lead-reviewed slices with receipt; no wholesale runtime merge.
 
-Session A: finish `V2A-003b-R` SP2; `V2A-H6A-R` SP1; isolated `V2A-003X` SP2 DBOS reuse spike. After 003b-R lead acceptance: V2A-003c result fence, then durable worker service/client. Session A also owns current-tip local broker/admission revalidation; do not create a third general implementation lane for it.
+B priority:
+1. pull/reinstall corrected Windows heartbeat scheduler.
+2. `V2B-000` SP1 — merge only reviewed integration baseline into product lane; run Windows baseline.
+3. `V2B-001` SP2 — freeze G13 calibration/held-out IDs/hashes and scorer/size/prompt/tool/model versions.
+4. `V2B-002` SP3 — reviewer calibration/freeze. Counted held-out qualification starts only after frozen manifests are lead-reviewed.
 
-Session B: `V2B-001` SP2 task-pool/version freeze; `V2B-002` SP3 calibration-only reviewer repair/freeze; `V2B-003a+H1` SP2 project-scoped provenance; `V2B-004a+H4` SP2 ActionEnvelope/ApprovalGrant/Receipt contracts. Session B hands central migration/API integration notes to Session A.
+## Gate truth
 
-## Lead future lane
+V1.0 still blocked on separate authenticated Cursor-agent worker evidence. V1.1 required artifacts are verified. V1.2 broker is verified but dual-remote overlap blocked at 0 admitted remotes. V1.3 has 72 provisional screening cells but zero qualified cells; task pool/reviewer design not frozen. V1.4 real E2E first run failed usefully; live adaptive proof and LIVE-142 have not started. V1.5 lease claim/renew/expire repair is review-passed at packet level; result acceptance remains. V1.6/V1.7 are ready for B implementation. V2.0 integration/hardening remain drafting.
 
-`ART-V30-PERSISTENT-OBJECTIVE-CONTRACT` was materially expanded in LEAD-022: immutable objective versions, trigger receipts, deterministic schedule occurrence/missed-run policy, MissionProposal admission boundary, authority monotonicity, V2.3 fair-share anti-amplification, governed-learning candidate/version boundary, restart/dedupe semantics, threat cases and acceptance scenarios. It remains drafting architecture, not V3 implementation/acceptance.
+Lead advanced `ART-V20-RELIABILITY-PROTOCOL`: frozen-candidate manifest, change invalidation, seven-day real wall-clock observation, append-only evidence, mandatory restart/worker/provider/quota/tool/knowledge/backup/site-epoch/migration drills and zero-tolerance safety invariants. No elapsed time is claimed.
 
-`ART-V30-LEARNING-GOVERNANCE`, `ART-V23-MULTIMISSION-OPS`, V1.8 recovery and V2.0 security/reliability remain active lead lanes.
-
-## Human/live blockers
-
-Cursor CLI authentication remains the immediate human-auth blocker for `ART-V10-WORKER-HEARTBEAT`: complete a live `cursor agent login` only while an actual waiter is active, then status/whoami must verify. G12 remote overlap requires fresh exact-route account/tier/zero-charge/quota/health evidence for two remote routes; public provider docs do not self-admit an account. Do not fabricate provider eligibility, cost, timing, worker activity or elapsed acceptance time.
+Zero-spend, fail-closed, no operational mocks, no known-answer substitution, no admission bypass, no fabricated worker/provider/cost/time/acceptance evidence remain mandatory.
