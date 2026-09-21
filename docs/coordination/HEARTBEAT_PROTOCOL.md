@@ -2,146 +2,114 @@
 
 Status: active
 Owner: ChatGPT engineering lead
-Active workers: Cursor Session A / HOST-MAC-DEV and Cursor Session B / HOST-WIN-DEV
+Active local workers: Cursor Session A / HOST-MAC-DEV and Cursor Session B / HOST-WIN-DEV
 
 ## Purpose
 
-The heartbeat is a coordination/liveness mechanism, not acceptance evidence.
+Heartbeat is coordination/liveness evidence only. It proves that the host/session lane can reach GitHub and publish its branch/coordination state. It does not prove task correctness, model evidence, CI success or artifact acceptance.
 
-A green heartbeat proves:
-- the worker host/session lane can reach GitHub;
-- its assigned branch has an observable remote SHA;
-- it has fetched/referenced current coordination state;
-- the durable coordination channel is alive.
+Only heartbeats with `trigger = "scheduler"` count for cadence qualification. Manual/install/work/review heartbeats are useful context but never advance a cadence streak.
 
-A heartbeat does **not** prove:
-- the foreground Cursor agent is continuously reasoning;
-- a packet is correct;
-- tests passed;
-- an artifact is accepted;
-- live model/provider evidence exists.
+## Current owner-directed stress test — 2026-09-21
 
-Meaningful work must still produce a CURSOR-A/B message with exact source/evidence SHA, tests and proposed artifact transition.
+The previously verified hourly cadence is intentionally superseded for a fresh reliability exercise.
 
-## Bootstrap cadence
+### Phase 1 — 5-minute burst proof
 
-Each active worker heartbeat scheduler runs every 15 minutes during bootstrap.
+Both A and B publish at an effective **5-minute** cadence.
 
-A worker heartbeat payload is structurally valid when it contains:
-- host_alias
-- session_id
-- assigned branch
-- current remote branch SHA
-- current coordination branch SHA
-- observed_at UTC
-- current packet/artifact/status if known
-- no fabricated work/acceptance fields
+A counted heartbeat must:
+- be scheduler-authored;
+- carry the correct host/session/branch;
+- carry observable branch SHA + coordination SHA;
+- contain no fabricated work/acceptance fields.
 
-For the bootstrap cadence proof, ONLY heartbeats with `trigger = "scheduler"` count. Manual/install/working/review-request heartbeats are useful coordination events but do not advance the 15-minute streak.
+A consecutive Phase-1 interval is **3–8 minutes** after the prior counted scheduler heartbeat.
 
-A consecutive 15-minute scheduler heartbeat is one whose timestamp is 10–25 minutes after the prior counted scheduler heartbeat from the same session.
+Required:
+- A: 3 consecutive counted scheduler heartbeats;
+- B: 3 consecutive counted scheduler heartbeats.
 
-Required before graduation:
-- HOST-MAC-DEV / Session A: 3 consecutive valid 15-minute heartbeats
-- HOST-WIN-DEV / Session B: 3 consecutive valid 15-minute heartbeats
-- ChatGPT lead observes/reconciles both histories in a scheduled review
+The lead must verify both histories. ChatGPT scheduled automation remains hourly, so Phase-1 graduation may be recognized retrospectively on the next lead review; never claim ChatGPT itself checked every five minutes.
 
-Only after BOTH worker lanes satisfy the 3-heartbeat requirement may the lead set global mode to `hourly`.
+### Phase 2 — 24-hour 15-minute soak
 
-## Lead cadence limitation
+After both A and B satisfy Phase 1, the lead sets:
+- `mode = "soak_15m_24h"`;
+- `worker_effective_cadence_minutes = 15`;
+- `soak.started_at` to the transition time;
+- `soak.ends_at` exactly 24 hours later.
 
-ChatGPT scheduled Automations cannot run more frequently than once per hour.
+During the soak:
+- each worker publishes at effective 15-minute cadence;
+- a normal consecutive interval is **10–25 minutes**;
+- a gap >25 minutes is a missed interval and is preserved as evidence;
+- host-unavailable events may be labeled with the real reason, but they still prevent a clean 24-hour success claim unless the owner explicitly waives/restarts the soak;
+- manual heartbeats never substitute for scheduler receipts.
 
-Therefore:
-- worker/host heartbeats bootstrap at 15-minute effective cadence;
-- ChatGPT lead review remains hourly;
-- the hourly lead review inspects every heartbeat and commit since its prior run, so it can verify the full 15-minute history after the fact;
-- do not claim that ChatGPT itself executed three 15-minute scheduled runs.
+Success requires a complete real 24-hour observation window with no unresolved cadence miss for either required worker.
 
-This is a platform scheduling limit, not a worker limitation.
+### After the 24-hour soak
 
-## Scheduler independence
+Only after the lead verifies the full elapsed window may it restore the prior hourly effective cadence:
+- `mode = "hourly"`;
+- `worker_effective_cadence_minutes = 60`;
+- record exact soak start/end and verification decision.
 
-Manual/forced packet heartbeats must never reset or suppress the scheduler cadence clock. The heartbeat client keeps scheduler timing separately from work-status updates.
+Do not backfill missed time.
 
-## Hourly graduation
+## Scheduler strategy
 
-Canonical state: `docs/coordination/HEARTBEAT_STATE.json`.
+The OS-level heartbeat schedulers wake every **5 minutes**. The heartbeat client reads `HEARTBEAT_STATE.json` and self-throttles to the current effective cadence:
+- Phase 1: publish every 5m;
+- Phase 2: publish every 15m;
+- after soak verification: publish every 60m.
 
-When the lead verifies 3 consecutive bootstrap heartbeats for both A and B:
-1. set `mode = "hourly"`;
-2. set `worker_effective_cadence_minutes = 60`;
-3. record `graduated_at`;
-4. record the exact heartbeat timestamps used for each session.
+This avoids rewriting OS scheduler jobs at every phase transition.
 
-Worker OS schedulers may continue waking every 15 minutes, but the heartbeat client must self-throttle and publish only when the effective cadence is due. This avoids fragile scheduler rewrites while making the observable/check-in cadence hourly.
+Manual/forced packet updates use a separate clock and must never reset/suppress the scheduler cadence clock.
 
-## Durable heartbeat files
+## Durable files
 
+- `docs/coordination/HEARTBEAT_STATE.json`
 - `docs/coordination/heartbeats/HOST-MAC-DEV.json`
 - `docs/coordination/heartbeats/HOST-WIN-DEV.json`
 
-Workers update only their own heartbeat file through GitHub's contents API / `gh api`. They do not git-checkout the coordination branch in their application worktree.
+Each worker updates only its own heartbeat ledger through GitHub API / authenticated `gh`.
 
-Each file keeps a small rolling history so missed/late heartbeats are auditable.
+## Worker session start
 
-## Worker behavior
+1. safely pull assigned branch;
+2. read branch `SESSION_INSTRUCTIONS.md`;
+3. fetch/read current coordination registry/state/queue/backlog/messages;
+4. reinstall/verify the heartbeat scheduler from the current branch;
+5. publish one install/manual context heartbeat;
+6. continue assigned project work without waiting for heartbeat qualification.
 
-At session start:
-1. fetch/pull assigned branch safely;
-2. fetch `coordination/swarm-control`;
-3. read `SESSION_INSTRUCTIONS.md` on the assigned branch;
-4. read canonical registry/queue/backlog/new lead messages;
-5. install/verify the local heartbeat scheduler;
-6. publish a forced heartbeat with current packet/status.
+Heartbeat testing must not block useful dependency-ready implementation.
 
-Before starting a packet:
-- publish heartbeat context `working` with packet + artifact.
-
-After a meaningful push:
-- publish heartbeat context `review_requested` or `working_next`;
-- append CURSOR-A/B coordination message;
-- immediately fetch current coordination state and continue the next dependency-ready packet unless blocked.
-
-When blocked:
-- heartbeat status `blocked`;
-- record precise blocker;
-- switch to another dependency-ready packet if available.
-
-Do not stop merely because one artifact waits for lead review.
-
-## Lead hourly loop
+## Lead review
 
 Every lead automation run:
-1. fetch current A/B/integration refs and CI;
-2. read both heartbeat histories;
-3. validate cadence and update HEARTBEAT_STATE;
-4. alert on stale heartbeat:
-   - bootstrap mode: no valid heartbeat for >35 minutes
-   - hourly mode: no valid heartbeat for >90 minutes
-5. review every new CURSOR message/commit/evidence since the last lead run;
-6. update ARTIFACT_REGISTRY first;
-7. update worker performance from reviewed evidence only;
-8. update queues / next packets;
-9. keep >=3 dependency-ready SP1–SP3 packets per active lane when practical;
-10. notify the operator of meaningful changes, review decisions, blockers, stale heartbeat or required human action.
+1. read both ledgers;
+2. recompute the current phase and consecutive scheduler streaks;
+3. transition Phase 1 -> Phase 2 only when both are verified;
+4. during Phase 2 verify actual 15-minute history and elapsed wall clock;
+5. notify on misses, stale host, phase transition, 24-hour success/failure or human action;
+6. keep project work/reviews/assignments moving independently.
+
+Stale thresholds:
+- Phase 1 5m: >12 minutes;
+- Phase 2 15m: >35 minutes;
+- hourly: >90 minutes.
 
 ## Notification semantics
 
-Cursor cannot directly push an event into a currently idle ChatGPT conversation.
+Durable path:
+worker heartbeat/commit/message -> GitHub coordination -> hourly lead automation -> operator.
 
-The durable notification path is:
-Cursor heartbeat/commit/message -> GitHub coordination branch -> hourly ChatGPT lead automation -> operator notification/review.
-
-This means notifications are durable and reviewed within the lead's hourly scheduling window, not guaranteed instant push notifications.
+Notifications are durable but not guaranteed instant.
 
 ## Security
 
-Heartbeat payloads must not contain:
-- passwords/API keys/tokens/cookies;
-- private browser/session state;
-- raw environment dumps;
-- sensitive URLs;
-- personal identity mappings.
-
-Only safe host alias, branch/SHA, packet/artifact/status and sanitized notes.
+Never publish passwords, keys, tokens, cookies, private browser state, raw env dumps or private identity mappings. Heartbeats contain only sanitized host/session/branch/SHA/packet/artifact/status metadata.
