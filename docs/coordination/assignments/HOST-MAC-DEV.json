@@ -1,13 +1,13 @@
 {
-  "schema_version": "1.1",
-  "assignment_id": "A-AUTONOMY-RUNNER-REPAIR-02",
-  "generation": 2,
+  "schema_version": "1.2",
+  "assignment_id": "A-EXECUTION-BATCH-03",
+  "generation": 3,
   "enabled": true,
   "host_alias": "HOST-MAC-DEV",
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
-  "priority": "immediate",
-  "max_runtime_seconds": 1800,
+  "priority": "critical",
+  "max_runtime_seconds": 3000,
   "boundaries": {
     "additional_spend": false,
     "main_merge": false,
@@ -16,13 +16,20 @@
   },
   "items": [
     {
-      "packet_id": "OPS-AUTO-001-R",
-      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
-      "instruction_path": "docs/coordination/packets/OPS-AUTO-001-R.md",
-      "max_runtime_seconds": 1800,
-      "note": "Repair exact-tip autonomous-runner Ruff failure and preserve fail-closed one-packet/generation safety. Parent artifact remains drafting after this packet."
+      "packet_id": "V14-REAL-001-R",
+      "artifact_id": "ART-V14-REAL-E2E",
+      "instruction_path": "docs/coordination/packets/V14-REAL-001-R.md",
+      "max_runtime_seconds": 3000,
+      "note": "Repair generic implementation materialization and execute a new preregistered real local mission on a different subsystem."
+    },
+    {
+      "packet_id": "V2A-003c",
+      "artifact_id": "ART-V15-LEASE-FENCING",
+      "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+      "max_runtime_seconds": 2400,
+      "note": "After the V1.4 repair packet is pushed, implement durable result acceptance fencing."
     }
   ],
   "next_assignment_owner": "ChatGPT lead",
-  "note": "Previous A-AUTONOMY-BATCH-01 items were not observed as autonomously started. Do not execute V14-REAL-001-R or V2A-003c from generation 1. Complete only OPS-AUTO-001-R, push evidence, then wait for lead review/new generation."
+  "note": "OPS-AUTO-001-R is lead-reviewed accepted as a bounded repair. Execute these items in order, one packet per invocation, then stop for review."
 }
