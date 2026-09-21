@@ -1,0 +1,15 @@
+{
+  "packet_id": "R26",
+  "artifact_id": "ART-V17-APPROVAL-BINDING",
+  "status": "v17_action_contracts_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "ccff399627987ae9be188e2b9d32bce2c0abe4be",
+  "verified_at": "2026-09-21T20:04:35Z",
+  "module": "src/swarm/contracts/actions.py",
+  "types_present": [
+    "ActionEnvelope",
+    "ApprovalGrant",
+    "ActionReceiptV17"
+  ],
+  "note": "V1.7 action/approval/receipt contracts present. No invent-accept."
+}
