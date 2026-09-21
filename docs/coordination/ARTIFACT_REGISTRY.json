@@ -1268,6 +1268,172 @@
       "blockers": [
         "V2.0 artifact set incomplete"
       ]
+    },
+    {
+      "artifact_id": "ART-V23-MULTIMISSION-OPS",
+      "target_version": "2.3",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+      "dependencies": [
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "worker_packets": [],
+      "next_action": "refine artifact-specific contract after V2.0 candidate integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V23-CAPABILITY-PACKS",
+      "target_version": "2.3",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+      "dependencies": [
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "worker_packets": [],
+      "next_action": "refine artifact-specific contract after V2.0 candidate integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V23-PORTABILITY",
+      "target_version": "2.3",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+      "dependencies": [
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "worker_packets": [],
+      "next_action": "refine artifact-specific contract after V2.0 candidate integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V23-OBSERVABILITY",
+      "target_version": "2.3",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+      "dependencies": [
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "worker_packets": [],
+      "next_action": "refine artifact-specific contract after V2.0 candidate integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V23-FLEET-POLICY",
+      "target_version": "2.3",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+      "dependencies": [
+        "ART-V20-INTEGRATED-CANDIDATE"
+      ],
+      "worker_packets": [],
+      "next_action": "refine artifact-specific contract after V2.0 candidate integration",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-OBJECTIVE-CONTRACT",
+      "target_version": "3.0",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "future",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V23-MULTIMISSION-OPS"
+      ],
+      "worker_packets": [],
+      "next_action": "derive scheduler/event/idempotency schema after V2.3 multi-mission contract",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-LEARNING-GOVERNANCE",
+      "target_version": "3.0",
+      "kind": "architecture-contract",
+      "owner": "ChatGPT lead",
+      "lane": "future",
+      "status": "drafting",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V13-QUAL-PROTOCOL",
+        "ART-V19-BETA-ACCEPTANCE"
+      ],
+      "worker_packets": [],
+      "next_action": "derive LearningProposal schema, rollout/rollback protocol and drift evidence",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-RESOURCE-ALLOCATOR",
+      "target_version": "3.0",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V23-OPS-PLATFORM"
+      ],
+      "worker_packets": [],
+      "next_action": "refine after V2.3 contracts",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-CONTROLLED-SELFDEV",
+      "target_version": "3.0",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V23-OPS-PLATFORM"
+      ],
+      "worker_packets": [],
+      "next_action": "refine after V2.3 contracts",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-CAPABILITY-ECOSYSTEM",
+      "target_version": "3.0",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V23-OPS-PLATFORM"
+      ],
+      "worker_packets": [],
+      "next_action": "refine after V2.3 contracts",
+      "blockers": []
+    },
+    {
+      "artifact_id": "ART-V30-FLEET-TENANCY-AUDIT",
+      "target_version": "3.0",
+      "kind": "future-architecture",
+      "owner": "ChatGPT lead + Cursor",
+      "lane": "future",
+      "status": "planned",
+      "path_or_source_ref": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md",
+      "dependencies": [
+        "ART-V23-OPS-PLATFORM"
+      ],
+      "worker_packets": [],
+      "next_action": "refine after V2.3 contracts",
+      "blockers": []
     }
   ],
   "major_milestones": {
