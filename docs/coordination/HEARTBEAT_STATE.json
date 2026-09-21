@@ -1,14 +1,20 @@
 {
   "schema_version": "1.0",
-  "updated_at": "2026-09-21T03:48:22Z",
+  "updated_at": "2026-09-21T04:00:00Z",
   "mode": "bootstrap_15m",
   "worker_effective_cadence_minutes": 15,
   "lead_effective_cadence_minutes": 60,
   "lead_platform_minimum_minutes": 60,
   "graduation": {
     "required_consecutive_per_session": 3,
-    "valid_gap_minutes": {"min": 10, "max": 25},
-    "requires_sessions": ["A", "B"],
+    "valid_gap_minutes": {
+      "min": 10,
+      "max": 25
+    },
+    "requires_sessions": [
+      "A",
+      "B"
+    ],
     "all_workers_verified": false,
     "graduated_at": null,
     "counted_trigger": "scheduler_only"
@@ -19,31 +25,39 @@
       "branch": "cursor/v2-runtime-lane",
       "last_heartbeat_at": "2026-09-21T03:47:19+00:00",
       "consecutive_valid_15m": 1,
-      "verified_timestamps": ["2026-09-21T03:47:19+00:00"],
+      "verified_timestamps": [
+        "2026-09-21T03:47:19+00:00"
+      ],
       "stale": false,
-      "status": "fresh_first_scheduler_heartbeat_after_reinstall; streak_restarted_1_of_3 because prior counted 02:31:49Z is outside 10-25m consecutive window"
+      "status": "post-reinstall scheduler streak 1/3"
     },
     "B": {
       "host_alias": "HOST-WIN-DEV",
       "branch": "cursor/v2-product-lane",
-      "last_heartbeat_at": "2026-09-21T03:43:40+00:00",
-      "consecutive_valid_15m": 1,
-      "verified_timestamps": ["2026-09-21T03:43:40+00:00"],
+      "last_heartbeat_at": "2026-09-21T03:59:17+00:00",
+      "consecutive_valid_15m": 2,
+      "verified_timestamps": [
+        "2026-09-21T03:43:40+00:00",
+        "2026-09-21T03:59:17+00:00"
+      ],
       "stale": false,
-      "status": "fresh_first_scheduler_heartbeat_after_reinstall; streak_1_of_3"
+      "status": "post-reinstall scheduler streak 2/3"
     }
   },
   "lead": {
     "automation_id": "6ab02943e168819192c9c5672b2a6578",
     "schedule": "hourly_platform_limit",
-    "last_review_at": "2026-09-21T03:48:22Z",
+    "last_review_at": "2026-09-21T04:00:00Z",
     "last_notified_worker_sha": {
       "A": "1e4b560a2cd1e4285222452a6839a5a5cc5b4c60",
       "B": "6b0e1277051ae90fe1d56825d3e771b042380755"
     },
-    "note": "Both hosts produced their first fresh scheduler heartbeat after reinstall. Neither has a 3/3 consecutive streak yet, so worker cadence remains bootstrap_15m. Lead itself remains hourly. Current A/B source tips are red in offline CI because the newly added autonomous-runner coordination scripts fail Ruff; assignment queues were redirected/held accordingly."
+    "note": "Only scheduler heartbeats count. A=1/3, B=2/3 after reinstall. No hourly graduation yet."
   },
-  "stale_threshold_minutes": {"bootstrap_15m": 35, "hourly": 90},
+  "stale_threshold_minutes": {
+    "bootstrap_15m": 35,
+    "hourly": 90
+  },
   "notifications": {
     "channel": "GitHub durable coordination -> hourly lead automation -> operator",
     "instant_push_guaranteed": false
