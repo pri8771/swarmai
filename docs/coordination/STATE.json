@@ -17,10 +17,10 @@
     "implementation_workhorse": "Cursor",
     "final_authority": "operator"
   },
-  "last_lead_message_id": "LEAD-20260920-016",
+  "last_lead_message_id": "LEAD-20260920-017",
   "last_lead_message_path": "docs/coordination/messages/LEAD-20260920-016.md",
   "last_seen_cursor_message_id": "CURSOR-20260920-024",
-  "last_lead_heartbeat_at": "2026-09-20T23:51:30Z",
+  "last_lead_heartbeat_at": "2026-09-21T00:18:09Z",
   "last_cursor_heartbeat_at": "2026-09-21T00:12:38Z",
   "current_source_verification": {
     "verified_at": "2026-09-20T23:47:44Z",
@@ -34,7 +34,11 @@
     "offline": "success",
     "console": "success",
     "database_integration": "skipped_no_SWARM_DATABASE_URL",
-    "live_gated": "notice_only_not_live_evidence"
+    "live_gated": "notice_only_not_live_evidence",
+    "v2_base_sha": "2c08f968f301d3be80f8d0b17eb98b98fb2cb8ea",
+    "v2_integration_branch": "cursor/v2-integration",
+    "v2_runtime_branch": "cursor/v2-runtime-lane",
+    "v2_product_branch": "cursor/v2-product-lane"
   },
   "version_state": {
     "1.0-repair": {
@@ -86,6 +90,28 @@
       "role_manifest": "blocked_on_G13",
       "live_adaptive_proof": "blocked_on_G12_G13",
       "final_campaign": "preregistered_not_started"
+    },
+    "1.7": {
+      "status": "implementation_active",
+      "includes": [
+        "1.5",
+        "1.6",
+        "1.7"
+      ],
+      "note": "distributed workers/knowledge/tools lanes activated; acceptance depends on lower artifacts"
+    },
+    "2.0": {
+      "status": "implementation_target_active",
+      "target_type": "implementation_artifact_complete_candidate",
+      "note": "accepted status requires lower artifacts and wall-clock evidence"
+    },
+    "2.3": {
+      "status": "lead_architecture_drafting",
+      "artifact": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md"
+    },
+    "3.0": {
+      "status": "lead_architecture_drafting",
+      "artifact": "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md"
     }
   },
   "ready_worker_packets": [
@@ -113,8 +139,16 @@
     "blocker": "cursor agent status/whoami Not logged in"
   },
   "lead_artifacts_advanced_this_heartbeat": [
-    "docs/artifacts/current/ART-V12-REMOTE-ADMISSION-RESEARCH.md",
-    "docs/artifacts/future/ART-V15-WORKER_PROTOCOL.md"
+    "docs/coordination/V2_EXECUTION_PLAN.md",
+    "docs/coordination/TWO_CURSOR_TEAM.md",
+    "docs/artifacts/future/ART-V15-LEASE_FENCING_ADR.md",
+    "docs/artifacts/future/ART-V16-PROVENANCE_SCHEMA.md",
+    "docs/artifacts/future/ART-V17-APPROVAL_BINDING.md",
+    "docs/artifacts/future/ART-V18-SITE_EPOCH_BACKUP.md",
+    "docs/artifacts/future/ART-V19-EXTENSION_CONTRACT.md",
+    "docs/artifacts/future/ART-V20-ACCEPTANCE.md",
+    "docs/artifacts/future/ART-V23-OPS_PLATFORM.md",
+    "docs/artifacts/future/ART-V30-OBJECTIVE_LEARNING.md"
   ],
   "open_blockers": [
     "ART-V10-WORKER-HEARTBEAT requires live Cursor CLI authentication + real receipts",
