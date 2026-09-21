@@ -16,13 +16,15 @@ Canonical lifecycle: `ARTIFACT_REGISTRY.json`. This is a derived execution view.
 
 Infrastructure: `pri8771/remote-workers` only; SwarmAI remains project authority.
 
-Attempt `swarmai-v13-task-pool-freeze-01` / `ART-V13-TASK-POOL` / `V2B-001` did not execute to a reviewable result:
-- dispatch commit `7e17163e7fc85455a8eb0180d3cb2173711dc978`;
-- Actions run `35559390335` = `cancelled`;
-- no `results/swarmai-v13-task-pool-freeze-01.json`;
-- no `worker/swarmai-v13-task-pool-freeze-01` branch.
+Attempt 01 `swarmai-v13-task-pool-freeze-01` / `ART-V13-TASK-POOL` / `V2B-001` was cancelled before reviewable output:
+- dispatch `7e17163e7fc85455a8eb0180d3cb2173711dc978`;
+- Actions `35559390335` = `cancelled`;
+- no result JSON;
+- no worker branch.
 
-No artifact credit is granted. At review time worker-pc's dispatch lane was occupied by unrelated run `35560103791`, observed `in_progress`. Capacity is 1, so **do not submit a competing retry**. When worker-pc becomes idle, submit a new unique branch-mode task for the same V2B-001 intent. Lead must review branch/diff/tests/result before any task-pool freeze. Counted G13 qualification remains prohibited until independent freeze.
+After worker-pc capacity became free, lead dispatched fresh retry **`swarmai-v13-task-pool-freeze-02`** at `pri8771/remote-workers@4c5fe82f227fc80038a3ce9b1643305be48f09d9`. Actions run `35562827710` is `in_progress`; expected branch is `worker/swarmai-v13-task-pool-freeze-02`.
+
+Retry 02 is **not** completion. Lead must inspect result JSON, exact branch/commit, diff ownership and tests before freezing the task pool. Counted G13 qualification remains prohibited. Local B must not duplicate V2B-001 while the remote retry is active.
 
 ## Session A — assignment generation 2
 
@@ -56,10 +58,10 @@ After A0 is independently reviewed and the shared fix is propagated, publish a *
 Sync only reviewed integration baseline, preserve branch-local host/session files, run Windows Python+console baseline, push exact evidence.
 
 ### B1-remote — V2B-001 / ART-V13-TASK-POOL / SP2
-Reserved for a fresh worker-pc retry once remote capacity is idle. Freeze calibration/held-out IDs/hashes, required family x S/M/L/XL coverage and exact classifier/scorer/prompt/tool/model-config identities. Hidden answers stay worker-invisible. No counted qualification.
+**Active externally as retry 02.** Freeze calibration/held-out IDs/hashes, required family x S/M/L/XL coverage and exact classifier/scorer/prompt/tool/model-config identities. Hidden answers stay worker-invisible. No counted qualification.
 
 ### B2-local — V2B-002 / ART-V13-REVIEWER-QUALIFICATION / SP3
-Calibration-only reviewer benchmark/scorer repair and freeze. Local B may proceed after B0 while external B1 is running, provided file ownership remains independent. No held-out qualification before lead freeze.
+Calibration-only reviewer benchmark/scorer repair and freeze. Local B may proceed after B0 while external B1 runs, provided file ownership remains independent. No held-out qualification before lead freeze.
 
 ### B3 — W-131B / ART-V13-QUALIFIED-MATRIX / SP2 batches
 Only after lead accepts/freeze-binds B1. Preserve all outcomes and total workflow overhead; no post-result threshold changes.
@@ -89,7 +91,7 @@ No bounded implementation packet reached lead review in LEAD-026; `WORKER_PERFOR
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - `ART-V10-WORKER-HEARTBEAT`: authenticated Cursor-agent receipts absent.
 - `ART-V12-REMOTE-OVERLAP`: 0 admitted remotes.
-- `ART-V13-TASK-POOL`: drafting; first worker-pc attempt cancelled before result/branch.
+- `ART-V13-TASK-POOL`: drafting; retry 02 running and unreviewed.
 - `ART-V13-QUALIFIED-MATRIX`: zero qualified cells.
 - `ART-V14-REAL-E2E`: first real attempt failed; repair/rerun waits behind A0.
 - `ART-V14-ROLE-MANIFEST` / live adaptive proof: blocked on G12/G13.
