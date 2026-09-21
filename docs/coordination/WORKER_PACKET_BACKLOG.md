@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog
 
-Updated: 2026-09-21T02:12:00Z.
+Updated: 2026-09-21T02:42:00Z.
 
 ## Latest lead reviews
 
@@ -31,6 +31,28 @@ Owns `cursor/v2-runtime-lane` and `cursor/v2-integration`; owns shared API/store
   5. Preserve the existing 52-test behaviors: current claim authority, dependency readiness, >32 pagination, race, project-scoped renew, renewable horizon, cancelled-mission no-revive.
   6. Rebind evidence to the new implementation SHA and run exact-tip CI.
 - Acceptance: no source/evidence ambiguity; do not self-accept. Lead review required before V2A-003c.
+### PRIORITY A-REAL — V14-REAL-001 — one actual SwarmAI mission
+- Artifact: `ART-V14-REAL-E2E`
+- SP2
+- Protocol: `docs/coordination/REAL_V14_E2E_PROTOCOL.md`
+- Priority: immediately after any already-started bounded Session-A packet; before DBOS/optional later-version work.
+- Run the real repository-audit mission through an operational product surface with actual local model inference through the governed broker.
+- No fixture/demo/test-mode/stubbed adapter/known answer.
+- Model is not told the defect.
+- Actual repo/tool reads, isolated worktree/diff, real regression/check, $0 spend, exact candidate/model/tool/mission evidence.
+- Failure is preserved and becomes a bounded repair packet.
+- This smoke is mandatory for V1.4 completion but does not substitute for G12/G13/G14/LIVE-142.
+
+### PRIORITY A-G12 — V12-REMOTE-ADMIT-01 — unblock dual-remote G12
+- Artifact: `ART-V12-PROVIDER-ELIGIBILITY` + prerequisite for `ART-V12-REMOTE-OVERLAP`
+- SP2
+- Probe presence/configuration of candidate provider credentials without printing secrets.
+- Preferred current candidates from lead public research: OpenRouter Free exact `:free` route; Groq Free exact model; Gemini Free exact model as fallback.
+- For each candidate require: exact account alias/tier, exact model, zero-charge pricing evidence, quota/health, fail-closed no-paid fallback, bounded canary with observed no charge.
+- Public docs never admit a route by themselves.
+- If account/key/login is absent, return a precise USER_ACTION with provider and exact human step; continue other ready work instead of idling.
+- Once two exact routes are admitted, run W-121B overlap proof with overlapping calls and reconciliation.
+
 ### READY A1 — V2A-H6A-R — secret-file and overwrite-safety repair
 - Artifacts: `ART-V20-FOUNDATION-HARDENING`, `ART-V18-DEPLOYMENT-MANIFEST`, `ART-V19-INSTALL-UPGRADE`
 - SP1
@@ -81,6 +103,22 @@ Owns `cursor/v2-product-lane`. Current branch remains `2c08f968f301d3be80f8d0b17
 ### READY B2 — V2B-002 / W-131C2 — reviewer calibration + benchmark freeze
 - Artifact: `ART-V13-REVIEWER-QUALIFICATION`; SP3.
 - Calibration only; diagnose weak reviewer screening, fix benchmark/scorer, version/freeze design; no reviewer qualification claim and no held-out contamination.
+
+### PRIORITY B-G13 — W-131B — counted qualification immediately after B1 freeze
+- Artifact: `ART-V13-QUALIFIED-MATRIX`
+- SP2 per five-observation batch / bounded cell group
+- Dependency: lead-verified frozen `ART-V13-TASK-POOL`.
+- Start counted held-out qualification immediately after B1; do not defer behind V1.6/V1.7 product work.
+- Use only frozen held-out IDs, prompt/scorer/tool/model identities.
+- Count every planning/coordination/retry/review model call and token/cost overhead.
+- Preserve failures; no threshold changes after results.
+- Continue five-observation batches until required family x size cells meet the frozen Wilson LCB criterion or become honestly blocked.
+
+### PRIORITY B-G13R — reviewer-role held-out qualification
+- Artifact: `ART-V13-REVIEWER-QUALIFICATION`
+- Dependency: B2 calibration benchmark/scorer version frozen.
+- Run held-out reviewer-role qualification needed for G14 using the frozen design.
+- No calibration leakage and no worker self-qualification.
 
 ### READY B3 — V2B-003a + V2B-H1 — provenance repository/project isolation
 - Artifact: `ART-V16-PROVENANCE` + V2 hardening; SP2.
