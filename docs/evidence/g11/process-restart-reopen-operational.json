@@ -1,0 +1,177 @@
+{
+  "gate": "G11-RUN-111",
+  "artifact_id": "ART-V11-RESTART-EVIDENCE",
+  "packet_id": "V2A-002",
+  "scenario": "os_process_restart_reopen_operational",
+  "recorded_at": "2026-09-21T00:51:58.414039+00:00",
+  "mode": "live_local",
+  "status": "pass",
+  "command": "/Users/pchordia/Downloads/swarm-ai/.venv/bin/python -m uvicorn swarm.api.app:app --host 127.0.0.1 --port 18791 --log-level warning",
+  "exit_code": 0,
+  "generated_at": "2026-09-21T00:51:58.414042+00:00",
+  "candidate_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+  "spend_usd": 0.0,
+  "execution_mode": "operational",
+  "g11_lead_accept_invented": false,
+  "identity": {
+    "candidate_sha": "c3df96ef074568e7a92dd2f6c6bfd070fe5374f3",
+    "config_version": "v2a002-process-restart-v1",
+    "store_alias": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-v2a002-q68thi5t/var/missions",
+    "install_project_id": "proj_install_v2a002_restart",
+    "seed_token_name": "SWARM_SEED_LOOPBACK_TOKEN",
+    "repo_root_env": "SWARM_REPO_ROOT"
+  },
+  "process_1": {
+    "command": [
+      "/Users/pchordia/Downloads/swarm-ai/.venv/bin/python",
+      "-m",
+      "uvicorn",
+      "swarm.api.app:app",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "18791",
+      "--log-level",
+      "warning"
+    ],
+    "pid": 47234,
+    "started_at": "2026-09-21T00:51:56.734215+00:00",
+    "cwd": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+    "SWARM_REPO_ROOT": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-v2a002-q68thi5t",
+    "SWARM_INSTALL_PROJECT_ID": "proj_install_v2a002_restart",
+    "port": 18791,
+    "host": "127.0.0.1",
+    "ready": {
+      "http_status": 200,
+      "body": {
+        "status": "ready",
+        "execution_mode": "operational",
+        "fixture_mode": false,
+        "providers_network": false,
+        "allow_paid": false,
+        "database": "unprobed",
+        "runtime": "ok",
+        "configured_accounts": 0,
+        "configured_routes": 0,
+        "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+      },
+      "at": "2026-09-21T00:51:57.152308+00:00"
+    },
+    "stop": {
+      "stop_signal": "SIGTERM",
+      "stop_sent_at": "2026-09-21T00:51:57.171857+00:00",
+      "exited_at": "2026-09-21T00:51:57.353922+00:00",
+      "exit_code": -15,
+      "pid": 47234,
+      "still_alive": false
+    },
+    "observed": {
+      "create_http_status": 200,
+      "create_at": "2026-09-21T00:51:57.152318+00:00",
+      "mission_id": "848f46e229fd4cf9b9a328a70f2ee70f",
+      "mission_status": "planning",
+      "get_http_status": 200,
+      "get_status": "planning",
+      "disk_path": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-v2a002-q68thi5t/var/missions/848f46e229fd4cf9b9a328a70f2ee70f.json",
+      "disk_sha256": "379a41f7e83e51b38ade7d0dcc2fa1fcba7c37f25a5328551d3e6c779cf0d559",
+      "process_alive": true
+    }
+  },
+  "process_2": {
+    "command": [
+      "/Users/pchordia/Downloads/swarm-ai/.venv/bin/python",
+      "-m",
+      "uvicorn",
+      "swarm.api.app:app",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "18791",
+      "--log-level",
+      "warning"
+    ],
+    "pid": 47235,
+    "started_at": "2026-09-21T00:51:57.655158+00:00",
+    "cwd": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+    "SWARM_REPO_ROOT": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-v2a002-q68thi5t",
+    "SWARM_INSTALL_PROJECT_ID": "proj_install_v2a002_restart",
+    "port": 18791,
+    "host": "127.0.0.1",
+    "ready": {
+      "http_status": 200,
+      "body": {
+        "status": "ready",
+        "execution_mode": "operational",
+        "fixture_mode": false,
+        "providers_network": false,
+        "allow_paid": false,
+        "database": "unprobed",
+        "runtime": "ok",
+        "configured_accounts": 0,
+        "configured_routes": 0,
+        "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+      },
+      "at": "2026-09-21T00:51:58.070305+00:00"
+    },
+    "reopen_http_at": "2026-09-21T00:51:58.070314+00:00",
+    "reopen_http_status": 200,
+    "reopened_mission_id": "848f46e229fd4cf9b9a328a70f2ee70f",
+    "reopened_status": "planning",
+    "reopened_objective": "V2A-002 process-restart reopen probe \u2014 no model rerun required",
+    "disk_sha256": "379a41f7e83e51b38ade7d0dcc2fa1fcba7c37f25a5328551d3e6c779cf0d559",
+    "stop": {
+      "stop_signal": "SIGTERM",
+      "stop_sent_at": "2026-09-21T00:51:58.414059+00:00",
+      "exited_at": "2026-09-21T00:51:58.595566+00:00",
+      "exit_code": -15,
+      "pid": 47235,
+      "still_alive": false
+    }
+  },
+  "cli_reopen": {
+    "command": [
+      "/Users/pchordia/Downloads/swarm-ai/.venv/bin/python",
+      "-m",
+      "swarm.cli",
+      "mission",
+      "status",
+      "--mission-id",
+      "848f46e229fd4cf9b9a328a70f2ee70f"
+    ],
+    "pid_note": "cli_subprocess_separate_from_api",
+    "started_at": "2026-09-21T00:51:58.088406+00:00",
+    "finished_at": "2026-09-21T00:51:58.413936+00:00",
+    "exit_code": 0,
+    "stdout_json": {
+      "mission_id": "848f46e229fd4cf9b9a328a70f2ee70f",
+      "status": "planning",
+      "revision": 1,
+      "tasks": [],
+      "cost_usd": 0.0,
+      "last_event": {
+        "at": "2026-09-21T00:51:57.170096+00:00",
+        "event": "mission.created",
+        "detail": {
+          "source": "api",
+          "status": "planning"
+        }
+      },
+      "updated_at": "2026-09-21T00:51:57.170328+00:00"
+    },
+    "stderr_tail": ""
+  },
+  "checks": {
+    "distinct_os_pids": true,
+    "pid_1": 47234,
+    "pid_2": 47235,
+    "process_1_exited": true,
+    "same_durable_id": true,
+    "same_disk_sha256": true,
+    "http_reopen_ok": true,
+    "cli_reopen_ok": true,
+    "not_create_app_object_only": true
+  },
+  "note": "Actual uvicorn OS process SIGTERM stop/start against durable SWARM_REPO_ROOT store; reopen via HTTP + CLI. Not create_app() in-process recreation. Lead acceptance not claimed.",
+  "evidence_path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/docs/evidence/g11/process-restart-reopen-operational.json",
+  "evidence_sha256": "bdfd2a24fdff310be51114a57aaa256ff8e5c0bf1b26c34c11c9f473a39f3d78"
+}
