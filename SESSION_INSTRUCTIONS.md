@@ -13,6 +13,15 @@ Session A owns shared runtime/API/DB migration/integration surfaces.
 4. Read fresh `HEARTBEAT_PROTOCOL.md`, `HEARTBEAT_STATE.json`, `ARTIFACT_REGISTRY.json`, `WORK_QUEUE.md`, `WORKER_PACKET_BACKLOG.md`, and newest `AGENT_MESSAGES.md` from `origin/coordination/swarm-control`.
 5. Newest coordination state overrides older bootstrap text.
 
+## Heartbeat client update — reinstall once
+
+The heartbeat client was corrected so manual/forced packet updates no longer reset or suppress the scheduler's 15-minute proof clock. Windows scheduler diagnostics were also added.
+
+After pulling this revision, rerun once:
+`powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`
+
+Record the printed Task state / Next run. If the scheduled heartbeat fails, inspect the printed scheduler.log path and report the sanitized error. Manual packet heartbeats may continue, but only scheduler heartbeats count toward the 3-consecutive 15-minute bootstrap proof.
+
 ## Heartbeat — required
 Install/verify once: `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`.
 Before a packet publish context:
