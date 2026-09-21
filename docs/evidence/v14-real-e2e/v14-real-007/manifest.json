@@ -1,0 +1,54 @@
+{
+  "packet_id": "R02",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-007",
+  "status": "operational_pass_pending_independent_lead_review",
+  "failure_class": null,
+  "recorded_at": "2026-09-21T19:40:26Z",
+  "candidate_sha": "dd3ec870efe41a1618485823bc70e7f5d9e9a1d1",
+  "freeze_sha": "e2fca4c619977b021696189ff337bdf0378662a3",
+  "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+  "spend_usd": 0.0,
+  "subsystem": "src/swarm/workspace/context.py",
+  "changed_files": [
+    "src/swarm/workspace/context.py"
+  ],
+  "material_diff": true,
+  "brokered_local_inference": true,
+  "model": "qwen2.5-coder:14b",
+  "focused_verify": true,
+  "review_grounding": {
+    "grounded": true,
+    "reasons": [
+      "review_grounded"
+    ],
+    "checks": {
+      "material_diff_present": true,
+      "review_references_changed_target": true,
+      "stale_unrelated_symbols_absent": true,
+      "focused_check_paths_executed": true,
+      "focused_or_target_relevant_verify": true
+    },
+    "changed_paths": [
+      "src/swarm/workspace/context.py"
+    ]
+  },
+  "primary_checkout_modified": false,
+  "auto_apply": false,
+  "self_accept": false,
+  "g14_lead_accept_invented": false,
+  "artifact_status_claim": "reviewable_candidate_not_self_accepted",
+  "prior_attempt": "v14-real-006_failed_noop",
+  "notes": [
+    "Genuine $0 brokered mission; material diff on context.py; focused tests/workspace verify; review accepted under R01 grounding",
+    "Independent lead semantic review still required; do not invent-accept ART-V14-REAL-E2E",
+    "v14-real-005 remains CHANGES REQUIRED evidence",
+    "Honesty: do not treat typing modernization as verified semantic V14 acceptance; lead review required."
+  ],
+  "semantic_self_check": {
+    "operator_note": "Patch is largely typing.Optional/List/Set modernization plus provenance list->set. Reviewer text claiming typing.Set prevents runtime mutation is incorrect. Prove operational path only; lead must judge whether this is a real useful defect/fix.",
+    "behavior_change_risk": "provenance order no longer stable (set)",
+    "focused_tests_passed": true,
+    "invent_accept": false
+  }
+}

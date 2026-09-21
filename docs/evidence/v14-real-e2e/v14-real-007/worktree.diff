@@ -1,0 +1,76 @@
+diff --git a/src/swarm/workspace/context.py b/src/swarm/workspace/context.py
+index 2ff3ba5..5c0b046 100644
+--- a/src/swarm/workspace/context.py
++++ b/src/swarm/workspace/context.py
+@@ -3,7 +3,7 @@
+ from __future__ import annotations
+ 
+ from dataclasses import dataclass
+-from typing import Any
++from typing import Any, Dict, List, Optional, Set
+ 
+ from swarm.contracts.enums import FindingStatus
+ from swarm.contracts.mission import TaskSpec
+@@ -32,9 +32,9 @@ class ContextAssembler:
+         self,
+         task: TaskSpec,
+         *,
+-        allowed_scopes: set[str],
+-        budget: ContextBudget | None = None,
+-        prior_tool_outputs: list[dict[str, object]] | None = None,
++        allowed_scopes: Set[str],
++        budget: Optional[ContextBudget] = None,
++        prior_tool_outputs: Optional[List[Dict[str, object]]] = None,
+         graph_revision: int = 1,
+         policy_version: str = "ctx-v1",
+     ) -> ContextBundle:
+@@ -56,15 +56,15 @@ class ContextAssembler:
+             statuses=statuses,
+         )
+         # Enforce task scopes: findings must intersect task.scopes.
+-        scoped: list[Finding] = []
++        scoped: List[Finding] = []
+         for f in candidates:
+             acl = set(f.acl) if f.acl else {task.project_id}
+             if acl.intersection(set(task.scopes)) or acl.intersection(allowed_scopes):
+                 scoped.append(f)
+ 
+-        excerpts: list[dict[str, Any]] = []
+-        provenance: list[str] = []
+-        omission: list[str] = []
++        excerpts: List[Dict[str, Any]] = []
++        provenance: Set[str] = set()
++        omission: List[str] = []
+         used_chars = 0
+         included = 0
+         for f in scoped:
+@@ -73,7 +73,7 @@ class ContextAssembler:
+                 continue
+             content = f.content or ""
+             # Malicious instructions remain data in the excerpt.
+-            piece: dict[str, Any] = {
++            piece: Dict[str, Any] = {
+                 "finding_id": f.id,
+                 "status": f.status.value,
+                 "content": content,
+@@ -85,9 +85,9 @@ class ContextAssembler:
+                 omission.append(f"truncated_chars_at={f.id}")
+                 continue
+             excerpts.append(piece)
+-            provenance.extend(f.source_ids)
++            provenance.update(f.source_ids)
+             if f.artifact_ref:
+-                provenance.append(f.artifact_ref)
++                provenance.add(f.artifact_ref)
+             used_chars += size
+             included += 1
+ 
+@@ -117,7 +117,7 @@ class ContextAssembler:
+             task_id=task.id,
+             graph_revision=graph_revision,
+             excerpts=excerpts,
+-            provenance=list(dict.fromkeys(provenance)),
++            provenance=list(provenance),
+             omission_notes=omission,
+             token_estimate=max(1, used_chars // 4),
+             policy_version=policy_version,

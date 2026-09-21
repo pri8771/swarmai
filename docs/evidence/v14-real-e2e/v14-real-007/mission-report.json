@@ -1,0 +1,538 @@
+{
+  "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/context.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "status": "completed",
+  "created_at": "2026-09-21T19:39:19.403694+00:00",
+  "updated_at": "2026-09-21T19:39:19.403708+00:00",
+  "revision": 2,
+  "project_id": null,
+  "source": "mission_store",
+  "contract": {},
+  "plan": {
+    "proposal_id": "gp_98d95320742045fe87daa5a4c7f953e0",
+    "operation": "spawn",
+    "rationale": "V0.1 structured software mission: inspect \u2192 implement \u2192 verify \u2192 review",
+    "inspection": {
+      "root": "/Users/pchordia/Downloads/swarm-ai-v2-runtime",
+      "git_head": "dd3ec870efe41a1618485823bc70e7f5d9e9a1d1",
+      "has_pyproject": true,
+      "has_tests": true,
+      "top_entries": [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md",
+        "alembic.ini",
+        "apps",
+        "benchmarks",
+        "changes",
+        "config",
+        "deploy",
+        "docs",
+        "examples",
+        "migrations",
+        "packs",
+        "pyproject.toml",
+        "release",
+        "sandbox",
+        "schemas",
+        "scripts",
+        "src",
+        "tests",
+        "uv.lock",
+        "var"
+      ],
+      "notes": [
+        "selfdev_off_by_one_sample_present",
+        "swarm_package_present"
+      ]
+    },
+    "task_ids": [
+      "tsk_b265e375041e42668597b5b0511f7539",
+      "tsk_cbbf5ca7c0304be19282425782854a1b",
+      "tsk_d57171c0772343c98e086c5ba7ad21df",
+      "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27"
+    ],
+    "route_plan": null
+  },
+  "tasks": [
+    {
+      "id": "tsk_b265e375041e42668597b5b0511f7539",
+      "task_family": "inspect",
+      "objective": "Inspect repository layout and identify files to change for the goal",
+      "dependency_ids": [],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "inspection_complete"
+    },
+    {
+      "id": "tsk_cbbf5ca7c0304be19282425782854a1b",
+      "task_family": "implement",
+      "objective": "Implement the required change in an isolated worktree",
+      "dependency_ids": [
+        "tsk_b265e375041e42668597b5b0511f7539"
+      ],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "implement_applied"
+    },
+    {
+      "id": "tsk_d57171c0772343c98e086c5ba7ad21df",
+      "task_family": "verify",
+      "objective": "Run configured verification (tests/lint) in the worker worktree",
+      "dependency_ids": [
+        "tsk_cbbf5ca7c0304be19282425782854a1b"
+      ],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "verify_complete"
+    },
+    {
+      "id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+      "task_family": "review",
+      "objective": "Review diff, synthesize outcome, and accept or request repair",
+      "dependency_ids": [
+        "tsk_d57171c0772343c98e086c5ba7ad21df"
+      ],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "accept"
+    }
+  ],
+  "timeline": [
+    {
+      "at": "2026-09-21T19:39:19.403706+00:00",
+      "event": "mission_started",
+      "detail": {
+        "revision": 2,
+        "model": "qwen2.5-coder:14b",
+        "route_plan": null
+      }
+    },
+    {
+      "at": "2026-09-21T19:39:19.417253+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 0
+      }
+    },
+    {
+      "at": "2026-09-21T19:39:19.417374+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_b265e375041e42668597b5b0511f7539",
+        "family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2"
+      }
+    },
+    {
+      "at": "2026-09-21T19:39:55.629078+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b",
+        "family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2"
+      }
+    },
+    {
+      "at": "2026-09-21T19:39:58.018511+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_d57171c0772343c98e086c5ba7ad21df",
+        "family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2"
+      }
+    },
+    {
+      "at": "2026-09-21T19:40:03.311864+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+        "family": "review",
+        "ok": true,
+        "summary": "accept",
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2"
+      }
+    },
+    {
+      "at": "2026-09-21T19:40:03.311925+00:00",
+      "event": "apply_pending",
+      "detail": {
+        "changed_files": [
+          "src/swarm/workspace/context.py"
+        ],
+        "auto_promote": false
+      }
+    }
+  ],
+  "agents": [
+    {
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "task_id": "tsk_b265e375041e42668597b5b0511f7539",
+      "family": "inspect"
+    },
+    {
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "task_id": "tsk_d57171c0772343c98e086c5ba7ad21df",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "task_id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+      "family": "review"
+    }
+  ],
+  "artifacts": {
+    "worker_results": {
+      "tsk_b265e375041e42668597b5b0511f7539": {
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "task_id": "tsk_b265e375041e42668597b5b0511f7539",
+        "task_family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "artifacts": {
+          "findings": {
+            "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+            "goal": "Audit the current SwarmAI subsystem at src/swarm/workspace/context.py together with tests/workspace/test_workspace.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/workspace, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+            "candidate_files": [
+              "src/swarm/workspace/context.py",
+              "tests/workspace/test_workspace.py"
+            ],
+            "strategy": "goal_path_scan",
+            "parser_dogfood_fixture": false,
+            "missing_cost_ledger": false
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:39:19.417372+00:00",
+        "finished_at": "2026-09-21T19:39:19.417367+00:00"
+      },
+      "tsk_cbbf5ca7c0304be19282425782854a1b": {
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b",
+        "task_family": "implement",
+        "ok": true,
+        "summary": "implement_applied",
+        "artifacts": {
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+            "branch": "mission/609fc23e9cb0/tsk_cbbf5ca7c0304be19282425782854a1b/we8f5543",
+            "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+            "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+            "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b"
+          },
+          "changed_files": [
+            "src/swarm/workspace/context.py"
+          ],
+          "diff": "diff --git a/src/swarm/workspace/context.py b/src/swarm/workspace/context.py\nindex 2ff3ba5..5c0b046 100644\n--- a/src/swarm/workspace/context.py\n+++ b/src/swarm/workspace/context.py\n@@ -3,7 +3,7 @@\n from __future__ import annotations\n \n from dataclasses import dataclass\n-from typing import Any\n+from typing import Any, Dict, List, Optional, Set\n \n from swarm.contracts.enums import FindingStatus\n from swarm.contracts.mission import TaskSpec\n@@ -32,9 +32,9 @@ class ContextAssembler:\n         self,\n         task: TaskSpec,\n         *,\n-        allowed_scopes: set[str],\n-        budget: ContextBudget | None = None,\n-        prior_tool_outputs: list[dict[str, object]] | None = None,\n+        allowed_scopes: Set[str],\n+        budget: Optional[ContextBudget] = None,\n+        prior_tool_outputs: Optional[List[Dict[str, object]]] = None,\n         graph_revision: int = 1,\n         policy_version: str = \"ctx-v1\",\n     ) -> ContextBundle:\n@@ -56,15 +56,15 @@ class ContextAssembler:\n             statuses=statuses,\n         )\n         # Enforce task scopes: findings must intersect task.scopes.\n-        scoped: list[Finding] = []\n+        scoped: List[Finding] = []\n         for f in candidates:\n             acl = set(f.acl) if f.acl else {task.project_id}\n             if acl.intersection(set(task.scopes)) or acl.intersection(allowed_scopes):\n                 scoped.append(f)\n \n-        excerpts: list[dict[str, Any]] = []\n-        provenance: list[str] = []\n-        omission: list[str] = []\n+        excerpts: List[Dict[str, Any]] = []\n+        provenance: Set[str] = set()\n+        omission: List[str] = []\n         used_chars = 0\n         included = 0\n         for f in scoped:\n@@ -73,7 +73,7 @@ class ContextAssembler:\n                 continue\n             content = f.content or \"\"\n             # Malicious instructions remain data in the excerpt.\n-            piece: dict[str, Any] = {\n+            piece: Dict[str, Any] = {\n                 \"finding_id\": f.id,\n                 \"status\": f.status.value,\n                 \"content\": content,\n@@ -85,9 +85,9 @@ class ContextAssembler:\n                 omission.append(f\"truncated_chars_at={f.id}\")\n                 continue\n             excerpts.append(piece)\n-            provenance.extend(f.source_ids)\n+            provenance.update(f.source_ids)\n             if f.artifact_ref:\n-                provenance.append(f.artifact_ref)\n+                provenance.add(f.artifact_ref)\n             used_chars += size\n             included += 1\n \n@@ -117,7 +117,7 @@ class ContextAssembler:\n             task_id=task.id,\n             graph_revision=graph_revision,\n             excerpts=excerpts,\n-            provenance=list(dict.fromkeys(provenance)),\n+            provenance=list(provenance),\n             omission_notes=omission,\n             token_estimate=max(1, used_chars // 4),\n             policy_version=policy_version,\n",
+          "used_model_fallback": false,
+          "known_answer_forbidden": true,
+          "parser_dogfood_fixture": false
+        },
+        "inference": {
+          "ok": true,
+          "text": "```python\n\"\"\"Bounded context projection with ACL and omission notes.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Any, Dict, List, Optional, Set\n\nfrom swarm.contracts.enums import FindingStatus\nfrom swarm.contracts.mission import TaskSpec\nfrom swarm.contracts.workspace import ContextBundle, Finding\nfrom swarm.workspace.findings import FindingStore\n\n\n@dataclass\nclass ContextBudget:\n    max_findings: int = 8\n    max_chars: int = 4000\n    include_hypotheses: bool = False\n\n\nclass ContextAssembler:\n    def __init__(\n        self,\n        findings: FindingStore,\n        *,\n        text_only: bool = True,\n    ) -> None:\n        self.findings = findings\n        self.text_only = text_only  # no remote embedding/network\n\n    def build(\n        self,\n        task: TaskSpec,\n        *,\n        allowed_scopes: Set[str],\n        budget: Optional[ContextBudget] = None,\n        prior_tool_outputs: Optional[List[Dict[str, object]]] = None,\n        graph_revision: int = 1,\n        policy_version: str = \"ctx-v1\",\n    ) -> ContextBundle:\n        if not self.text_only:\n            raise RuntimeError(\"embedding_mode_requires_broker\")  # pragma: no cover\n        budget = budget or ContextBudget()\n        statuses = {\n            FindingStatus.ACCEPTED,\n            FindingStatus.CORROBORATED,\n            FindingStatus.DISPUTED,\n        }\n        if budget.include_hypotheses:\n            statuses.add(FindingStatus.HYPOTHESIS)\n\n        candidates = self.findings.query_scoped(\n            project_id=task.project_id,\n            allowed_scopes=allowed_scopes.intersection(set(task.scopes)) or allowed_scopes,\n            query=\"\",\n            statuses=statuses,\n        )\n        # Enforce task scopes: findings must intersect task.scopes.\n        scoped: List[Finding] = []\n        for f in candidates:\n            acl = set(f.acl) if f.acl else {task.project_id}\n            if acl.intersection(set(task.scopes)) or acl.intersection(allowed_scopes):\n                scoped.append(f)\n\n        excerpts: List[Dict[str, Any]] = []\n        provenance: Set[str] = set()\n        omission: List[str] = []\n        used_chars = 0\n        included = 0\n        for f in scoped:\n            if included >= budget.max_findings:\n                omission.append(f\"truncated_findings_after={f.id}\")\n                continue\n            content = f.content or \"\"\n            # Malicious instructions remain data in the excerpt.\n            piece: Dict[str, Any] = {\n                \"finding_id\": f.id,\n                \"status\": f.status.value,\n                \"content\": content,\n                \"source_ids\": list(f.source_ids),\n                \"untrusted_external_text\": True,\n            }\n            size = len(content)\n            if used_chars + size > budget.max_chars:\n                omission.append(f\"truncated_chars_at={f.id}\")\n                continue\n            excerpts.append(piece)\n            provenance.update(f.source_ids)\n            if f.artifact_ref:\n                provenance.add(f.artifact_ref)\n            used_chars += size\n            included += 1\n\n        if prior_tool_outputs:\n            for i, tool in enumerate(prior_tool_outputs):\n                text = str(tool.get(\"summary\") or tool)\n                if used_chars + len(text) > budget.max_chars:\n                    omission.append(f\"omitted_tool_output_{i}\")\n                    continue\n                excerpts.append({\"tool_output\": tool, \"untrusted_external_text\": True})\n                used_chars += len(text)\n\n        if omission:\n            omission.append(\"certainty_reduced_due_to_truncation\")\n\n        # Missing sources \u2192 explicit uncertainty note.\n        missing_sources = [\n            e\n            for e in excerpts\n            if isinstance(e, dict) and not e.get(\"source_ids\") and e.get(\"finding_id\")\n        ]\n        if missing_sources:\n            omission.append(\"some_findings_lack_source_ids_treat_as_uncertain\")\n\n        return ContextBundle(\n        ",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "prompt_tokens": 1088,
+          "completion_tokens": 911,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:39:55.629030+00:00",
+        "finished_at": "2026-09-21T19:39:55.628987+00:00"
+      },
+      "tsk_d57171c0772343c98e086c5ba7ad21df": {
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "task_id": "tsk_d57171c0772343c98e086c5ba7ad21df",
+        "task_family": "verify",
+        "ok": true,
+        "summary": "verify_complete",
+        "artifacts": {
+          "commands": [
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/workspace/test_workspace.py",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": ".........                                                                [100%]\n9 passed in 0.12s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\nUsing CPython 3.12.13\nCreating virtual environment at: .venv\n   Building swarm @ file:///Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2\n      Built swarm @ file:///Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2\nInstalled 124 packages in 192ms\n"
+            },
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/workspace",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": ".........                                                                [100%]\n9 passed in 0.05s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/Downloads/swarm-ai-v2-runtime/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            }
+          ],
+          "worktree": {
+            "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+            "branch": "mission/609fc23e9cb0/tsk_cbbf5ca7c0304be19282425782854a1b/we8f5543",
+            "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+            "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+            "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b"
+          },
+          "parser_dogfood_fixture": false,
+          "focused_check_paths": [
+            "tests/workspace/test_workspace.py"
+          ]
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:39:58.018486+00:00",
+        "finished_at": "2026-09-21T19:39:58.018455+00:00"
+      },
+      "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27": {
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "task_id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+        "task_family": "review",
+        "ok": true,
+        "summary": "accept",
+        "artifacts": {
+          "decision": "accept",
+          "reasons": [
+            "verification_passed_and_diff_clean"
+          ],
+          "diff_excerpt": "diff --git a/src/swarm/workspace/context.py b/src/swarm/workspace/context.py\nindex 2ff3ba5..5c0b046 100644\n--- a/src/swarm/workspace/context.py\n+++ b/src/swarm/workspace/context.py\n@@ -3,7 +3,7 @@\n from __future__ import annotations\n \n from dataclasses import dataclass\n-from typing import Any\n+from typing import Any, Dict, List, Optional, Set\n \n from swarm.contracts.enums import FindingStatus\n from swarm.contracts.mission import TaskSpec\n@@ -32,9 +32,9 @@ class ContextAssembler:\n         self,\n         task: TaskSpec,\n         *,\n-        allowed_scopes: set[str],\n-        budget: ContextBudget | None = None,\n-        prior_tool_outputs: list[dict[str, object]] | None = None,\n+        allowed_scopes: Set[str],\n+        budget: Optional[ContextBudget] = None,\n+        prior_tool_outputs: Optional[List[Dict[str, object]]] = None,\n         graph_revision: int = 1,\n         policy_version: str = \"ctx-v1\",\n     ) -> ContextBundle:\n@@ -56,15 +56,15 @@ class ContextAssembler:\n             statuses=statuses,\n         )\n         # Enforce task scopes: findings must intersect task.scopes.\n-        scoped: list[Finding] = []\n+        scoped: List[Finding] = []\n         for f in candidates:\n             acl = set(f.acl) if f.acl else {task.project_id}\n             if acl.intersection(set(task.scopes)) or acl.intersection(allowed_scopes):\n                 scoped.append(f)\n \n-        excerpts: list[dict[str, Any]] = []\n-        provenance: list[str] = []\n-        omission: list[str] = []\n+        excerpts: List[Dict[str, Any]] = []\n+        provenance: Set[str] = set()\n+        omission: List[str] = []\n         used_chars = 0\n         included = 0\n         for f in scoped:\n@@ -73,7 +73,7 @@ class ContextAssembler:\n                 continue\n             content = f.content or \"\"\n             # Malicious instructions remain data in the excerpt.\n-            piece: dict[str, Any] = {\n+            piece: Dict[str, Any] = {\n                 \"finding_id\": f.id,\n                 \"status\": f.status.value,\n                 \"content\": content,\n@@ -85,9 +85,9 @@ class ContextAssembler:\n                 omission.append(f\"truncated_chars_at={f.id}\")\n                 continue\n             excerpts.append(piece)\n-            provenance.extend(f.source_ids)\n+            provenance.update(f.source_ids)\n             if f.artifact_ref:\n-                provenance.append(f.artifact_ref)\n+                provenance.add(f.artifact_ref)\n             used_chars += size\n             included += 1\n \n@@ -117,7 +117,7 @@ class ContextAssembler:\n             task_id=task.id,\n             graph_revision=graph_revision,\n             excerpts=excerpts,\n-            provenance=list(dict.fromkeys(provenance)),\n+            provenance=list(provenance),\n             omission_notes=omission,\n             token_estimate=max(1, used_chars // 4),\n             policy_version=policy_version,\n",
+          "changed_paths": [
+            "src/swarm/workspace/context.py"
+          ],
+          "competing_solutions": [
+            {
+              "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+              "ok": true
+            }
+          ],
+          "review_notes": {
+            "ok": true,
+            "text": "The patch to `src/swarm/workspace/context.py` correctly updates type annotations from mutable types (`set`, `list`) to their immutable counterparts (`Set`, `List`). The defect being fixed is the potential for unexpected modifications of these collections, which could lead to inconsistencies in the context assembly process.",
+            "model": "qwen2.5-coder:14b",
+            "route_id": "rt_ollama_qwen2.5-coder:14b",
+            "prompt_tokens": 779,
+            "completion_tokens": 60,
+            "cost_usd": 0.0,
+            "error": null
+          },
+          "independent_review": {
+            "accepted": true,
+            "reasons": [
+              "all_independent_checks_passed"
+            ],
+            "checks": {
+              "verification_passed": true,
+              "implementation_present": true,
+              "diff_clean": true,
+              "review_grounded": true
+            }
+          },
+          "review_grounding": {
+            "grounded": true,
+            "reasons": [
+              "review_grounded"
+            ],
+            "checks": {
+              "material_diff_present": true,
+              "review_references_changed_target": true,
+              "stale_unrelated_symbols_absent": true,
+              "focused_check_paths_executed": true,
+              "focused_or_target_relevant_verify": true
+            },
+            "changed_paths": [
+              "src/swarm/workspace/context.py"
+            ]
+          }
+        },
+        "inference": {
+          "ok": true,
+          "text": "The patch to `src/swarm/workspace/context.py` correctly updates type annotations from mutable types (`set`, `list`) to their immutable counterparts (`Set`, `List`). The defect being fixed is the potential for unexpected modifications of these collections, which could lead to inconsistencies in the context assembly process.",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "prompt_tokens": 779,
+          "completion_tokens": 60,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-21T19:40:03.311856+00:00",
+        "finished_at": "2026-09-21T19:40:03.311842+00:00"
+      }
+    },
+    "pending_apply": {
+      "status": "pending_explicit_apply",
+      "changed_files": [
+        "src/swarm/workspace/context.py"
+      ],
+      "worktree": {
+        "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "branch": "mission/609fc23e9cb0/tsk_cbbf5ca7c0304be19282425782854a1b/we8f5543",
+        "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+        "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+        "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b"
+      },
+      "note": "accepted worktree changes are isolated; automatic primary-checkout promotion is disabled"
+    }
+  },
+  "validation": {
+    "accepted": true,
+    "review": {
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "task_id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+      "task_family": "review",
+      "ok": true,
+      "summary": "accept",
+      "artifacts": {
+        "decision": "accept",
+        "reasons": [
+          "verification_passed_and_diff_clean"
+        ],
+        "diff_excerpt": "diff --git a/src/swarm/workspace/context.py b/src/swarm/workspace/context.py\nindex 2ff3ba5..5c0b046 100644\n--- a/src/swarm/workspace/context.py\n+++ b/src/swarm/workspace/context.py\n@@ -3,7 +3,7 @@\n from __future__ import annotations\n \n from dataclasses import dataclass\n-from typing import Any\n+from typing import Any, Dict, List, Optional, Set\n \n from swarm.contracts.enums import FindingStatus\n from swarm.contracts.mission import TaskSpec\n@@ -32,9 +32,9 @@ class ContextAssembler:\n         self,\n         task: TaskSpec,\n         *,\n-        allowed_scopes: set[str],\n-        budget: ContextBudget | None = None,\n-        prior_tool_outputs: list[dict[str, object]] | None = None,\n+        allowed_scopes: Set[str],\n+        budget: Optional[ContextBudget] = None,\n+        prior_tool_outputs: Optional[List[Dict[str, object]]] = None,\n         graph_revision: int = 1,\n         policy_version: str = \"ctx-v1\",\n     ) -> ContextBundle:\n@@ -56,15 +56,15 @@ class ContextAssembler:\n             statuses=statuses,\n         )\n         # Enforce task scopes: findings must intersect task.scopes.\n-        scoped: list[Finding] = []\n+        scoped: List[Finding] = []\n         for f in candidates:\n             acl = set(f.acl) if f.acl else {task.project_id}\n             if acl.intersection(set(task.scopes)) or acl.intersection(allowed_scopes):\n                 scoped.append(f)\n \n-        excerpts: list[dict[str, Any]] = []\n-        provenance: list[str] = []\n-        omission: list[str] = []\n+        excerpts: List[Dict[str, Any]] = []\n+        provenance: Set[str] = set()\n+        omission: List[str] = []\n         used_chars = 0\n         included = 0\n         for f in scoped:\n@@ -73,7 +73,7 @@ class ContextAssembler:\n                 continue\n             content = f.content or \"\"\n             # Malicious instructions remain data in the excerpt.\n-            piece: dict[str, Any] = {\n+            piece: Dict[str, Any] = {\n                 \"finding_id\": f.id,\n                 \"status\": f.status.value,\n                 \"content\": content,\n@@ -85,9 +85,9 @@ class ContextAssembler:\n                 omission.append(f\"truncated_chars_at={f.id}\")\n                 continue\n             excerpts.append(piece)\n-            provenance.extend(f.source_ids)\n+            provenance.update(f.source_ids)\n             if f.artifact_ref:\n-                provenance.append(f.artifact_ref)\n+                provenance.add(f.artifact_ref)\n             used_chars += size\n             included += 1\n \n@@ -117,7 +117,7 @@ class ContextAssembler:\n             task_id=task.id,\n             graph_revision=graph_revision,\n             excerpts=excerpts,\n-            provenance=list(dict.fromkeys(provenance)),\n+            provenance=list(provenance),\n             omission_notes=omission,\n             token_estimate=max(1, used_chars // 4),\n             policy_version=policy_version,\n",
+        "changed_paths": [
+          "src/swarm/workspace/context.py"
+        ],
+        "competing_solutions": [
+          {
+            "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+            "ok": true
+          }
+        ],
+        "review_notes": {
+          "ok": true,
+          "text": "The patch to `src/swarm/workspace/context.py` correctly updates type annotations from mutable types (`set`, `list`) to their immutable counterparts (`Set`, `List`). The defect being fixed is the potential for unexpected modifications of these collections, which could lead to inconsistencies in the context assembly process.",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "prompt_tokens": 779,
+          "completion_tokens": 60,
+          "cost_usd": 0.0,
+          "error": null
+        },
+        "independent_review": {
+          "accepted": true,
+          "reasons": [
+            "all_independent_checks_passed"
+          ],
+          "checks": {
+            "verification_passed": true,
+            "implementation_present": true,
+            "diff_clean": true,
+            "review_grounded": true
+          }
+        },
+        "review_grounding": {
+          "grounded": true,
+          "reasons": [
+            "review_grounded"
+          ],
+          "checks": {
+            "material_diff_present": true,
+            "review_references_changed_target": true,
+            "stale_unrelated_symbols_absent": true,
+            "focused_check_paths_executed": true,
+            "focused_or_target_relevant_verify": true
+          },
+          "changed_paths": [
+            "src/swarm/workspace/context.py"
+          ]
+        }
+      },
+      "inference": {
+        "ok": true,
+        "text": "The patch to `src/swarm/workspace/context.py` correctly updates type annotations from mutable types (`set`, `list`) to their immutable counterparts (`Set`, `List`). The defect being fixed is the potential for unexpected modifications of these collections, which could lead to inconsistencies in the context assembly process.",
+        "model": "qwen2.5-coder:14b",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "prompt_tokens": 779,
+        "completion_tokens": 60,
+        "cost_usd": 0.0,
+        "error": null
+      },
+      "cost_usd": 0.0,
+      "started_at": "2026-09-21T19:40:03.311856+00:00",
+      "finished_at": "2026-09-21T19:40:03.311842+00:00"
+    }
+  },
+  "retries": [],
+  "model_assignments": [
+    {
+      "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    },
+    {
+      "task_id": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    }
+  ],
+  "cost": {
+    "spend_policy": "zero",
+    "allow_paid": false,
+    "total_usd": 0.0,
+    "entries": [
+      {
+        "source": "tsk_cbbf5ca7c0304be19282425782854a1b",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 1088,
+        "completion_tokens": 911,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T19:39:55.629091+00:00"
+      },
+      {
+        "source": "tsk_1d8cc4dc2ecb4f748e0439ad3361cd27",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 779,
+        "completion_tokens": 60,
+        "cost_usd": 0.0,
+        "at": "2026-09-21T19:40:03.311872+00:00"
+      }
+    ],
+    "requests": 2
+  },
+  "result": {
+    "accepted": true,
+    "summary": "mission_accepted",
+    "changed_files": [
+      "src/swarm/workspace/context.py"
+    ],
+    "worktree": {
+      "path": "/Users/pchordia/Downloads/swarm-ai-v2-runtime/var/mission-worktrees/609fc23e9cb04117a032eb3d50a0104b/tsk_cbbf5ca7c0304be19282425782854a1b-wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "branch": "mission/609fc23e9cb0/tsk_cbbf5ca7c0304be19282425782854a1b/we8f5543",
+      "worker_id": "wrk_268a78971a3c4ddebe4f6133bd52e9d2",
+      "mission_id": "609fc23e9cb04117a032eb3d50a0104b",
+      "task_id": "tsk_cbbf5ca7c0304be19282425782854a1b"
+    }
+  }
+}
