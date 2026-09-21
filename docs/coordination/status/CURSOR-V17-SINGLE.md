@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `dd3ec870efe41a1618485823bc70e7f5d9e9a1d1`
-- Coordination SHA: `9d88a6c75c09077f0bd92f28c0571ca5ff4f052d`
-- Updated: `2026-09-21T19:40:04Z`
-- Trigger: `scheduler`
-- Status: **testing**
+- Branch SHA: `4c7e06f35756fff91bae39e114b34b334cc331ad`
+- Coordination SHA: `dd1f0ab29b4715fd12609e1a876103c2df812f76`
+- Updated: `2026-09-21T19:41:09Z`
+- Trigger: `manual`
+- Status: **working**
 - Current packet: `R02`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-21T19:35:54Z`
+- Last meaningful activity: `2026-09-21T19:41:08Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit
+- Blocker: USER_ACTION: restore GitHub Actions billing/spending limit; ART-V14-REAL-E2E awaiting independent lead review of v14-real-007
 
 ## Update
 
-Launching v14-real-006 genuine brokered mission on workspace/artifacts.py with qwen2.5-coder:14b; freeze tip=2be0cc49793cf9f46f1f9fb663e80f49b54c3a6b
+R02/CP1: v14-real-007 operational pass (context.py, focused workspace tests, grounding green, $0). Tip=4c7e06f35756fff91bae39e114b34b334cc331ad. Lead semantic review pending — no invent-accept. Next: R03 G13 transplant or R09/R13.
 
 ## Next
 
-Complete v14-real-006 live run + package CP1 evidence
+R03 selective G13 pool transplant from product donor (dependency-ready after R00)
