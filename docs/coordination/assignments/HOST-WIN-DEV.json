@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "assignment_id": "B-V2B-000",
+  "generation": 1,
+  "enabled": true,
+  "host_alias": "HOST-WIN-DEV",
+  "session_id": "B",
+  "branch": "cursor/v2-product-lane",
+  "packet_id": "V2B-000",
+  "artifact_id": "ART-V20-INTEGRATED-CANDIDATE",
+  "instruction_path": "docs/coordination/WORKER_PACKET_BACKLOG.md",
+  "priority": "immediate",
+  "max_runtime_seconds": 1800,
+  "boundaries": {
+    "additional_spend": false,
+    "main_merge": false,
+    "public_deploy": false,
+    "force_push": false
+  },
+  "next_assignment_owner": "ChatGPT lead",
+  "note": "Sync only the reviewed integration baseline into the product lane, run Windows baseline, push evidence, then stop for lead review."
+}
