@@ -1,0 +1,27 @@
+{
+  "packet_id": "R15",
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "status": "result_acceptance_fence_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "dbac43017e3773ed600249b329a9ba9a3a0c56f8",
+  "verified_at": "2026-09-21T19:55:31Z",
+  "files": [
+    {
+      "path": "tests/integration/db/test_lease_result_acceptance.py",
+      "local_sha256": "c35d8bc177dcbb4623dc249843621617f0d433fa9464d808af420f7470c1985e",
+      "present": true
+    },
+    {
+      "path": "docs/evidence/v15/v2a003c-result-acceptance-fence.json",
+      "local_sha256": "04b0add63ba7dd2e516ba38318e9cdd878b43f9e52fedb284dd0f147dafb47d9",
+      "present": true
+    }
+  ],
+  "lease_fencing_includes_003c": true,
+  "tests": {
+    "command": "pytest -q tests/integration/db/test_lease_result_acceptance.py",
+    "result": "10 passed",
+    "db": "swarmai_v17_r13"
+  },
+  "note": "R15 verify-on-tip; tip already carries V2A-003c accept fence. No invent-accept."
+}
