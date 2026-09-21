@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T18:44:42Z",
+  "updated_at": "2026-09-21T18:48:27Z",
   "mode": "single_session_5m",
   "worker_effective_cadence_minutes": 5,
   "active_session_epoch": "single-v17-20260921-01",
@@ -11,7 +11,7 @@
     "ledger": "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json",
     "status_page": "docs/coordination/status/CURSOR-V17-SINGLE.md",
     "registered": true,
-    "last_heartbeat_at": "2026-09-21T18:44:42Z",
+    "last_heartbeat_at": "2026-09-21T18:48:27Z",
     "status": "working"
   },
   "legacy": {
