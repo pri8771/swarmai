@@ -1,14 +1,14 @@
 {
-  "schema_version": "1.0",
-  "status": "active_recovery_plan_not_worker_started_until_operator_prompt",
-  "generated_at": "2026-09-21T18:35:00Z",
+  "schema_version": "1.1",
+  "status": "lead_approved_active_recovery_plan",
+  "generated_at": "2026-09-21T20:30:00Z",
   "branch": "cursor/v17-single-session",
   "session": "CURSOR-V17-SINGLE",
   "max_active_implementation_sessions": 1,
   "heartbeat_producers": 1,
   "packet_rule": "one_small_packet_per_commit; blocked external packet does not block dependency-independent packets",
   "live_checkpoint_protocol": "docs/coordination/V17_LIVE_CHECKPOINT_PROTOCOL.md",
-  "audit": "docs/coordination/V17_CODE_AUDIT_20260921_1432.md",
+  "audit": "docs/coordination/V17_CODE_AUDIT_20260921_2030_FABLE.md",
   "plan": "docs/coordination/V17_RECOVERY_PLAN_ARTIFACT_FIRST.md",
   "packets": [
     {
@@ -18,7 +18,12 @@
       "type": "infra",
       "goal": "Classify GitHub Actions pre-step failures; package CP0 local exact-tip deterministic health.",
       "checkpoint": "CP0",
-      "status": "planned"
+      "status": "review_pending",
+      "audit": "CP0 local health green (ruff, mypy, 94 tests). Exact-tip CI blocked: gate EXT-ACTIONS-BILLING. Probable root cause O1; fix first with OPS-CI-01.",
+      "gate": "EXT-ACTIONS-BILLING",
+      "remediation": [
+        "OPS-CI-01"
+      ]
     },
     {
       "id": "R01",
@@ -28,7 +33,8 @@
       ],
       "type": "code",
       "goal": "Ground reviewer in actual diff/target/focused regression; reject stale unrelated review.",
-      "status": "planned"
+      "status": "impl_complete",
+      "audit": "Source + 5 focused tests at bb54517. No evidence folder (finding V5)."
     },
     {
       "id": "R02",
@@ -39,7 +45,13 @@
       "type": "live",
       "goal": "New preregistered real mission; semantically correct patch + focused check + independent review.",
       "checkpoint": "CP1",
-      "status": "planned"
+      "status": "changes_required",
+      "audit": "v14-real-006 no-op; v14-real-007 CHANGES REQUIRED by lead (no demonstrated pre-patch defect). Two attempts spent; runtime repair required before another attempt.",
+      "remediation": [
+        "R02a",
+        "R02b"
+      ],
+      "gate": "EXT-V14-LEAD-REVIEW"
     },
     {
       "id": "R03",
@@ -49,7 +61,8 @@
       ],
       "type": "transplant",
       "goal": "Selectively transplant G13 v3 corpus/freeze/verifier source+tests from product donor; exclude coordination daemons.",
-      "status": "planned"
+      "status": "impl_complete",
+      "audit": "Selective G13 v3 transplant at 26e9cc3; 8 focused tests."
     },
     {
       "id": "R04",
@@ -59,7 +72,9 @@
       ],
       "type": "evidence",
       "goal": "Run current-topology generator/verifier/Ruff/mypy/offline tests and bind frozen digests.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Mac verification of 240 held-out inputs + digests. Registry still requires HOST-WIN-DEV verification or a lead governance change.",
+      "gate": "EXT-G13-WIN-VERIFY"
     },
     {
       "id": "R05",
@@ -69,7 +84,8 @@
       ],
       "type": "code",
       "goal": "Reviewer input/scorer/calibration/contamination guard only.",
-      "status": "planned"
+      "status": "review_pending",
+      "audit": "Calibration contract + scorer at 7687753; 10/10 calibration receipt; no held-out run."
     },
     {
       "id": "R06",
@@ -79,7 +95,9 @@
       ],
       "type": "lead_sensitive",
       "goal": "Bind real sealed references without exposing held-out answers.",
-      "status": "planned"
+      "status": "blocked_external",
+      "audit": "Needs the lead-held sealed reference bundle digest.",
+      "gate": "EXT-G13-SEALED-DIGEST"
     },
     {
       "id": "R07",
@@ -110,7 +128,9 @@
       ],
       "type": "external_live",
       "goal": "Admit at least two exact account-specific zero-charge remote routes or emit precise USER_ACTION blocker.",
-      "status": "planned"
+      "status": "blocked_external",
+      "audit": "0 admitted remote routes. Needs operator-confirmed zero-charge entitlement + fresh $0 canaries for >= 2 providers.",
+      "gate": "EXT-G12-REMOTE-ROUTES"
     },
     {
       "id": "R10",
@@ -141,7 +161,9 @@
       ],
       "type": "wall_clock",
       "goal": "Start canonical wall-clock campaign immediately; run while later implementation continues.",
-      "status": "planned"
+      "status": "planned",
+      "audit": "24h wall-clock window; cannot start until R11 and lead prerequisite confirmation.",
+      "gate": "WC-LIVE142-24H"
     },
     {
       "id": "R13",
@@ -151,7 +173,8 @@
       ],
       "type": "transplant",
       "goal": "Port durable lease schema/foundation donor source 630ab780 + 92f59faf source/tests only.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only: source landed earlier in V2A-003a/003a-R commits. 11 tests on real Postgres."
     },
     {
       "id": "R14",
@@ -161,7 +184,8 @@
       ],
       "type": "transplant",
       "goal": "Port claim/renew/expire donor source 7dcefe4c + e764834a + 685810cc source/tests only.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only (V2A-003b). 17 tests on real Postgres."
     },
     {
       "id": "R15",
@@ -171,7 +195,8 @@
       ],
       "type": "code",
       "goal": "Durable result acceptance fence with project/task/source/generation/lease/cancel/reservation/uniqueness negatives.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only (V2A-003c ddd96a6). 10 tests on real Postgres."
     },
     {
       "id": "R16",
@@ -181,7 +206,12 @@
       ],
       "type": "code",
       "goal": "Durable worker enrollment/capability/claim/renew/drain/cancel/result service.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only (V2A-004 a26f21a). Service exists but has no caller outside workers/ (finding W4).",
+      "remediation": [
+        "R17b",
+        "R17c"
+      ]
     },
     {
       "id": "R17",
@@ -192,7 +222,11 @@
       "type": "live",
       "goal": "Local separate-process kill/expiry/reassign/stale-result/exactly-one-accept proof.",
       "checkpoint": "CP3",
-      "status": "planned"
+      "status": "gaps_found",
+      "audit": "CP3 genuinely live; 7 of 9 requirements shown. Missing cancellation-generation rejection; duplicate race sequential (finding V2).",
+      "remediation": [
+        "R17a"
+      ]
     },
     {
       "id": "R18",
@@ -202,7 +236,9 @@
       ],
       "type": "external_live",
       "goal": "Actual second-host worker proof if accessible; otherwise exact blocker.",
-      "status": "planned"
+      "status": "blocked_external",
+      "audit": "No second physical host.",
+      "gate": "EXT-V15-SECOND-HOST"
     },
     {
       "id": "R19",
@@ -212,7 +248,8 @@
       ],
       "type": "code",
       "goal": "KnowledgeItem/KnowledgeLink/Tombstone versioned contracts.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only (V2B-003a 7f86981)."
     },
     {
       "id": "R20",
@@ -222,7 +259,8 @@
       ],
       "type": "code",
       "goal": "Durable project-scoped versioned knowledge repository.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only."
     },
     {
       "id": "R21",
@@ -232,7 +270,8 @@
       ],
       "type": "code",
       "goal": "Permission candidate prefilter before ranking; no cross-project existence leak.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only. pytest output byte-identical to R22 and R23 (finding V1)."
     },
     {
       "id": "R22",
@@ -242,7 +281,8 @@
       ],
       "type": "code",
       "goal": "Permitted-only ranking/context + retrieval receipt/provenance/token cost.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only. Shares R21's pytest output (finding V1)."
     },
     {
       "id": "R23",
@@ -252,7 +292,8 @@
       ],
       "type": "code",
       "goal": "Contradiction/supersession/deletion/tombstone and dependent invalidation.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only. Shares R21's pytest output (finding V1)."
     },
     {
       "id": "R24",
@@ -263,7 +304,8 @@
       ],
       "type": "code",
       "goal": "Conservative legacy MemoryStore adapter; no auto accepted_fact promotion.",
-      "status": "planned"
+      "status": "evidence_only",
+      "audit": "Re-verification only; 3 memory tests."
     },
     {
       "id": "R25",
@@ -277,7 +319,12 @@
       "type": "live",
       "goal": "Two-project isolation + reuse + supersession/delete + token savings checkpoint.",
       "checkpoint": "CP4",
-      "status": "planned"
+      "status": "gaps_found",
+      "audit": "CP4 not live: in-process repository calls, no real mission, no existence-inference negative, savings assertion >= 0 (finding V3). Retrieval is not on the mission path (W3).",
+      "remediation": [
+        "R25a",
+        "R25b"
+      ]
     },
     {
       "id": "R26",
@@ -287,7 +334,11 @@
       ],
       "type": "code",
       "goal": "Define ActionEnvelope/ApprovalGrant/ActionReceipt V1.7 contracts only.",
-      "status": "planned"
+      "status": "gaps_found",
+      "audit": "No test executed. Contracts trust envelope classification and default the fences (findings A1, A2).",
+      "remediation": [
+        "R28b"
+      ]
     },
     {
       "id": "R27",
@@ -297,7 +348,15 @@
       ],
       "type": "code",
       "goal": "Durable approvals/effect reservations/action receipts + unique effect key.",
-      "status": "planned"
+      "status": "gaps_found",
+      "audit": "Receipts not durable; reserve/execute not atomic; caller-owned transactions; approval use non-atomic (findings E1-E5, E8-E10, A3-A5).",
+      "remediation": [
+        "R27a",
+        "R27b",
+        "R27c",
+        "R27d",
+        "R27e"
+      ]
     },
     {
       "id": "R28",
@@ -307,7 +366,14 @@
       ],
       "type": "code",
       "goal": "Migrate ToolGateway sequence to durable V1.7 boundary; remove process-local idempotency authority.",
-      "status": "planned"
+      "status": "split",
+      "audit": "Legacy ToolGateway still holds _seen_ops; V1.7 gateway has no operational caller (W1, W2).",
+      "split_into": [
+        "R28a",
+        "R28b",
+        "R28c",
+        "R28d"
+      ]
     },
     {
       "id": "R29",
@@ -317,7 +383,12 @@
       ],
       "type": "code",
       "goal": "Adapter interface/version manifest + one local/sandbox adapter.",
-      "status": "planned"
+      "status": "split",
+      "audit": "Adapter interface exists; no registry, no manifest files (I1, I3). Local integration becomes real in R28d.",
+      "split_into": [
+        "R29a",
+        "R28d"
+      ]
     },
     {
       "id": "R30",
@@ -327,7 +398,12 @@
       ],
       "type": "code",
       "goal": "One real API/MCP-style integration through same envelope.",
-      "status": "planned"
+      "status": "split",
+      "audit": "ApiMcpAdapter is an in-process echo (I2).",
+      "split_into": [
+        "R30a",
+        "R30b"
+      ]
     },
     {
       "id": "R31",
@@ -337,7 +413,12 @@
       ],
       "type": "code",
       "goal": "Session-aware web adapter: expiry/signout/destination preserve/reauth/no auto-submit.",
-      "status": "planned"
+      "status": "split",
+      "audit": "BrowserSessionAdapter is a simulator; recovery state in memory (I2).",
+      "split_into": [
+        "R31a",
+        "R31b"
+      ]
     },
     {
       "id": "R32",
@@ -348,7 +429,11 @@
       ],
       "type": "test",
       "goal": "Wrong project/payload/destination/expiry/revocation/stale lease/cancel/duplicate/unknown/redirect negatives.",
-      "status": "planned"
+      "status": "split",
+      "audit": "Negatives exist piecemeal; matrix missing.",
+      "split_into": [
+        "R32a"
+      ]
     },
     {
       "id": "R33",
@@ -362,7 +447,31 @@
       "type": "live",
       "goal": "Three integration classes through one shared action/effect boundary.",
       "checkpoint": "CP5",
-      "status": "planned"
+      "status": "split",
+      "audit": "No CP5 evidence exists (V4). Lead amendment: CP5 live-local is not sufficient for a working claim; R33c crosses a real external boundary.",
+      "split_into": [
+        "R33a",
+        "R33b",
+        "R33c"
+      ]
+    },
+    {
+      "id": "R33c",
+      "artifact": "V1.7-live-integration",
+      "artifacts_also": [
+        "ART-V17-INTEGRATION-MANIFEST",
+        "ART-V17-PERMISSION-NEGATIVES"
+      ],
+      "depends": [
+        "R33b"
+      ],
+      "type": "external_live",
+      "goal": "Real-world reversible GitHub issue/comment/close through the V1.7 action boundary; no duplicate external effects.",
+      "sp": 2,
+      "tier": "small-mid",
+      "spec": "docs/coordination/packets/R33c.md",
+      "status": "planned",
+      "gate": "EXT-V17-REALWORLD-GITHUB"
     },
     {
       "id": "R34",
@@ -376,7 +485,602 @@
       "type": "audit",
       "goal": "Exact-tip CP6 artifact-by-artifact implementation/evidence/blocker report; formal acceptance only if all canonical gates done.",
       "checkpoint": "CP6",
+      "status": "split",
+      "audit": "No CP6 evidence exists (V4).",
+      "split_into": [
+        "R34a",
+        "R34b"
+      ]
+    },
+    {
+      "id": "OPS-CI-01",
+      "artifact": "ART-OPS-HEARTBEAT",
+      "depends": [],
+      "type": "ops",
+      "goal": "Stop heartbeat commits from triggering CI: paths-ignore + concurrency + [skip ci]. Must land before Actions billing is restored.",
+      "sp": 1,
+      "tier": "small",
+      "spec": "docs/coordination/packets/OPS-CI-01.md",
+      "status": "ready",
+      "fixes": [
+        "O1"
+      ]
+    },
+    {
+      "id": "R27a",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R27"
+      ],
+      "type": "code",
+      "goal": "Durable immutable action_receipts table + effect bookkeeping columns; replay returns the original receipt.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R27a.md",
+      "status": "ready",
+      "fixes": [
+        "E1",
+        "E9",
+        "E10"
+      ]
+    },
+    {
+      "id": "R27b",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R27a"
+      ],
+      "type": "code",
+      "goal": "Atomic reserve (ON CONFLICT), compare-and-swap to executing, effect_key binding-mismatch rejection.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R27b.md",
+      "status": "planned",
+      "fixes": [
+        "E2",
+        "E3",
+        "E8"
+      ]
+    },
+    {
+      "id": "R27c",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R27b"
+      ],
+      "type": "code",
+      "goal": "Repository-owned transactions; begin_execution commits before the adapter runs; atomic approval consumption; in-transaction fence reader seam.",
+      "sp": 3,
+      "tier": "high",
+      "spec": "docs/coordination/packets/R27c.md",
+      "status": "planned",
+      "fixes": [
+        "E4",
+        "A3"
+      ],
+      "review_hold": "lead reviews diff before R27e"
+    },
+    {
+      "id": "R27d",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R27c"
+      ],
+      "type": "code",
+      "goal": "Approvals insert-only, monotonic revocation, legacy NULL-binding rows non-operational, project-filtered reads.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R27d.md",
+      "status": "planned",
+      "fixes": [
+        "A4",
+        "A5"
+      ]
+    },
+    {
+      "id": "R27e",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R27c"
+      ],
+      "type": "code",
+      "goal": "Orphaned executing -> unknown (never reserved); reconcile verdict gating by side-effect class; real kill tests.",
+      "sp": 3,
+      "tier": "high",
+      "spec": "docs/coordination/packets/R27e.md",
+      "status": "planned",
+      "fixes": [
+        "E5",
+        "E10"
+      ],
+      "review_hold": "lead reviews diff"
+    },
+    {
+      "id": "R28a",
+      "artifact": "ART-V17-TOOL-CONTRACT",
+      "depends": [
+        "R27e"
+      ],
+      "type": "code",
+      "goal": "Fail-closed outcome mapping, adapter deadline, durable store required for consequential effects.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R28a.md",
+      "status": "planned",
+      "fixes": [
+        "E6",
+        "E7",
+        "E11",
+        "I4"
+      ]
+    },
+    {
+      "id": "R28b",
+      "artifact": "ART-V17-APPROVAL-BINDING",
+      "depends": [
+        "R28a"
+      ],
+      "type": "code",
+      "goal": "Effective classification from manifest, required fences, ActorContext, FenceProvider/PolicyProvider seams.",
+      "sp": 3,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R28b.md",
+      "status": "planned",
+      "fixes": [
+        "A1",
+        "A2",
+        "A6"
+      ]
+    },
+    {
+      "id": "R28c",
+      "artifact": "ART-V17-TOOL-CONTRACT",
+      "depends": [
+        "R28b"
+      ],
+      "type": "code",
+      "goal": "AdapterRegistry; legacy ToolGateway loses _seen_ops and delegates side effects to the V1.7 boundary.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R28c.md",
+      "status": "planned",
+      "fixes": [
+        "W2",
+        "I1"
+      ]
+    },
+    {
+      "id": "R29a",
+      "artifact": "ART-V17-INTEGRATION-MANIFEST",
+      "depends": [
+        "R28c"
+      ],
+      "type": "code",
+      "goal": "Versioned manifest files, digest on receipts, vocabulary subset of V1.9 ExtensionManifest.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R29a.md",
+      "status": "planned",
+      "fixes": [
+        "I3"
+      ]
+    },
+    {
+      "id": "R28d",
+      "artifact": "ART-V17-TOOL-CONTRACT",
+      "depends": [
+        "R29a"
+      ],
+      "type": "code",
+      "goal": "Mission RepoWorker file writes and commands go through the boundary (local.sandbox); no direct effects.",
+      "sp": 3,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R28d.md",
+      "status": "planned",
+      "fixes": [
+        "W1"
+      ]
+    },
+    {
+      "id": "R30a",
+      "artifact": "ART-V17-INTEGRATION-MANIFEST",
+      "depends": [],
+      "type": "infra",
+      "goal": "Live local fixture service (real HTTP, separate process) + integration/live_local markers.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R30a.md",
+      "status": "ready",
+      "fixes": [
+        "I2",
+        "O3"
+      ]
+    },
+    {
+      "id": "R30b",
+      "artifact": "ART-V17-INTEGRATION-MANIFEST",
+      "depends": [
+        "R30a",
+        "R29a",
+        "R28a"
+      ],
+      "type": "code",
+      "goal": "HttpApiAdapter with idempotency key, response-loss reconcile, no redirects.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R30b.md",
+      "status": "planned",
+      "fixes": [
+        "I2"
+      ]
+    },
+    {
+      "id": "R31a",
+      "artifact": "ART-V17-SESSION-RECOVERY",
+      "depends": [
+        "R30a",
+        "R29a",
+        "R28a"
+      ],
+      "type": "code",
+      "goal": "HttpSessionAdapter: real cookie session, expiry detection, submit-unknown semantics.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R31a.md",
+      "status": "planned",
+      "fixes": [
+        "I2"
+      ]
+    },
+    {
+      "id": "R31b",
+      "artifact": "ART-V17-SESSION-RECOVERY",
+      "depends": [
+        "R31a",
+        "R27e"
+      ],
+      "type": "code",
+      "goal": "Durable session recovery; safe destination; login never submits; exactly one submission after recovery.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R31b.md",
+      "status": "planned",
+      "fixes": [
+        "I2"
+      ]
+    },
+    {
+      "id": "R32a",
+      "artifact": "ART-V17-PERMISSION-NEGATIVES",
+      "depends": [
+        "R28c",
+        "R30b",
+        "R31b"
+      ],
+      "type": "test",
+      "goal": "Negative-case matrix N17-01..N17-26 mapped to collected tests at unit/integration/live_local level.",
+      "sp": 2,
+      "tier": "small",
+      "spec": "docs/coordination/packets/R32a.md",
       "status": "planned"
+    },
+    {
+      "id": "R33a",
+      "artifact": "V1.7-live-integration",
+      "depends": [
+        "R28d",
+        "R30b",
+        "R31b",
+        "R32a"
+      ],
+      "type": "code",
+      "goal": "CP5 harness: three integrations through one gateway object + live negatives + evidence directory.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R33a.md",
+      "status": "planned",
+      "checkpoint": "CP5"
+    },
+    {
+      "id": "R33b",
+      "artifact": "V1.7-live-integration",
+      "depends": [
+        "R33a"
+      ],
+      "type": "live",
+      "goal": "Run CP5 on the pushed tip; commit the run directory untouched; failures preserved.",
+      "sp": 1,
+      "tier": "small",
+      "spec": "docs/coordination/packets/R33a.md",
+      "status": "planned",
+      "checkpoint": "CP5"
+    },
+    {
+      "id": "R17a",
+      "artifact": "ART-V15-RECOVERY-EVIDENCE",
+      "depends": [
+        "R17"
+      ],
+      "type": "live",
+      "goal": "Close CP3 gaps: cancellation-generation rejection and truly concurrent duplicate accept; rerun CP3.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R17a.md",
+      "status": "ready",
+      "fixes": [
+        "V2"
+      ],
+      "checkpoint": "CP3"
+    },
+    {
+      "id": "R02a",
+      "artifact": "ART-V14-REAL-E2E",
+      "depends": [
+        "R01"
+      ],
+      "type": "code",
+      "goal": "Red->green defect-proof gate: regression must fail pre-patch and pass post-patch, else no_defect_demonstrated.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R02a.md",
+      "status": "ready"
+    },
+    {
+      "id": "R02b",
+      "artifact": "ART-V14-REAL-E2E",
+      "depends": [
+        "R02a"
+      ],
+      "type": "live",
+      "goal": "Preregister and run v14-real-008 on an unaudited subsystem; at most two attempts.",
+      "sp": 1,
+      "tier": "small",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "checkpoint": "CP1",
+      "gate": "EXT-V14-LEAD-REVIEW"
+    },
+    {
+      "id": "R25a",
+      "artifact": "ART-V16-PERMISSION-RETRIEVAL",
+      "depends": [
+        "R28d"
+      ],
+      "type": "code",
+      "goal": "KnowledgeService facade; permission-first context on the mission path; legacy retrieve_context off operational paths.",
+      "sp": 3,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R25a.md",
+      "status": "planned",
+      "fixes": [
+        "W3"
+      ]
+    },
+    {
+      "id": "R25b",
+      "artifact": "ART-V16-CONTEXT-BUDGET-EVIDENCE",
+      "depends": [
+        "R25a"
+      ],
+      "type": "live",
+      "goal": "CP4 through real missions in projects A/B incl. existence-inference negative and strict token savings.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "fixes": [
+        "V3"
+      ],
+      "checkpoint": "CP4"
+    },
+    {
+      "id": "R17b",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17a",
+        "R28d"
+      ],
+      "type": "code",
+      "goal": "Leased execution mode for MissionRuntime; reconcile_leases implemented; LeaseFenceProvider on the gateway.",
+      "sp": 3,
+      "tier": "high",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "fixes": [
+        "W4"
+      ]
+    },
+    {
+      "id": "R17c",
+      "artifact": "ART-V15-WORKER-PROTOCOL",
+      "depends": [
+        "R17b"
+      ],
+      "type": "code",
+      "goal": "Separate-process worker CLI; API worker routes on the durable service; single worker-state authority.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "fixes": [
+        "W4"
+      ]
+    },
+    {
+      "id": "R34a",
+      "artifact": "V1.7-integrated-audit",
+      "depends": [
+        "R33b",
+        "R25a",
+        "R17b"
+      ],
+      "type": "live",
+      "goal": "One real $0 mission proving broker, lease, knowledge and action receipts are all on the path; cancel and restart negatives.",
+      "sp": 2,
+      "tier": "mid",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "checkpoint": "CP6"
+    },
+    {
+      "id": "R34b",
+      "artifact": "V1.7-integrated-audit",
+      "depends": [
+        "R34a",
+        "R02b",
+        "R25b",
+        "R17a"
+      ],
+      "type": "audit",
+      "goal": "Exact-tip CP6 package on the claim ladder; open gates listed; label limited to IMPLEMENTATION-COMPLETE / LIVE-CHECKPOINTED / FORMAL-ACCEPTANCE-PENDING.",
+      "sp": 2,
+      "tier": "high",
+      "spec": "docs/coordination/packets/R-LATER-V17.md",
+      "status": "planned",
+      "checkpoint": "CP6"
     }
-  ]
+  ],
+  "audited_implementation_tip": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
+  "previous_audit": "docs/coordination/V17_CODE_AUDIT_20260921_1432.md",
+  "spec_dir": "docs/coordination/packets/",
+  "spec_conventions": "docs/coordination/packets/README.md",
+  "selection_rule": "First packet in file order with status ready, or planned with every dependency satisfied. Satisfied = impl_complete, live_checkpointed, evidence_only or review_pending. A split packet is satisfied when every id in split_into is satisfied. A gaps_found or changes_required packet is satisfied for the packets listed in its own remediation, and for everyone else only once all of that remediation is satisfied. blocked_external packets are skipped, never waited on. `gate` on a planned packet names what must clear before its artifact can advance, not before work can start. Compute the ready set with: python3 docs/coordination/tools/validate_plan.py --ready",
+  "status_vocabulary": [
+    "planned",
+    "ready",
+    "in_progress",
+    "impl_complete",
+    "live_checkpointed",
+    "evidence_only",
+    "gaps_found",
+    "split",
+    "blocked_external",
+    "wall_clock_pending",
+    "review_pending",
+    "changes_required"
+  ],
+  "acceptance_note": "verified/accepted never appear here. Only ARTIFACT_REGISTRY.json carries them and only the lead sets them.",
+  "claim_ladder": [
+    "implementation",
+    "wired",
+    "live_checkpoint",
+    "independent_review",
+    "external_gate",
+    "wall_clock_gate"
+  ],
+  "tiers": {
+    "small": "Haiku-class or equivalent, low effort",
+    "mid": "Sonnet 4.6-class, medium effort",
+    "high": "Sonnet 4.6 at high effort or Opus-class; diff reviewed by lead before dependants start"
+  },
+  "gates": [
+    {
+      "id": "EXT-ACTIONS-BILLING",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "precondition": "OPS-CI-01 landed and coordination-branch ci patch applied",
+      "action": "Restore GitHub Actions billing / spending limit under Billing & plans.",
+      "blocks": [
+        "exact-tip CI line of CP0 and CP6"
+      ]
+    },
+    {
+      "id": "EXT-V14-LEAD-REVIEW",
+      "kind": "external",
+      "owner": "lead",
+      "status": "open",
+      "action": "Independent semantic review of the next preregistered real mission (v14-real-008).",
+      "blocks": [
+        "ART-V14-REAL-E2E verified",
+        "CP1"
+      ]
+    },
+    {
+      "id": "EXT-G13-WIN-VERIFY",
+      "kind": "external",
+      "owner": "operator_or_lead",
+      "status": "open",
+      "action": "Either run the G13 v3 verifier on HOST-WIN-DEV, or record a lead governance decision that semantic corpus verification is platform-neutral (recovery plan R04 already argues this).",
+      "blocks": [
+        "ART-V13-TASK-POOL verified",
+        "R06",
+        "R07"
+      ]
+    },
+    {
+      "id": "EXT-G13-SEALED-DIGEST",
+      "kind": "external",
+      "owner": "lead",
+      "status": "open",
+      "action": "Bind the real sealed-reference bundle content digest per G13_SEALED_REFERENCE_BINDING_PROTOCOL.md.",
+      "blocks": [
+        "R06",
+        "R07",
+        "R08",
+        "R11"
+      ]
+    },
+    {
+      "id": "EXT-G12-REMOTE-ROUTES",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "action": "Confirm zero-charge entitlement with remaining quota for >= 2 distinct remote providers; then fresh $0 canaries with SWARM_ALLOW_PAID=false.",
+      "blocks": [
+        "R09",
+        "R10",
+        "R11",
+        "R12"
+      ]
+    },
+    {
+      "id": "EXT-V15-SECOND-HOST",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "action": "Provide a second physical host with git/gh access, Python and Postgres reachability. No aliases, containers or simulated hosts.",
+      "blocks": [
+        "R18",
+        "ART-V15-MULTIHOST-EVIDENCE"
+      ]
+    },
+    {
+      "id": "EXT-V10-WORKER-HEARTBEAT",
+      "kind": "external",
+      "owner": "lead",
+      "status": "open",
+      "action": "Decide whether single-session heartbeat evidence satisfies ART-V10-WORKER-HEARTBEAT or what authenticated worker evidence is still required.",
+      "blocks": [
+        "V1.0-repair accepted",
+        "LIVE-142 prerequisites"
+      ]
+    },
+    {
+      "id": "WC-LIVE142-24H",
+      "kind": "wall_clock",
+      "owner": "lead",
+      "status": "not_started",
+      "duration_hours": 24,
+      "start_condition": "G10-G14 integrated on a frozen candidate, R11 passed, lead confirms prerequisites.",
+      "rule": "Never backfilled; runtime/security/routing change restarts the affected window.",
+      "blocks": [
+        "ART-LIVE142-CAMPAIGN",
+        "ART-LIVE142-FINAL-REPORT",
+        "V1.4 accepted"
+      ]
+    },
+    {
+      "id": "EXT-V17-REALWORLD-GITHUB",
+      "kind": "external",
+      "owner": "operator",
+      "status": "preauthorized_if_existing_gh_session_available",
+      "action": "Use existing authenticated GitHub identity for R33c; if unavailable, record blocker rather than substituting fixture evidence.",
+      "blocks": [
+        "R33c",
+        "V1.7 working claim"
+      ]
+    }
+  ],
+  "lead_review": "docs/coordination/reviews/FABLE_V3_PLANNING_LEAD_REVIEW_20260921.md"
 }

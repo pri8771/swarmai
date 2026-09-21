@@ -1,5 +1,7 @@
 # SwarmAI forward architecture plan — V1.6 through V3.0
 
+> **SUPERSEDED (2026-09-21, proposed by Fable planning pass):** history only. Canonical: `MASTER_PLAN_V17_TO_V30_20260921.md` and the queue/graph JSON files. See `DOC_ROUTER.md`.
+
 Date: 2026-09-21
 Status: FUTURE PLANNING ONLY
 Authority: does not change artifact acceptance or authorize V1.8+ implementation in the current Cursor run.

@@ -26,7 +26,7 @@ Do not reread all roadmaps every session.
 
 ## Evidence
 Implementation, deterministic tests, live evidence, independent review, and formal acceptance are distinct.
-Mocks/simulations never count as live evidence.
+Mocks/simulations never count as live evidence. Local fixtures count as live-local mechanics only; a milestone is not called working without the real external/physical proof defined in `docs/coordination/REAL_WORLD_ACCEPTANCE_POLICY.md`.
 Preserve failed attempts.
 Bind evidence to exact source/config/route/policy versions.
 Never backfill wall-clock evidence.

@@ -77,3 +77,13 @@ When executing:
 2. current coordination packet ID;
 3. prep grouping;
 in that order of authority.
+
+## Machine-readable form (Fable planning pass, 2026-09-21, proposed)
+
+The mapping above now lives in the DAG files so it can be checked:
+- `V17_TO_V23_PACKET_QUEUE.json`: each packet's `aliases` lists its contract-embedded ID(s) and coarse phase ID.
+- `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json`: each coarse phase group lists `maps_to` execution IDs; `v30_packets` holds the canonical `V30A-001…008` and a **proposed** packetization (`V30B`–`V30F`, `V30X`, flagged `proposed: true`, `requires_lead_freeze: true`) for the tranches this document says have no frozen IDs yet.
+- The three dangling placeholders (`V1.5-result-fencing`, `V1.7-effect-boundary`, `V16-knowledge`) were replaced by real packet IDs (`R15`, `R34`/`R33`, `R25`).
+- `tools/validate_plan.py` fails on any unresolved ID, cycle, alias collision, unknown artifact, or uncovered V1.7–V3.0 registry artifact.
+
+The authority order in **Rule** is unchanged.

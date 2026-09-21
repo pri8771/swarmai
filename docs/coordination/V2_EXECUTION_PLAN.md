@@ -1,5 +1,7 @@
 # SwarmAI execution plan — current state -> V2.0 candidate -> V2.3 -> V3.0
 
+> **SUPERSEDED (2026-09-21, proposed by Fable planning pass):** two-lane plan, history only. Canonical: `MASTER_PLAN_V17_TO_V30_20260921.md` and `V17_TO_V23_PACKET_QUEUE.json`.
+
 ## Current operating mode — pull-driven A/B team
 
 Active implementation lanes:
