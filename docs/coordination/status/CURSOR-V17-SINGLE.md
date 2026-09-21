@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `f079d5e3ca27f08bdbe7b5457a571e6bbb167882`
-- Coordination SHA: `f89d35c1374bc3a48010f3c1e411a3a22d45d2a3`
-- Updated: `2026-09-21T18:27:37Z`
-- Trigger: `manual`
+- Coordination SHA: `86d9c2851355248dd615973a67c89e9860fc7cb9`
+- Updated: `2026-09-21T18:28:08Z`
+- Trigger: `scheduler`
 - Status: **testing**
 - Current packet: `V14-REAL-001-R`
 - Current artifact: `ART-V14-REAL-E2E`
