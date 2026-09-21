@@ -265,6 +265,56 @@ class ApprovalRow(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    # V2B-004a / ART-V17-DURABLE-EFFECT-SCHEMA extensions (nullable for legacy).
+    project_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    actor: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    integration_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    integration_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    operation: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    effect_key: Mapped[str | None] = mapped_column(String(192), nullable=True, index=True)
+    max_effect_count: Mapped[int] = mapped_column(Integer, default=1)
+    used_count: Mapped[int] = mapped_column(Integer, default=0)
+    policy_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, server_default=func.now()
+    )
+    constraints: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ActionEffectRow(Base):
+    """Durable consequential effect reservation / reconciliation row."""
+
+    __tablename__ = "action_effects"
+    __table_args__ = (
+        UniqueConstraint("project_id", "effect_key", name="uq_action_effect_project_key"),
+        Index("ix_action_effects_project_state", "project_id", "state"),
+    )
+
+    effect_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    effect_key: Mapped[str] = mapped_column(String(192), index=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    mission_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    task_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    attempt_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    action_id: Mapped[str] = mapped_column(String(64), index=True)
+    approval_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    integration_id: Mapped[str] = mapped_column(String(64))
+    integration_version: Mapped[str] = mapped_column(String(32))
+    operation: Mapped[str] = mapped_column(String(64))
+    destination_digest: Mapped[str] = mapped_column(String(128))
+    payload_hash: Mapped[str] = mapped_column(String(128))
+    state: Mapped[str] = mapped_column(String(32), index=True, default="reserved")
+    external_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    lease_generation: Mapped[int] = mapped_column(Integer, default=1)
+    cancellation_generation: Mapped[int] = mapped_column(Integer, default=0)
+    pre_observation: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    post_observation: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    reconciliation: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reconciled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
 
 
 class WorkerLeaseRow(Base):

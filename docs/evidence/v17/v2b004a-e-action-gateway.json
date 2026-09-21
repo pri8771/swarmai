@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-09-21T19:02:12Z",
+  "base_sha": "d4440bf20ed8218d7974411e6607bd668a890e1a",
+  "spend_usd": 0.0,
+  "swarm_allow_paid": false,
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "b3_live_multihost": "UNKNOWN",
+  "artifact_id": "ART-V17-TOOL-GATEWAY-EVIDENCE",
+  "packet_ids": ["V2B-004a", "V2B-004b", "V2B-004c", "V2B-004d", "V2B-004e"],
+  "phase": "D",
+  "status": "pass_local_implementation_complete_reviewable_candidate",
+  "landed": [
+    "D1 ActionEnvelope/ApprovalGrant/ActionReceiptV17 + ApprovalRow extensions + ActionEffectRow + alembic a17effect004a0001 + InMemoryEffectStore + DurableEffectRepository",
+    "D2 ConsequentialToolGateway ordered pipeline with exact approval binding, effect/idempotency, lease/cancel generation, policy_version, unknown→reconcile no blind retry",
+    "D3 IntegrationAdapter + LocalSandboxAdapter + ApiMcpAdapter + BrowserSessionAdapter manifests",
+    "D4 SessionRecoveryService safe alias, signed-out detect, preserve destination, login≠submit",
+    "D5 negative suite: wrong project, altered payload, changed destination, expired/revoked, unsafe redirect, denied scopes, cancel, stale lease, duplicate retry, unknown outcome, recovery without duplicate side effect, filesystem escape"
+  ],
+  "still_unknown_or_remaining": [
+    "ActionAttemptRow optional audit table not landed (schema notes optional)",
+    "central API/CLI wiring of ConsequentialToolGateway (Session A shared path) not required for Sp2 unit boundary",
+    "live multi-host durable effect fence under crash (B3 still UNKNOWN)",
+    "browser adapter is session-aware simulator with honest unsafe-redirect/login blockers — not live browser automation",
+    "no self-accept; independent review required"
+  ],
+  "tests": {
+    "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/tools/ -q",
+    "result": "24 passed",
+    "ruff": "pass",
+    "mypy": "pass (9 source files)"
+  },
+  "candidate_sha": "PENDING_COMMIT"
+}
