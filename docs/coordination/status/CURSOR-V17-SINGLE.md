@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `dbac43017e3773ed600249b329a9ba9a3a0c56f8`
-- Coordination SHA: `3142c3eb8264b75db766611e9e4132f43cb27b4a`
-- Updated: `2026-09-21T19:54:57Z`
-- Trigger: `manual`
+- Coordination SHA: `016c11a9a14fbbdee5171dd342bfbae8d1115d2b`
+- Updated: `2026-09-21T19:55:20Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R14`
 - Current artifact: `ART-V15-LEASE-FENCING`
