@@ -41,4 +41,10 @@ Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Fo
 
 $env:SWARM_GH_PATH = $Gh
 & $PythonPath $HeartbeatCopy --host $HostAlias --session $SessionId --branch $Branch --trigger install --force
-Write-Host "Installed SwarmAI coordination heartbeat B. Scheduler wakes every 15m; client self-throttles after lead graduation."
+$Task = Get-ScheduledTask -TaskName $TaskName
+$Info = Get-ScheduledTaskInfo -TaskName $TaskName
+Write-Host "Installed SwarmAI coordination heartbeat B."
+Write-Host ("Task state: " + $Task.State)
+Write-Host ("Next run: " + $Info.NextRunTime)
+Write-Host ("Scheduler log: " + $SchedulerLog)
+Write-Host "Scheduler wakes every 15m; client self-throttles after lead graduation."
