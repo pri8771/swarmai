@@ -1,180 +1,123 @@
 # SwarmAI worker packet backlog
 
-Updated: 2026-09-20
-This is an execution/decomposition aid. Gate contracts remain authoritative.
+Updated: 2026-09-20T23:51:30Z. Artifact registry is canonical. Packets exist only to advance artifact state; story points are complexity/risk metadata, not hours. Packet completion never self-accepts an artifact.
 
-## Artifact mapping
+## Mapping and reviewed results
 
-Every packet below advances one primary artifact:
-- W-041A/B/C -> ART-V10-WORKER-HEARTBEAT
-- W-111A -> ART-V11-MULTISURFACE-EVIDENCE
-- W-111B -> ART-V11-CONTROL-EVIDENCE + ART-V11-RESTART-EVIDENCE
-- W-121A -> ART-V12-PROVIDER-ELIGIBILITY
-- W-121B -> ART-V12-REMOTE-OVERLAP
-- W-131A -> ART-V13-SCREENING-MATRIX / ART-V13-QUALIFIED-MATRIX planning
-- W-131B -> ART-V13-QUALIFIED-MATRIX
-- W-131C -> ART-V13-TASK-POOL + ART-V13-REVIEWER-QUALIFICATION
-- W-141A -> ART-V14-ROLE-MANIFEST
-- W-141B1-B4 -> ART-V14-LIVE-ADAPTIVE-PROOF
-- W-141C -> ART-V14-MODE-COMPARISON
-- W-142A-D -> ART-LIVE142-CAMPAIGN
+- W-041A/B/C -> `ART-V10-WORKER-HEARTBEAT` — blocked on live Cursor CLI auth.
+- W-111A -> `ART-V11-MULTISURFACE-EVIDENCE` — **completed, lead verified**.
+- W-111B -> `ART-V11-CONTROL-EVIDENCE` + partial `ART-V11-RESTART-EVIDENCE` — **changes required only for process-restart portion**; split to W-111C.
+- W-121A -> `ART-V12-PROVIDER-ELIGIBILITY` — **completed, lead verified as truthful 0-admissible-remote state**; does not unblock W-121B.
+- W-122A -> `ART-V12-BROKER-CONTRACT` — new ready repair packet from independent source review.
+- W-131A -> `ART-V13-SCREENING-MATRIX` — **completed, lead verified** (72 n=5 provisional cells; no qualification claim).
+- W-131B -> `ART-V13-QUALIFIED-MATRIX` — blocked until qualification pool/versions freeze.
+- W-131C1 -> `ART-V13-TASK-POOL` — new ready bounded split.
+- W-131C2 -> `ART-V13-REVIEWER-QUALIFICATION` — new ready bounded split.
+- W-141A -> `ART-V14-ROLE-MANIFEST`; W-141B1-B4 -> `ART-V14-LIVE-ADAPTIVE-PROOF`; W-141C -> `ART-V14-MODE-COMPARISON`; W-142A-D -> `ART-LIVE142-CAMPAIGN`.
 
-Packet completion does not automatically accept the artifact; independent artifact review still applies.
+## Dependency-ready packets — keep these stocked
 
-## Current V1.4 worker packets
+### W-111C — Actual service-process restart/reopen
+- Gate/artifact: G11 / `ART-V11-RESTART-EVIDENCE`
+- SP: 1
+- Worker: Cursor
+- Transition: `drafting -> reviewable`
+- Why: existing `restart-reopen-operational.json` creates a new `create_app`/MissionStore instance but does not prove the acceptance plan's **actual service process restart** requirement.
+- Do: create/retain one durable operational mission, start the real API service process, observe mission from a second interface, terminate that process cleanly, start a new process using the same persistent store/config, reopen the exact same mission ID/status/artifacts via API or CLI.
+- Evidence: exact app/code tree SHA, config/store path alias, process start/stop commands, distinct process IDs or equivalent process-instance evidence, timestamps, before/after mission ID/status/artifact hash, exit codes, mode=`live_local operational`, no model rerun required solely to prove reopen.
+- Done when: evidence cannot be satisfied by constructing another app object in the same process and current tests remain green.
+
+### W-122A — Close operational broker bypass
+- Gate/artifact: G12 / `ART-V12-BROKER-CONTRACT`
+- SP: 2
+- Worker: Cursor
+- Transition: `drafting -> reviewable`
+- Independent lead finding: `ProductStore.execute_mission()` currently constructs `RepoWorker(repo, model=model)` without broker/project ID; `RepoWorker._chat()` therefore falls back to direct `local_chat`. This violates G12's “every model attempt through governed broker” rule even though `MissionRuntime` itself is brokered.
+- Do: inject/reuse the governed project-scoped broker for the ProductStore/API/CLI generic operational execution path. Avoid a second broker implementation. Ensure project ID and route/account admission flow through the same boundary.
+- Tests: negative regression proving operational generic execution cannot reach inference if broker admission denies/has no eligible route; positive local admitted route; route/usage identity recorded; no mock/known-answer fallback. Search all operational model-call sites for equivalent bypasses and either route them or mark unsupported before calling the contract reviewable.
+- Done when: exact source diff + tests + current-tip lint/mypy/offline/console CI are green and no operational direct-model bypass remains in supported G11/G12 mission paths.
+
+### W-131C1 — Freeze product qualification task pool/version manifest
+- Gate/artifact: G13 / `ART-V13-TASK-POOL`
+- SP: 2
+- Worker: Cursor, lead reviews/freeze semantics
+- Transition: `drafting -> reviewable`
+- Do: create a machine-readable manifest that separates calibration/screening IDs from qualification-held-out IDs for required `coding/planning/reasoning/extraction` × S/M/L/XL; bind dataset/task hashes, size-classifier version, scorer/grader version, prompt version, tool contract/version, exact model config identifiers and acceptance protocol v1.0.
+- Rules: no plaintext hidden answers exposed to worker prompts; no qualification task previously used for prompt/routing calibration; duplicate/retry attempt is not an independent observation; preserve source/license metadata.
+- Done when: lead can verify future W-131B samples against a frozen version and detect calibration leakage/version drift.
+
+### W-131C2 — Reviewer benchmark calibration and freeze
+- Gate/artifact: G13/G14 / `ART-V13-REVIEWER-QUALIFICATION`
+- SP: 3
+- Worker: Cursor; lead owns final benchmark contract
+- Transition: `drafting -> reviewable` for benchmark design only, **not reviewer qualification**
+- Current evidence: existing review screening is weak (best S ~0.2; M/L/XL 0.0), so do not spend held-out qualification calls on the current scorer/task design.
+- Do: debug only on calibration tasks; identify whether task construction, expected decision contract, evidence bundle or grader causes systematic failure; version the corrected reviewer benchmark and scorer; include wrong-result rejection, evidence/acceptance consistency, forbidden-action detection and size classification; freeze held-out IDs/hashes after calibration.
+- Done when: benchmark/scorer version is reviewable and held-out qualification can begin without contamination. Do not claim a reviewer route qualified.
+
+## Blocked / follow-on packets
 
 ### W-041A — Authenticate Cursor CLI
-- Gate: G10 / FIX-004
-- SP: 1 worker-side verification + external human auth dependency
-- Worker: Cursor
-- Ready: blocked on operator completing live CLI login
-- Done when: `cursor agent status` and `cursor agent whoami` both verify authenticated without exposing credentials.
-- Lead role: verify receipts; do not perform login.
+- Gate/artifact: G10 / `ART-V10-WORKER-HEARTBEAT`
+- SP: 1 + external human auth
+- Blocked: `cursor agent status`/`whoami` reported Not logged in.
+- Done: both authenticated without exposing credentials. Lead cannot perform password/passkey/MFA/CAPTCHA/consent.
 
 ### W-041B — Authenticated manual worker receipt
-- Gate: G10 / FIX-004
-- SP: 2
-- Depends on: W-041A
-- Worker: Cursor
-- Done when: one bounded authenticated Cursor-agent invocation executes the coordination prompt, respects lease/timeout, produces sanitized receipt tied to source/config, and performs no unapproved action.
+- SP2; depends W-041A. One bounded authenticated invocation, lease/no-overlap respected, sanitized receipt.
 
-### W-041C — Two genuine hourly worker receipts
-- Gate: G10 / FIX-004
-- SP: 2
-- Depends on: W-041B
-- Worker: Cursor
-- Done when: two separate scheduler-triggered invocations occur on the real hourly cadence, no overlap/lease violation, both authenticated, both produce sanitized receipts.
-- Do not accelerate the cadence to manufacture evidence.
-
-### W-111A — Actual browser console mission journey
-- Gate: G11
-- SP: 2
-- Worker: Cursor
-- Ready: evidenced under CURSOR-021; awaiting lead review (not accepted).
-- Done when: actual console UI creates/opens an unfamiliar operational mission and the same durable ID/status/artifacts are observed through API and CLI.
-
-### W-111B — Current-candidate control revalidation
-- Gate: G11
-- SP: 2
-- Worker: Cursor
-- Ready: evidenced under CURSOR-021; awaiting lead review (not accepted).
-- Done when: current operational candidate reruns restart/reopen, cancellation, unsupported outcome and deliberate wrong-output rejection with FIX-003-compliant evidence.
-
-### W-121A — Remote route eligibility ledger
-- Gate: G12
-- SP: 2
-- Worker: Cursor
-- Lead supplies shortlist/requirements.
-- Done when: at least two candidate remote exact routes have current auth, price/zero-additional-spend eligibility, quota/reset, health and privacy evidence—or are explicitly rejected/blocked.
-- Metadata-only auth cannot establish inference eligibility.
+### W-041C — Two genuine hourly authenticated worker receipts
+- SP2; depends W-041B. Two distinct real scheduler-triggered hourly invocations; do not accelerate cadence.
 
 ### W-121B — Dual-remote overlap mission
-- Gate: G12
-- SP: 3
-- Depends on: two admissible routes from W-121A + local route.
-- Worker: Cursor
-- Done when: one mission produces overlapping real calls on two independently authorized remote routes plus actual local route/fallback, all through broker admission/reconcile.
-
-### W-131A — Qualification gap map
-- Gate: G13
-- SP: 1
-- Worker: Cursor
-- Done when: machine-readable map identifies required family×size cells, existing screening counts, strongest candidate route(s), missing third-model screening, reviewer-role gaps and exact next sample batches under the frozen protocol.
+- Gate/artifact: G12 / `ART-V12-REMOTE-OVERLAP`
+- SP3
+- Depends: W-122A reviewable + two exact remote routes independently admissible + local route.
+- Current blocker: W-121A correctly reports **0 admissible remote routes**.
+- Lead checklist: `docs/artifacts/current/ART-V12-REMOTE-ADMISSION-RESEARCH.md` prioritizes exact OpenRouter `:free`, Groq Free-plan exact model, then Gemini exact Flash Free-tier route. Public docs alone do not admit anything.
+- Done: one mission has provably overlapping real calls to two independent remote routes plus an actually available local route/fallback, all broker-admitted/reconciled, no paid fallback.
 
 ### W-131B — Candidate-cell qualification batches
-- Gate: G13
-- SP: 2 per batch packet
-- Depends on: W-131A.
-- Worker: Cursor
-- Done when: selected held-out candidate cells add five independent observations, preserve all attempts/overhead and recompute the one-sided Wilson bound.
-- One packet = one bounded batch, not “finish all G13.”
+- Gate/artifact: G13 / `ART-V13-QUALIFIED-MATRIX`
+- SP2 **per 5-observation batch**
+- Depends: W-131C1 review/freeze. Do not run qualification volume before this dependency.
+- Frozen criterion: n>=15 minimum, batches of five, one-sided 90% Wilson lower bound >=0.80, max n=60, zero forbidden actions, all mandatory checks, full overhead/provenance.
+- First lead-selected candidate cells after W-131C1:
+  1. planning / XL / `gemma3:4b` (screen 5/5);
+  2. coding / XL / `qwen3.5:4b` (screen 5/5);
+  3. reasoning / L / `qwen3.5:9b` (screen 5/5).
+- One W-131B invocation advances one cell by one independent batch. Stop/continue only under frozen protocol. Extraction/XL screening is weak; do not prioritize it blindly.
 
-### W-131C — Reviewer benchmark calibration/freeze
-- Gate: G13/G14
-- SP: 3
-- Worker: Cursor with lead-owned benchmark contract.
-- Done when: review benchmark/scorer defects are debugged only on calibration tasks, a new version is frozen, held-out pool hashes are recorded without exposing answers, and reviewer qualification can start.
+## Later G14/LIVE-142 packets
 
-### W-141A — Qualified route/role manifest
-- Gate: G14
-- SP: 1
-- Worker: Cursor
-- Depends on: G13 qualification evidence.
-- Done when: exact planner/reviewer/worker routes permitted for the live G14 mission are enumerated with qualification/profile evidence and resource caps.
+### W-141A — Qualified role manifest
+SP1, blocked on product/reviewer qualification.
 
-### W-141B — Live adaptive swarm proof
-- Gate: G14
-- SP: 5 conceptually; MUST execute as subpackets below.
-- Worker: Cursor.
-- Subpackets:
-  - W-141B1 SP2: mission fixture/input selection + graph/event instrumentation;
-  - W-141B2 SP3: two planner/reviewer configurations + qualified workers through governed broker;
-  - W-141B3 SP3: evidence-driven expansion and convergence-driven merge/retire/cancel;
-  - W-141B4 SP2: capture logical-agent/session/request/process counters and admission denials.
-- Lead reviews after each subpacket.
+### W-141B concept split
+- W-141B1 SP2: live mission input + graph/event instrumentation.
+- W-141B2 SP3: two qualified planner/reviewer configs + qualified workers through broker.
+- W-141B3 SP3: evidence-driven expansion and convergence-driven merge/retire/cancel.
+- W-141B4 SP2: logical-agent/session/request/process counters and admission-denial evidence.
+All remain blocked on G12/G13 where applicable.
 
-### W-141C — Elastic vs fixed vs single comparison
-- Gate: G14
-- SP: 3
-- Worker: Cursor
-- Done when: same task set runs under all three modes and reports quality, latency, model calls/tokens and coordination overhead without cherry-picking.
+### W-141C — Single vs fixed vs elastic comparison
+SP3, blocked on live adaptive proof; same task set and full overhead, no cherry-picking.
 
-### W-142A — Candidate freeze manifest
-- Gate: LIVE-142
-- SP: 2
-- Worker: Cursor; lead approves.
-- Done when: candidate/config/provider/profile/task-pool hashes and budgets are frozen before final campaign.
+### W-142A-D — final campaign
+Candidate freeze; positives; negatives; 24-hour real observation. All blocked until G10-G14 required artifact set is ready.
 
-### W-142B — Positive campaign execution
-- Gate: LIVE-142
-- SP: 5 conceptually; split into four SP2 packets of three preregistered positive missions each.
-- Worker: Cursor.
-- Preserve all attempts. Do not hide failed slots.
+## Lead-side work completed/active
 
-### W-142C — Negative campaign execution
-- Gate: LIVE-142
-- SP: 3; split into two packets of three negative scenarios.
-- Worker: Cursor.
+- **L-121R completed first research draft:** `ART-V12-REMOTE-ADMISSION-RESEARCH.md`; it narrows provider verification but does not self-admit a route.
+- **L-131R first candidate selection completed:** planning/XL gemma3:4b; coding/XL qwen3.5:4b; reasoning/L qwen3.5:9b after task-pool freeze.
+- L-131V: independently review/freeze reviewer benchmark after W-131C2 calibration.
+- L-142S: select final hidden payloads only after candidate freeze.
+- L-142R: independent campaign review/defect triage.
 
-### W-142D — 24-hour protected observation
-- Gate: LIVE-142
-- SP: 3 operational evidence task
-- Worker: Cursor/runtime.
-- Done when: real wall-clock window completes with heartbeats/logs/restart evidence and no invalidating runtime/security change.
+## Future preparation — no V1.5+ code
 
-## Lead-side parallel work
-
-These do not replace worker implementation:
-- L-121R: remote provider shortlist and exact evidence checklist.
-- L-131R: compute/verify Wilson bounds and choose next candidate cells after each batch.
-- L-131V: design/freeze reviewer benchmark after calibration feedback.
-- L-142S: select exact final held-out task payloads only after candidate freeze.
-- L-142R: independent campaign review and defect triage.
-
-## Future preparation backlog (no V1.5+ implementation yet)
-
-The owner asked the lead to move onto future tasks when current useful lead work is exhausted. Prepare/decompose these in advance, but current V1.5+ implementation remains version-gated until the active V1.4 tranche is accepted or the owner explicitly activates the next tranche.
-
-### FUT-151 — distributed worker execution
-- Conceptual size: SP5.
-- Lead decomposition target: worker registration (SP2), durable leases/fencing (SP3), second-host enrollment (SP2), kill/recovery proof (SP3), shared-quota two-mission proof (SP3).
-
-### FUT-161 — scoped reusable knowledge
-- Conceptual size: SP5.
-- Decompose: provenance schema (SP2), retrieval permission tests (SP2), contradiction/supersession logic (SP3), context-budget measurement (SP2), cross-project leak suite (SP3).
-
-### FUT-171 — reliable tool/browser integrations
-- Conceptual size: SP5.
-- Decompose: integration shortlist (SP1), permission-adapter template (SP2), payload-bound approval contract (SP3), expired-session recovery proof (SP3).
-
-### FUT-181 — cloud/local recovery
-- Conceptual size: SP5.
-- Decompose only after actual host entitlement is known.
-
-### FUT-191 — independent beta/self-development
-- Conceptual size: SP5.
-- Decompose: clean install checklist (SP2), external install evidence (SP3), extension/SDK freeze (SP3), isolated self-development PR proof (SP3).
+The lead may advance design artifacts without changing the active candidate. `ART-V15-ARCH` and the new `ART-V15-WORKER-PROTOCOL` are drafting. Future Cursor source implementation remains unauthorized until the owner activates V1.5.
 
 ## Queue rule
 
-When one packet blocks on human auth/provider reset/review, Cursor should move to the next dependency-ready packet inside the authorized V1.4 range. The lead should keep 3+ ready packets when practical. Do not jump to unauthorized V1.5 implementation merely because a V1.4 live prerequisite is temporarily blocked.
+When a packet blocks on human auth/provider eligibility/review, Cursor moves to another dependency-ready packet **inside V1.4**. Routine SP1-SP3 implementation/test work stays with Cursor. The lead should preserve at least three ready packets when practical, resolve architecture/evidence contracts, and must not invent worker execution or start future-version code.
