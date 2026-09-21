@@ -51,12 +51,21 @@ _FORBIDDEN_RAW_KEYS = frozenset(
 )
 
 
-def _assert_no_raw_token_fields(payload: dict[str, Any] | None) -> None:
-    if not payload:
+def _assert_no_raw_token_fields(payload: Any, *, path: str = "resource_payload") -> None:
+    """Recursively reject token-sensitive keys in free-form metadata (V2A-003a-R / H2)."""
+    if payload is None:
         return
-    for key in payload:
-        if key.lower() in _FORBIDDEN_RAW_KEYS:
-            raise RawTokenPersistenceError(f"raw_token_field_forbidden:{key}")
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            key_path = f"{path}.{key}"
+            if str(key).lower() in _FORBIDDEN_RAW_KEYS:
+                raise RawTokenPersistenceError(f"raw_token_field_forbidden:{key_path}")
+            _assert_no_raw_token_fields(value, path=key_path)
+        return
+    if isinstance(payload, (list, tuple)):
+        for index, value in enumerate(payload):
+            _assert_no_raw_token_fields(value, path=f"{path}[{index}]")
+        return
 
 
 class WorkerRegistrationRepository:
@@ -154,6 +163,57 @@ class WorkerRegistrationRepository:
     def list_by_project(self, project_id: str) -> list[WorkerLeaseRow]:
         stmt = select(WorkerLeaseRow).where(WorkerLeaseRow.project_id == project_id)
         return list(self.session.scalars(stmt))
+
+    def rotate_membership_token(
+        self,
+        *,
+        worker_id: str,
+        current_token: str,
+        new_token: str,
+    ) -> tuple[WorkerLeaseRow, str]:
+        """Rotate membership credential: increment generation; invalidate prior token."""
+        row = self.session.get(WorkerLeaseRow, worker_id)
+        if row is None:
+            raise WorkerNotEligibleError("worker_not_found")
+        if row.revoked_at is not None:
+            raise WorkerNotEligibleError("worker_revoked")
+        if not row.token_hash or not verify_membership_token(
+            token=current_token, token_hash=row.token_hash
+        ):
+            raise WorkerNotEligibleError("invalid_membership_token")
+        if any(k in new_token.lower() for k in ("sk-", "api_key", "secret=")):
+            raise WorkerNotEligibleError("provider_secret_forbidden_on_worker_token")
+        now = utc_now()
+        tid = new_token_id()
+        row.token_hash = hash_membership_token(new_token)
+        row.token_id = tid
+        row.lease_generation = int(row.lease_generation) + 1
+        row.updated_at = now
+        self.session.flush()
+        self._assert_row_has_no_raw_token(row)
+        return row, tid
+
+    def revoke_worker(self, *, worker_id: str) -> WorkerLeaseRow:
+        """Revoke worker membership: fence generation and invalidate stored credential."""
+        row = self.session.get(WorkerLeaseRow, worker_id)
+        if row is None:
+            raise WorkerNotEligibleError("worker_not_found")
+        now = utc_now()
+        row.revoked_at = now
+        row.status = "quarantined"
+        row.lease_generation = int(row.lease_generation) + 1
+        row.token_hash = None
+        row.token_id = None
+        row.updated_at = now
+        self.session.flush()
+        return row
+
+    def verify_membership(self, *, worker_id: str, membership_token: str) -> bool:
+        """Return True only when the worker is not revoked and token matches durable hash."""
+        row = self.session.get(WorkerLeaseRow, worker_id)
+        if row is None or row.revoked_at is not None or not row.token_hash:
+            return False
+        return verify_membership_token(token=membership_token, token_hash=row.token_hash)
 
     @staticmethod
     def _assert_row_has_no_raw_token(row: WorkerLeaseRow) -> None:

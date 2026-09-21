@@ -34,3 +34,8 @@ def test_new_token_id_is_opaque_public_ref() -> None:
 def test_resource_payload_rejects_raw_token_keys() -> None:
     with pytest.raises(RawTokenPersistenceError, match="raw_token_field_forbidden"):
         _assert_no_raw_token_fields({"membership_token": "wt_should_never_persist"})
+
+
+def test_resource_payload_rejects_nested_raw_token_keys() -> None:
+    with pytest.raises(RawTokenPersistenceError, match=r"raw_token_field_forbidden:.*token"):
+        _assert_no_raw_token_fields({"meta": {"nested": [{"token": "wt_leaked"}]}})
