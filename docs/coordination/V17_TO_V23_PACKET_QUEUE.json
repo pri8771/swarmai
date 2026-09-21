@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "status": "cemented_future_plan_not_active",
+  "schema_version": "1.1",
+  "status": "cemented_future_plan_not_active__proposed_revision_by_fable_planning_pass",
   "active_after": "V1.7 recovery completion + operator authorization",
   "architecture_plan": "docs/coordination/V17_TO_V23_CEMENTED_EXECUTION_PLAN.md",
   "live_checkpoints": "docs/coordination/V17_TO_V23_LIVE_CHECKPOINTS.md",
@@ -15,6 +15,18 @@
         "R34"
       ],
       "goal": "Bind exact V1.7 CP6 source/evidence as V1.8 base manifest.",
+      "status": "planned",
+      "sp": 1
+    },
+    {
+      "id": "18-00a",
+      "version": "1.8",
+      "artifact": "ART-V18-RECOVERY-ARCH",
+      "depends": [],
+      "owner": "lead",
+      "type": "lead_decision",
+      "sp": 2,
+      "goal": "Freeze ART-V18-RECOVERY-ARCH and decision D18-01 (SiteEpoch fencing authority mechanism) for the single-site/local topology actually available; record what stays blocked for split-site acceptance. Contract work: may be done now.",
       "status": "planned"
     },
     {
@@ -22,10 +34,19 @@
       "version": "1.8",
       "artifact": "ART-V18-SITE-EPOCH",
       "depends": [
-        "18-00"
+        "18-00",
+        "18-00a"
       ],
       "goal": "SiteAuthority/SiteEpoch/AuthorityBinding/transition receipt contracts.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018a",
+        "V18-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/contracts/ (new site_authority.py)"
+      ]
     },
     {
       "id": "18-02",
@@ -35,7 +56,17 @@
         "18-01"
       ],
       "goal": "DB persistence + migration + authority state transitions.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018a",
+        "V18-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "migrations/versions/ (one revision after a17effect004b0001)",
+        "src/swarm/db/models.py",
+        "src/swarm/db/ (new site_authority.py repository)"
+      ]
     },
     {
       "id": "18-03",
@@ -45,7 +76,16 @@
         "18-02"
       ],
       "goal": "Dispatch epoch fence.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018a",
+        "V18-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/db/lease_fencing.py (claim path reads authority binding)"
+      ]
     },
     {
       "id": "18-04",
@@ -55,7 +95,17 @@
         "18-02"
       ],
       "goal": "Result/effect epoch fences + stale negatives.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018a",
+        "V18-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/db/lease_fencing.py (_assert_accept_fence)",
+        "src/swarm/tools/fences.py (FenceState.authority + reader key site_epoch)",
+        "src/swarm/tools/effects.py (begin_execution step 2 compares site_epoch)"
+      ]
     },
     {
       "id": "18-05",
@@ -65,7 +115,16 @@
         "18-02"
       ],
       "goal": "Redacted deployment + BackupManifest contracts.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018b",
+        "V18-02"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/contracts/ (backup manifest)",
+        "src/swarm/deploy/"
+      ]
     },
     {
       "id": "18-06",
@@ -75,7 +134,16 @@
         "18-05"
       ],
       "goal": "Backup create/verify/corruption detection.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018b",
+        "V18-02"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/cli.py (recovery group)",
+        "src/swarm/deploy/"
+      ]
     },
     {
       "id": "18-07",
@@ -86,7 +154,17 @@
         "18-06"
       ],
       "goal": "Restore/recovery-mode/reconciliation/new authority interface.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018c",
+        "V18-02"
+      ],
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/cli.py (recovery group)",
+        "src/swarm/tools/effects.py (executing -> unknown at consistency point; reuse R27e)",
+        "src/swarm/db/lease_fencing.py (expire in-flight leases)"
+      ]
     },
     {
       "id": "18-08",
@@ -98,7 +176,12 @@
         "18-07"
       ],
       "goal": "Stale-site/duplicate-authority negative suite.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2A-018d",
+        "V18-01"
+      ],
+      "sp": 2
     },
     {
       "id": "18-09",
@@ -109,6 +192,21 @@
       ],
       "goal": "Live CP18 recovery drill with RPO/RTO.",
       "checkpoint": "CP18",
+      "status": "planned",
+      "aliases": [
+        "V18-03"
+      ],
+      "sp": 2
+    },
+    {
+      "id": "19-00",
+      "version": "1.9",
+      "artifact": "ART-V19-BETA-ACCEPTANCE",
+      "depends": [],
+      "owner": "lead",
+      "type": "lead_decision",
+      "sp": 1,
+      "goal": "Freeze the beta acceptance protocol before any counted V1.9 evidence. Contract work: may be done now.",
       "status": "planned"
     },
     {
@@ -119,7 +217,15 @@
         "R33"
       ],
       "goal": "ExtensionManifest contracts.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2B-019a",
+        "V19-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/contracts/ (new extensions.py; superset of AdapterManifest from R29a)"
+      ]
     },
     {
       "id": "19-02",
@@ -129,7 +235,18 @@
         "19-01"
       ],
       "goal": "Project-scoped install/grant/lifecycle persistence.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2B-019b",
+        "V2B-019d",
+        "V19-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "migrations/versions/",
+        "src/swarm/db/models.py",
+        "src/swarm/ (new extensions/ package: registry + grants)"
+      ]
     },
     {
       "id": "19-03",
@@ -139,17 +256,31 @@
         "19-02"
       ],
       "goal": "ToolGateway extension bridge and no-bypass negatives.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V2B-019c",
+        "V19-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "src/swarm/tools/adapter_registry.py (register validated extension adapters)",
+        "src/swarm/tools/fences.py (PolicyProvider intersects project grant)"
+      ]
     },
     {
       "id": "19-04",
       "version": "1.9",
       "artifact": "ART-V19-INSTALL-UPGRADE",
       "depends": [
-        "18-07"
+        "18-07",
+        "19-00"
       ],
       "goal": "Clean install/doctor/empty state/migrations.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V19-02"
+      ],
+      "sp": 2
     },
     {
       "id": "19-05",
@@ -159,7 +290,11 @@
         "19-04"
       ],
       "goal": "Upgrade preflight/backup/migration/failure semantics.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V19-02"
+      ],
+      "sp": 2
     },
     {
       "id": "19-06",
@@ -169,7 +304,11 @@
         "19-05"
       ],
       "goal": "Rollback + redacted support bundle.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V19-02"
+      ],
+      "sp": 2
     },
     {
       "id": "19-07",
@@ -180,7 +319,15 @@
         "R33"
       ],
       "goal": "Bounded isolated selfdev PR-candidate path; no self-merge/release.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V19-04"
+      ],
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/selfdev/runner.py",
+        "src/swarm/mission/acceptance.py (reuse prove_defect from R02a)"
+      ]
     },
     {
       "id": "19-08",
@@ -193,7 +340,44 @@
       ],
       "goal": "Live CP19 install/extension/upgrade/rollback/selfdev checkpoint.",
       "checkpoint": "CP19",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V19-02",
+        "V19-04"
+      ],
+      "sp": 2
+    },
+    {
+      "id": "19-09",
+      "version": "1.9",
+      "artifact": "ART-V19-EXTERNAL-INSTALLS",
+      "depends": [
+        "19-06"
+      ],
+      "type": "external_live",
+      "sp": 1,
+      "goal": "Fresh external-environment install evidence. Implementation-complete does not wait on it.",
+      "status": "planned",
+      "gate": "EXT-V19-FRESH-ENVIRONMENTS",
+      "aliases": [
+        "V19-03"
+      ]
+    },
+    {
+      "id": "19-10",
+      "version": "1.9",
+      "artifact": "ART-V19-WINDOWS-CLEAN-INSTALL",
+      "depends": [
+        "19-06"
+      ],
+      "type": "external_live",
+      "sp": 1,
+      "goal": "Clean install on a real Windows host. No OS appears in the support matrix without this evidence (D19-01).",
+      "status": "planned",
+      "gate": "EXT-V19-WINDOWS-HOST",
+      "aliases": [
+        "V19-03"
+      ]
     },
     {
       "id": "20-01",
@@ -204,7 +388,14 @@
         "19-08"
       ],
       "goal": "Integrate reviewed lower-version slices; one migration head.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-01"
+      ],
+      "sp": 3,
+      "artifacts_also": [
+        "ART-V20-FOUNDATION-HARDENING"
+      ]
     },
     {
       "id": "20-02",
@@ -214,7 +405,11 @@
         "20-01"
       ],
       "goal": "Freeze CandidateManifest exact source/schema/deps/policies.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-01"
+      ],
+      "sp": 1
     },
     {
       "id": "20-03",
@@ -224,7 +419,11 @@
         "20-02"
       ],
       "goal": "Exact-tip deterministic matrix + migration checks.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-01"
+      ],
+      "sp": 2
     },
     {
       "id": "20-04",
@@ -234,7 +433,14 @@
         "20-03"
       ],
       "goal": "Evidence-grounded support matrix + clean install journey.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-02"
+      ],
+      "sp": 2,
+      "artifacts_also": [
+        "ART-V20-INSTALL-JOURNEY"
+      ]
     },
     {
       "id": "20-05",
@@ -244,7 +450,11 @@
         "20-03"
       ],
       "goal": "Candidate-bound upgrade/rollback journey.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-02"
+      ],
+      "sp": 2
     },
     {
       "id": "20-06",
@@ -254,7 +464,11 @@
         "20-03"
       ],
       "goal": "Candidate-bound threat/negative review.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-03"
+      ],
+      "sp": 3
     },
     {
       "id": "20-07",
@@ -264,32 +478,77 @@
         "20-03"
       ],
       "goal": "Candidate-bound performance/resource baseline with orchestration overhead.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-03"
+      ],
+      "sp": 2
     },
     {
-      "id": "20-08",
+      "id": "20-08a",
+      "version": "2.0",
+      "artifact": "ART-V20-RELIABILITY-PROTOCOL",
+      "depends": [],
+      "owner": "lead",
+      "type": "lead_decision",
+      "sp": 2,
+      "goal": "Freeze the reliability protocol (decision D20-01) including whether 20-05 and 20-07 may run on the campaign deployment. Pure contract work: may be done now, in parallel with V1.7.",
+      "status": "planned",
+      "aliases": [
+        "V20-04"
+      ]
+    },
+    {
+      "id": "20-08b",
       "version": "2.0",
       "artifact": "ART-V20-RELIABILITY-PROTOCOL",
       "depends": [
-        "20-04",
-        "20-05",
-        "20-06",
-        "20-07"
+        "20-03",
+        "20-08a"
       ],
-      "goal": "Freeze/start real reliability campaign.",
-      "checkpoint": "CP20-start",
-      "status": "planned"
+      "type": "wall_clock_start",
+      "sp": 1,
+      "goal": "Start the 168h campaign on the frozen CandidateManifest immediately after the deterministic matrix passes. Do not wait for 20-04..20-07; if any of them forces a candidate-invalidating change, the campaign restarts under a new identity (accepted risk: costs no more than having waited).",
+      "status": "planned",
+      "gate": "WC-V20-RELIABILITY-168H",
+      "aliases": [
+        "V20-04"
+      ]
+    },
+    {
+      "id": "20-08c",
+      "version": "2.0",
+      "artifact": "ART-V20-RELIABILITY-PROTOCOL",
+      "depends": [
+        "20-08b"
+      ],
+      "type": "wall_clock",
+      "sp": 1,
+      "goal": "Campaign elapsed: ended_at - started_at >= 168h for one compatible identity, 24h checkpoints published, gaps classified by lead.",
+      "status": "planned",
+      "gate": "WC-V20-RELIABILITY-168H",
+      "aliases": [
+        "V20-04"
+      ]
     },
     {
       "id": "20-09",
       "version": "2.0",
       "artifact": "ART-V20-RELEASE-REVIEW",
       "depends": [
-        "20-08"
+        "20-04",
+        "20-05",
+        "20-06",
+        "20-07",
+        "20-08c"
       ],
       "goal": "After actual elapsed campaign, independent release review.",
       "checkpoint": "CP20-final",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V20-04"
+      ],
+      "sp": 2
     },
     {
       "id": "23-01",
@@ -299,7 +558,17 @@
         "20-03"
       ],
       "goal": "Durable SchedulerPolicy/ProjectQueueState/decision receipt schema + migration.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-001",
+        "V23-01"
+      ],
+      "sp": 2,
+      "surfaces": [
+        "migrations/versions/",
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/db/models.py"
+      ]
     },
     {
       "id": "23-02",
@@ -309,7 +578,12 @@
         "23-01"
       ],
       "goal": "Weighted-deficit project selector + bounded aging + deterministic tie-break.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-002a",
+        "V23-01"
+      ],
+      "sp": 2
     },
     {
       "id": "23-03",
@@ -319,7 +593,12 @@
         "23-02"
       ],
       "goal": "Mission/task eligibility selector + anti-head-of-line blocking.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-002b",
+        "V23-01"
+      ],
+      "sp": 2
     },
     {
       "id": "23-04",
@@ -329,7 +608,17 @@
         "23-03"
       ],
       "goal": "DispatchIntent multi-resource reservation/compensation.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-002c",
+        "V23-01"
+      ],
+      "sp": 3,
+      "surfaces": [
+        "src/swarm/controller/scheduler.py",
+        "src/swarm/broker/broker.py (reservation component)",
+        "src/swarm/tools/effects.py (reservation component via reserve/created flag)"
+      ]
     },
     {
       "id": "23-05",
@@ -339,7 +628,12 @@
         "23-04"
       ],
       "goal": "Crash/unknown reservation reconciliation.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-003b",
+        "V23-01"
+      ],
+      "sp": 3
     },
     {
       "id": "23-06",
@@ -349,7 +643,12 @@
         "23-03"
       ],
       "goal": "Backpressure/cancel/project+worker+site drain.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-003a",
+        "V23-01"
+      ],
+      "sp": 2
     },
     {
       "id": "23-07",
@@ -360,7 +659,12 @@
         "23-04"
       ],
       "goal": "Scheduler epoch/restart/fairness-state reconciliation.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-003b",
+        "V23-01"
+      ],
+      "sp": 3
     },
     {
       "id": "23-08",
@@ -371,7 +675,12 @@
         "23-07"
       ],
       "goal": "Scheduling/effect/artifact read model + decision receipts; UI mutation via V1.7 boundary.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23B-003",
+        "V23-04"
+      ],
+      "sp": 2
     },
     {
       "id": "23-09",
@@ -381,7 +690,12 @@
         "19-03"
       ],
       "goal": "Capability pack manifest/lifecycle/project scoping.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23B-001",
+        "V23-02"
+      ],
+      "sp": 2
     },
     {
       "id": "23-10",
@@ -392,7 +706,12 @@
         "R25"
       ],
       "goal": "Secret-free export/import bundle + reconciliation.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23B-002",
+        "V23-03"
+      ],
+      "sp": 2
     },
     {
       "id": "23-11",
@@ -403,7 +722,12 @@
         "18-09"
       ],
       "goal": "Trust/locality/privacy/capability placement + drain/migration/stale fencing.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23A-004",
+        "V23-05"
+      ],
+      "sp": 3
     },
     {
       "id": "23-12",
@@ -415,7 +739,13 @@
         "23-07"
       ],
       "goal": "Freeze/run deterministic pathological fairness/reservation workload.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23X-001",
+        "V23-01",
+        "V23-06"
+      ],
+      "sp": 2
     },
     {
       "id": "23-13",
@@ -430,7 +760,11 @@
       ],
       "goal": "Live CP23 multi-project/fleet/pack/portability/observability checkpoint.",
       "checkpoint": "CP23",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23-06"
+      ],
+      "sp": 2
     },
     {
       "id": "23-14",
@@ -440,7 +774,92 @@
         "23-13"
       ],
       "goal": "Independent artifact-by-artifact V2.3 integrated audit.",
-      "status": "planned"
+      "status": "planned",
+      "aliases": [
+        "V23-06"
+      ],
+      "sp": 2
+    }
+  ],
+  "id_authority": "Execution IDs in this file are canonical for V1.8-V2.3. `aliases` list the contract-embedded IDs (V2A-018a, V2B-019a, V23A-001 ...) and the coarse phase IDs of FUTURE_EXECUTION_GRAPH_V18_TO_V30.json so every name resolves to one node.",
+  "cross_file_dependencies": "R-prefixed ids resolve in V17_RECOVERY_PACKET_QUEUE.json. A split packet there is satisfied when its split_into packets are satisfied.",
+  "forward_compat_seams_from_v17": {
+    "fence_reader_mapping": "R27c/R28b: effects.begin_execution compares a mapping supplied by the owning module inside the transaction. 18-04 adds key site_epoch; no gateway reorder.",
+    "FenceState.authority": "R28b: reserved dict; 18-03/18-04 fill site_id/site_epoch/authority_digest.",
+    "PolicyProvider.effective_scopes": "R28b: scope intersection point. 19-03 adds the project extension grant; V30A-004 digests the same intersection.",
+    "AdapterRegistry": "R28c: only registration path. 19-03 registers validated extension adapters; 23-09 packs reuse it.",
+    "AdapterManifest vocabulary": "R29a: strict subset of ExtensionManifest, so a built-in integration is the smallest extension.",
+    "effect reservation `created` flag + CAS": "R27b: lets 23-04 DispatchIntent treat an effect reservation as an idempotently compensable component.",
+    "unknown-effect path": "R27e: reused by 18-07 restore reconciliation and the V2.0 response-loss drill.",
+    "KnowledgeService": "R25a: 23-10 adds export/import here; V3 learning promotes knowledge only through accept_fact.",
+    "prove_defect": "R02a: mandatory entry check for 19-07 and V3 controlled self-development."
+  },
+  "gates": [
+    {
+      "id": "EXT-D18-01",
+      "kind": "external",
+      "owner": "operator_and_lead",
+      "status": "open",
+      "action": "Decide the cross-site SiteEpoch fencing authority mechanism and the target deployment topology.",
+      "blocks": [
+        "formal split-site acceptance of ART-V18-SPLIT-BRAIN-SAFETY and ART-V18-OUTAGE-DRILL"
+      ],
+      "note": "Local single-site drill (18-09) can become reviewable without it."
+    },
+    {
+      "id": "EXT-D18-02",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "action": "Choose backup storage / encryption / retention target. Zero-spend default: local encrypted directory.",
+      "blocks": [
+        "counted V1.8 recovery evidence"
+      ]
+    },
+    {
+      "id": "EXT-V19-FRESH-ENVIRONMENTS",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "action": "Provide fresh external install environment(s).",
+      "blocks": [
+        "19-09"
+      ]
+    },
+    {
+      "id": "EXT-V19-WINDOWS-HOST",
+      "kind": "external",
+      "owner": "operator",
+      "status": "open",
+      "action": "Provide a real Windows host for clean-install evidence.",
+      "blocks": [
+        "19-10",
+        "Windows row of ART-V20-SUPPORT-MATRIX"
+      ]
+    },
+    {
+      "id": "WC-V20-RELIABILITY-168H",
+      "kind": "wall_clock",
+      "owner": "lead",
+      "status": "not_started",
+      "duration_hours": 168,
+      "start_condition": "20-03 passed on a frozen CandidateManifest and 20-08a protocol frozen.",
+      "rule": "Never backfilled, never spliced across incompatible identities; material change restarts.",
+      "blocks": [
+        "20-08c",
+        "20-09",
+        "V2.0 accepted"
+      ]
+    },
+    {
+      "id": "EXT-D23-FAIRNESS",
+      "kind": "external",
+      "owner": "lead",
+      "status": "open",
+      "action": "Freeze fairness tolerance (D23-01) and the normalized service-cost function (D23-02) before 23-12 counted runs.",
+      "blocks": [
+        "23-12 counted evidence"
+      ]
     }
   ]
 }

@@ -3,6 +3,30 @@
 Date: 2026-09-21
 Status: PLANNING ONLY
 
+## V1.7 remainder — hard dependencies (Fable planning pass; machine-readable in `V17_RECOVERY_PACKET_QUEUE.json`)
+
+```
+OPS-CI-01                      (none)            -> gate EXT-ACTIONS-BILLING may then be cleared
+R27a -> R27b -> R27c -> R27d
+                 R27c -> R27e -> R28a -> R28b -> R28c -> R29a -> R28d
+R30a (none)
+R30a + R29a + R28a -> R30b
+R30a + R29a + R28a -> R31a ;  R31a + R27e -> R31b
+R28c + R30b + R31b -> R32a
+R28d + R30b + R31b + R32a -> R33a -> R33b            [CP5]
+R17 -> R17a                                           [CP3]
+R01 -> R02a -> R02b                                   [CP1, then lead review]
+R28d -> R25a -> R25b                                  [CP4]
+R17a + R28d -> R17b -> R17c
+R33b + R25a + R17b -> R34a ;  R34a + R02b + R25b + R17a -> R34b   [CP6]
+```
+
+Externally gated side chains (never block the chain above): `R06 → R07 → R08`, `R09 → R10`, `R07 + R10 → R11 → R12 (24 h wall clock)`, `R18`.
+
+Cross-version edges: `R34 → 18-00`, `R33 → 19-01`/`19-07`, `R25 → 23-10`, `R15 → V18-01`, `R05 → V30B-001`, `R07 → V30B-003`. A `split` node resolves when all of its `split_into` packets resolve.
+
+Earliest wall-clock starts: `WC-LIVE142-24H` is gated only by operator/lead action on `EXT-G12-REMOTE-ROUTES` and `EXT-G13-*`; `WC-V20-RELIABILITY-168H` starts at `20-08b`, directly after `20-03`, with `20-04`–`20-07` running during the clock; `20-08a`, `18-00a` and `19-00` are contract freezes the lead can do today.
+
 ## Hard dependency graph
 
 ```

@@ -17,6 +17,18 @@ Workers must inspect current migrations first and choose actual revision IDs at 
 - backfill must be deterministic and auditable;
 - migrations never fabricate historical evidence.
 
+## Current chain and the V1.7 remainder (audited at `f2b8d5f`)
+
+Linear chain, one head: `9eb193b10f4e` (p02 initial) → `a15lease003a0001` (V1.5 lease fencing) → `a16know003a0001` (V1.6 knowledge) → `a17effect004a0001` (V1.7 approvals + `action_effects`).
+
+| Order | Revision | Packet | Content |
+|---|---|---|---|
+| M17-02 | `a17effect004b0001` | R27a | `action_receipts` (immutable, `UNIQUE(effect_id, attempt_number)`); `action_effects` + `state_reason`, `attempt_count`, `executor_id`, `approval_consumed_at` |
+
+That is the only migration V1.7 still needs. R27b–R34b add none; R31b stores session-recovery state in `action_effects.reconciliation`; R17b/R17c reuse the V1.5 tables; R25a reuses the V1.6 tables. Any packet that believes it needs another V1.7 migration must stop and split.
+
+Ordering after V1.7: M18-01 → M18-02 → M19-01 → (V2.0 candidate tables) → M23-01 → M23-02 → M23-03 → M23-04 → M30-01 → M30-02 → M30-03 → M30-04, each `down_revision` = the previous head, each landing with its repository code in the packet named in the queue (`18-02`, `18-05`, `19-02`, `20-02`, `23-01`, `23-04`, `23-09`, `23-10`, `V30A-001`, `V30B-001`, `V30C-001`, `V30E-001`). `18-04` adds `site_epoch` to `action_effects`, `task_leases` and `worker_results` as NULLable columns; NULL means "pre-epoch, historical, never fresh authority".
+
 ## V1.8 migration group
 
 ### M18-01 SiteAuthority
