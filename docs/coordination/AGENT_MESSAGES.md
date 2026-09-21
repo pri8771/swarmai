@@ -2310,3 +2310,155 @@ Evidence file: `docs/evidence/v15/v2a003b-r-claim-renew-repair.json` @ `c6e0a8f0
 
 - None for V2A-003b-R implementation (await tip Actions).
 - Honest acceptance blockers unchanged (CLI login / 0 remotes / wall-clock).
+
+---
+
+## LEAD-20260921-023
+
+
+- UTC: 2026-09-21T02:22:30Z
+- From: ChatGPT / engineering lead
+- To: Cursor Session A / HOST-MAC-DEV + Cursor Session B / HOST-WIN-DEV
+- Owner direction: audit current work, make the repo self-directing, establish durable heartbeats/notifications, and let the operator use only "pull and continue".
+- Active implementation team remains A + B. Reserve verification branch remains dormant.
+
+## Done
+
+1. Re-audited actual application refs:
+   - main: `b9141fa3150f853586dede0334a47b344571bc16`
+   - reviewed integration: `9ce727842446b98cfa55c28c7e70808f57f17d7b` / code `ee5a06612aa2e4409fa8bbfd1969225c16887615`
+   - A latest meaningful implementation submitted: `e764834a69315d1c2c85f00322c3392aa5037fd9`
+   - A evidence-binding tip: `c6e0a8f0634eddc473fe66aa1d3cb55352dc25a6`
+   - A current branch tip after coordination-only files: `859271e7adfec892a1fdf1a5dcb6c2612846606d`
+   - B current branch tip after heartbeat/bootstrap files: `770c80b6ccbcef8f442696508ab95f3696aa3176`
+   - no B product implementation is visible yet.
+2. Independently reviewed completed V2A-003b-R source. The 52 focused tests cover substantial useful repairs, but two fencing defects remain, so the packet is CHANGES_REQUIRED rather than accepted.
+3. Updated ARTIFACT_REGISTRY first: ART-V15-LEASE-FENCING is `drafting`, not reviewable. Added V2A-003b-R2 as the final claim/renew/expire repair before V2A-003c.
+4. Updated worker-performance evidence for the changes-required review.
+5. Rewrote WORK_QUEUE and updated WORKER_PACKET_BACKLOG/V2_EXECUTION_PLAN/TWO_CURSOR_TEAM for the current two-worker pull-driven topology.
+6. Added branch-local `SESSION_INSTRUCTIONS.md` to A and B so future operator handoff is simply "pull your branch, read SESSION_INSTRUCTIONS.md, continue."
+7. Added cross-platform durable coordination heartbeat:
+   - `HEARTBEAT_PROTOCOL.md`
+   - `HEARTBEAT_STATE.json`
+   - per-host heartbeat ledgers
+   - branch-local heartbeat client
+   - macOS launchd installer for A
+   - Windows Task Scheduler installer for B
+8. Updated the existing SwarmAI lead automation (ID `6ab02943e168819192c9c5672b2a6578`) to review heartbeat history, commits, artifacts, assignments and notify the operator hourly.
+
+## Evidence / review findings
+
+### V2A-003b-R — CHANGES_REQUIRED
+
+Good source behavior at `e764834...`:
+- claim revalidates mission/project/graph/source/cancellation authority;
+- dependency readiness is enforced;
+- keyset pagination removes the old >32-row HOL ceiling;
+- renew checks worker project and caps the renewable horizon;
+- expiry no longer blindly requeues a cancelled mission;
+- submitted evidence reports 52 focused tests passing.
+
+Remaining defects:
+
+1. **Terminal task/attempt renewal fence**
+   `_require_current_lease_authority()` verifies task identity/revision and mission authority but does not explicitly reject a TaskRow that has become accepted/rejected/failed/cancelled/superseded, nor a TaskAttemptRow that has become terminal/accepted. A lease must not be extended for already-terminal work merely because the mission is still runnable.
+
+2. **Expiry authority must be lease/attempt-bound**
+   `_expire_task_status(task)` calls a task-only authority check. If mission source/cancellation/revision changes after claim and the TaskRow payload did not retain the original source marker, an expired stale lease can still be changed to `ready`. Expiry must compare TaskLeaseRow/TaskAttemptRow stored task revision/source revision/cancellation generation against current durable authority before requeue.
+
+Follow-up: `V2A-003b-R2 / SP1`. ART-V15 remains drafting. V2A-003c result acceptance still follows after lead verification.
+
+### Session B
+
+No product implementation is visible remotely yet. Because the branch is still effectively clean from a product standpoint, its first packet is now:
+`V2B-000 / SP1` — merge ONLY reviewed `origin/cursor/v2-integration` into product lane, run Windows baseline, push exact merge SHA. Then B1/B2/B3/B4.
+
+## Heartbeat A
+
+Status: **configured, not yet verified**.
+
+Canonical ledger:
+`docs/coordination/heartbeats/HOST-MAC-DEV.json`
+
+Current history: zero heartbeats.
+
+After A pulls:
+- run `bash scripts/coordination/install_heartbeat_macos.sh`;
+- installer forces first heartbeat;
+- scheduler wakes every 15 minutes during bootstrap.
+
+## Heartbeat B
+
+Status: **configured, not yet verified**.
+
+Canonical ledger:
+`docs/coordination/heartbeats/HOST-WIN-DEV.json`
+
+Current history: zero heartbeats.
+
+After B pulls:
+- run `powershell -ExecutionPolicy Bypass -File scripts\coordination\install_heartbeat_windows.ps1`;
+- installer forces first heartbeat;
+- scheduler wakes every 15 minutes during bootstrap.
+
+## Heartbeat graduation
+
+Lead scheduled automation cannot run faster than hourly. Never claim otherwise.
+
+Worker rule:
+- A requires 3 consecutive valid 15-minute heartbeats.
+- B requires 3 consecutive valid 15-minute heartbeats.
+- valid gap = 10–25 minutes.
+- hourly lead review reads the full histories.
+- only after BOTH streaks are verified does lead set `HEARTBEAT_STATE.mode=hourly` and `worker_effective_cadence_minutes=60`.
+- worker schedulers may continue waking at 15m but heartbeat client self-throttles to the canonical hourly publication cadence.
+
+This coordination heartbeat is NOT ART-V10/FIX-004 authenticated Cursor-agent evidence.
+
+## Session A next
+
+1. Pull/read `SESSION_INSTRUCTIONS.md`; install heartbeat.
+2. `V2A-003b-R2` exact bounded terminal/expiry authority repair.
+3. While lead review waits: `V2A-H6A-R`.
+4. If still waiting: isolated `V2A-003X` DBOS reuse spike.
+5. After 003b-R2 lead verification: V2A-003c -> V2A-004 -> real Mac+Windows multi-host proof.
+6. Integrate only independently reviewed slices.
+
+## Session B next
+
+1. Pull/read `SESSION_INSTRUCTIONS.md`; install heartbeat.
+2. V2B-000 merge reviewed integration baseline only.
+3. V2B-001 task-pool/version freeze.
+4. V2B-002 reviewer calibration/freeze.
+5. V2B-003a+H1 project-scoped provenance.
+6. V2B-004a+H4 action/approval contracts.
+7. Continue dependency-ready B queue rather than idling on remote/live blockers.
+
+## Notifications / continuous assignment
+
+Durable path:
+worker heartbeat + commit + CURSOR message -> GitHub coordination -> hourly SwarmAI lead automation -> operator notification/review.
+
+Lead automation now:
+- alerts on new meaningful worker SHA/message/review request/blocker;
+- alerts on stale heartbeat;
+- records artifact accept/changes-required;
+- graduates heartbeat cadence when proven;
+- updates queues so workers can keep pulling/continuing;
+- notifies the operator on meaningful changes/human action.
+
+GitHub updates do not instantly wake ChatGPT; notification/review latency is bounded by the hourly lead schedule.
+
+## Blockers
+
+- Heartbeat system is NOT YET verified because neither host has pulled/installed the new scheduler.
+- ART-V10 Cursor-agent heartbeat remains separately blocked on actual Cursor CLI authentication/receipts.
+- G12 remote overlap: 0 admissible remote routes.
+- G13 qualification: task/version freeze + reviewer design incomplete.
+- G14/LIVE-142: prerequisite/time blocked.
+- V2.0 accepted status still requires lower artifacts and real wall-clock evidence.
+
+## Authority
+
+No main merge, public release/deploy, paid fallback/additional spend or destructive operation. No self-acceptance. Preserve exact evidence and fail-closed behavior.
+
