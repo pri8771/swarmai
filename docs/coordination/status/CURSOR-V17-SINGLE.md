@@ -3,21 +3,21 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `6b728874c9621e2c67bf29ab3fc1e96e4aa1a55a`
-- Coordination SHA: `b7394434c0f22f0fc1c120ce63bd53557a2c9e76`
-- Updated: `2026-09-21T19:45:23Z`
-- Trigger: `manual`
+- Branch SHA: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`
+- Coordination SHA: `bca5c094e1ae62419e01edebd21f5a881dbdb07b`
+- Updated: `2026-09-21T20:25:50Z`
+- Trigger: `scheduler`
 - Status: **working**
-- Current packet: `R04`
-- Current artifact: `ART-V13-TASK-POOL`
-- Last meaningful activity: `2026-09-21T19:45:22Z`
+- Current packet: `R27`
+- Current artifact: `ART-V17-APPROVAL-BINDING`
+- Last meaningful activity: `2026-09-21T20:05:50Z`
 - Spend USD: `0.0`
-- Blocker: USER_ACTION: Actions billing; ART-V14 lead review of v14-real-007; sealed digest unbound (R06)
+- Blocker: USER_ACTION: Actions billing; ART-V14 new preregistered mission; R06 sealed digest; R18 2nd physical host; R09 ≥2 zero-charge remote canaries
 
 ## Update
 
-R04 done: g13-pool-freeze-v3 verify OK on Mac (240 holdout, 15/cell, digests match). No invent-accept. Next R05 reviewer calibration.
+Session advanced R16-R27 (verify+CP3). Real blockers: Actions billing; ART-V14 new mission (007 CHANGES REQUIRED); R06 sealed digest; R09 zero-charge canaries; R18 2nd host. Tip=f2b8d5f7dfd65530e73c63438c229b9fa428f922.
 
 ## Next
 
-R05 reviewer input/scorer/calibration/contamination guard
+Paused on external USER_ACTION blockers; R28 ToolGateway migrate verify when continuing
