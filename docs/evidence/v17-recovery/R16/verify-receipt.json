@@ -1,0 +1,60 @@
+{
+  "packet_id": "R16",
+  "artifact_id": "ART-V15-WORKER-PROTOCOL",
+  "status": "worker_protocol_verified_on_tip_no_retransplant",
+  "self_accept": false,
+  "donor": {
+    "sha": "a26f21a",
+    "summary": "V2A-004 durable worker service and client"
+  },
+  "tip_sha_at_verify": "8c28f0d5eed9f4b4a47f020760a55f44664bef45",
+  "verified_at": "2026-09-21T19:57:36Z",
+  "files": [
+    {
+      "path": "src/swarm/workers/service.py",
+      "donor_rev": "a26f21a",
+      "local_sha256": "5446d8937adcb8ff662057403d9698f17ac9fb21145a77c532e1886dd6b3798a",
+      "donor_sha256": "5446d8937adcb8ff662057403d9698f17ac9fb21145a77c532e1886dd6b3798a",
+      "identical_to_donor": true
+    },
+    {
+      "path": "src/swarm/workers/client.py",
+      "donor_rev": "a26f21a",
+      "local_sha256": "2355e3bb2a9fa5a2a8d64c8abca48762e999b6fbb03bb3e7caeac6135d9d21ae",
+      "donor_sha256": "2355e3bb2a9fa5a2a8d64c8abca48762e999b6fbb03bb3e7caeac6135d9d21ae",
+      "identical_to_donor": true
+    },
+    {
+      "path": "src/swarm/workers/envelopes.py",
+      "donor_rev": "a26f21a",
+      "local_sha256": "98c12297b1e0636ed103c64439f0fc5445b21d35f1ea6fe6c16deb0d996758e8",
+      "donor_sha256": "98c12297b1e0636ed103c64439f0fc5445b21d35f1ea6fe6c16deb0d996758e8",
+      "identical_to_donor": true
+    },
+    {
+      "path": "src/swarm/workers/transport.py",
+      "donor_rev": "a26f21a",
+      "local_sha256": "1790ad03fef062b0680083d6ac87215c90bfba22a66a397e689a775cf653b078",
+      "donor_sha256": "1790ad03fef062b0680083d6ac87215c90bfba22a66a397e689a775cf653b078",
+      "identical_to_donor": true
+    },
+    {
+      "path": "tests/workers/test_durable_worker_protocol.py",
+      "donor_rev": "a26f21a",
+      "local_sha256": "1b3a926fe04fc756c6bfbe364520b15e29a1b47371b5e1c0a245ae0cb3b40dc6",
+      "donor_sha256": "1b3a926fe04fc756c6bfbe364520b15e29a1b47371b5e1c0a245ae0cb3b40dc6",
+      "identical_to_donor": true
+    }
+  ],
+  "excluded": [
+    "provider secrets on worker",
+    "coordination heartbeat topology",
+    "autonomous-runner"
+  ],
+  "tests": {
+    "command": "pytest -q tests/workers/test_durable_worker_protocol.py tests/workers/test_workers.py",
+    "result": "18 passed",
+    "db": "swarmai_v17_r13"
+  },
+  "note": "R16 verify-on-tip; enrollment/capability/claim/renew/drain/cancel/result service present. No invent-accept."
+}
