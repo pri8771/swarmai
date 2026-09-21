@@ -4,36 +4,21 @@
   "session_id": "B",
   "branch": "cursor/v2-product-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T17:13:36+00:00",
-    "trigger": "scheduler",
+    "observed_at": "2026-09-21T17:13:53+00:00",
+    "trigger": "manual",
     "host_alias": "HOST-WIN-DEV",
     "session_id": "B",
     "branch": "cursor/v2-product-lane",
     "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-    "coordination_sha": "ef4b2ddf0e943dcabe38e84093bada1dc5044005",
+    "coordination_sha": "d403d8aae4558fa0a1a6ccd3fcd114a92e0043ce",
     "effective_cadence_minutes": 5,
     "packet_id": "V2B-002",
     "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
-    "status": "blocked",
-    "last_agent_activity_at": "2026-09-21T17:09:41+00:00",
-    "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
+    "status": "working",
+    "last_agent_activity_at": "2026-09-21T17:13:51+00:00",
+    "note": "session_epoch=reset-20260921-two-lanes-02; implementing V2B-002 reviewer calibration freeze"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T16:48:17+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-WIN-DEV",
-      "session_id": "B",
-      "branch": "cursor/v2-product-lane",
-      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
-      "coordination_sha": "addc515667320632614336b5800bf354ac9c9dfb",
-      "effective_cadence_minutes": 5,
-      "packet_id": "V2B-001-R4",
-      "artifact_id": "ART-V13-TASK-POOL",
-      "status": "review_requested",
-      "last_agent_activity_at": "2026-09-21T16:29:47+00:00",
-      "note": "V2B-001-R4 g13-pool-freeze-v3 tip 5344763; 240 unique archetypes; 15/cell; counted_qualification_ready=false; W-131B not started. Lead freeze requested."
-    },
     {
       "observed_at": "2026-09-21T16:53:21+00:00",
       "trigger": "scheduler",
@@ -198,7 +183,22 @@
       "status": "blocked",
       "last_agent_activity_at": "2026-09-21T17:09:41+00:00",
       "note": "cursor_agent_exit_1; check local runner log; lead may increment generation"
+    },
+    {
+      "observed_at": "2026-09-21T17:13:53+00:00",
+      "trigger": "manual",
+      "host_alias": "HOST-WIN-DEV",
+      "session_id": "B",
+      "branch": "cursor/v2-product-lane",
+      "branch_sha": "534476393257794c4e8ebf8d65f44fd090ab28eb",
+      "coordination_sha": "d403d8aae4558fa0a1a6ccd3fcd114a92e0043ce",
+      "effective_cadence_minutes": 5,
+      "packet_id": "V2B-002",
+      "artifact_id": "ART-V13-REVIEWER-QUALIFICATION",
+      "status": "working",
+      "last_agent_activity_at": "2026-09-21T17:13:51+00:00",
+      "note": "session_epoch=reset-20260921-two-lanes-02; implementing V2B-002 reviewer calibration freeze"
     }
   ],
-  "status": "blocked"
+  "status": "working"
 }
