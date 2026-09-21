@@ -4,9 +4,9 @@
 - Epoch: `single-v17-20260921-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `26e9cc3292abe85782302fdde3bbe13a5d2440e0`
-- Coordination SHA: `02262e4b113a0f8c19f236403e5067f63bc5aa13`
-- Updated: `2026-09-21T19:44:13Z`
-- Trigger: `manual`
+- Coordination SHA: `48955f650bdce373b20e1217bc2918848d393481`
+- Updated: `2026-09-21T19:45:09Z`
+- Trigger: `scheduler`
 - Status: **working**
 - Current packet: `R03`
 - Current artifact: `ART-V13-TASK-POOL`
