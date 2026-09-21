@@ -10,6 +10,24 @@ Heartbeat is coordination/liveness evidence only. It proves that the host/sessio
 
 Only heartbeats with `trigger = "scheduler"` count for cadence qualification. Manual/install/work/review heartbeats are useful context but never advance a cadence streak.
 
+## Active session epoch
+
+The owner stopped all prior interactive lanes and started fresh sessions.
+
+Current epoch: `reset-20260921-new-lanes-01`.
+
+Old heartbeat ledger entries remain historical evidence only. They MUST NOT count toward the current heartbeat stress test.
+
+A fresh lane becomes eligible for counting only after it explicitly registers the current epoch by publishing a manual/install heartbeat context containing:
+
+- packet/artifact for its current assignment;
+- status `session_started`;
+- note containing `session_epoch=reset-20260921-new-lanes-01`.
+
+Only scheduler heartbeats whose inherited session context comes from that registered fresh-session event count toward the current Phase-1 streak.
+
+This prevents old background scheduler jobs from being mistaken for the new interactive lanes.
+
 ## Current owner-directed stress test — 2026-09-21
 
 The previously verified hourly cadence is intentionally superseded for a fresh reliability exercise.
