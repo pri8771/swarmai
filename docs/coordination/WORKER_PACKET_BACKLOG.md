@@ -1,6 +1,6 @@
 # SwarmAI worker packet backlog — current
 
-Updated: 2026-09-21T06:02:46Z after `LEAD-20260921-027`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
+Updated: 2026-09-21T06:51:13Z after `LEAD-20260921-028`. Canonical artifact lifecycle remains in `ARTIFACT_REGISTRY.json`; this backlog contains bounded execution packets only.
 
 ## Shared local execution blocker
 
@@ -22,8 +22,8 @@ B's autonomous assignment remains `B-AUTONOMY-HOLD-RUNNER-02`, generation 2, dis
 Only `trigger=scheduler` counts. Coordination liveness is separate from autonomous-worker proof and ART-V10 Cursor-agent evidence.
 
 - A: `03:47:19Z -> 04:02:22Z` = valid pair, **2/3**, stale at the >35m bootstrap threshold.
-- B: valid scheduler sequence from `03:43:40Z` through `05:29:17Z` = **8 consecutive valid**, individually complete and fresh.
-- Keep global worker publication cadence at 15 minutes until A also meets the requirement. ChatGPT lead remains hourly.
+- B: earlier scheduler chain through `05:29:17Z` was broken by a 45-minute gap; current `06:14:26Z -> 06:29:17Z` = **2/3**, fresh.
+- Keep global worker publication cadence at 15 minutes until both hosts have current 3/3 qualifying chains. ChatGPT lead remains hourly.
 
 ## External worker-pc / G13 task-pool
 
@@ -57,7 +57,9 @@ Lead repair contract: `docs/artifacts/current/ART-V13-TASK_POOL_REPAIR_CONTRACT.
 - base: `worker/swarmai-v13-task-pool-freeze-02`
 - expected branch: `worker/swarmai-v13-task-pool-freeze-03`
 - dispatch commit: `pri8771/remote-workers@cbdaaab46142e2165084a15157f1aabd8180483d`
-- run: `35566726945`, `in_progress` at last check.
+- run: `35566726945`
+- job: `106229937621`
+- status at `2026-09-21T06:51:13Z`: worker execution still in progress; sanitized result publication has not begun, result JSON is absent, and the expected SwarmAI branch is absent.
 
 The repair must produce a **new** v2 freeze with input-only worker-visible held-out cases; sealed grader-reference identity; at least 15 independent held-out inputs per required coding/planning/reasoning/extraction × S/M/L/XL cell; hard calibration/holdout and normalized-template independence checks; pinned identities; and actually executed verification evidence. It must preserve v1 as incomplete evidence and must not run counted qualification.
 
@@ -72,7 +74,7 @@ Local B must not duplicate this task while retry 03 is active.
 - **A5-LOCAL-G12-CURRENT-TIP / SP2 — accepted live-local evidence.** Actual local two-model broker/fallback/quota proof; no remote claim.
 - **EXT-WORKER-PC-V2B-001-02 / ART-V13-TASK-POOL / SP2 — changes required.** Real/scoped output but not qualification-ready.
 
-`WORKER_PERFORMANCE.json` now records 12 reviewed SP2 packets, 5 accepted on first lead review (0.4166666667); sample interpretation remains about packet complexity/quality, not elapsed time.
+`WORKER_PERFORMANCE.json` is unchanged this run because no new bounded packet reached independent review.
 
 ## Session A — runtime/control-plane/integration
 
@@ -127,7 +129,7 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 
 ## Acceptance blockers — do not relabel
 
-- `ART-OPS-HEARTBEAT`: A 2/3 stale; B 8 consecutive individually complete; global drafting.
+- `ART-OPS-HEARTBEAT`: A current 2/3 stale; B current 2/3 fresh; global drafting.
 - `ART-OPS-AUTONOMOUS-WORKERS`: no verified repo-assigned self-launch/push by either host.
 - authenticated Cursor-agent worker receipts absent.
 - remote overlap = 0 admitted routes.
@@ -140,6 +142,6 @@ ActionEnvelope / ApprovalGrant / ActionReceipt with mandatory project identity a
 
 ## Lead-owned parallel work
 
-`ART-V13-TASK_POOL_REPAIR_CONTRACT.md` now fixes the critical-path acceptance ambiguity: sealed hidden references, >=15 independent held-out inputs per required cell, independence/contamination enforcement, exact identity binding and executable verification before lead freeze.
+`ART-V13-TASK_POOL_REPAIR_CONTRACT.md` remains the critical-path acceptance contract: sealed hidden references, >=15 independent held-out inputs per required cell, independence/contamination enforcement, exact identity binding and executable verification before lead freeze.
 
 `ART-V20-RELIABILITY-PROTOCOL` remains drafting with campaign identity/reset classes, immutable checkpoints, monitoring-gap classification and no-splicing/no-backfill semantics. No reliability time is claimed.
