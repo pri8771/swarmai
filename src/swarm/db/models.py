@@ -88,18 +88,36 @@ class TaskRow(Base):
 
 class TaskAttemptRow(Base):
     __tablename__ = "task_attempts"
+    __table_args__ = (
+        Index("ix_task_attempts_project_status", "project_id", "status"),
+        Index("ix_task_attempts_mission_id", "mission_id"),
+    )
 
     attempt_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     task_id: Mapped[str] = mapped_column(ForeignKey("tasks.id"), index=True)
+    # V2A-003a / ART-V15 durable fencing fields (nullable for legacy rows).
+    project_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    mission_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("missions.id"), nullable=True
+    )
     agent_profile_id: Mapped[str] = mapped_column(String(64))
     selected_route_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     worker_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     lease_generation: Mapped[int] = mapped_column(Integer, default=0)
+    task_revision: Mapped[int] = mapped_column(Integer, default=1)
+    input_digest: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    source_revision: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    cancellation_generation: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(String(32), index=True)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    terminal_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     result_artifact_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     verification_receipt_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    accepted_result_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     blocked_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
 
@@ -250,7 +268,15 @@ class ApprovalRow(Base):
 
 
 class WorkerLeaseRow(Base):
+    """Durable worker registration / generation row (not a per-task lease).
+
+    Per ART-V15-DURABLE-SCHEMA-DELTA: this table remains worker-state identity.
+    Per-task leases live in TaskLeaseRow / ``task_leases``.
+    Membership credentials are stored as token_hash + token_id only (V2A-H2).
+    """
+
     __tablename__ = "worker_leases"
+    __table_args__ = (Index("ix_worker_leases_project_status", "project_id", "status"),)
 
     worker_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     node_identity: Mapped[str] = mapped_column(String(128), index=True)
@@ -262,6 +288,93 @@ class WorkerLeaseRow(Base):
     heartbeat_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     labels: Mapped[list[Any]] = mapped_column(JSONB, default=list)
     capabilities: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    # V2A-003a / V2A-H2 extensions
+    project_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    trust_class: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    token_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    token_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    registered_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, server_default=func.now()
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, server_default=func.now(), onupdate=func.now()
+    )
+    drain_requested_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    policy_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    software_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    build_sha: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    privacy_classes: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    resource_payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class TaskLeaseRow(Base):
+    """Per-attempt task lease — authoritative fencing row for claim/renew/expire."""
+
+    __tablename__ = "task_leases"
+    __table_args__ = (Index("ix_task_leases_project_state", "project_id", "state"),)
+
+    lease_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("task_attempts.attempt_id"), index=True
+    )
+    task_id: Mapped[str] = mapped_column(String(64), ForeignKey("tasks.id"), index=True)
+    mission_id: Mapped[str] = mapped_column(String(64), ForeignKey("missions.id"), index=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    worker_id: Mapped[str] = mapped_column(String(64), index=True)
+    worker_generation: Mapped[int] = mapped_column(Integer)
+    task_revision: Mapped[int] = mapped_column(Integer, default=1)
+    input_digest: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    source_revision: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    cancellation_generation: Mapped[int] = mapped_column(Integer, default=0)
+    state: Mapped[str] = mapped_column(String(32), index=True)
+    issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    renewable_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    reservation_refs: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    effect_scope: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    policy_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class WorkerResultRow(Base):
+    """Durable worker result submission — immutable except acceptance disposition."""
+
+    __tablename__ = "worker_results"
+    __table_args__ = (
+        Index("ix_worker_results_project_acceptance", "project_id", "acceptance_state"),
+    )
+
+    result_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    attempt_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("task_attempts.attempt_id"), index=True
+    )
+    lease_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("task_leases.lease_id"), index=True
+    )
+    task_id: Mapped[str] = mapped_column(String(64), index=True)
+    mission_id: Mapped[str] = mapped_column(String(64), index=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    worker_id: Mapped[str] = mapped_column(String(64), index=True)
+    worker_generation: Mapped[int] = mapped_column(Integer)
+    task_revision: Mapped[int] = mapped_column(Integer, default=1)
+    input_digest: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    source_revision: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    result_status: Mapped[str] = mapped_column(String(32))
+    artifact_manifest: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    checks: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    usage: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    effect_receipts: Mapped[list[Any]] = mapped_column(JSONB, default=list)
+    submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    acceptance_state: Mapped[str] = mapped_column(String(32), index=True, default="submitted")
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class EventRow(Base):

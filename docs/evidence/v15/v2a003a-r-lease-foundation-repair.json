@@ -1,0 +1,26 @@
+{
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "packet_id": "V2A-003a-R",
+  "hardening_packet_id": "V2A-H2",
+  "scenario": "legacy_alembic_upgrade_token_lifecycle_recursive_denial",
+  "status": "pass",
+  "recorded_at": "2026-09-21T01:13:53.795893+00:00",
+  "candidate_sha": "92f59faf2ffc1d7e0f999d7cc9f8212f53f764f2",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "commands": [
+    "PYTHONPATH=src python -m pytest tests/db/test_token_hash.py tests/integration/db/test_lease_fencing_schema.py -q",
+    "PYTHONPATH=src python -m pytest tests/integration/db/test_lease_claim_renew_expire.py tests/workers/test_workers.py tests/integration/db/test_persistence.py -q"
+  ],
+  "results": {
+    "foundation_repair_tests": "pass",
+    "legacy_alembic_upgrade_from_9eb193b10f4e": true,
+    "unknown_project_ownership_not_fabricated": true,
+    "token_rotation_invalidates_prior": true,
+    "token_revocation_fences_credential": true,
+    "recursive_token_metadata_denied": true,
+    "raw_membership_token_persisted": false,
+    "api_routes_wired": false,
+    "note": "V2A-003a-R foundation repair only; claim/accept review order per LEAD-019"
+  }
+}
