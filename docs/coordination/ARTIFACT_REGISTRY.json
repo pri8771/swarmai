@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-21T02:12:00Z",
+  "updated_at": "2026-09-21T02:40:00Z",
   "canonical": true,
   "management_model": "artifact_oriented",
   "history": {
@@ -74,7 +74,8 @@
         "ART-V14-MODE-COMPARISON",
         "ART-LIVE142-PROTOCOL",
         "ART-LIVE142-CAMPAIGN",
-        "ART-LIVE142-FINAL-REPORT"
+        "ART-LIVE142-FINAL-REPORT",
+        "ART-V14-REAL-E2E"
       ]
     },
     "1.5": {
@@ -1655,6 +1656,33 @@
         "awaiting first durable heartbeat from B"
       ],
       "notes": "This coordination heartbeat is not ART-V10 authenticated Cursor-agent worker evidence and must not be used to satisfy FIX-004."
+    },
+    {
+      "artifact_id": "ART-V14-REAL-E2E",
+      "target_version": "1.4",
+      "name": "One real end-to-end SwarmAI mission",
+      "kind": "live-local-product-evidence",
+      "owner": "Cursor Session A + ChatGPT lead",
+      "lane": "runtime-verification",
+      "status": "drafting",
+      "path_or_source_ref": "docs/coordination/REAL_V14_E2E_PROTOCOL.md",
+      "dependencies": [
+        "ART-V11-MISSION-PATH",
+        "ART-V12-BROKER-CONTRACT"
+      ],
+      "acceptance_refs": [
+        "docs/coordination/REAL_V14_E2E_PROTOCOL.md"
+      ],
+      "evidence_refs": [],
+      "worker_packets": [
+        "V14-REAL-001"
+      ],
+      "story_points_next": 2,
+      "next_action": "Run the preregistered real repository-audit mission through the operational product path with actual local model inference, real tools/worktree/test, zero spend, and exact evidence binding.",
+      "blockers": [
+        "exact local model inventory/availability for the run must be observed at execution time"
+      ],
+      "notes": "Mandatory owner rule: V1.4 cannot be called complete without one actual non-mock end-to-end mission. This artifact does not replace G12/G13/G14/LIVE-142."
     }
   ],
   "major_milestones": {
