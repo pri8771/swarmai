@@ -1,0 +1,14 @@
+{
+  "packet_id": "R20",
+  "artifact_id": "ART-V16-PROVENANCE",
+  "status": "knowledge_repository_verified_on_tip",
+  "self_accept": false,
+  "tip_sha_at_verify": "9a989f205f3ae74ada08b4df894be0a5defd7ec5",
+  "verified_at": "2026-09-21T20:03:01Z",
+  "module": "src/swarm/knowledge/repository.py",
+  "tests": {
+    "command": "pytest -q tests/knowledge/test_knowledge_repository.py",
+    "result": "7 passed"
+  },
+  "note": "R20 durable project-scoped knowledge repository present (V2B-003a). No invent-accept."
+}
