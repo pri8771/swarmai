@@ -1,0 +1,18 @@
+{
+  "packet_id": "R25",
+  "artifact_id": "ART-V16-CONTEXT-BUDGET-EVIDENCE",
+  "status": "cp4_budget_isolation_pass_task_quality_UNKNOWN",
+  "self_accept": false,
+  "checkpoint": "CP4",
+  "tip_sha_at_verify": "aabd6e80bf427a1e394d89adf49bdbaf7ede8a1a",
+  "verified_at": "2026-09-21T20:05:32Z",
+  "prior_evidence": "docs/evidence/v15/v2b003e-context-budget.json",
+  "tests": {
+    "budget_related": "2 passed (knowledge suite filter)",
+    "budget_module": "1 passed"
+  },
+  "still_unknown": [
+    "live task quality eval"
+  ],
+  "note": "CP4 budget/isolation math present; task quality remains UNKNOWN. No invent-accept."
+}
