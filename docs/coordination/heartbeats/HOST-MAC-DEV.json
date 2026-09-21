@@ -4,36 +4,21 @@
   "session_id": "A",
   "branch": "cursor/v2-runtime-lane",
   "last_heartbeat": {
-    "observed_at": "2026-09-21T17:07:26+00:00",
+    "observed_at": "2026-09-21T17:19:46+00:00",
     "trigger": "scheduler",
     "host_alias": "HOST-MAC-DEV",
     "session_id": "A",
     "branch": "cursor/v2-runtime-lane",
     "branch_sha": "11a7e1d51c4c4d630c7d83c1af65e380c32ad80f",
-    "coordination_sha": "b468337de0f974c7efb1d467957c62ea70878dd1",
+    "coordination_sha": "c9492dca0e1df70215d92a0718fb3e1b435913ea",
     "effective_cadence_minutes": 5,
-    "packet_id": "A5-LOCAL-G12-CURRENT-TIP",
-    "artifact_id": "ART-V12-REMOTE-OVERLAP",
+    "packet_id": "OPS-AUTO-001-R",
+    "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
     "status": "review_requested",
-    "last_agent_activity_at": "2026-09-21T02:53:06+00:00",
-    "note": null
+    "last_agent_activity_at": "2026-09-21T14:07:00+00:00",
+    "note": "CURSOR-A-20260921-014 human-prompted repair tip=39bba63 CI=35609579398; not autonomous self-launch; waiting new generation"
   },
   "history": [
-    {
-      "observed_at": "2026-09-21T15:22:09+00:00",
-      "trigger": "scheduler",
-      "host_alias": "HOST-MAC-DEV",
-      "session_id": "A",
-      "branch": "cursor/v2-runtime-lane",
-      "branch_sha": "11a7e1d51c4c4d630c7d83c1af65e380c32ad80f",
-      "coordination_sha": "da0865afb08f4327dc5172b5f41d13cbe6857979",
-      "effective_cadence_minutes": 5,
-      "packet_id": "A5-LOCAL-G12-CURRENT-TIP",
-      "artifact_id": "ART-V12-REMOTE-OVERLAP",
-      "status": "review_requested",
-      "last_agent_activity_at": "2026-09-21T02:53:06+00:00",
-      "note": null
-    },
     {
       "observed_at": "2026-09-21T15:37:12+00:00",
       "trigger": "scheduler",
@@ -198,6 +183,21 @@
       "status": "review_requested",
       "last_agent_activity_at": "2026-09-21T02:53:06+00:00",
       "note": null
+    },
+    {
+      "observed_at": "2026-09-21T17:19:46+00:00",
+      "trigger": "scheduler",
+      "host_alias": "HOST-MAC-DEV",
+      "session_id": "A",
+      "branch": "cursor/v2-runtime-lane",
+      "branch_sha": "11a7e1d51c4c4d630c7d83c1af65e380c32ad80f",
+      "coordination_sha": "c9492dca0e1df70215d92a0718fb3e1b435913ea",
+      "effective_cadence_minutes": 5,
+      "packet_id": "OPS-AUTO-001-R",
+      "artifact_id": "ART-OPS-AUTONOMOUS-WORKERS",
+      "status": "review_requested",
+      "last_agent_activity_at": "2026-09-21T14:07:00+00:00",
+      "note": "CURSOR-A-20260921-014 human-prompted repair tip=39bba63 CI=35609579398; not autonomous self-launch; waiting new generation"
     }
   ],
   "status": "review_requested"
