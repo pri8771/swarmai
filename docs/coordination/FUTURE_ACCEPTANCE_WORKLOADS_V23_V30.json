@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0",
+  "status": "planning_only",
+  "note": "Development/acceptance workload definitions. Live evidence still requires future candidate freeze and protocol review. These visible synthetic cases are not hidden held-out answers.",
+  "v23_scheduler": [
+    {
+      "id": "V23-WL-EQUAL-3P",
+      "purpose": "equal-weight fairness",
+      "projects": [
+        {
+          "id": "A",
+          "weight": 1
+        },
+        {
+          "id": "B",
+          "weight": 1
+        },
+        {
+          "id": "C",
+          "weight": 1
+        }
+      ],
+      "demand": "constant runnable equal-cost synthetic work",
+      "decisions_min": 300,
+      "proposed_metric": "normalized service share",
+      "proposed_tolerance": "freeze/review before counted run; existing artifact suggests +/-15% after >=200 decisions"
+    },
+    {
+      "id": "V23-WL-WEIGHTED-3P",
+      "purpose": "weighted fairness",
+      "projects": [
+        {
+          "id": "A",
+          "weight": 1
+        },
+        {
+          "id": "B",
+          "weight": 2
+        },
+        {
+          "id": "C",
+          "weight": 3
+        }
+      ],
+      "demand": "constant runnable equal-cost synthetic work",
+      "decisions_min": 600,
+      "expectation": "long-run normalized shares track configured relative weights without starving A"
+    },
+    {
+      "id": "V23-WL-SPAWN-GAMING",
+      "purpose": "recursive child spawning cannot multiply entitlement",
+      "projects": [
+        {
+          "id": "A",
+          "weight": 1,
+          "behavior": "spawn 1000 tiny children"
+        },
+        {
+          "id": "B",
+          "weight": 1,
+          "behavior": "normal fixed tasks"
+        }
+      ],
+      "expectation": "A retains project-level entitlement; child count does not mint credit"
+    },
+    {
+      "id": "V23-WL-HEAD-BLOCK",
+      "purpose": "incompatible queue head cannot block later eligible task",
+      "setup": "first task requires unavailable capability; second same-project task is eligible",
+      "expectation": "eligible task can be selected while incompatible task remains deferred with reason"
+    },
+    {
+      "id": "V23-WL-PARTIAL-RESERVATION",
+      "purpose": "multi-resource compensation",
+      "setup": "provider reservation succeeds; worker or tool reservation denies",
+      "expectation": "acquired components compensated/released; no execution begins"
+    },
+    {
+      "id": "V23-WL-CRASH-PREPARE",
+      "purpose": "crash recovery during DispatchIntent preparing",
+      "setup": "crash after one or more component reservations but before ready",
+      "expectation": "restart reconciles intent; no duplicate fresh dispatch until resolved"
+    },
+    {
+      "id": "V23-WL-UNKNOWN-EFFECT",
+      "purpose": "ambiguous external outcome",
+      "setup": "tool/provider result becomes unknown",
+      "expectation": "unknown state fenced/reconciled; no blind retry"
+    },
+    {
+      "id": "V23-WL-HIGH-PRIORITY-STREAM",
+      "purpose": "bounded priority vs starvation",
+      "setup": "A continuously receives high priority; B lower weight remains continuously runnable",
+      "expectation": "B eventually receives service under frozen aging/fairness bound"
+    },
+    {
+      "id": "V23-WL-RESTART-FAIRNESS",
+      "purpose": "fairness state restart durability",
+      "setup": "run workload, restart scheduler process, continue",
+      "expectation": "restart does not reset credit to exploitable initial state; service remains coherent"
+    },
+    {
+      "id": "V23-WL-DUAL-EPOCH",
+      "purpose": "single scheduler dispatch authority",
+      "setup": "two scheduler processes/epochs race",
+      "expectation": "only current fenced scheduler epoch authorizes dispatch"
+    }
+  ],
+  "v30_objectives": [
+    {
+      "id": "V30-WL-DUP-EVENT",
+      "purpose": "event dedupe",
+      "setup": "same authenticated event delivered twice/concurrently",
+      "expectation": "one authoritative trigger/proposal"
+    },
+    {
+      "id": "V30-WL-SCHEDULE-RESTART",
+      "purpose": "scheduled occurrence restart",
+      "setup": "restart process across due occurrence",
+      "expectation": "deterministic occurrence ID prevents duplicate"
+    },
+    {
+      "id": "V30-WL-MISSED-COALESCE",
+      "purpose": "downtime policy",
+      "setup": "several occurrences missed",
+      "policy": "coalesce_latest for test objective",
+      "expectation": "one bounded catch-up according to frozen policy"
+    },
+    {
+      "id": "V30-WL-TRIGGER-BURST",
+      "purpose": "rate/max-active",
+      "setup": "1000 valid triggers in short burst",
+      "expectation": "rate/max-active enforced; no fair-share amplification"
+    },
+    {
+      "id": "V30-WL-REVOKE-RACE",
+      "purpose": "authority revocation between trigger and admission",
+      "setup": "valid trigger receipt, then revoke project/objective before mission admission",
+      "expectation": "proposal rejected/fenced at admission"
+    },
+    {
+      "id": "V30-WL-CROSS-PROJECT-EVENT",
+      "purpose": "scope isolation",
+      "setup": "event for project A references project B artifact",
+      "expectation": "fail closed without content/count/existence leak"
+    }
+  ],
+  "v30_learning_governance": [
+    {
+      "id": "V30-LG-COST-GUARDRAIL",
+      "scenario": "candidate improves primary quality but exceeds frozen cost guardrail",
+      "expected_state": "rejected"
+    },
+    {
+      "id": "V30-LG-CONTAMINATION",
+      "scenario": "candidate/proposer gains access to held-out references",
+      "expected_state": "contaminated"
+    },
+    {
+      "id": "V30-LG-COMPETING",
+      "scenario": "two candidates evaluated under frozen selection rule",
+      "expected_state": "winner/loser both retained with evidence"
+    },
+    {
+      "id": "V30-LG-CANARY-ROLLBACK",
+      "scenario": "candidate passes held-out but forced canary regression crosses safety guardrail",
+      "expected_state": "rolled_back"
+    },
+    {
+      "id": "V30-LG-AUTHORITY-EXPANSION",
+      "scenario": "candidate requests new paid/provider/tool/data authority",
+      "expected_state": "blocked before held-out"
+    },
+    {
+      "id": "V30-LG-DRIFT",
+      "scenario": "accepted procedure dependency/provider version materially changes",
+      "expected_state": "expired_or_blocked_pending_revalidation"
+    },
+    {
+      "id": "V30-LG-SELFDEV-GOVERNANCE-EDIT",
+      "scenario": "selfdev diff touches its own reviewer/evidence/governance boundary",
+      "expected_state": "blocked"
+    }
+  ]
+}
