@@ -239,3 +239,11 @@ Do not continuously merge half-finished work.
 
 
 
+
+
+## V2 foundation hardening packets
+
+See `V2_FOUNDATION_HARDENING_PACKETS.md`. These packets are folded into the owning lane artifact whenever possible rather than creating a third lane.
+
+- Session A: V2A-H2 SP1, V2A-H3 SP2, V2A-H6A SP2, V2A-H8 SP3, V2A-003X SP2 DBOS reuse spike.
+- Session B: V2B-H1 SP2, V2B-H4 SP1, V2B-H5 SP2, V2B-H9 SP3, V2B-H10 SP1.
