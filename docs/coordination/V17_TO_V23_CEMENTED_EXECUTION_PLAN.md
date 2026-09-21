@@ -22,6 +22,27 @@ This plan supersedes broad future prose where it conflicts on packet granularity
 9. Portability exports references/digests and current authorized content; never secret values.
 10. V2.1/V2.2 are optional internal implementation checkpoints only unless canonical registry defines artifacts.
 
+## Cemented V1.7 seams that later versions extend (proposed 2026-09-21, Fable planning pass)
+
+These are implemented by V1.7 packets so that V1.8–V3.0 add data, not new control flow. Machine-readable copy: `forward_compat_seams_from_v17` in `V17_TO_V23_PACKET_QUEUE.json`.
+
+11. Fences are compared **inside** the effect's `begin_execution` transaction through a reader supplied by the module that owns the fence (`R27c`, `R28b`). V1.8 adds the key `site_epoch`; the gateway's step order never changes.
+12. Scope authorization is one intersection inside `PolicyProvider` (`R28b`). V1.9 adds the project extension grant to it; V3.0 digests it for `MissionProposal`.
+13. `AdapterRegistry` is the only way an adapter becomes executable (`R28c`). Extensions and capability packs register through it after validation; nothing else can reach `adapter.execute`.
+14. `AdapterManifest` is a strict vocabulary subset of `ExtensionManifest` (`R29a`): a built-in integration is the smallest extension.
+15. An effect reservation is idempotently compensable (`created` flag + single-winner CAS, `R27b`), which is what V2.3 `DispatchIntent` needs from it.
+16. `unknown` is the only legal reading of an interrupted effect (`R27e`). V1.8 restore and the V2.0 response-loss drill reuse that path.
+17. `KnowledgeService` is the only knowledge API for operational code (`R25a`). Portability and governed learning extend it; they get no other write path.
+18. `prove_defect` (`R02a`) is the mandatory entry check for every self-authored fix (V1.9 selfdev, V3.0 controlled self-development).
+
+## Queue revisions in this pass
+
+- `18-00a` (lead): freeze ART-V18-RECOVERY-ARCH + D18-01 for the topology actually available. Can be done during V1.7.
+- `19-00` (lead): freeze ART-V19-BETA-ACCEPTANCE before counted V1.9 evidence.
+- `19-09`, `19-10`: external-install and Windows clean-install evidence as explicit externally gated packets (previously only in the coarse graph / uncovered).
+- `20-08` split into `20-08a` (freeze protocol, D20-01 — do now), `20-08b` (start the 168 h clock right after `20-03`), `20-08c` (elapsed). `20-04`–`20-07` run **during** the clock. A candidate-invalidating finding restarts the campaign, which costs no more than having waited.
+- Every packet lists `aliases` to the contract-embedded IDs and coarse phase IDs.
+
 ## Deliberately NOT frozen yet
 
 - concrete cross-site SiteEpoch fencing authority mechanism;
