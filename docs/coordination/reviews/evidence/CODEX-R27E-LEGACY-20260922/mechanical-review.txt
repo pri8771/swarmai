@@ -1,0 +1,26 @@
+R27e final mechanical review
+Commit: e924351bd93510eaae279225db3a2fa447dd6894
+Scope: effect_recovery.py, DurableEffectRepository legacy disposition/recovery changes,
+and test_effect_legacy_recovery.py. Read-only; no DB or concurrent test execution.
+
+Result: no introduced fail-open or repository race found.
+
+Mechanically matched invariants:
+- disposition_legacy_effect requires a non-empty explicit Bearer header, resolves it
+  through AuthRegistry, applies project scope, and requires operator/admin before the
+  repository mutation.
+- disposition_legacy_executing locks the row with SELECT FOR UPDATE, then validates
+  the exact (executor_id, attempt_count, state) observation under that lock. It accepts
+  only executing rows lacking both timeout_seconds and side_effect_class, retains an
+  authenticated subject/reason/evidence_ref audit in payload, and moves only to unknown.
+- recover_orphaned locks the row and verifies caller timeout equals the immutable stored
+  timeout before calculating the cutoff. Missing legacy timeout fails closed.
+- A reconciled legacy not_applied row retains legacy_disposition and is classified as
+  irreversible; rearm_irreversible rejects it with legacy_effect_requires_policy_migration.
+- The contention regression deliberately holds the row until both contenders are seen
+  waiting, then requires one success and one conflict and checks the persisted audit is
+  the winner's audit. This covers the stale-read/lost-update seam that an unlocked read
+  would leave.
+
+Validation limit: static diff inspection only. Root reported 13 focused tests passed and
+was running repeated focused/full gates; this review did not independently execute them.

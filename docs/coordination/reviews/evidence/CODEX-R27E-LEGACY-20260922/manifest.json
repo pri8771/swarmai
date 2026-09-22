@@ -1,0 +1,21 @@
+{
+  "source_sha": "e924351bd93510eaae279225db3a2fa447dd6894",
+  "source_tree": "c907deb19ba157def74b64c2514187e6c8161a54",
+  "recorded_utc": "2026-09-22T04:43:48.435271+00:00",
+  "formal_acceptance": false,
+  "evidence_class": "synthetic_local_engineering_only",
+  "files": {
+    "original-finding.txt": {
+      "sha256": "14927bd3532fd81a48c6f28bc585dc47a5ed05f5c027550d91e324aad9bac25d"
+    },
+    "mechanical-review.txt": {
+      "sha256": "6ea73e5ded48959dd802628fcddc56bad2728548393705a1657d18ba67bb5fa3"
+    },
+    "checks.json": {
+      "sha256": "3ae6d6112416f12cc06c68dcb1b8f897a39ae9e13e23178fcd3b6a5e7f9212ec"
+    },
+    "checks.txt": {
+      "sha256": "d6c5c2a8db62c0a4c429a5bca40963f926384fcb6700f85edb390fe7984b3fd8"
+    }
+  }
+}
