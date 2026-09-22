@@ -23,13 +23,23 @@ from urllib.parse import quote
 COORD_BRANCH = "coordination/swarm-control"
 DEFAULT_REPO = "pri8771/swarmai"
 SESSION_ID = "CURSOR-V17-SINGLE"
-SESSION_EPOCH = "single-v17-20260921-01"
+SESSION_EPOCH = os.environ.get("SWARM_HB_EPOCH") or "single-v17-20260921-01"
+WORKER_ENGINE = os.environ.get("SWARM_HB_ENGINE") or "cursor"
+CI_SKIP_SUFFIX = "[skip ci]"
 DEFAULT_BRANCH = "cursor/v17-single-session"
 LEDGER_PATH = "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json"
 STATUS_PATH = "docs/coordination/status/CURSOR-V17-SINGLE.md"
 HB_STATE_PATH = "docs/coordination/HEARTBEAT_STATE.json"
 LOCK_NAME = "heartbeat.lock"
 PID_NAME = "heartbeat.pid"
+
+
+def ci_skip(message: str) -> str:
+    """Append the GitHub Actions skip marker exactly once (OPS-CI-01)."""
+    text = message.rstrip()
+    if text.endswith(CI_SKIP_SUFFIX):
+        return text
+    return f"{text} {CI_SKIP_SUFFIX}"
 
 
 def utc_now() -> str:
@@ -185,6 +195,7 @@ def render_status(entry: dict) -> str:
 - Coordination SHA: `{entry.get("coordination_sha") or "unknown"}`
 - Updated: `{entry["timestamp_utc"]}`
 - Trigger: `{entry["trigger"]}`
+- Worker engine: `{entry.get("worker_engine") or "unknown"}`
 - Status: **{entry.get("status") or "unknown"}**
 - Current packet: `{packet}`
 - Current artifact: `{artifact}`
@@ -225,15 +236,17 @@ def update_heartbeat_state(
     state["active_session_epoch"] = SESSION_EPOCH
     state["producer_limit"] = 1
     state["worker_effective_cadence_minutes"] = 5
+    state["worker_engine"] = WORKER_ENGINE
     if register:
         state["note"] = (
-            "CURSOR-V17-SINGLE producer registered; legacy A/B ledgers are historical only."
+            f"CURSOR-V17-SINGLE stream; producer engine={WORKER_ENGINE} "
+            f"epoch={SESSION_EPOCH}; legacy A/B ledgers are historical only."
         )
     put_file(
         repo,
         HB_STATE_PATH,
         content=json.dumps(state, indent=2) + "\n",
-        message=f"heartbeat-state(CURSOR-V17-SINGLE): {timestamp_utc}",
+        message=ci_skip(f"heartbeat-state(CURSOR-V17-SINGLE): {timestamp_utc}"),
         blob_sha=blob_sha,
     )
 
@@ -287,6 +300,16 @@ def main() -> int:
             context["next_action"] = args.next_action[:400] if args.next_action else None
         if args.spend_usd is not None:
             context["spend_usd"] = float(args.spend_usd)
+        if args.trigger == "takeover":
+            # Explicit engine/epoch handoff on the same stream (no duplicate producer).
+            context["takeover"] = {
+                "engine": WORKER_ENGINE,
+                "epoch": SESSION_EPOCH,
+                "previous_epoch": str(context.get("epoch") or "single-v17-20260921-01"),
+                "at": utc_now(),
+                "note": (args.note or "")[:400],
+            }
+            context["epoch"] = SESSION_EPOCH
         if any(
             v is not None
             for v in (
@@ -298,7 +321,7 @@ def main() -> int:
                 args.next_action,
                 args.spend_usd,
             )
-        ):
+        ) or args.trigger == "takeover":
             context["last_meaningful_activity_at"] = utc_now()
             write_json_private(context_path, context)
 
@@ -347,6 +370,8 @@ def main() -> int:
             "timestamp_utc": timestamp_utc,
             "trigger": args.trigger,
             "status": status,
+            "worker_engine": WORKER_ENGINE,
+            "takeover": context.get("takeover"),
             "current_packet": context.get("current_packet"),
             "current_artifact": context.get("current_artifact"),
             "short_note": (
@@ -388,7 +413,7 @@ def main() -> int:
             args.repo_slug,
             LEDGER_PATH,
             content=json.dumps(document, indent=2) + "\n",
-            message=f"heartbeat(CURSOR-V17-SINGLE): {timestamp_utc}",
+            message=ci_skip(f"heartbeat(CURSOR-V17-SINGLE): {timestamp_utc}"),
             blob_sha=blob_sha,
         )
 
@@ -397,11 +422,15 @@ def main() -> int:
             args.repo_slug,
             STATUS_PATH,
             content=render_status(entry),
-            message=f"status(CURSOR-V17-SINGLE): {timestamp_utc}",
+            message=ci_skip(f"status(CURSOR-V17-SINGLE): {timestamp_utc}"),
             blob_sha=status_sha,
         )
 
-        register = status == "session_started" or args.trigger in {"install", "session_started"}
+        register = status == "session_started" or args.trigger in {
+            "install",
+            "session_started",
+            "takeover",
+        }
         if not args.skip_state_update:
             update_heartbeat_state(
                 args.repo_slug,
