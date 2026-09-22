@@ -5,7 +5,9 @@
   "scope_precedence": "The latest owner request supersedes all earlier continue-through-V3 instructions and historical scope fields. Artifact acceptance/evidence requirements are unchanged.",
   "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
   "goal_version": "1.7",
-  "allowed_phases": ["v17"],
+  "allowed_phases": [
+    "v17"
+  ],
   "initial_phase": "v17",
   "future_implementation_authorized": false,
   "future_planning_authorized": false,
@@ -16,24 +18,61 @@
   "max_implementation_sessions": 1,
   "max_heartbeat_producers": 1,
   "dependency_additions": {
-    "R27e": ["R27d"],
-    "R28a": ["R27d"],
-    "R34a": ["R17c"],
-    "R34b": ["R33c", "R17c", "R27d"]
+    "R27e": [
+      "R27d"
+    ],
+    "R28a": [
+      "R27d"
+    ],
+    "R34a": [
+      "R17c"
+    ],
+    "R34b": [
+      "R33c",
+      "R17c",
+      "R27d"
+    ]
   },
   "execution_gates": {
-    "R07": ["EXT-G13-WIN-VERIFY", "EXT-G13-SEALED-DIGEST"],
-    "R10": ["EXT-G12-REMOTE-ROUTES"],
-    "R11": ["EXT-G13-WIN-VERIFY", "EXT-G13-SEALED-DIGEST", "EXT-G12-REMOTE-ROUTES"],
-    "R33c": ["EXT-V17-REALWORLD-GITHUB"]
+    "R07": [
+      "EXT-G13-WIN-VERIFY",
+      "EXT-G13-SEALED-DIGEST"
+    ],
+    "R10": [
+      "EXT-G12-REMOTE-ROUTES"
+    ],
+    "R11": [
+      "EXT-G13-WIN-VERIFY",
+      "EXT-G13-SEALED-DIGEST",
+      "EXT-G12-REMOTE-ROUTES"
+    ],
+    "R33c": [
+      "EXT-V17-REALWORLD-GITHUB"
+    ]
   },
-  "result_only_gates": ["EXT-V14-LEAD-REVIEW"],
-  "runtime_probe_gates": ["EXT-V17-REALWORLD-GITHUB"],
+  "result_only_gates": [
+    "EXT-V14-LEAD-REVIEW"
+  ],
+  "runtime_probe_gates": [
+    "EXT-V17-REALWORLD-GITHUB"
+  ],
   "review_before": {
-    "R27e": ["R27c"],
-    "R28a": ["R27e"]
+    "R27e": [
+      "R27c"
+    ],
+    "R28a": [
+      "R27e"
+    ]
   },
-  "reviewed_packets": {},
+  "reviewed_packets": {
+    "R27c": {
+      "decision": "bounded_slice_accepted",
+      "source_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e",
+      "base_sha": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+      "review_ref": "docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27C-R1-LEAD-REVIEW.md",
+      "live_acceptance": false
+    }
+  },
   "frozen_packets": [],
   "rules": [
     "Only V1.7 delivery and its required lower-version prerequisites are active. V1.8-V3 source work, roadmap elaboration and future packet selection are parked.",
@@ -47,5 +86,8 @@
     "Empty reviewed_packets and frozen_packets do not preapprove future code or unresolved acceptance thresholds.",
     "Do not replace the registry, duplicate queues, or rewrite historical evidence. Scope controls authorization, not artifact acceptance.",
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
-  ]
+  ],
+  "current_direct_worker": "codex",
+  "current_direct_assignment": "docs/coordination/assignments/CODEX_R27E_20260922.md",
+  "fable_handoff_authorized": false
 }
