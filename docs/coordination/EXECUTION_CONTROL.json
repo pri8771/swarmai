@@ -107,6 +107,13 @@
       "review_ref": "docs/coordination/reviews/ART-V14-REAL-E2E-R02C-LEAD-REVIEW.md",
       "live_acceptance": false,
       "next_live_attempt_authorized": false
+    },
+    "R28c": {
+      "decision": "bounded_slice_accepted",
+      "source_sha": "ba458eb1a9a1af5f7e022159f36e6ce296d472cc",
+      "base_sha": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb",
+      "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28C-LEAD-REVIEW.md",
+      "live_acceptance": false
     }
   },
   "frozen_packets": [],
@@ -125,7 +132,7 @@
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
   ],
   "current_direct_worker": "codex",
-  "current_direct_assignment": "docs/coordination/assignments/CODEX_R28C_20260922.md",
+  "current_direct_assignment": "docs/coordination/assignments/CODEX_R29A_20260922.md",
   "fable_handoff_authorized": false,
   "authorized_versions": [
     "1.7",
