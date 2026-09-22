@@ -1,0 +1,192 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-execute_envelope] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1097d9be0>
+entry = 'execute_envelope', field = 'normalized_payload'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097da000>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+_ test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-reconcile] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1097d9430>
+entry = 'reconcile', field = 'normalized_payload'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097dad20>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+_ test_stale_hash_rejects_before_validation_policy_or_store[destination-execute_envelope] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1097db560>
+entry = 'execute_envelope', field = 'destination'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097dbbc0>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+_ test_stale_hash_rejects_before_validation_policy_or_store[destination-reconcile] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1097f0fb0>
+entry = 'reconcile', field = 'destination'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097f0110>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[False] _
+
+empty_hash = False
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097f07a0>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[True] _
+
+empty_hash = True
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+>       gw = gateway(adapter)
+             ^^^^^^^^^^^^^^^^
+
+tests/tools/test_gateway_envelope_integrity.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <test_gateway_envelope_integrity.RecordingAdapter object at 0x1097f1af0>
+
+    def gateway(adapter):
+        registry = AdapterRegistry()
+        registry.register(adapter)
+        return ConsequentialToolGateway(
+            registry=registry,
+            store=InMemoryEffectStore(),
+>           fences=StaticFenceProvider(),
+                   ^^^^^^^^^^^^^^^^^^^^^
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
+        )
+E       TypeError: StaticFenceProvider.__init__() missing 2 required positional arguments: 'lease_generation' and 'cancellation_generation'
+
+tests/tools/test_gateway_envelope_integrity.py:49: TypeError
+=========================== short test summary info ============================
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-execute_envelope]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-reconcile]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_stale_hash_rejects_before_validation_policy_or_store[destination-execute_envelope]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_stale_hash_rejects_before_validation_policy_or_store[destination-reconcile]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_custom_key_and_durable_attempt_override_preserve_logical_identity[False]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_custom_key_and_durable_attempt_override_preserve_logical_identity[True]
+6 failed in 0.21s

@@ -1,0 +1,76 @@
+....FF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[False] _
+
+empty_hash = False
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        expected_hash = env.payload_hash
+        env = env.model_copy(
+            update={
+                "effect_key": "custom:mission:task:1",
+                "idempotency_key": "stable-key",
+                "execution_attempt": 999,
+            }
+        )
+        if empty_hash:
+            env.payload_hash = ""
+        receipt = await gw.execute_envelope(env, context=CONTEXT)
+        assert receipt.outcome == "succeeded"
+        assert adapter.attempts == [("pre", 1), ("execute", 1), ("post", 1)]
+        assert env.execution_attempt == 999  # caller envelope was not reused as runtime authority
+        assert "execution_attempt" not in env.model_dump()
+        loaded = ActionEnvelope.model_validate_json(env.model_dump_json())
+        assert loaded.execution_attempt is None
+        row = gw.store.get(project_id=env.project_id, effect_key=env.effect_key)
+        assert row["payload_hash"] == expected_hash
+        assert row["effect_key"] == "custom:mission:task:1"
+>       assert row["idempotency_key"] == "stable-key"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'idempotency_key'
+
+tests/tools/test_gateway_envelope_integrity.py:118: KeyError
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[True] _
+
+empty_hash = True
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        expected_hash = env.payload_hash
+        env = env.model_copy(
+            update={
+                "effect_key": "custom:mission:task:1",
+                "idempotency_key": "stable-key",
+                "execution_attempt": 999,
+            }
+        )
+        if empty_hash:
+            env.payload_hash = ""
+        receipt = await gw.execute_envelope(env, context=CONTEXT)
+        assert receipt.outcome == "succeeded"
+        assert adapter.attempts == [("pre", 1), ("execute", 1), ("post", 1)]
+        assert env.execution_attempt == 999  # caller envelope was not reused as runtime authority
+        assert "execution_attempt" not in env.model_dump()
+        loaded = ActionEnvelope.model_validate_json(env.model_dump_json())
+        assert loaded.execution_attempt is None
+        row = gw.store.get(project_id=env.project_id, effect_key=env.effect_key)
+        assert row["payload_hash"] == expected_hash
+        assert row["effect_key"] == "custom:mission:task:1"
+>       assert row["idempotency_key"] == "stable-key"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'idempotency_key'
+
+tests/tools/test_gateway_envelope_integrity.py:118: KeyError
+=========================== short test summary info ============================
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_custom_key_and_durable_attempt_override_preserve_logical_identity[False]
+FAILED tests/tools/test_gateway_envelope_integrity.py::test_custom_key_and_durable_attempt_override_preserve_logical_identity[True]
+2 failed, 4 passed in 0.18s

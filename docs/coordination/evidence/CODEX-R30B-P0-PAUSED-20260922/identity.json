@@ -1,0 +1,22 @@
+{
+  "base": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+  "status": " M src/swarm/contracts/actions.py\n M src/swarm/tools/v17_gateway.py\n?? tests/integration/db/test_execution_attempt_context.py\n?? tests/tools/test_gateway_envelope_integrity.py\n",
+  "files": {
+    "src/swarm/contracts/actions.py": {
+      "sha256": "b1a9c92c3464c99c451e3529d402d6066105170da5f0de957f85704424215a87",
+      "git_blob": "8f84a388cfd9d1e5469fc89ead7a394977d8dc32"
+    },
+    "src/swarm/tools/v17_gateway.py": {
+      "sha256": "b17ce0785c934aa6c7fad36f470d8eacd52913bf7ae313eb7f23786892a5d04b",
+      "git_blob": "44cf2e397a7d9d63bbbf2f237c1a4fefb48eac97"
+    },
+    "tests/tools/test_gateway_envelope_integrity.py": {
+      "sha256": "89336c23cf69cf47d6b3fff7ed4812458f9a4fbf40ccac3349b7157240a8ff14",
+      "git_blob": "01d322f02115c44c816a8abc43ee154b844daca3"
+    },
+    "tests/integration/db/test_execution_attempt_context.py": {
+      "sha256": "148334cd028c436b4971bb0ff1fdedcb6def6d3c1ff67394e972192dfb15be87",
+      "git_blob": "3da854a7447d9c1b57fc4869f4d4605ef73f1af2"
+    }
+  }
+}
