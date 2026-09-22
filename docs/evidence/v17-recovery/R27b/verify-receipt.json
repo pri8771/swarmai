@@ -1,0 +1,33 @@
+{
+  "packet": "R27b",
+  "artifact": "ART-V17-APPROVAL-BINDING",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "939ab596c578b083b11aa465ae6ae894d81c2905",
+  "tested_source_sha": "d3a7b56fa98feea332d819e5e8400fd2c1928bc7",
+  "migration_head": "a17effect004b0001",
+  "database": "postgresql+psycopg://pchordia@127.0.0.1:5432/swarmai_v17_test (local, no secret)",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/integration/db/test_effect_reservation_atomic.py -v (x5)",
+      "result": "7 passed x5"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "407 passed, 2 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T00:40:27Z"
+}
