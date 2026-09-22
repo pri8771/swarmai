@@ -6,23 +6,31 @@ tables in a product or shared test schema.
 
 from __future__ import annotations
 
+import json
 import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from uuid import uuid4
 
+import httpx
 import pytest
 from sqlalchemy import create_engine, text
 
+from swarm.broker.broker import SharedInferenceBroker
 from swarm.broker.durable_remote import (
     DurableRemoteCallGate,
     RemoteAdmissionDenied,
     remote_request_hash,
 )
+from swarm.broker.errors import AmbiguousSendError, BrokerBypassError
+from swarm.broker.policy import RoutePolicyContext
 from swarm.contracts.common import utc_now
 from swarm.contracts.enums import (
     AvailabilityStatus,
+    BillingMode,
+    ErrorClass,
+    PurposeEligibility,
     ReservationPhase,
     SettlementState,
 )
@@ -36,12 +44,14 @@ from swarm.contracts.provider import (
 from swarm.db.engine import make_session_factory
 from swarm.db.models import (
     ApprovalRow,
+    AttemptReceiptRow,
     Base,
     ProviderAccountRow,
     QuotaBucketRow,
     ReservationRow,
     RouteSnapshotRow,
 )
+from swarm.providers.core.adapters import OpenRouterAdapter, OpenRouterFreeRoute
 
 pytestmark = pytest.mark.integration
 SOURCE_TREE = "a" * 40
@@ -253,7 +263,9 @@ def test_settlement_needs_zero_cost_and_selected_free_backend(factory):
                 "provider_cost_usd": "0.0000",
                 "provider_cost_source": "response.usage.cost",
                 "openrouter_routing": {
-                    "selected_provider": "liquid",
+                    "selected_provider": "Liquid",
+                    "selected_model": route.model_id,
+                    "attempt": 1,
                     "is_byok": False,
                     "usage_is_byok": False,
                 },
@@ -278,6 +290,10 @@ def test_missing_cost_report_retains_unknown_even_on_success(factory):
     )
     gate.record_result(ticket, receipt)
     assert gate.read_state(ticket.reservation_id)["state"] == "unknown"
+    with factory() as session:
+        stored = session.get(AttemptReceiptRow, receipt.network_attempt_id)
+        assert stored.settlement_state == "unknown"
+        assert stored.payload["settlement_state"] == "settled"
 
 
 def test_parallel_reservations_have_one_postgres_winner(factory):
@@ -320,3 +336,193 @@ def test_parallel_reservations_have_one_postgres_winner(factory):
     with factory() as session:
         assert session.get(QuotaBucketRow, "request-quota").remaining == 0
         assert sum(session.get(ApprovalRow, gid).used_count for gid in (grant.id, "grant-two")) == 1
+
+
+class _ReceiptAdapter:
+    provider_id = "openrouter"
+
+    def __init__(self, route: RouteSnapshot, *, cost_known: bool = True) -> None:
+        self.route = route
+        self.free_route = OpenRouterFreeRoute(
+            model_id=route.model_id, provider_slug=route.hosted_by
+        )
+        self.cost_known = cost_known
+        self.calls = []
+
+    async def discover(self):
+        return [self.route]
+
+    async def execute_one(self, request, ticket):
+        self.calls.append((request, ticket))
+        extras = {"provider_cost_status": "unknown"}
+        if self.cost_known:
+            extras = {
+                "provider_cost_status": "reported",
+                "provider_cost_usd": "0",
+                "provider_cost_source": "response.usage.cost",
+                "openrouter_routing": {
+                    "selected_provider": "Liquid",
+                    "selected_model": self.route.model_id,
+                    "attempt": 1,
+                    "is_byok": False,
+                    "usage_is_byok": False,
+                },
+            }
+        return AttemptReceipt(
+            logical_call_id=ticket.logical_call_id,
+            actual_route=ticket.route_id,
+            send_phase=ReservationPhase.SETTLED,
+            settlement_state=SettlementState.SETTLED,
+            normalized_usage=NormalizedUsage(extras=extras),
+        )
+
+    async def classify_error(self, exc):
+        return ErrorClass.UNKNOWN_OUTCOME
+
+
+def _broker(factory, route: RouteSnapshot, *, cost_known: bool = True):
+    adapter = _ReceiptAdapter(route, cost_known=cost_known)
+    broker = SharedInferenceBroker(
+        adapter,
+        route_contexts={
+            route.route_id: RoutePolicyContext(
+                route=route,
+                billing_mode=BillingMode.FREE,
+                purpose_eligibility=PurposeEligibility.PROTOTYPE,
+                charge_verified_free=True,
+            )
+        },
+        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+    )
+    return broker, adapter
+
+
+@pytest.mark.asyncio
+async def test_broker_needs_exact_grant_before_any_remote_adapter_call(factory):
+    request, route, grant = _seed(factory)
+    broker, adapter = _broker(factory, route)
+    assert [r.route_id for r in await broker.assess(request)] == [route.route_id]
+    with pytest.raises(RemoteAdmissionDenied, match="exact_grant_missing"):
+        await broker.reserve(request, route)
+    assert adapter.calls == []
+    ticket = await broker.reserve(request, route, grant_id=grant.id)
+    receipt = await broker.invoke(ticket)
+    assert receipt.settlement_state == SettlementState.SETTLED
+    assert broker.remote_gate.read_state(ticket.reservation_id)["state"] == "committed"
+    assert adapter.calls and broker.request_count == 1
+    with pytest.raises(RemoteAdmissionDenied, match="already_sent"):
+        await broker.invoke(ticket)
+    with pytest.raises(BrokerBypassError, match="remote_settlement_requires_durable_gate"):
+        await broker.reconcile(receipt)
+
+
+@pytest.mark.asyncio
+async def test_broker_unknown_charge_stays_unknown_and_cannot_retry(factory):
+    request, route, grant = _seed(factory)
+    broker, adapter = _broker(factory, route, cost_known=False)
+    ticket = await broker.reserve(request, route, grant_id=grant.id)
+    with pytest.raises(AmbiguousSendError):
+        await broker.invoke(ticket)
+    assert broker.remote_gate.read_state(ticket.reservation_id)["state"] == "unknown"
+    assert len(adapter.calls) == 1
+    with pytest.raises(RemoteAdmissionDenied, match="already_sent"):
+        await broker.invoke(ticket)
+    assert len(adapter.calls) == 1
+
+
+@pytest.mark.asyncio
+async def test_adapter_pin_cannot_change_between_reserve_and_send(factory):
+    request, route, grant = _seed(factory)
+    broker, adapter = _broker(factory, route)
+    original_pin = adapter.free_route
+    adapter.free_route = OpenRouterFreeRoute(
+        model_id=route.model_id, provider_slug="modelrun"
+    )
+    with pytest.raises(RemoteAdmissionDenied, match="adapter_pin_mismatch"):
+        await broker.reserve(request, route, grant_id=grant.id)
+    adapter.free_route = original_pin
+    ticket = await broker.reserve(request, route, grant_id=grant.id)
+    adapter.free_route = OpenRouterFreeRoute(
+        model_id=route.model_id, provider_slug="modelrun"
+    )
+    with pytest.raises(RemoteAdmissionDenied, match="adapter_pin_mismatch"):
+        await broker.invoke(ticket)
+    assert adapter.calls == []
+    adapter.free_route = original_pin
+    await broker.expire_unsent(ticket.reservation_id)
+    assert broker.remote_gate.read_state(ticket.reservation_id)["state"] == "released"
+    with pytest.raises(RemoteAdmissionDenied, match="remote_call_not_resendable"):
+        await broker.invoke(ticket)
+    assert adapter.calls == []
+
+
+@pytest.mark.asyncio
+async def test_actual_openrouter_adapter_is_fenced_through_mock_http(
+    factory, monkeypatch: pytest.MonkeyPatch
+):
+    request, route, grant = _seed(factory)
+    sent = []
+
+    def handler(http_request: httpx.Request) -> httpx.Response:
+        sent.append(json.loads(http_request.content))
+        return httpx.Response(
+            200,
+            json={
+                "id": "offline-generation",
+                "model": route.model_id,
+                "openrouter_metadata": {
+                    "attempt": 1,
+                    "is_byok": False,
+                    "endpoints": {
+                        "available": [
+                            {
+                                "provider": "Liquid",
+                                "model": route.model_id,
+                                "selected": True,
+                            }
+                        ]
+                    },
+                },
+                "usage": {"cost": 0, "is_byok": False},
+            },
+        )
+
+    original = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: original(transport=httpx.MockTransport(handler), **kwargs),
+    )
+    adapter = OpenRouterAdapter(
+        mode="live",
+        enabled=True,
+        secret_ref_names=[],
+        account_id=route.account_id,
+        free_route=OpenRouterFreeRoute(model_id=route.model_id, provider_slug="liquid"),
+    )
+    adapter._routes = {route.route_id: route}
+    broker = SharedInferenceBroker(
+        adapter,
+        route_contexts={
+            route.route_id: RoutePolicyContext(
+                route=route,
+                billing_mode=BillingMode.FREE,
+                purpose_eligibility=PurposeEligibility.PROTOTYPE,
+                charge_verified_free=True,
+            )
+        },
+        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+    )
+    ticket = await broker.reserve(request, route, grant_id=grant.id)
+    await broker.invoke(ticket)
+    assert broker.remote_gate.read_state(ticket.reservation_id)["state"] == "committed"
+    assert len(sent) == 1
+    assert sent[0]["provider"] == {
+        "only": ["liquid"],
+        "allow_fallbacks": False,
+        "max_price": {"prompt": 0, "completion": 0},
+        "require_parameters": True,
+    }
+    with pytest.raises(RemoteAdmissionDenied, match="already_sent"):
+        await broker.invoke(ticket)
+    assert len(sent) == 1

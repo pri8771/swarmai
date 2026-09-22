@@ -203,6 +203,10 @@ class DurableRemoteCallGate:
                 or row.phase != ReservationPhase.SENDING.value
             ):
                 raise RemoteAdmissionDenied("remote_result_without_sending_fence")
+            certified = (
+                receipt.settlement_state == SettlementState.SETTLED
+                and self._zero_cost_result(session, row, receipt)
+            )
             session.add(
                 AttemptReceiptRow(
                     network_attempt_id=receipt.network_attempt_id,
@@ -211,18 +215,23 @@ class DurableRemoteCallGate:
                     provider_request_id=receipt.provider_request_id,
                     actual_route=receipt.actual_route,
                     send_phase=receipt.send_phase.value,
-                    settlement_state=receipt.settlement_state.value,
+                    settlement_state=(
+                        SettlementState.SETTLED.value
+                        if certified
+                        else SettlementState.UNKNOWN.value
+                    ),
                     error_class=receipt.error_class.value if receipt.error_class else None,
                     started_at=receipt.started_at,
                     finished_at=receipt.finished_at,
-                    payload=receipt.model_dump(mode="json"),
+                    payload={
+                        **receipt.model_dump(mode="json"),
+                        "gate_settlement_state": "settled" if certified else "unknown",
+                    },
                 )
             )
             # A successful provider response alone cannot certify a free call.
             # Charge and route evidence are retained in the receipt payload.
-            if receipt.settlement_state == SettlementState.SETTLED and self._zero_cost_result(
-                session, row, receipt
-            ):
+            if certified:
                 row.state = ReservationState.COMMITTED.value
                 row.phase = ReservationPhase.SETTLED.value
             else:
@@ -317,7 +326,11 @@ class DurableRemoteCallGate:
             routing = extras.get("openrouter_routing")
             return (
                 isinstance(routing, dict)
-                and routing.get("selected_provider") == (route.payload or {}).get("backend_slug")
+                and isinstance(routing.get("selected_provider"), str)
+                and routing["selected_provider"].casefold()
+                == (route.payload or {}).get("backend_slug")
+                and routing.get("selected_model") == route.model_id
+                and routing.get("attempt") == 1
                 and routing.get("is_byok") is False
                 and routing.get("usage_is_byok") is False
             )
