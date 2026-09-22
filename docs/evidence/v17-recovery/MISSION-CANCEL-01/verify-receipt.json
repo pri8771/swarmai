@@ -1,0 +1,31 @@
+{
+  "packet": "MISSION-CANCEL-01",
+  "artifact": "ART-V15-WORKER-PROTOCOL",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "b4e2a77b1e0e9d294e268ac931329ec4e7dc9733",
+  "tested_source_sha": "2237effbd09ea5fff90d132e88da2ac7996d4177",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/integration/db/test_mission_cancellation.py -v",
+      "result": "4 passed"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "437 passed, 13 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": "CP3 rerun follows in a separate evidence commit",
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T02:01:27Z"
+}
