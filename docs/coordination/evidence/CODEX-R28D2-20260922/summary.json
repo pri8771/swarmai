@@ -48,5 +48,17 @@
     "evidence": "GitHub Actions check annotations: runner_id=0, empty steps, account billing/spending-limit blocker",
     "source_change_indicated": false
   },
+  "post_review_r730_host_note": {
+    "owner_directed_action": "started existing lm-studio container",
+    "verified_result": "container started; existing autostart and port mappings preserved",
+    "not_performed": [
+      "model load or inference",
+      "prompt or API request",
+      "credential creation or entry",
+      "certificate bypass",
+      "SwarmAI mission or worker startup"
+    ],
+    "worker_integration_found": false
+  },
   "review_state": "REVIEW_BLOCKED_REMOTE_CI_ACCOUNT_GATE"
 }
