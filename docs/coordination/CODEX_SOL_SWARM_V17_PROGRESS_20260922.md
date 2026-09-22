@@ -31,11 +31,12 @@ PR35 was rebased onto PR36 and its body updated; current ordering is
 PR30 → PR32 → PR33 → PR34 → PR36 → PR35 → PR37 → PR38 → PR39 → PR40.
 PR31 is still the separate R31a child. No source main merge occurred.
 
-PR40 exact-source local checks: 16 isolated-schema PostgreSQL cases passed;
+PR40 branch checks before the final documentation-only commit: 16
+isolated-schema PostgreSQL cases passed;
 485 offline passed, 4 skipped, 223 deselected; Ruff, mypy (176 source files)
 and diff checks clean. The dual-remote test forces both HTTP handlers through
 a barrier, but uses synthetic grants/account data and `httpx.MockTransport`.
-Hosted PR40 checks were green as of 22:00:47 UTC. No authenticated provider
+Hosted PR40 exact-head checks were green as of 22:00:47 UTC. No authenticated provider
 request, real inference, local Ollama host probe, real dual overlap, account
 charge readback, second-host proof, CP1/CP3/CP4/CP5 or R33c action occurred.
 

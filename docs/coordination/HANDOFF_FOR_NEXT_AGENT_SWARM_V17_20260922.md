@@ -12,7 +12,8 @@ PR31 is a separate child of PR30. All are draft/open; PR30/31/32 have no
 formal reviews or requests. PR35 was rebased onto PR36. Never collapse the
 PR31 and PR32 dispositions.
 
-**Settled checks on PR40:** 16 owned isolated-schema PostgreSQL cases passed;
+**Settled PR40 branch checks before its final documentation-only commit:**
+16 owned isolated-schema PostgreSQL cases passed;
 485 offline passed, 4 skipped, 223 deselected; Ruff/mypy/diff clean; hosted
 offline/console green on the exact head. MockTransport proved two HTTP calls
 overlap through one broker; it is not live provider proof. Disposable database
