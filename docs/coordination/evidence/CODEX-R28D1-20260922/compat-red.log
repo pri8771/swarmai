@@ -1,0 +1,58 @@
+..................sFs.sss.sssFsss.............sss                        [100%]
+=================================== FAILURES ===================================
+________________________ test_d3_local_sandbox_adapter _________________________
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-437/test_d3_local_sandbox_adapter0')
+
+    @pytest.mark.asyncio
+    async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
+        adapter = LocalSandboxAdapter(
+            load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
+        )
+        gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+        env = _explicit_generations(
+>           adapter.normalize(
+                {
+                    "project_id": "proj_a",
+                    "text": "hello",
+                    "path": "note.txt",
+                    "operation": "write_text",
+                }
+            )
+        )
+
+tests/tools/test_v17_gateway_negatives.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <swarm.tools.adapters.local_sandbox.LocalSandboxAdapter object at 0x10bba9e50>
+request = {'project_id': 'proj_a', 'text': 'hello', 'path': 'note.txt', 'operation': 'write_text'}
+
+    def normalize(self, request: dict[str, Any]) -> ActionEnvelope:
+        operation = str(request.get("operation", "fs.write_text"))
+>       declaration = self.manifest.operations[operation]
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'write_text'
+
+src/swarm/tools/adapters/local_sandbox.py:41: KeyError
+________________________ test_filesystem_escape_denied _________________________
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-437/test_filesystem_escape_denied0')
+
+    @pytest.mark.asyncio
+    async def test_filesystem_escape_denied(tmp_path: Path) -> None:
+        adapter = LocalSandboxAdapter(
+            load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
+        )
+        gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+        env = adapter.normalize({"project_id": "proj_a", "text": "x", "path": "../escape.txt"})
+>       with pytest.raises(PermissionError, match="filesystem_path_escape"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'filesystem_path_escape'
+E         Actual message: 'path_outside_root'
+
+tests/tools/test_v17_gateway_negatives.py:445: AssertionError
+=========================== short test summary info ============================
+FAILED tests/tools/test_v17_gateway_negatives.py::test_d3_local_sandbox_adapter
+FAILED tests/tools/test_v17_gateway_negatives.py::test_filesystem_escape_denied
+2 failed, 33 passed, 14 skipped in 0.54s

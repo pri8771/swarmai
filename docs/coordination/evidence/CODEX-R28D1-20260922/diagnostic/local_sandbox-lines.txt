@@ -1,0 +1,87 @@
+     1	"""Local/sandbox adapter — filesystem-bounded, no network."""
+     2	
+     3	from __future__ import annotations
+     4	
+     5	from pathlib import Path
+     6	from typing import Any
+     7	
+     8	from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest
+     9	from swarm.contracts.common import utc_now
+    10	
+    11	
+    12	class LocalSandboxAdapter:
+    13	    def __init__(self, manifest: AdapterManifest, *, root: Path | None = None) -> None:
+    14	        if manifest.adapter_class != "local_sandbox":
+    15	            raise ValueError("adapter_class_mismatch")
+    16	        self.manifest = AdapterManifest.model_validate(manifest.model_dump())
+    17	        self.root = (root or Path("/tmp/swarm-sandbox")).resolve()
+    18	        self.root.mkdir(parents=True, exist_ok=True)
+    19	
+    20	    def normalize(self, request: dict[str, Any]) -> ActionEnvelope:
+    21	        dest = str(request.get("destination") or f"file://{self.root / 'out.txt'}")
+    22	        operation = str(request.get("operation", "write_text"))
+    23	        declaration = self.manifest.operations[operation]
+    24	        env = ActionEnvelope(
+    25	            project_id=str(request["project_id"]),
+    26	            actor=str(request.get("actor", "worker")),
+    27	            integration_id=self.manifest.integration_id,
+    28	            integration_version=self.manifest.integration_version,
+    29	            operation=operation,
+    30	            destination=dest,
+    31	            normalized_payload={
+    32	                "text": str(request.get("text", "")),
+    33	                "path": str(request.get("path", "out.txt")),
+    34	            },
+    35	            requested_scopes=list(declaration.scopes),
+    36	            side_effect_class=declaration.side_effect_class,
+    37	            risk_class=declaration.risk_class,
+    38	            lease_generation=request.get("lease_generation"),
+    39	            cancellation_generation=request.get("cancellation_generation"),
+    40	            policy_version=str(request.get("policy_version", "v17-policy-1")),
+    41	            mission_id=request.get("mission_id"),
+    42	            task_id=request.get("task_id"),
+    43	            attempt_id=request.get("attempt_id"),
+    44	            approval_id=request.get("approval_id"),
+    45	        )
+    46	        return env.ensure_hashes()
+    47	
+    48	    def validate(self, envelope: ActionEnvelope) -> None:
+    49	        if envelope.integration_id != self.manifest.integration_id:
+    50	            raise ValueError("integration_mismatch")
+    51	        path = Path(str(envelope.normalized_payload.get("path", "out.txt")))
+    52	        if path.is_absolute() or ".." in path.parts:
+    53	            raise PermissionError("filesystem_path_escape_denied")
+    54	
+    55	    def observe_pre_state(self, envelope: ActionEnvelope) -> dict[str, Any]:
+    56	        path = self.root / str(envelope.normalized_payload.get("path", "out.txt"))
+    57	        return {"exists": path.exists(), "path": str(path), "observed_at": utc_now().isoformat()}
+    58	
+    59	    def execute(self, envelope: ActionEnvelope) -> dict[str, Any]:
+    60	        path = self.root / str(envelope.normalized_payload.get("path", "out.txt"))
+    61	        path.parent.mkdir(parents=True, exist_ok=True)
+    62	        text = str(envelope.normalized_payload.get("text", ""))
+    63	        path.write_text(text, encoding="utf-8")
+    64	        return {
+    65	            "outcome": "succeeded",
+    66	            "written": True,
+    67	            "bytes": len(text.encode("utf-8")),
+    68	            "path": str(path),
+    69	        }
+    70	
+    71	    def observe_post_state(
+    72	        self, envelope: ActionEnvelope, execution_result: dict[str, Any]
+    73	    ) -> dict[str, Any]:
+    74	        path = Path(str(execution_result.get("path") or self.root / "out.txt"))
+    75	        return {
+    76	            "exists": path.exists(),
+    77	            "size": path.stat().st_size if path.exists() else 0,
+    78	            "result": execution_result,
+    79	        }
+    80	
+    81	    def reconcile(
+    82	        self, envelope: ActionEnvelope, prior_receipts: list[ActionReceiptV17]
+    83	    ) -> dict[str, Any]:
+    84	        path = self.root / str(envelope.normalized_payload.get("path", "out.txt"))
+    85	        if path.exists():
+    86	            return {"state": "succeeded", "external_id": str(path)}
+    87	        return {"state": "failed", "reason": "file_missing"}

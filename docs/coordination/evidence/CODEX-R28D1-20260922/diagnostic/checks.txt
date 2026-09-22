@@ -1,0 +1,9 @@
+PASS exact source SHA/tree and clean worktree verified
+PASS safe temporary probe exit 0
+PASS current relative write_text reproduced
+RED required fs.write_text missing (KeyError)
+RED required proc.run missing (KeyError); no subprocess launched
+RED symlink escape passed validation and wrote outside injected root, within owned temporary directory
+PASS lexical parent and absolute paths rejected without outside mutation
+PASS temporary directory cleanup verified
+NOT RUN tests, database, gateway mission, provider/model/network/public actions

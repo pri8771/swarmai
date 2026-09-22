@@ -1,0 +1,6 @@
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+git rev-parse HEAD
+git rev-parse HEAD^{tree}
+git status --short
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/python /tmp/swarm-r28d1-diagnostic-20260922/probe.py > /tmp/swarm-r28d1-diagnostic-20260922/probe.log
+rg -n 'LocalSandboxAdapter\(|operation.?[:=].?["'"']write_text|operation.?[:=].?["'"']fs.write_text|operation.?[:=].?["'"']proc.run' src tests > /tmp/swarm-r28d1-diagnostic-20260922/callers.txt

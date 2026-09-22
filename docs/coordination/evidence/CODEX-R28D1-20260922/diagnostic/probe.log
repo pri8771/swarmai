@@ -1,0 +1,59 @@
+{
+  "absolute": {
+    "error": "filesystem_path_escape_denied",
+    "error_type": "PermissionError",
+    "outside_exists": false
+  },
+  "current_operations": [
+    "write_text"
+  ],
+  "current_write_text": {
+    "classification": [
+      "idempotent",
+      "low"
+    ],
+    "content": "safe-current",
+    "post_keys": [
+      "exists",
+      "result",
+      "size"
+    ],
+    "pre_keys": [
+      "exists",
+      "observed_at",
+      "path"
+    ],
+    "result": {
+      "bytes": 12,
+      "outcome": "succeeded",
+      "path": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-r28d1-probe-zu1b3_1_/root/nested/a.txt",
+      "written": true
+    }
+  },
+  "fs.write_text": {
+    "error": "'fs.write_text'",
+    "error_type": "KeyError"
+  },
+  "proc.run": {
+    "error": "'proc.run'",
+    "error_type": "KeyError"
+  },
+  "relative_parent": {
+    "error": "filesystem_path_escape_denied",
+    "error_type": "PermissionError",
+    "outside_exists": false
+  },
+  "symlink_escape": {
+    "outside_content": "current-escape",
+    "outside_created": true,
+    "result": {
+      "bytes": 14,
+      "outcome": "succeeded",
+      "path": "/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/swarm-r28d1-probe-zu1b3_1_/root/escape/pwn.txt",
+      "written": true
+    },
+    "validation": "passed"
+  },
+  "temp_cleanup_after_context": true,
+  "temp_cleanup_pending_inside_context": true
+}

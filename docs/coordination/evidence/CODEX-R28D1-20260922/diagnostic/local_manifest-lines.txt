@@ -1,0 +1,36 @@
+     1	{
+     2	  "schema_version": "1.0",
+     3	  "integration_id": "local.sandbox",
+     4	  "integration_version": "1",
+     5	  "adapter_class": "local_sandbox",
+     6	  "operations": {
+     7	    "write_text": {
+     8	      "side_effect_class": "idempotent",
+     9	      "risk_class": "low",
+    10	      "scopes": [
+    11	        "sandbox.fs"
+    12	      ],
+    13	      "read_data_classes": [
+    14	        "workspace_file"
+    15	      ],
+    16	      "write_data_classes": [
+    17	        "workspace_file"
+    18	      ]
+    19	    }
+    20	  },
+    21	  "read_data_classes": [
+    22	    "workspace_file"
+    23	  ],
+    24	  "write_data_classes": [
+    25	    "workspace_file"
+    26	  ],
+    27	  "network_scopes": [],
+    28	  "filesystem_scopes": [
+    29	    "/tmp/swarm-sandbox"
+    30	  ],
+    31	  "secrets_refs_required": [],
+    32	  "risk_class": "low",
+    33	  "sandbox_required": true,
+    34	  "host_requirements": [],
+    35	  "user_interaction_consequential": false
+    36	}

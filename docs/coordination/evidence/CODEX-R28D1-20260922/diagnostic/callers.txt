@@ -1,0 +1,6 @@
+tests/tools/test_v17_gateway_classification_fences.py:72:        LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path),
+tests/tools/test_v17_gateway_negatives.py:80:    adapter = LocalSandboxAdapter(
+tests/tools/test_v17_gateway_negatives.py:90:                "operation": "write_text",
+tests/tools/test_v17_gateway_negatives.py:279:    local = LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path)
+tests/tools/test_v17_gateway_negatives.py:440:    adapter = LocalSandboxAdapter(
+tests/tools/test_v17_gateway_negatives.py:453:    local = LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path)
