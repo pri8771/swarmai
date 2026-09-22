@@ -863,9 +863,17 @@
       "sp": 1,
       "tier": "small",
       "spec": "docs/coordination/packets/R-LATER-V17.md",
-      "status": "planned",
+      "status": "changes_required",
       "checkpoint": "CP1",
-      "gate": "EXT-V14-LEAD-REVIEW"
+      "gate": "EXT-V14-LEAD-REVIEW",
+      "attempts_used": 2,
+      "attempts_remaining": 0,
+      "latest_attempt": "v14-real-008/attempt2",
+      "latest_mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+      "latest_result": "failed/repair_required",
+      "evidence_ref": "codex/portfolio-review-20260922@ca7db098e56168bf9b24d91808fe88393f798bf3",
+      "lead_ack_ref": "docs/coordination/reviews/CP1_V14_REAL_008_ATTEMPT2_LEAD_ACK_20260922.md",
+      "next_live_attempt_authorized": false
     },
     {
       "id": "R25a",
