@@ -1,0 +1,23 @@
+{
+  "missing_authority": {
+    "accepted": "succeeded",
+    "adapter_calls": 1,
+    "attempt_id": null,
+    "cancellation_generation": 0,
+    "lease_generation": 1,
+    "mission_id": null,
+    "task_id": null
+  },
+  "undeclared_operation": {
+    "accepted": "succeeded",
+    "adapter_calls": 1,
+    "operation": "undeclared.synthetic"
+  },
+  "underclassification": {
+    "accepted": "succeeded",
+    "adapter_calls": 1,
+    "approval_id": null,
+    "receipt_effective_risk_class": null,
+    "receipt_effective_side_effect_class": null
+  }
+}

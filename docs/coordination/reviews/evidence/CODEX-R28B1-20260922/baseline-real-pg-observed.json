@@ -1,0 +1,26 @@
+{
+  "missing_authority": {
+    "accepted": "succeeded",
+    "adapter_calls": 1,
+    "attempt_id": null,
+    "cancellation_generation": 0,
+    "durable_store_type": "DurableEffectRepository",
+    "lease_generation": 1,
+    "mission_id": null,
+    "operation": "echo",
+    "stored_state": "succeeded",
+    "task_id": null
+  },
+  "undeclared_operation": {
+    "accepted": "succeeded",
+    "adapter_calls": 1,
+    "attempt_id": null,
+    "cancellation_generation": 0,
+    "durable_store_type": "DurableEffectRepository",
+    "lease_generation": 1,
+    "mission_id": null,
+    "operation": "undeclared.synthetic",
+    "stored_state": "succeeded",
+    "task_id": null
+  }
+}

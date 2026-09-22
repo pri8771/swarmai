@@ -1,0 +1,29 @@
+R28b-1 production-only static review
+Baseline: b204fda738221787325ce8fd0b8db58e6e29b573
+Scope: current uncommitted actions.py, v17_gateway.py, and three adapter manifests;
+canonical CODEX_R28B1_20260922.md at 11d9d8f, native R28b rules 1-3 only.
+
+Result: no causally grounded production defect found in released scope.
+
+Mechanically matched invariants
+- Every production adapter operation is explicitly declared: API echo, local write_text,
+  browser navigate and submit. Missing operation lookup raises operation_not_declared
+  before observe/execute.
+- _effective_envelope copies the caller envelope and takes the ranked maximum for both
+  side-effect and risk. The effective copy drives fence presence, durability, policy,
+  exact approval, reservation/admission, reconciliation, and receipt construction.
+- Consequential/irreversible effective operations require all three identity fields and
+  both generations. Omitted generations remain None through all normalizers; no 1/0
+  authority is fabricated. Existing generation comparison remains in force afterward.
+- ActionReceiptV17 adds nullable effective fields. Every newly constructed gateway receipt
+  populates both from the effective envelope; older persisted receipt JSON validates with
+  None rather than an invented classification. No relational migration is required because
+  receipts are stored as JSON.
+- A higher caller claim remains higher than a lower manifest declaration; a lower caller
+  claim cannot weaken the declaration. Consequential classification still forces exact
+  approval through _require_exact_approval even when max_risk_without_approval is raised.
+
+Limits
+- Static inspection only; root owns the active PostgreSQL and full-suite gates.
+- R28b-2 actor, provider, policy, and durable fence-reader seams were intentionally excluded.
+- Test/fixture changes were outside this production-only pass.

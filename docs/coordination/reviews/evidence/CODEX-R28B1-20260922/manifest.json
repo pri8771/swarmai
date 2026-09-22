@@ -1,0 +1,42 @@
+{
+  "baseline-memory-observed.json": {
+    "bytes": 541,
+    "sha256": "15bdd1fc11e83a309366a87a5a38623a722fa4b34c226e681495b2595a44dbf4"
+  },
+  "baseline-memory-repro.py": {
+    "bytes": 2821,
+    "sha256": "7eec9f927aa919dc6251d8e36851ee3b1ef9b968db3eb02cb764d0067a5a1aac"
+  },
+  "baseline-real-pg-observed.json": {
+    "bytes": 668,
+    "sha256": "83cd227727c35b9bae1be3895de18a71441cf6091b28b8386ff8f501fa24ccd2"
+  },
+  "baseline-real-pg-repro.py": {
+    "bytes": 2143,
+    "sha256": "35f317e792397c4695d3bf308fe0186abd9664108b71bd581ba4a2425fe7fce2"
+  },
+  "causal-map.txt": {
+    "bytes": 6632,
+    "sha256": "0072861dc509c9ddfb8afeb8fa7a953684bfdd001bbf66b47da9f51ae3a9d141"
+  },
+  "checks.json": {
+    "bytes": 1469,
+    "sha256": "a2caada6933b0b6ec5b1ab944bcab4e7d2ce9bb53d0f63cc18006b876b9afd2d"
+  },
+  "full.txt": {
+    "bytes": 661,
+    "sha256": "5be8415f30fed38292f5b9f0ab074dacf98154fd3f7ff66e1c7def81ed1a3e83"
+  },
+  "mechanical-review.txt": {
+    "bytes": 1881,
+    "sha256": "4bcb8f3759bf73b1515fa8bf08c37e85d067fb495df4fe336930260ec5ddb08b"
+  },
+  "mypy.txt": {
+    "bytes": 45,
+    "sha256": "90acfc2dd8ef96aecf92af2c2eeb276f66cb63023d07bf19074f3c4ae4fca52e"
+  },
+  "ruff.txt": {
+    "bytes": 19,
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  }
+}
