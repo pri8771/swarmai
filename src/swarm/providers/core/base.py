@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from swarm.contracts.common import utc_now
@@ -72,9 +73,7 @@ class BaseCoreAdapter:
             capability_claims=["chat"],
             observed_capabilities=[],
             availability_status=(
-                AvailabilityStatus.DISABLED
-                if not self.enabled
-                else AvailabilityStatus.AVAILABLE
+                AvailabilityStatus.DISABLED if not self.enabled else AvailabilityStatus.AVAILABLE
             ),
             status="implemented_offline" if not self.enabled else "enabled",
             observed_at=utc_now(),
@@ -140,16 +139,64 @@ class BaseCoreAdapter:
                 actual_route=route.route_id,
                 error_class=exc.error_class,
                 settlement_state=SettlementState.UNKNOWN,
-                normalized_usage=NormalizedUsage(requests=1),
+                normalized_usage=NormalizedUsage(
+                    requests=1,
+                    extras={
+                        "provider_cost_status": "unknown",
+                        "rate_limit_headers": exc.rate_limit_headers,
+                    },
+                ),
                 usage_raw_ref=None,
             )
+        rate_limit_headers = raw.pop("_swarm_rate_limit_headers", {})
         usage = normalize_openai_usage(raw.get("usage"))
+        raw_usage = raw.get("usage")
+        raw_cost = raw_usage.get("cost") if isinstance(raw_usage, dict) else None
+        routing: dict[str, Any] = {}
+        if self.provider_id == "openrouter":
+            metadata = raw.get("openrouter_metadata")
+            if isinstance(metadata, dict):
+                attempt = metadata.get("attempt")
+                if isinstance(attempt, int) and not isinstance(attempt, bool) and attempt > 0:
+                    routing["attempt"] = attempt
+                if isinstance(metadata.get("is_byok"), bool):
+                    routing["is_byok"] = metadata["is_byok"]
+                endpoints = metadata.get("endpoints")
+                available = endpoints.get("available") if isinstance(endpoints, dict) else None
+                if isinstance(available, list):
+                    selected = [
+                        item
+                        for item in available
+                        if isinstance(item, dict) and item.get("selected") is True
+                    ]
+                    if len(selected) == 1:
+                        for key, target in (
+                            ("provider", "selected_provider"),
+                            ("model", "selected_model"),
+                        ):
+                            value = selected[0].get(key)
+                            if isinstance(value, str) and len(value) <= 128 and value.isprintable():
+                                routing[target] = value
+            if isinstance(raw_usage, dict) and isinstance(raw_usage.get("is_byok"), bool):
+                routing["usage_is_byok"] = raw_usage["is_byok"]
+            if not routing:
+                routing["status"] = "unknown"
+        cost_evidence: dict[str, Any] = {"provider_cost_status": "unknown"}
+        if raw_cost is not None and not isinstance(raw_cost, bool):
+            try:
+                value = Decimal(str(raw_cost))
+                if value.is_finite() and value >= 0:
+                    cost_evidence = {
+                        "provider_cost_status": "reported",
+                        "provider_cost_usd": format(value, "f"),
+                        "provider_cost_source": "response.usage.cost",
+                    }
+            except (InvalidOperation, ValueError):
+                pass
         model_served = raw.get("model") or route.model_id
         # Persist observed upstream identity on the route snapshot.
         route.resolved_model_revision = str(model_served)
-        route.observed_capabilities = list(
-            set(route.observed_capabilities + ["chat"])
-        )
+        route.observed_capabilities = list(set(route.observed_capabilities + ["chat"]))
         return AttemptReceipt(
             logical_call_id=admitted_ticket.logical_call_id,
             send_phase=ReservationPhase.SETTLED,
@@ -163,6 +210,12 @@ class BaseCoreAdapter:
                 extras={
                     "upstream_model": model_served,
                     "usage_confidence": usage.get("confidence"),
+                    "rate_limit_headers": rate_limit_headers,
+                    "upstream_provider": routing.get("selected_provider")
+                    if self.provider_id == "openrouter"
+                    else raw.get("provider"),
+                    **({"openrouter_routing": routing} if self.provider_id == "openrouter" else {}),
+                    **cost_evidence,
                 },
             ),
             settlement_state=SettlementState.SETTLED,
@@ -183,7 +236,8 @@ class BaseCoreAdapter:
         if request.max_output_tokens is not None:
             token_field = "max_completion_tokens" if self.provider_id == "groq" else "max_tokens"
             body[token_field] = request.max_output_tokens
-        return self.transport.request("POST", "/chat/completions", json_body=body)
+        response = self.transport.request_with_metadata("POST", "/chat/completions", json_body=body)
+        return {**response.body, "_swarm_rate_limit_headers": response.rate_limit_headers}
 
     def _invoke_gemini(self, model_id: str, request: InferenceRequest) -> dict[str, Any]:
         contents = []

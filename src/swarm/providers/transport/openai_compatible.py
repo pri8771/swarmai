@@ -26,12 +26,39 @@ class RecordedExchange:
     headers: dict[str, str] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class TransportResult:
+    body: dict[str, Any]
+    rate_limit_headers: dict[str, str]
+
+
 class ProviderHttpError(RuntimeError):
-    def __init__(self, status_code: int, body: str, error_class: ErrorClass) -> None:
+    def __init__(
+        self,
+        status_code: int,
+        body: str,
+        error_class: ErrorClass,
+        *,
+        rate_limit_headers: dict[str, str] | None = None,
+    ) -> None:
         super().__init__(f"http_{status_code}")
         self.status_code = status_code
         self.body = body
         self.error_class = error_class
+        self.rate_limit_headers = rate_limit_headers or {}
+
+
+def _safe_rate_limit_headers(headers: dict[str, str], secrets: list[str]) -> dict[str, str]:
+    """Retain a narrow, redacted header subset; never retain arbitrary headers."""
+    safe: dict[str, str] = {}
+    for key, raw in headers.items():
+        name = key.lower()
+        if name != "retry-after" and not name.startswith("x-ratelimit-"):
+            continue
+        value = redact(str(raw).strip()[:100], secrets)
+        if all(32 <= ord(char) < 127 for char in value):
+            safe[name] = value
+    return safe
 
 
 class RecordingTransport:
@@ -74,6 +101,23 @@ class RecordingTransport:
         params: dict[str, str] | None = None,
         extra_headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
+        return self.request_with_metadata(
+            method,
+            path,
+            json_body=json_body,
+            params=params,
+            extra_headers=extra_headers,
+        ).body
+
+    def request_with_metadata(
+        self,
+        method: str,
+        path: str,
+        *,
+        json_body: dict[str, Any] | None = None,
+        params: dict[str, str] | None = None,
+        extra_headers: dict[str, str] | None = None,
+    ) -> TransportResult:
         self.calls += 1
         url = path if path.startswith("http") else f"{self.base_url}/{path.lstrip('/')}"
         if self.mode == "replay":
@@ -82,37 +126,40 @@ class RecordingTransport:
         if extra_headers:
             headers.update(extra_headers)
         with httpx.Client(timeout=self.timeout) as client:
-            response = client.request(
-                method, url, json=json_body, params=params, headers=headers
-            )
+            response = client.request(method, url, json=json_body, params=params, headers=headers)
         body_text = response.text
         secrets = [r.resolve() for r in self.secret_refs if r.present()]
         safe_body = redact(body_text, secrets)
+        safe_headers = _safe_rate_limit_headers(dict(response.headers), secrets)
         if self.mode == "record" and self.fixture_path is not None:
-            self._append_record(method, url, response.status_code, json_body, safe_body)
+            self._append_record(
+                method, url, response.status_code, json_body, safe_body, safe_headers
+            )
         if response.status_code >= 400:
             raise ProviderHttpError(
                 response.status_code,
                 safe_body,
                 classify_http_status(response.status_code, safe_body),
+                rate_limit_headers=safe_headers,
             )
-        return response.json() if response.content else {}
+        return TransportResult(
+            body=response.json() if response.content else {},
+            rate_limit_headers=safe_headers,
+        )
 
-    def _replay(
-        self, method: str, url: str, json_body: dict[str, Any] | None
-    ) -> dict[str, Any]:
+    def _replay(self, method: str, url: str, json_body: dict[str, Any] | None) -> TransportResult:
         if not self._replay_queue:
             raise RuntimeError(f"no recorded fixture left for {method} {url}")
         exchange = self._replay_queue.pop(0)
+        safe_headers = _safe_rate_limit_headers(exchange.headers, [])
         if exchange.status_code >= 400:
             raise ProviderHttpError(
                 exchange.status_code,
                 exchange.response_text or json.dumps(exchange.response_json),
-                classify_http_status(
-                    exchange.status_code, exchange.response_text or ""
-                ),
+                classify_http_status(exchange.status_code, exchange.response_text or ""),
+                rate_limit_headers=safe_headers,
             )
-        return exchange.response_json or {}
+        return TransportResult(exchange.response_json or {}, safe_headers)
 
     def _append_record(
         self,
@@ -121,6 +168,7 @@ class RecordingTransport:
         status: int,
         request_json: dict[str, Any] | None,
         body_text: str,
+        rate_limit_headers: dict[str, str],
     ) -> None:
         assert self.fixture_path is not None
         try:
@@ -138,7 +186,7 @@ class RecordingTransport:
                 "request_json": request_json,
                 "response_json": payload,
                 "response_text": body_text if payload is None else None,
-                "headers": {},
+                "headers": rate_limit_headers,
             }
         )
         self.fixture_path.parent.mkdir(parents=True, exist_ok=True)
