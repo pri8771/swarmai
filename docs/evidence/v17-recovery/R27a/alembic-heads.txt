@@ -1,0 +1,2 @@
+$ uv run alembic heads
+a17effect004b0001 (head)

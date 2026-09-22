@@ -1,0 +1,9 @@
+{
+  "metric": "gh api repos/pri8771/swarmai/actions/runs?per_page=1 --jq .total_count",
+  "readings": [
+    {"at": "2026-09-21T20:2xZ", "total_count": 1023, "note": "planning-pass audit reading (approximate minute); all recent runs on coordination/swarm-control, failure, zero steps"},
+    {"at": "2026-09-22T00:31:31Z", "total_count": 1383, "note": "T0, before OPS-CI-01; newest run 2026-09-22T00:30:09Z from heartbeat commits"},
+    {"at": "2026-09-22T00:34:17Z", "total_count": 1383, "note": "T1, after takeover heartbeat published 3 commits at 00:33:35-37Z with [skip ci]; no new run. The ab958d7 push to cursor/v17-single-session (non-doc paths) also produced no run: hosted CI remains account-blocked (EXT-ACTIONS-BILLING), so hosted CI status is blocked, not green"}
+  ],
+  "heartbeat_producer": {"label": "com.swarmai.coord-heartbeat-v17", "engine": "fable", "epoch": "fable-v17-20260922-01", "cadence_minutes": 5}
+}

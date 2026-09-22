@@ -130,6 +130,7 @@ class ActionReceiptV17(StrictModel):
     external_id: str | None = None
     outcome: ActionOutcomeV17
     reconciliation_state: str = "none"
+    attempt_number: int = 0
     attempt_refs: list[str] = Field(default_factory=list)
     evidence_digest: str | None = None
     authorized_artifacts: list[str] = Field(default_factory=list)

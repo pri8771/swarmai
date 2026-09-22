@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, ApprovalGrant
 from swarm.contracts.common import new_id, payload_hash, utc_now
-from swarm.db.models import ActionEffectRow, ApprovalRow
+from swarm.db.models import ActionEffectRow, ActionReceiptRow, ApprovalRow
 
 
 class EffectStoreError(ValueError):
@@ -43,15 +44,22 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
         "finished_at": row.finished_at,
         "reconciled_at": row.reconciled_at,
         "external_id": row.external_id,
+        "state_reason": row.state_reason,
+        "attempt_count": int(row.attempt_count or 0),
+        "executor_id": row.executor_id,
+        "approval_consumed_at": row.approval_consumed_at,
     }
 
 
 class InMemoryEffectStore:
     """Process-local effect store used by tests and single-host loops."""
 
+    durable = False
+
     def __init__(self) -> None:
         self.effects: dict[tuple[str, str], dict[str, Any]] = {}
-        self.receipts: dict[str, ActionReceiptV17] = {}
+        # receipt_id -> (effect_id, attempt_number, receipt); insert-only (R27a).
+        self.receipts: dict[str, tuple[str, int, ActionReceiptV17]] = {}
         self.approvals: dict[str, ApprovalGrant] = {}
 
     def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
@@ -91,6 +99,10 @@ class InMemoryEffectStore:
             "reconciliation": {},
             "created_at": utc_now(),
             "external_id": None,
+            "state_reason": None,
+            "attempt_count": 0,
+            "executor_id": None,
+            "approval_consumed_at": None,
         }
         self.effects[key] = row
         return row
@@ -142,11 +154,42 @@ class InMemoryEffectStore:
         return self.effects.get((project_id, effect_key))
 
     def store_receipt(self, receipt: ActionReceiptV17) -> ActionReceiptV17:
-        self.receipts[receipt.action_id] = receipt
-        return receipt
+        """Insert-only. attempt_number = 1 + max(existing for this effect)."""
+        row = self._require(receipt.project_id, receipt.effect_key)
+        effect_id = str(row["effect_id"])
+        if receipt.receipt_id in self.receipts:
+            raise EffectConflictError("receipt_already_recorded")
+        existing = [n for (eid, n, _) in self.receipts.values() if eid == effect_id]
+        attempt_number = 1 + (max(existing) if existing else 0)
+        if any(eid == effect_id and n == attempt_number for (eid, n, _) in self.receipts.values()):
+            raise EffectConflictError("receipt_already_recorded")
+        stored = receipt.model_copy(
+            update={"effect_id": effect_id, "attempt_number": attempt_number}
+        )
+        self.receipts[stored.receipt_id] = (effect_id, attempt_number, stored)
+        return stored
 
     def get_receipt(self, action_id: str) -> ActionReceiptV17 | None:
-        return self.receipts.get(action_id)
+        matches = [r for (_, _, r) in self.receipts.values() if r.action_id == action_id]
+        if not matches:
+            return None
+        return max(matches, key=lambda r: r.finished_at or r.started_at or utc_now())
+
+    def list_receipts(self, *, project_id: str, effect_key: str) -> list[ActionReceiptV17]:
+        rows = [
+            (n, r)
+            for (_, n, r) in self.receipts.values()
+            if r.project_id == project_id and r.effect_key == effect_key
+        ]
+        return [r for _, r in sorted(rows, key=lambda t: t[0])]
+
+    def terminal_receipt(self, *, project_id: str, effect_key: str) -> ActionReceiptV17 | None:
+        ok = [
+            r
+            for r in self.list_receipts(project_id=project_id, effect_key=effect_key)
+            if r.outcome == "succeeded"
+        ]
+        return ok[-1] if ok else None
 
     def _require(self, project_id: str, effect_key: str) -> dict[str, Any]:
         row = self.effects.get((project_id, effect_key))
@@ -162,9 +205,10 @@ class DurableEffectRepository:
     can use either backend.
     """
 
+    durable = True
+
     def __init__(self, session: Session) -> None:
         self.session = session
-        self.receipts: dict[str, ActionReceiptV17] = {}
 
     def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
         row = ApprovalRow(
@@ -312,11 +356,80 @@ class DurableEffectRepository:
         return _effect_dict_from_row(row)
 
     def store_receipt(self, receipt: ActionReceiptV17) -> ActionReceiptV17:
-        self.receipts[receipt.action_id] = receipt
-        return receipt
+        """Insert-only. attempt_number computed under FOR UPDATE on the effect row."""
+        effect = self.session.scalar(
+            select(ActionEffectRow)
+            .where(
+                ActionEffectRow.project_id == receipt.project_id,
+                ActionEffectRow.effect_key == receipt.effect_key,
+            )
+            .with_for_update()
+        )
+        if effect is None:
+            raise EffectStoreError("effect_not_found")
+        if self.session.get(ActionReceiptRow, receipt.receipt_id) is not None:
+            raise EffectConflictError("receipt_already_recorded")
+        current_max = self.session.scalar(
+            select(func.max(ActionReceiptRow.attempt_number)).where(
+                ActionReceiptRow.effect_id == effect.effect_id
+            )
+        )
+        attempt_number = 1 + int(current_max or 0)
+        stored = receipt.model_copy(
+            update={"effect_id": effect.effect_id, "attempt_number": attempt_number}
+        )
+        row = ActionReceiptRow(
+            receipt_id=stored.receipt_id,
+            project_id=stored.project_id,
+            effect_id=effect.effect_id,
+            effect_key=stored.effect_key,
+            action_id=stored.action_id,
+            attempt_number=attempt_number,
+            outcome=stored.outcome,
+            reconciliation_state=stored.reconciliation_state,
+            evidence_digest=stored.evidence_digest or "",
+            receipt=stored.model_dump(mode="json"),
+        )
+        self.session.add(row)
+        try:
+            self.session.flush()
+        except IntegrityError as exc:
+            self.session.rollback()
+            raise EffectConflictError("receipt_already_recorded") from exc
+        return stored
 
     def get_receipt(self, action_id: str) -> ActionReceiptV17 | None:
-        return self.receipts.get(action_id)
+        row = self.session.scalar(
+            select(ActionReceiptRow)
+            .where(ActionReceiptRow.action_id == action_id)
+            .order_by(ActionReceiptRow.created_at.desc(), ActionReceiptRow.attempt_number.desc())
+            .limit(1)
+        )
+        return None if row is None else ActionReceiptV17.model_validate(row.receipt)
+
+    def list_receipts(self, *, project_id: str, effect_key: str) -> list[ActionReceiptV17]:
+        rows = self.session.scalars(
+            select(ActionReceiptRow)
+            .where(
+                ActionReceiptRow.project_id == project_id,
+                ActionReceiptRow.effect_key == effect_key,
+            )
+            .order_by(ActionReceiptRow.attempt_number.asc())
+        )
+        return [ActionReceiptV17.model_validate(r.receipt) for r in rows]
+
+    def terminal_receipt(self, *, project_id: str, effect_key: str) -> ActionReceiptV17 | None:
+        row = self.session.scalar(
+            select(ActionReceiptRow)
+            .where(
+                ActionReceiptRow.project_id == project_id,
+                ActionReceiptRow.effect_key == effect_key,
+                ActionReceiptRow.outcome == "succeeded",
+            )
+            .order_by(ActionReceiptRow.attempt_number.desc())
+            .limit(1)
+        )
+        return None if row is None else ActionReceiptV17.model_validate(row.receipt)
 
     def _require_row(self, project_id: str, effect_key: str) -> ActionEffectRow:
         row = self.session.scalar(

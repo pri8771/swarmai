@@ -126,10 +126,13 @@ class ConsequentialToolGateway:
         # Reserve early so succeeded effects short-circuit without re-consuming approval.
         effect = self.store.reserve(envelope)
         if effect["state"] == "succeeded":
-            prior = self.store.get_receipt(envelope.action_id)
-            if prior is not None:
-                return prior
-            return self._receipt_from_effect(envelope, effect, outcome="succeeded")
+            # R27a: a replay returns the original immutable receipt, never a re-mint.
+            terminal = self.store.terminal_receipt(
+                project_id=envelope.project_id, effect_key=envelope.effect_key
+            )
+            if terminal is None:
+                raise ReconciliationRequiredError("succeeded_effect_missing_receipt")
+            return terminal
         if effect["state"] == "unknown":
             return await self._reconcile_unknown(envelope, effect)
 
@@ -144,9 +147,12 @@ class ConsequentialToolGateway:
             if "unknown" in str(exc):
                 raise ReconciliationRequiredError(str(exc)) from exc
             if "succeeded" in str(exc):
-                row = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
-                assert row is not None
-                return self._receipt_from_effect(envelope, row, outcome="succeeded")
+                terminal = self.store.terminal_receipt(
+                    project_id=envelope.project_id, effect_key=envelope.effect_key
+                )
+                if terminal is None:
+                    raise ReconciliationRequiredError("succeeded_effect_missing_receipt") from exc
+                return terminal
             raise
 
         # 6-7) pre observe, execute, post observe
@@ -270,11 +276,9 @@ class ConsequentialToolGateway:
     async def _reconcile_unknown(
         self, envelope: ActionEnvelope, effect: dict[str, Any]
     ) -> ActionReceiptV17:
-        prior = [
-            r
-            for r in self.store.receipts.values()
-            if r.effect_key == envelope.effect_key and r.project_id == envelope.project_id
-        ]
+        prior = self.store.list_receipts(
+            project_id=envelope.project_id, effect_key=envelope.effect_key
+        )
         result = self.adapter.reconcile(envelope, prior)
         state = str(result.get("state", "unknown"))
         if state == "succeeded":
@@ -431,18 +435,4 @@ class ConsequentialToolGateway:
             attempt_refs=[new_id("aat_")],
             evidence_digest=digest,
             authorized_artifacts=list(artifacts or []),
-        )
-
-    def _receipt_from_effect(
-        self, envelope: ActionEnvelope, effect: dict[str, Any], *, outcome: str
-    ) -> ActionReceiptV17:
-        return self._build_receipt(
-            envelope,
-            effect_id=effect["effect_id"],
-            outcome=outcome,
-            pre=effect.get("pre_observation") or {},
-            post=effect.get("post_observation") or {},
-            started=effect.get("started_at"),
-            external_id=effect.get("external_id"),
-            artifacts=self._authorized_artifacts(envelope, effect.get("post_observation") or {}),
         )

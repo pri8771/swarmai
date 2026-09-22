@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/Downloads/swarm-ai-fable-v17/.venv/bin/python
+rootdir: /Users/pchordia/Downloads/swarm-ai-fable-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 6 items
+
+tests/integration/db/test_action_receipts_durable.py::test_receipt_survives_new_repository_instance PASSED [ 16%]
+tests/integration/db/test_action_receipts_durable.py::test_replay_returns_original_receipt_not_reminted PASSED [ 33%]
+tests/integration/db/test_action_receipts_durable.py::test_duplicate_receipt_attempt_rejected PASSED [ 50%]
+tests/integration/db/test_action_receipts_durable.py::test_project_b_cannot_list_project_a_receipts PASSED [ 66%]
+tests/integration/db/test_action_receipts_durable.py::test_succeeded_effect_without_receipt_fails_closed PASSED [ 83%]
+tests/integration/db/test_action_receipts_durable.py::test_single_alembic_head_after_upgrade PASSED [100%]
+
+============================== 6 passed in 0.55s ===============================

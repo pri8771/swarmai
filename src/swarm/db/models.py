@@ -315,6 +315,41 @@ class ActionEffectRow(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     reconciled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    # R27a bookkeeping (used by R27b/R27c/R27e): why a terminal state was reached,
+    # how many execution attempts were admitted, who admitted the current one, and
+    # when the bound approval was consumed for this effect.
+    state_reason: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    attempt_count: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    executor_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    approval_consumed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+
+class ActionReceiptRow(Base):
+    """Immutable per-attempt action receipt (R27a). Insert-only; never updated."""
+
+    __tablename__ = "action_receipts"
+    __table_args__ = (
+        UniqueConstraint("effect_id", "attempt_number", name="uq_action_receipt_effect_attempt"),
+        Index("ix_action_receipts_project_effect_key", "project_id", "effect_key"),
+    )
+
+    receipt_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    effect_id: Mapped[str] = mapped_column(
+        String(64), ForeignKey("action_effects.effect_id", name="fk_action_receipt_effect")
+    )
+    effect_key: Mapped[str] = mapped_column(String(192))
+    action_id: Mapped[str] = mapped_column(String(64), index=True)
+    attempt_number: Mapped[int] = mapped_column(Integer)
+    outcome: Mapped[str] = mapped_column(String(32))
+    reconciliation_state: Mapped[str] = mapped_column(
+        String(32), default="none", server_default="none"
+    )
+    evidence_digest: Mapped[str] = mapped_column(String(128))
+    receipt: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class WorkerLeaseRow(Base):
