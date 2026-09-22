@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import difflib
 import re
+import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,7 +27,7 @@ from swarm.mission.worktree import (
     intent_to_add,
     worktree_diff,
 )
-from swarm.tools.fences import ActorContext
+from swarm.tools.fences import ActorContext, FenceState
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 # Known dogfood target inside the SwarmAI repo.
@@ -43,6 +44,10 @@ def inclusive_range_count(start: int, end: int) -> int:
     """Count integers from start to end inclusive."""
     return end - start + 1
 '''
+
+
+class WorkerCancellationRequested(RuntimeError):
+    """Raised when a runtime interruption reaches a synchronous repository worker."""
 
 
 @dataclass
@@ -353,6 +358,7 @@ class RepoWorker:
         action_gateway: ConsequentialToolGateway | None = None,
         actor_context: ActorContext | None = None,
         action_gateway_factory: Callable[[Path], ConsequentialToolGateway] | None = None,
+        cancellation_event: threading.Event | None = None,
         parser_dogfood_fixture: bool = False,
         require_broker: bool = False,
     ) -> None:
@@ -377,6 +383,8 @@ class RepoWorker:
         self._effect_attempt_id: str | None = None
         self._effect_sequence = 0
         self._effect_receipt_ids: list[str] = []
+        self._effect_fence: FenceState | None = None
+        self._cancellation_event = cancellation_event or threading.Event()
         # The runtime needs this even when an effect raises before run_task can
         # return its normal (result, handle) tuple.  It is deliberately only a
         # cleanup handle; it does not make the worktree eligible for promotion.
@@ -397,12 +405,32 @@ class RepoWorker:
         """Worktree retained for runtime cleanup if a task raises mid-turn."""
         return self._active_worktree
 
+    @property
+    def active_action_receipt_ids(self) -> list[str]:
+        """Return receipts completed before an interrupted task could return normally."""
+        return list(self._effect_receipt_ids)
+
+    def request_cancellation(self) -> None:
+        """Cooperatively stop new inference/effects after the current synchronous step."""
+        self._cancellation_event.set()
+
+    def _raise_if_cancelled(self) -> None:
+        fence_cancelled = bool(getattr(self.action_gateway.fences, "cancelled", False))
+        if self._cancellation_event.is_set() or fence_cancelled:
+            raise WorkerCancellationRequested("worker_cancelled")
+
     def _begin_task_effects(self, *, mission_id: str, task_id: str) -> None:
         self._effect_mission_id = mission_id
         self._effect_task_id = task_id
         self._effect_attempt_id = new_id("att_")
         self._effect_sequence = 0
         self._effect_receipt_ids = []
+        self._effect_fence = self.action_gateway.fences.current(
+            project_id=self.project_id,
+            mission_id=mission_id,
+            task_id=task_id,
+            attempt_id=self._effect_attempt_id,
+        )
 
     def _end_task_effects(self, result: WorkerResult) -> WorkerResult:
         result.action_receipt_ids = list(self._effect_receipt_ids)
@@ -411,18 +439,17 @@ class RepoWorker:
         self._effect_attempt_id = None
         self._effect_sequence = 0
         self._effect_receipt_ids = []
+        self._effect_fence = None
         return result
 
     def _action_effect(self, operation: str, payload: dict[str, Any]) -> Any:
+        self._raise_if_cancelled()
         if not self._effect_mission_id or not self._effect_task_id or not self._effect_attempt_id:
             raise RuntimeError("action_effect_without_task_context")
+        if self._effect_fence is None:
+            raise RuntimeError("action_effect_without_fence")
         self._effect_sequence += 1
-        fence = self.action_gateway.fences.current(
-            project_id=self.project_id,
-            mission_id=self._effect_mission_id,
-            task_id=self._effect_task_id,
-            attempt_id=self._effect_attempt_id,
-        )
+        fence = self._effect_fence
         adapter = self.action_gateway.registry.resolve("local.sandbox", "1")
         request = {
             **payload,
@@ -452,10 +479,12 @@ class RepoWorker:
         envelope = envelope.model_copy(
             update={"effect_key": effect_key, "idempotency_key": effect_key}
         ).ensure_hashes()
+        self._raise_if_cancelled()
         receipt = self.action_gateway.execute_envelope_sync(
             envelope, context=self.actor_context
         )
         self._effect_receipt_ids.append(receipt.receipt_id)
+        self._raise_if_cancelled()
         return receipt
 
     def _run_effect(self, cmd: list[str], *, timeout: float = 120.0) -> dict[str, Any]:
@@ -503,6 +532,7 @@ class RepoWorker:
         max_tokens: int = 800,
     ) -> InferenceResult:
         """Prefer brokered path; fail closed when broker is required but missing."""
+        self._raise_if_cancelled()
         if self.broker is not None:
             from swarm.mission.brokered_inference import brokered_local_chat_sync
 
@@ -537,6 +567,7 @@ class RepoWorker:
         prior: dict[str, WorkerResult],
         shared_worktree: WorktreeHandle | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle | None]:
+        self._raise_if_cancelled()
         self._begin_task_effects(mission_id=mission_id, task_id=task.id)
         family = task.task_family
         support = classify_task_support(family)
@@ -613,6 +644,7 @@ class RepoWorker:
             model=self._model_for(family),
             max_tokens=600,
         )
+        self._raise_if_cancelled()
         text = (inference.text or "").strip()
         ok = bool(inference.ok and len(text) >= 20)
         summary = f"{family}_complete" if ok else f"{family}_failed_or_empty"
@@ -697,6 +729,7 @@ class RepoWorker:
         shared: WorktreeHandle | None,
         prior: dict[str, WorkerResult] | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle]:
+        self._raise_if_cancelled()
         if self._effect_mission_id is None:
             # Direct unit-test seam; normal product execution always establishes
             # the task attempt in run_task before reaching this method.
@@ -712,7 +745,9 @@ class RepoWorker:
         # so MissionRuntime can remove this disposable worktree if this task
         # throws before it returns its normal result tuple.
         self._active_worktree = handle
+        self._raise_if_cancelled()
         self._bind_worktree_effects(handle)
+        self._raise_if_cancelled()
         target_rel = self._resolve_target_rel(task)
         if target_rel is None and prior:
             for prev in prior.values():
@@ -781,6 +816,7 @@ class RepoWorker:
                 max_tokens=4096,
             )
             calls.append(inference)
+            self._raise_if_cancelled()
             patched = _extract_python_file(inference.text) if inference.ok else None
         else:
             # R02c: targeted edit blocks + mandatory new regression test; echo => one re-prompt.
@@ -800,6 +836,7 @@ class RepoWorker:
                     max_tokens=4096,
                 )
                 calls.append(inference)
+                self._raise_if_cancelled()
                 if not inference.ok:
                     break
                 change = _parse_targeted_change(inference.text)
@@ -1205,6 +1242,7 @@ class RepoWorker:
                 model=self._model_for("review"),
                 max_tokens=160,
             )
+            self._raise_if_cancelled()
 
         review_text = ""
         if review_inference is not None:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 
@@ -74,6 +75,74 @@ class StaticFenceProvider:
             return {
                 "lease_generation": self.state.lease_generation,
                 "cancellation_generation": self.state.cancellation_generation,
+            }
+
+        return read
+
+
+class RevocableFenceProvider:
+    """Thread-safe local fence provider that can invalidate an active mission turn.
+
+    Local mission workers run synchronously in a background thread.  A runtime
+    interruption must therefore invalidate the generation that the worker
+    captured at task start; otherwise a worker that resumes after cancellation
+    could mint a fresh matching generation and admit another effect.
+    """
+
+    def __init__(self, lease_generation: int = 1, cancellation_generation: int = 0) -> None:
+        self._lock = threading.Lock()
+        self._cancelled = False
+        self._state = FenceState(
+            lease_generation=lease_generation,
+            cancellation_generation=cancellation_generation,
+        )
+
+    def current(
+        self,
+        *,
+        project_id: str,
+        mission_id: str | None,
+        task_id: str | None,
+        attempt_id: str | None,
+    ) -> FenceState:
+        del project_id, mission_id, task_id, attempt_id
+        with self._lock:
+            return self._state.model_copy(deep=True)
+
+    @property
+    def cancelled(self) -> bool:
+        """Whether this local mission fence has been revoked."""
+        with self._lock:
+            return self._cancelled
+
+    def cancel(self) -> FenceState:
+        """Advance cancellation generation so pre-cancel envelopes fail closed."""
+        with self._lock:
+            self._cancelled = True
+            self._state = self._state.model_copy(
+                update={"cancellation_generation": self._state.cancellation_generation + 1}
+            )
+            return self._state.model_copy(deep=True)
+
+    def reader(
+        self,
+        *,
+        project_id: str,
+        mission_id: str | None,
+        task_id: str | None,
+        attempt_id: str | None,
+    ) -> Callable[[Session], Mapping[str, int | None]]:
+        def read(session: Session) -> Mapping[str, int | None]:
+            del session
+            state = self.current(
+                project_id=project_id,
+                mission_id=mission_id,
+                task_id=task_id,
+                attempt_id=attempt_id,
+            )
+            return {
+                "lease_generation": state.lease_generation,
+                "cancellation_generation": state.cancellation_generation,
             }
 
         return read
