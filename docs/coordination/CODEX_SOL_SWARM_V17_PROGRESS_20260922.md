@@ -36,9 +36,29 @@ isolated-schema PostgreSQL cases passed;
 485 offline passed, 4 skipped, 223 deselected; Ruff, mypy (176 source files)
 and diff checks clean. The dual-remote test forces both HTTP handlers through
 a barrier, but uses synthetic grants/account data and `httpx.MockTransport`.
-Hosted PR40 exact-head checks were green as of 22:00:47 UTC. No authenticated provider
-request, real inference, local Ollama host probe, real dual overlap, account
-charge readback, second-host proof, CP1/CP3/CP4/CP5 or R33c action occurred.
+Hosted PR40 exact-head checks were green as of 22:00:47 UTC. No real inference,
+real dual overlap, account charge readback, second-host proof, CP1/CP3/CP4/CP5
+or R33c action occurred. Authenticated metadata and local host observations are
+recorded below.
+
+### Read-only provider observations after owner request to proceed with live testing
+
+- OpenRouter current-key GET: HTTP 200; `is_free_tier=false`, `limit=1`,
+  `limit_remaining=1`, `usage=0` (daily/weekly/monthly also zero),
+  `include_byok_in_limit=false`. These fields do not establish a no-charge
+  model route or authorize inference.
+- Groq models GET using the existing credential: HTTP 403. Current model
+  permission and tier remain unverified; no inference request was made.
+- Local Ollama `/api/tags`: HTTP 200. Installed models include `qwen3.5:4b`
+  and `qwen3.5:9b`; no generation or download was requested.
+- Fresh GitHub PR list: PR30/PR31/PR32 and the dependent PR33-PR40 chain
+  remain draft/open with empty review decisions. No current source tree has
+  an independent formal acceptance verdict.
+
+The owner asked to proceed with the live test, so the bounded metadata/host
+checks above were executed. That broad request does not identify an exact
+model call, source tree, account allowance, output cap or independent review
+verdict. Do not claim LIVE qualification from these observations.
 
 ## Exact prerequisite access proposal — **not granted**
 

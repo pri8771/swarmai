@@ -21,12 +21,13 @@ and socket-only PostgreSQL cluster were stopped and removed; public tables and
 test schemas were zero before cleanup. New candidate worktrees are clean;
 the pre-existing dirty main checkout was untouched.
 
-**Grant:** read-only authenticated metadata/loopback proposal is pending owner
-answer. Exact action/fields/limits: `CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`.
-It covers one OpenRouter `/api/v1/key` GET, Groq tier/limits pages and one
-`/openai/v1/models` GET, and one local Ollama `/api/tags` GET. No inference.
-Do not treat silence or provider selection as approval. A later model-call
-grant must separately bind the accepted source tree and exact request.
+**Provider observations after owner asked to proceed with live testing:**
+OpenRouter current-key GET 200 (`is_free_tier=false`, limit and remaining 1,
+usage 0); Groq models GET 403; Ollama loopback tags GET 200 with installed
+`qwen3.5:4b`/`qwen3.5:9b`. No inference or download. Details in
+`CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`. A model-call grant must bind the
+independently reviewed source tree and exact request, model, backend, allowance
+and output cap.
 
 **Independent gates:** PR30 formal review first, then separate PR31/PR32
 reviews, then new dependent chain. CP1 attempt3 unauthorized; R33c public
@@ -36,9 +37,9 @@ CP3 evidence remain open. The CP3 rerun is located at source
 9/9 local harness and 20/20 concurrent accepts, independent review pending;
 it does not prove the operational mission or second host.
 
-**Next bounded task:** if the metadata grant arrives, perform only its three
-read-only observations, retain redacted receipts and reassess exact free
-eligibility. If not, wait for independent PR30 disposition and an explicitly
-released Swarm source packet; do not repeat the settled offline suite without
-source drift or a concrete failure. The full source chain, evidence limits and
-grant scope are in `CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`.
+**Next bounded task:** obtain independent PR30 disposition, then the separate
+PR31/PR32 reviews; resolve Groq 403/current tier and pin a genuinely free
+remote allowance before a bounded reviewed-source inference grant. Do not
+repeat the settled offline suite without source drift or a concrete failure.
+The full source chain and evidence limits are in
+`CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`.
