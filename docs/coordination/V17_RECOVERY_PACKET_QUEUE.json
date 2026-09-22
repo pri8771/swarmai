@@ -553,12 +553,15 @@
       "sp": 3,
       "tier": "high",
       "spec": "docs/coordination/packets/R27c.md",
-      "status": "planned",
+      "status": "impl_complete",
       "fixes": [
         "E4",
         "A3"
       ],
-      "review_hold": "lead reviews diff before R27e"
+      "review_hold": "lead reviews diff before R27e",
+      "implementation_ref": "codex/swarm-r27c-repair-20260922@fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e",
+      "review_ref": "docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27C-R1-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R27d",
@@ -571,11 +574,14 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R27d.md",
-      "status": "planned",
+      "status": "impl_complete",
       "fixes": [
         "A4",
         "A5"
-      ]
+      ],
+      "implementation_ref": "cursor/v17-single-session@1b9afc510b5cac875ae5b6291c123f132938ede1",
+      "review_ref": "docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27D-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R27e",
@@ -588,12 +594,14 @@
       "sp": 3,
       "tier": "high",
       "spec": "docs/coordination/packets/R27e.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "E5",
         "E10"
       ],
-      "review_hold": "lead reviews diff"
+      "review_hold": "lead reviews diff",
+      "assignee": "codex",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R27E_20260922.md"
     },
     {
       "id": "R28a",
@@ -612,7 +620,8 @@
         "E7",
         "E11",
         "I4"
-      ]
+      ],
+      "review_hold": "R27e exact-SHA lead review required before start"
     },
     {
       "id": "R28b",
