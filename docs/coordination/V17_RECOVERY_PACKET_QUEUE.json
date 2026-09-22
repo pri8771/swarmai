@@ -517,12 +517,15 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R27a.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "E1",
         "E9",
         "E10"
-      ]
+      ],
+      "implementation_ref": "0505c24576259d8cf54fa2ec07590a789b398d52",
+      "review_decision": "bounded_engineering_slice_accepted",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md"
     },
     {
       "id": "R27b",
@@ -535,12 +538,15 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R27b.md",
-      "status": "planned",
+      "status": "impl_complete",
       "fixes": [
         "E2",
         "E3",
         "E8"
-      ]
+      ],
+      "implementation_ref": "d3a7b56fa98feea332d819e5e8400fd2c1928bc7",
+      "review_decision": "bounded_engineering_slice_accepted",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md"
     },
     {
       "id": "R27c",
@@ -790,10 +796,10 @@
       ],
       "diagnostic_status": "complete_contract_disposition_frozen",
       "diagnostic_assignment_ref": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
-      "review_hold": "Owner pause: preserve P0 WIP only; no implementation/test execution until explicit resume. Product/live R30b remains held.",
+      "review_hold": "Product HttpApiAdapter remains held; make_approval integrity follow-up + composed-tip review required before product release.",
       "diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e",
       "contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
-      "prerequisite_status": "paused_uncommitted_unreviewed",
+      "prerequisite_status": "accepted_followup_required_on_composition",
       "prerequisite_assignment_ref": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md"
     },
     {
@@ -809,10 +815,14 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R31a.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "I2"
-      ]
+      ],
+      "assignee": "codex",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R31A_OFFLINE_20260922.md",
+      "active_slice": "offline implementation/test-source only",
+      "review_hold": "No session/network/live execution; R31b held."
     },
     {
       "id": "R31b",
@@ -888,11 +898,14 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R17a.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "V2"
       ],
-      "checkpoint": "CP3"
+      "checkpoint": "CP3",
+      "review_decision": "local_harness_checkpoint_accepted",
+      "review_ref": "docs/coordination/reviews/ART-V15-RECOVERY-EVIDENCE-R17A-LEAD-REVIEW.md",
+      "review_hold": "Final CP3 still requires exact rerun evidence review and remaining physical-host gate."
     },
     {
       "id": "R02a",
@@ -905,7 +918,9 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R02a.md",
-      "status": "ready"
+      "status": "impl_complete",
+      "review_decision": "bounded_runtime_guard_accepted",
+      "review_ref": "docs/coordination/reviews/ART-V14-REAL-E2E-R02A-LEAD-REVIEW.md"
     },
     {
       "id": "R02b",
@@ -978,7 +993,8 @@
       "status": "planned",
       "fixes": [
         "W4"
-      ]
+      ],
+      "review_hold": "R17a dependency reconciled; assess only after R28d parent/live dependency disposition and composition tip review."
     },
     {
       "id": "R17c",
