@@ -3,9 +3,9 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `889c9c16bb30c9569267741dfc74c10d8ae10d69`
-- Coordination SHA: `8144af313f9e539fd57b013727368482f0df5063`
-- Updated: `2026-09-22T01:54:40Z`
+- Branch SHA: `b4e2a77b1e0e9d294e268ac931329ec4e7dc9733`
+- Coordination SHA: `4d1da16b515966d7a4351337263fa1991fc0a235`
+- Updated: `2026-09-22T01:59:45Z`
 - Trigger: `scheduler`
 - Worker engine: `fable`
 - Status: **review_requested**
