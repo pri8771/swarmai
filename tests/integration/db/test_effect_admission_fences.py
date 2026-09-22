@@ -7,10 +7,11 @@ from sqlalchemy import text
 
 from swarm.contracts.common import new_id
 from swarm.db.engine import make_session_factory
-from swarm.db.lease_fencing import LeaseLifecycleService
+from swarm.db.lease_fencing import LeaseClaimError, LeaseLifecycleService
 from swarm.db.repositories import MissionRepository
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import EffectConflictError
+from swarm.tools.fences import ActorContext
 from swarm.tools.v17_gateway import StaleLeaseError
 from tests.integration.db.test_effect_transactions import (
     _gateway,
@@ -69,16 +70,16 @@ def _leased_envelope(factory, adapter):
             }
         )
         session.commit()
-        return envelope
+        return envelope, ActorContext(actor=worker_id, project_id=mission.project_id)
 
 
 @pytest.mark.asyncio
 async def test_gateway_admits_current_durable_lease(factory):
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
-    receipt = await gateway.execute_envelope(env)
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
+    receipt = await gateway.execute_envelope(env, context=context)
     assert receipt.outcome == "succeeded"
     assert adapter.call_count == 1
     assert _used_count(factory, env.approval_id) == 1
@@ -88,9 +89,9 @@ async def test_gateway_admits_current_durable_lease(factory):
 @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
 async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
     original_reserve = gateway.store.reserve
 
     def reserve_then_change(envelope):
@@ -125,7 +126,7 @@ async def test_gateway_fences_durable_change_after_local_precheck(factory, monke
 
     monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
     with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=context)
     assert adapter.call_count == 0
     assert _used_count(factory, env.approval_id) == 0
     row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
@@ -137,12 +138,12 @@ async def test_gateway_fences_durable_change_after_local_precheck(factory, monke
 @pytest.mark.asyncio
 async def test_partial_lease_context_fails_closed(factory):
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     env.attempt_id = None
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
     with pytest.raises(StaleLeaseError, match="fence_missing"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=context)
     assert adapter.call_count == 0
     assert _used_count(factory, env.approval_id) == 0
 
@@ -150,13 +151,13 @@ async def test_partial_lease_context_fails_closed(factory):
 @pytest.mark.asyncio
 async def test_reserved_effect_cannot_strip_lease_binding(factory):
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
     gateway.store.reserve(env)
     stripped = env.model_copy(update={"mission_id": None, "task_id": None, "attempt_id": None})
     with pytest.raises(StaleLeaseError, match="fence_missing"):
-        await gateway.execute_envelope(stripped)
+        await gateway.execute_envelope(stripped, context=context)
     assert adapter.call_count == 0
     assert _used_count(factory, env.approval_id) == 0
 
@@ -169,9 +170,9 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
     import swarm.tools.effects as effects
 
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
     at_cas, release, cancelled = threading.Event(), threading.Event(), threading.Event()
     errors = []
     original_cas = effects._cas_to_executing
@@ -183,7 +184,7 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
 
     def admit():
         try:
-            asyncio.run(gateway.execute_envelope(env))
+            asyncio.run(gateway.execute_envelope(env, context=context))
         except BaseException as exc:
             errors.append(exc)
 
@@ -237,15 +238,15 @@ async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(
     factory, monkeypatch, outcome
 ):
     adapter = ApiMcpAdapter()
-    env = _leased_envelope(factory, adapter)
+    env, context = _leased_envelope(factory, adapter)
     if outcome == "unknown":
         env.normalized_payload["force_unknown"] = True
         env.payload_hash = ""
         env.effect_key = ""
         env.ensure_hashes()
     gateway = _gateway(adapter, factory, project=env.project_id)
-    env.approval_id = gateway.make_approval(env).approval_id
-    assert (await gateway.execute_envelope(env)).outcome == outcome
+    env.approval_id = gateway.make_approval(env, context=context).approval_id
+    assert (await gateway.execute_envelope(env, context=context)).outcome == outcome
 
     def forbidden_reconcile(*args, **kwargs):
         pytest.fail("changed authority must be rejected before adapter reconciliation")
@@ -258,7 +259,7 @@ async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(
             "attempt_id": "another-attempt",
         }
     )
-    with pytest.raises(EffectConflictError, match="effect_authority_binding_mismatch"):
-        await gateway.execute_envelope(changed)
+    with pytest.raises(LeaseClaimError, match="lease_not_current"):
+        await gateway.execute_envelope(changed, context=context)
     assert adapter.call_count == 1
     assert _used_count(factory, env.approval_id) == 1

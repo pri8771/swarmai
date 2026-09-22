@@ -13,6 +13,7 @@ from sqlalchemy import text
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
+from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import (
     ApprovalInvalidError,
     ConsequentialToolGateway,
@@ -25,6 +26,7 @@ pytestmark = pytest.mark.integration
 DATABASE_URL = os.environ.get(
     "SWARM_DATABASE_URL", "postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm"
 )
+CRASH_CONTEXT = ActorContext(actor="worker", project_id="crash_project")
 
 
 @pytest.fixture(scope="module")
@@ -56,18 +58,17 @@ def setup_effect(factory, tmp_path, side_effect_class="consequential"):
     adapter = FileEffectAdapter(str(path))
     store = DurableEffectRepository(factory)
     gateway = ConsequentialToolGateway(
-        adapter,
-        project_id="crash_project",
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
+        adapter=adapter,
         store=store,
+        fences=LeaseFenceProvider(factory),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
         orphan_grace_seconds=0,
     )
     env = adapter.normalize({"project_id": "crash_project", "body": str(path)})
     env = bind_lease(factory, env)
     env.timeout_seconds = 1
     env.side_effect_class = side_effect_class
-    env.approval_id = gateway.make_approval(env).approval_id
+    env.approval_id = gateway.make_approval(env, context=CRASH_CONTEXT).approval_id
     return path, adapter, store, gateway, env
 
 
@@ -120,14 +121,16 @@ async def test_kill_after_side_effect_before_finalize_reconciles_to_succeeded_on
     path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
     kill_at("after", env, path)
     assert row(store, env)["state"] == "executing"
-    result = await gateway.execute_envelope(env)
+    result = await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert result.outcome == "succeeded" and result.reconciliation_state == "reconciled"
     assert path.read_text().splitlines() == [env.effect_key]
     assert adapter.call_count == 0 and adapter.reconcile_calls == 1
     assert row(store, env)["attempt_count"] == 1
     receipts = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
     assert [r.outcome for r in receipts] == ["succeeded"]
-    assert (await gateway.execute_envelope(env)).receipt_id == result.receipt_id
+    assert (
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
+    ).receipt_id == result.receipt_id
     assert len(path.read_text().splitlines()) == 1
 
 
@@ -136,7 +139,7 @@ async def test_kill_before_side_effect_retries_exactly_once(factory, tmp_path):
     path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
     kill_at("before", env, path)
     assert not path.exists()
-    result = await gateway.execute_envelope(env)
+    result = await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert result.outcome == "succeeded"
     assert path.read_text().splitlines() == [env.effect_key]
     assert adapter.call_count == 1 and row(store, env)["attempt_count"] == 2
@@ -145,7 +148,7 @@ async def test_kill_before_side_effect_retries_exactly_once(factory, tmp_path):
     assert [r.attempt_number for r in receipts] == [1, 2]
     assert receipts[0].reconciliation_state == "reconciled"
     assert store.get_approval(env.approval_id, project_id=env.project_id).used_count == 1
-    await gateway.execute_envelope(env)
+    await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert adapter.call_count == 1
 
 
@@ -154,16 +157,15 @@ async def test_live_executor_is_not_taken_over(factory, tmp_path):
     _, adapter, store, gateway, env = setup_effect(factory, tmp_path)
     begin(store, env)
     with pytest.raises(EffectConflictError, match="effect_already_executing"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert adapter.call_count == 0 and adapter.reconcile_calls == 0
     assert row(store, env)["state"] == "executing"
     assert (
         ConsequentialToolGateway(
-            adapter,
-            project_id=env.project_id,
-            allowed_scopes=set(),
-            current_lease_generation=1,
+            adapter=adapter,
             store=store,
+            fences=LeaseFenceProvider(factory),
+            policy=StaticPolicyProvider(set(), "v17-policy-1"),
         ).orphan_grace_seconds
         == 30
     )
@@ -192,7 +194,7 @@ async def test_irreversible_not_applied_requires_operator_rearm(factory, tmp_pat
         with pytest.raises(
             ReconciliationRequiredError, match="irreversible_requires_operator_disposition"
         ):
-            await gateway.execute_envelope(env)
+            await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert not path.exists() and adapter.call_count == 0
     assert adapter.reconcile_calls == 1
     for operator, reason in [("", "confirmed absent"), ("owner", "")]:
@@ -217,7 +219,7 @@ async def test_irreversible_not_applied_requires_operator_rearm(factory, tmp_pat
             operator="test_operator",
             reason="duplicate",
         )
-    assert (await gateway.execute_envelope(env)).outcome == "succeeded"
+    assert (await gateway.execute_envelope(env, context=CRASH_CONTEXT)).outcome == "succeeded"
     assert len(path.read_text().splitlines()) == 1
 
 
@@ -231,7 +233,7 @@ async def test_reconcile_garbage_verdict_stays_unknown_and_never_executes(
     age(factory, env)
     monkeypatch.setattr(adapter, "reconcile", lambda *_: {"state": verdict})
     with pytest.raises(ReconciliationRequiredError, match="external_outcome_still_unknown"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert row(store, env)["state"] == "unknown" and not path.exists()
     receipts = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
     assert len(receipts) == 1 and receipts[0].reconciliation_state == "pending"
@@ -242,9 +244,13 @@ async def test_reconciliation_does_not_restore_revoked_approval(factory, tmp_pat
     path, _, store, gateway, env = setup_effect(factory, tmp_path)
     begin(store, env)
     age(factory, env)
-    gateway.revoke_approval(env.approval_id, revoked_by="test_operator", reason="revoked")
+    gateway.revoke_approval(
+        env.approval_id,
+        context=ActorContext(actor="test_operator", project_id="crash_project"),
+        reason="revoked",
+    )
     with pytest.raises(ApprovalInvalidError):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     assert row(store, env)["state"] == "failed" and not path.exists()
     assert row(store, env)["attempt_count"] == 1
 
@@ -299,7 +305,7 @@ async def test_recovery_cannot_reclassify_effect_or_change_timeout(
     begin(store, env)
     age(factory, env)
     with pytest.raises(EffectConflictError, match=error):
-        await gateway.execute_envelope(env.model_copy(update=change))
+        await gateway.execute_envelope(env.model_copy(update=change), context=CRASH_CONTEXT)
     assert row(store, env)["state"] == "executing" and not path.exists()
     assert adapter.reconcile_calls == 0
 
@@ -334,7 +340,7 @@ async def test_reconcile_exception_is_retained_as_pending_receipt(factory, tmp_p
 
     monkeypatch.setattr(adapter, "reconcile", fail_probe)
     with pytest.raises(ReconciliationRequiredError, match="external_outcome_still_unknown"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     receipts = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
     assert len(receipts) == 1 and receipts[0].reconciliation_state == "pending"
     assert "synthetic private probe detail" not in receipts[0].model_dump_json()
@@ -360,7 +366,7 @@ def test_concurrent_reconcile_has_one_terminal_disposition(factory, tmp_path, mo
 
     def run(_):
         try:
-            return asyncio.run(gateway.execute_envelope(env)).outcome
+            return asyncio.run(gateway.execute_envelope(env, context=CRASH_CONTEXT)).outcome
         except EffectConflictError as exc:
             return str(exc)
 
@@ -409,7 +415,7 @@ async def test_malformed_reconcile_result_is_pending(factory, tmp_path, monkeypa
     age(factory, env)
     monkeypatch.setattr(adapter, "reconcile", lambda *_: bad_result)
     with pytest.raises(ReconciliationRequiredError, match="external_outcome_still_unknown"):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     receipts = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
     assert len(receipts) == 1 and receipts[0].reconciliation_state == "pending"
     assert row(store, env)["state"] == "unknown" and not path.exists()

@@ -9,6 +9,7 @@ from swarm.contracts.actions import ActionEnvelope
 from swarm.db.engine import create_db_engine, make_session_factory
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository
+from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -37,13 +38,13 @@ def run_paused_execution(
         envelope = ActionEnvelope.model_validate_json(envelope_json)
         adapter = PausingAdapter(started, release)
         gateway = ConsequentialToolGateway(
-            adapter,
-            project_id=envelope.project_id,
-            allowed_scopes={"network.https", "mcp.call"},
-            current_lease_generation=envelope.lease_generation,
+            adapter=adapter,
             store=DurableEffectRepository(factory),
+            fences=LeaseFenceProvider(factory),
+            policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
         )
-        receipt = asyncio.run(gateway.execute_envelope(envelope))
+        context = ActorContext(actor="worker", project_id="proj_a")
+        receipt = asyncio.run(gateway.execute_envelope(envelope, context=context))
         result_queue.put({"outcome": receipt.outcome, "receipt_id": receipt.receipt_id})
     except Exception as exc:  # noqa: BLE001
         started.set()

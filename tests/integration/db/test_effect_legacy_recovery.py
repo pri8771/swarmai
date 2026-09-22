@@ -12,6 +12,7 @@ from swarm.tools.effect_recovery import disposition_legacy_effect
 from swarm.tools.effects import EffectConflictError, EffectStoreError
 from swarm.tools.v17_gateway import ReconciliationRequiredError
 from tests.integration.db.test_effect_crash_window import (
+    CRASH_CONTEXT,
     age,
     begin,
     row,
@@ -131,7 +132,7 @@ async def test_legacy_not_applied_keeps_audit_and_cannot_rearm(factory, tmp_path
     with pytest.raises(
         ReconciliationRequiredError, match="irreversible_requires_operator_disposition"
     ):
-        await gateway.execute_envelope(env)
+        await gateway.execute_envelope(env, context=CRASH_CONTEXT)
     reconciled = row(store, env)
     assert reconciled["state"] == "failed"
     assert reconciled["legacy_disposition"]["evidence_ref"] == "evidence://r27e/legacy/absent"

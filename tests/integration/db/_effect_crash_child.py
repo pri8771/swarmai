@@ -11,6 +11,7 @@ from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17
 from swarm.db.engine import create_db_engine, make_session_factory
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository
+from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -46,11 +47,11 @@ def run_crash(database_url: str, envelope_json: str, path: str, phase: str) -> N
     factory = make_session_factory(engine)
     envelope = ActionEnvelope.model_validate_json(envelope_json)
     gateway = ConsequentialToolGateway(
-        FileEffectAdapter(path, phase),
-        project_id=envelope.project_id,
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
+        adapter=FileEffectAdapter(path, phase),
         store=DurableEffectRepository(factory),
+        fences=LeaseFenceProvider(factory),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
     )
-    asyncio.run(gateway.execute_envelope(envelope))
+    context = ActorContext(actor="worker", project_id="crash_project")
+    asyncio.run(gateway.execute_envelope(envelope, context=context))
     os._exit(99)  # The specified crash seam must have terminated the child first.

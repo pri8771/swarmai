@@ -7,6 +7,7 @@ from typing import Any
 
 from swarm.contracts.actions import ActionEnvelope, BrowserSessionRef
 from swarm.tools.adapters.browser_session import BrowserSessionAdapter
+from swarm.tools.fences import ActorContext
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -38,8 +39,10 @@ class SessionRecoveryService:
         *,
         session_ref: BrowserSessionRef,
         approved_envelope: ActionEnvelope,
+        context: ActorContext,
         perform_human_login: bool = True,
     ) -> SessionRecoveryResult:
+        self.gateway._authorize_context(approved_envelope, context)
         notes: list[str] = []
         alias = session_ref.session_alias
         self.adapter.register_session(session_ref)
@@ -79,7 +82,7 @@ class SessionRecoveryService:
             "attempt_id": approved_envelope.attempt_id,
         }
         # Navigate uses a distinct operation → distinct effect key from submit.
-        nav_receipt = await self.gateway.execute_request(navigate_req)
+        nav_receipt = await self.gateway.execute_request(navigate_req, context=context)
         return SessionRecoveryResult(
             session_alias=alias,
             signed_out_detected=signed_out,
