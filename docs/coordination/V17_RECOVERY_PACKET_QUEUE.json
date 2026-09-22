@@ -783,9 +783,13 @@
       "fixes": [
         "I2"
       ],
-      "diagnostic_status": "released_offline_only",
+      "diagnostic_status": "complete_contract_disposition_frozen",
       "diagnostic_assignment_ref": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
-      "review_hold": "No R30b implementation/live_local release; diagnostic only under current action holds"
+      "review_hold": "R30b product implementation held pending exact-SHA R30b-P0 acceptance; live execution separately held",
+      "diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e",
+      "contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
+      "prerequisite_status": "released",
+      "prerequisite_assignment_ref": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md"
     },
     {
       "id": "R31a",
