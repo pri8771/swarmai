@@ -37,6 +37,10 @@ from swarm.tools.fences import ActorContext, FenceProvider, PolicyProvider
 from swarm.tools.manifests import manifest_digest
 
 
+class PayloadIntegrityError(ToolAuthorizationError):
+    """The supplied digest no longer describes the logical action fields."""
+
+
 class ApprovalInvalidError(PermissionError):
     pass
 
@@ -143,6 +147,7 @@ class ConsequentialToolGateway:
         self, envelope: ActionEnvelope, *, context: ActorContext
     ) -> ActionReceiptV17:
         self._authorize_context(envelope, context)
+        self._require_payload_integrity(envelope)
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         definition_digest = manifest_digest(adapter.manifest)
         envelope = self._effective_envelope(envelope)
@@ -214,6 +219,8 @@ class ConsequentialToolGateway:
                 raise ApprovalInvalidError("approval_expired_or_revoked_or_exhausted") from exc
             raise
 
+        # Runtime correlation comes only from committed durable admission, not the caller.
+        envelope = envelope.model_copy(update={"execution_attempt": effect["attempt_count"]})
         # 6-7) adapter calls leave the event loop responsive and have deadlines.
         pre: dict[str, Any] = {}
         started = utc_now()
@@ -383,6 +390,7 @@ class ConsequentialToolGateway:
         self, envelope: ActionEnvelope, *, context: ActorContext
     ) -> ActionReceiptV17:
         self._authorize_context(envelope, context)
+        self._require_payload_integrity(envelope)
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
@@ -403,6 +411,7 @@ class ConsequentialToolGateway:
     async def _reconcile_unknown(
         self, envelope: ActionEnvelope, effect: dict[str, Any], *, context: ActorContext
     ) -> ActionReceiptV17:
+        envelope = envelope.model_copy(update={"execution_attempt": effect["attempt_count"]})
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         definition_digest = manifest_digest(adapter.manifest)
         prior = self.store.list_receipts(
@@ -483,6 +492,12 @@ class ConsequentialToolGateway:
             reconciliation_state="pending",
         )
         raise ReconciliationRequiredError("external_outcome_still_unknown")
+
+    @staticmethod
+    def _require_payload_integrity(envelope: ActionEnvelope) -> None:
+        if envelope.payload_hash and envelope.payload_hash != envelope.canonical_payload_hash():
+            raise PayloadIntegrityError("payload_hash_mismatch")
+        envelope.ensure_hashes()
 
     def _effective_envelope(self, envelope: ActionEnvelope) -> ActionEnvelope:
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)

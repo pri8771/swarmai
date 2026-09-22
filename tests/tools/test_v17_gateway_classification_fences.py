@@ -83,6 +83,10 @@ async def test_undeclared_operation_denied_before_adapter_action():
     )
     envelope = adapter.normalize({"project_id": "r28b1"})
     envelope.operation = "undeclared.synthetic"
+    # R30b-P0: the stale digest from normalize() now fails integrity first.
+    with pytest.raises(ToolAuthorizationError, match="payload_hash_mismatch"):
+        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
+    envelope.payload_hash = envelope.canonical_payload_hash()
     with pytest.raises(ToolAuthorizationError, match="operation_not_declared"):
         await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
