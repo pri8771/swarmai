@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Callable, Mapping
+from contextlib import AbstractContextManager, nullcontext
 from datetime import timedelta
 from typing import Any
 
@@ -27,6 +28,7 @@ from swarm.db.models import ActionEffectRow, ActionReceiptRow, ApprovalRow
 # A fence reader runs inside the admission transaction and returns the current
 # fence generations from the module that owns them (leases, later site epochs).
 FenceReader = Callable[[Any], Mapping[str, int | None]]
+AdmissionGuard = Callable[[], AbstractContextManager[None]]
 
 FINALIZABLE_STATES = ("executing", "unknown")
 
@@ -233,8 +235,10 @@ class InMemoryEffectStore:
         *,
         executor_id: str,
         fence_reader: FenceReader | None = None,
+        admission_guard: AdmissionGuard | None = None,
     ) -> dict[str, Any]:
-        with self._lock:
+        # Provider guard precedes store locks and ends before adapter work.
+        with admission_guard() if admission_guard else nullcontext(), self._lock:
             row = self._require(envelope.project_id, envelope.effect_key)
             check_effect_binding(row, envelope)
             if fence_reader is not None:
@@ -540,10 +544,15 @@ class DurableEffectRepository:
         *,
         executor_id: str,
         fence_reader: FenceReader | None = None,
+        admission_guard: AdmissionGuard | None = None,
     ) -> dict[str, Any]:
         """Committed admission point: fences, exact approval consumption, CAS — one transaction."""
         envelope.ensure_hashes()
-        with session_scope(self.factory) as session:
+        # Contexts exit in reverse order: commit before releasing the provider guard.
+        with (
+            admission_guard() if admission_guard else nullcontext(),
+            session_scope(self.factory) as session,
+        ):
             row = session.scalar(
                 select(ActionEffectRow)
                 .where(

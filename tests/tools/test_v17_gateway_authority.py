@@ -334,6 +334,9 @@ class FutureAuthorityFence:
     def reader(self, **identity: Any):
         return self.delegate.reader(**identity)
 
+    def admission_guard(self):
+        return self.delegate.admission_guard()
+
 
 @pytest.mark.asyncio
 async def test_v17_does_not_consume_reserved_future_authority(factory):

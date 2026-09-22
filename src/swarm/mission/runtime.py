@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +26,7 @@ from swarm.mission.store import MissionRecord, MissionStore
 from swarm.mission.worker import RepoWorker, WorkerResult
 from swarm.mission.worktree import WorktreeHandle, remove_worktree
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
-from swarm.tools.fences import ActorContext
+from swarm.tools.fences import ActorContext, FenceProvider, RevocableFenceProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -55,9 +56,27 @@ class MissionRuntime:
         else:
             self._effect_store = InMemoryEffectStore()
 
-    def _action_gateway_for(self, worktree: Path) -> ConsequentialToolGateway:
+    def _action_gateway_for(
+        self, worktree: Path, *, fences: FenceProvider | None = None
+    ) -> ConsequentialToolGateway:
         """Create the worker boundary for one isolated worktree handle."""
-        return local_worktree_gateway(worktree, store=self._effect_store)
+        return local_worktree_gateway(worktree, store=self._effect_store, fences=fences)
+
+    @staticmethod
+    async def _drain_worker_turn(turn: asyncio.Task[Any]) -> Any:
+        """Wait for a shielded sync-worker thread even under repeated cancellation.
+
+        ``asyncio.to_thread`` cannot terminate the underlying worker.  The
+        runtime must therefore wait for it to quiesce before removing a
+        worktree or returning cancellation to the caller.
+        """
+        while True:
+            try:
+                return await asyncio.shield(turn)
+            except asyncio.CancelledError:
+                if turn.cancelled():
+                    raise
+                continue
 
     def _mission_broker(self, *, models: list[str] | None = None) -> SharedInferenceBroker:
         if self._broker is None:
@@ -134,6 +153,15 @@ class MissionRuntime:
         )
         self.store.save(record)
 
+        # One shared revocable fence reaches the initial gateway and every
+        # per-worktree gateway.  Workers snapshot it at task start; a runtime
+        # cancellation advances the generation and makes that snapshot stale.
+        cancellation_event = threading.Event()
+        revocable_fences = RevocableFenceProvider()
+
+        def action_gateway_for(worktree: Path) -> ConsequentialToolGateway:
+            return self._action_gateway_for(worktree, fences=revocable_fences)
+
         # Pass None so broker loads defaults + discovered local Ollama tags,
         # ensuring route coverage for evidence-router and --model selections.
         worker = RepoWorker(
@@ -142,11 +170,12 @@ class MissionRuntime:
             model_by_family=model_by_family,
             broker=self._mission_broker(models=None),
             project_id=mission.project_id,
-            action_gateway=self._action_gateway_for(self.repo),
+            action_gateway=action_gateway_for(self.repo),
             actor_context=ActorContext(
                 actor="mission_runtime", project_id=mission.project_id
             ),
-            action_gateway_factory=self._action_gateway_for,
+            action_gateway_factory=action_gateway_for,
+            cancellation_event=cancellation_event,
             parser_dogfood_fixture=self.parser_dogfood_fixture,
             require_broker=True,
         )
@@ -155,6 +184,31 @@ class MissionRuntime:
         ledger = CostLedger(spend_policy="zero", allow_paid=False)
         accepted = False
         summary = "incomplete"
+        worker_turn: asyncio.Task[Any] | None = None
+        cancelled_turn_result: tuple[WorkerResult, WorktreeHandle | None] | None = None
+        cancelled_turn_error: BaseException | None = None
+        cancellation_requested = False
+        terminal_error: Exception | None = None
+        current_task_id: str | None = None
+
+        def request_cancellation() -> None:
+            nonlocal cancellation_requested
+            if cancellation_requested:
+                return
+            cancellation_requested = True
+            # Invalidate the task-frozen generation before making the worker
+            # observe cancellation.  A worker already past its event check
+            # then still presents a stale envelope at gateway admission.
+            revocable_fences.cancel()
+            cancellation_event.set()
+            request_worker_cancellation = getattr(worker, "request_cancellation", None)
+            if callable(request_worker_cancellation):
+                request_worker_cancellation()
+            self.store.append_timeline(
+                record,
+                "mission_cancellation_requested",
+                {"task_id": current_task_id},
+            )
 
         try:
             for round_idx in range(self.max_repair_rounds + 1):
@@ -174,12 +228,35 @@ class MissionRuntime:
                     if round_idx > 0 and task.task_family == "implement":
                         # Force re-implement after failed verify/review.
                         pass
-                    result, shared_wt = worker.run_task(
-                        task,
-                        mission_id=mission.id,
-                        prior=prior,
-                        shared_worktree=shared_wt,
+                    # RepoWorker is deliberately synchronous because its local
+                    # action gateway owns a synchronous entrypoint.  The
+                    # mission orchestrator is async, so execute the serial
+                    # worker turn off this loop rather than weakening the
+                    # gateway's fail-closed running-loop guard.  Shielding
+                    # prevents cancellation from abandoning the live thread;
+                    # the cancellation handler drains it before cleanup.
+                    current_task_id = task.id
+                    worker_turn = asyncio.create_task(
+                        asyncio.to_thread(
+                            worker.run_task,
+                            task,
+                            mission_id=mission.id,
+                            prior=prior,
+                            shared_worktree=shared_wt,
+                        )
                     )
+                    try:
+                        result, shared_wt = await asyncio.shield(worker_turn)
+                    except asyncio.CancelledError:
+                        request_cancellation()
+                        try:
+                            cancelled_turn_result = await self._drain_worker_turn(worker_turn)
+                        except BaseException as exc:  # worker interruption is recorded below
+                            cancelled_turn_error = exc
+                        raise
+                    finally:
+                        if worker_turn is not None and worker_turn.done():
+                            worker_turn = None
                     prior[task.id] = result
                     self.store.append_timeline(
                         record,
@@ -304,8 +381,9 @@ class MissionRuntime:
                     "changed_files": changed,
                     "worktree": shared_wt.to_dict(),
                     "note": (
-                        "accepted worktree changes are isolated; "
-                        "automatic primary-checkout promotion is disabled"
+                        "accepted worktree changes are isolated and retained for explicit "
+                        "reviewed application or disposal; automatic primary-checkout "
+                        "promotion is disabled"
                     ),
                 }
                 self.store.append_timeline(
@@ -319,12 +397,125 @@ class MissionRuntime:
             self.store.append_timeline(record, "mission_finished", {"accepted": accepted})
             self.store.save(record)
             return record
+        except asyncio.CancelledError:
+            request_cancellation()
+            raise
+        except Exception as exc:
+            terminal_error = exc
+            raise
         finally:
-            if shared_wt is not None:
+            # A worker can create and bind a worktree before a gateway effect
+            # raises. In that case run_task never returns its tuple, so retain
+            # the worker's bound handle solely to remove the disposable tree.
+            if cancelled_turn_result is not None:
+                _, returned_worktree = cancelled_turn_result
+                if returned_worktree is not None:
+                    shared_wt = returned_worktree
+            cleanup_wt = shared_wt or getattr(worker, "active_worktree", None)
+            # G11 pending-apply is an actionable isolated artifact.  A normal
+            # accepted return must retain its worktree until a separate
+            # reviewed apply or disposal action occurs.  Failed, interrupted,
+            # and exception paths remain disposable so they cannot leak.
+            retain_for_explicit_apply = bool(
+                accepted
+                and not cancellation_requested
+                and terminal_error is None
+                and cleanup_wt is not None
+                and "pending_apply" in record.artifacts
+            )
+            cleanup: dict[str, Any] = {
+                "attempted": False,
+                "completed": cleanup_wt is None,
+                "deferred_worker_still_running": bool(
+                    worker_turn is not None and not worker_turn.done()
+                ),
+                "retained_for_explicit_apply": retain_for_explicit_apply,
+                "error_type": None,
+            }
+            if (
+                cleanup_wt is not None
+                and not cleanup["deferred_worker_still_running"]
+                and not retain_for_explicit_apply
+            ):
+                cleanup["attempted"] = True
                 try:
-                    remove_worktree(self.repo, shared_wt, force=True)
-                except Exception:  # noqa: BLE001
-                    pass
+                    remove_worktree(self.repo, cleanup_wt, force=True)
+                    cleanup["completed"] = not cleanup_wt.path.exists()
+                except Exception as exc:  # noqa: BLE001 - terminal record is still required
+                    cleanup["error_type"] = type(exc).__name__
+
+            if cancellation_requested or terminal_error is not None:
+                receipt_ids = {
+                    receipt_id
+                    for worker_result in prior.values()
+                    for receipt_id in worker_result.action_receipt_ids
+                }
+                if cancelled_turn_result is not None:
+                    receipt_ids.update(cancelled_turn_result[0].action_receipt_ids)
+                active_receipts = getattr(worker, "active_action_receipt_ids", [])
+                receipt_ids.update(str(receipt_id) for receipt_id in active_receipts)
+
+                interrupted = cancellation_requested
+                if interrupted:
+                    for row in record.tasks:
+                        if row["id"] == current_task_id or row.get("status") in {
+                            TaskStatus.READY.value,
+                            TaskStatus.RUNNING.value,
+                            TaskStatus.WAITING_CAPACITY.value,
+                            TaskStatus.WAITING_APPROVAL.value,
+                        }:
+                            row["status"] = TaskStatus.CANCELLED.value
+                            row["ok"] = False
+                            row["summary"] = "runtime_cancelled"
+                    self.store.append_timeline(
+                        record,
+                        "mission_worker_quiesced",
+                        {
+                            "task_id": current_task_id,
+                            "turn_result_available": cancelled_turn_result is not None,
+                            "turn_error_type": (
+                                type(cancelled_turn_error).__name__
+                                if cancelled_turn_error is not None
+                                else None
+                            ),
+                        },
+                    )
+
+                record.status = (
+                    MissionStatus.CANCELLED.value if interrupted else MissionStatus.FAILED.value
+                )
+                record.validation = {
+                    "accepted": False,
+                    "interrupted": interrupted,
+                    "error_type": (
+                        type(cancelled_turn_error).__name__
+                        if interrupted and cancelled_turn_error is not None
+                        else type(terminal_error).__name__ if terminal_error is not None else None
+                    ),
+                }
+                record.result = {
+                    "accepted": False,
+                    "summary": "mission_cancelled" if interrupted else "mission_exception",
+                    "worktree": cleanup_wt.to_dict() if cleanup_wt else None,
+                    "action_receipt_ids": sorted(receipt_ids),
+                    "current_task_id": current_task_id,
+                    "cleanup": cleanup,
+                    "cost_accounting": "partial_or_unknown" if interrupted else "failed",
+                }
+                record.cost = {**ledger.to_dict(), "requests": len(ledger.entries)}
+                record.artifacts = {
+                    "worker_results": {k: v.to_dict() for k, v in prior.items()},
+                }
+                if cancelled_turn_result is not None:
+                    record.artifacts["interrupted_worker_result"] = (
+                        cancelled_turn_result[0].to_dict()
+                    )
+                self.store.append_timeline(
+                    record,
+                    "mission_cleanup_finished",
+                    dict(cleanup),
+                )
+                self.store.save(record)
 
     def apply_worktree_changes(
         self,
