@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `0130105e826f02d5e2a5809072712fc310b96274`
-- Coordination SHA: `217bc2ae023b543cd2eb8c35f0a80b9571a8e1b1`
-- Updated: `2026-09-22T00:48:35Z`
-- Trigger: `scheduler`
+- Branch SHA: `9ff6859d3920106af9a55937c78937b785506ede`
+- Coordination SHA: `2d18e719be2df54c2d9b71f144d49b2432496825`
+- Updated: `2026-09-22T00:49:47Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `R27c`
+- Current packet: `R27d`
 - Current artifact: `ART-V17-APPROVAL-BINDING`
-- Last meaningful activity: `2026-09-22T00:40:28Z`
+- Last meaningful activity: `2026-09-22T00:49:46Z`
 - Spend USD: `0.0`
-- Blocker: EXT-ACTIONS-BILLING (apply coordination ci patch first); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
+- Blocker: REV-R27C (lead diff review before R27e/R28a); EXT-ACTIONS-BILLING; EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
 
 ## Update
 
-R27b impl_complete: pushed d3a7b56 (feat) + 0130105 (bind). Atomic INSERT..ON CONFLICT reserve, single-winner UPDATE..RETURNING CAS, effect_key binding mismatch. 7 tests x5 green on real Postgres; full suite 407 passed/2 skipped. Starting R27c repository-owned transactions.
+R27c review_pending: pushed 8dbe5d8 (feat) + 9ff6859 (bundle). Repository-owned transactions, committed begin_execution admission, exact-once approval consumption, real second-process test. 16 tests x5 green; full suite 416 passed/2 skipped. REV-R27C hold: R27e/R28a wait for lead diff review. Continuing R27d (approval immutability) which is not held.
 
 ## Next
 
-R27c begin_execution transaction + atomic approval consumption (review hold before R27e)
+R27d approval insert-only + monotonic revocation; then R30a/R17a/R02a while REV-R27C waits
