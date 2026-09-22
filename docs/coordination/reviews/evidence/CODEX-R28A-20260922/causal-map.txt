@@ -1,0 +1,51 @@
+R28a pre-implementation reproduction/root-cause map
+Baseline: e924351bd93510eaae279225db3a2fa447dd6894
+
+Observed mechanically from current control flow (no provider/DB calls):
+1. Empty dict: _outcome_from_result falls through to succeeded
+   (v17_gateway.py:455-460), then finalizes succeeded (:248-259).
+2. Unrecognized outcome such as "bogus": helper returns it (:456-457); it matches
+   none of unknown/denied/cancelled (:224-247), then finalizes succeeded (:248-259).
+3. Explicit not_applied: same fallthrough as unrecognized and is finalized succeeded.
+4. Generic adapter exception: caught at :207-219 and finalized failed, losing uncertainty.
+   Exception text is persisted in post, potentially retaining sensitive transport detail.
+5. AdapterNotSentError/AdapterDeniedError and ADAPTER_OUTCOMES do not exist, so the
+   gateway cannot distinguish provable non-send/denial from uncertain exceptions.
+6. Timeout: envelope.timeout_seconds is not used around execute. execute is synchronous
+   at :208, so it can block the event loop indefinitely and cannot produce timeout/unknown.
+7. Task cancellation while execute blocks cannot be delivered by the event loop. A direct
+   CancelledError is not caught by except Exception and leaves the admitted row executing;
+   no cancelled_during_execute disposition exists.
+8. Non-dict result: observe_post receives it first (:221); afterward the helper assumes
+   membership/.get (:456-459), raising TypeError/AttributeError and leaving executing.
+9. observe_pre, execute, observe_post, and reconcile are all synchronous calls
+   (:199, :208, :221, :334), so each can block the event loop. Post-observation exception
+   escapes and leaves executing instead of preserving the explicit execute outcome.
+10. store is optional and silently becomes InMemoryEffectStore (:66, :78). Consequential
+    and irreversible requests have no durable-store gate before adapter observation/execute.
+11. ApiMcpAdapter empty reconciliation returns failed/no_prior_success
+    (api_mcp.py:92-101), asserting more than an echo destination can observe.
+
+Compatibility/caller facts:
+- Every visible constructor supplies store except the default-grace assertion at
+  tests/integration/db/test_effect_crash_window.py:155.
+- test_v17_gateway_negatives::_gw always supplies an in-memory store; consequential API
+  and browser-submit success tests must move to a durable test/store or become denial tests.
+- LocalSandboxAdapter.execute lacks outcome (local_sandbox.py:69-74); add succeeded.
+  Its absent-file reconciliation says failed; select not_applied only if absence is proof.
+- BrowserSessionAdapter's unknown-operation path returns invalid outcome=failed
+  (browser_session.py:114); choose a defined verdict, defaulting unknown absent proof.
+- RaisingAdapter tests that expect failed/retry must raise AdapterNotSentError only when
+  their seam proves the request never left the process. RuntimeError must remain unknown.
+
+Minimal test sequence is in /tmp/swarm-agent-r28a-negative-tests.py:
+- invalid/missing/non-dict outcome -> unknown/unrecognized_outcome;
+- exact exception mappings, unknown replay does not execute twice;
+- controlled blocking timeout, release worker in finally;
+- controlled task cancellation, persist unknown then re-raise CancelledError;
+- post-observation exception preserves explicit execute outcome;
+- non-durable denial before pre-observe/execute and no row;
+- missing required store raises TypeError;
+- echo empty reconciliation remains unknown.
+Add one durable PostgreSQL parametrization for the uncertain outcomes after unit behavior
+passes; do not add retry/backoff.
