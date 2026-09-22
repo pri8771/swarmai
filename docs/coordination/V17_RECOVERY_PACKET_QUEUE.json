@@ -722,14 +722,14 @@
       "sp": 3,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28d.md",
-      "status": "ready",
+      "status": "changes_required",
       "fixes": [
         "W1"
       ],
-      "review_hold": "parent R28d remains incomplete until genuine live_local evidence is independently reviewed",
+      "review_hold": "PR27 exact 86f8e0c REWORK_FOUND; no successor live run authorized",
       "assignee": "codex",
-      "active_slice": "R28d live_local evidence",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R28D_LIVE_LOCAL_20260922.md",
+      "active_slice": "R28d successor local cancellation/admission atomicity repair",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28D_ADMISSION_ATOMICITY_20260922.md",
       "r28d1": {
         "status": "impl_complete",
         "implementation_ref": "codex/swarm-r28d1-local-sandbox-20260922@a2cfb3c1d5e326a1b15d7d23cfe3c91ea2e40bf4",
@@ -741,6 +741,11 @@
         "implementation_ref": "codex/swarm-r28d1-local-sandbox-20260922@6dbf8c43463cbdbd8c87561af2abcdde59969765",
         "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28D2-LEAD-REVIEW.md",
         "review_decision": "bounded_engineering_slice_accepted"
+      },
+      "successor_rework": {
+        "source_sha": "86f8e0c90e399c683d68ba9628ef48af4723f33f",
+        "decision": "rework_found",
+        "review_ref": "docs/coordination/reviews/ASTRA_R28D_SUCCESSOR_REWORK_LEAD_20260922.md"
       }
     },
     {
@@ -752,11 +757,14 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R30a.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "I2",
         "O3"
-      ]
+      ],
+      "implementation_ref": "e46f5b63d3bef3e6ccb00c73fb2b1455b8abf264",
+      "review_ref": "docs/coordination/reviews/ART-V17-INTEGRATION-MANIFEST-R30A-LEAD-REVIEW.md",
+      "review_decision": "bounded_infrastructure_slice_accepted"
     },
     {
       "id": "R30b",
@@ -774,7 +782,10 @@
       "status": "planned",
       "fixes": [
         "I2"
-      ]
+      ],
+      "diagnostic_status": "released_offline_only",
+      "diagnostic_assignment_ref": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
+      "review_hold": "No R30b implementation/live_local release; diagnostic only under current action holds"
     },
     {
       "id": "R31a",
