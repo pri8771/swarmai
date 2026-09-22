@@ -40,10 +40,13 @@ V1.7 even where historical files describe later ceilings.
 
 ## Current safe implementation work
 
-- Establish an isolated R730 execution checkout only if existing host Git and
-  repository authentication are present; do not create credentials or use a
-  browser certificate bypass.
-- Run the released mission only after loopback preflight succeeds.
+- R730 preflight is **BLOCKED**: SSH and Git are present, but Python/uv, a
+  SwarmAI checkout, and existing repository authentication are absent. See
+  `CODEX_R28D_R730_PREFLIGHT_20260922.md`.
+- Do not install a runtime, create credentials, proxy the model, or use a
+  browser certificate bypass to change that result. Run the released mission
+  only after an existing, independently authorized R730 runtime/checkout is
+  available and loopback preflight succeeds.
 - If the host lacks checkout/auth/runtime access, write the exact blocked
   frontier and continue offline/reviewable V1.7 work; do not proxy the model or
   create a second scheduler.
