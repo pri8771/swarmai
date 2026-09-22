@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `ab958d7a4b4d6198b143e7e79ecf69ff367cb10e`
-- Coordination SHA: `6952448b12eb1722f28b0d1a696403bd0157a31e`
-- Updated: `2026-09-22T00:33:34Z`
-- Trigger: `takeover`
+- Branch SHA: `939ab596c578b083b11aa465ae6ae894d81c2905`
+- Coordination SHA: `817821d0bab6c68ae1b92671b115f8be98590ebc`
+- Updated: `2026-09-22T00:37:53Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `OPS-CI-01`
-- Current artifact: `ART-OPS-HEARTBEAT`
-- Last meaningful activity: `2026-09-22T00:33:33Z`
+- Current packet: `R27b`
+- Current artifact: `ART-V17-APPROVAL-BINDING`
+- Last meaningful activity: `2026-09-22T00:37:52Z`
 - Spend USD: `0.0`
-- Blocker: EXT-ACTIONS-BILLING (clear only after coordination ci patch applied); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
+- Blocker: EXT-ACTIONS-BILLING (apply coordination ci patch first); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
 
 ## Update
 
-Fable takeover of CURSOR-V17-SINGLE stream (engine=fable, epoch fable-v17-20260922-01) from Cursor epoch single-v17-20260921-01 at source ab958d7 (base f2b8d5f). Previous Cursor agent PIDs 13798/15619/15674 observed idle since 20:05Z, worktree clean; not killed. Scope: OWNER_V17_LIVE_ONLY. OPS-CI-01 pushed.
+R27a impl_complete: pushed 0505c24 (feat) + 939ab59 (receipt bind). action_receipts migration a17effect004b0001, insert-only receipts, replay returns original receipt. 6 integration tests + full suite 400 passed/2 skipped on real Postgres. Starting R27b atomic reserve/CAS.
 
 ## Next
 
-R27a durable action receipts
+R27b atomic reserve + compare-and-swap execute
