@@ -722,14 +722,14 @@
       "sp": 3,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28d.md",
-      "status": "changes_required",
+      "status": "reviewed_engineering_live_held",
       "fixes": [
         "W1"
       ],
-      "review_hold": "PR27 exact 86f8e0c REWORK_FOUND; no successor live run authorized",
+      "review_hold": "Engineering repair accepted; live evidence remains unaccepted and all new execution is paused.",
       "assignee": "codex",
-      "active_slice": "R28d successor local cancellation/admission atomicity repair",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R28D_ADMISSION_ATOMICITY_20260922.md",
+      "active_slice": "PAUSED_BY_OWNER",
+      "assignment_ref": null,
       "r28d1": {
         "status": "impl_complete",
         "implementation_ref": "codex/swarm-r28d1-local-sandbox-20260922@a2cfb3c1d5e326a1b15d7d23cfe3c91ea2e40bf4",
@@ -746,6 +746,11 @@
         "source_sha": "86f8e0c90e399c683d68ba9628ef48af4723f33f",
         "decision": "rework_found",
         "review_ref": "docs/coordination/reviews/ASTRA_R28D_SUCCESSOR_REWORK_LEAD_20260922.md"
+      },
+      "successor_repair": {
+        "source_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+        "decision": "bounded_engineering_repair_accepted",
+        "review_ref": "docs/coordination/reviews/ASTRA_R28D_ADMISSION_REPAIR_LEAD_20260922.md"
       }
     },
     {
@@ -785,10 +790,10 @@
       ],
       "diagnostic_status": "complete_contract_disposition_frozen",
       "diagnostic_assignment_ref": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
-      "review_hold": "R30b product implementation held pending exact-SHA R30b-P0 acceptance; live execution separately held",
+      "review_hold": "Owner pause: preserve P0 WIP only; no implementation/test execution until explicit resume. Product/live R30b remains held.",
       "diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e",
       "contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
-      "prerequisite_status": "released",
+      "prerequisite_status": "paused_uncommitted_unreviewed",
       "prerequisite_assignment_ref": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md"
     },
     {
