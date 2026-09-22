@@ -1,125 +1,113 @@
-# SwarmAI delivery contract — one instruction, continuous artifact execution
+# SwarmAI delivery contract — V1.7 LIVE ONLY
 
-Status: ACTIVE LEAD EXECUTION HANDOFF, 2026-09-21.
-Owner direction: execute toward V3.0; nothing is called working without relevant real-life evidence.
-This is an execution assignment, NOT another whole-project planning pass.
-ChatGPT is engineering/product lead and independent reviewer. Fable is the worker.
+Status: ACTIVE OWNER SCOPE: OWNER_V17_LIVE_ONLY.
+Latest instruction: "Lets focus on getting to 1.7 live and thats it."
+This supersedes all earlier continue-through-V3 launch instructions and historical scope fields. It narrows work, not evidence requirements.
+ChatGPT = engineering/product lead and independent reviewer. Fable = implementation worker. Operator = final authority.
 
-## 1. Source, scope and authority
+## 1. One goal and a hard stop
+
+Deliver a genuinely running, private/local V1.7 candidate with source-bound operational and real-world checkpoint evidence. Repair required lower-version prerequisites as necessary. Do not implement, redesign, expand roadmaps or select tasks for V1.8, V1.9, V2.x or V3.0. Existing future plans remain parked, not deleted.
+
+After the V1.7 live handoff/review package, STOP implementation. Successful V1.7 does not authorize another version. Continue only after a new explicit owner directive.
+
+A missing prerequisite is still a blocker. Do not hide an unmet lower-version gate by declaring a narrower demo to be V1.7. Local operational proof, real-world checkpoint proof, independent verification and formal artifact acceptance are separate claims.
+
+## 2. Correct source and efficient startup
 
 Repository: `pri8771/swarmai`.
-Continue application source from the CURRENT `origin/cursor/v17-single-session`; the reviewed snapshot was `f2b8d5f7dfd65530e73c63438c229b9fa428f922`, not a pin to reset to.
-Canonical instructions: `coordination/swarm-control`.
-The coordination and `fable/v3-planning` branches contain older application snapshots: NEVER merge their application trees into the worker branch or run product tests against them as the delivery candidate.
-Fetch both refs; inspect dirty work, current HEAD and recent diffs. Preserve unrelated changes; no destructive reset, automatic stash of another worker's work, or force push. Use a separate worktree when necessary.
+Application branch: current `origin/cursor/v17-single-session`.
+Coordination: `coordination/swarm-control`.
+Last fetched application snapshot during this scope change: `f2b8d5f7dfd65530e73c63438c229b9fa428f922`; re-fetch, never reset to this historical SHA.
 
-Implementation goal remains V3.0. Priority is a genuinely integrated V1.7, then V1.8/V1.9/V2.0/V2.3/V3.0 in dependency order. No routine version-by-version permission question is necessary within that scope. Hard prerequisites, explicit review holds, frozen protocols, and release/spend limits still apply.
+Fetch without losing dirty work or another session's changes. Read root CLAUDE.md, SESSION_START.md, this contract, EXECUTION_CONTROL.json, current status/heartbeat and latest relevant lead review. Then read ONLY the selected packet card and required source/interfaces. Access memory/history only when genuinely available; otherwise use repo memory/decisions. Do not claim Claude can retrieve ChatGPT's private conversations.
 
-No main merge, public release/tag/deployment, paid fallback, destructive production operation or authority expansion. Keep `SWARM_ALLOW_PAID=false`. Existing account access is not permission for unrelated public posting, applications, purchases or bulk activity.
+The planning/coordination branches contain older application snapshots. Never merge their application trees into current implementation. Use `git show` or a separate coordination worktree for instructions. Do not open all future roadmaps at startup.
 
-## 2. Bootstrap once; preserve one implementation owner
+Existing `V17_RECOVERY_PACKET_QUEUE.json` remains the queue; do not create another master plan. EXECUTION_CONTROL adds required dependencies and restricts selection to `allowed_phases=["v17"]`.
 
-Check actual local Cursor/Fable processes, local scheduler configuration and the current repository heartbeat. A fresh heartbeat timestamp alone does not prove a worker is running.
-Stop/relinquish ONLY the obsolete SwarmAI implementation session and its explicitly identified producer when taking ownership. Do not terminate other projects or all Claude/Cursor processes. If another worker still owns this repository, perform a clean handoff first; do not race it.
-Reuse the existing single stream `heartbeats/CURSOR-V17-SINGLE.json` / `status/CURSOR-V17-SINGLE.md` for compatibility. Its name is historical. Record `worker_engine`, a new session epoch, takeover source SHA and previous owner in a handoff receipt; do not erase history. Do not install a second producer merely to rename it.
+From a coordination worktree:
+```sh
+python3 docs/coordination/tools/execution_guard.py --phase v17 --json
+python3 -m unittest discover -s docs/coordination/tools -p 'test_*guard.py' -v
+python3 -m unittest discover -s docs/coordination/tools -p test_v17_scope.py -v
+```
+The structural validator remains available for a targeted consistency check; its old ready-set output does not override scope, review or live execution gates. No tool output grants external permission.
 
-Run one local five-minute producer only while this implementation session is active. Separate:
-- heartbeat publication time;
-- last real implementation/test activity time;
-- process identity / long-running test identity;
-- current packet and branch SHA.
-A timer must not advance the real-activity timestamp. If the process is stopped/blocked, report that state instead of repeating working. A long test is progress only when its process/log/output is actually inspected. No promise that a heartbeat daemon wakes an inactive model session.
+## 3. One worker and one truthful heartbeat
 
-First land `OPS-CI-01` narrowly: prevent heartbeat-only commits from triggering application CI, preserve CI on code/security/workflow changes, and do not conceal required checks. Use one logical heartbeat update, not three independent CI-triggering pushes. Test path selection locally. Do not raise billing limits, enable spend or repeatedly rerun unavailable Actions.
+Inspect actual local implementation processes before takeover. Reuse an already active Fable session; otherwise obtain a clean Cursor-to-Fable handoff. Do not kill unrelated processes, touch other projects, or race an existing writer.
 
-## 3. Read the minimum necessary
+Reuse the historical stream `heartbeats/CURSOR-V17-SINGLE.json` and `status/CURSOR-V17-SINGLE.md` for compatibility. Record actual worker engine, session epoch and takeover source SHA. Preserve history. Do not install another producer just to rename the stream.
 
-Read this file, `EXECUTION_CONTROL.json`, the latest relevant lead review and current heartbeat/status once. Recover intent from memory/history only when actually accessible; otherwise use `PROJECT_MEMORY.md` and repo decisions. Never claim access to ChatGPT's private conversations from Claude.
-Then read only the active packet's spec, required interface contracts and changed source. Use git diff/search; avoid rereading the full registry and V3 corpus at every packet.
+Exactly one local five-minute heartbeat producer while the worker session is active. It must report packet, artifact, source SHA, current command/test activity, blocker and next step. Keep publication time separate from last meaningful activity. A timer may not turn an idle/blocked/stopped worker into working. Verify long-running tests by their real process/logs. A heartbeat does not wake an inactive model or prove completion.
 
-Existing queues remain the ONLY task graphs:
-- V1.7: `V17_RECOVERY_PACKET_QUEUE.json`;
-- V1.8–V2.3: `V17_TO_V23_PACKET_QUEUE.json`;
-- V3: `FUTURE_EXECUTION_GRAPH_V18_TO_V30.json`, `v30_packets` (coarse groups are not duplicate work).
-`EXECUTION_CONTROL.json` adds prerequisites to those queues; it never fabricates completion.
+First repair heartbeat-only CI churn under OPS-CI-01. Keep CI on code/security/workflow changes. Do not raise billing limits or spam Actions reruns; locally executed checks and hosted CI are distinct evidence.
 
-From a coordination-only worktree, run:
-`python3 docs/coordination/tools/validate_plan.py --json`
-`python3 docs/coordination/tools/execution_guard.py --phase v17 --json`
-`python3 -m unittest discover -s docs/coordination/tools -p test_execution_guard.py -v`
-Use `--phase v23` or `--phase v30` only after verifying the corresponding source handoff and authorization conditions. Structural validation is NOT execution authorization. `preflight_only` means read-only prerequisite probes first, not permission to mutate.
+## 4. Small artifact packets, not another planning pass
 
-If a tooling mismatch appears, repair that precise validator/schema mismatch with a regression; do not disable the guard or redesign the entire roadmap.
+Use the existing dependency-ready micro-packets. Initial priority after reconciling current evidence: OPS-CI-01 -> R27a -> R27b -> R27c -> R27d. Observe independent review holds before R27e/R28a. Useful independent work while reviews wait includes R30a, R17a and R02a.
 
-## 4. Execute, do not re-plan
-
-Use one packet at a time. Verify existing source before reimplementing; a recheck of old code is useful evidence, not a newly delivered feature.
 For each packet:
-1. Record the artifact, precise failure/requirement, consumed interfaces, allowed surfaces and test oracle.
-2. Reproduce the defect or verify the missing behavior. For a bug fix, keep a focused test failing on the old source and passing on the patch; do not create an artificial defect just to get red/green.
-3. Implement the smallest change, usually 1–3 production files plus focused tests. A cross-cutting transaction may need more files; split named child packets rather than pad or hide work to meet a line limit.
-4. Run focused tests, relevant integration tests, configured Ruff/mypy and affected broader tests. Distinguish PASS, FAIL, SKIPPED, NOT RUN and infrastructure failure.
-5. Commit/push source before counted live evidence. Package full diffs, commands, exit codes, logs and receipts BEFORE pruning the worktree. Preserve the tested source SHA and a separate evidence-packaging SHA; documentation commits do not retroactively change which code was tested.
-6. Update packet progress with source/evidence references and heartbeat. Never set registry verified/accepted or write a lead approval for your own work.
-7. Re-read changed coordination only; take the next genuinely ready packet immediately.
+1. Inspect existing code. Re-verification of earlier code is not a new feature.
+2. Record the exact required behavior, allowed surfaces, dependencies and relevant regression.
+3. Implement one bounded concern, usually 1-3 production files plus focused tests. Split a genuinely broader change into named child packets; do not hide work to meet a line limit.
+4. For defect repair, prove a relevant regression fails on old source and passes on the fix. Do not seed a fake defect or supply a held-out answer.
+5. Run focused tests, relevant real PostgreSQL/process integration and configured lint/type checks. Distinguish passed, failed, skipped, not-run and infrastructure-blocked.
+6. Commit/push source before counted live evidence. Preserve full diff, commands, outputs and receipts BEFORE cleaning the worktree. Record tested source SHA separately from evidence-packaging SHA.
+7. Update progress and heartbeat; continue the next ready V1.7 packet. Two repeated attempts with no new diagnostic evidence require a small diagnosis/repair packet, not a third blind retry or relaxed success criteria.
 
-Two attempts with the same failure signature without new diagnostic evidence trigger a SMALL repair packet, not a third blind retry or a new easier acceptance criterion. Historical failed missions remain failed. A meaningful material diff is necessary but not sufficient: it must fix the actual behavior and satisfy a relevant test.
+Do not author a lead review, self-set verified/accepted, overwrite failures, or expand permissions. Proposed implementation-detail splits must preserve contracts and review holds.
 
-Initial priority, subject to current evidence: `OPS-CI-01`, `R27a`, `R27b`, `R27c`, `R27d`; then `R27e` and the R28 chain after their specified review holds. Independent `R30a`, `R17a`, `R02a` can advance while a hold is pending. Do not wait on an unrelated account to write durable receipts or local test infrastructure.
+## 5. What must actually work
 
-## 5. Close the operational wiring, not just the libraries
+The same operational product path must connect the broker, durable worker leases/results, scoped knowledge and the durable action gateway. Standalone classes and test-only entrypoints do not count.
 
-V1.5: operational CLI/API missions must use durable claim, lease, cancellation and result acceptance; a standalone worker-service class is not enough. Exercise a real separate worker process, kill/reassign and concurrent duplicate result attempts.
-V1.6: the actual mission prompt/context must use permission-first knowledge retrieval. Verify project isolation, lifecycle after restart, supersession/tombstone behavior, and retrieval receipts. Token estimates must be labeled estimates and compared under the same frozen method. Do not invent a task-quality gain.
-V1.7: actual file writes, subprocess/API actions and session operations must traverse the durable action boundary. No in-memory operational fallback. Request input must not invent actor identity, approval, risk classification, lease generation or policy authority.
+| Checkpoint | Required proof |
+|---|---|
+| CP0 | Exact tested-source health; configured test/lint/type results and hosted-CI status reported separately. |
+| CP1 | Real unfamiliar task; real brokered inference; a defensible defect/fix, focused red-to-green proof, isolated diff and independent semantic review; no primary-checkout auto-apply. |
+| CP2 | Actual qualification/provider prerequisite evidence under existing frozen rules. Missing sealed material, entitlement or required host verification stays explicit. |
+| CP3 | Durable worker on a real operational mission; actual separate processes; kill/expiry/reassignment; cancellation rejection; genuinely concurrent duplicate-result attempts; one accepted result. Required physical multi-host evidence is not replaced by aliases. |
+| CP4 | Actual mission context uses permission-first retrieval; two-project content/existence isolation; reuse, supersession/deletion including after restart; source-bound retrieval receipts and honestly labeled token accounting. No invented quality gain. |
+| CP5 | Local, API and session integration semantics through the same durable gateway; negative tests, recovery, replay and unknown-outcome reconciliation. Local fixtures prove mechanics only. |
+| CP5-REALWORLD / R33c | Reversible real external GitHub issue/comment/close test THROUGH SwarmAI, observed after mutation, with stable effect keys and no duplicate mutation on replay. |
+| CP6 | Exact-tip integrated mission showing all receipt families on the real path; cancellation/restart tests; user-accessible private/local running candidate; complete checkpoint and open-gate matrix. |
 
-Lead dependency corrections are machine-readable in EXECUTION_CONTROL:
-- R27d approval revocation/immutability is required before R27e/R28a advance.
-- R34a requires R17c separate-process/API worker wiring, not only the earlier runtime library.
-- R34b requires R33c real external proof, R17c and R27d in addition to its existing dependencies.
-These prerequisites cannot be waived by labeling a parent packet evidence_only or review_pending.
+R34a requires R17c actual separate-process/API worker wiring. R34b also requires R33c, R17c and R27d. Do not skip approval immutability/revocation, real external proof, or worker integration because a parent is called evidence_only.
 
-## 6. Exact semantics to avoid impossible or misleading claims
+An internal effect key is not universal exactly-once delivery to every external service. After an ambiguous send, persist UNKNOWN and reconcile rather than resend under a new key. Committed begin_execution is the authorization admission point: cancellation before it denies admission; later cancellation may race an already-admitted remote action and requires honest reconciliation. A cookie HTTP test is not proof of browser/UI automation; exercise an actual browser when making a browser support claim. Do not bypass prohibited SSO/MFA/CAPTCHA flows.
 
-An internal unique effect key is NOT universal exactly-once delivery to arbitrary external services. Prove one accepted internal effect and the documented external replay/reconciliation behavior. After an ambiguous send, persist UNKNOWN and reconcile; do not mint a new key and resend.
+## 6. Real service, identity and access
 
-Define the authorization linearization point as the committed `begin_execution` transaction. Cancellation committed before that point must deny admission. Cancellation after admission may race an already-authorized network action; record/reconcile that in-flight action. Do not promise that a local database transaction can retract an already-sent remote side effect. Test both orderings and preserve the actual external observation.
+No new account is needed for the preferred GitHub checkpoint. Probe the actual host's existing `gh` authentication and private-repo access read-only. ChatGPT connector access does not prove local `gh` authentication.
 
-A cookie-based HTTP session test is not proof of browser automation. Label its scope honestly. If the support matrix says browser/UI recovery works, run an actual browser on the declared workflow and preserve destination/login/no-auto-submit evidence. Do not automate prohibited Google SSO flows or bypass MFA/CAPTCHA.
+Use one uniquely named `[SwarmAI LIVE TEST] <run-id>` issue in private `pri8771/swarmai`; create, observe, comment once, close and replay through SwarmAI's approved durable action boundary. Cleanup is also a receipt-backed action. Direct connector/manual `gh` mutations outside SwarmAI are not product proof. No tokens/cookies in prompts, logs or Git.
 
-## 7. Real-life checkpoints and accounts
+The operator's earlier permission to use an existing suitable account or necessary unsubscriber Google Cloud email alias remains conditional on a genuine V1.7 identity test. Verify the configured mechanism; do not invent an alias service, perform bulk/public actions, or create accounts merely for a checklist. Request only the exact unavailable login/MFA/consent step.
 
-Follow `REAL_WORLD_ACCEPTANCE_POLICY.md`. Separate unit, real-Postgres integration, live-local fixtures, real-world product execution, independent review and formal acceptance.
+"Live" means running in the existing authorized local/private environment, not public release. At handoff give the real application URL/port, exact start/restart/stop commands, tested SHA, process/service identity and sanitized log location. Confirm reachability from the execution host and state honestly whether owner-side reachability was tested. Do not promise a remotely usable localhost URL. Do not expose a new public listener, create infrastructure or incur spend.
 
-Required V1.7 output is CP1 + CP3 + CP4 + CP5 + CP5-REALWORLD + CP6, with CP2/other canonical lower gates reported accurately. Every required component must be ON the same operational path at CP6. Do not silently omit an unmet lower milestone.
+## 7. Reviews and blockers without idle work
 
-R33c uses the existing GitHub identity ONLY after a read-only local `gh` authentication/repository probe. ChatGPT's GitHub connector does not prove the host's `gh` is signed in.
-Through SwarmAI's own durable gateway, create one `[SwarmAI LIVE TEST] <run-id>` private-repo issue, observe it, comment once, close it, and prove replay produces no duplicate issue/comment. Use exact bounded approvals, stable effect keys and sanitized readback receipts. Direct manual `gh`/ChatGPT connector writes bypassing SwarmAI DO NOT count as product proof. Preserve and report any incomplete cleanup.
+Preserve existing safety-critical review holds. Package exact diffs, regressions, source identities and decision requests for ChatGPT. A worker may prepare an audit bundle but not decide its own independent review.
 
-The owner permits an existing suitable test account or, when genuinely necessary, an account/email through the unsubscriber Google Cloud alias arrangement. First verify the actual configured mechanism without exposing secrets; do not invent an alias API, create accounts merely to decorate evidence, or make paid/bulk/public actions. Escalate only the exact unavailable consent/MFA/credential step. No new account is required for the preferred GitHub checkpoint.
+For an external/review/time blocker record: affected packet/checkpoint, actual probe/error, required human/lead action, descendant impact and next independent V1.7 packet. Missing credentials block the real call, not writing its adapter/tests. Review holds block protected dependants, not unrelated tasks. Continue all genuinely executable in-scope work.
 
-For V1.8–V3 retain the real deployment recovery, fresh install, frozen reliability campaign, physically distinct fleet nodes, and real elapsed objective plus external action requirements. Simulated time and two aliases on one host do not satisfy them.
+Do not shorten or backfill required wall-clock evidence, waive sealed-reference requirements, or mark blocked tests as passed. Narrowing to V1.7 does not remove its canonical lower gates. If all in-scope executable work is exhausted, report BLOCKED_FRONTIER with exact needs; do not continue into V1.8 or invent completion.
 
-## 8. Blockers and independent review
+No main merge, public tag/release/deployment, destructive production operation, paid fallback or additional spend. Keep SWARM_ALLOW_PAID=false.
 
-Source authorization through V3.0 does not remove gate requirements. Existing safety-critical review holds and proposed-packet freeze points remain. Prepare exact diffs, regressions and evidence for ChatGPT; never self-author its review. An audit packet may be prepared as a worker evidence bundle, but its decision remains lead-owned.
+## 8. Final handoff, then STOP
 
-For each blocker record: packet, condition, read-only probe performed, exact error, affected descendants, minimum human/lead action, whether retries are safe, and next independent packet. Never print secrets.
-A missing credential blocks the live call, not writing its adapter/tests. A review hold blocks protected dependent integration, not unrelated work. A wall-clock campaign may run on a frozen candidate while non-conflicting work proceeds in the same worker session, but changed covered source invalidates affected evidence.
+Return:
+- implementation branch and exact pushed source SHA;
+- running private/local application URL, launch/restart/stop commands and reachability evidence;
+- CP0-CP6 and CP5-REALWORLD matrix: result, evidence path, tested SHA, independent-review status and open gates;
+- meaningful source changes versus re-verification-only work;
+- actual test counts, failures, skips and not-run checks;
+- remaining prerequisite/review/account/host/time blockers and their affected claims;
+- heartbeat owner/state and last meaningful activity;
+- READY_FOR_LEAD_REVIEW, or BLOCKED_FRONTIER if required work cannot proceed.
 
-Do not shorten a 24-hour requirement, claim a future review occurred, or poll imaginary lead services. If all genuinely ready work is exhausted, stop with a precise blocked-frontier/review handoff instead of a false completion statement. If the model session ends or compacts, persist the current packet/commands/working tree/next step in repo state; never imply a stopped model is continuing merely because a timer runs.
-
-## 9. Deliverable for this round
-
-One pushed implementation candidate, not another portfolio of roadmaps.
-Return only:
-- implementation branch + exact source SHA;
-- highest IMPLEMENTED / WIRED / LIVE-LOCAL / REAL-WORLD / INDEPENDENTLY VERIFIED milestone, separately;
-- a checkpoint matrix with exact evidence paths, tested SHA, actual outcome, and unresolved gates;
-- material source changes versus re-verification-only work;
-- full test results with skips/not-run separated;
-- remaining review/credential/host/time blockers and their affected packets;
-- active/stopped heartbeat owner and last meaningful activity;
-- READY_FOR_LEAD_REVIEW (or BLOCKED_FRONTIER if no executable work remains).
-
-No claim that V3.0 is accepted unless the canonical registry and real evidence support every mandatory gate. One launch prompt is not a guarantee that missing credentials, independent review or elapsed-time requirements disappear.
+Leave the product running where safe and authorized; stop the implementation heartbeat or mark it stopped when the model session ends. Do not imply continuing work from a timer alone. No future-version tasks or new roadmap. A V1.7 success report is not permission to begin V1.8.
