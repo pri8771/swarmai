@@ -1,0 +1,16 @@
+src/swarm/tools/adapters/local_sandbox.py:17:            integration_id="local.sandbox",
+src/swarm/tools/adapters/local_sandbox.py:18:            integration_version="1.0",
+src/swarm/tools/adapters/browser_session.py:22:            integration_id="browser.session",
+src/swarm/tools/adapters/browser_session.py:23:            integration_version="1.0",
+src/swarm/tools/adapters/browser_session.py:29:                    scopes=["browser.session"],
+src/swarm/tools/adapters/browser_session.py:36:                    scopes=["browser.session"],
+src/swarm/tools/adapters/browser_session.py:43:            scopes=["browser.session"],
+src/swarm/tools/adapters/api_mcp.py:23:            integration_id="api.mcp.echo",
+src/swarm/tools/adapters/api_mcp.py:24:            integration_version="1.0",
+tests/tools/test_v17_gateway_negatives.py:249:    gw = _gw(browser, project="proj_a", scopes={"browser.session"}, store=InMemoryEffectStore())
+tests/tools/test_v17_gateway_negatives.py:363:        scopes={"browser.session"},
+tests/tools/test_v17_gateway_negatives.py:382:        scopes={"browser.session"},
+tests/tools/test_v17_gateway_negatives.py:449:        browser, project="proj_a", scopes={"browser.session"}, store=InMemoryEffectStore()
+tests/tools/test_v17_gateway_negatives.py:491:    assert r1.integration_id == "local.sandbox"
+tests/tools/test_v17_gateway_negatives.py:492:    assert r2.integration_id == "api.mcp.echo"
+tests/tools/test_v17_gateway_negatives.py:493:    assert r3.integration_id == "browser.session"

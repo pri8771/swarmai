@@ -1,0 +1,4 @@
+src/swarm/tools/adapters/local_sandbox.py:16:        self.manifest = AdapterManifest(
+src/swarm/tools/adapters/browser_session.py:21:        self.manifest = AdapterManifest(
+src/swarm/tools/adapters/api_mcp.py:22:        self.manifest = AdapterManifest(
+src/swarm/tools/gateway.py:214:        self.manifest = AdapterManifest(

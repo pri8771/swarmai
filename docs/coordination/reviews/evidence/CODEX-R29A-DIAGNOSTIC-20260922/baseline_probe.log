@@ -1,0 +1,94 @@
+{
+  "adapter_manifest_fields": [
+    "adapter_class",
+    "filesystem_allowed",
+    "filesystem_roots",
+    "host_requirements",
+    "integration_id",
+    "integration_version",
+    "network_allowed",
+    "operations",
+    "read_data_classes",
+    "risk_class",
+    "sandbox_required",
+    "schema_version",
+    "scopes",
+    "secrets_required",
+    "side_effect_class",
+    "user_interaction_consequential",
+    "write_data_classes"
+  ],
+  "adapters": [
+    {
+      "adapter": "ApiMcpAdapter",
+      "constructor": "(*, transport: 'Callable[[str, dict[str, Any]], dict[str, Any]] | None' = None) -> 'None'",
+      "inline_manifest": true,
+      "manifest_fields": [
+        "adapter_class",
+        "filesystem_allowed",
+        "filesystem_roots",
+        "host_requirements",
+        "integration_id",
+        "integration_version",
+        "network_allowed",
+        "operations",
+        "read_data_classes",
+        "risk_class",
+        "sandbox_required",
+        "schema_version",
+        "scopes",
+        "secrets_required",
+        "side_effect_class",
+        "user_interaction_consequential",
+        "write_data_classes"
+      ],
+      "manifest_identity": "api.mcp.echo@1.0"
+    },
+    {
+      "adapter": "BrowserSessionAdapter",
+      "constructor": "() -> 'None'",
+      "inline_manifest": true,
+      "manifest_fields": [
+        "adapter_class",
+        "filesystem_allowed",
+        "filesystem_roots",
+        "host_requirements",
+        "integration_id",
+        "integration_version",
+        "network_allowed",
+        "operations",
+        "read_data_classes",
+        "risk_class",
+        "sandbox_required",
+        "schema_version",
+        "scopes",
+        "secrets_required",
+        "side_effect_class",
+        "user_interaction_consequential",
+        "write_data_classes"
+      ],
+      "manifest_identity": "browser.session@1.0"
+    }
+  ],
+  "expected_r29a_fields": [
+    "adapter_class",
+    "filesystem_scopes",
+    "host_requirements",
+    "integration_id",
+    "integration_version",
+    "network_scopes",
+    "operations",
+    "read_data_classes",
+    "risk_class",
+    "sandbox_required",
+    "schema_version",
+    "secrets_refs_required",
+    "user_interaction_consequential",
+    "write_data_classes"
+  ],
+  "receipt_has_manifest_digest": false,
+  "registry_manifest_live_mutation": {
+    "after": false,
+    "before": true
+  }
+}

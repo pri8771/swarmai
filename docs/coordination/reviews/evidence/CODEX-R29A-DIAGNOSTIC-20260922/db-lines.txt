@@ -1,0 +1,27 @@
+   329	class ActionReceiptRow(Base):
+   330	    """Immutable per-attempt action receipt (R27a). Insert-only; never updated."""
+   331	
+   332	    __tablename__ = "action_receipts"
+   333	    __table_args__ = (
+   334	        UniqueConstraint("effect_id", "attempt_number", name="uq_action_receipt_effect_attempt"),
+   335	        Index("ix_action_receipts_project_effect_key", "project_id", "effect_key"),
+   336	    )
+   337	
+   338	    receipt_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+   339	    project_id: Mapped[str] = mapped_column(String(64), index=True)
+   340	    effect_id: Mapped[str] = mapped_column(
+   341	        String(64), ForeignKey("action_effects.effect_id", name="fk_action_receipt_effect")
+   342	    )
+   343	    effect_key: Mapped[str] = mapped_column(String(192))
+   344	    action_id: Mapped[str] = mapped_column(String(64), index=True)
+   345	    attempt_number: Mapped[int] = mapped_column(Integer)
+   346	    outcome: Mapped[str] = mapped_column(String(32))
+   347	    reconciliation_state: Mapped[str] = mapped_column(
+   348	        String(32), default="none", server_default="none"
+   349	    )
+   350	    evidence_digest: Mapped[str] = mapped_column(String(128))
+   351	    receipt: Mapped[dict[str, Any]] = mapped_column(JSONB)
+   352	    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+   353	
+   354	
+   355	class WorkerLeaseRow(Base):

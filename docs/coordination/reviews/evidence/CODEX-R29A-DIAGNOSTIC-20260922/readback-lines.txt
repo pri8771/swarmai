@@ -1,0 +1,48 @@
+   795	            )
+   796	            if effect is None:
+   797	                raise EffectStoreError("effect_not_found")
+   798	            return _insert_receipt(session, effect, receipt)
+   799	
+   800	    def get_receipt(self, action_id: str) -> ActionReceiptV17 | None:
+   801	        with session_scope(self.factory) as session:
+   802	            row = session.scalar(
+   803	                select(ActionReceiptRow)
+   804	                .where(ActionReceiptRow.action_id == action_id)
+   805	                .order_by(
+   806	                    ActionReceiptRow.created_at.desc(), ActionReceiptRow.attempt_number.desc()
+   807	                )
+   808	                .limit(1)
+   809	            )
+   810	            return None if row is None else ActionReceiptV17.model_validate(row.receipt)
+   811	
+   812	    def list_receipts(self, *, project_id: str, effect_key: str) -> list[ActionReceiptV17]:
+   813	        with session_scope(self.factory) as session:
+   814	            rows = session.scalars(
+   815	                select(ActionReceiptRow)
+   816	                .where(
+   817	                    ActionReceiptRow.project_id == project_id,
+   818	                    ActionReceiptRow.effect_key == effect_key,
+   819	                )
+   820	                .order_by(ActionReceiptRow.attempt_number.asc())
+   821	            )
+   822	            return [ActionReceiptV17.model_validate(r.receipt) for r in rows]
+   823	
+   824	    def terminal_receipt(self, *, project_id: str, effect_key: str) -> ActionReceiptV17 | None:
+   825	        with session_scope(self.factory) as session:
+   826	            row = session.scalar(
+   827	                select(ActionReceiptRow)
+   828	                .where(
+   829	                    ActionReceiptRow.project_id == project_id,
+   830	                    ActionReceiptRow.effect_key == effect_key,
+   831	                    ActionReceiptRow.outcome == "succeeded",
+   832	                )
+   833	                .order_by(ActionReceiptRow.attempt_number.desc())
+   834	                .limit(1)
+   835	            )
+   836	            return None if row is None else ActionReceiptV17.model_validate(row.receipt)
+   837	
+   838	
+   839	# ---- transaction-internal helpers (take an open Session; never commit)
+   840	
+   841	
+   842	def _require_row(
