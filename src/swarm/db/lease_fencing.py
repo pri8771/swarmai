@@ -7,6 +7,7 @@ V2A-003c: durable result submission + acceptance fence.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
@@ -14,6 +15,7 @@ from typing import Any
 from sqlalchemy import literal, select, tuple_
 from sqlalchemy.orm import Session
 
+from swarm.contracts.actions import ActionEnvelope
 from swarm.contracts.common import new_id, utc_now
 from swarm.db.models import (
     MissionRow,
@@ -649,6 +651,65 @@ class LeaseLifecycleService:
         self._leases = TaskLeaseRepository(session)
         self._workers = WorkerRegistrationRepository(session)
         self._results = WorkerResultRepository(session)
+
+    def read_effect_fence(
+        self, *, project_id: str, mission_id: str, task_id: str, attempt_id: str
+    ) -> dict[str, int]:
+        """Read execution authority under SHARE locks held until admission commits.
+
+        Use the caller's transaction. Mission then lease/attempt/task follows
+        cancellation's lock order; worker rotation also serializes on its row.
+        Missing, ambiguous and legacy-unbound authority all fail closed.
+        """
+        mission = self.session.scalar(
+            select(MissionRow).where(MissionRow.id == mission_id).with_for_update(read=True)
+        )
+        if mission is None or mission.project_id != project_id:
+            raise LeaseRenewError("effect_mission_missing_or_mismatched")
+        leases = list(self.session.scalars(
+            select(TaskLeaseRow).where(
+                TaskLeaseRow.attempt_id == attempt_id,
+                TaskLeaseRow.state.in_(_ACTIVE_LEASE_STATES),
+            ).with_for_update(read=True)
+        ))
+        if len(leases) != 1:
+            raise LeaseRenewError("effect_requires_one_active_lease")
+        lease = leases[0]
+        attempt = self.session.scalar(
+            select(TaskAttemptRow).where(
+                TaskAttemptRow.attempt_id == attempt_id
+            ).with_for_update(read=True)
+        )
+        task = self.session.scalar(
+            select(TaskRow).where(TaskRow.id == task_id).with_for_update(read=True)
+        )
+        worker = self.session.scalar(
+            select(WorkerLeaseRow).where(
+                WorkerLeaseRow.worker_id == lease.worker_id
+            ).with_for_update(read=True)
+        )
+        if (
+            attempt is None or task is None or worker is None
+            or lease.project_id != project_id or lease.mission_id != mission_id
+            or lease.task_id != task_id or attempt.project_id != project_id
+            or attempt.mission_id != mission_id or attempt.worker_id != lease.worker_id
+            or task.mission_id != mission_id or worker.project_id != project_id
+        ):
+            raise LeaseRenewError("effect_authority_binding_mismatch")
+        if worker.revoked_at is not None or worker.status in {"draining", "offline", "quarantined"}:
+            raise LeaseRenewError("effect_worker_not_active")
+        if lease.expires_at <= utc_now():
+            raise LeaseRenewError("effect_lease_expired")
+        if (
+            worker.lease_generation != lease.worker_generation
+            or worker.lease_generation != attempt.lease_generation
+        ):
+            raise LeaseRenewError("effect_worker_generation_stale")
+        self._require_current_lease_authority(lease)
+        return {
+            "lease_generation": worker.lease_generation,
+            "cancellation_generation": mission.cancellation_generation,
+        }
 
     def claim_eligible_attempt(
         self,
@@ -1530,3 +1591,19 @@ class LeaseLifecycleService:
         result.rejection_reason = reason[:512]
         result.accepted_at = None
         # Keep submitted_at; rejection is a disposition only.
+
+
+def effect_fence_reader(envelope: ActionEnvelope) -> Callable[[Session], Mapping[str, int]]:
+    """Bind the owning lease service to one envelope, without opening a transaction."""
+    project_id, mission_id, task_id, attempt_id = (
+        envelope.project_id, envelope.mission_id, envelope.task_id, envelope.attempt_id
+    )
+
+    def read(session: Session) -> Mapping[str, int]:
+        if not mission_id or not task_id or not attempt_id:
+            raise LeaseRenewError("effect_authority_incomplete")
+        return LeaseLifecycleService(session).read_effect_fence(
+            project_id=project_id, mission_id=mission_id, task_id=task_id, attempt_id=attempt_id
+        )
+
+    return read
