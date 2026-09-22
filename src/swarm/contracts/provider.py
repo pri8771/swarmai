@@ -143,6 +143,6 @@ class InferenceRequest(Envelope):
     purpose: str
     messages: list[dict[str, Any]]
     estimated_input_tokens: int | None = None
-    max_output_tokens: int | None = None
+    max_output_tokens: int | None = Field(default=None, strict=True, gt=0)
     tools_requested: list[str] = Field(default_factory=list)
     secret_ref_names: list[str] = Field(default_factory=list)

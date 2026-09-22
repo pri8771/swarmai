@@ -175,11 +175,14 @@ class BaseCoreAdapter:
             return self._invoke_cloudflare(model_id, request)
         if self.api_style == "cohere":
             return self._invoke_cohere(model_id, request)
-        body = {
+        body: dict[str, Any] = {
             "model": model_id,
             "messages": request.messages,
             "stream": False,
         }
+        if request.max_output_tokens is not None:
+            token_field = "max_completion_tokens" if self.provider_id == "groq" else "max_tokens"
+            body[token_field] = request.max_output_tokens
         return self.transport.request("POST", "/chat/completions", json_body=body)
 
     def _invoke_gemini(self, model_id: str, request: InferenceRequest) -> dict[str, Any]:
@@ -192,7 +195,10 @@ class BaseCoreAdapter:
                 }
             )
         path = f"/models/{model_id}:generateContent"
-        raw = self.transport.request("POST", path, json_body={"contents": contents})
+        body: dict[str, Any] = {"contents": contents}
+        if request.max_output_tokens is not None:
+            body["generationConfig"] = {"maxOutputTokens": request.max_output_tokens}
+        raw = self.transport.request("POST", path, json_body=body)
         # Normalize to openai-like shape for shared usage handling.
         usage_meta = raw.get("usageMetadata") or {}
         text = ""
@@ -212,11 +218,15 @@ class BaseCoreAdapter:
 
     def _invoke_cloudflare(self, model_id: str, request: InferenceRequest) -> dict[str, Any]:
         # Workers AI OpenAI-compatible path under /ai/v1/chat/completions when configured.
-        body = {"model": model_id, "messages": request.messages, "stream": False}
+        body: dict[str, Any] = {"model": model_id, "messages": request.messages, "stream": False}
+        if request.max_output_tokens is not None:
+            body["max_tokens"] = request.max_output_tokens
         return self.transport.request("POST", "/chat/completions", json_body=body)
 
     def _invoke_cohere(self, model_id: str, request: InferenceRequest) -> dict[str, Any]:
-        body = {"model": model_id, "messages": request.messages, "stream": False}
+        body: dict[str, Any] = {"model": model_id, "messages": request.messages, "stream": False}
+        if request.max_output_tokens is not None:
+            body["max_tokens"] = request.max_output_tokens
         raw = self.transport.request("POST", "/chat", json_body=body)
         usage = raw.get("usage") or {}
         tokens = usage.get("tokens") or {}
