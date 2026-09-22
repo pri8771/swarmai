@@ -130,11 +130,13 @@ class ConsequentialToolGateway:
         return await self.execute_envelope(envelope)
 
     async def execute_envelope(self, envelope: ActionEnvelope) -> ActionReceiptV17:
+        envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
         self.adapter.validate(envelope)
 
         # 2) authorize project/resource
         self._authorize_project(envelope)
+        self._require_fence_fields(envelope)
 
         # 3) evaluate policy/risk
         self._require_durable_store(envelope)
@@ -355,9 +357,11 @@ class ConsequentialToolGateway:
         )
 
     async def reconcile(self, envelope: ActionEnvelope) -> ActionReceiptV17:
+        envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
         self.adapter.validate(envelope)
         self._authorize_project(envelope)
+        self._require_fence_fields(envelope)
         self._require_durable_store(envelope)
         self._evaluate_policy(envelope)
         self._check_generations(envelope)
@@ -447,6 +451,36 @@ class ConsequentialToolGateway:
         )
         raise ReconciliationRequiredError("external_outcome_still_unknown")
 
+    def _effective_envelope(self, envelope: ActionEnvelope) -> ActionEnvelope:
+        declaration = self.adapter.manifest.operations.get(envelope.operation)
+        if declaration is None:
+            raise ToolAuthorizationError("operation_not_declared")
+        effect_rank = {"none": 0, "idempotent": 1, "consequential": 2, "irreversible": 3}
+        return envelope.model_copy(
+            update={
+                "side_effect_class": max(
+                    envelope.side_effect_class,
+                    declaration.side_effect_class,
+                    key=effect_rank.__getitem__,
+                ),
+                "risk_class": max(
+                    envelope.risk_class, declaration.risk_class, key=self._risk_rank.__getitem__
+                ),
+            }
+        )
+
+    @staticmethod
+    def _require_fence_fields(envelope: ActionEnvelope) -> None:
+        if envelope.side_effect_class in {"consequential", "irreversible"} and (
+            any(
+                not value or not value.strip()
+                for value in (envelope.mission_id, envelope.task_id, envelope.attempt_id)
+            )
+            or envelope.lease_generation is None
+            or envelope.cancellation_generation is None
+        ):
+            raise StaleLeaseError("fence_missing")
+
     def _authorize_project(self, envelope: ActionEnvelope) -> None:
         if envelope.project_id != self.project_id:
             raise ToolAuthorizationError("wrong_project")
@@ -465,7 +499,7 @@ class ConsequentialToolGateway:
                 self.max_risk_without_approval, 0
             ):
                 if not envelope.approval_id:
-                    raise PolicyDeniedError("consequential_requires_approval")
+                    raise PolicyDeniedError("approval_required")
 
     def _require_exact_approval(
         self, envelope: ActionEnvelope, existing: dict[str, Any] | None = None
@@ -568,6 +602,8 @@ class ConsequentialToolGateway:
             finished_at=finished,
             external_id=external_id,
             outcome=outcome,  # type: ignore[arg-type]
+            effective_side_effect_class=envelope.side_effect_class,
+            effective_risk_class=envelope.risk_class,
             reconciliation_state=reconciliation_state,
             attempt_refs=[new_id("aat_")],
             evidence_digest=digest,

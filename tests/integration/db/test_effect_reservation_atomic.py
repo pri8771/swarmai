@@ -69,6 +69,8 @@ def _envelope(
         normalized_payload=payload or {"body": "atomic"},
         side_effect_class="consequential",
         risk_class="medium",
+        lease_generation=1,
+        cancellation_generation=0,
         effect_key=effect_key or "",
     )
     return env.ensure_hashes()

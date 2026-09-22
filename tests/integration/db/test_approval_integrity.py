@@ -19,6 +19,7 @@ from swarm.db.models import ApprovalRow, Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
+from tests.integration.db.effect_fixtures import bind_lease
 
 pytestmark = pytest.mark.integration
 
@@ -46,7 +47,10 @@ def factory(engine):
     yield fac
     with engine.begin() as conn:
         conn.execute(
-            text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE action_receipts, action_effects, approvals, missions, worker_leases "
+                "RESTART IDENTITY CASCADE"
+            )
         )
 
 
@@ -82,6 +86,7 @@ def test_put_approval_twice_rejected_and_row_unchanged(factory) -> None:
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "insert-only"}
     )
+    env = bind_lease(factory, env)
     grant = gw.make_approval(env, max_effect_count=1)
     before = _row(factory, grant.approval_id)
     tampered = grant.model_copy(update={"max_effect_count": 99, "grantor": "attacker"})
@@ -101,6 +106,7 @@ async def test_put_cannot_reset_used_count(factory) -> None:
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "consume-once"}
     )
+    env = bind_lease(factory, env)
     grant = gw.make_approval(env, max_effect_count=1)
     env.approval_id = grant.approval_id
     assert (await gw.execute_envelope(env)).outcome == "succeeded"
@@ -123,6 +129,7 @@ async def test_revocation_is_monotonic_and_blocks_execution(factory) -> None:
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "revoke-me"}
     )
+    env = bind_lease(factory, env)
     grant = gw.make_approval(env, max_effect_count=3)
     env.approval_id = grant.approval_id
     assert gw.revoke_approval(grant.approval_id, revoked_by="operator", reason="changed mind")
@@ -149,6 +156,7 @@ def test_revoke_wrong_project_returns_false_and_leaves_grant_active(factory) -> 
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-revoke"}
     )
+    env = bind_lease(factory, env)
     grant = gw_a.make_approval(env)
     repo = DurableEffectRepository(factory)
     assert (
@@ -169,6 +177,7 @@ async def test_legacy_null_binding_row_is_non_operational(factory) -> None:
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "legacy"}
     )
+    env = bind_lease(factory, env)
     legacy_id = new_id("apr_")
     sess = factory()
     try:
@@ -218,6 +227,7 @@ async def test_project_b_cannot_fetch_project_a_approval(factory) -> None:
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "isolation"}
     )
+    env = bind_lease(factory, env)
     grant = gw_a.make_approval(env)
     repo = DurableEffectRepository(factory)
     assert repo.get_approval(grant.approval_id, project_id="proj_b") is None
@@ -228,6 +238,7 @@ async def test_project_b_cannot_fetch_project_a_approval(factory) -> None:
     env_b = adapter.normalize(
         {"project_id": "proj_b", "destination": "mcp://echo/default", "body": "isolation"}
     )
+    env_b = bind_lease(factory, env_b)
     env_b.approval_id = grant.approval_id
     with pytest.raises(ApprovalInvalidError, match="unknown_approval"):
         await gw_b.execute_envelope(env_b)

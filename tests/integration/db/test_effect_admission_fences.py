@@ -11,6 +11,7 @@ from swarm.db.lease_fencing import LeaseLifecycleService
 from swarm.db.repositories import MissionRepository
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import EffectConflictError
+from swarm.tools.v17_gateway import StaleLeaseError
 from tests.integration.db.test_effect_transactions import (
     _gateway,
     _sql,
@@ -61,6 +62,8 @@ def _leased_envelope(factory, adapter):
                 "mission_id": mission.id,
                 "task_id": task.id,
                 "attempt_id": lease.attempt_id,
+                "lease_generation": lease.worker_generation,
+                "cancellation_generation": mission.cancellation_generation,
                 "actor": worker_id,
                 "body": "offline durable-fence regression",
             }
@@ -138,7 +141,7 @@ async def test_partial_lease_context_fails_closed(factory):
     env.attempt_id = None
     gateway = _gateway(adapter, factory, project=env.project_id)
     env.approval_id = gateway.make_approval(env).approval_id
-    with pytest.raises(EffectConflictError, match="effect_authority_incomplete"):
+    with pytest.raises(StaleLeaseError, match="fence_missing"):
         await gateway.execute_envelope(env)
     assert adapter.call_count == 0
     assert _used_count(factory, env.approval_id) == 0
@@ -152,7 +155,7 @@ async def test_reserved_effect_cannot_strip_lease_binding(factory):
     env.approval_id = gateway.make_approval(env).approval_id
     gateway.store.reserve(env)
     stripped = env.model_copy(update={"mission_id": None, "task_id": None, "attempt_id": None})
-    with pytest.raises(EffectConflictError, match="effect_authority_binding_mismatch"):
+    with pytest.raises(StaleLeaseError, match="fence_missing"):
         await gateway.execute_envelope(stripped)
     assert adapter.call_count == 0
     assert _used_count(factory, env.approval_id) == 0
@@ -230,7 +233,9 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("outcome", ["succeeded", "unknown"])
-async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(factory, monkeypatch, outcome):
+async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(
+    factory, monkeypatch, outcome
+):
     adapter = ApiMcpAdapter()
     env = _leased_envelope(factory, adapter)
     if outcome == "unknown":
@@ -246,7 +251,13 @@ async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(fa
         pytest.fail("changed authority must be rejected before adapter reconciliation")
 
     monkeypatch.setattr(adapter, "reconcile", forbidden_reconcile)
-    changed = env.model_copy(update={"mission_id": "another-mission", "task_id": "another-task", "attempt_id": "another-attempt"})
+    changed = env.model_copy(
+        update={
+            "mission_id": "another-mission",
+            "task_id": "another-task",
+            "attempt_id": "another-attempt",
+        }
+    )
     with pytest.raises(EffectConflictError, match="effect_authority_binding_mismatch"):
         await gateway.execute_envelope(changed)
     assert adapter.call_count == 1

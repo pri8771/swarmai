@@ -8,6 +8,7 @@ import asyncio
 import threading
 
 import pytest
+from tests.integration.db.effect_fixtures import bind_lease
 from tests.integration.db.test_effect_crash_window import engine as engine
 from tests.integration.db.test_effect_crash_window import factory as factory
 
@@ -16,8 +17,8 @@ from swarm.tools.adapters.base import AdapterDeniedError, AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
 from swarm.tools.v17_gateway import (
     ConsequentialToolGateway,
-    PolicyDeniedError,
     ReconciliationRequiredError,
+    StaleLeaseError,
 )
 
 
@@ -56,14 +57,27 @@ class ResultAdapter(ApiMcpAdapter):
 def setup(adapter, store, timeout=1):
     # No-effect unit fixtures are explicit. Consequential semantics use real PG.
     adapter.manifest.side_effect_class = "consequential" if store.durable else "none"
+    if not store.durable:
+        adapter.manifest.operations["echo"].side_effect_class = "none"
+        adapter.manifest.operations["echo"].risk_class = "low"
+    envelope = adapter.normalize(
+        {
+            "project_id": "r28a",
+            "body": "synthetic",
+            "lease_generation": 1,
+            "cancellation_generation": 0,
+        }
+    )
+    if store.durable:
+        envelope = bind_lease(store.factory, envelope)
     gateway = ConsequentialToolGateway(
         adapter,
-        project_id="r28a",
+        project_id=envelope.project_id,
         allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
+        current_lease_generation=envelope.lease_generation,
+        current_cancellation_generation=envelope.cancellation_generation,
         store=store,
     )
-    envelope = adapter.normalize({"project_id": "r28a", "body": "synthetic"})
     envelope.timeout_seconds = timeout
     envelope.approval_id = gateway.make_approval(envelope).approval_id
     return gateway, envelope
@@ -217,10 +231,12 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
         current_lease_generation=1,
         store=store,
     )
-    envelope = adapter.normalize({"project_id": "r28a"})
-    with pytest.raises(PolicyDeniedError, match="durable_store_required"):
+    envelope = adapter.normalize(
+        {"project_id": "r28a", "lease_generation": 1, "cancellation_generation": 0}
+    )
+    with pytest.raises(StaleLeaseError, match="fence_missing"):
         await gateway.execute_envelope(envelope)
-    with pytest.raises(PolicyDeniedError, match="durable_store_required"):
+    with pytest.raises(StaleLeaseError, match="fence_missing"):
         await gateway.reconcile(envelope)
     assert adapter.pre_calls == adapter.call_count == 0
     assert row(store, envelope) is None
@@ -235,7 +251,9 @@ def test_gateway_requires_store_argument():
 
 def test_echo_adapter_reconcile_never_claims_not_applied():
     adapter = ApiMcpAdapter()
-    envelope = adapter.normalize({"project_id": "r28a"})
+    envelope = adapter.normalize(
+        {"project_id": "r28a", "lease_generation": 1, "cancellation_generation": 0}
+    )
     assert adapter.reconcile(envelope, []) == {
         "state": "unknown",
         "reason": "destination_not_observable",
