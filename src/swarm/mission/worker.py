@@ -377,6 +377,10 @@ class RepoWorker:
         self._effect_attempt_id: str | None = None
         self._effect_sequence = 0
         self._effect_receipt_ids: list[str] = []
+        # The runtime needs this even when an effect raises before run_task can
+        # return its normal (result, handle) tuple.  It is deliberately only a
+        # cleanup handle; it does not make the worktree eligible for promotion.
+        self._active_worktree: WorktreeHandle | None = None
         self.parser_dogfood_fixture = parser_dogfood_fixture
         # Operational API/CLI paths must set this so model calls cannot bypass
         # the governed project-scoped broker via direct local_chat.
@@ -384,8 +388,14 @@ class RepoWorker:
 
     def _bind_worktree_effects(self, handle: WorktreeHandle) -> None:
         """Bind a fresh local-sandbox adapter to the isolated worktree only."""
+        self._active_worktree = handle
         if self._action_gateway_factory is not None:
             self.action_gateway = self._action_gateway_factory(handle.path)
+
+    @property
+    def active_worktree(self) -> WorktreeHandle | None:
+        """Worktree retained for runtime cleanup if a task raises mid-turn."""
+        return self._active_worktree
 
     def _begin_task_effects(self, *, mission_id: str, task_id: str) -> None:
         self._effect_mission_id = mission_id
@@ -698,6 +708,10 @@ class RepoWorker:
             worker_id=self.worker_id,
             base_dir=self.worktree_root,
         )
+        # Preserve the handle before binding an adapter or starting any effect,
+        # so MissionRuntime can remove this disposable worktree if this task
+        # throws before it returns its normal result tuple.
+        self._active_worktree = handle
         self._bind_worktree_effects(handle)
         target_rel = self._resolve_target_rel(task)
         if target_rel is None and prior:

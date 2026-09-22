@@ -174,7 +174,13 @@ class MissionRuntime:
                     if round_idx > 0 and task.task_family == "implement":
                         # Force re-implement after failed verify/review.
                         pass
-                    result, shared_wt = worker.run_task(
+                    # RepoWorker is deliberately synchronous because its local
+                    # action gateway owns a synchronous entrypoint.  The
+                    # mission orchestrator is async, so execute the serial
+                    # worker turn off this loop rather than weakening the
+                    # gateway's fail-closed running-loop guard.
+                    result, shared_wt = await asyncio.to_thread(
+                        worker.run_task,
                         task,
                         mission_id=mission.id,
                         prior=prior,
@@ -320,9 +326,13 @@ class MissionRuntime:
             self.store.save(record)
             return record
         finally:
-            if shared_wt is not None:
+            # A worker can create and bind a worktree before a gateway effect
+            # raises. In that case run_task never returns its tuple, so retain
+            # the worker's bound handle solely to remove the disposable tree.
+            cleanup_wt = shared_wt or worker.active_worktree
+            if cleanup_wt is not None:
                 try:
-                    remove_worktree(self.repo, shared_wt, force=True)
+                    remove_worktree(self.repo, cleanup_wt, force=True)
                 except Exception:  # noqa: BLE001
                     pass
 
