@@ -41,6 +41,9 @@ No paid fallback by default.
 No main merge/public release/destructive production action without explicit operator authorization.
 No permission/spend/release/self-review escalation by persistent objectives, learning, extensions, or self-development.
 
-
 ## Review authority
 No worker may impersonate the ChatGPT lead, fabricate a lead review, or promote its own branch as approved. Worker-produced review suggestions are advisory only. Canonical promotion requires an actual operator/ChatGPT lead decision after independent inspection.
+
+## Current scope and Codex portfolio routing
+SwarmAI's latest owner cap is **V1.7 live, then stop** under `docs/coordination/EXECUTION_CONTROL.json`; V1.8-V3 implementation and further planning are parked.
+When explicitly asked to manage Bots, Jobs and Swarm together, read `CODEX_START.md` and `docs/coordination/portfolio/README.md` from `coordination/swarm-control`. That package is a routing/context hub, NOT a replacement for each project's authority, queue or evidence. Do not import SwarmAI's heartbeat policy into Social Bots, merge the repositories, start overlapping workers, or treat portfolio coordination as a new product feature.

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "kind": "portfolio_resume_index_not_acceptance_or_second_queue",
+  "initialized_at_utc": "2026-09-22T00:39:07Z",
+  "manager_session": null,
+  "manager_status": "handoff_prepared_not_launched",
+  "last_manager_activity_at": null,
+  "selected_project": null,
+  "portfolio_heartbeat_created": false,
+  "projects": {
+    "swarm": {"native_ref": "coordination/swarm-control", "source_ref": "cursor/v17-single-session", "observed_source_sha": "ab958d7a4b4d6198b143e7e79ecf69ff367cb10e", "last_observed_packet": "OPS-CI-01", "next_reported_packet": "R27a", "reported_owner": "fable", "reported_epoch": "fable-v17-20260922-01", "local_owner_verified": false, "last_independently_verified_live_checkpoint": null, "must_refresh": true},
+    "bots": {"native_ref": "chatgpt/social-bots-plan-20260920", "source_ref": "fable/social-bots-v23-fasttrack-20260921", "observed_source_sha": "347de2b5c91c774670c3b884cc542c88fa6eabfa", "last_observed_packet": null, "reported_owner": "fable_integrator_per_scope_not_process_verified", "local_owner_verified": false, "last_independently_verified_live_checkpoint": null, "must_refresh": true},
+    "jobs": {"native_ref": "main", "source_ref": null, "candidate_ref": "lead/jobs-v145-final-campaign-20260921", "observed_candidate_sha": "2615f6b5b2a7eab9b98ef3f4e3b50eeb55c8e298", "last_observed_packet": "A-V14-P0A-INTEGRITY remains REWORK per native queue", "reported_owner": "fable_per_scope_not_process_verified", "local_owner_verified": false, "last_independently_verified_live_checkpoint": null, "must_refresh": true}
+  },
+  "first_action": "Refresh all native scope/queue/review/source/ownership records; preserve active workers; produce one three-project status before choosing a ready packet",
+  "update_rules": ["Update on actual coordination/execution events, not a new timer", "Record exact source/evidence refs and truthful observation times", "Keep private paths/identity and secrets out of shared records", "Null checkpoint means not verified in this handoff, not proof that none ever existed", "Never promote native artifacts or scope via this index"]
+}
