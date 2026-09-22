@@ -1,5 +1,7 @@
 # Provider inventory and blocker corrections — 2026-09-22
 
+**Current clarification:** see PROVIDER_PROGRESS_20260922.md. Eight core remotes and five extended remotes already have recorded account/key/auth onboarding, plus local Ollama. Zero admitted remote routes does not mean zero setup. The earlier generic request for account names is superseded; reuse the known inventory and ask only for a concrete missing access step or exact live-run grant.
+
 Read-only evidence on accepted source `fb58a751d40f1828990d7a0d687ad30de6eb6103`. No provider calls, secret reads, account changes or grants.
 
 ## Complete source catalogue

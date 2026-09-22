@@ -17,7 +17,7 @@ R31a uses in-process MockTransport only. It does not claim a live server, login,
 
 Canonical 93d4e6e accepted P0/lint, normalized bounded R02a/R17a records and released composition plus R31a offline work. Earlier billing-start failures are historical; current hosted offline checks execute. Gated live CI is not live proof. Windows is not mandatory for the platform-neutral G13 verifier, but actual sealed-bundle proof still needs disposition.
 
-Still needed: exact candidate verdicts; fresh grants for exhausted/failed missions; two independently qualified remote providers with verified no-spend quota; a qualified second physical host; actual CP/live/recovery receipts and R33c per-action authority. Owner mentioned R730/Windows, so “none exists” must not be repeated. No route or host is qualified by that mention. Full 32-entry source catalogue and account-inventory question are in PROVIDER_INVENTORY_20260922.md; owner answer pending.
+Still needed: exact candidate verdicts; fresh grants for exhausted/failed missions; two independently qualified remote providers with verified no-spend quota; a qualified second physical host; actual CP/live/recovery receipts and R33c per-action authority. Owner mentioned R730/Windows, so “none exists” must not be repeated. No route or host is qualified by that mention. Full 32-entry source catalogue is in PROVIDER_INVENTORY_20260922.md; completed onboarding and definitions are in PROVIDER_PROGRESS_20260922.md. Thirteen remote accounts already have recorded credentials/auth plus local Ollama. Do not re-ask generic account names. Fresh exact-route free eligibility and live-call authority remain unresolved.
 
 ## Next bounded action
 
