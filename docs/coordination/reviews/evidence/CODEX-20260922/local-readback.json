@@ -1,0 +1,43 @@
+{
+  "observed_at_utc": "2026-09-22T02:39:25.632609+00:00",
+  "observation_type": "read_only_local_uncommitted_evidence",
+  "repository": "pri8771/swarmai",
+  "branch": "cursor/v17-single-session",
+  "checkout_head": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+  "dirty_paths": [
+    "?? docs/evidence/v14-real-e2e/v14-real-008/attempt2/"
+  ],
+  "attempt2": {
+    "path": "docs/evidence/v14-real-e2e/v14-real-008/attempt2/mission-run.stdout.json",
+    "sha256": "45a5236057ab57c53c555542f17a4d945f06f4d21c5699c863dc0131eb7e47f2",
+    "bytes": 22534,
+    "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+    "status": "failed",
+    "result_summary": "repair_required",
+    "updated_at": "2026-09-22T02:11:59.854522+00:00",
+    "project_id": null,
+    "total_usd": 0.0,
+    "stderr_bytes": 0,
+    "committed": false,
+    "accepted": false
+  },
+  "candidate_service": {
+    "label": "com.swarmai.v17-candidate",
+    "state": "running",
+    "pid": 85277,
+    "loaded_source_identity": "not independently bound; process predates current checkout HEAD",
+    "health_live": 200,
+    "health_ready": 200,
+    "execution_mode": "operational",
+    "database": "up",
+    "allow_paid": false
+  },
+  "heartbeat_service": {
+    "label": "com.swarmai.coord-heartbeat-v17",
+    "state": "not running between scheduled invocations",
+    "last_exit_code": 0,
+    "runs_observed": 24,
+    "model_activity_proven": false
+  },
+  "mutations_performed": []
+}
