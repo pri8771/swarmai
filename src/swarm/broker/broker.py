@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
@@ -84,7 +85,11 @@ class SharedInferenceBroker:
         self.retry = retry_owner or RetryOwner(clock=clock)
         self._clock: Clock = clock or utc_now
         self._ttl = reservation_ttl or timedelta(minutes=5)
-        self._contexts = route_contexts or {}
+        self._contexts: dict[str, RoutePolicyContext] = {}
+        for route_id, ctx in (route_contexts or {}).items():
+            if route_id != ctx.route.route_id:
+                raise BrokerBypassError("route_context_key_mismatch")
+            self.register_route(ctx)
         self._tickets: dict[str, PendingCall] = {}
         self._decisions: dict[str, DecisionRecord] = {}
         self._attempt_decisions: dict[str, str] = {}
@@ -97,7 +102,26 @@ class SharedInferenceBroker:
         self.last_decision_id: str | None = None
 
     def register_route(self, ctx: RoutePolicyContext) -> None:
-        self._contexts[ctx.route.route_id] = ctx
+        self._contexts[ctx.route.route_id] = deepcopy(ctx)
+
+    @staticmethod
+    def _same_admission_route(left: RouteSnapshot, right: RouteSnapshot) -> bool:
+        """Compare every field that can change admission, origin or accounting."""
+        fields = (
+            "route_id",
+            "provider",
+            "account_id",
+            "model_id",
+            "endpoint",
+            "hosted_by",
+            "billing_origin",
+            "availability_status",
+            "status",
+            "quota_bucket_ids",
+            "privacy_policy_ref",
+            "model_terms_ref",
+        )
+        return all(getattr(left, name) == getattr(right, name) for name in fields)
 
     async def assess(self, request: InferenceRequest) -> list[RouteSnapshot]:
         routes = await self.adapter.discover()
@@ -112,11 +136,18 @@ class SharedInferenceBroker:
         )
         eligible: list[RouteSnapshot] = []
         for route in routes:
-            ctx = self._contexts.get(route.route_id) or RoutePolicyContext(
-                route=route, qualified=True, qualification_rationale="default_mock_qualified"
-            )
-            # Keep context route object current.
-            ctx.route = route
+            ctx = self._contexts.get(route.route_id)
+            if ctx is None or not self._same_admission_route(ctx.route, route):
+                record.blocked.append(
+                    {
+                        "route_id": route.route_id,
+                        "reason": "route_context_unregistered"
+                        if ctx is None
+                        else "route_snapshot_changed",
+                        "dimension": "authority",
+                    }
+                )
+                continue
             decision = self.policy.evaluate(request, ctx)
             if decision.allowed:
                 try:
@@ -143,10 +174,13 @@ class SharedInferenceBroker:
         return eligible
 
     async def reserve(self, request: InferenceRequest, route: RouteSnapshot) -> Reservation:
-        ctx = self._contexts.get(route.route_id) or RoutePolicyContext(
-            route=route, qualified=True, qualification_rationale="default_mock_qualified"
-        )
-        ctx.route = route
+        if request.route_id is not None and request.route_id != route.route_id:
+            raise BrokerBypassError("request_route_mismatch")
+        ctx = self._contexts.get(route.route_id)
+        if ctx is None:
+            raise BrokerBypassError("route_context_unregistered")
+        if not self._same_admission_route(ctx.route, route):
+            raise BrokerBypassError("route_snapshot_changed")
         self.policy.assert_allowed(request, ctx)
         self.circuit.assert_closed(route.route_id)
 
@@ -156,7 +190,7 @@ class SharedInferenceBroker:
             self._queue_weights[request.purpose] = weight + 0.01
 
         amounts = self.ledger.estimate_amounts(
-            bucket_ids=list(route.quota_bucket_ids),
+            bucket_ids=list(ctx.route.quota_bucket_ids),
             estimated_input_tokens=request.estimated_input_tokens,
             max_output_tokens=request.max_output_tokens,
             purpose=request.purpose,
