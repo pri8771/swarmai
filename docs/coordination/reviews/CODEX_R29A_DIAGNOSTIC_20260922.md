@@ -2,7 +2,7 @@
 
 REWORK_FOUND baseline gaps reproduced on accepted `ba458eb1a9a1af5f7e022159f36e6ce296d472cc`, tree `8c22e55f11351f567ae7d62b139383179caeb6fa`; native release `8ce9f5ef0069fde2ac4ad708f465612ddb3cb36d`. Codex diagnostic only; no source changes or live action.
 
-Inline manifests retain obsolete vocabulary, constructors have no validated-manifest input, and receipts lack a resolved definition digest. The [offline causal inventory](evidence/CODEX-R29A-DIAGNOSTIC-20260922/diagnostic.md) and [hash manifest](evidence/CODEX-R29A-DIAGNOSTIC-20260922/manifest.json) identify exact paths/callers. Independent integration owner inspected the report/source boundary; the mechanical probe has not been independently rerun yet.
+Inline manifests retain obsolete vocabulary, constructors have no validated-manifest input, and receipts lack a resolved definition digest. The [offline causal inventory](evidence/CODEX-R29A-DIAGNOSTIC-20260922/diagnostic.md) and [hash manifest](evidence/CODEX-R29A-DIAGNOSTIC-20260922/manifest.sha256) identify exact paths/callers. Independent integration owner inspected the report/source boundary; the mechanical probe has not been independently rerun yet.
 
 Request narrow lead contract clarification before the version/receipt compatibility change:
 
