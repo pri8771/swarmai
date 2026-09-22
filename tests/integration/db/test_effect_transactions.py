@@ -17,11 +17,11 @@ import pytest
 from sqlalchemy import text
 
 from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, ApprovalGrant
-from swarm.contracts.common import utc_now
+from swarm.contracts.common import new_id, utc_now
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
-from swarm.tools.effects import DurableEffectRepository, EffectConflictError
+from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
 
@@ -344,3 +344,225 @@ def test_fence_reader_mismatch_blocks_execution_and_adapter_not_called(factory) 
         fence_reader=lambda s: {"lease_generation": 1, "cancellation_generation": 3},
     )
     assert admitted["state"] == "executing" and admitted["attempt_count"] == 1
+
+
+def _unbound_one_shot_approval(gateway, envelope):
+    """Create a one-shot grant usable to distinguish exhaustion from key binding."""
+    return gateway.put_approval(
+        ApprovalGrant(
+            project_id=envelope.project_id,
+            grantor="operator",
+            actor=envelope.actor,
+            integration_id=envelope.integration_id,
+            integration_version=envelope.integration_version,
+            operation=envelope.operation,
+            destination=envelope.destination,
+            payload_hash=envelope.payload_hash,
+            effect_key=None,
+            max_effect_count=1,
+            expires_at=utc_now() + timedelta(seconds=300),
+            policy_version=envelope.policy_version,
+        )
+    )
+
+
+@pytest.mark.asyncio
+async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None:
+    raising = RaisingAdapter()
+    gateway_a = _gateway(raising, factory)
+    envelope_a = raising.normalize(
+        {
+            "project_id": "proj_a",
+            "destination": "mcp://echo/default",
+            "body": "retry-with-replacement-grant",
+        }
+    )
+    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    envelope_a.approval_id = grant_a.approval_id
+
+    first = await gateway_a.execute_envelope(envelope_a)
+    assert first.outcome == "failed"
+    assert _used_count(factory, grant_a.approval_id) == 1
+    _sql(
+        factory,
+        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
+        k=envelope_a.effect_key,
+    )
+
+    working = ApiMcpAdapter()
+    gateway_b = _gateway(working, factory)
+    grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
+    envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
+
+    second = await gateway_b.execute_envelope(envelope_b)
+    assert second.outcome == "succeeded"
+    assert second.attempt_number == 2
+    assert working.call_count == 1
+    assert _used_count(factory, grant_a.approval_id) == 1
+    assert _used_count(factory, grant_b.approval_id) == 1
+    binding = _sql(
+        factory,
+        "SELECT approval_id FROM action_effects WHERE project_id=:p AND effect_key=:k",
+        p=envelope_b.project_id,
+        k=envelope_b.effect_key,
+    )
+    assert binding == grant_b.approval_id
+
+    # A same-effect replay under B returns the immutable success receipt and must not
+    # consume B twice or invoke the adapter again.
+    replay = await gateway_b.execute_envelope(envelope_b)
+    assert replay.receipt_id == second.receipt_id
+    assert _used_count(factory, grant_b.approval_id) == 1
+    assert working.call_count == 1
+
+    # B was deliberately unbound to an effect key, so this denial proves exhaustion,
+    # rather than approval_effect_key_mismatch. No adapter call may occur.
+    other_adapter = ApiMcpAdapter()
+    other_gateway = _gateway(other_adapter, factory)
+    other = envelope_b.model_copy(
+        update={
+            "action_id": new_id("act_"),
+            "effect_key": "proj_a:replacement-grant-second-effect",
+            "idempotency_key": "proj_a:replacement-grant-second-effect",
+        }
+    )
+    with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
+        await other_gateway.execute_envelope(other)
+    assert other_adapter.call_count == 0
+    assert _used_count(factory, grant_b.approval_id) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("how", ["revoked", "expired"])
+async def test_not_applied_retry_replacement_grant_must_still_be_active(factory, how: str) -> None:
+    raising = RaisingAdapter()
+    gateway_a = _gateway(raising, factory)
+    envelope_a = raising.normalize(
+        {
+            "project_id": "proj_a",
+            "destination": "mcp://echo/default",
+            "body": f"replacement-grant-{how}",
+        }
+    )
+    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    envelope_a.approval_id = grant_a.approval_id
+    assert (await gateway_a.execute_envelope(envelope_a)).outcome == "failed"
+    _sql(
+        factory,
+        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
+        k=envelope_a.effect_key,
+    )
+
+    adapter_b = ApiMcpAdapter()
+    gateway_b = _gateway(adapter_b, factory)
+    grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
+    if how == "revoked":
+        _sql(factory, "UPDATE approvals SET revoked_at=now() WHERE id=:a", a=grant_b.approval_id)
+    else:
+        _sql(
+            factory,
+            "UPDATE approvals SET expires_at=now() - interval '1 second' WHERE id=:a",
+            a=grant_b.approval_id,
+        )
+    envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
+
+    with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
+        await gateway_b.execute_envelope(envelope_b)
+    assert adapter_b.call_count == 0
+    assert _used_count(factory, grant_a.approval_id) == 1
+    assert _used_count(factory, grant_b.approval_id) == 0
+    row = gateway_b.store.get(project_id=envelope_b.project_id, effect_key=envelope_b.effect_key)
+    assert row is not None
+    assert row["state"] == "failed"
+    assert row["state_reason"] == "not_applied"
+    assert row["attempt_count"] == 1
+    assert row["approval_id"] == grant_a.approval_id
+
+
+@pytest.mark.asyncio
+async def test_in_memory_already_executing_does_not_consume_replacement_grant() -> None:
+    store = InMemoryEffectStore()
+    first_adapter = ApiMcpAdapter()
+    gateway_a = ConsequentialToolGateway(
+        first_adapter,
+        project_id="proj_a",
+        allowed_scopes=SCOPES,
+        current_lease_generation=1,
+        store=store,
+    )
+    envelope_a = first_adapter.normalize(
+        {
+            "project_id": "proj_a",
+            "destination": "mcp://echo/default",
+            "body": "already-executing-admission",
+        }
+    )
+    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    envelope_a.approval_id = grant_a.approval_id
+    store.reserve(envelope_a)
+    store.begin_execution(envelope_a, executor_id="exe_first")
+    assert store.get_approval(grant_a.approval_id, project_id="proj_a").used_count == 1
+
+    second_adapter = ApiMcpAdapter()
+    gateway_b = ConsequentialToolGateway(
+        second_adapter,
+        project_id="proj_a",
+        allowed_scopes=SCOPES,
+        current_lease_generation=1,
+        store=store,
+    )
+    grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
+    envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
+
+    with pytest.raises(EffectConflictError, match="effect_already_executing"):
+        store.begin_execution(envelope_b, executor_id="exe_rejected")
+    assert second_adapter.call_count == 0
+    assert store.get_approval(grant_b.approval_id, project_id="proj_a").used_count == 0
+    row = store.get(project_id="proj_a", effect_key=envelope_a.effect_key)
+    assert row is not None
+    assert row["approval_id"] == grant_a.approval_id
+    assert row["attempt_count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again(factory):
+    adapter = RaisingAdapter()
+    gateway = _gateway(adapter, factory)
+    env = adapter.normalize({"project_id": "proj_a", "body": "A-B-A-retry"})
+    grant_a = gateway.make_approval(env)
+    grant_b = _unbound_one_shot_approval(gateway, env)
+    for number, grant in enumerate((grant_a, grant_b, grant_a, grant_b), start=1):
+        env.approval_id = grant.approval_id
+        receipt = await gateway.execute_envelope(env)
+        assert receipt.outcome == "failed"
+        assert receipt.approval_id == grant.approval_id
+        assert receipt.attempt_number == number
+        assert _used_count(factory, grant.approval_id) == 1
+        _sql(
+            factory,
+            "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
+            k=env.effect_key,
+        )
+    row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
+    assert set(row["consumed_approval_ids"]) == {grant_a.approval_id, grant_b.approval_id}
+    assert row["approval_id"] == grant_b.approval_id
+
+
+def test_durable_busy_effect_rolls_back_replacement_approval_and_ledger(factory):
+    adapter = ApiMcpAdapter()
+    gateway = _gateway(adapter, factory)
+    env = adapter.normalize({"project_id": "proj_a", "body": "busy-durable-rollback"})
+    grant_a = gateway.make_approval(env)
+    env.approval_id = grant_a.approval_id
+    gateway.store.reserve(env)
+    gateway.store.begin_execution(env, executor_id="original-executor")
+    grant_b = _unbound_one_shot_approval(gateway, env)
+    changed = env.model_copy(update={"approval_id": grant_b.approval_id})
+    with pytest.raises(EffectConflictError, match="effect_already_executing"):
+        gateway.store.begin_execution(changed, executor_id="rejected-executor")
+    row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
+    assert _used_count(factory, grant_b.approval_id) == 0
+    assert row["approval_id"] == grant_a.approval_id
+    assert row["consumed_approval_ids"] == [grant_a.approval_id]
+    assert row["attempt_count"] == 1
+    assert adapter.call_count == 0

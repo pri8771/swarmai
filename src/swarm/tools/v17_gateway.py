@@ -17,12 +17,14 @@ from swarm.contracts.actions import (
     ApprovalGrant,
 )
 from swarm.contracts.common import new_id, payload_hash, utc_now
+from swarm.db.lease_fencing import LeaseRenewError, effect_fence_reader
 from swarm.tools.adapters.base import IntegrationAdapter
 from swarm.tools.effects import (
     DurableEffectRepository,
     EffectConflictError,
     EffectStoreError,
     InMemoryEffectStore,
+    check_effect_binding,
 )
 
 
@@ -134,6 +136,7 @@ class ConsequentialToolGateway:
         # succeeded effect replays even after its approval expired (R27c).
         existing = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
         if existing is not None:
+            check_effect_binding(existing, envelope)
             if existing["state"] == "succeeded":
                 return self._terminal_or_fail(envelope)
             if existing["state"] == "unknown":
@@ -147,9 +150,18 @@ class ConsequentialToolGateway:
         # consumption + single-winner CAS in one transaction).
         self.store.reserve(envelope)
         try:
+            # Standalone actions have no mission lease. Any linked action must
+            # re-read its complete durable authority inside committed admission.
+            reader = None
+            if isinstance(self.store, DurableEffectRepository) and any(
+                (envelope.mission_id, envelope.task_id, envelope.attempt_id)
+            ):
+                reader = effect_fence_reader(envelope)
             effect = self.store.begin_execution(
-                envelope, executor_id=new_id("exe_"), fence_reader=None
+                envelope, executor_id=new_id("exe_"), fence_reader=reader
             )
+        except LeaseRenewError as exc:
+            raise EffectConflictError(f"fence_changed_before_execute:{exc}") from exc
         except EffectConflictError as exc:
             if "unknown" in str(exc):
                 raise ReconciliationRequiredError(str(exc)) from exc
@@ -340,10 +352,12 @@ class ConsequentialToolGateway:
         # at admission (begin_execution); a re-attempt of the same effect that already
         # consumed this grant is not a second use. The durable UPDATE remains the
         # authority; this is the read-only pre-check.
-        consumed_by_this_effect = (
-            existing is not None
-            and existing.get("approval_consumed_at") is not None
-            and existing.get("approval_id") == grant.approval_id
+        consumed_by_this_effect = existing is not None and (
+            grant.approval_id in existing.get("consumed_approval_ids", [])
+            or (
+                existing.get("approval_consumed_at") is not None
+                and existing.get("approval_id") == grant.approval_id
+            )
         )
         if not grant.is_active(ignore_usage=consumed_by_this_effect):
             raise ApprovalInvalidError("approval_expired_or_revoked_or_exhausted")

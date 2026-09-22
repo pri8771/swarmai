@@ -44,6 +44,9 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
         "effect_key": row.effect_key,
         "project_id": row.project_id,
         "action_id": row.action_id,
+        "mission_id": row.mission_id,
+        "task_id": row.task_id,
+        "attempt_id": row.attempt_id,
         "approval_id": row.approval_id,
         "integration_id": row.integration_id,
         "integration_version": row.integration_version,
@@ -65,6 +68,7 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
         "attempt_count": int(row.attempt_count or 0),
         "executor_id": row.executor_id,
         "approval_consumed_at": row.approval_consumed_at,
+        "consumed_approval_ids": list((row.payload or {}).get("consumed_approval_ids", [])),
     }
 
 
@@ -107,6 +111,19 @@ def _check_fence(stored: Mapping[str, Any], current: Mapping[str, int | None]) -
             continue
         if int(stored.get(key) or 0) != int(value):
             raise EffectConflictError("fence_changed_before_execute")
+
+
+def check_effect_binding(stored: Mapping[str, Any], envelope: ActionEnvelope) -> None:
+    _check_binding(stored, envelope)
+    for field in (
+        "mission_id",
+        "task_id",
+        "attempt_id",
+        "lease_generation",
+        "cancellation_generation",
+    ):
+        if stored.get(field) != getattr(envelope, field):
+            raise EffectConflictError("effect_authority_binding_mismatch")
 
 
 class InMemoryEffectStore:
@@ -171,6 +188,9 @@ class InMemoryEffectStore:
                 "effect_key": envelope.effect_key,
                 "project_id": envelope.project_id,
                 "action_id": envelope.action_id,
+                "mission_id": envelope.mission_id,
+                "task_id": envelope.task_id,
+                "attempt_id": envelope.attempt_id,
                 "approval_id": envelope.approval_id,
                 "integration_id": envelope.integration_id,
                 "integration_version": envelope.integration_version,
@@ -192,6 +212,7 @@ class InMemoryEffectStore:
                 "attempt_count": 0,
                 "executor_id": None,
                 "approval_consumed_at": None,
+                "consumed_approval_ids": [],
             }
             self.effects[key] = row
             return {**row, "created": True}
@@ -205,8 +226,11 @@ class InMemoryEffectStore:
     ) -> dict[str, Any]:
         with self._lock:
             row = self._require(envelope.project_id, envelope.effect_key)
+            check_effect_binding(row, envelope)
             if fence_reader is not None:
                 _check_fence(row, fence_reader(None))
+            if not _executable(row["state"], row.get("state_reason")):
+                raise _not_executable(row["state"], row.get("state_reason"))
             if envelope.approval_id:
                 grant = self.approvals.get(envelope.approval_id)
                 now = utc_now()
@@ -217,13 +241,17 @@ class InMemoryEffectStore:
                     or grant.expires_at <= now
                 ):
                     raise EffectStoreError("approval_not_consumable")
-                if row["approval_consumed_at"] is None:
+                consumed_ids = set(row["consumed_approval_ids"])
+                if row["approval_consumed_at"] is not None and row["approval_id"]:
+                    consumed_ids.add(row["approval_id"])
+                if envelope.approval_id not in consumed_ids:
                     if grant.used_count >= grant.max_effect_count:
                         raise EffectStoreError("approval_not_consumable")
                     grant.used_count += 1
                     row["approval_consumed_at"] = now
-            if not _executable(row["state"], row.get("state_reason")):
-                raise _not_executable(row["state"], row.get("state_reason"))
+                    consumed_ids.add(envelope.approval_id)
+                row["approval_id"] = envelope.approval_id
+                row["consumed_approval_ids"] = sorted(consumed_ids)
             row["state"] = "executing"
             row["state_reason"] = None
             row["started_at"] = utc_now()
@@ -468,6 +496,7 @@ class DurableEffectRepository:
             )
             if row is None:
                 raise EffectStoreError("effect_not_found")
+            check_effect_binding(_effect_dict_from_row(row), envelope)
             if fence_reader is not None:
                 _check_fence(_effect_dict_from_row(row), fence_reader(session))
             if envelope.approval_id:
@@ -486,7 +515,11 @@ class DurableEffectRepository:
     @staticmethod
     def _consume_approval(session: Session, row: ActionEffectRow, approval_id: str) -> None:
         """Consume a bounded-use approval exactly once per effect; never on revoked/expired."""
-        if row.approval_consumed_at is None:
+        consumed_ids = set((row.payload or {}).get("consumed_approval_ids", []))
+        # Preserve attribution for effects admitted before this ledger existed.
+        if row.approval_consumed_at is not None and row.approval_id:
+            consumed_ids.add(row.approval_id)
+        if approval_id not in consumed_ids:
             consumed = session.execute(
                 update(ApprovalRow)
                 .where(
@@ -501,22 +534,23 @@ class DurableEffectRepository:
             ).scalar_one_or_none()
             if consumed is None:
                 raise EffectStoreError("approval_not_consumable")
-            session.execute(
-                update(ActionEffectRow)
-                .where(ActionEffectRow.effect_id == row.effect_id)
-                .values(approval_consumed_at=func.now())
+            consumed_ids.add(approval_id)
+            row.approval_consumed_at = utc_now()
+        else:
+            still_valid = session.scalar(
+                select(ApprovalRow.id)
+                .where(
+                    ApprovalRow.id == approval_id,
+                    ApprovalRow.project_id == row.project_id,
+                    ApprovalRow.revoked_at.is_(None),
+                    ApprovalRow.expires_at > func.now(),
+                )
+                .with_for_update()
             )
-            return
-        still_valid = session.scalar(
-            select(ApprovalRow.id).where(
-                ApprovalRow.id == approval_id,
-                ApprovalRow.project_id == row.project_id,
-                ApprovalRow.revoked_at.is_(None),
-                ApprovalRow.expires_at > func.now(),
-            )
-        )
-        if still_valid is None:
-            raise EffectStoreError("approval_not_consumable")
+            if still_valid is None:
+                raise EffectStoreError("approval_not_consumable")
+        row.approval_id = approval_id
+        row.payload = {**(row.payload or {}), "consumed_approval_ids": sorted(consumed_ids)}
 
     def attach_pre_observation(
         self, *, project_id: str, effect_key: str, pre_observation: dict[str, Any]
