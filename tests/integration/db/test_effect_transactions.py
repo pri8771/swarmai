@@ -10,12 +10,14 @@ from __future__ import annotations
 import multiprocessing as mp
 import os
 import threading
+from datetime import timedelta
 from typing import Any
 
 import pytest
 from sqlalchemy import text
 
-from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17
+from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, ApprovalGrant
+from swarm.contracts.common import utc_now
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
@@ -124,9 +126,23 @@ def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
     base = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "one-shot"}
     )
-    grant = gw.make_approval(base, max_effect_count=1)
-    grant = grant.model_copy(update={"effect_key": None})
-    gw.store.put_approval(grant)  # rebind without an effect key: one use, any key
+    # One-shot grant bound to payload/destination/operation but not to an effect key.
+    grant = gw.put_approval(
+        ApprovalGrant(
+            project_id="proj_a",
+            grantor="operator",
+            actor=base.actor,
+            integration_id=base.integration_id,
+            integration_version=base.integration_version,
+            operation=base.operation,
+            destination=base.destination,
+            payload_hash=base.payload_hash,
+            effect_key=None,
+            max_effect_count=1,
+            expires_at=utc_now() + timedelta(seconds=300),
+            policy_version=base.policy_version,
+        )
+    )
 
     def envelope_with_key(key: str) -> ActionEnvelope:
         env = base.model_copy(update={"effect_key": key, "idempotency_key": key})

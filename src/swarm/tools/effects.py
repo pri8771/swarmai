@@ -126,13 +126,36 @@ class InMemoryEffectStore:
         self.receipts: dict[str, tuple[str, int, ActionReceiptV17]] = {}
         self.approvals: dict[str, ApprovalGrant] = {}
 
-    # ---- approvals
+    # ---- approvals (insert-only; revocation monotonic — R27d)
     def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
-        self.approvals[grant.approval_id] = grant
+        _check_insertable(grant)
+        with self._lock:
+            if grant.approval_id in self.approvals:
+                raise EffectConflictError("approval_already_exists")
+            stored = grant.model_copy(update={"used_count": 0})
+            self.approvals[stored.approval_id] = stored
+            return stored
+
+    def get_approval(self, approval_id: str, *, project_id: str) -> ApprovalGrant | None:
+        grant = self.approvals.get(approval_id)
+        if grant is None or grant.project_id != project_id:
+            return None
         return grant
 
-    def get_approval(self, approval_id: str) -> ApprovalGrant | None:
-        return self.approvals.get(approval_id)
+    def revoke_approval(
+        self, *, project_id: str, approval_id: str, revoked_by: str, reason: str
+    ) -> bool:
+        with self._lock:
+            grant = self.approvals.get(approval_id)
+            if grant is None or grant.project_id != project_id or grant.revoked_at is not None:
+                return False
+            grant.revoked_at = utc_now()
+            grant.constraints["revocation"] = {
+                "revoked_by": revoked_by,
+                "reason": reason,
+                "at": grant.revoked_at.isoformat(),
+            }
+            return True
 
     # ---- effects
     def reserve(self, envelope: ActionEnvelope) -> dict[str, Any]:
@@ -309,39 +332,79 @@ class DurableEffectRepository:
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         self.factory = session_factory
 
-    # ---- approvals
+    # ---- approvals (insert-only; revocation monotonic — R27d)
     def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
+        _check_insertable(grant)
+        stored = grant.model_copy(update={"used_count": 0})
         with session_scope(self.factory) as session:
-            row = ApprovalRow(
-                id=grant.approval_id,
-                payload_hash=grant.payload_hash,
-                permitted_operation=f"{grant.integration_id}.{grant.operation}",
-                destination=grant.destination,
-                grantor=grant.grantor,
-                expires_at=grant.expires_at,
-                revoked_at=grant.revoked_at,
-                payload=dict(grant.constraints),
-                project_id=grant.project_id,
-                actor=grant.actor,
-                integration_id=grant.integration_id,
-                integration_version=grant.integration_version,
-                operation=grant.operation,
-                effect_key=grant.effect_key,
-                max_effect_count=grant.max_effect_count,
-                used_count=grant.used_count,
-                policy_version=grant.policy_version,
-                created_at=grant.created_at,
-                constraints=dict(grant.constraints),
+            session.add(
+                ApprovalRow(
+                    id=stored.approval_id,
+                    payload_hash=stored.payload_hash,
+                    permitted_operation=f"{stored.integration_id}.{stored.operation}",
+                    destination=stored.destination,
+                    grantor=stored.grantor,
+                    expires_at=stored.expires_at,
+                    revoked_at=None,
+                    payload=dict(stored.constraints),
+                    project_id=stored.project_id,
+                    actor=stored.actor,
+                    integration_id=stored.integration_id,
+                    integration_version=stored.integration_version,
+                    operation=stored.operation,
+                    effect_key=stored.effect_key,
+                    max_effect_count=stored.max_effect_count,
+                    used_count=0,
+                    policy_version=stored.policy_version,
+                    created_at=stored.created_at,
+                    constraints=dict(stored.constraints),
+                )
             )
-            session.merge(row)
-        return grant
+            try:
+                session.flush()
+            except IntegrityError as exc:
+                raise EffectConflictError("approval_already_exists") from exc
+        return stored
 
-    def get_approval(self, approval_id: str) -> ApprovalGrant | None:
+    def get_approval(self, approval_id: str, *, project_id: str) -> ApprovalGrant | None:
         with session_scope(self.factory) as session:
-            row = session.get(ApprovalRow, approval_id)
-            if row is None or row.project_id is None:
+            row = session.scalar(
+                select(ApprovalRow).where(
+                    ApprovalRow.id == approval_id, ApprovalRow.project_id == project_id
+                )
+            )
+            if row is None or not _operational(row):
                 return None
             return _grant_from_row(row)
+
+    def revoke_approval(
+        self, *, project_id: str, approval_id: str, revoked_by: str, reason: str
+    ) -> bool:
+        with session_scope(self.factory) as session:
+            row = session.scalar(
+                select(ApprovalRow)
+                .where(
+                    ApprovalRow.id == approval_id,
+                    ApprovalRow.project_id == project_id,
+                    ApprovalRow.revoked_at.is_(None),
+                )
+                .with_for_update()
+            )
+            if row is None:
+                return False
+            constraints = dict(row.constraints or {})
+            constraints["revocation"] = {
+                "revoked_by": revoked_by,
+                "reason": reason,
+                "at": utc_now().isoformat(),
+            }
+            changed = session.execute(
+                update(ApprovalRow)
+                .where(ApprovalRow.id == approval_id, ApprovalRow.revoked_at.is_(None))
+                .values(revoked_at=func.now(), constraints=constraints)
+                .returning(ApprovalRow.id)
+            ).scalar_one_or_none()
+            return changed is not None
 
     # ---- effects
     def reserve(self, envelope: ActionEnvelope) -> dict[str, Any]:
@@ -656,15 +719,36 @@ def _insert_receipt(
     return stored
 
 
+# Legacy approval rows whose V1.7 binding columns are NULL are non-operational
+# until reconciled by governance; they are never defaulted into validity.
+_REQUIRED_APPROVAL_BINDING = (
+    "project_id",
+    "integration_id",
+    "integration_version",
+    "operation",
+    "policy_version",
+)
+
+
+def _operational(row: ApprovalRow) -> bool:
+    return all(getattr(row, column) is not None for column in _REQUIRED_APPROVAL_BINDING)
+
+
+def _check_insertable(grant: ApprovalGrant) -> None:
+    if grant.revoked_at is not None:
+        raise EffectStoreError("approval_insert_revoked")
+
+
 def _grant_from_row(row: ApprovalRow) -> ApprovalGrant:
+    assert _operational(row)
     return ApprovalGrant(
         approval_id=row.id,
-        project_id=row.project_id or "",
+        project_id=str(row.project_id),
         actor=row.actor,
         grantor=row.grantor,
-        integration_id=row.integration_id or "",
-        integration_version=row.integration_version or "",
-        operation=row.operation or row.permitted_operation,
+        integration_id=str(row.integration_id),
+        integration_version=str(row.integration_version),
+        operation=str(row.operation),
         destination=row.destination,
         payload_hash=row.payload_hash,
         effect_key=row.effect_key,
@@ -672,7 +756,7 @@ def _grant_from_row(row: ApprovalRow) -> ApprovalGrant:
         used_count=int(row.used_count or 0),
         expires_at=row.expires_at,
         revoked_at=row.revoked_at,
-        policy_version=row.policy_version or "v17-policy-1",
-        constraints=dict(row.constraints or row.payload or {}),
+        policy_version=str(row.policy_version),
+        constraints=dict(row.constraints or {}),
         created_at=row.created_at or utc_now(),
     )

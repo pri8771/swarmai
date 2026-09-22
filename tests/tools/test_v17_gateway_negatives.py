@@ -141,7 +141,8 @@ async def test_expired_and_revoked_approval() -> None:
     env2 = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "y"}
     )
-    revoked = gw.make_approval(env2, revoked=True)
+    revoked = gw.make_approval(env2)
+    assert gw.revoke_approval(revoked.approval_id, revoked_by="operator", reason="test")
     env2.approval_id = revoked.approval_id
     with pytest.raises(ApprovalInvalidError):
         await gw.execute_envelope(env2)

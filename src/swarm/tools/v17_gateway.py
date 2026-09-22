@@ -78,6 +78,14 @@ class ConsequentialToolGateway:
             raise ApprovalInvalidError("approval_project_mismatch")
         return self.store.put_approval(grant)
 
+    def revoke_approval(self, approval_id: str, *, revoked_by: str, reason: str) -> bool:
+        return self.store.revoke_approval(
+            project_id=self.project_id,
+            approval_id=approval_id,
+            revoked_by=revoked_by,
+            reason=reason,
+        )
+
     def make_approval(
         self,
         envelope: ActionEnvelope,
@@ -85,7 +93,6 @@ class ConsequentialToolGateway:
         grantor: str = "operator",
         expires_in_seconds: int = 300,
         max_effect_count: int = 1,
-        revoked: bool = False,
     ) -> ApprovalGrant:
         envelope.ensure_hashes()
         now = utc_now()
@@ -101,7 +108,6 @@ class ConsequentialToolGateway:
             effect_key=envelope.effect_key,
             max_effect_count=max_effect_count,
             expires_at=now + timedelta(seconds=expires_in_seconds),
-            revoked_at=now if revoked else None,
             policy_version=envelope.policy_version,
         )
         return self.put_approval(grant)
@@ -326,11 +332,10 @@ class ConsequentialToolGateway:
             return
         if not envelope.approval_id:
             raise ApprovalInvalidError("approval_required")
-        grant = self.store.get_approval(envelope.approval_id)
+        grant = self.store.get_approval(envelope.approval_id, project_id=envelope.project_id)
         if grant is None:
+            # Unknown, other-project, or legacy non-operational row: no existence signal.
             raise ApprovalInvalidError("unknown_approval")
-        if grant.project_id != envelope.project_id:
-            raise ApprovalInvalidError("approval_project_mismatch")
         # Revocation and expiry always deny. Usage is consumed exactly once per effect
         # at admission (begin_execution); a re-attempt of the same effect that already
         # consumed this grant is not a second use. The durable UPDATE remains the
