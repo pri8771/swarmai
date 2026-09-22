@@ -39,5 +39,14 @@
     "performed": false,
     "reason": "R28d-2 assignment explicitly holds provider/model execution"
   },
-  "review_state": "READY_FOR_LEAD_REVIEW"
+  "remote_ci": {
+    "run_id": 35722809270,
+    "candidate_sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+    "jobs": ["offline", "console", "live-gated"],
+    "observed": "2026-09-22T11:41:00Z",
+    "result": "blocked_before_runner_start",
+    "evidence": "GitHub Actions check annotations: runner_id=0, empty steps, account billing/spending-limit blocker",
+    "source_change_indicated": false
+  },
+  "review_state": "REVIEW_BLOCKED_REMOTE_CI_ACCOUNT_GATE"
 }
