@@ -700,13 +700,16 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R29a.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "I3"
       ],
       "assignee": "codex",
       "assignment_ref": "docs/coordination/assignments/CODEX_R29A_20260922.md",
-      "review_hold": "R28d held pending exact-SHA R29a lead review"
+      "review_hold": "R28d held pending exact-SHA R29a lead review",
+      "implementation_ref": "codex/swarm-r29a-manifests-20260922@1ea1ca55a2470d94fe704d64c029a991c3c0dea5",
+      "review_ref": "docs/coordination/reviews/ART-V17-INTEGRATION-MANIFEST-R29A-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R28d",
@@ -719,11 +722,14 @@
       "sp": 3,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28d.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "W1"
       ],
-      "review_hold": "R29a exact-SHA lead review required before release"
+      "review_hold": "R28d-2 held pending exact-SHA R28d-1 lead review",
+      "assignee": "codex",
+      "active_slice": "R28d-1 adapter operations only",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28D1_20260922.md"
     },
     {
       "id": "R30a",
