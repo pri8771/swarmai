@@ -304,7 +304,8 @@ def test_finalize_state_conflict_when_not_executing(factory) -> None:
     )
     with pytest.raises(EffectConflictError, match="finalize_state_conflict"):
         repo.finalize_with_receipt(
-            project_id="proj_a", effect_key=env.effect_key, state="succeeded", receipt=receipt
+            project_id="proj_a", effect_key=env.effect_key, state="succeeded", receipt=receipt,
+            expected_execution=(None, 0, "reserved"),
         )
     assert repo.get(project_id="proj_a", effect_key=env.effect_key)["state"] == "reserved"
     assert repo.list_receipts(project_id="proj_a", effect_key=env.effect_key) == []

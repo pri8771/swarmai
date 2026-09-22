@@ -65,7 +65,11 @@ class ConsequentialToolGateway:
         current_cancellation_generation: int = 0,
         store: InMemoryEffectStore | DurableEffectRepository | None = None,
         max_risk_without_approval: str = "low",
+        orphan_grace_seconds: int = 30,
     ) -> None:
+        if orphan_grace_seconds < 0:
+            raise ValueError("invalid_recovery_window")
+        self.orphan_grace_seconds = orphan_grace_seconds
         self.adapter = adapter
         self.project_id = project_id
         self.allowed_scopes = allowed_scopes
@@ -137,6 +141,24 @@ class ConsequentialToolGateway:
         existing = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
         if existing is not None:
             check_effect_binding(existing, envelope)
+            if existing["state"] == "executing":
+                if existing.get("timeout_seconds") is None:
+                    raise ReconciliationRequiredError("effect_recovery_timeout_unavailable")
+                recovered = self.store.recover_orphaned(
+                    project_id=envelope.project_id,
+                    effect_key=envelope.effect_key,
+                    grace_seconds=self.orphan_grace_seconds,
+                    timeout_seconds=envelope.timeout_seconds,
+                )
+                if not recovered:
+                    raise EffectConflictError("effect_already_executing")
+                existing = self.store.get(
+                    project_id=envelope.project_id, effect_key=envelope.effect_key
+                )
+                if existing is None:
+                    raise EffectConflictError("effect_not_found")
+            if existing.get("state_reason") == "irreversible_requires_operator_disposition":
+                raise ReconciliationRequiredError("irreversible_requires_operator_disposition")
             if existing["state"] == "succeeded":
                 return self._terminal_or_fail(envelope)
             if existing["state"] == "unknown":
@@ -179,6 +201,7 @@ class ConsequentialToolGateway:
             project_id=envelope.project_id,
             effect_key=envelope.effect_key,
             pre_observation=pre,
+            expected_execution=(effect.get("executor_id"), effect["attempt_count"], "executing"),
         )
         started = utc_now()
         try:
@@ -280,13 +303,25 @@ class ConsequentialToolGateway:
             external_id=external_id,
             reconciliation=reconciliation,
             receipt=receipt,
+            expected_execution=(
+                effect.get("executor_id"),
+                effect["attempt_count"],
+                effect["state"],
+            ),
         )
 
     async def reconcile(self, envelope: ActionEnvelope) -> ActionReceiptV17:
         envelope.ensure_hashes()
+        self.adapter.validate(envelope)
+        self._authorize_project(envelope)
+        self._evaluate_policy(envelope)
+        self._check_generations(envelope)
         effect = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
         if effect is None:
             raise EffectConflictError("effect_not_found")
+        check_effect_binding(effect, envelope)
+        if effect["state"] != "unknown":
+            raise EffectConflictError("effect_not_unknown")
         return await self._reconcile_unknown(envelope, effect)
 
     async def _reconcile_unknown(
@@ -295,22 +330,56 @@ class ConsequentialToolGateway:
         prior = self.store.list_receipts(
             project_id=envelope.project_id, effect_key=envelope.effect_key
         )
-        result = self.adapter.reconcile(envelope, prior)
+        try:
+            result = self.adapter.reconcile(envelope, prior)
+        except Exception as exc:  # noqa: BLE001
+            result = {"state": "unknown", "error_type": type(exc).__name__}
+        if not isinstance(result, dict):
+            result = {"state": "unknown", "invalid_result_type": type(result).__name__}
         state = str(result.get("state", "unknown"))
-        if state in {"succeeded", "failed"}:
+        if state == "succeeded":
             return self._finalize(
                 envelope,
                 effect,
-                state=state,
-                outcome=state,
+                state="succeeded",
+                outcome="succeeded",
                 pre=effect.get("pre_observation") or {},
                 post=result,
                 started=effect.get("started_at"),
-                external_id=result.get("external_id") if state == "succeeded" else None,
+                external_id=result.get("external_id"),
                 reconciliation={"status": "reconciled", "result": result},
                 reconciliation_state="reconciled",
             )
-        # Still unknown — do not execute again.
+        if state == "not_applied":
+            irreversible = effect.get("side_effect_class") != "consequential"
+            reason = "irreversible_requires_operator_disposition" if irreversible else "not_applied"
+            self._finalize(
+                envelope,
+                effect,
+                state="failed",
+                outcome="failed",
+                state_reason=reason,
+                pre=effect.get("pre_observation") or {},
+                post=result,
+                started=effect.get("started_at"),
+                reconciliation={"status": "reconciled", "result": result},
+                reconciliation_state="reconciled",
+            )
+            if irreversible:
+                raise ReconciliationRequiredError("irreversible_requires_operator_disposition")
+            return await self.execute_envelope(envelope)
+        self._finalize(
+            envelope,
+            effect,
+            state="unknown",
+            outcome="unknown",
+            state_reason=effect.get("state_reason"),
+            pre=effect.get("pre_observation") or {},
+            post=result,
+            started=effect.get("started_at"),
+            reconciliation={"status": "pending", "result": result},
+            reconciliation_state="pending",
+        )
         raise ReconciliationRequiredError("external_outcome_still_unknown")
 
     def _authorize_project(self, envelope: ActionEnvelope) -> None:
