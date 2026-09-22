@@ -1,0 +1,37 @@
+{
+  "packet": "R27a",
+  "artifact": "ART-V17-APPROVAL-BINDING",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "ab958d7a4b4d6198b143e7e79ecf69ff367cb10e",
+  "tested_source_sha": "0505c24576259d8cf54fa2ec07590a789b398d52",
+  "migration_head": "a17effect004b0001",
+  "database": "postgresql+psycopg://pchordia@127.0.0.1:5432/swarmai_v17_test (local, no secret)",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/integration/db/test_action_receipts_durable.py -v",
+      "result": "6 passed"
+    },
+    {
+      "argv": "uv run alembic heads",
+      "result": "a17effect004b0001 (head)"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "400 passed, 2 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T00:37:40Z"
+}
