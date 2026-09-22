@@ -1,0 +1,18 @@
+{
+  "mission-run.stderr.txt": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "mission-run.stdout.json": {
+    "bytes": 22534,
+    "sha256": "45a5236057ab57c53c555542f17a4d945f06f4d21c5699c863dc0131eb7e47f2"
+  },
+  "pre-run-freeze-attempt2.json": {
+    "bytes": 2800,
+    "sha256": "4cf161553aae7dbcb9ddbd5137bfb8c61a56cdba78e1cef9611206663564b3c1"
+  },
+  "provenance-readback.json": {
+    "bytes": 1186,
+    "sha256": "7a413b1a3c2000d8245926ae4ad72d83faf6d1cd7fe629caca6e665ae913509b"
+  }
+}

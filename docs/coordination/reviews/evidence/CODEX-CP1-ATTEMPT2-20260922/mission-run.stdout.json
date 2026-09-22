@@ -1,0 +1,529 @@
+{
+  "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/runtime/backpressure.py together with tests/runtime/test_runtime.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/runtime that fails before the patch and passes after it, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "status": "failed",
+  "created_at": "2026-09-22T02:08:40.013192+00:00",
+  "updated_at": "2026-09-22T02:11:59.854522+00:00",
+  "revision": 2,
+  "project_id": null,
+  "source": "mission_store",
+  "contract": {},
+  "plan": {
+    "proposal_id": "gp_398238e36c8447569b3ee9b88ab322d2",
+    "operation": "spawn",
+    "rationale": "V0.1 structured software mission: inspect \u2192 implement \u2192 verify \u2192 review",
+    "inspection": {
+      "root": "/Users/pchordia/swarmai-v17",
+      "git_head": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+      "has_pyproject": true,
+      "has_tests": true,
+      "top_entries": [
+        "AGENTS.md",
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "SECURITY.md",
+        "alembic.ini",
+        "apps",
+        "benchmarks",
+        "changes",
+        "config",
+        "deploy",
+        "docs",
+        "examples",
+        "migrations",
+        "packs",
+        "pyproject.toml",
+        "release",
+        "sandbox",
+        "schemas",
+        "scripts",
+        "src",
+        "tests",
+        "uv.lock",
+        "var"
+      ],
+      "notes": [
+        "selfdev_off_by_one_sample_present",
+        "swarm_package_present"
+      ]
+    },
+    "task_ids": [
+      "tsk_1b9c46bc4eed416ca1d01202a6f3c442",
+      "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "tsk_0a0875d347c140458b156326fa1c42e0",
+      "tsk_7b8e6af820cf41c58929170765795322"
+    ],
+    "route_plan": null
+  },
+  "tasks": [
+    {
+      "id": "tsk_1b9c46bc4eed416ca1d01202a6f3c442",
+      "task_family": "inspect",
+      "objective": "Inspect repository layout and identify files to change for the goal",
+      "dependency_ids": [],
+      "status": "accepted",
+      "ok": true,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "inspection_complete"
+    },
+    {
+      "id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "task_family": "implement",
+      "objective": "Implement the required change in an isolated worktree",
+      "dependency_ids": [
+        "tsk_1b9c46bc4eed416ca1d01202a6f3c442"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "task_family": "verify",
+      "objective": "Run configured verification (tests/lint) in the worker worktree",
+      "dependency_ids": [
+        "tsk_3d9e6de457d942209eead7c5eaa482b2"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b",
+      "summary": "verify_failed"
+    },
+    {
+      "id": "tsk_7b8e6af820cf41c58929170765795322",
+      "task_family": "review",
+      "objective": "Review diff, synthesize outcome, and accept or request repair",
+      "dependency_ids": [
+        "tsk_0a0875d347c140458b156326fa1c42e0"
+      ],
+      "status": "ready",
+      "ok": null,
+      "assigned_model": "qwen2.5-coder:14b"
+    }
+  ],
+  "timeline": [
+    {
+      "at": "2026-09-22T02:08:40.013215+00:00",
+      "event": "mission_started",
+      "detail": {
+        "revision": 2,
+        "model": "qwen2.5-coder:14b",
+        "route_plan": null
+      }
+    },
+    {
+      "at": "2026-09-22T02:08:40.021010+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 0
+      }
+    },
+    {
+      "at": "2026-09-22T02:08:40.021157+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_1b9c46bc4eed416ca1d01202a6f3c442",
+        "family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:09:40.060332+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:09:44.624902+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:09:44.624925+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-22T02:09:44.624935+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 1
+      }
+    },
+    {
+      "at": "2026-09-22T02:10:36.531760+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:10:38.351018+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:10:38.351046+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-22T02:10:38.351063+00:00",
+      "event": "execution_round",
+      "detail": {
+        "round": 2
+      }
+    },
+    {
+      "at": "2026-09-22T02:11:57.728305+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:11:59.852376+00:00",
+      "event": "task_finished",
+      "detail": {
+        "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+        "family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa"
+      }
+    },
+    {
+      "at": "2026-09-22T02:11:59.852409+00:00",
+      "event": "repair_scheduled",
+      "detail": {
+        "round": 3
+      }
+    },
+    {
+      "at": "2026-09-22T02:11:59.854513+00:00",
+      "event": "mission_finished",
+      "detail": {
+        "accepted": false
+      }
+    }
+  ],
+  "agents": [
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_1b9c46bc4eed416ca1d01202a6f3c442",
+      "family": "inspect"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement"
+    },
+    {
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify"
+    }
+  ],
+  "artifacts": {
+    "worker_results": {
+      "tsk_1b9c46bc4eed416ca1d01202a6f3c442": {
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+        "task_id": "tsk_1b9c46bc4eed416ca1d01202a6f3c442",
+        "task_family": "inspect",
+        "ok": true,
+        "summary": "inspection_complete",
+        "artifacts": {
+          "findings": {
+            "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+            "goal": "Audit the current SwarmAI subsystem at src/swarm/runtime/backpressure.py together with tests/runtime/test_runtime.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/runtime that fails before the patch and passes after it, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+            "candidate_files": [
+              "src/swarm/runtime/backpressure.py",
+              "tests/runtime/test_runtime.py"
+            ],
+            "strategy": "goal_path_scan",
+            "parser_dogfood_fixture": false,
+            "missing_cost_ledger": false
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-22T02:08:40.021154+00:00",
+        "finished_at": "2026-09-22T02:08:40.021149+00:00"
+      },
+      "tsk_3d9e6de457d942209eead7c5eaa482b2": {
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+        "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "task_family": "implement",
+        "ok": false,
+        "summary": "implement_failed_no_known_answer_fallback",
+        "artifacts": {
+          "worktree": {
+            "path": "/Users/pchordia/swarmai-v17/var/mission-worktrees/ec5bf495ed3d4318b97af2ea2840b5be/tsk_3d9e6de457d942209eead7c5eaa482b2-wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+            "branch": "mission/ec5bf495ed3d/tsk_3d9e6de457d942209eead7c5eaa482b2/w2cb6dba",
+            "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+            "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+            "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2"
+          },
+          "changed_files": [],
+          "diff": "",
+          "used_model_fallback": false,
+          "known_answer_forbidden": true,
+          "parser_dogfood_fixture": false,
+          "target_file": "src/swarm/runtime/backpressure.py",
+          "model_output_excerpt": "### EDIT src/swarm/runtime/backpressure.py\n<<<<<<< SEARCH\n```python\ndef dispatch(\n    self,\n    mission: Mission,\n    *,\n    inference_slots: int,\n    worker_slots: int,\n) -> tuple[list[QueuedWork], dict[str, Any]]:\n    self._purge_expired()\n    ready_tasks = [\n        q.task.model_copy(update={\"status\": TaskStatus.READY})\n        for q in self.queue\n        if not q.cancelled\n    ]\n    selected, explanation = self.inner.choose_ready(\n        mission,\n        ready_tasks,\n        inference_slots",
+          "inference_calls": 2,
+          "edit_blocks_applied": 0,
+          "new_test_files": [],
+          "rejected_new_files": [],
+          "echo_detected": false,
+          "reprompted": true,
+          "unmatched_edit_blocks": [
+            "```python\ndef dispatch(\n    self,\n    mission: Mission,\n    *,\n    inference_slots: int,\n    worker_slots: int,\n) -> tuple[list[QueuedWork], dict[str, Any]]:\n  "
+          ]
+        },
+        "inference": {
+          "ok": true,
+          "text": "### EDIT src/swarm/runtime/backpressure.py\n<<<<<<< SEARCH\n```python\ndef dispatch(\n    self,\n    mission: Mission,\n    *,\n    inference_slots: int,\n    worker_slots: int,\n) -> tuple[list[QueuedWork], dict[str, Any]]:\n    self._purge_expired()\n    ready_tasks = [\n        q.task.model_copy(update={\"status\": TaskStatus.READY})\n        for q in self.queue\n        if not q.cancelled\n    ]\n    selected, explanation = self.inner.choose_ready(\n        mission,\n        ready_tasks,\n        inference_slots=inference_slots,\n        worker_slots=worker_slots,\n    )\n    # Scale path: if qualification gates starve the queue, fall back to FIFO\n    # under the same concurrency / reserve limits.\n    if not selected and ready_tasks:\n        slots = min(\n            inference_slots,\n            worker_slots,\n            self.inner.config.max_concurrency,\n        )\n        usable = max(0, slots - self.inner.config.control_reserve_slots)\n        if self.inner.state.cooldown_remaining > 0:\n            usable = max(1, usable // 2) if usable else 0\n        selected = ready_tasks[:usable]\n        explanation = {\n            **explanation,\n            \"fallback\": \"fifo_without_qualification_profiles\",\n            \"selected\": len(selected),\n        }\n    selected_ids = {t.id for t in selected}\n    dispatched: list[QueuedWork] = []\n    remaining: deque[QueuedWork] = deque()\n    while self.queue:\n        item = self.queue.popleft()\n        if item.cancelled or item.task.id not in selected_ids:\n            if not item.cancelled:\n                remaining.append(item)\n            continue\n        quota = self.quotas.setdefault(\n            item.provider_id, ProviderQuota(item.provider_id)\n        )\n        if not quota.try_acquire():\n            remaining.append(item)\n            self.rejected_backpressure += 1\n            continue\n        dispatched.append(item)\n    self.queue = remaining\n    explanation = {\n        **explanation,\n        \"dispatched\": len(dispatched),\n        \"queue_depth\": len(self.queue),\n        \"rejected_backpressure\": self.rejected_backpressure,\n        \"timed_out\": self.timed_out,\n        \"cancelled\": self.cancelled,\n        \"quotas\": {\n            k: {\"in_flight\": v.in_flight, \"window_count\": v.window_count}\n            for k, v in self.quotas.items()\n        },\n    }\n    return dispatched, explanation\n```\n=======\n```python\ndef dispatch(\n    self,\n    mission: Mission,\n    *,\n    inference_slots: int,\n    worker_slots: int,\n) -> tuple[list[QueuedWork], dict[str, Any]]:\n    self._purge_expired()\n    ready_tasks = [\n        q.task.model_copy(update={\"status\": TaskStatus.READY})\n        for q in self.queue\n        if not q.cancelled\n    ]\n    selected, explanation = self.inner.choose_ready(\n        mission,\n        ready_tasks,\n        inference_slots=inference_slots,\n        worker_slots=worker_slots,\n    )\n    # Scale path: if qualification gates starve the queue, fall back to FIFO\n    # under the same concurrency / reserve limits.\n    if not selected and ready_tasks:\n        slots = min(\n            inference_slots,\n            worker_slots,\n            self.inner.config.max_concurrency,\n        )\n        usable = max(0, slots - self.inner.config.control_reserve_slots)\n        if self.inner.state.cooldown_remaining > 0:\n            usable = max(1, usable // 2) if usable else 0\n        selected = ready_tasks[:usable]\n        explanation = {\n            **explanation,\n            \"fallback\": \"fifo_without_qualification_profiles\",\n            \"selected\": len(selected),\n        }\n    selected_ids = {t.id for t in selected}\n    dispatched: list[QueuedWork] = []\n    remaining: deque[QueuedWork] = deque()\n    while self.queue:\n        item = self.queue.popleft()\n        if item.cancelled or item.task.id not in selected_ids:\n            if not item.cancelled:\n                remaining.append(item)\n            continue\n        quota = self.quotas.get(item.provider_id, ProviderQuota(item.provider_id))\n        if not quota.try_acquire():\n     ",
+          "model": "qwen2.5-coder:14b",
+          "route_id": "rt_ollama_qwen2.5-coder:14b",
+          "prompt_tokens": 3749,
+          "completion_tokens": 1519,
+          "cost_usd": 0.0,
+          "error": null,
+          "calls": 2
+        },
+        "cost_usd": 0.0,
+        "started_at": "2026-09-22T02:11:57.728286+00:00",
+        "finished_at": "2026-09-22T02:11:57.728264+00:00"
+      },
+      "tsk_0a0875d347c140458b156326fa1c42e0": {
+        "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+        "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+        "task_family": "verify",
+        "ok": false,
+        "summary": "verify_failed",
+        "artifacts": {
+          "commands": [
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/runtime/test_runtime.py",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": "............                                                             [100%]\n12 passed in 0.39s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/swarmai-v17/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            },
+            {
+              "cmd": [
+                "uv",
+                "run",
+                "pytest",
+                "tests/runtime",
+                "-q",
+                "--tb=line"
+              ],
+              "exit_code": 0,
+              "ok": true,
+              "stdout": "..................                                                       [100%]\n18 passed in 0.39s\n",
+              "stderr": "warning: `VIRTUAL_ENV=/Users/pchordia/swarmai-v17/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead\n"
+            }
+          ],
+          "worktree": {
+            "path": "/Users/pchordia/swarmai-v17/var/mission-worktrees/ec5bf495ed3d4318b97af2ea2840b5be/tsk_3d9e6de457d942209eead7c5eaa482b2-wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+            "branch": "mission/ec5bf495ed3d/tsk_3d9e6de457d942209eead7c5eaa482b2/w2cb6dba",
+            "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+            "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+            "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2"
+          },
+          "parser_dogfood_fixture": false,
+          "focused_check_paths": [
+            "tests/runtime/test_runtime.py"
+          ],
+          "defect_proof": {
+            "proven": false,
+            "reason": "no_regression_test_in_patch",
+            "regression_tests": [],
+            "pre_patch": {},
+            "post_patch": {}
+          }
+        },
+        "inference": null,
+        "cost_usd": 0.0,
+        "started_at": "2026-09-22T02:11:59.852309+00:00",
+        "finished_at": "2026-09-22T02:11:59.852277+00:00"
+      }
+    },
+    "reports": {
+      "machine": "/Users/pchordia/swarmai-v17/var/reports/missions/ec5bf495ed3d4318b97af2ea2840b5be/mission-report.json",
+      "human": "/Users/pchordia/swarmai-v17/var/reports/missions/ec5bf495ed3d4318b97af2ea2840b5be/MISSION_REPORT.md"
+    }
+  },
+  "validation": {
+    "accepted": false,
+    "review": null
+  },
+  "retries": [
+    {
+      "round": 0,
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 0,
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify",
+      "reason": "verify_failed"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 1,
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify",
+      "reason": "verify_failed"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "family": "implement",
+      "reason": "implement_failed_no_known_answer_fallback"
+    },
+    {
+      "round": 2,
+      "task_id": "tsk_0a0875d347c140458b156326fa1c42e0",
+      "family": "verify",
+      "reason": "verify_failed"
+    }
+  ],
+  "model_assignments": [
+    {
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    },
+    {
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    },
+    {
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+      "route_id": "rt_ollama_qwen2.5-coder:14b",
+      "model": "qwen2.5-coder:14b"
+    }
+  ],
+  "cost": {
+    "spend_policy": "zero",
+    "allow_paid": false,
+    "total_usd": 0.0,
+    "entries": [
+      {
+        "source": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 3749,
+        "completion_tokens": 1115,
+        "cost_usd": 0.0,
+        "at": "2026-09-22T02:09:40.060371+00:00"
+      },
+      {
+        "source": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 3749,
+        "completion_tokens": 965,
+        "cost_usd": 0.0,
+        "at": "2026-09-22T02:10:36.531783+00:00"
+      },
+      {
+        "source": "tsk_3d9e6de457d942209eead7c5eaa482b2",
+        "route_id": "rt_ollama_qwen2.5-coder:14b",
+        "model": "qwen2.5-coder:14b",
+        "requests": 1,
+        "prompt_tokens": 3749,
+        "completion_tokens": 1519,
+        "cost_usd": 0.0,
+        "at": "2026-09-22T02:11:57.728312+00:00"
+      }
+    ],
+    "requests": 3
+  },
+  "result": {
+    "accepted": false,
+    "summary": "repair_required",
+    "changed_files": [],
+    "worktree": {
+      "path": "/Users/pchordia/swarmai-v17/var/mission-worktrees/ec5bf495ed3d4318b97af2ea2840b5be/tsk_3d9e6de457d942209eead7c5eaa482b2-wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "branch": "mission/ec5bf495ed3d/tsk_3d9e6de457d942209eead7c5eaa482b2/w2cb6dba",
+      "worker_id": "wrk_34f5530327414d2b8aa7d9b05a3dafaa",
+      "mission_id": "ec5bf495ed3d4318b97af2ea2840b5be",
+      "task_id": "tsk_3d9e6de457d942209eead7c5eaa482b2"
+    }
+  }
+}

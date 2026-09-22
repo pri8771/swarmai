@@ -1,0 +1,50 @@
+{
+  "packet_id": "R02b",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "run_id": "v14-real-008",
+  "checkpoint": "CP1",
+  "frozen_at": "2026-09-22T02:08:27Z",
+  "candidate_sha": "32ddb91164b236740eb6dfa561470de2ce67485d",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false SWARM_DATABASE_URL=<local swarmai_v17_live> uv run swarm mission run --goal <goal> --model qwen2.5-coder:14b --no-evidence-router",
+  "execution_mode": "operational_real_local_brokered_inference",
+  "selected_model": "qwen2.5-coder:14b",
+  "routes_available": [
+    "qwen3.5:4b",
+    "qwen3.5:9b",
+    "deepseek-coder-v2:16b",
+    "qwen2.5-coder:14b",
+    "gemma3:4b",
+    "qwen2.5vl:3b"
+  ],
+  "evidence_router": false,
+  "zero_spend": true,
+  "paid_fallback": false,
+  "no_known_answer": true,
+  "no_fixture": true,
+  "target_subsystem": "src/swarm/runtime/backpressure.py",
+  "focused_check": "tests/runtime/test_runtime.py",
+  "why_this_target": "not named in any audit or packet spec; not used by v14-real-005/006/007 (workspace/*); excluded areas per R-LATER-V17: tools/**, knowledge/**, workers/**, db/lease_fencing.py, workspace/artifacts.py, workspace/context.py",
+  "max_attempts_this_packet": 2,
+  "attempt": 2,
+  "limits": {
+    "max_wall_time_s": 1800,
+    "model_call_budget": "runtime default (bounded rounds)",
+    "max_graph_nodes": "runtime default"
+  },
+  "pass_criteria": "REAL_V14_E2E_PROTOCOL minimum criteria 1-10 plus R02a defect_proof.proven == true; independent lead review required (EXT-V14-LEAD-REVIEW); self_accept false; an honest no_defect_demonstrated outcome is a valid negative result, never edited into a pass",
+  "prior_run_ids": [
+    "v14-real-001",
+    "v14-real-002",
+    "v14-real-003",
+    "v14-real-004",
+    "v14-real-005",
+    "v14-real-006",
+    "v14-real-007"
+  ],
+  "goal": "Audit the current SwarmAI subsystem at src/swarm/runtime/backpressure.py together with tests/runtime/test_runtime.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/runtime that fails before the patch and passes after it, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+  "repair_between_attempts": "R02c (42f8323): targeted edit blocks + mandatory regression test, echo detection with one re-prompt",
+  "attempt_1_outcome": "failed_no_material_diff_preserved (verbatim echo x3)",
+  "note": "Same goal/target/model/limits as attempt 1; only the runtime repair differs. Last attempt allowed for this preregistration."
+}
