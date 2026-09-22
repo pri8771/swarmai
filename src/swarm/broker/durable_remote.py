@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import subprocess
+from collections.abc import Sequence
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -121,7 +122,7 @@ class DurableRemoteCallGate:
     def reserve(
         self, request: InferenceRequest, route: RouteSnapshot, *, grant_id: str
     ) -> Reservation:
-        """Atomically consume one grant use and one observed request allowance."""
+        """Atomically consume the grant and every observed route quota bucket."""
         self._assert_source_unchanged()
         if route.provider not in {"groq", "openrouter"}:
             raise RemoteAdmissionDenied("provider_not_released_for_remote_gate")
@@ -144,39 +145,23 @@ class DurableRemoteCallGate:
                 self._check_grant(grant, request, route, request_hash, now)
                 assert grant is not None
                 self._check_account_route(session, route, grant, now)
-                if len(route.quota_bucket_ids) != 1:
-                    raise RemoteAdmissionDenied("exactly_one_request_bucket_required")
-                bucket_id = route.quota_bucket_ids[0]
-                bucket = session.scalar(
+                buckets = session.scalars(
                     select(QuotaBucketRow)
-                    .where(QuotaBucketRow.bucket_id == bucket_id)
+                    .where(QuotaBucketRow.bucket_id.in_(sorted(route.quota_bucket_ids)))
+                    .order_by(QuotaBucketRow.bucket_id)
                     .with_for_update()
-                )
-                if (
-                    bucket is None
-                    or bucket.scope_type != "account"
-                    or bucket.scope_id != route.account_id
-                    or bucket.dimension != QuotaDimension.REQUESTS.value
-                    or bucket.remaining is None
-                    or bucket.remaining < 1
-                    or not self._fresh(bucket.observed_at, now)
-                    or (bucket.payload or {}).get("confidence") != "exact"
-                    or (bucket.payload or {}).get("quota_evidence_ref")
-                    != (grant.constraints or {}).get("quota_evidence_ref")
-                ):
-                    raise RemoteAdmissionDenied("request_allowance_unverified_or_exhausted")
-                bucket.remaining -= 1
-                bucket.version += 1
+                ).all()
+                amounts = self._admit_buckets(request, route, grant, buckets, now)
+                for bucket, amount in zip(buckets, amounts, strict=True):
+                    assert bucket.remaining is not None
+                    bucket.remaining -= amount.amount
+                    bucket.version += 1
                 grant.used_count += 1
                 ticket = Reservation(
                     logical_call_id=logical_call_id,
                     attempt_id=request.attempt_id,
                     route_id=route.route_id,
-                    bucket_amounts=[
-                        BucketAmount(
-                            bucket_id=bucket_id, dimension=QuotaDimension.REQUESTS, amount=1
-                        )
-                    ],
+                    bucket_amounts=amounts,
                     expires_at=min(grant.expires_at, now + timedelta(minutes=2)),
                 )
                 session.add(
@@ -225,7 +210,7 @@ class DurableRemoteCallGate:
             row.payload = {**(row.payload or {}), "phase": row.phase}
 
     def record_result(self, ticket: Reservation, receipt: AttemptReceipt) -> None:
-        """Persist terminal or unknown outcome; never replenish a sent call."""
+        """Settle certified usage; keep every hold after an uncertain send."""
         with session_scope(self.factory) as session:
             row = session.scalar(
                 select(ReservationRow)
@@ -243,7 +228,10 @@ class DurableRemoteCallGate:
             certified = (
                 receipt.settlement_state == SettlementState.SETTLED
                 and self._zero_cost_result(session, row, receipt)
+                and self._usage_within_hold(row, receipt)
             )
+            if certified:
+                self._settle_usage_holds(session, row, receipt)
             session.add(
                 AttemptReceiptRow(
                     network_attempt_id=receipt.network_attempt_id,
@@ -292,24 +280,15 @@ class DurableRemoteCallGate:
             ):
                 raise RemoteAdmissionDenied("cannot_release_sent_or_unknown_call")
             # The caller's ticket is mutable. Refund only the stored hold.
-            stored_amounts = (row.payload or {}).get("bucket_amounts")
-            if not isinstance(stored_amounts, list) or len(stored_amounts) != 1:
-                raise RemoteAdmissionDenied("stored_hold_missing")
-            for amount in stored_amounts:
-                if (
-                    not isinstance(amount, dict)
-                    or amount.get("dimension") != QuotaDimension.REQUESTS.value
-                    or amount.get("amount") != 1
-                ):
-                    raise RemoteAdmissionDenied("stored_hold_invalid")
+            for amount in self._stored_amounts(row):
                 bucket = session.scalar(
                     select(QuotaBucketRow)
-                    .where(QuotaBucketRow.bucket_id == amount.get("bucket_id"))
+                    .where(QuotaBucketRow.bucket_id == amount.bucket_id)
                     .with_for_update()
                 )
                 if bucket is None or bucket.remaining is None:
                     raise RemoteAdmissionDenied("held_bucket_missing")
-                bucket.remaining += 1
+                bucket.remaining += amount.amount
                 bucket.version += 1
             row.state = ReservationState.RELEASED.value
             row.payload = {**(row.payload or {}), "state": row.state}
@@ -334,6 +313,140 @@ class DurableRemoteCallGate:
             observed_at is not None
             and timedelta(0) <= now - observed_at <= self.max_evidence_age
         )
+
+    def _stored_amounts(self, row: ReservationRow) -> list[BucketAmount]:
+        raw = (row.payload or {}).get("bucket_amounts")
+        if not isinstance(raw, list) or not 1 <= len(raw) <= 3:
+            raise RemoteAdmissionDenied("stored_hold_missing")
+        amounts: list[BucketAmount] = []
+        seen_ids: set[str] = set()
+        seen_dims: set[str] = set()
+        for item in raw:
+            if not isinstance(item, dict):
+                raise RemoteAdmissionDenied("stored_hold_invalid")
+            bucket_id = item.get("bucket_id")
+            dimension = item.get("dimension")
+            amount = item.get("amount")
+            if (
+                not isinstance(bucket_id, str)
+                or bucket_id in seen_ids
+                or dimension in seen_dims
+                or dimension not in {"requests", "total_tokens", "concurrency"}
+                or not isinstance(amount, int)
+                or isinstance(amount, bool)
+                or amount < 1
+                or (dimension in {"requests", "concurrency"} and amount != 1)
+            ):
+                raise RemoteAdmissionDenied("stored_hold_invalid")
+            seen_ids.add(bucket_id)
+            seen_dims.add(dimension)
+            amounts.append(
+                BucketAmount(
+                    bucket_id=bucket_id,
+                    dimension=QuotaDimension(dimension),
+                    amount=amount,
+                )
+            )
+        if "requests" not in seen_dims:
+            raise RemoteAdmissionDenied("stored_hold_invalid")
+        return sorted(amounts, key=lambda amount: amount.bucket_id)
+
+    def _admit_buckets(
+        self,
+        request: InferenceRequest,
+        route: RouteSnapshot,
+        grant: ApprovalRow,
+        buckets: Sequence[QuotaBucketRow],
+        now: Any,
+    ) -> list[BucketAmount]:
+        ids = route.quota_bucket_ids
+        if not 1 <= len(ids) <= 3 or len(set(ids)) != len(ids) or len(buckets) != len(ids):
+            raise RemoteAdmissionDenied("remote_quota_bucket_set_invalid")
+        refs = (grant.constraints or {}).get("quota_evidence_refs")
+        refs = refs if isinstance(refs, dict) else {}
+        amounts: list[BucketAmount] = []
+        dimensions: set[QuotaDimension] = set()
+        for bucket in buckets:
+            try:
+                dimension = QuotaDimension(bucket.dimension)
+            except ValueError as exc:
+                raise RemoteAdmissionDenied("remote_quota_dimension_unsupported") from exc
+            if dimension in dimensions or dimension not in {
+                QuotaDimension.REQUESTS,
+                QuotaDimension.TOTAL_TOKENS,
+                QuotaDimension.CONCURRENCY,
+            }:
+                raise RemoteAdmissionDenied("remote_quota_dimension_unsupported")
+            dimensions.add(dimension)
+            if dimension == QuotaDimension.TOTAL_TOKENS:
+                assert request.estimated_input_tokens is not None
+                assert request.max_output_tokens is not None
+                need = request.estimated_input_tokens + request.max_output_tokens
+            else:
+                need = 1
+            evidence_ref = refs.get(dimension.value)
+            if dimension == QuotaDimension.REQUESTS and evidence_ref is None:
+                evidence_ref = (grant.constraints or {}).get("quota_evidence_ref")
+            if (
+                not evidence_ref
+                or bucket.scope_type != "account"
+                or bucket.scope_id != route.account_id
+                or bucket.remaining is None
+                or bucket.remaining < need
+                or not self._fresh(bucket.observed_at, now)
+                or (bucket.payload or {}).get("confidence") != "exact"
+                or (bucket.payload or {}).get("quota_evidence_ref") != evidence_ref
+            ):
+                raise RemoteAdmissionDenied("remote_allowance_unverified_or_exhausted")
+            amounts.append(
+                BucketAmount(bucket_id=bucket.bucket_id, dimension=dimension, amount=need)
+            )
+        if QuotaDimension.REQUESTS not in dimensions:
+            raise RemoteAdmissionDenied("request_allowance_missing")
+        if request.purpose in {"mission", "production"} and dimensions != {
+            QuotaDimension.REQUESTS,
+            QuotaDimension.TOTAL_TOKENS,
+            QuotaDimension.CONCURRENCY,
+        }:
+            raise RemoteAdmissionDenied("mission_token_and_concurrency_allowance_missing")
+        return amounts
+
+    def _usage_within_hold(self, row: ReservationRow, receipt: AttemptReceipt) -> bool:
+        usage = receipt.normalized_usage
+        if usage is None or usage.requests != 1:
+            return False
+        for amount in self._stored_amounts(row):
+            if amount.dimension == QuotaDimension.TOTAL_TOKENS:
+                observed = usage.total_tokens
+                if observed is None or observed < 0 or observed > amount.amount:
+                    return False
+        return True
+
+    def _settle_usage_holds(
+        self, session: Session, row: ReservationRow, receipt: AttemptReceipt
+    ) -> None:
+        usage = receipt.normalized_usage
+        assert usage is not None
+        for amount in self._stored_amounts(row):
+            if amount.dimension == QuotaDimension.REQUESTS:
+                continue
+            if amount.dimension == QuotaDimension.TOTAL_TOKENS:
+                if usage.total_tokens is None:
+                    raise RemoteAdmissionDenied("token_usage_missing")
+                refund = amount.amount - usage.total_tokens
+            else:
+                refund = 1
+            if refund <= 0:
+                continue
+            bucket = session.scalar(
+                select(QuotaBucketRow)
+                .where(QuotaBucketRow.bucket_id == amount.bucket_id)
+                .with_for_update()
+            )
+            if bucket is None or bucket.remaining is None:
+                raise RemoteAdmissionDenied("held_bucket_missing")
+            bucket.remaining += refund
+            bucket.version += 1
 
     def _zero_cost_result(
         self, session: Session, row: ReservationRow, receipt: AttemptReceipt
