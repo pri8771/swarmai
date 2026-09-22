@@ -24,6 +24,7 @@ from swarm.tools.effects import (
     EffectConflictError,
     EffectStoreError,
     InMemoryEffectStore,
+    check_effect_binding,
 )
 
 
@@ -135,6 +136,7 @@ class ConsequentialToolGateway:
         # succeeded effect replays even after its approval expired (R27c).
         existing = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
         if existing is not None:
+            check_effect_binding(existing, envelope)
             if existing["state"] == "succeeded":
                 return self._terminal_or_fail(envelope)
             if existing["state"] == "unknown":

@@ -546,3 +546,23 @@ async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
     row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
     assert set(row["consumed_approval_ids"]) == {grant_a.approval_id, grant_b.approval_id}
     assert row["approval_id"] == grant_b.approval_id
+
+
+def test_durable_busy_effect_rolls_back_replacement_approval_and_ledger(factory):
+    adapter = ApiMcpAdapter()
+    gateway = _gateway(adapter, factory)
+    env = adapter.normalize({"project_id": "proj_a", "body": "busy-durable-rollback"})
+    grant_a = gateway.make_approval(env)
+    env.approval_id = grant_a.approval_id
+    gateway.store.reserve(env)
+    gateway.store.begin_execution(env, executor_id="original-executor")
+    grant_b = _unbound_one_shot_approval(gateway, env)
+    changed = env.model_copy(update={"approval_id": grant_b.approval_id})
+    with pytest.raises(EffectConflictError, match="effect_already_executing"):
+        gateway.store.begin_execution(changed, executor_id="rejected-executor")
+    row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
+    assert _used_count(factory, grant_b.approval_id) == 0
+    assert row["approval_id"] == grant_a.approval_id
+    assert row["consumed_approval_ids"] == [grant_a.approval_id]
+    assert row["attempt_count"] == 1
+    assert adapter.call_count == 0

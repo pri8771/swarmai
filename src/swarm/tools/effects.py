@@ -113,7 +113,7 @@ def _check_fence(stored: Mapping[str, Any], current: Mapping[str, int | None]) -
             raise EffectConflictError("fence_changed_before_execute")
 
 
-def _check_admission_binding(stored: Mapping[str, Any], envelope: ActionEnvelope) -> None:
+def check_effect_binding(stored: Mapping[str, Any], envelope: ActionEnvelope) -> None:
     _check_binding(stored, envelope)
     for field in (
         "mission_id",
@@ -226,7 +226,7 @@ class InMemoryEffectStore:
     ) -> dict[str, Any]:
         with self._lock:
             row = self._require(envelope.project_id, envelope.effect_key)
-            _check_admission_binding(row, envelope)
+            check_effect_binding(row, envelope)
             if fence_reader is not None:
                 _check_fence(row, fence_reader(None))
             if not _executable(row["state"], row.get("state_reason")):
@@ -496,7 +496,7 @@ class DurableEffectRepository:
             )
             if row is None:
                 raise EffectStoreError("effect_not_found")
-            _check_admission_binding(_effect_dict_from_row(row), envelope)
+            check_effect_binding(_effect_dict_from_row(row), envelope)
             if fence_reader is not None:
                 _check_fence(_effect_dict_from_row(row), fence_reader(session))
             if envelope.approval_id:

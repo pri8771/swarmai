@@ -226,3 +226,28 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
     assert cancelled.is_set()
     assert adapter.call_count == 1
     assert _used_count(factory, env.approval_id) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("outcome", ["succeeded", "unknown"])
+async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(factory, monkeypatch, outcome):
+    adapter = ApiMcpAdapter()
+    env = _leased_envelope(factory, adapter)
+    if outcome == "unknown":
+        env.normalized_payload["force_unknown"] = True
+        env.payload_hash = ""
+        env.effect_key = ""
+        env.ensure_hashes()
+    gateway = _gateway(adapter, factory, project=env.project_id)
+    env.approval_id = gateway.make_approval(env).approval_id
+    assert (await gateway.execute_envelope(env)).outcome == outcome
+
+    def forbidden_reconcile(*args, **kwargs):
+        pytest.fail("changed authority must be rejected before adapter reconciliation")
+
+    monkeypatch.setattr(adapter, "reconcile", forbidden_reconcile)
+    changed = env.model_copy(update={"mission_id": "another-mission", "task_id": "another-task", "attempt_id": "another-attempt"})
+    with pytest.raises(EffectConflictError, match="effect_authority_binding_mismatch"):
+        await gateway.execute_envelope(changed)
+    assert adapter.call_count == 1
+    assert _used_count(factory, env.approval_id) == 1
