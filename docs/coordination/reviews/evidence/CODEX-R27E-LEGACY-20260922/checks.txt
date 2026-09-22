@@ -1,0 +1,74 @@
+
+CHECK: crash and legacy repeat 1
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_crash_window.py', 'tests/integration/db/test_effect_legacy_recovery.py', '-q', '-s']
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+................................
+33 passed in 3.52s
+EXIT: 0
+
+CHECK: crash and legacy repeat 2
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_crash_window.py', 'tests/integration/db/test_effect_legacy_recovery.py', '-q', '-s']
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+................................
+33 passed in 3.55s
+EXIT: 0
+
+CHECK: crash and legacy repeat 3
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_crash_window.py', 'tests/integration/db/test_effect_legacy_recovery.py', '-q', '-s']
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+................................
+33 passed in 3.51s
+EXIT: 0
+
+CHECK: crash and legacy repeat 4
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_crash_window.py', 'tests/integration/db/test_effect_legacy_recovery.py', '-q', '-s']
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+................................
+33 passed in 3.55s
+EXIT: 0
+
+CHECK: crash and legacy repeat 5
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_crash_window.py', 'tests/integration/db/test_effect_legacy_recovery.py', '-q', '-s']
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+................................
+33 passed in 3.53s
+EXIT: 0
+
+CHECK: affected
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', 'tests/integration/db/test_effect_admission_fences.py', 'tests/integration/db/test_effect_transactions.py', 'tests/integration/db/test_effect_reservation_atomic.py', '-q']
+.................................                                        [100%]
+33 passed in 1.12s
+EXIT: 0
+
+CHECK: full
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python', '-m', 'pytest', '-q']
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+........................................................................ [ 42%]
+........................................................................ [ 56%]
+........................................................................ [ 71%]
+........................................................................ [ 85%]
+........................................................................ [ 99%]
+...                                                                      [100%]
+507 passed in 39.25s
+EXIT: 0
+
+CHECK: ruff
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff', 'check', 'src', 'tests']
+All checks passed!
+EXIT: 0
+
+CHECK: format
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff', 'format', '--check', 'src/swarm/tools/effects.py', 'src/swarm/tools/effect_recovery.py', 'tests/integration/db/test_effect_legacy_recovery.py']
+3 files already formatted
+EXIT: 0
+
+CHECK: mypy
+COMMAND: ['/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy', 'src']
+Success: no issues found in 170 source files
+EXIT: 0

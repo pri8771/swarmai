@@ -1,0 +1,11 @@
+{
+  "source_sha": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+  "evidence_class": "OFFLINE_IN_MEMORY_ENGINEERING_REPRODUCTION",
+  "first_outcome": "failed",
+  "retry_with_new_grant": "succeeded",
+  "grant_b_used_count_after_retry": 0,
+  "second_effect_with_same_one_use_grant": "succeeded",
+  "grant_b_used_count_final": 1,
+  "adapter_b_calls": 2,
+  "finding_reproduced": true
+}

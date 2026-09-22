@@ -1,0 +1,42 @@
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -s tests/integration/db/test_effect_crash_window.py
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+...................
+20 passed in 3.30s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -s tests/integration/db/test_effect_crash_window.py
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+...................
+20 passed in 3.29s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -s tests/integration/db/test_effect_crash_window.py
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+...................
+20 passed in 3.49s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -s tests/integration/db/test_effect_crash_window.py
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+...................
+20 passed in 3.28s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -s tests/integration/db/test_effect_crash_window.py
+real_spawn_crash phase=after exit=9
+.real_spawn_crash phase=before exit=9
+...................
+20 passed in 3.24s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.19s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q -rs
+........................................................................ [ 14%]
+........................................................................ [ 29%]
+........................................................................ [ 43%]
+........................................................................ [ 58%]
+........................................................................ [ 72%]
+........................................................................ [ 87%]
+..............................................................           [100%]
+494 passed in 36.19s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff check src tests
+All checks passed!
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy src
+Success: no issues found in 169 source files
+$ git diff --check

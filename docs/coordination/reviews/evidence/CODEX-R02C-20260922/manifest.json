@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-09-22T03:51:40.088179+00:00",
+  "source_sha": "1c9ff44ec787508fb874f5ac7fde849f89bdfe42",
+  "base_sha": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+  "evidence_class": "engineering_only",
+  "formal_acceptance": false,
+  "live_attempt_performed": false,
+  "files": {
+    "baseline-red.txt": {
+      "sha256": "b6400041c131981f209fa694a503450aeecfd31b09739556adcf4a94955e904b"
+    },
+    "checks.json": {
+      "sha256": "8d8e442951bd6e8824c5eab9d78b4cd48956382e7ba89d3fb2c5b9753e07d659"
+    },
+    "checks.txt": {
+      "sha256": "f08ba7b12e5cbc8df3e3c258a5a4100d74e4bf3f7417fdd9d93ab2b7824b9f3a"
+    }
+  }
+}

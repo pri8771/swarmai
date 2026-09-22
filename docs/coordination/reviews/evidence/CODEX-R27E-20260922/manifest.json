@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-09-22T04:08:22.057412+00:00",
+  "source_sha": "193e454e0226f7e7be768ad810eb68e6050aea8f",
+  "base_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e",
+  "contract_sha": "51270d612030beb1b43b87630103096d6b5688cf",
+  "evidence_class": "engineering_only",
+  "formal_acceptance": false,
+  "files": {
+    "checks.json": {
+      "sha256": "2689abcf8163f5602d654101fe05403f2bbaefbb8c1ea99eeed1b4b4bec851a2"
+    },
+    "checks.txt": {
+      "sha256": "4a1a692e36dd6d834dc4b3ab4a13074053eac7fa53820ac8e9765b76d2257a31"
+    }
+  }
+}

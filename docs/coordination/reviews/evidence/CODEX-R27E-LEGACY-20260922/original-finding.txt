@@ -1,0 +1,32 @@
+R27e independent mechanical review
+Candidate: 193e454e0226f7e7be768ad810eb68e6050aea8f
+Baseline: fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e
+Worktree: /Users/pchordia/Downloads/swarm_codex/review/swarm-r27e-source
+Mode: read-only source/test diff; no PostgreSQL or external services started
+
+Blocking finding:
+Legacy executing effects are permanently unrecoverable. Effects created before R27e have
+payload={} and therefore timeout_seconds=None. ConsequentialToolGateway.execute_envelope
+raises effect_recovery_timeout_unavailable before recover_orphaned for every such row.
+No repository method backfills the immutable recovery binding and no operator disposition
+path can transition that executing row to unknown. Minimal reproduction: create/bind an
+effect with payload {}, state executing and an old started_at, then execute the same envelope;
+the row remains executing regardless of age.
+
+Source anchors:
+- src/swarm/tools/v17_gateway.py:141-152
+- src/swarm/tools/effects.py:119-124
+- src/swarm/tools/effects.py:696-713
+
+Mechanically matched:
+- execution token is mandatory for public pre-observation and finalization methods
+- gateway passes executor_id, attempt_count and prior state
+- stale executor and concurrent reconciliation CAS paths are covered
+- irreversible not_applied persists a blocked reason until audited operator rearm
+- new rows persist side-effect class and timeout binding
+- production orphan grace defaults to 30; tests explicitly use 0
+
+Validation limits:
+- Did not run PostgreSQL tests or start a server.
+- Parent reports 20 PostgreSQL tests x5 and 494-test full suite green; not independently rerun.
+- No live/provider/model/scheduler checks performed.

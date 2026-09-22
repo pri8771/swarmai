@@ -1,0 +1,41 @@
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_edit_for_a_different_path_cannot_mutate_selected_target _________
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-345/test_edit_for_a_different_path0')
+
+    def test_edit_for_a_different_path_cannot_mutate_selected_target(tmp_path: Path) -> None:
+        repo = _init_repo(tmp_path / "repo")
+        worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+        response = EDIT_RESPONSE.replace("### EDIT widgets/counter.py", "### EDIT other/counter.py")
+        with patch("swarm.mission.worker.local_chat", return_value=_inf(response)):
+            result, handle = worker._implement(_task("tsk_path"), mission_id="m_path", shared=None)
+>       assert not result.ok
+E       AssertionError: assert not True
+E        +  where True = WorkerResult(worker_id='wrk_45e5fbc568c144f08379777ea0048e15', task_id='tsk_path', task_family='implement', ok=True, s...alls': 1}, cost_usd=0.0, started_at='2026-09-22T03:47:49.646145+00:00', finished_at='2026-09-22T03:47:49.646118+00:00').ok
+
+tests/mission/test_r02c_targeted_edits.py:252: AssertionError
+________ test_retry_requires_exact_indentation_and_unfenced_edit_bodies ________
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-345/test_retry_requires_exact_inde0')
+
+    def test_retry_requires_exact_indentation_and_unfenced_edit_bodies(tmp_path: Path) -> None:
+        repo = _init_repo(tmp_path / "repo")
+        worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+        bad = EDIT_RESPONSE.replace("<<<<<<< SEARCH\n", "<<<<<<< SEARCH\n```python\n", 1)
+        responses = iter([_inf(bad), _inf(EDIT_RESPONSE)])
+        prompts: list[str] = []
+        def fake_chat(**kwargs):
+            prompts.append(kwargs["messages"][-1]["content"])
+            return next(responses)
+        with patch("swarm.mission.worker.local_chat", side_effect=fake_chat):
+            result, _ = worker._implement(_task("tsk_indent"), mission_id="m_indent", shared=None)
+        assert result.ok
+>       assert "preserve leading spaces exactly" in prompts[0]
+E       assert 'preserve leading spaces exactly' in 'You are editing widgets/counter.py in a software mission.\nGoal: Fix the bug that bump does not increment; add a regr...Held-out widget counter used only by targeted-edit regressions."""\n\ndef bump(value: int) -> int:\n    return value\n'
+
+tests/mission/test_r02c_targeted_edits.py:271: AssertionError
+=========================== short test summary info ============================
+FAILED tests/mission/test_r02c_targeted_edits.py::test_edit_for_a_different_path_cannot_mutate_selected_target
+FAILED tests/mission/test_r02c_targeted_edits.py::test_retry_requires_exact_indentation_and_unfenced_edit_bodies
+2 failed, 1 passed, 7 deselected in 0.40s

@@ -1,0 +1,23 @@
+R28a bounded static review of current uncommitted gateway/adapter diff
+
+Corrected result: no concrete defects found in the requested scope.
+
+Withdrawn finding:
+- I initially read the outcome table as distinguishing explicit outcome="unknown" from
+  missing/unrecognized/non-dict outcomes. The canonical R28a row explicitly groups all
+  of them as state=unknown with state_reason=unrecognized_outcome. The implementation at
+  src/swarm/tools/v17_gateway.py:272-281 and its test match that exact contract. Calling
+  the reason name potentially confusing would be a naming preference, not a defect, and
+  warrants no R28a code change.
+
+Mechanically matched behavior:
+- durable denial occurs after validate and before approval/store/observe/execute/reconcile;
+- execute timeout and cancellation finalize unknown, and cancellation is re-raised;
+- worker threads may outlive wait_for, but their late return cannot finalize or trigger a retry;
+- post-observation failure/timeout preserves the explicit execute state and records only type;
+- generic execute exceptions become unknown and replay enters reconciliation, not execute;
+- AdapterNotSentError alone maps to failed/not_applied;
+- API echo reconciliation no longer asserts non-application;
+- LocalSandbox success and Browser unknown-operation denial are explicit outcomes.
+
+Validation limit: static inspection only; no DB/tests run concurrently with root.

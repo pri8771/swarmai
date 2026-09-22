@@ -1,0 +1,103 @@
+{
+  "source_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e",
+  "tree_sha": "49d2ca0e5c11e0b4e7a7bdad360fed564eab8c7d",
+  "evidence_class": "engineering_only",
+  "environment": "separate PostgreSQL Unix socket, SWARM_LIVE_LOCAL=1 synthetic fixture only; existing lockfile console dependencies",
+  "runs": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/mypy",
+        "src"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ],
+  "completed_utc": "2026-09-22T03:40:51.441846+00:00"
+}

@@ -1,0 +1,8 @@
+source_sha=e924351bd93510eaae279225db3a2fa447dd6894
+{"case": "empty_outcome", "elapsed_seconds": 0.0, "state": "succeeded", "reason": null, "adapter_calls": 1, "receipt_outcome": "succeeded"}
+{"case": "unrecognized_outcome", "elapsed_seconds": 0.0, "state": "succeeded", "reason": null, "adapter_calls": 1, "receipt_outcome": "succeeded"}
+{"case": "ambiguous_exception", "elapsed_seconds": 0.0, "state": "failed", "reason": null, "adapter_calls": 1, "receipt_outcome": "failed"}
+{"case": "deadline_1s", "elapsed_seconds": 1.201, "state": "succeeded", "reason": null, "adapter_calls": 1, "receipt_outcome": "succeeded"}
+{"case": "post_observation_failure", "elapsed_seconds": 0.0, "state": "executing", "reason": null, "adapter_calls": 1, "raised": "RuntimeError"}
+{"case": "omitted_store", "accepted": true, "store_type": "InMemoryEffectStore"}
+{"case": "unobservable_echo_reconcile", "result": {"state": "failed", "reason": "no_prior_success"}}

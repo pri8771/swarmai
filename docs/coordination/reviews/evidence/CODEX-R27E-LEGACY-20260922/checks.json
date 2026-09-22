@@ -1,0 +1,126 @@
+{
+  "source_sha": "e924351bd93510eaae279225db3a2fa447dd6894",
+  "source_tree": "c907deb19ba157def74b64c2514187e6c8161a54",
+  "SWARM_DATABASE_URL": "dedicated Swarm Unix-socket test PostgreSQL only",
+  "SWARM_LIVE_LOCAL": "1 synthetic local fixture only",
+  "checks": [
+    {
+      "name": "crash and legacy repeat 1",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_crash_window.py",
+        "tests/integration/db/test_effect_legacy_recovery.py",
+        "-q",
+        "-s"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "crash and legacy repeat 2",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_crash_window.py",
+        "tests/integration/db/test_effect_legacy_recovery.py",
+        "-q",
+        "-s"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "crash and legacy repeat 3",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_crash_window.py",
+        "tests/integration/db/test_effect_legacy_recovery.py",
+        "-q",
+        "-s"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "crash and legacy repeat 4",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_crash_window.py",
+        "tests/integration/db/test_effect_legacy_recovery.py",
+        "-q",
+        "-s"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "crash and legacy repeat 5",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_crash_window.py",
+        "tests/integration/db/test_effect_legacy_recovery.py",
+        "-q",
+        "-s"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "affected",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py",
+        "-q"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "full",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "format",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff",
+        "format",
+        "--check",
+        "src/swarm/tools/effects.py",
+        "src/swarm/tools/effect_recovery.py",
+        "tests/integration/db/test_effect_legacy_recovery.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "mypy",
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy",
+        "src"
+      ],
+      "exit_code": 0
+    }
+  ]
+}
