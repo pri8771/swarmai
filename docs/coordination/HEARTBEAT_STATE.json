@@ -1,9 +1,9 @@
 {
   "schema_version": "1.2",
-  "updated_at": "2026-09-22T00:30:05Z",
+  "updated_at": "2026-09-22T00:33:34Z",
   "mode": "single_session_5m",
   "worker_effective_cadence_minutes": 5,
-  "active_session_epoch": "single-v17-20260921-01",
+  "active_session_epoch": "fable-v17-20260922-01",
   "producer_limit": 1,
   "session": {
     "session_id": "CURSOR-V17-SINGLE",
@@ -11,7 +11,7 @@
     "ledger": "docs/coordination/heartbeats/CURSOR-V17-SINGLE.json",
     "status_page": "docs/coordination/status/CURSOR-V17-SINGLE.md",
     "registered": true,
-    "last_heartbeat_at": "2026-09-22T00:30:05Z",
+    "last_heartbeat_at": "2026-09-22T00:33:34Z",
     "status": "working"
   },
   "legacy": {
@@ -42,5 +42,6 @@
   },
   "stale_threshold_minutes": 12,
   "lead_heartbeat_automation": false,
-  "note": "CURSOR-V17-SINGLE producer registered; legacy A/B ledgers are historical only."
+  "note": "CURSOR-V17-SINGLE stream; producer engine=fable epoch=fable-v17-20260922-01; legacy A/B ledgers are historical only.",
+  "worker_engine": "fable"
 }
