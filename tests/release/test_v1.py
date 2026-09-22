@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 from swarm.release.contract_freeze import freeze_public_contracts
@@ -12,11 +13,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_contract_freeze(tmp_path: Path) -> None:
-    # Use real repo schemas + write freeze under tmp by copying minimal tree.
-    report = freeze_public_contracts(ROOT)
+    # Freeze against a temp copy of the real schemas; the tracked tree must stay clean.
+    repo = tmp_path / "repo"
+    shutil.copytree(ROOT / "schemas" / "contracts", repo / "schemas" / "contracts")
+    before = (ROOT / "schemas" / "v1" / "product_contract.v1.json").read_bytes()
+    report = freeze_public_contracts(repo)
     assert report.ok is True
     assert report.hash
-    assert (ROOT / "schemas" / "v1" / "product_contract.v1.json").is_file()
+    assert (repo / "schemas" / "v1" / "product_contract.v1.json").is_file()
+    assert (repo / "schemas" / "v1" / "COMPATIBILITY.md").is_file()
+    assert (ROOT / "schemas" / "v1" / "product_contract.v1.json").read_bytes() == before
 
 
 def test_first_run_ok() -> None:

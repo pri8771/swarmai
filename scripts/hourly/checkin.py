@@ -301,17 +301,21 @@ def main() -> int:
         save_state(state)
         append_log(entry)
         # Sanitized evidence copy into repo when writable (may fail under TCC).
-        evidence_dir = repo / "docs" / "evidence" / "fix-004"
-        try:
-            evidence_dir.mkdir(parents=True, exist_ok=True)
-            (evidence_dir / "last-checkin.json").write_text(
-                json.dumps(entry, indent=2) + "\n"
-            )
-            (evidence_dir / "runner-state.json").write_text(
-                json.dumps(state, indent=2) + "\n"
-            )
-        except OSError as exc:
-            entry["repo_evidence_error"] = str(exc)
+        # Tests set SWARM_HOURLY_REPO_EVIDENCE=0 so a check-in never dirties a checkout.
+        if os.environ.get("SWARM_HOURLY_REPO_EVIDENCE", "1") != "0":
+            evidence_dir = repo / "docs" / "evidence" / "fix-004"
+            try:
+                evidence_dir.mkdir(parents=True, exist_ok=True)
+                (evidence_dir / "last-checkin.json").write_text(
+                    json.dumps(entry, indent=2) + "\n"
+                )
+                (evidence_dir / "runner-state.json").write_text(
+                    json.dumps(state, indent=2) + "\n"
+                )
+            except OSError as exc:
+                entry["repo_evidence_error"] = str(exc)
+        else:
+            entry["repo_evidence_skipped"] = True
         # Always mirror evidence under Application Support (LaunchAgent-safe).
         try:
             local_ev = STATE_DIR / "evidence"

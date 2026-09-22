@@ -14,10 +14,12 @@ CHECKIN = ROOT / "scripts" / "hourly" / "checkin.py"
 
 def test_hourly_checkin_manual(tmp_path: Path) -> None:
     state_dir = tmp_path / "hourly"
+    before = (ROOT / "docs" / "evidence" / "fix-004" / "last-checkin.json").read_bytes()
     env = {
         **os.environ,
         "SWARM_HOURLY_STATE_DIR": str(state_dir),
         "SWARM_HOST_ALIAS": "test-host",
+        "SWARM_HOURLY_REPO_EVIDENCE": "0",
     }
     proc = subprocess.run(
         [sys.executable, str(CHECKIN), "--repo", str(ROOT), "--trigger", "manual"],
@@ -30,6 +32,7 @@ def test_hourly_checkin_manual(tmp_path: Path) -> None:
     assert proc.returncode == 0, proc.stderr
     state = json.loads((state_dir / "state.json").read_text())
     assert state["manual_checkins"] >= 1
+    assert (ROOT / "docs" / "evidence" / "fix-004" / "last-checkin.json").read_bytes() == before
     assert state["invocation_count"] >= 1
     assert not (state_dir / "hourly.lock").exists()
 
