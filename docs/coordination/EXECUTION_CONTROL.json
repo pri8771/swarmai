@@ -47,5 +47,16 @@
     "Empty reviewed_packets and frozen_packets do not preapprove future code or unresolved acceptance thresholds.",
     "Do not replace the registry, duplicate queues, or rewrite historical evidence. Scope controls authorization, not artifact acceptance.",
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
-  ]
+  ],
+  "next_session_assignment": {
+    "owner_directive_ref": "docs/coordination/OWNER_RACE_V17_20260922.md",
+    "implementation_owner": "GPT-6 Sol in a new Codex task",
+    "prompt_ref": "docs/coordination/GPT6_SOL_SWARM_V17_RACE_20260922.md",
+    "state": "ASSIGNED_WAITING_FOR_WORKER",
+    "target_version": "1.7",
+    "auto_launch": false,
+    "new_live_grant": false,
+    "new_scheduler_grant": false,
+    "changes_acceptance": false
+  }
 }

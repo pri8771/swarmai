@@ -1,3 +1,5 @@
+> **Latest owner assignment — 2026-09-22:** GPT-6 Sol in a new Codex task is the next SwarmAI implementation owner; target accepted LIVE V1.7. Read `docs/coordination/OWNER_RACE_V17_20260922.md` and `docs/coordination/GPT6_SOL_SWARM_V17_RACE_20260922.md` first. State: ASSIGNED_WAITING_FOR_WORKER, not launched. This supersedes older worker/pause routing below only; existing evidence, review holds and action grants are unchanged. No new scheduler or watcher.
+
 # SwarmAI cross-agent operating contract
 
 ## Authority

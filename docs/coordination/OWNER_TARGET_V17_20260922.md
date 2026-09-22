@@ -1,3 +1,5 @@
+> **Latest owner assignment — 2026-09-22:** GPT-6 Sol in a new Codex task is the next SwarmAI implementation owner; target accepted LIVE V1.7. Read `docs/coordination/OWNER_RACE_V17_20260922.md` and `docs/coordination/GPT6_SOL_SWARM_V17_RACE_20260922.md` first. State: ASSIGNED_WAITING_FOR_WORKER, not launched. This supersedes older worker/pause routing below only; existing evidence, review holds and action grants are unchanged. No new scheduler or watcher.
+
 # Owner decisions and goal post reset to V1.7 — SwarmAI — 2026-09-22 (~18:45Z)
 
 Recorded by Claude from the owner's direct messages in the current Claude session. **This records owner direction only. It is not a lead verdict, a release or a version acceptance.** The native ChatGPT Swarm lead must reconcile `EXECUTION_CONTROL.json`, the packet queue and the registry, and keeps acceptance authority.
