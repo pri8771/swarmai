@@ -1,63 +1,83 @@
 # SwarmAI live progress
 
-Latest observed scheduler heartbeat: 2026-09-22T00:53:40Z
+Latest observed scheduler heartbeat: 2026-09-22T01:54:40Z
 
 ## Current operating model
 
-Repository authority currently defines exactly one implementation session:
+Repository authority defines exactly one implementation session under `OWNER_V17_LIVE_ONLY`:
 
 | Role | Identity | Scope |
 |---|---|---|
-| Implementation | `CURSOR-V17-SINGLE` | Current truth -> V1.7 implementation-complete/reviewable candidate |
-| Heartbeat | `CURSOR-V17-SINGLE` | Exactly one 5-minute scheduled producer |
+| Implementation | `CURSOR-V17-SINGLE` / Fable | Current truth -> V1.7 live/reviewable candidate only |
+| Heartbeat | `CURSOR-V17-SINGLE` | One five-minute scheduled producer; liveness only |
 | Operator | owner | Final authority |
-| ChatGPT | planning / coordination / independent review | No competing implementation lane |
+| ChatGPT | lead / independent reviewer | Canonical review and acceptance; no competing implementation lane |
 
-Implementation branch: `cursor/v17-single-session@9ff6859d3920106af9a55937c78937b785506ede`.
-Legacy A/B assignment JSONs remain disabled historical state; older two-lane heartbeat text does not override the current repo directive.
+Implementation branch: `cursor/v17-single-session@889c9c16bb30c9569267741dfc74c10d8ae10d69`.
+The worker ended its implementation session at a truthful `BLOCKED_FRONTIER`; the launchd candidate remains a private loopback service at `http://127.0.0.1:18771`. Legacy A/B assignments and heartbeats are historical and do not count.
 
 ## Heartbeat
 
 - Active epoch: `fable-v17-20260922-01`; producer registered.
-- Current-epoch scheduler receipts observed at `00:38:24Z`, `00:43:29Z`, `00:48:35Z`, and `00:53:40Z`; cadence is healthy around five minutes.
-- Status: `working`; packet `R27d`; artifact `ART-V17-APPROVAL-BINDING`.
-- Heartbeat liveness is not implementation acceptance.
+- Status: `review_requested`; latest scheduler publication `01:54:40Z`.
+- Last meaningful worker activity recorded at `01:50:07Z`.
+- Timer publications after the handoff are liveness publications only and must not be represented as continuing implementation.
 
-## Latest review decision — R27c / ART-V17-APPROVAL-BINDING
+## Lead reviews this run
 
-**CHANGES REQUIRED** for source `8dbe5d810d732f17806ac9611bec78383201ac82` / evidence bundle `9ff6859d3920106af9a55937c78937b785506ede`.
+### R27c / ART-V17-APPROVAL-BINDING
 
-Useful evidence retained: repository-owned durable transactions, committed effect admission, atomic receipt finalization, cross-process visibility test, one-shot approval race test, and locally bound verification reporting 16 focused tests x5, full suite 416 passed / 2 skipped, Ruff clean, mypy clean.
+**CHANGES REQUIRED remains in force.** Current descendant source still shows both blocking defects from the prior review: the operational gateway reaches committed admission with `fence_reader=None`, and a distinct replacement approval on an already-consumed effect can be validated without consuming/rebinding the new grant.
 
-Two blockers prevent lead acceptance:
+Repair: `R27c-R1`. `R27e` and `R28a` remain held. Parent artifact remains canonical `drafting`.
 
-1. `ConsequentialToolGateway.execute_envelope()` calls durable `begin_execution(..., fence_reader=None)`. The repository can perform an authoritative fence read inside the admission transaction, but the operational gateway does not wire it; its generation check is only a pre-admission comparison against gateway-local integers. A durable lease/cancellation change can therefore race that pre-check unless the authoritative reader is wired into the committed admission path.
-2. On a retry of an existing effect under a distinct fresh approval, the effect row's prior `approval_consumed_at` causes `_consume_approval()` to validate the new approval without incrementing its use count or rebinding the approval. A new broad `max_effect_count=1` grant can therefore authorize the retry without being consumed.
+### R27d approval integrity
 
-Repair packet: `R27c-R1`. Required regressions: durable-fence TOCTOU blocks adapter execution and consumes no approval; replacement approval B on a provable `not_applied` retry is consumed exactly once and cannot authorize another effect. Preserve same-grant no-double-consume, revocation/expiry denial, immutable replay, unknown reconciliation, and one-shot race behavior.
+**BOUNDED SLICE ACCEPTED; parent artifact unchanged** at source `1b9afc510b5cac875ae5b6291c123f132938ede1`.
 
-Review record: `docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27C-LEAD-REVIEW.md`.
+Accepted: insert-only approvals, non-resettable usage, monotonic project-scoped revocation, project-filtered lookup/non-disclosure behavior, and fail-closed legacy null binding rows. Local bound evidence: 6 focused PostgreSQL tests; full `422 passed, 2 skipped`; Ruff clean; mypy clean.
 
-`ART-V17-APPROVAL-BINDING` remains canonical `drafting`; no lifecycle promotion occurred. `R27d` may continue. `R27e` and `R28a` remain held pending repaired R27c review.
+Review: `docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27D-LEAD-REVIEW.md`.
+
+### R17a / local durable recovery checkpoint
+
+**LOCAL HARNESS CHECKPOINT ACCEPTED; artifact lifecycle unchanged** at `e5bd6350569fb10146517430ca6f7fa097de84a4`.
+
+Useful proof: real separate OS processes + PostgreSQL, victim `SIGKILL`, expiry/reassignment, stale-result rejection, cancellation-generation rejection, and 20/20 concurrent duplicate-result races with exactly one accepted result. It does not satisfy final CP3 because tasks were harness-seeded rather than produced by the operational mission path, the harness directly advanced mission cancellation generation, and physical multi-host proof remains absent.
+
+Review: `docs/coordination/reviews/ART-V15-RECOVERY-EVIDENCE-R17A-LEAD-REVIEW.md`.
+
+### R02a / V14 defect-proof gate
+
+**BOUNDED RUNTIME GUARD ACCEPTED; ART-V14-REAL-E2E unchanged** at `ef8a2cc25c9caf8665804a28453c6f81f82d4a11`.
+
+The new gate requires a patch-carried regression to fail cleanly on pre-patch production source and pass on patched source; collection/config errors do not count. Local bound evidence: 8 focused tests; 50 mission tests; full `433 passed, 2 skipped`; Ruff clean; mypy clean.
+
+`v14-real-008` then failed honestly: the model emitted a verbatim/full-file echo, no material diff and no patch regression; no semantic review or acceptance was reached. Next bounded repair is `R02c`, then a new preregistered mission.
+
+Review: `docs/coordination/reviews/ART-V14-REAL-E2E-R02A-LEAD-REVIEW.md`.
+
+## Candidate / checkpoint truth
+
+- Private local candidate: loopback `127.0.0.1:18771`, launchd `com.swarmai.v17-candidate`; health/readiness and authentication mechanics were demonstrated locally. This is not proof that V1.7 subsystems are wired into the mission path.
+- CP0: local suite/lint/type evidence is green; hosted CI remains externally unavailable.
+- CP1: not passed; `v14-real-008` is a preserved failed attempt.
+- CP2: not run; canonical G13 still requires actual HOST-WIN-DEV executable verification + lead-held sealed-reference binding; G12 remains 0 admitted remote routes.
+- CP3: strong local harness checkpoint accepted as evidence, but not operational-mission or physical multi-host completion.
+- CP4/CP5/CP6: not passed; knowledge/action boundary are not yet on the same operational mission path.
 
 ## CI
 
-Exact-tip Actions run `35673524977` for `9ff6859d3920106af9a55937c78937b785506ede` concluded failure, but `offline`, `console`, and `live-gated` each contain zero steps and `runner_id=0`. Treat this as external Actions availability/billing non-evidence, not source/test evidence.
-
-## Other acceptance truth
-
-- G13: canonical task pool remains `reviewable`, not verified/frozen; actual HOST-WIN-DEV executable verification plus real sealed-reference binding remain required before counted qualification.
-- V1.4: `ART-V14-REAL-E2E` remains drafting / changes-required; a new preregistered mission must demonstrate an objectively real pre-patch defect and correct targeted regression.
-- V1.5: local durable result/worker/recovery evidence is useful, but actual second-physical-host evidence remains unsatisfied.
-- G12 remote: 0 admitted remote routes; no paid fallback.
-- worker-pc: last G13 static audit completed without branch/commit and cannot substitute for executable acceptance; no new dispatch under the current single-session directive.
+Latest inspected hosted run `35676958677` on `963acaefacc2f5c320a6cab57835a32a737cef3a` failed before runner allocation: `offline`, `console`, and `live-gated` each have zero steps and `runner_id=0`. Treat as external Actions non-evidence, not a source failure.
 
 ## Top next actions
 
-1. Finish dependency-independent `R27d`; prepare and execute bounded `R27c-R1`; keep `R27e`/`R28a` held until independent re-review.
-2. Continue only dependency-independent single-session work while external V14/G13/G12/V15 blockers remain; do not create parallel implementation lanes.
-3. Restore GitHub Actions availability only within the existing/no-additional-spend entitlement; do not authorize new charges.
+1. Resume the single authorized Fable implementation session and execute `R27c-R1`; do not proceed to `R27e`/`R28a` until independent re-review accepts the repaired source.
+2. In dependency-independent work, execute `R02c` echo/no-material-diff repair and the bounded mission-cancel/control-plane method; preserve tests and current safety semantics.
+3. After R27c-R1 review, continue the existing V1.7 queue only. Do not start V1.8+ and do not create a second implementation lane.
 
 ## Human action
 
-GitHub Actions remains externally unavailable before runner allocation. Restore Actions only if it can be done within the existing/no-additional-spend entitlement. No main merge, public release/deploy, force push, or additional spend is authorized.
+The Fable implementation session has stopped at `BLOCKED_FRONTIER`; its timer cannot resume the model. Reopen/reuse that one existing `CURSOR-V17-SINGLE` session so it can read the lead reviews and execute `R27c-R1`/independent repairs. Separately, GitHub Actions may be restored only within the existing/no-additional-spend entitlement; do not authorize new charges.
+
+No main merge, public release/deploy, force push, paid fallback or additional spend is authorized.
