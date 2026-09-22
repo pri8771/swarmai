@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "recorded_utc": "2026-09-22T03:10:47.740874+00:00",
+  "recorded_utc": "2026-09-22T03:42:08.539288+00:00",
   "evidence_class": "engineering_only",
-  "source_sha": "aa85f061afa50996c2b90732ecdb253d56c9bfcc",
+  "source_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e",
   "dispatched": false,
   "formal_acceptance": false,
   "files": {
@@ -29,6 +29,15 @@
     },
     "swarm-console-install.txt": {
       "sha256": "65d4b77e86311cc2511f573c4924bde1e0c33c5cb2b771f1f536afd3a6d64078"
+    },
+    "swarm-followup-checks.txt": {
+      "sha256": "475c3957d6b8368fbae91b5b436805e34441f7dee126f70f3fda1a5206616ab0",
+      "source_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e"
+    },
+    "swarm-followup-checks.json": {
+      "sha256": "c3fd1bfc7e1a327dce02d6c136bba8d00875e7a1485b848c85de0a0f0e6d1f2e",
+      "source_sha": "fb34b2c00fc7cc2c81cb481dfa35df8e259bc04e"
     }
-  }
+  },
+  "original_source_sha": "aa85f061afa50996c2b90732ecdb253d56c9bfcc"
 }

@@ -1,0 +1,29 @@
+$ .venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.21s
+$ .venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.11s
+$ .venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.10s
+$ .venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.11s
+$ .venv/bin/python -m pytest -q tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py
+.................................                                        [100%]
+33 passed in 1.09s
+$ .venv/bin/python -m pytest -q -rs
+........................................................................ [ 15%]
+........................................................................ [ 30%]
+........................................................................ [ 45%]
+........................................................................ [ 60%]
+........................................................................ [ 75%]
+........................................................................ [ 91%]
+..........................................                               [100%]
+474 passed in 34.85s
+$ .venv/bin/ruff check src tests
+All checks passed!
+$ .venv/bin/mypy src
+Success: no issues found in 169 source files
+$ git diff --check
