@@ -41,3 +41,7 @@ Use non-private qualification material. No paid upgrade or inference is authoriz
 - R31a's dependencies are accepted, but its contract must align with the newer R30b terminal-request-proof rule and accepted manifest vocabulary before implementation; bare zero submissions cannot establish `not_applied`.
 
 Requested native lead package: target/ownership reconciliation; exact PR28/29 verdicts; bounded composition and R31a release; truthful queue normalization. No self-acceptance, live attempt renewal, new scheduler or main merge.
+
+## Subsequent lead disposition / source return
+
+Canonical `93d4e6e` accepted PR28/29, normalized the bounded R02a/R17a queue and released composition. PR30 now contains the reviewed composition at `4d16fe85`; see CODEX_V17_COMPOSITION_RETURN_20260922.md. R31a's terminal-request reconciliation, exact URL and manifest contract is frozen in canonical R31A_CONTRACT_DISPOSITION_20260922.md. Earlier awaiting-release paragraphs above are historical inventory observations. No remote provider or live gate became qualified through these source decisions.
