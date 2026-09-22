@@ -1,0 +1,66 @@
+SwarmAI bounded offline mechanical checks
+Date: 2026-09-21 America/New_York
+Repository: <isolated-review-root>/swarm-source
+Source state: detached HEAD
+Exact source SHA: 05fe7807db3509d68dd8a86a0616c9e8ffaa2307
+Source status before checks: clean (git status --short --branch returned only "## HEAD (no branch)")
+Source status after checks: clean (git status --short --branch returned only "## HEAD (no branch)")
+
+Applicable guidance read:
+- AGENTS.md
+- origin/coordination/swarm-control:CLAUDE.md (via git show; no fetch)
+- origin/coordination/swarm-control:docs/coordination/SESSION_START.md (via git show; no fetch)
+- Focused test sources: tests/mission/test_r02c_targeted_edits.py,
+  tests/integration/db/test_mission_cancellation.py,
+  tests/integration/db/test_effect_transactions.py,
+  tests/integration/db/test_effect_reservation_atomic.py
+
+Offline focused R02c test
+Command: .venv/bin/python -m pytest tests/mission/test_r02c_targeted_edits.py -q
+Exit: 0
+Result: 7 passed in 1.04s
+
+Ruff
+Command: .venv/bin/ruff check src tests
+Exit: 0
+Result: All checks passed!
+
+Mypy
+Command: .venv/bin/mypy src
+Exit: 0
+Result: Success: no issues found in 169 source files
+
+Isolated PostgreSQL availability and setup
+Binaries: /opt/homebrew/bin/initdb, postgres, pg_ctl, createdb, psql
+Version observed in server log: PostgreSQL 16.13 (Homebrew)
+Cluster root: /tmp/swarm-pgcheck.QxqRvZ
+Data directory: /tmp/swarm-pgcheck.QxqRvZ/data
+Socket directory: /tmp/swarm-pgcheck.QxqRvZ/socket
+Log: /tmp/swarm-pgcheck.QxqRvZ/postgres.log
+Port: 56421
+Database: swarm_checks
+TCP: disabled (-h '')
+Host authentication: reject
+Local socket authentication: trust
+
+Cluster commands and exits:
+Command: mkdir -p /tmp/swarm-pgcheck.QxqRvZ/socket && /opt/homebrew/bin/initdb -D /tmp/swarm-pgcheck.QxqRvZ/data --no-locale --encoding=UTF8 --auth-local=trust --auth-host=reject
+Exit: 0
+Command: /opt/homebrew/bin/pg_ctl -D /tmp/swarm-pgcheck.QxqRvZ/data -l /tmp/swarm-pgcheck.QxqRvZ/postgres.log -o "-p 56421 -k /tmp/swarm-pgcheck.QxqRvZ/socket -h ''" -w start && /opt/homebrew/bin/createdb -h /tmp/swarm-pgcheck.QxqRvZ/socket -p 56421 swarm_checks && /opt/homebrew/bin/psql -h /tmp/swarm-pgcheck.QxqRvZ/socket -p 56421 -d swarm_checks -Atqc "select current_database(), current_setting('port')"
+Exit: 0
+Probe result: swarm_checks|56421
+
+Cancellation guard plus requested effect transaction/reservation tests
+Command: env -u SWARM_DATABASE_URL SWARM_DATABASE_URL='postgresql+psycopg://pchordia@/swarm_checks?host=/tmp/swarm-pgcheck.QxqRvZ/socket&port=56421' .venv/bin/python -m pytest tests/integration/db/test_mission_cancellation.py tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py -q
+Exit: 0
+Result: 20 passed in 2.65s
+
+Cluster shutdown
+Command: /opt/homebrew/bin/pg_ctl -D /tmp/swarm-pgcheck.QxqRvZ/data -w stop -m fast && test ! -f /tmp/swarm-pgcheck.QxqRvZ/data/postmaster.pid
+Exit: 0
+Result: server stopped; postmaster.pid absent
+
+Aggregate focused pytest count: 27 passed (7 R02c + 20 PostgreSQL integration), 0 failed, 0 skipped.
+No model calls, network calls, external live calls, scheduler starts, shared-service starts,
+source edits, commits, fetches, or worker takeover were performed.
+No test errors were observed.
