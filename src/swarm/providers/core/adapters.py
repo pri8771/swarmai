@@ -55,9 +55,10 @@ class OpenRouterAdapter(BaseCoreAdapter):
             raise ValueError("OpenRouter route model differs from pinned free model")
         if request.max_output_tokens is None:
             raise ValueError("OpenRouter free route requires a finite output limit")
-        return self.transport.request(
+        response = self.transport.request_with_metadata(
             "POST",
             "/chat/completions",
+            extra_headers={"X-OpenRouter-Metadata": "enabled"},
             json_body={
                 "model": free_route.model_id,
                 "messages": request.messages,
@@ -71,6 +72,7 @@ class OpenRouterAdapter(BaseCoreAdapter):
                 },
             },
         )
+        return {**response.body, "_swarm_rate_limit_headers": response.rate_limit_headers}
 
 
 class GroqAdapter(BaseCoreAdapter):
