@@ -8,6 +8,7 @@ Unknown external outcome enters reconciliation; never blind-retry.
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from typing import Any
 
@@ -18,7 +19,12 @@ from swarm.contracts.actions import (
 )
 from swarm.contracts.common import new_id, payload_hash, utc_now
 from swarm.db.lease_fencing import LeaseRenewError, effect_fence_reader
-from swarm.tools.adapters.base import IntegrationAdapter
+from swarm.tools.adapters.base import (
+    ADAPTER_OUTCOMES,
+    AdapterDeniedError,
+    AdapterNotSentError,
+    IntegrationAdapter,
+)
 from swarm.tools.effects import (
     DurableEffectRepository,
     EffectConflictError,
@@ -63,7 +69,7 @@ class ConsequentialToolGateway:
         allowed_scopes: set[str],
         current_lease_generation: int,
         current_cancellation_generation: int = 0,
-        store: InMemoryEffectStore | DurableEffectRepository | None = None,
+        store: InMemoryEffectStore | DurableEffectRepository,
         max_risk_without_approval: str = "low",
         orphan_grace_seconds: int = 30,
     ) -> None:
@@ -75,7 +81,7 @@ class ConsequentialToolGateway:
         self.allowed_scopes = allowed_scopes
         self.current_lease_generation = current_lease_generation
         self.current_cancellation_generation = current_cancellation_generation
-        self.store = store or InMemoryEffectStore()
+        self.store = store
         self.max_risk_without_approval = max_risk_without_approval
         self._risk_rank = {"low": 0, "medium": 1, "high": 2, "critical": 3}
 
@@ -131,6 +137,7 @@ class ConsequentialToolGateway:
         self._authorize_project(envelope)
 
         # 3) evaluate policy/risk
+        self._require_durable_store(envelope)
         self._evaluate_policy(envelope)
 
         # lease / cancel fences
@@ -195,68 +202,105 @@ class ConsequentialToolGateway:
                 raise ApprovalInvalidError("approval_expired_or_revoked_or_exhausted") from exc
             raise
 
-        # 6-7) pre observe, execute, post observe
-        pre = self.adapter.observe_pre_state(envelope)
+        # 6-7) adapter calls leave the event loop responsive and have deadlines.
+        pre: dict[str, Any] = {}
+        started = utc_now()
+
+        def finish(
+            state: str,
+            reason: str | None,
+            post: dict[str, Any],
+            external_id: str | None = None,
+        ) -> ActionReceiptV17:
+            uncertain = state == "unknown"
+            return self._finalize(
+                envelope,
+                effect,
+                state=state,
+                outcome=state,
+                state_reason=reason,
+                pre=pre,
+                post=post,
+                started=started,
+                external_id=external_id,
+                reconciliation={"status": "pending"} if uncertain else None,
+                reconciliation_state="pending" if uncertain else "none",
+                artifacts=self._authorized_artifacts(envelope, post)
+                if state == "succeeded"
+                else None,
+            )
+
+        try:
+            pre = await asyncio.wait_for(
+                asyncio.to_thread(self.adapter.observe_pre_state, envelope),
+                timeout=envelope.timeout_seconds,
+            )
+            if not isinstance(pre, dict):
+                pre = {}
+                raise TypeError("invalid_pre_observation")
+        except asyncio.CancelledError as cancelled:
+            try:
+                finish("unknown", "cancelled_during_execute", {})
+            finally:
+                raise cancelled
+        except TimeoutError:
+            return finish("unknown", "timeout", {})
+        except Exception as exc:  # noqa: BLE001
+            return finish("unknown", f"exception:{type(exc).__name__}", {})
+
         effect = self.store.attach_pre_observation(
             project_id=envelope.project_id,
             effect_key=envelope.effect_key,
             pre_observation=pre,
             expected_execution=(effect.get("executor_id"), effect["attempt_count"], "executing"),
         )
-        started = utc_now()
         try:
-            result = self.adapter.execute(envelope)
-        except Exception as exc:  # noqa: BLE001
-            post = {"error": str(exc)}
-            return self._finalize(
-                envelope,
-                effect,
-                state="failed",
-                outcome="failed",
-                pre=pre,
-                post=post,
-                started=started,
-            )
+            try:
+                result = await asyncio.wait_for(
+                    asyncio.to_thread(self.adapter.execute, envelope),
+                    timeout=envelope.timeout_seconds,
+                )
+            except AdapterNotSentError:
+                return finish("failed", "not_applied", {})
+            except AdapterDeniedError as exc:
+                return finish("denied", str(exc), {})
+            except TimeoutError:
+                return finish("unknown", "timeout", {})
+            except Exception as exc:  # noqa: BLE001
+                return finish("unknown", f"exception:{type(exc).__name__}", {})
 
-        post = self.adapter.observe_post_state(envelope, result)
-        outcome = self._outcome_from_result(result)
+            value = result.get("outcome") if isinstance(result, dict) else None
+            outcome = value if isinstance(value, str) and value in ADAPTER_OUTCOMES else "unknown"
+            reason = None
+            state = outcome
+            if outcome == "unknown":
+                reason = "unrecognized_outcome"
+            elif outcome == "not_applied":
+                state, reason = "failed", "not_applied"
+            elif outcome == "denied":
+                reason = str(result.get("detail") or result.get("reason") or "adapter_denied")
 
-        if outcome == "unknown":
-            # 8) reconcile path — do not mark succeeded; never blind retry later.
-            return self._finalize(
-                envelope,
-                effect,
-                state="unknown",
-                outcome="unknown",
-                pre=pre,
-                post=post,
-                started=started,
-                external_id=result.get("external_id"),
-                reconciliation={"status": "pending", "steps": ["poll_external", "confirm"]},
-                reconciliation_state="pending",
-            )
-        if outcome in {"denied", "cancelled"}:
-            return self._finalize(
-                envelope,
-                effect,
-                state=outcome,
-                outcome=outcome,
-                pre=pre,
-                post=post,
-                started=started,
-            )
-        # succeeded — approval use was consumed at admission (begin_execution), never here.
-        return self._finalize(
-            envelope,
-            effect,
-            state="succeeded",
-            outcome="succeeded",
-            pre=pre,
-            post=post,
-            started=started,
-            external_id=result.get("external_id"),
-            artifacts=self._authorized_artifacts(envelope, post),
-        )
+            if isinstance(result, dict):
+                try:
+                    post = await asyncio.wait_for(
+                        asyncio.to_thread(self.adapter.observe_post_state, envelope, result),
+                        timeout=envelope.timeout_seconds,
+                    )
+                    if not isinstance(post, dict):
+                        raise TypeError("invalid_post_observation")
+                except Exception as exc:  # noqa: BLE001
+                    post = {"post_observation_error": type(exc).__name__}
+            else:
+                post = {"unrecognized_result_type": type(result).__name__}
+            external_id = result.get("external_id") if isinstance(result, dict) else None
+            if not isinstance(external_id, str):
+                external_id = None
+            return finish(state, reason, post, external_id)
+        except asyncio.CancelledError as cancelled:
+            try:
+                finish("unknown", "cancelled_during_execute", {})
+            finally:
+                raise cancelled
 
     def _terminal_or_fail(self, envelope: ActionEnvelope) -> ActionReceiptV17:
         """R27a: a replay returns the original immutable receipt, never a re-mint."""
@@ -314,6 +358,7 @@ class ConsequentialToolGateway:
         envelope.ensure_hashes()
         self.adapter.validate(envelope)
         self._authorize_project(envelope)
+        self._require_durable_store(envelope)
         self._evaluate_policy(envelope)
         self._check_generations(envelope)
         effect = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
@@ -331,9 +376,29 @@ class ConsequentialToolGateway:
             project_id=envelope.project_id, effect_key=envelope.effect_key
         )
         try:
-            result = self.adapter.reconcile(envelope, prior)
+            result = await asyncio.wait_for(
+                asyncio.to_thread(self.adapter.reconcile, envelope, prior),
+                timeout=envelope.timeout_seconds,
+            )
+        except asyncio.CancelledError as cancelled:
+            try:
+                self._finalize(
+                    envelope,
+                    effect,
+                    state="unknown",
+                    outcome="unknown",
+                    state_reason="cancelled_during_execute",
+                    pre=effect.get("pre_observation") or {},
+                    post={},
+                    reconciliation={"status": "pending"},
+                    reconciliation_state="pending",
+                )
+            finally:
+                raise cancelled
+        except TimeoutError:
+            result = {"state": "unknown", "reason": "timeout"}
         except Exception as exc:  # noqa: BLE001
-            result = {"state": "unknown", "error_type": type(exc).__name__}
+            result = {"state": "unknown", "reason": f"exception:{type(exc).__name__}"}
         if not isinstance(result, dict):
             result = {"state": "unknown", "invalid_result_type": type(result).__name__}
         state = str(result.get("state", "unknown"))
@@ -373,7 +438,7 @@ class ConsequentialToolGateway:
             effect,
             state="unknown",
             outcome="unknown",
-            state_reason=effect.get("state_reason"),
+            state_reason=result.get("reason", effect.get("state_reason")),
             pre=effect.get("pre_observation") or {},
             post=result,
             started=effect.get("started_at"),
@@ -451,13 +516,12 @@ class ConsequentialToolGateway:
         if envelope.cancellation_generation != self.current_cancellation_generation:
             raise CancellationFenceError("cancellation_generation_mismatch")
 
-    @staticmethod
-    def _outcome_from_result(result: dict[str, Any]) -> str:
-        if "outcome" in result:
-            return str(result["outcome"])
-        if result.get("written") or result.get("submitted") or result.get("navigated_to"):
-            return "succeeded"
-        return "succeeded"
+    def _require_durable_store(self, envelope: ActionEnvelope) -> None:
+        if (
+            envelope.side_effect_class in {"consequential", "irreversible"}
+            and getattr(self.store, "durable", False) is not True
+        ):
+            raise PolicyDeniedError("durable_store_required")
 
     @staticmethod
     def _authorized_artifacts(envelope: ActionEnvelope, post: dict[str, Any]) -> list[str]:

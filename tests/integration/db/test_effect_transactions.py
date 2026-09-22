@@ -21,6 +21,7 @@ from swarm.contracts.common import new_id, utc_now
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
+from swarm.tools.adapters.base import AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
@@ -58,7 +59,7 @@ def factory(engine):
 class RaisingAdapter(ApiMcpAdapter):
     def execute(self, envelope: ActionEnvelope) -> dict[str, Any]:
         self._calls.append({"effect_key": envelope.effect_key})
-        raise RuntimeError("transport_exploded")
+        raise AdapterNotSentError("transport_not_started")
 
 
 def _gateway(adapter: ApiMcpAdapter, factory, project: str = "proj_a") -> ConsequentialToolGateway:
@@ -189,11 +190,12 @@ async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> 
     first = await gw.execute_envelope(env)
     assert first.outcome == "failed"
     assert _used_count(factory, env.approval_id) == 1
-    # Until R28a nothing writes not_applied; simulate the provable non-application verdict.
-    _sql(
-        factory,
-        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
-        k=env.effect_key,
+    # A proven pre-send failure now writes not_applied through the gateway.
+    assert (
+        _sql(
+            factory, "SELECT state_reason FROM action_effects WHERE effect_key=:k", k=env.effect_key
+        )
+        == "not_applied"
     )
     working = ApiMcpAdapter()
     gw2 = _gateway(working, factory)
@@ -216,10 +218,11 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
     )
     env.approval_id = gw.make_approval(env, max_effect_count=1).approval_id
     assert (await gw.execute_envelope(env)).outcome == "failed"
-    _sql(
-        factory,
-        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
-        k=env.effect_key,
+    assert (
+        _sql(
+            factory, "SELECT state_reason FROM action_effects WHERE effect_key=:k", k=env.effect_key
+        )
+        == "not_applied"
     )
     if how == "revoked":
         _sql(factory, "UPDATE approvals SET revoked_at=now() WHERE id=:a", a=env.approval_id)
@@ -304,7 +307,10 @@ def test_finalize_state_conflict_when_not_executing(factory) -> None:
     )
     with pytest.raises(EffectConflictError, match="finalize_state_conflict"):
         repo.finalize_with_receipt(
-            project_id="proj_a", effect_key=env.effect_key, state="succeeded", receipt=receipt,
+            project_id="proj_a",
+            effect_key=env.effect_key,
+            state="succeeded",
+            receipt=receipt,
             expected_execution=(None, 0, "reserved"),
         )
     assert repo.get(project_id="proj_a", effect_key=env.effect_key)["state"] == "reserved"
@@ -384,10 +390,13 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
     first = await gateway_a.execute_envelope(envelope_a)
     assert first.outcome == "failed"
     assert _used_count(factory, grant_a.approval_id) == 1
-    _sql(
-        factory,
-        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
-        k=envelope_a.effect_key,
+    assert (
+        _sql(
+            factory,
+            "SELECT state_reason FROM action_effects WHERE effect_key=:k",
+            k=envelope_a.effect_key,
+        )
+        == "not_applied"
     )
 
     working = ApiMcpAdapter()
@@ -448,10 +457,13 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
     grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
     assert (await gateway_a.execute_envelope(envelope_a)).outcome == "failed"
-    _sql(
-        factory,
-        "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
-        k=envelope_a.effect_key,
+    assert (
+        _sql(
+            factory,
+            "SELECT state_reason FROM action_effects WHERE effect_key=:k",
+            k=envelope_a.effect_key,
+        )
+        == "not_applied"
     )
 
     adapter_b = ApiMcpAdapter()
@@ -539,10 +551,13 @@ async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
         assert receipt.approval_id == grant.approval_id
         assert receipt.attempt_number == number
         assert _used_count(factory, grant.approval_id) == 1
-        _sql(
-            factory,
-            "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
-            k=env.effect_key,
+        assert (
+            _sql(
+                factory,
+                "SELECT state_reason FROM action_effects WHERE effect_key=:k",
+                k=env.effect_key,
+            )
+            == "not_applied"
         )
     row = gateway.store.get(project_id=env.project_id, effect_key=env.effect_key)
     assert set(row["consumed_approval_ids"]) == {grant_a.approval_id, grant_b.approval_id}

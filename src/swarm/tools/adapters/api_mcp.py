@@ -95,10 +95,7 @@ class ApiMcpAdapter:
         for receipt in reversed(prior_receipts):
             if receipt.effect_key == envelope.effect_key and receipt.outcome == "succeeded":
                 return {"state": "succeeded", "external_id": receipt.external_id}
-            if receipt.effect_key == envelope.effect_key and receipt.outcome == "unknown":
-                # Still unknown — do not invent success.
-                return {"state": "unknown", "reason": "external_outcome_unconfirmed"}
-        return {"state": "failed", "reason": "no_prior_success"}
+        return {"state": "unknown", "reason": "destination_not_observable"}
 
     @property
     def call_count(self) -> int:

@@ -111,7 +111,7 @@ class BrowserSessionAdapter:
                 "navigated_to": envelope.destination,
                 "external_id": f"nav:{envelope.destination}",
             }
-        return {"outcome": "failed", "reason": f"unknown_operation:{envelope.operation}"}
+        return {"outcome": "denied", "reason": f"unknown_operation:{envelope.operation}"}
 
     def observe_post_state(
         self, envelope: ActionEnvelope, execution_result: dict[str, Any]

@@ -153,7 +153,11 @@ async def test_live_executor_is_not_taken_over(factory, tmp_path):
     assert row(store, env)["state"] == "executing"
     assert (
         ConsequentialToolGateway(
-            adapter, project_id=env.project_id, allowed_scopes=set(), current_lease_generation=1
+            adapter,
+            project_id=env.project_id,
+            allowed_scopes=set(),
+            current_lease_generation=1,
+            store=store,
         ).orphan_grace_seconds
         == 30
     )

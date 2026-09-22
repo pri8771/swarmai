@@ -5,10 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from tests.integration.db.test_effect_transactions import engine as engine
+from tests.integration.db.test_effect_transactions import factory as factory
 
 from swarm.contracts.actions import BrowserSessionRef
 from swarm.tools.adapters import ApiMcpAdapter, BrowserSessionAdapter, LocalSandboxAdapter
-from swarm.tools.effects import InMemoryEffectStore
+from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
 from swarm.tools.session_recovery import SessionRecoveryService
 from swarm.tools.v17_gateway import (
     ApprovalInvalidError,
@@ -20,21 +22,21 @@ from swarm.tools.v17_gateway import (
 )
 
 
-def _gw(adapter, *, project: str, scopes: set[str], lease: int = 1, cancel: int = 0, store=None):
+def _gw(adapter, *, project: str, scopes: set[str], store, lease: int = 1, cancel: int = 0):
     return ConsequentialToolGateway(
         adapter,
         project_id=project,
         allowed_scopes=scopes,
         current_lease_generation=lease,
         current_cancellation_generation=cancel,
-        store=store or InMemoryEffectStore(),
+        store=store,
     )
 
 
 @pytest.mark.asyncio
 async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
     adapter = LocalSandboxAdapter(root=tmp_path)
-    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"})
+    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
     env = adapter.normalize(
         {
             "project_id": "proj_a",
@@ -49,10 +51,11 @@ async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
     assert (tmp_path / "note.txt").read_text() == "hello"
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_d3_api_mcp_requires_approval_and_dedupes() -> None:
+async def test_d3_api_mcp_requires_approval_and_dedupes(factory) -> None:
     adapter = ApiMcpAdapter()
-    store = InMemoryEffectStore()
+    store = DurableEffectRepository(factory)
     gw = _gw(
         adapter,
         project="proj_a",
@@ -83,7 +86,9 @@ async def test_d3_api_mcp_requires_approval_and_dedupes() -> None:
 @pytest.mark.asyncio
 async def test_wrong_project_denied() -> None:
     adapter = ApiMcpAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"network.https", "mcp.call"})
+    gw = _gw(
+        adapter, project="proj_a", scopes={"network.https", "mcp.call"}, store=InMemoryEffectStore()
+    )
     env = adapter.normalize(
         {"project_id": "proj_b", "destination": "mcp://echo/default", "body": "x"}
     )
@@ -91,10 +96,16 @@ async def test_wrong_project_denied() -> None:
         await gw.execute_envelope(env)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_altered_payload_after_approval() -> None:
+async def test_altered_payload_after_approval(factory) -> None:
     adapter = ApiMcpAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"network.https", "mcp.call"})
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=DurableEffectRepository(factory),
+    )
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "one"}
     )
@@ -109,10 +120,16 @@ async def test_altered_payload_after_approval() -> None:
         await gw.execute_envelope(env)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_changed_destination_denied() -> None:
+async def test_changed_destination_denied(factory) -> None:
     adapter = ApiMcpAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"network.https", "mcp.call"})
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=DurableEffectRepository(factory),
+    )
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "one"}
     )
@@ -127,10 +144,16 @@ async def test_changed_destination_denied() -> None:
         await gw.execute_envelope(env)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_expired_and_revoked_approval() -> None:
+async def test_expired_and_revoked_approval(factory) -> None:
     adapter = ApiMcpAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"network.https", "mcp.call"})
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=DurableEffectRepository(factory),
+    )
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "x"}
     )
@@ -151,7 +174,7 @@ async def test_expired_and_revoked_approval() -> None:
 @pytest.mark.asyncio
 async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
     browser = BrowserSessionAdapter()
-    gw = _gw(browser, project="proj_a", scopes={"browser.session"})
+    gw = _gw(browser, project="proj_a", scopes={"browser.session"}, store=InMemoryEffectStore())
     env = browser.normalize(
         {
             "project_id": "proj_a",
@@ -165,14 +188,15 @@ async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
         await gw.execute_envelope(env)
 
     local = LocalSandboxAdapter(root=tmp_path)
-    gw2 = _gw(local, project="proj_a", scopes=set())
+    gw2 = _gw(local, project="proj_a", scopes=set(), store=InMemoryEffectStore())
     env2 = local.normalize({"project_id": "proj_a", "text": "x", "path": "a.txt"})
     with pytest.raises(ToolAuthorizationError):
         await gw2.execute_envelope(env2)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_stale_lease_and_cancel_generation() -> None:
+async def test_stale_lease_and_cancel_generation(factory) -> None:
     adapter = ApiMcpAdapter()
     gw = _gw(
         adapter,
@@ -180,6 +204,7 @@ async def test_stale_lease_and_cancel_generation() -> None:
         scopes={"network.https", "mcp.call"},
         lease=2,
         cancel=3,
+        store=DurableEffectRepository(factory),
     )
     env = adapter.normalize(
         {
@@ -210,10 +235,16 @@ async def test_stale_lease_and_cancel_generation() -> None:
         await gw.execute_envelope(env2)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_unknown_outcome_requires_reconcile_no_blind_retry() -> None:
+async def test_unknown_outcome_requires_reconcile_no_blind_retry(factory) -> None:
     adapter = ApiMcpAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"network.https", "mcp.call"})
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=DurableEffectRepository(factory),
+    )
     env = adapter.normalize(
         {
             "project_id": "proj_a",
@@ -233,10 +264,16 @@ async def test_unknown_outcome_requires_reconcile_no_blind_retry() -> None:
     assert adapter.call_count == calls_after_unknown
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_session_recovery_login_does_not_submit() -> None:
+async def test_session_recovery_login_does_not_submit(factory) -> None:
     adapter = BrowserSessionAdapter()
-    gw = _gw(adapter, project="proj_a", scopes={"browser.session"})
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"browser.session"},
+        store=DurableEffectRepository(factory),
+    )
     # Approved submit envelope
     submit_env = adapter.normalize(
         {
@@ -274,16 +311,15 @@ async def test_session_recovery_login_does_not_submit() -> None:
 @pytest.mark.asyncio
 async def test_filesystem_escape_denied(tmp_path: Path) -> None:
     adapter = LocalSandboxAdapter(root=tmp_path)
-    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"})
-    env = adapter.normalize(
-        {"project_id": "proj_a", "text": "x", "path": "../escape.txt"}
-    )
+    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+    env = adapter.normalize({"project_id": "proj_a", "text": "x", "path": "../escape.txt"})
     with pytest.raises(PermissionError, match="filesystem_path_escape"):
         await gw.execute_envelope(env)
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_three_integration_classes_share_boundary(tmp_path: Path) -> None:
+async def test_three_integration_classes_share_boundary(tmp_path: Path, factory) -> None:
     """V1.7 acceptance: local + API/MCP + browser use same gateway boundary."""
     local = LocalSandboxAdapter(root=tmp_path)
     api = ApiMcpAdapter()
@@ -298,13 +334,18 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path) -> None:
         )
     )
 
-    gw_local = _gw(local, project="proj_a", scopes={"sandbox.fs"})
-    gw_api = _gw(api, project="proj_a", scopes={"network.https", "mcp.call"})
-    gw_browser = _gw(browser, project="proj_a", scopes={"browser.session"})
-
-    r1 = await gw_local.execute_request(
-        {"project_id": "proj_a", "text": "a", "path": "a.txt"}
+    gw_local = _gw(local, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+    gw_api = _gw(
+        api,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=DurableEffectRepository(factory),
     )
+    gw_browser = _gw(
+        browser, project="proj_a", scopes={"browser.session"}, store=InMemoryEffectStore()
+    )
+
+    r1 = await gw_local.execute_request({"project_id": "proj_a", "text": "a", "path": "a.txt"})
     env_api = api.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "b"}
     )
@@ -326,10 +367,11 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path) -> None:
     assert r3.integration_id == "browser.session"
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_cancel_before_execute() -> None:
+async def test_cancel_before_execute(factory) -> None:
     adapter = ApiMcpAdapter()
-    store = InMemoryEffectStore()
+    store = DurableEffectRepository(factory)
     gw = _gw(
         adapter,
         project="proj_a",
@@ -352,57 +394,32 @@ async def test_cancel_before_execute() -> None:
     assert adapter.call_count == 0
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
-async def test_durable_effect_repository_reserve_finalize_idempotent() -> None:
-    """Postgres-backed D1 path; skips when SWARM_DATABASE_URL unavailable."""
-    import os
-
-    from sqlalchemy import text
-
-    from swarm.db.engine import create_db_engine, make_session_factory, ping
-    from swarm.db.models import Base
-    from swarm.tools.effects import DurableEffectRepository
-
-    url = os.environ.get(
-        "SWARM_DATABASE_URL", "postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm"
+async def test_durable_effect_repository_reserve_finalize_idempotent(factory) -> None:
+    """Postgres-backed D1 path through the shared isolated fixture."""
+    adapter = ApiMcpAdapter()
+    store = DurableEffectRepository(factory)
+    gw = _gw(
+        adapter,
+        project="proj_a",
+        scopes={"network.https", "mcp.call"},
+        store=store,
     )
-    eng = create_db_engine(url)
-    try:
-        ping(eng)
-    except Exception as exc:  # noqa: BLE001
-        pytest.skip(f"postgres_unavailable:{type(exc).__name__}")
-
-    Base.metadata.create_all(eng)
-    factory = make_session_factory(eng)
-    try:
-        adapter = ApiMcpAdapter()
-        store = DurableEffectRepository(factory)
-        gw = _gw(
-            adapter,
-            project="proj_a",
-            scopes={"network.https", "mcp.call"},
-            store=store,
-        )
-        req = {
-            "project_id": "proj_a",
-            "destination": "mcp://echo/default",
-            "body": "durable-ping",
-        }
-        env = adapter.normalize(req)
-        env.approval_id = gw.make_approval(env).approval_id
-        first = await gw.execute_envelope(env)
-        assert first.outcome == "succeeded"
-        env2 = adapter.normalize(req)
-        env2.approval_id = env.approval_id
-        second = await gw.execute_envelope(env2)
-        assert second.outcome == "succeeded"
-        assert adapter.call_count == 1
-        row = store.get(project_id="proj_a", effect_key=env.effect_key)
-        assert row is not None
-        assert row["state"] == "succeeded"
-    finally:
-        with eng.begin() as conn:
-            conn.execute(
-                text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
-            )
-        eng.dispose()
+    req = {
+        "project_id": "proj_a",
+        "destination": "mcp://echo/default",
+        "body": "durable-ping",
+    }
+    env = adapter.normalize(req)
+    env.approval_id = gw.make_approval(env).approval_id
+    first = await gw.execute_envelope(env)
+    assert first.outcome == "succeeded"
+    env2 = adapter.normalize(req)
+    env2.approval_id = env.approval_id
+    second = await gw.execute_envelope(env2)
+    assert second.outcome == "succeeded"
+    assert adapter.call_count == 1
+    stored = store.get(project_id="proj_a", effect_key=env.effect_key)
+    assert stored is not None
+    assert stored["state"] == "succeeded"
