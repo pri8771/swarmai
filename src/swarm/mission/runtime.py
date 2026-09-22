@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,8 @@ from swarm.contracts.common import utc_now
 from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.controller.mission import MissionController
 from swarm.cost.ledger import CostEntry, CostLedger
+from swarm.db.engine import create_db_engine, make_session_factory
+from swarm.mission.action_boundary import local_worktree_gateway
 from swarm.mission.brokered_inference import build_local_mission_broker
 from swarm.mission.planner import (
     build_software_mission,
@@ -21,6 +24,9 @@ from swarm.mission.report import live_state_view, write_reports
 from swarm.mission.store import MissionRecord, MissionStore
 from swarm.mission.worker import RepoWorker, WorkerResult
 from swarm.mission.worktree import WorktreeHandle, remove_worktree
+from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
+from swarm.tools.fences import ActorContext
+from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
 class MissionRuntime:
@@ -42,6 +48,16 @@ class MissionRuntime:
         self.parser_dogfood_fixture = parser_dogfood_fixture
         self.controller = MissionController(inference_slots=2, worker_slots=2)
         self._broker: SharedInferenceBroker | None = None
+        if os.environ.get("SWARM_DATABASE_URL"):
+            self._effect_store: InMemoryEffectStore | DurableEffectRepository = (
+                DurableEffectRepository(make_session_factory(create_db_engine()))
+            )
+        else:
+            self._effect_store = InMemoryEffectStore()
+
+    def _action_gateway_for(self, worktree: Path) -> ConsequentialToolGateway:
+        """Create the worker boundary for one isolated worktree handle."""
+        return local_worktree_gateway(worktree, store=self._effect_store)
 
     def _mission_broker(self, *, models: list[str] | None = None) -> SharedInferenceBroker:
         if self._broker is None:
@@ -126,6 +142,11 @@ class MissionRuntime:
             model_by_family=model_by_family,
             broker=self._mission_broker(models=None),
             project_id=mission.project_id,
+            action_gateway=self._action_gateway_for(self.repo),
+            actor_context=ActorContext(
+                actor="mission_runtime", project_id=mission.project_id
+            ),
+            action_gateway_factory=self._action_gateway_for,
             parser_dogfood_fixture=self.parser_dogfood_fixture,
             require_broker=True,
         )
@@ -169,6 +190,7 @@ class MissionRuntime:
                             "ok": result.ok,
                             "summary": result.summary,
                             "worker_id": result.worker_id,
+                            "action_receipt_ids": list(result.action_receipt_ids),
                         },
                     )
                     record.agents.append(
@@ -255,6 +277,13 @@ class MissionRuntime:
                 "summary": summary,
                 "changed_files": changed,
                 "worktree": shared_wt.to_dict() if shared_wt else None,
+                "action_receipt_ids": sorted(
+                    {
+                        receipt_id
+                        for worker_result in prior.values()
+                        for receipt_id in worker_result.action_receipt_ids
+                    }
+                ),
             }
             record.status = (
                 MissionStatus.COMPLETED.value if accepted else MissionStatus.FAILED.value

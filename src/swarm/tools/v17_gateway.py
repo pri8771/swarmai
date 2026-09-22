@@ -315,6 +315,16 @@ class ConsequentialToolGateway:
             finally:
                 raise cancelled
 
+    def execute_envelope_sync(
+        self, envelope: ActionEnvelope, *, context: ActorContext
+    ) -> ActionReceiptV17:
+        """Run one envelope from synchronous code when no event loop is active."""
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self.execute_envelope(envelope, context=context))
+        raise RuntimeError("sync_call_inside_running_loop")
+
     def _terminal_or_fail(self, envelope: ActionEnvelope) -> ActionReceiptV17:
         """R27a: a replay returns the original immutable receipt, never a re-mint."""
         terminal = self.store.terminal_receipt(

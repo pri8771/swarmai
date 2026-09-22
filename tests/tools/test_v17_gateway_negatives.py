@@ -80,14 +80,14 @@ async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
     adapter = LocalSandboxAdapter(
         load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
     )
-    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+    gw = _gw(adapter, project="proj_a", scopes={"fs.worktree"}, store=InMemoryEffectStore())
     env = _explicit_generations(
         adapter.normalize(
             {
                 "project_id": "proj_a",
                 "text": "hello",
                 "path": "note.txt",
-                "operation": "write_text",
+                "operation": "fs.write_text",
             }
         )
     )
@@ -440,9 +440,9 @@ async def test_filesystem_escape_denied(tmp_path: Path) -> None:
     adapter = LocalSandboxAdapter(
         load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
     )
-    gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+    gw = _gw(adapter, project="proj_a", scopes={"fs.worktree"}, store=InMemoryEffectStore())
     env = adapter.normalize({"project_id": "proj_a", "text": "x", "path": "../escape.txt"})
-    with pytest.raises(PermissionError, match="filesystem_path_escape"):
+    with pytest.raises(PermissionError, match="path_outside_root"):
         await gw.execute_envelope(env, context=_context())
 
 
@@ -467,7 +467,7 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
         )
     )
 
-    gw_local = _gw(local, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
+    gw_local = _gw(local, project="proj_a", scopes={"fs.worktree"}, store=InMemoryEffectStore())
     gw_api = _gw(
         api,
         project="proj_a",

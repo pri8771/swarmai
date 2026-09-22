@@ -16,8 +16,10 @@ import pytest
 from swarm.api.store import ProductStore
 from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.contracts.mission import Mission, SizeFeatures, TaskSpec
+from swarm.mission.action_boundary import local_worktree_gateway
 from swarm.mission.brokered_inference import build_local_mission_broker
 from swarm.mission.worker import RepoWorker
+from swarm.tools.fences import ActorContext
 
 
 def _seed_extract_mission(store: ProductStore, *, project_id: str = "proj_a") -> str:
@@ -152,6 +154,8 @@ def test_require_broker_blocks_direct_local_chat_fallback(tmp_path: Path) -> Non
         model="gemma3:4b",
         broker=None,
         project_id="proj_x",
+        action_gateway=local_worktree_gateway(tmp_path),
+        actor_context=ActorContext(actor="test", project_id="proj_x"),
         require_broker=True,
     )
 
@@ -173,6 +177,8 @@ def test_unregistered_route_is_broker_denial_without_local_chat(tmp_path: Path) 
         model="gemma3:4b",
         broker=broker,
         project_id="proj_x",
+        action_gateway=local_worktree_gateway(tmp_path),
+        actor_context=ActorContext(actor="test", project_id="proj_x"),
         require_broker=True,
     )
     task = TaskSpec(

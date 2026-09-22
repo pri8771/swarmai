@@ -5,14 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.mission._worker_support import make_worker
+
 from swarm.contracts.fixtures import sample_task
 from swarm.mission.inference import InferenceResult
-from swarm.mission.worker import GOOD_FIX, RepoWorker
+from swarm.mission.worker import GOOD_FIX
 
 
 def test_implement_does_not_apply_good_fix_on_model_failure(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
-    worker = RepoWorker(
+    worker = make_worker(
         repo=repo, worktree_root=tmp_path / "wt", parser_dogfood_fixture=True
     )
     task = sample_task().model_copy(

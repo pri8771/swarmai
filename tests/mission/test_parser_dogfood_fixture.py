@@ -6,13 +6,27 @@ from pathlib import Path
 from unittest.mock import patch
 
 from swarm.contracts.fixtures import sample_task
+from swarm.mission.action_boundary import local_worktree_gateway
 from swarm.mission.inference import InferenceResult
 from swarm.mission.worker import RepoWorker
+from swarm.tools.fences import ActorContext
+
+
+def _worker(repo: Path, worktree_root: Path, *, fixture: bool = False) -> RepoWorker:
+    return RepoWorker(
+        repo=repo,
+        worktree_root=worktree_root,
+        project_id="proj_test",
+        action_gateway=local_worktree_gateway(repo),
+        action_gateway_factory=local_worktree_gateway,
+        actor_context=ActorContext(actor="test", project_id="proj_test"),
+        parser_dogfood_fixture=fixture,
+    )
 
 
 def test_default_worker_does_not_hardwire_parser_dogfood(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = _worker(repo, tmp_path / "wt")
     assert worker.parser_dogfood_fixture is False
     task = sample_task().model_copy(
         update={
@@ -31,9 +45,7 @@ def test_default_worker_does_not_hardwire_parser_dogfood(tmp_path: Path) -> None
 
 def test_fixture_flag_enables_parser_dogfood_path(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
-    worker = RepoWorker(
-        repo=repo, worktree_root=tmp_path / "wt", parser_dogfood_fixture=True
-    )
+    worker = _worker(repo, tmp_path / "wt", fixture=True)
     task = sample_task().model_copy(
         update={"task_family": "implement", "id": "tsk_fixture"}
     )
@@ -54,7 +66,7 @@ def test_fixture_flag_enables_parser_dogfood_path(tmp_path: Path) -> None:
 
 def test_inspect_without_fixture_does_not_auto_select_parser(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = _worker(repo, tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "inspect",

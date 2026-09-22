@@ -6,11 +6,12 @@ import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.mission._worker_support import make_worker
+
 from swarm.contracts.fixtures import sample_task
 from swarm.mission.inference import InferenceResult
 from swarm.mission.worker import (
     GOOD_FIX,
-    RepoWorker,
     _extract_python_file,
 )
 
@@ -72,7 +73,7 @@ def test_extract_accepts_raw_and_fenced_python() -> None:
 def test_generic_raw_source_materializes_nonempty_diff(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
     primary_before = (repo / "widgets" / "counter.py").read_text(encoding="utf-8")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
@@ -102,7 +103,7 @@ def test_generic_raw_source_materializes_nonempty_diff(tmp_path: Path) -> None:
 
 def test_generic_fenced_source_materializes(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
@@ -130,7 +131,7 @@ def test_generic_fenced_source_materializes(tmp_path: Path) -> None:
 
 def test_malformed_output_rejected_without_write(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
@@ -184,7 +185,7 @@ def test_truncated_rewrite_rejected_without_write(tmp_path: Path) -> None:
         check=True,
         capture_output=True,
     )
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
@@ -218,7 +219,7 @@ def test_truncated_rewrite_rejected_without_write(tmp_path: Path) -> None:
 
 def test_invalid_syntax_rejected_without_write(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
@@ -259,7 +260,7 @@ def test_invalid_syntax_rejected_without_write(tmp_path: Path) -> None:
 def test_noop_candidate_not_summarized_as_implement_applied(tmp_path: Path) -> None:
     repo = _init_temp_repo(tmp_path / "heldout_repo")
     original = (repo / "widgets" / "counter.py").read_text(encoding="utf-8")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     task = sample_task().model_copy(
         update={
             "task_family": "implement",
