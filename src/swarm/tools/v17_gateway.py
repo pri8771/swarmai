@@ -21,6 +21,7 @@ from swarm.tools.adapters.base import IntegrationAdapter
 from swarm.tools.effects import (
     DurableEffectRepository,
     EffectConflictError,
+    EffectStoreError,
     InMemoryEffectStore,
 )
 
@@ -123,38 +124,35 @@ class ConsequentialToolGateway:
         # lease / cancel fences
         self._check_generations(envelope)
 
-        # Reserve early so succeeded effects short-circuit without re-consuming approval.
-        effect = self.store.reserve(envelope)
-        if effect["state"] == "succeeded":
-            # R27a: a replay returns the original immutable receipt, never a re-mint.
-            terminal = self.store.terminal_receipt(
-                project_id=envelope.project_id, effect_key=envelope.effect_key
-            )
-            if terminal is None:
-                raise ReconciliationRequiredError("succeeded_effect_missing_receipt")
-            return terminal
-        if effect["state"] == "unknown":
-            return await self._reconcile_unknown(envelope, effect)
+        # Read-only replay/unknown short-circuit BEFORE approval validation, so a
+        # succeeded effect replays even after its approval expired (R27c).
+        existing = self.store.get(project_id=envelope.project_id, effect_key=envelope.effect_key)
+        if existing is not None:
+            if existing["state"] == "succeeded":
+                return self._terminal_or_fail(envelope)
+            if existing["state"] == "unknown":
+                return await self._reconcile_unknown(envelope, existing)
 
-        # 4) require exact approval if needed (only for new execution)
-        self._require_exact_approval(envelope)
+        # 4) exact approval is validated before any durable row exists; a denied
+        # request leaves nothing behind.
+        self._require_exact_approval(envelope, existing)
 
+        # 5) reserve, then the committed admission point (fences + approval
+        # consumption + single-winner CAS in one transaction).
+        self.store.reserve(envelope)
         try:
-            self.store.mark_executing(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                executor_id=new_id("exe_"),
+            effect = self.store.begin_execution(
+                envelope, executor_id=new_id("exe_"), fence_reader=None
             )
         except EffectConflictError as exc:
             if "unknown" in str(exc):
                 raise ReconciliationRequiredError(str(exc)) from exc
             if "succeeded" in str(exc):
-                terminal = self.store.terminal_receipt(
-                    project_id=envelope.project_id, effect_key=envelope.effect_key
-                )
-                if terminal is None:
-                    raise ReconciliationRequiredError("succeeded_effect_missing_receipt") from exc
-                return terminal
+                return self._terminal_or_fail(envelope)
+            raise
+        except EffectStoreError as exc:
+            if str(exc) == "approval_not_consumable":
+                raise ApprovalInvalidError("approval_expired_or_revoked_or_exhausted") from exc
             raise
 
         # 6-7) pre observe, execute, post observe
@@ -169,104 +167,102 @@ class ConsequentialToolGateway:
             result = self.adapter.execute(envelope)
         except Exception as exc:  # noqa: BLE001
             post = {"error": str(exc)}
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="failed",
-                post_observation=post,
-            )
-            receipt = self._build_receipt(
+            return self._finalize(
                 envelope,
-                effect_id=effect["effect_id"],
+                effect,
+                state="failed",
                 outcome="failed",
                 pre=pre,
                 post=post,
                 started=started,
             )
-            return self.store.store_receipt(receipt)
 
         post = self.adapter.observe_post_state(envelope, result)
         outcome = self._outcome_from_result(result)
 
         if outcome == "unknown":
             # 8) reconcile path — do not mark succeeded; never blind retry later.
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="unknown",
-                post_observation=post,
-                external_id=result.get("external_id"),
-                reconciliation={"status": "pending", "steps": ["poll_external", "confirm"]},
-            )
-            receipt = self._build_receipt(
+            return self._finalize(
                 envelope,
-                effect_id=effect["effect_id"],
+                effect,
+                state="unknown",
                 outcome="unknown",
                 pre=pre,
                 post=post,
                 started=started,
-                reconciliation_state="pending",
                 external_id=result.get("external_id"),
+                reconciliation={"status": "pending", "steps": ["poll_external", "confirm"]},
+                reconciliation_state="pending",
             )
-            return self.store.store_receipt(receipt)
-
-        if outcome == "denied":
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="denied",
-                post_observation=post,
-            )
-            receipt = self._build_receipt(
+        if outcome in {"denied", "cancelled"}:
+            return self._finalize(
                 envelope,
-                effect_id=effect["effect_id"],
-                outcome="denied",
+                effect,
+                state=outcome,
+                outcome=outcome,
                 pre=pre,
                 post=post,
                 started=started,
             )
-            return self.store.store_receipt(receipt)
-
-        if outcome == "cancelled":
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="cancelled",
-                post_observation=post,
-            )
-            receipt = self._build_receipt(
-                envelope,
-                effect_id=effect["effect_id"],
-                outcome="cancelled",
-                pre=pre,
-                post=post,
-                started=started,
-            )
-            return self.store.store_receipt(receipt)
-
-        # succeeded
-        self.store.finalize(
-            project_id=envelope.project_id,
-            effect_key=envelope.effect_key,
-            state="succeeded",
-            post_observation=post,
-            external_id=result.get("external_id"),
-        )
-        if envelope.approval_id:
-            self.store.record_approval_use(envelope.approval_id)
-        # 9) expose only authorized artifacts
-        artifacts = self._authorized_artifacts(envelope, post)
-        receipt = self._build_receipt(
+        # succeeded — approval use was consumed at admission (begin_execution), never here.
+        return self._finalize(
             envelope,
-            effect_id=effect["effect_id"],
+            effect,
+            state="succeeded",
             outcome="succeeded",
             pre=pre,
             post=post,
             started=started,
             external_id=result.get("external_id"),
+            artifacts=self._authorized_artifacts(envelope, post),
+        )
+
+    def _terminal_or_fail(self, envelope: ActionEnvelope) -> ActionReceiptV17:
+        """R27a: a replay returns the original immutable receipt, never a re-mint."""
+        terminal = self.store.terminal_receipt(
+            project_id=envelope.project_id, effect_key=envelope.effect_key
+        )
+        if terminal is None:
+            raise ReconciliationRequiredError("succeeded_effect_missing_receipt")
+        return terminal
+
+    def _finalize(
+        self,
+        envelope: ActionEnvelope,
+        effect: dict[str, Any],
+        *,
+        state: str,
+        outcome: str,
+        pre: dict[str, Any],
+        post: dict[str, Any],
+        started: Any = None,
+        external_id: str | None = None,
+        reconciliation: dict[str, Any] | None = None,
+        reconciliation_state: str = "none",
+        artifacts: list[str] | None = None,
+        state_reason: str | None = None,
+    ) -> ActionReceiptV17:
+        receipt = self._build_receipt(
+            envelope,
+            effect_id=effect["effect_id"],
+            outcome=outcome,
+            pre=pre,
+            post=post,
+            started=started,
+            reconciliation_state=reconciliation_state,
+            external_id=external_id,
             artifacts=artifacts,
         )
-        return self.store.store_receipt(receipt)
+        return self.store.finalize_with_receipt(
+            project_id=envelope.project_id,
+            effect_key=envelope.effect_key,
+            state=state,
+            state_reason=state_reason,
+            post_observation=post,
+            external_id=external_id,
+            reconciliation=reconciliation,
+            receipt=receipt,
+        )
 
     async def reconcile(self, envelope: ActionEnvelope) -> ActionReceiptV17:
         envelope.ensure_hashes()
@@ -283,43 +279,19 @@ class ConsequentialToolGateway:
         )
         result = self.adapter.reconcile(envelope, prior)
         state = str(result.get("state", "unknown"))
-        if state == "succeeded":
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="succeeded",
-                post_observation=result,
-                external_id=result.get("external_id"),
-                reconciliation={"status": "reconciled", "result": result},
-            )
-            receipt = self._build_receipt(
+        if state in {"succeeded", "failed"}:
+            return self._finalize(
                 envelope,
-                effect_id=effect["effect_id"],
-                outcome="succeeded",
+                effect,
+                state=state,
+                outcome=state,
                 pre=effect.get("pre_observation") or {},
                 post=result,
                 started=effect.get("started_at"),
-                reconciliation_state="reconciled",
-                external_id=result.get("external_id"),
-            )
-            return self.store.store_receipt(receipt)
-        if state == "failed":
-            self.store.finalize(
-                project_id=envelope.project_id,
-                effect_key=envelope.effect_key,
-                state="failed",
-                post_observation=result,
+                external_id=result.get("external_id") if state == "succeeded" else None,
                 reconciliation={"status": "reconciled", "result": result},
-            )
-            receipt = self._build_receipt(
-                envelope,
-                effect_id=effect["effect_id"],
-                outcome="failed",
-                pre=effect.get("pre_observation") or {},
-                post=result,
                 reconciliation_state="reconciled",
             )
-            return self.store.store_receipt(receipt)
         # Still unknown — do not execute again.
         raise ReconciliationRequiredError("external_outcome_still_unknown")
 
@@ -343,7 +315,9 @@ class ConsequentialToolGateway:
                 if not envelope.approval_id:
                     raise PolicyDeniedError("consequential_requires_approval")
 
-    def _require_exact_approval(self, envelope: ActionEnvelope) -> None:
+    def _require_exact_approval(
+        self, envelope: ActionEnvelope, existing: dict[str, Any] | None = None
+    ) -> None:
         needs = envelope.side_effect_class in {"consequential", "irreversible"} or (
             self._risk_rank.get(envelope.risk_class, 0)
             > self._risk_rank.get(self.max_risk_without_approval, 0)
@@ -357,7 +331,16 @@ class ConsequentialToolGateway:
             raise ApprovalInvalidError("unknown_approval")
         if grant.project_id != envelope.project_id:
             raise ApprovalInvalidError("approval_project_mismatch")
-        if not grant.is_active():
+        # Revocation and expiry always deny. Usage is consumed exactly once per effect
+        # at admission (begin_execution); a re-attempt of the same effect that already
+        # consumed this grant is not a second use. The durable UPDATE remains the
+        # authority; this is the read-only pre-check.
+        consumed_by_this_effect = (
+            existing is not None
+            and existing.get("approval_consumed_at") is not None
+            and existing.get("approval_id") == grant.approval_id
+        )
+        if not grant.is_active(ignore_usage=consumed_by_this_effect):
             raise ApprovalInvalidError("approval_expired_or_revoked_or_exhausted")
         if grant.integration_id != envelope.integration_id:
             raise ApprovalInvalidError("approval_integration_mismatch")

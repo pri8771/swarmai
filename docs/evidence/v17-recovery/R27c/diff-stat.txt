@@ -1,0 +1,7 @@
+ src/swarm/contracts/actions.py                     |   4 +-
+ src/swarm/tools/effects.py                         | 676 +++++++++++++--------
+ src/swarm/tools/v17_gateway.py                     | 225 ++++---
+ .../integration/db/test_action_receipts_durable.py | 140 ++---
+ .../db/test_effect_reservation_atomic.py           | 127 ++--
+ tests/tools/test_v17_gateway_negatives.py          |  11 +-
+ 6 files changed, 648 insertions(+), 535 deletions(-)

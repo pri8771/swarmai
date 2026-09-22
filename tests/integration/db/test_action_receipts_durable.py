@@ -74,60 +74,50 @@ def _gateway(adapter: ApiMcpAdapter, store: DurableEffectRepository, project: st
 
 async def _execute_once(factory, project: str, body: str):
     """Approve + execute one consequential MCP echo; return (envelope, receipt, adapter)."""
-    sess = factory()
-    try:
-        adapter = ApiMcpAdapter()
-        store = DurableEffectRepository(sess)
-        gw = _gateway(adapter, store, project)
-        env = adapter.normalize(
-            {"project_id": project, "destination": "mcp://echo/default", "body": body}
-        )
-        env.approval_id = gw.make_approval(env).approval_id
-        receipt = await gw.execute_envelope(env)
-        sess.commit()
-        return env, receipt, adapter
-    finally:
-        sess.close()
+    adapter = ApiMcpAdapter()
+    store = DurableEffectRepository(factory)
+    gw = _gateway(adapter, store, project)
+    env = adapter.normalize(
+        {"project_id": project, "destination": "mcp://echo/default", "body": body}
+    )
+    env.approval_id = gw.make_approval(env).approval_id
+    receipt = await gw.execute_envelope(env)
+    return env, receipt, adapter
 
 
 @pytest.mark.asyncio
 async def test_receipt_survives_new_repository_instance(factory) -> None:
     env, receipt, _ = await _execute_once(factory, "proj_a", "r27a-durable")
     assert receipt.outcome == "succeeded"
-    sess = factory()
-    try:
-        fresh = DurableEffectRepository(sess)
-        again = fresh.get_receipt(env.action_id)
-        assert again is not None
-        assert again.receipt_id == receipt.receipt_id
-        assert again.attempt_number == 1
-        listed = fresh.list_receipts(project_id="proj_a", effect_key=env.effect_key)
-        assert [r.receipt_id for r in listed] == [receipt.receipt_id]
-        terminal = fresh.terminal_receipt(project_id="proj_a", effect_key=env.effect_key)
-        assert terminal is not None and terminal.receipt_id == receipt.receipt_id
-    finally:
-        sess.close()
+    fresh = DurableEffectRepository(factory)
+    again = fresh.get_receipt(env.action_id)
+    assert again is not None
+    assert again.receipt_id == receipt.receipt_id
+    assert again.attempt_number == 1
+    listed = fresh.list_receipts(project_id="proj_a", effect_key=env.effect_key)
+    assert [r.receipt_id for r in listed] == [receipt.receipt_id]
+    terminal = fresh.terminal_receipt(project_id="proj_a", effect_key=env.effect_key)
+    assert terminal is not None and terminal.receipt_id == receipt.receipt_id
 
 
 @pytest.mark.asyncio
 async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
+    adapter = ApiMcpAdapter()
+    store = DurableEffectRepository(factory)
+    gw = _gateway(adapter, store, "proj_a")
+    req = {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay"}
+    env = adapter.normalize(req)
+    env.approval_id = gw.make_approval(env).approval_id
+    first = await gw.execute_envelope(env)
+    env2 = adapter.normalize(req)
+    env2.approval_id = env.approval_id
+    second = await gw.execute_envelope(env2)
+    assert second.receipt_id == first.receipt_id
+    assert second.finished_at == first.finished_at
+    assert second.attempt_refs == first.attempt_refs
+    assert adapter.call_count == 1
     sess = factory()
     try:
-        adapter = ApiMcpAdapter()
-        store = DurableEffectRepository(sess)
-        gw = _gateway(adapter, store, "proj_a")
-        req = {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay"}
-        env = adapter.normalize(req)
-        env.approval_id = gw.make_approval(env).approval_id
-        first = await gw.execute_envelope(env)
-        sess.commit()
-        env2 = adapter.normalize(req)
-        env2.approval_id = env.approval_id
-        second = await gw.execute_envelope(env2)
-        assert second.receipt_id == first.receipt_id
-        assert second.finished_at == first.finished_at
-        assert second.attempt_refs == first.attempt_refs
-        assert adapter.call_count == 1
         rows = sess.scalars(
             select(ActionReceiptRow).where(ActionReceiptRow.effect_key == env.effect_key)
         ).all()
@@ -139,24 +129,18 @@ async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
 @pytest.mark.asyncio
 async def test_duplicate_receipt_attempt_rejected(factory) -> None:
     env, receipt, _ = await _execute_once(factory, "proj_a", "dup-receipt")
+    store = DurableEffectRepository(factory)
+    with pytest.raises(EffectConflictError, match="receipt_already_recorded"):
+        store.store_receipt(receipt)  # same receipt_id
+    # A second distinct receipt for the same effect gets attempt_number 2, never 1 again.
+    second = store.store_receipt(receipt.model_copy(update={"receipt_id": "arc_manual_2"}))
+    assert second.attempt_number == 2
+    listed = store.list_receipts(project_id="proj_a", effect_key=env.effect_key)
+    assert [r.attempt_number for r in listed] == [1, 2]
+    # Forcing a duplicate (effect_id, attempt_number) at the row level is rejected by the
+    # unique constraint.
     sess = factory()
     try:
-        store = DurableEffectRepository(sess)
-        with pytest.raises(EffectConflictError, match="receipt_already_recorded"):
-            store.store_receipt(receipt)  # same receipt_id
-    finally:
-        sess.close()
-    sess = factory()
-    try:
-        store = DurableEffectRepository(sess)
-        # A second distinct receipt for the same effect gets attempt_number 2, never 1 again.
-        second = store.store_receipt(receipt.model_copy(update={"receipt_id": "arc_manual_2"}))
-        sess.commit()
-        assert second.attempt_number == 2
-        listed = store.list_receipts(project_id="proj_a", effect_key=env.effect_key)
-        assert [r.attempt_number for r in listed] == [1, 2]
-        # Forcing a duplicate (effect_id, attempt_number) at the row level is rejected by
-        # the unique constraint and surfaces as the same conflict error.
         clash = ActionReceiptRow(
             receipt_id="arc_manual_clash",
             project_id="proj_a",
@@ -180,14 +164,10 @@ async def test_duplicate_receipt_attempt_rejected(factory) -> None:
 @pytest.mark.asyncio
 async def test_project_b_cannot_list_project_a_receipts(factory) -> None:
     env, receipt, _ = await _execute_once(factory, "proj_a", "isolation")
-    sess = factory()
-    try:
-        store = DurableEffectRepository(sess)
-        assert store.list_receipts(project_id="proj_b", effect_key=env.effect_key) == []
-        assert store.terminal_receipt(project_id="proj_b", effect_key=env.effect_key) is None
-        assert store.list_receipts(project_id="proj_a", effect_key=env.effect_key) != []
-    finally:
-        sess.close()
+    store = DurableEffectRepository(factory)
+    assert store.list_receipts(project_id="proj_b", effect_key=env.effect_key) == []
+    assert store.terminal_receipt(project_id="proj_b", effect_key=env.effect_key) is None
+    assert store.list_receipts(project_id="proj_a", effect_key=env.effect_key) != []
 
 
 @pytest.mark.asyncio
@@ -195,24 +175,16 @@ async def test_succeeded_effect_without_receipt_fails_closed(engine, factory) ->
     env, receipt, _ = await _execute_once(factory, "proj_a", "orphan-succeeded")
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM action_receipts"))
-    sess = factory()
-    try:
-        adapter = ApiMcpAdapter()
-        store = DurableEffectRepository(sess)
-        gw = _gateway(adapter, store, "proj_a")
-        env2 = adapter.normalize(
-            {
-                "project_id": "proj_a",
-                "destination": "mcp://echo/default",
-                "body": "orphan-succeeded",
-            }
-        )
-        env2.approval_id = env.approval_id
-        with pytest.raises(ReconciliationRequiredError, match="succeeded_effect_missing_receipt"):
-            await gw.execute_envelope(env2)
-        assert adapter.call_count == 0
-    finally:
-        sess.close()
+    adapter = ApiMcpAdapter()
+    store = DurableEffectRepository(factory)
+    gw = _gateway(adapter, store, "proj_a")
+    env2 = adapter.normalize(
+        {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "orphan-succeeded"}
+    )
+    env2.approval_id = env.approval_id
+    with pytest.raises(ReconciliationRequiredError, match="succeeded_effect_missing_receipt"):
+        await gw.execute_envelope(env2)
+    assert adapter.call_count == 0
 
 
 def test_single_alembic_head_after_upgrade(engine) -> None:

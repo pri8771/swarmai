@@ -100,13 +100,13 @@ class ApprovalGrant(StrictModel):
     constraints: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=utc_now)
 
-    def is_active(self, *, now: datetime | None = None) -> bool:
+    def is_active(self, *, now: datetime | None = None, ignore_usage: bool = False) -> bool:
         clock = now or utc_now()
         if self.revoked_at is not None:
             return False
         if self.expires_at <= clock:
             return False
-        if self.used_count >= self.max_effect_count:
+        if not ignore_usage and self.used_count >= self.max_effect_count:
             return False
         return True
 

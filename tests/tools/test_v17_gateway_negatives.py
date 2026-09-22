@@ -373,10 +373,9 @@ async def test_durable_effect_repository_reserve_finalize_idempotent() -> None:
 
     Base.metadata.create_all(eng)
     factory = make_session_factory(eng)
-    sess = factory()
     try:
         adapter = ApiMcpAdapter()
-        store = DurableEffectRepository(sess)
+        store = DurableEffectRepository(factory)
         gw = _gw(
             adapter,
             project="proj_a",
@@ -392,7 +391,6 @@ async def test_durable_effect_repository_reserve_finalize_idempotent() -> None:
         env.approval_id = gw.make_approval(env).approval_id
         first = await gw.execute_envelope(env)
         assert first.outcome == "succeeded"
-        sess.commit()
         env2 = adapter.normalize(req)
         env2.approval_id = env.approval_id
         second = await gw.execute_envelope(env2)
@@ -402,7 +400,8 @@ async def test_durable_effect_repository_reserve_finalize_idempotent() -> None:
         assert row is not None
         assert row["state"] == "succeeded"
     finally:
-        sess.execute(text("TRUNCATE action_effects, approvals RESTART IDENTITY CASCADE"))
-        sess.commit()
-        sess.close()
+        with eng.begin() as conn:
+            conn.execute(
+                text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
+            )
         eng.dispose()
