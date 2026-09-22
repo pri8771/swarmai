@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `1bbf316a0b370c29299f0b91205ffdf2d85bae67`
-- Coordination SHA: `310f3344678361e2e336d9b32adf74a4fcc87b8c`
-- Updated: `2026-09-22T01:29:15Z`
-- Trigger: `scheduler`
+- Branch SHA: `c25182dfa5b03f3b9a4409282b6ea465484fe79f`
+- Coordination SHA: `a780d588818ed52c91dac03a3a95b24dc4e8e8b5`
+- Updated: `2026-09-22T01:33:04Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `R30a`
-- Current artifact: `ART-V17-INTEGRATION-MANIFEST`
-- Last meaningful activity: `2026-09-22T01:27:13Z`
+- Current packet: `R02a`
+- Current artifact: `ART-V14-REAL-E2E`
+- Last meaningful activity: `2026-09-22T01:33:03Z`
 - Spend USD: `0.0`
 - Blocker: REV-R27C (lead diff review before R27e/R28a); EXT-ACTIONS-BILLING; EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
 
 ## Update
 
-R27d impl_complete: pushed 1b9afc5 (feat) + 1bbf316 (bind). Approvals insert-only, monotonic revocation, project-filtered reads, legacy NULL rows non-operational. 6 tests; full suite 422 passed/2 skipped. R27 chain a-d done; REV-R27C hold gates R27e/R28a. Taking independent R30a (live fixture service).
+R17a live_checkpointed: CP3 run cp3-20260922T013226Z on e5bd635 — 9/9 requirements incl. cancellation_generation_stale fence and 20/20 concurrent duplicate-accept iterations across spawned processes; evidence commit c25182d. Finding: cancel_active_lease does not bump durable mission generation (follow-up packet). Next: R02a red->green defect-proof gate.
 
 ## Next
 
-R30a live local fixture service + markers; then R17a CP3 gaps; R02a defect-proof gate
+R02a prove_defect gate; then R30a fixture; REV-R27C still gates R27e/R28a
