@@ -726,15 +726,21 @@
       "fixes": [
         "W1"
       ],
-      "review_hold": "R28d live_local evidence remains held pending R28d-2 engineering review and explicit applicable live/model release",
+      "review_hold": "parent R28d remains incomplete until genuine live_local evidence is independently reviewed",
       "assignee": "codex",
-      "active_slice": "R28d-2 engineering wiring only",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R28D2_20260922.md",
+      "active_slice": "R28d live_local evidence",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28D_LIVE_LOCAL_20260922.md",
       "r28d1": {
         "status": "impl_complete",
         "implementation_ref": "codex/swarm-r28d1-local-sandbox-20260922@a2cfb3c1d5e326a1b15d7d23cfe3c91ea2e40bf4",
         "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28D1-LEAD-REVIEW.md",
         "review_decision": "bounded_slice_accepted"
+      },
+      "r28d2": {
+        "status": "engineering_accepted",
+        "implementation_ref": "codex/swarm-r28d1-local-sandbox-20260922@6dbf8c43463cbdbd8c87561af2abcdde59969765",
+        "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28D2-LEAD-REVIEW.md",
+        "review_decision": "bounded_engineering_slice_accepted"
       }
     },
     {
