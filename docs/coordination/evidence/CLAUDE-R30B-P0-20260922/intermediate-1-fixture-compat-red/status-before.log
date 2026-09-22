@@ -1,0 +1,4 @@
+ M src/swarm/contracts/actions.py
+ M src/swarm/tools/v17_gateway.py
+?? tests/integration/db/test_execution_attempt_context.py
+?? tests/tools/test_gateway_envelope_integrity.py

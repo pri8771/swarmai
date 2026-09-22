@@ -1,0 +1,261 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+___ test_reload_reconciles_persisted_attempt_then_retries_with_next_attempt ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r30b_p0_87401_1790100046?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_reload_reconciles_persisted_attempt_then_retries_with_next_attempt(factory):
+        first_adapter = AttemptAdapter(uncertain=True)
+        gw = _gateway(first_adapter, factory)
+        env = bind_lease(
+            factory, first_adapter.normalize({"project_id": "proj_a", "body": "immutable"})
+        )
+        env.effect_key = "r30b:mission:custom-effect"
+        env.idempotency_key = "r30b:logical-stable-key"
+        env.approval_id = gw.make_approval(env, context=_context(), max_effect_count=1).approval_id
+        serialized = env.model_dump_json()
+        first = await gw.execute_envelope(env, context=_context())
+        assert first.outcome == "unknown"
+>       assert first_adapter.phases == [("pre", 1), ("execute", 1), ("post", 1)]
+E       AssertionError: assert [('pre', None...'post', None)] == [('pre', 1), ..., ('post', 1)]
+E         
+E         At index 0 diff: ('pre', None) != ('pre', 1)
+E         Use -v to get more diff
+
+tests/integration/db/test_execution_attempt_context.py:66: AssertionError
+_ test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-execute_envelope] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1095fe750>
+entry = 'execute_envelope', field = 'normalized_payload'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        update = (
+            {field: {"body": "changed"}}
+            if field == "normalized_payload"
+            else {field: "mcp://echo/changed"}
+        )
+        altered = env.model_copy(update=update)
+    
+        def forbidden(*args, **kwargs):
+            pytest.fail("authority or adapter boundary reached before integrity denial")
+    
+        monkeypatch.setattr(adapter, "validate", forbidden)
+        monkeypatch.setattr(gw, "_authorize_policy", forbidden)
+        monkeypatch.setattr(gw.store, "get", forbidden)
+        monkeypatch.setattr(gw.store, "reserve", forbidden)
+        monkeypatch.setattr(gw.store, "get_approval", forbidden)
+        with pytest.raises(ToolAuthorizationError, match="payload_hash_mismatch"):
+>           await getattr(gw, entry)(altered, context=CONTEXT)
+
+tests/tools/test_gateway_envelope_integrity.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:150: in execute_envelope
+    adapter.validate(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (ActionEnvelope(schema_version='1.0', action_id='act_2db3c17ddcb74276a11a3976f3904e41', mission_id=None, task_id=None,...None, created_at=datetime.datetime(2026, 9, 22, 18, 0, 47, 569654, tzinfo=datetime.timezone.utc), timeout_seconds=30),)
+kwargs = {}
+
+    def forbidden(*args, **kwargs):
+>       pytest.fail("authority or adapter boundary reached before integrity denial")
+E       Failed: authority or adapter boundary reached before integrity denial
+
+tests/tools/test_gateway_envelope_integrity.py:80: Failed
+_ test_stale_hash_rejects_before_validation_policy_or_store[normalized_payload-reconcile] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109c5b2f0>
+entry = 'reconcile', field = 'normalized_payload'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        update = (
+            {field: {"body": "changed"}}
+            if field == "normalized_payload"
+            else {field: "mcp://echo/changed"}
+        )
+        altered = env.model_copy(update=update)
+    
+        def forbidden(*args, **kwargs):
+            pytest.fail("authority or adapter boundary reached before integrity denial")
+    
+        monkeypatch.setattr(adapter, "validate", forbidden)
+        monkeypatch.setattr(gw, "_authorize_policy", forbidden)
+        monkeypatch.setattr(gw.store, "get", forbidden)
+        monkeypatch.setattr(gw.store, "reserve", forbidden)
+        monkeypatch.setattr(gw.store, "get_approval", forbidden)
+        with pytest.raises(ToolAuthorizationError, match="payload_hash_mismatch"):
+>           await getattr(gw, entry)(altered, context=CONTEXT)
+
+tests/tools/test_gateway_envelope_integrity.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:389: in reconcile
+    adapter.validate(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (ActionEnvelope(schema_version='1.0', action_id='act_dbc6d19d0c0e44099099485e69523c68', mission_id=None, task_id=None,...None, created_at=datetime.datetime(2026, 9, 22, 18, 0, 47, 576341, tzinfo=datetime.timezone.utc), timeout_seconds=30),)
+kwargs = {}
+
+    def forbidden(*args, **kwargs):
+>       pytest.fail("authority or adapter boundary reached before integrity denial")
+E       Failed: authority or adapter boundary reached before integrity denial
+
+tests/tools/test_gateway_envelope_integrity.py:80: Failed
+_ test_stale_hash_rejects_before_validation_policy_or_store[destination-execute_envelope] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109c5aba0>
+entry = 'execute_envelope', field = 'destination'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        update = (
+            {field: {"body": "changed"}}
+            if field == "normalized_payload"
+            else {field: "mcp://echo/changed"}
+        )
+        altered = env.model_copy(update=update)
+    
+        def forbidden(*args, **kwargs):
+            pytest.fail("authority or adapter boundary reached before integrity denial")
+    
+        monkeypatch.setattr(adapter, "validate", forbidden)
+        monkeypatch.setattr(gw, "_authorize_policy", forbidden)
+        monkeypatch.setattr(gw.store, "get", forbidden)
+        monkeypatch.setattr(gw.store, "reserve", forbidden)
+        monkeypatch.setattr(gw.store, "get_approval", forbidden)
+        with pytest.raises(ToolAuthorizationError, match="payload_hash_mismatch"):
+>           await getattr(gw, entry)(altered, context=CONTEXT)
+
+tests/tools/test_gateway_envelope_integrity.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:150: in execute_envelope
+    adapter.validate(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (ActionEnvelope(schema_version='1.0', action_id='act_58ee7d361c224c2893f740469465679c', mission_id=None, task_id=None,...None, created_at=datetime.datetime(2026, 9, 22, 18, 0, 47, 581613, tzinfo=datetime.timezone.utc), timeout_seconds=30),)
+kwargs = {}
+
+    def forbidden(*args, **kwargs):
+>       pytest.fail("authority or adapter boundary reached before integrity denial")
+E       Failed: authority or adapter boundary reached before integrity denial
+
+tests/tools/test_gateway_envelope_integrity.py:80: Failed
+_ test_stale_hash_rejects_before_validation_policy_or_store[destination-reconcile] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109cb9400>
+entry = 'reconcile', field = 'destination'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("entry", ["execute_envelope", "reconcile"])
+    @pytest.mark.parametrize("field", ["normalized_payload", "destination"])
+    async def test_stale_hash_rejects_before_validation_policy_or_store(monkeypatch, entry, field):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        update = (
+            {field: {"body": "changed"}}
+            if field == "normalized_payload"
+            else {field: "mcp://echo/changed"}
+        )
+        altered = env.model_copy(update=update)
+    
+        def forbidden(*args, **kwargs):
+            pytest.fail("authority or adapter boundary reached before integrity denial")
+    
+        monkeypatch.setattr(adapter, "validate", forbidden)
+        monkeypatch.setattr(gw, "_authorize_policy", forbidden)
+        monkeypatch.setattr(gw.store, "get", forbidden)
+        monkeypatch.setattr(gw.store, "reserve", forbidden)
+        monkeypatch.setattr(gw.store, "get_approval", forbidden)
+        with pytest.raises(ToolAuthorizationError, match="payload_hash_mismatch"):
+>           await getattr(gw, entry)(altered, context=CONTEXT)
+
+tests/tools/test_gateway_envelope_integrity.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:389: in reconcile
+    adapter.validate(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = (ActionEnvelope(schema_version='1.0', action_id='act_c542664e7fb746b4be093c5ae1cce616', mission_id=None, task_id=None,...None, created_at=datetime.datetime(2026, 9, 22, 18, 0, 47, 587498, tzinfo=datetime.timezone.utc), timeout_seconds=30),)
+kwargs = {}
+
+    def forbidden(*args, **kwargs):
+>       pytest.fail("authority or adapter boundary reached before integrity denial")
+E       Failed: authority or adapter boundary reached before integrity denial
+
+tests/tools/test_gateway_envelope_integrity.py:80: Failed
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[False] _
+
+empty_hash = False
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        expected_hash = env.payload_hash
+        env = env.model_copy(
+            update={
+                "effect_key": "custom:mission:task:1",
+                "idempotency_key": "stable-key",
+                "execution_attempt": 999,
+            }
+        )
+        if empty_hash:
+            env.payload_hash = ""
+        receipt = await gw.execute_envelope(env, context=CONTEXT)
+        assert receipt.outcome == "succeeded"
+>       assert adapter.attempts == [("pre", 1), ("execute", 1), ("post", 1)]
+E       AssertionError: assert [('pre', 999)...('post', 999)] == [('pre', 1), ..., ('post', 1)]
+E         
+E         At index 0 diff: ('pre', 999) != ('pre', 1)
+E         Use -v to get more diff
+
+tests/tools/test_gateway_envelope_integrity.py:110: AssertionError
+_ test_custom_key_and_durable_attempt_override_preserve_logical_identity[True] _
+
+empty_hash = True
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("empty_hash", [False, True])
+    async def test_custom_key_and_durable_attempt_override_preserve_logical_identity(empty_hash):
+        adapter = RecordingAdapter()
+        gw = gateway(adapter)
+        env = envelope(adapter)
+        expected_hash = env.payload_hash
+        env = env.model_copy(
+            update={
+                "effect_key": "custom:mission:task:1",
+                "idempotency_key": "stable-key",
+                "execution_attempt": 999,
+            }
+        )
+        if empty_hash:
+            env.payload_hash = ""
+        receipt = await gw.execute_envelope(env, context=CONTEXT)
+        assert receipt.outcome == "succeeded"
+>       assert adapter.attempts == [("pre", 1), ("execute", 1), ("post", 1)]
+E       AssertionError: assert [('pre', 999)...('post', 999)] == [('pre', 1), ..., ('post', 1)]
+E         
+E         At index 0 diff: ('pre', 999) != ('pre', 1)
+E         Use -v to get more diff
+
+tests/tools/test_gateway_envelope_integrity.py:110: AssertionError
+7 failed in 0.44s

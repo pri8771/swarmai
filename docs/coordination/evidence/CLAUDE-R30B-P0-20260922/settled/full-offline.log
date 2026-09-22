@@ -1,0 +1,100 @@
+........................................................................ [ 11%]
+......................................................ssssssssssssssssss [ 22%]
+sssssssssssssssssssssssss.............ssssssssssssssssssssssssssssssssss [ 33%]
+sssssssssssssssssssssssssssssssssssssssssssssssssssssssssss............. [ 45%]
+........................................................................ [ 56%]
+...s.................................................................... [ 67%]
+.....................................ss.ss.....................s........ [ 79%]
+........ssssssssssssssssssssss.............sss.....sssss.s.s.....sssss.s [ 90%]
+.s.s.s.....s.sss.sss.sss...ssssssssssssssss.................             [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py:108: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py:125: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py:162: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py:197: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py:206: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_action_receipts_durable.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_approval_integrity.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_approval_integrity.py:117: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_approval_integrity.py:142: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_approval_integrity.py:196: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_approval_integrity.py:248: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_admission_fences.py:77: integration: SWARM_DATABASE_URL not set
+SKIPPED [5] tests/integration/db/test_effect_admission_fences.py:91: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_admission_fences.py:143: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_admission_fences.py:158: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_admission_fences.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_effect_admission_fences.py:246: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:126: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:146: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:164: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/integration/db/test_effect_crash_window.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:197: integration: SWARM_DATABASE_URL not set
+SKIPPED [3] tests/integration/db/test_effect_crash_window.py:235: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:251: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_effect_crash_window.py:267: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_effect_crash_window.py:312: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_crash_window.py:351: integration: SWARM_DATABASE_URL not set
+SKIPPED [3] tests/integration/db/test_effect_crash_window.py:430: integration: SWARM_DATABASE_URL not set
+SKIPPED [7] tests/integration/db/test_effect_reservation_atomic.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:115: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/integration/db/test_effect_transactions.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:216: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_effect_transactions.py:248: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:284: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:307: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:428: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/integration/db/test_effect_transactions.py:502: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:555: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_effect_transactions.py:604: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/integration/db/test_execution_attempt_context.py:53: integration: SWARM_DATABASE_URL not set
+SKIPPED [17] tests/integration/db/test_lease_claim_renew_expire.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [6] tests/integration/db/test_lease_fencing_schema.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [10] tests/integration/db/test_lease_result_acceptance.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/integration/db/test_mission_cancellation.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [8] tests/integration/db/test_persistence.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [7] tests/knowledge/test_knowledge_repository.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [7] tests/knowledge/test_knowledge_retrieval_lifecycle.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [11] tests/live_fixture/test_fixture_service.py: live_local: SWARM_LIVE_LOCAL != 1
+SKIPPED [1] tests/product/test_product.py:121: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:118: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:144: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:177: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:199: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_integration_manifests.py:170: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_single_consequential_path.py:216: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_single_consequential_path.py:244: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_single_consequential_path.py:287: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/tools/test_v17_gateway_authority.py:109: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:162: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:190: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:206: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:230: integration: SWARM_DATABASE_URL not set
+SKIPPED [6] tests/tools/test_v17_gateway_authority.py:258: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:288: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:338: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_classification_fences.py:132: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_classification_fences.py:147: integration: SWARM_DATABASE_URL not set
+SKIPPED [5] tests/tools/test_v17_gateway_failclosed.py:109: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:120: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:133: integration: SWARM_DATABASE_URL not set
+SKIPPED [5] tests/tools/test_v17_gateway_failclosed.py:145: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:163: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:191: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:209: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:226: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:100: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:150: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:185: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:220: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:286: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:337: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:377: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:449: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:525: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:568: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/ui/test_console.py:22: npm install not run
+SKIPPED [1] tests/ui/test_console.py:34: npm install not run
+SKIPPED [10] tests/workers/test_durable_worker_protocol.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/workers/test_recovery_harness.py: integration: SWARM_DATABASE_URL not set
+427 passed, 209 skipped in 18.52s

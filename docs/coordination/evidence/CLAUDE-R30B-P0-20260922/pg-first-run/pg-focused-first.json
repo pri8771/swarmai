@@ -1,0 +1,11 @@
+{
+  "socket": "/tmp/swarm-pgcheck.QxqRvZ",
+  "port": "56421",
+  "database": "swarm_r30b_p0_87344_1790100036",
+  "created": true,
+  "current_user": "pchordia",
+  "data_directory": "/tmp/swarm-pgcheck.QxqRvZ/data",
+  "listen_addresses": "",
+  "exit": 0,
+  "cleanup_remaining": 0
+}
