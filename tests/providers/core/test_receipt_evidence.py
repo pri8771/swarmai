@@ -104,7 +104,9 @@ async def test_missing_provider_cost_stays_unknown(monkeypatch: pytest.MonkeyPat
         monkeypatch,
         lambda request: httpx.Response(200, json={"id": "offline-2", "usage": {}}),
     )
-    adapter = GroqAdapter(mode="live", secret_ref_names=[])
+    adapter = GroqAdapter(
+        mode="live", secret_ref_names=[], pinned_model_id="openai/gpt-oss-20b"
+    )
     route = (await adapter.discover())[0]
     receipt = await adapter.execute_one(_request(), _reservation(route.route_id))
     assert receipt.normalized_usage is not None
@@ -122,7 +124,9 @@ async def test_rate_limit_error_preserves_safe_headers(monkeypatch: pytest.Monke
             headers={"retry-after": "2", "x-ratelimit-remaining-requests": "0"},
         ),
     )
-    adapter = GroqAdapter(mode="live", secret_ref_names=[])
+    adapter = GroqAdapter(
+        mode="live", secret_ref_names=[], pinned_model_id="openai/gpt-oss-20b"
+    )
     route = (await adapter.discover())[0]
     receipt = await adapter.execute_one(_request(), _reservation(route.route_id))
     assert receipt.error_class == ErrorClass.RATE_LIMIT

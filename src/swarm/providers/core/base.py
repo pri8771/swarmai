@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -130,7 +131,12 @@ class BaseCoreAdapter:
     ) -> AttemptReceipt:
         route = await self.describe_route(admitted_ticket.route_id)
         try:
-            raw = self._invoke(route.model_id, request)
+            if self.provider_id in {"groq", "openrouter"} and self.mode != "replay":
+                # The HTTP transport is synchronous. Separate worker threads
+                # permit overlap after the broker has reserved each call.
+                raw = await asyncio.to_thread(self._invoke, route.model_id, request)
+            else:
+                raw = self._invoke(route.model_id, request)
         except ProviderHttpError as exc:
             return AttemptReceipt(
                 logical_call_id=admitted_ticket.logical_call_id,

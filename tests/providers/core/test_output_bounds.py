@@ -38,6 +38,8 @@ async def test_core_output_limit_reaches_http_body(
         options["free_route"] = OpenRouterFreeRoute(
             model_id="qwen/qwen3.8-27b:free", provider_slug="modelrun"
         )
+    elif provider_id == "groq":
+        options["pinned_model_id"] = "openai/gpt-oss-20b"
     adapter = CORE_ADAPTER_TYPES[provider_id](
         mode="live", base_url="https://provider.invalid/v1", secret_ref_names=[], **options
     )
@@ -49,8 +51,8 @@ async def test_core_output_limit_reaches_http_body(
         messages=[{"role": "user", "content": "Reply with exactly: OK"}],
         max_output_tokens=bound,
     )
-    if provider_id == "openrouter" and bound is None:
-        with pytest.raises(ValueError, match="finite output limit"):
+    if provider_id in {"openrouter", "groq"} and bound is None:
+        with pytest.raises(ValueError, match="output limit"):
             await adapter.execute_one(request, _reservation(route_id))
         assert sent == []
         return
