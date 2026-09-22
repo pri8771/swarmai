@@ -1,0 +1,38 @@
+R28b-2 verification provenance and corrected setup failures
+
+Counted final source
+- commit a06b8a82925daa4dd08a137cb1eb724aaa2d4efb
+- tree 20a1c9b5ea240c009d41c5a5effb1c075aa78a70
+- parent 2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510
+
+Pre-edit application reds
+- baseline-red.txt is the no-effect synthetic stop-before-reservation reproduction on the
+  accepted parent. Stale policy, actor-unauthorized requested scope, and constructor-static
+  stale fences all reached reservation. The first worktree-local `.venv` command was absent
+  (exit 127); the retained sibling venv then ran the same harness successfully. This setup
+  error is not an application result.
+
+Authority test initial red, corrected as a test issue
+- authority-tests-initial-red.txt preserves 3 failures from the newly authored test module.
+- Two stale-provider cases omitted the approval required earlier in the native pipeline,
+  so they stopped at approval_required instead of reaching the later fence assertion.
+- The cancellation-race case monkeypatched a separately constructed repository rather than
+  `gateway.store`; its hook never ran, no cancellation bump occurred, and it could not
+  establish an application failure. The initial snapshot/isolation suspicion was withdrawn.
+- The corrected test binds the hook to the gateway's actual repository, asserts the hook ran,
+  preserves adapter0/unused-approval/reserved-state assertions, and passes on real PostgreSQL.
+- Final authority-tests-final.txt: 19 passed, Ruff passed, unique database cleanup count 0.
+
+Other setup/static corrections
+- An initial owned PostgreSQL attempt skipped because its connection target was stale. It is
+  not counted. Counted PostgreSQL runs use socket /tmp/swarm-pgcheck.QxqRvZ port 56421,
+  unique disposable databases where agent-owned, and show cleanup count 0 in retained logs.
+- mypy-initial-red.txt preserves the first `FenceState(**dict[str, int])` typing failure.
+  Construction was made explicit; final mypy.txt is clean for 171 source files.
+
+Review finding and resolution
+- mechanical-review.txt preserves the independent finding that fence presence was checked
+  before policy version/scope. Production order was corrected in execute and reconcile.
+- The final authority module includes conflicting-failure regressions for stale policy plus
+  missing fence and denied scope plus missing fence through both entrypoints. Exploding
+  provider/store seams prove policy/scope denial occurs first. The finding is resolved.

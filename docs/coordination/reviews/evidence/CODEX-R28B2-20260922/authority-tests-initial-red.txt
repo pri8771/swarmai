@@ -1,0 +1,125 @@
+.....FF....F.                                                            [100%]
+=================================== FAILURES ===================================
+_________________ test_provider_generation_is_authority[lease] _________________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://pchordia@/swarm_r28b2_authority_20260922062737_47787?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+field = 'lease'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("field", ["lease", "cancellation"])
+    async def test_provider_generation_is_authority(factory, field):
+        adapter = ApiMcpAdapter()
+        envelope = leased(factory, adapter)
+        lease = int(envelope.lease_generation)
+        cancellation = int(envelope.cancellation_generation)
+        fences = StaticFenceProvider(
+            lease_generation=lease + (field == "lease"),
+            cancellation_generation=cancellation + (field == "cancellation"),
+        )
+        store = DurableEffectRepository(factory)
+        subject = gateway(factory, adapter, fences=fences)
+        expected = StaleLeaseError if field == "lease" else CancellationFenceError
+        reason = "stale_lease_generation" if field == "lease" else "cancellation_generation_mismatch"
+    
+        with pytest.raises(expected, match=reason):
+>           await subject.execute_envelope(envelope, context=TRUSTED)
+
+tests/tools/test_v17_gateway_authority.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:147: in execute_envelope
+    self._evaluate_policy(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <swarm.tools.v17_gateway.ConsequentialToolGateway object at 0x109f31010>
+envelope = ActionEnvelope(schema_version='1.0', action_id='act_c7d2fa66e3814b8895233e41cb93e964', mission_id='msn_d646dfa56a4c404...d=None, created_at=datetime.datetime(2026, 9, 22, 6, 27, 38, 307702, tzinfo=datetime.timezone.utc), timeout_seconds=30)
+
+    def _evaluate_policy(self, envelope: ActionEnvelope) -> None:
+        if envelope.side_effect_class in {"consequential", "irreversible"}:
+            if self._risk_rank.get(envelope.risk_class, 99) > self._risk_rank.get(
+                self.max_risk_without_approval, 0
+            ):
+                if not envelope.approval_id:
+>                   raise PolicyDeniedError("approval_required")
+E                   swarm.tools.v17_gateway.PolicyDeniedError: approval_required
+
+src/swarm/tools/v17_gateway.py:516: PolicyDeniedError
+_____________ test_provider_generation_is_authority[cancellation] ______________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://pchordia@/swarm_r28b2_authority_20260922062737_47787?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+field = 'cancellation'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("field", ["lease", "cancellation"])
+    async def test_provider_generation_is_authority(factory, field):
+        adapter = ApiMcpAdapter()
+        envelope = leased(factory, adapter)
+        lease = int(envelope.lease_generation)
+        cancellation = int(envelope.cancellation_generation)
+        fences = StaticFenceProvider(
+            lease_generation=lease + (field == "lease"),
+            cancellation_generation=cancellation + (field == "cancellation"),
+        )
+        store = DurableEffectRepository(factory)
+        subject = gateway(factory, adapter, fences=fences)
+        expected = StaleLeaseError if field == "lease" else CancellationFenceError
+        reason = "stale_lease_generation" if field == "lease" else "cancellation_generation_mismatch"
+    
+        with pytest.raises(expected, match=reason):
+>           await subject.execute_envelope(envelope, context=TRUSTED)
+
+tests/tools/test_v17_gateway_authority.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:147: in execute_envelope
+    self._evaluate_policy(envelope)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <swarm.tools.v17_gateway.ConsequentialToolGateway object at 0x109f2d590>
+envelope = ActionEnvelope(schema_version='1.0', action_id='act_313f2b8f59f4413bb555526b86c62dc0', mission_id='msn_f2ece46bbc4940e...d=None, created_at=datetime.datetime(2026, 9, 22, 6, 27, 38, 349052, tzinfo=datetime.timezone.utc), timeout_seconds=30)
+
+    def _evaluate_policy(self, envelope: ActionEnvelope) -> None:
+        if envelope.side_effect_class in {"consequential", "irreversible"}:
+            if self._risk_rank.get(envelope.risk_class, 99) > self._risk_rank.get(
+                self.max_risk_without_approval, 0
+            ):
+                if not envelope.approval_id:
+>                   raise PolicyDeniedError("approval_required")
+E                   swarm.tools.v17_gateway.PolicyDeniedError: approval_required
+
+src/swarm/tools/v17_gateway.py:516: PolicyDeniedError
+________ test_cancellation_bump_between_precheck_and_begin_fails_closed ________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://pchordia@/swarm_r28b2_authority_20260922062737_47787?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109f83110>
+
+    @pytest.mark.asyncio
+    async def test_cancellation_bump_between_precheck_and_begin_fails_closed(factory, monkeypatch):
+        adapter = ApiMcpAdapter()
+        envelope = leased(factory, adapter)
+        store = DurableEffectRepository(factory)
+        subject = gateway(factory, adapter)
+        approval = subject.make_approval(envelope, context=TRUSTED)
+        envelope.approval_id = approval.approval_id
+        original_reserve = store.reserve
+    
+        def reserve_then_cancel(candidate):
+            reserved = original_reserve(candidate)
+            with factory() as session:
+                LeaseLifecycleService(session).revoke_mission_work(
+                    mission_id=envelope.mission_id,
+                    notify_leases=False,
+                )
+                session.commit()
+            return reserved
+    
+        monkeypatch.setattr(store, "reserve", reserve_then_cancel)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/tools/test_v17_gateway_authority.py:213: Failed
+=========================== short test summary info ============================
+FAILED tests/tools/test_v17_gateway_authority.py::test_provider_generation_is_authority[lease]
+FAILED tests/tools/test_v17_gateway_authority.py::test_provider_generation_is_authority[cancellation]
+FAILED tests/tools/test_v17_gateway_authority.py::test_cancellation_bump_between_precheck_and_begin_fails_closed
+3 failed, 10 passed in 0.50s
+EXIT_CODE=1

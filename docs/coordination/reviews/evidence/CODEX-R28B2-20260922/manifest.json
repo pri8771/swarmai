@@ -1,0 +1,62 @@
+{
+  "authority-tests-final.txt": {
+    "bytes": 155,
+    "sha256": "ee53aa2ad1dc286ab2be916a5de1e39cb5d99c82d1e926471994668894d34fc8"
+  },
+  "authority-tests-initial-red.txt": {
+    "bytes": 7027,
+    "sha256": "7f51c370473cdbb0dfec1501f3eb02c65f12dab687a29c5508b52ea23dd7b054"
+  },
+  "baseline-red.txt": {
+    "bytes": 1496,
+    "sha256": "2802ff68b53bcd69905e5c0ae53e4ed2b8d27f96697aa08558218355dfc5cfbb"
+  },
+  "causal-map.md": {
+    "bytes": 3798,
+    "sha256": "ec66c3b6f45d3c4b4901a8570cf71aded6c07ac6f48c5a66220465e503123523"
+  },
+  "checks.json": {
+    "bytes": 2851,
+    "sha256": "255f85f4625f25621c561f26aac9e7628e57870ca2473a3f1058c43a4bf00bc4"
+  },
+  "commands.txt": {
+    "bytes": 1453,
+    "sha256": "f8dd96a9905e1fdec658a262a0fc41feb342feeead9fc692c29fc83f9115824c"
+  },
+  "design-review.txt": {
+    "bytes": 3847,
+    "sha256": "ef5b6489db339ff24f63c07bc3e537677711112f582eca7a58579a1c9d5ebdc3"
+  },
+  "full.txt": {
+    "bytes": 741,
+    "sha256": "20d28e73c691e044a3ad9e373f1f960c7f76dc6e9d1cc598df8c5bf51f9f9dff"
+  },
+  "integration-compat.txt": {
+    "bytes": 283,
+    "sha256": "dd53661c5c29c45f6e08196f14b641e14f1bce5296235ac23812ac9c8784f0c9"
+  },
+  "mechanical-review.txt": {
+    "bytes": 3194,
+    "sha256": "06e8b8f010fd3fac46a9b033557ae8ef87dd7602f2142b0f8519c38e19dbb423"
+  },
+  "mypy-initial-red.txt": {
+    "bytes": 434,
+    "sha256": "2db2024bdb611f6da82198b8f706919c1ec45df950cd7c123127c0796a5b7db6"
+  },
+  "mypy.txt": {
+    "bytes": 45,
+    "sha256": "5a5d18602ec811a5e8d5394689dedc469378e3dc613794f1897fef5a5de66523"
+  },
+  "ruff.txt": {
+    "bytes": 19,
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "test-provenance.txt": {
+    "bytes": 2485,
+    "sha256": "7b56ef6e9a9c9750cf9985fdfbb60f762812d499307cf0eec738ef8b02eced21"
+  },
+  "tools-compat.txt": {
+    "bytes": 171,
+    "sha256": "470de716e81c5b4a6573d3f55fbcc1e43b34fdd2cc897cd67121acbaf656642d"
+  }
+}

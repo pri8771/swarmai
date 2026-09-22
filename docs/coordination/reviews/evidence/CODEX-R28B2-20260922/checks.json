@@ -1,0 +1,61 @@
+{
+  "repository": "pri8771/swarmai",
+  "source_sha": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb",
+  "tree": "20a1c9b5ea240c009d41c5a5effb1c075aa78a70",
+  "parent": "2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510",
+  "assignment_ref": "4fa4bd066c2a6415b4f1f9da84ef895d3882adb7",
+  "canonical_observed": "933fe98",
+  "pull_request": "https://github.com/pri8771/swarmai/pull/23",
+  "checks": [
+    {
+      "name": "authority adverse",
+      "command": "SWARM_LIVE_LOCAL=1 SWARM_DATABASE_URL='<unique DB on /tmp/swarm-pgcheck.QxqRvZ:56421>' PYTHONPATH=$PWD/src:$PWD ../swarm-source/.venv/bin/python -m pytest -q tests/tools/test_v17_gateway_authority.py",
+      "exit": 0,
+      "result": "19 passed in 0.52s; Ruff clean; cleanup count 0",
+      "log": "authority-tests-final.txt"
+    },
+    {
+      "name": "gateway compatibility",
+      "command": "pytest -q tests/tools/test_v17_gateway_negatives.py tests/tools/test_v17_gateway_failclosed.py tests/tools/test_v17_gateway_classification_fences.py",
+      "exit": 0,
+      "result": "66 passed in 3.25s; cleanup count 0",
+      "log": "tools-compat.txt"
+    },
+    {
+      "name": "affected PostgreSQL compatibility",
+      "command": "pytest -q tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_crash_window.py tests/integration/db/test_action_receipts_durable.py tests/integration/db/test_approval_integrity.py tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_legacy_recovery.py",
+      "exit": 0,
+      "result": "71 passed in 5.63s; cleanup count 0",
+      "log": "integration-compat.txt"
+    },
+    {
+      "name": "full suite",
+      "command": "SWARM_LIVE_LOCAL=1 SWARM_DATABASE_URL='postgresql+psycopg:///swarm_checks?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421' PYTHONPATH=$PWD/src:$PWD ../swarm-source/.venv/bin/python -m pytest -q",
+      "exit": 0,
+      "result": "578 passed in 43.76s",
+      "log": "full.txt"
+    },
+    {
+      "name": "ruff",
+      "command": "../swarm-source/.venv/bin/ruff check src tests",
+      "exit": 0,
+      "result": "All checks passed",
+      "log": "ruff.txt"
+    },
+    {
+      "name": "mypy",
+      "command": "../swarm-source/.venv/bin/mypy src",
+      "exit": 0,
+      "result": "Success: no issues found in 171 source files",
+      "log": "mypy.txt"
+    }
+  ],
+  "evidence_type": "engineering / synthetic no-effect diagnostics and actual disposable PostgreSQL",
+  "limitations": [
+    "No genuine live checkpoint or formal lead acceptance",
+    "No provider/model/external action, credentials, spend, deployment, main merge, or scheduler change",
+    "Initial authority test failures were corrected test setup errors, not application defects",
+    "Initial stale PostgreSQL target skip is excluded from counted results",
+    "R28c remains held pending independent exact-SHA lead review"
+  ]
+}

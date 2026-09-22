@@ -1,0 +1,61 @@
+source_sha=2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510
+first_attempt=.venv/bin/python unavailable exit=127
+command=PYTHONPATH=src:$PWD ../swarm-source/.venv/bin/python /tmp/swarm-r28b2-authority-red-harness.py
+{
+  "mode": "synthetic_stop_before_reservation_mutation",
+  "modeled_durable_current_generations": [
+    8,
+    4
+  ],
+  "scope_without_actor_authority_accepted": {
+    "actor": "worker-no-admin",
+    "adapter_calls": 0,
+    "claimed_generations": [
+      7,
+      3
+    ],
+    "effect_persisted": false,
+    "observed": "reached_reserve",
+    "policy_version": "v17-policy-current",
+    "requested_scopes": [
+      "network.https",
+      "mcp.call",
+      "admin.write"
+    ],
+    "reserve_attempts": 1
+  },
+  "source_sha": "2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510",
+  "stale_policy_accepted": {
+    "actor": "worker-authorized",
+    "adapter_calls": 0,
+    "claimed_generations": [
+      7,
+      3
+    ],
+    "effect_persisted": false,
+    "observed": "reached_reserve",
+    "policy_version": "v17-policy-stale",
+    "requested_scopes": [
+      "network.https",
+      "mcp.call"
+    ],
+    "reserve_attempts": 1
+  },
+  "static_stale_fence_accepted": {
+    "actor": "worker-authorized",
+    "adapter_calls": 0,
+    "claimed_generations": [
+      7,
+      3
+    ],
+    "effect_persisted": false,
+    "observed": "reached_reserve",
+    "policy_version": "v17-policy-current",
+    "requested_scopes": [
+      "network.https",
+      "mcp.call"
+    ],
+    "reserve_attempts": 1
+  }
+}
+exit=0

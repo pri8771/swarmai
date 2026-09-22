@@ -1,0 +1,25 @@
+R28b-2 production diff review against 2ebaa5a and canonical 4fa4bd0
+
+ONE CONCRETE CONTRACT ORDERING DEFECT
+
+`ConsequentialToolGateway.execute_envelope` calls `_require_fence_fields(envelope)` before `_authorize_policy(envelope, context)` (src/swarm/tools/v17_gateway.py:142-143). `reconcile` repeats the same order at lines 365-366.
+
+The released assignment and native rule 6 require this observable denial order after authenticated project/actor: current policy version, declaration-scopes union requested-scopes, then fence authority. With an envelope that has both a stale policy version and a missing mission/task/attempt/generation, current production returns `fence_missing`; native behavior requires `policy_version_stale`. The same inversion lets missing caller-supplied fence data mask a policy-scope denial. This is deterministic and occurs before any DB/provider call.
+
+Minimal correction: in both execute_envelope and reconcile, call `_authorize_policy(envelope, context)` before `_require_fence_fields(envelope)`. Keep `_require_fence_fields` before `_check_generations`, so the durable provider never receives incomplete consequential identity. No other pipeline reorder is needed.
+
+OTHER REVIEWED SURFACES MATCH THE SLICE
+- `execute_request` requires and propagates context; execute/reconcile reject project then actor before store access.
+- `_reconcile_unknown` carries the same context into the not-applied retry.
+- Session recovery checks approved-envelope project/actor before registering/recovering and includes the same actor in its navigation request; gateway policy/fence enforcement remains on navigation execution.
+- Required policy scopes are exactly operation declaration scopes union envelope requested scopes.
+- `LeaseFenceProvider.current` delegates to new `read_current_fence`; its committed reader directly invokes existing `LeaseLifecycleService.read_effect_fence`, preserving mission -> lease -> attempt lock order and full active/expiry/revocation/binding checks.
+- `read_current_fence` binds project, mission, attempt and task and returns only TaskAttempt lease generation plus Mission cancellation generation under the specified SHARE locks.
+- Approval creation checks project+actor context; put is project-scoped; revoke derives durable audit actor from authenticated context after constructor project removal.
+- `FenceState.authority` is defined and never read by V1.7 production code.
+- R28c registry work is absent.
+
+Validation limit: read-only source audit only as requested; no tests or DB activity.
+
+CORRECTION VERIFICATION — 2026-09-22
+Root moved `_authorize_policy` before `_require_fence_fields` in both execute_envelope and reconcile. The owned regression now combines stale policy + missing fence and denied requested scope + missing fence across both entrypoints. Exploding FenceProvider and effect-store seams prove each expected policy/scope error occurs before provider current/reader, store read/reservation, or adapter action. Focused authority module: 19 passed in 0.52s; Ruff clean; isolated PostgreSQL cleanup count 0. Log: /tmp/swarm-r28b2-authority-tests-order-final.log. The initial finding is resolved in the inspected candidate.

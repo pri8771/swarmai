@@ -1,0 +1,4 @@
+src/swarm/tools/fences.py:104: error: Argument 1 to "FenceState" has incompatible type "**dict[str, int]"; expected "dict[str, Any]"  [arg-type]
+src/swarm/tools/fences.py:104: note: "dict" is invariant -- see https://mypy.readthedocs.io/en/stable/common_issues.html#variance
+src/swarm/tools/fences.py:104: note: Consider using "Mapping" instead, which is covariant in the value type
+Found 1 error in 1 file (checked 171 source files)

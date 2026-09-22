@@ -1,0 +1,24 @@
+R28b-2 bounded design review
+Base: 2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510
+Canonical release: 4fa4bd0; assignment CODEX_R28B2_20260922.md; native packet R28b rules 4-6.
+
+1. Concrete locking issue in the proposed committed reader
+Do not have LeaseFenceProvider.reader(session) call new read_current_fence() and then LeaseLifecycleService.read_effect_fence().
+
+Why: the new rule-5 reader is specified to lock MissionRow then TaskAttemptRow FOR SHARE. Existing read_effect_fence (lease_fencing.py:655-712) deliberately locks mission, then active TaskLeaseRow, then TaskAttemptRow, TaskRow and WorkerLeaseRow; its docstring says this follows cancellation lock order. Calling the minimal reader first means the transaction's actual acquisition order is mission -> attempt -> lease, even though the second helper later re-locks mission. A concurrent lifecycle/cancellation path using mission -> lease -> attempt can hold lease while waiting on attempt, while this admission holds attempt while waiting on lease. PostgreSQL may detect and abort the deadlock, but committed admission should not create that inversion. The first call is also redundant: read_effect_fence already returns the exact rule-5 mapping and enforces stricter active lease/worker/binding/expiry/generation authority.
+
+Minimal alternative:
+- LeaseFenceProvider.current(): open its own read transaction and call new read_current_fence exactly as rule 5 specifies; return FenceState.
+- LeaseFenceProvider.reader(...): return a closure that directly calls LeaseLifecycleService(session).read_effect_fence(...) once, using the admission transaction supplied by DurableEffectRepository.begin_execution. Do not call read_current_fence in that closure.
+This preserves the native precheck, the full R27 committed defense, and existing lock order.
+
+2. Context must survive every internal replay/reconciliation path
+The public execute_request, execute_envelope and reconcile signatures can require ActorContext, but the current internal not-applied reconciliation path calls `await self.execute_envelope(envelope)` at v17_gateway.py:439. Refactoring only public signatures would either raise TypeError after a reconciled not-applied outcome or tempt an optional/default context, which would be fail-open. Minimal shape: pass context into _reconcile_unknown and pass the same authenticated object on its retry; all calls into _reconcile_unknown (existing unknown short-circuit and public reconcile) must supply it. Keep context required, with no synthesized envelope-derived fallback.
+
+Approval helper boundary
+Explicit context/project scope is necessary after removing constructor project. `make_approval(envelope, context)` should apply both wrong_project and actor_mismatch before hashing/building the grant. `put_approval(grant, context)` should at least require context.project_id == grant.project_id; a context actor need not equal grant.actor because an operator may grant another actor. For revocation, avoid retaining an independently caller-controlled `revoked_by` alongside authenticated context: derive persisted revoked_by from context.actor, or explicitly name/document a separately authenticated operator principal. Otherwise audit attribution remains forgeable even though project scope is checked.
+
+Ordering
+Apply context project then actor checks immediately after normalization/effective declaration resolution and before store reads, recovery, replay, approval operations or adapter observations. Policy-version then declaration-union-requested scope checks precede fence provider calls, matching the packet. Adapter `validate` is pure in current adapters, but placing it before context checks changes the native observable denial order; prefer context checks first once an envelope exists.
+
+No R28c registry work, source edits, DB runs or external actions were performed.

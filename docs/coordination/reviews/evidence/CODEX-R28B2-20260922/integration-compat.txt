@@ -1,0 +1,7 @@
+source_sha=2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510
+database=swarm_r28b2_compat_20260922023019_48684
+command=pytest assigned integration modules
+.......................................................................  [100%]
+71 passed in 5.63s
+pytest_exit=0
+cleanup_database_count=0

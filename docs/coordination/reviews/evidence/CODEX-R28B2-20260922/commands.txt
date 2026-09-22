@@ -1,0 +1,27 @@
+Environment for counted PostgreSQL checks:
+  SWARM_LIVE_LOCAL=1
+  SWARM_DATABASE_URL='postgresql+psycopg:///DB_NAME?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421'
+  PYTHONPATH=$PWD/src:$PWD
+  Python/pytest: ../swarm-source/.venv/bin/python -m pytest
+
+Focused authority:
+  ../swarm-source/.venv/bin/pytest -q tests/tools/test_v17_gateway_authority.py
+  Result: 19 passed in 0.52s; Ruff clean; unique DB cleanup 0.
+
+Gateway compatibility:
+  pytest -q tests/tools/test_v17_gateway_negatives.py tests/tools/test_v17_gateway_failclosed.py tests/tools/test_v17_gateway_classification_fences.py
+  Result: 66 passed in 3.25s; unique DB cleanup 0.
+
+Affected PostgreSQL compatibility group:
+  pytest -q tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_crash_window.py tests/integration/db/test_action_receipts_durable.py tests/integration/db/test_approval_integrity.py tests/integration/db/test_effect_admission_fences.py tests/integration/db/test_effect_legacy_recovery.py
+  Result: 71 passed in 5.63s; unique DB cleanup 0.
+
+Full:
+  SWARM_LIVE_LOCAL=1 SWARM_DATABASE_URL='postgresql+psycopg:///swarm_checks?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421' PYTHONPATH=$PWD/src:$PWD ../swarm-source/.venv/bin/python -m pytest -q
+  Result: 578 passed in 43.76s.
+
+Static:
+  ../swarm-source/.venv/bin/ruff check src tests
+  Result: All checks passed.
+  ../swarm-source/.venv/bin/mypy src
+  Result: Success: no issues found in 171 source files.
