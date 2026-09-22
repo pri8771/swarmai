@@ -1,0 +1,172 @@
+{
+  "checked_at": "2026-09-22T06:54:16.108110+00:00",
+  "method": "gh api read-only; no rerun or dispatch",
+  "repo": "pri8771/swarmai",
+  "sha": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb",
+  "pull_request": {
+    "number": 23,
+    "url": "https://github.com/pri8771/swarmai/pull/23",
+    "state": "open",
+    "head_sha": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb"
+  },
+  "check_run_count": 6,
+  "workflow_run_count": 2,
+  "legacy_commit_status": "pending",
+  "runs": [
+    {
+      "run_id": 35695802892,
+      "event": "pull_request",
+      "workflow": "ci",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/pri8771/swarmai/actions/runs/35695802892",
+      "attempt": 1,
+      "jobs": [
+        {
+          "job_id": 106642287434,
+          "name": "offline",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        },
+        {
+          "job_id": 106642287670,
+          "name": "console",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        },
+        {
+          "job_id": 106642287680,
+          "name": "live-gated",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": 35695770245,
+      "event": "push",
+      "workflow": "ci",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/pri8771/swarmai/actions/runs/35695770245",
+      "attempt": 1,
+      "jobs": [
+        {
+          "job_id": 106642187588,
+          "name": "live-gated",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        },
+        {
+          "job_id": 106642187822,
+          "name": "console",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        },
+        {
+          "job_id": 106642188013,
+          "name": "offline",
+          "status": "completed",
+          "conclusion": "failure",
+          "runner_id": 0,
+          "runner_name": "",
+          "steps_count": 0,
+          "steps": [],
+          "failure_annotations": [
+            {
+              "level": "failure",
+              "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+            }
+          ],
+          "notice_annotations": [
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "execution_verdict": "registered jobs never acquired runner and executed zero steps"
+}

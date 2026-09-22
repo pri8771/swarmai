@@ -31,6 +31,10 @@
     "bytes": 741,
     "sha256": "20d28e73c691e044a3ad9e373f1f960c7f76dc6e9d1cc598df8c5bf51f9f9dff"
   },
+  "hosted-ci.json": {
+    "bytes": 6303,
+    "sha256": "2cd60729b1d491204488d6e5310c4ecaddba2b015cd70291d239a1d20a485050"
+  },
   "integration-compat.txt": {
     "bytes": 283,
     "sha256": "dd53661c5c29c45f6e08196f14b641e14f1bce5296235ac23812ac9c8784f0c9"
