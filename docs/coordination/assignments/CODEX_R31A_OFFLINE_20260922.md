@@ -22,3 +22,25 @@ Before implementation, reconcile R31a destination validation with the already-fr
 Do not implement R31b recovery. Do not start R30a fixture service. No network/session/model/provider/public action, scheduler, spend, deploy or main merge.
 
 Return READY_FOR_LEAD_REVIEW with exact SHA/tree/base and offline evidence. Live evidence remains separately held.
+
+
+## Lead contract clarification — mandatory
+
+Read and implement against:
+`docs/coordination/reviews/R31A_CONTRACT_DISPOSITION_20260922.md`
+
+It supersedes the native packet where the packet says zero submission rows alone prove `not_applied`, and where the original redirect negative uses caller destination `/redirect?... `.
+
+Key frozen deltas:
+- wire-only `client_ref = sha256(effect_key)[:32]`;
+- `X-Fixture-Request-ID = sha256(effect_key + ":attempt:" + str(execution_attempt))[:32]`;
+- exact caller destinations only: `/app/form` for open and `/app/submit` for submit;
+- internal same-origin reads only to derived `/app/submissions?client_ref=...` and `/app/requests/<request_id>`;
+- form.submit requires both `web.submit` and `web.read`;
+- zero rows alone is never `not_applied`;
+- only terminal exact-request `not_applied` + zero matching rows permits `not_applied`;
+- missing/in-flight/auth-redirect request proof remains `unknown`;
+- duplicate/conflicting rows or receipt disagreement is `unknown/anomaly`;
+- unsafe redirect negative must use mocked transport on an allowed fixed destination, not broaden the destination allowlist.
+
+No vocabulary expansion is needed.
