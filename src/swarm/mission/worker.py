@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import difflib
 import re
-import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -26,6 +26,8 @@ from swarm.mission.worktree import (
     intent_to_add,
     worktree_diff,
 )
+from swarm.tools.fences import ActorContext
+from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 # Known dogfood target inside the SwarmAI repo.
 OFF_BY_ONE_REL = Path("sandbox/selfdev_issue/parser_helper.py")
@@ -55,6 +57,7 @@ class WorkerResult:
     cost_usd: float = 0.0
     started_at: str = field(default_factory=lambda: utc_now().isoformat())
     finished_at: str | None = None
+    action_receipt_ids: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -68,25 +71,8 @@ class WorkerResult:
             "cost_usd": self.cost_usd,
             "started_at": self.started_at,
             "finished_at": self.finished_at,
+            "action_receipt_ids": list(self.action_receipt_ids),
         }
-
-
-def _run_cmd(cwd: Path, cmd: list[str], *, timeout: float = 120.0) -> dict[str, Any]:
-    proc = subprocess.run(
-        cmd,
-        cwd=str(cwd),
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-        check=False,
-    )
-    return {
-        "cmd": cmd,
-        "exit_code": proc.returncode,
-        "ok": proc.returncode == 0,
-        "stdout": (proc.stdout or "")[-8000:],
-        "stderr": (proc.stderr or "")[-4000:],
-    }
 
 
 def _looks_like_python_source(text: str) -> bool:
@@ -363,10 +349,19 @@ class RepoWorker:
         worktree_root: Path | None = None,
         model_by_family: dict[str, str] | None = None,
         broker: Any | None = None,
-        project_id: str = "proj_demo",
+        project_id: str,
+        action_gateway: ConsequentialToolGateway | None = None,
+        actor_context: ActorContext | None = None,
+        action_gateway_factory: Callable[[Path], ConsequentialToolGateway] | None = None,
         parser_dogfood_fixture: bool = False,
         require_broker: bool = False,
     ) -> None:
+        if action_gateway is None:
+            raise RuntimeError("action_gateway_required")
+        if actor_context is None:
+            raise RuntimeError("actor_context_required")
+        if actor_context.project_id != project_id:
+            raise RuntimeError("actor_context_project_mismatch")
         self.repo = repo.resolve()
         self.model = model
         self.model_by_family = model_by_family or {}
@@ -374,10 +369,102 @@ class RepoWorker:
         self.worker_id = new_id("wrk_")
         self.broker = broker
         self.project_id = project_id
+        self.action_gateway = action_gateway
+        self.actor_context = actor_context
+        self._action_gateway_factory = action_gateway_factory
+        self._effect_mission_id: str | None = None
+        self._effect_task_id: str | None = None
+        self._effect_attempt_id: str | None = None
+        self._effect_sequence = 0
+        self._effect_receipt_ids: list[str] = []
         self.parser_dogfood_fixture = parser_dogfood_fixture
         # Operational API/CLI paths must set this so model calls cannot bypass
         # the governed project-scoped broker via direct local_chat.
         self.require_broker = require_broker
+
+    def _bind_worktree_effects(self, handle: WorktreeHandle) -> None:
+        """Bind a fresh local-sandbox adapter to the isolated worktree only."""
+        if self._action_gateway_factory is not None:
+            self.action_gateway = self._action_gateway_factory(handle.path)
+
+    def _begin_task_effects(self, *, mission_id: str, task_id: str) -> None:
+        self._effect_mission_id = mission_id
+        self._effect_task_id = task_id
+        self._effect_attempt_id = new_id("att_")
+        self._effect_sequence = 0
+        self._effect_receipt_ids = []
+
+    def _end_task_effects(self, result: WorkerResult) -> WorkerResult:
+        result.action_receipt_ids = list(self._effect_receipt_ids)
+        self._effect_mission_id = None
+        self._effect_task_id = None
+        self._effect_attempt_id = None
+        self._effect_sequence = 0
+        self._effect_receipt_ids = []
+        return result
+
+    def _action_effect(self, operation: str, payload: dict[str, Any]) -> Any:
+        if not self._effect_mission_id or not self._effect_task_id or not self._effect_attempt_id:
+            raise RuntimeError("action_effect_without_task_context")
+        self._effect_sequence += 1
+        fence = self.action_gateway.fences.current(
+            project_id=self.project_id,
+            mission_id=self._effect_mission_id,
+            task_id=self._effect_task_id,
+            attempt_id=self._effect_attempt_id,
+        )
+        adapter = self.action_gateway.registry.resolve("local.sandbox", "1")
+        request = {
+            **payload,
+            "operation": operation,
+            "project_id": self.project_id,
+            "actor": self.actor_context.actor,
+            "mission_id": self._effect_mission_id,
+            "task_id": self._effect_task_id,
+            "attempt_id": self._effect_attempt_id,
+            "lease_generation": fence.lease_generation,
+            "cancellation_generation": fence.cancellation_generation,
+            "policy_version": self.action_gateway.policy.current_policy_version(
+                project_id=self.project_id
+            ),
+        }
+        envelope = adapter.normalize(request)
+        effect_key = ":".join(
+            (
+                self.project_id,
+                self._effect_mission_id,
+                self._effect_task_id,
+                self._effect_attempt_id,
+                operation,
+                str(self._effect_sequence),
+            )
+        )
+        envelope = envelope.model_copy(
+            update={"effect_key": effect_key, "idempotency_key": effect_key}
+        ).ensure_hashes()
+        receipt = self.action_gateway.execute_envelope_sync(
+            envelope, context=self.actor_context
+        )
+        self._effect_receipt_ids.append(receipt.receipt_id)
+        return receipt
+
+    def _run_effect(self, cmd: list[str], *, timeout: float = 120.0) -> dict[str, Any]:
+        receipt = self._action_effect(
+            "proc.run", {"argv": cmd, "timeout_s": timeout}
+        )
+        result = dict(receipt.post_observation.get("result") or {})
+        exit_code = int(result.get("exit_code", 1))
+        return {
+            "cmd": list(cmd),
+            "exit_code": exit_code,
+            "ok": exit_code == 0,
+            "stdout": str(result.get("stdout_tail") or ""),
+            "stderr": str(result.get("stderr_tail") or ""),
+            "action_receipt_id": receipt.receipt_id,
+        }
+
+    def _write_effect(self, path: Path, text: str) -> None:
+        self._action_effect("fs.write_text", {"path": str(path), "text": text})
 
     def _model_for(self, task_family: str) -> str:
         return self.model_by_family.get(task_family) or self.model
@@ -440,6 +527,7 @@ class RepoWorker:
         prior: dict[str, WorkerResult],
         shared_worktree: WorktreeHandle | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle | None]:
+        self._begin_task_effects(mission_id=mission_id, task_id=task.id)
         family = task.task_family
         support = classify_task_support(family)
         if not support.supported:
@@ -452,39 +540,37 @@ class RepoWorker:
                 artifacts={"support": support.to_dict(), "unsupported": True},
                 finished_at=utc_now().isoformat(),
             )
-            return result, shared_worktree
+            return self._end_task_effects(result), shared_worktree
         if family == "inspect":
-            return self._inspect(task, mission_id=mission_id), shared_worktree
-        if family == "implement":
-            return self._implement(
+            result, handle = self._inspect(task, mission_id=mission_id), shared_worktree
+        elif family == "implement":
+            result, handle = self._implement(
                 task, mission_id=mission_id, shared=shared_worktree, prior=prior
             )
-        if family == "verify":
+        elif family == "verify":
             assert shared_worktree is not None
-            return self._verify(task, handle=shared_worktree), shared_worktree
-        if family == "review":
+            result, handle = self._verify(task, handle=shared_worktree), shared_worktree
+        elif family == "review":
             assert shared_worktree is not None
-            return (
+            result, handle = (
                 self._review(task, handle=shared_worktree, prior=prior),
                 shared_worktree,
             )
-        if family == "extract":
-            return self._extract_or_triage(task, family="extract"), shared_worktree
-        if family == "triage":
-            return self._extract_or_triage(task, family="triage"), shared_worktree
-        if family == "plan":
-            return self._extract_or_triage(task, family="plan"), shared_worktree
-        # Supported families without dedicated handlers stay honest incomplete.
-        result = WorkerResult(
-            worker_id=self.worker_id,
-            task_id=task.id,
-            task_family=family,
-            ok=False,
-            summary=f"handler_not_implemented:{family}",
-            artifacts={"support": support.to_dict(), "handler_missing": True},
-            finished_at=utc_now().isoformat(),
-        )
-        return result, shared_worktree
+        elif family in {"extract", "triage", "plan"}:
+            result, handle = self._extract_or_triage(task, family=family), shared_worktree
+        else:
+            # Supported families without dedicated handlers stay honest incomplete.
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family=family,
+                ok=False,
+                summary=f"handler_not_implemented:{family}",
+                artifacts={"support": support.to_dict(), "handler_missing": True},
+                finished_at=utc_now().isoformat(),
+            )
+            handle = shared_worktree
+        return self._end_task_effects(result), handle
 
     def _extract_or_triage(self, task: TaskSpec, *, family: str) -> WorkerResult:
         """Generic extract/triage/plan via local zero-spend inference — no known answers."""
@@ -601,6 +687,10 @@ class RepoWorker:
         shared: WorktreeHandle | None,
         prior: dict[str, WorkerResult] | None = None,
     ) -> tuple[WorkerResult, WorktreeHandle]:
+        if self._effect_mission_id is None:
+            # Direct unit-test seam; normal product execution always establishes
+            # the task attempt in run_task before reaching this method.
+            self._begin_task_effects(mission_id=mission_id, task_id=task.id)
         handle = shared or create_worktree(
             self.repo,
             mission_id=mission_id,
@@ -608,6 +698,7 @@ class RepoWorker:
             worker_id=self.worker_id,
             base_dir=self.worktree_root,
         )
+        self._bind_worktree_effects(handle)
         target_rel = self._resolve_target_rel(task)
         if target_rel is None and prior:
             for prev in prior.values():
@@ -826,8 +917,7 @@ class RepoWorker:
                 finished_at=utc_now().isoformat(),
             )
             return result, handle
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(patched, encoding="utf-8")
+        self._write_effect(target_rel, patched)
         written_tests: list[str] = []
         rejected_tests: list[str] = []
         for rel, body in new_files.items():
@@ -837,9 +927,7 @@ class RepoWorker:
             if not acceptable:
                 rejected_tests.append(rel)
                 continue
-            dest = handle.path / rel
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_text(body, encoding="utf-8")
+            self._write_effect(Path(rel), body)
             written_tests.append(rel)
         intent_to_add(handle, written_tests)
         r02c = _r02c_fields(
@@ -856,7 +944,7 @@ class RepoWorker:
         diff = worktree_diff(handle)
         if not diff.strip():
             if patched != original and target.exists():
-                target.write_text(original, encoding="utf-8")
+                self._write_effect(target_rel, original)
             result = WorkerResult(
                 worker_id=self.worker_id,
                 task_id=task.id,
@@ -902,6 +990,9 @@ class RepoWorker:
         return result, handle
 
     def _verify(self, task: TaskSpec, *, handle: WorktreeHandle) -> WorkerResult:
+        if self._effect_mission_id is None:
+            self._begin_task_effects(mission_id=handle.mission_id, task_id=task.id)
+        self._bind_worktree_effects(handle)
         commands: list[dict[str, Any]] = []
         test_rel = self._resolve_test_rel(task)
         goal = str(task.inputs.get("goal") or "")
@@ -919,8 +1010,7 @@ class RepoWorker:
             if test_file.exists():
                 if test_rel.parts[:1] == ("tests",) and (handle.path / "pyproject.toml").exists():
                     commands.append(
-                        _run_cmd(
-                            handle.path,
+                        self._run_effect(
                             [
                                 "uv",
                                 "run",
@@ -934,9 +1024,8 @@ class RepoWorker:
                     )
                 else:
                     commands.append(
-                        _run_cmd(
-                            test_file.parent,
-                            ["python", test_file.name],
+                        self._run_effect(
+                            ["python", "-m", "pytest", str(test_rel), "-q", "--tb=line"],
                             timeout=30,
                         )
                     )
@@ -946,8 +1035,7 @@ class RepoWorker:
                 pkg_tests = handle.path / "tests" / match
                 if pkg_tests.is_dir():
                     commands.append(
-                        _run_cmd(
-                            handle.path,
+                        self._run_effect(
                             [
                                 "uv",
                                 "run",
@@ -968,8 +1056,7 @@ class RepoWorker:
             and (self.parser_dogfood_fixture or not commands)
         ):
             commands.append(
-                _run_cmd(
-                    handle.path,
+                self._run_effect(
                     ["uv", "run", "pytest", "tests/mission", "-q", "--tb=line"],
                     timeout=180,
                 )
@@ -992,14 +1079,14 @@ class RepoWorker:
         defect_proof: dict[str, Any] | None = None
         if is_defect_repair_goal(goal, task.inputs):
             # R02a: defect repairs must demonstrate red->green with their own regression.
-            head = _run_cmd(self.repo, ["git", "rev-parse", "HEAD"], timeout=30)
+            head = self._run_effect(["git", "rev-parse", "HEAD"], timeout=30)
             candidate_sha = str(head.get("stdout") or "").strip() or "HEAD"
             decision = prove_defect(
                 repo=self.repo,
                 candidate_sha=candidate_sha,
                 worktree=handle.path,
                 diff_text=worktree_diff(handle),
-                run=lambda cwd, argv: _run_cmd(cwd, ["uv", "run", *argv], timeout=180),
+                run=lambda cwd, argv: self._run_effect(["uv", "run", *argv], timeout=180),
             )
             defect_proof = decision.to_dict()
             ok = ok and decision.proven

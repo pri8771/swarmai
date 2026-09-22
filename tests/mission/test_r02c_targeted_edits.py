@@ -9,10 +9,11 @@ import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.mission._worker_support import make_worker
+
 from swarm.contracts.fixtures import sample_task
 from swarm.mission.inference import InferenceResult
 from swarm.mission.worker import (
-    RepoWorker,
     _apply_edit_blocks,
     _is_echo,
     _parse_targeted_change,
@@ -121,7 +122,7 @@ def test_echo_detection_and_new_test_path_rules() -> None:
 
 def test_echo_is_reprompted_then_targeted_edit_and_new_test_land_in_diff(tmp_path: Path) -> None:
     repo = _init_repo(tmp_path / "repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     prompts: list[str] = []
     responses = iter([_inf(ORIGINAL), _inf(EDIT_RESPONSE)])
 
@@ -155,7 +156,7 @@ def test_echo_is_reprompted_then_targeted_edit_and_new_test_land_in_diff(tmp_pat
 
 def test_double_echo_is_no_material_diff_without_writing(tmp_path: Path) -> None:
     repo = _init_repo(tmp_path / "repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     with patch("swarm.mission.worker.local_chat", return_value=_inf(ORIGINAL)):
         result, handle = worker._implement(
             _task("tsk_r02c_echo2"), mission_id="m_echo2", shared=None
@@ -173,7 +174,7 @@ def test_double_echo_is_no_material_diff_without_writing(tmp_path: Path) -> None
 
 def test_unmatched_edit_block_is_reprompted_and_then_fails_honestly(tmp_path: Path) -> None:
     repo = _init_repo(tmp_path / "repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     bad = EDIT_RESPONSE.replace("    return value\n=======", "    return valu\n=======")
     with patch("swarm.mission.worker.local_chat", return_value=_inf(bad)):
         result, _ = worker._implement(_task("tsk_r02c_unmatched"), mission_id="m_um", shared=None)
@@ -185,7 +186,7 @@ def test_unmatched_edit_block_is_reprompted_and_then_fails_honestly(tmp_path: Pa
 
 def test_rejected_new_test_path_is_not_written(tmp_path: Path) -> None:
     repo = _init_repo(tmp_path / "repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     evil = EDIT_RESPONSE.replace(
         "### NEW tests/widgets/test_bump_regression.py", "### NEW tests/../widgets/evil.py"
     )
@@ -205,7 +206,7 @@ def test_targeted_fix_passes_the_defect_proof_gate_end_to_end(tmp_path: Path) ->
     from swarm.mission.acceptance import prove_defect
 
     repo = _init_repo(tmp_path / "repo")
-    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    worker = make_worker(repo=repo, worktree_root=tmp_path / "wt")
     with patch("swarm.mission.worker.local_chat", return_value=_inf(EDIT_RESPONSE)):
         result, handle = worker._implement(_task("tsk_r02c_gate"), mission_id="m_gate", shared=None)
     assert result.ok is True
