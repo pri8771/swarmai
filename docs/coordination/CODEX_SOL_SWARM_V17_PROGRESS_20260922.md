@@ -60,6 +60,17 @@ checks above were executed. That broad request does not identify an exact
 model call, source tree, account allowance, output cap or independent review
 verdict. Do not claim LIVE qualification from these observations.
 
+Follow-up after the owner asked for another route: the 403 response was a
+Cloudflare `browser_signature_banned` (error 1010) for Python urllib, not a
+Groq quota response. Repeating the read-only models GET with the Swarm
+worktree's `httpx` client returned HTTP 200, 11 catalog models, and the pinned
+`openai/gpt-oss-20b` model present. Groq Console limits requires login in the
+available browser session, so account tier/remaining requests were not read
+there. OpenRouter's current key still had its full reported allowance at the
+prior readback; Ollama remained available. No evidence says these three
+selected routes are out of requests. No model generation or additional provider
+onboarding occurred, and current-source independent review remains open.
+
 ## Exact prerequisite access proposal — **not granted**
 
 The owner handoff explicitly holds authenticated provider metadata/session

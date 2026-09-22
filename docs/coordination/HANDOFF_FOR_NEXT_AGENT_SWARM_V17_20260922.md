@@ -23,7 +23,9 @@ the pre-existing dirty main checkout was untouched.
 
 **Provider observations after owner asked to proceed with live testing:**
 OpenRouter current-key GET 200 (`is_free_tier=false`, limit and remaining 1,
-usage 0); Groq models GET 403; Ollama loopback tags GET 200 with installed
+usage 0); Groq models GET initially 403 via urllib but 200 via the Swarm
+worktree's `httpx` client (11 models, pinned `openai/gpt-oss-20b` present);
+Ollama loopback tags GET 200 with installed
 `qwen3.5:4b`/`qwen3.5:9b`. No inference or download. Details in
 `CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`. A model-call grant must bind the
 independently reviewed source tree and exact request, model, backend, allowance
@@ -38,7 +40,7 @@ CP3 evidence remain open. The CP3 rerun is located at source
 it does not prove the operational mission or second host.
 
 **Next bounded task:** obtain independent PR30 disposition, then the separate
-PR31/PR32 reviews; resolve Groq 403/current tier and pin a genuinely free
+PR31/PR32 reviews; verify Groq account tier and pin a genuinely free
 remote allowance before a bounded reviewed-source inference grant. Do not
 repeat the settled offline suite without source drift or a concrete failure.
 The full source chain and evidence limits are in
