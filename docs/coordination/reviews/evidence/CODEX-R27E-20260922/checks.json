@@ -1,0 +1,110 @@
+{
+  "source_sha": "193e454e0226f7e7be768ad810eb68e6050aea8f",
+  "tree_sha": "d496a1ddaa554892da118e8a1e910c9f6b100a7b",
+  "evidence_class": "engineering_only",
+  "environment": "isolated Swarm PostgreSQL Unix socket, test-only grace0/timeout1 with actual elapsed wait, real spawn/os._exit9 before/after temporary file effect; synthetic loopback fixtures; existing console lockfile dependencies",
+  "runs": [
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "tests/integration/db/test_effect_crash_window.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "tests/integration/db/test_effect_crash_window.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "tests/integration/db/test_effect_crash_window.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "tests/integration/db/test_effect_crash_window.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "tests/integration/db/test_effect_crash_window.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy",
+        "src"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ],
+  "completed_utc": "2026-09-22T04:07:12.715916+00:00"
+}
