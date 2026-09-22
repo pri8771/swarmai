@@ -200,6 +200,7 @@ class ConsequentialToolGateway:
                 envelope,
                 executor_id=new_id("exe_"),
                 fence_reader=self.fences.reader(**self._fence_identity(envelope)),
+                admission_guard=self.fences.admission_guard,
             )
         except LeaseClaimError as exc:
             raise EffectConflictError(f"fence_changed_before_execute:{exc}") from exc

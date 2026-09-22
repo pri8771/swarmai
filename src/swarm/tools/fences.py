@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import threading
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import AbstractContextManager, contextmanager, nullcontext
 from typing import Any, Protocol
 
 from pydantic import Field
@@ -25,6 +26,8 @@ class ActorContext(StrictModel):
 
 
 class FenceProvider(Protocol):
+    def admission_guard(self) -> AbstractContextManager[None]: ...
+
     def current(
         self,
         *,
@@ -52,6 +55,9 @@ class StaticFenceProvider:
             lease_generation=lease_generation,
             cancellation_generation=cancellation_generation,
         )
+
+    def admission_guard(self) -> AbstractContextManager[None]:
+        return nullcontext()
 
     def current(
         self,
@@ -90,12 +96,18 @@ class RevocableFenceProvider:
     """
 
     def __init__(self, lease_generation: int = 1, cancellation_generation: int = 0) -> None:
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._cancelled = False
         self._state = FenceState(
             lease_generation=lease_generation,
             cancellation_generation=cancellation_generation,
         )
+
+    @contextmanager
+    def admission_guard(self) -> Iterator[None]:
+        """Serialize local revocation with admission, including its committed return."""
+        with self._lock:
+            yield
 
     def current(
         self,
@@ -153,6 +165,9 @@ class LeaseFenceProvider:
 
     def __init__(self, session_factory: sessionmaker[Session]) -> None:
         self.session_factory = session_factory
+
+    def admission_guard(self) -> AbstractContextManager[None]:
+        return nullcontext()
 
     def current(
         self,

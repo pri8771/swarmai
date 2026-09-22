@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import subprocess
 import threading
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 import swarm.mission.worker as worker_module
+from swarm.db.engine import create_db_engine
+from swarm.db.models import Base
 from swarm.mission.action_boundary import local_worktree_gateway
 from swarm.mission.inference import InferenceResult
 from swarm.mission.runtime import MissionRuntime
@@ -19,6 +23,21 @@ from swarm.mission.worktree import WorktreeHandle, create_worktree, remove_workt
 from swarm.tools.adapters.local_sandbox import LocalSandboxAdapter
 from swarm.tools.fences import ActorContext, RevocableFenceProvider
 from swarm.tools.v17_gateway import CancellationFenceError
+
+
+@pytest.fixture(autouse=True)
+def runtime_effect_schema() -> Iterator[None]:
+    """Exercise durable runtime effects when the test harness supplies PostgreSQL."""
+    if not (os.environ.get("SWARM_DATABASE_URL") or "").strip():
+        yield
+        return
+    engine = create_db_engine()
+    Base.metadata.create_all(engine)
+    try:
+        yield
+    finally:
+        Base.metadata.drop_all(engine)
+        engine.dispose()
 
 
 def _init_fixture_repo(repo: Path) -> None:
@@ -472,7 +491,9 @@ async def test_runtime_invalidates_fence_before_signalling_worker_stop(
     original_cancel = RevocableFenceProvider.cancel
 
     class BlockingWorker:
-        def __init__(self, _repo: Path, *, cancellation_event: threading.Event, **_kwargs: Any) -> None:
+        def __init__(
+            self, _repo: Path, *, cancellation_event: threading.Event, **_kwargs: Any
+        ) -> None:
             self.cancellation_event = cancellation_event
             self.active_worktree = None
             self.active_action_receipt_ids: list[str] = []
