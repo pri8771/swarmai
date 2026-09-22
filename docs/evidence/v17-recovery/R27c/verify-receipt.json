@@ -1,0 +1,34 @@
+{
+  "packet": "R27c",
+  "artifact": "ART-V17-APPROVAL-BINDING",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "0130105e826f02d5e2a5809072712fc310b96274",
+  "tested_source_sha": "8dbe5d810d732f17806ac9611bec78383201ac82",
+  "migration_head": "a17effect004b0001",
+  "database": "postgresql+psycopg://pchordia@127.0.0.1:5432/swarmai_v17_test (local, no secret)",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/integration/db/test_effect_transactions.py tests/integration/db/test_effect_reservation_atomic.py -v (x5)",
+      "result": "16 passed x5"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "416 passed, 2 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "review_pending",
+  "review_hold": "REV-R27C: lead reviews this diff before R27e/R28a start",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T00:49:37Z"
+}
