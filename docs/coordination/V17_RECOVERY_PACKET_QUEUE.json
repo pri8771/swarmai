@@ -594,14 +594,17 @@
       "sp": 3,
       "tier": "high",
       "spec": "docs/coordination/packets/R27e.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "E5",
         "E10"
       ],
       "review_hold": "lead reviews diff",
       "assignee": "codex",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R27E_20260922.md"
+      "assignment_ref": "docs/coordination/assignments/CODEX_R27E_20260922.md",
+      "implementation_ref": "codex/swarm-r27e-recovery-20260922@e924351bd93510eaae279225db3a2fa447dd6894",
+      "review_ref": "docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R27E-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R28a",
@@ -614,14 +617,16 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28a.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "E6",
         "E7",
         "E11",
         "I4"
       ],
-      "review_hold": "R27e exact-SHA lead review required before start"
+      "review_hold": "lead reviews exact R28a SHA before dependent work",
+      "assignee": "codex",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28A_20260922.md"
     },
     {
       "id": "R28b",
