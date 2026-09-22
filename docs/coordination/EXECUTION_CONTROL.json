@@ -1,17 +1,17 @@
 {
   "schema_version": "1.2",
   "purpose": "Owner-scoped execution control over existing packet DAGs; not a second queue or evidence of completion",
-  "scope_directive": "OWNER_V20_LIVE_CEILING",
-  "scope_precedence": "Latest owner goal is SwarmAI V2.0. V1.7 and predecessor gates remain prerequisites. Historical V2.3/V3 plans are not current assignments.",
+  "scope_directive": "OWNER_V23_MINIMUM_V27_TARGET_REVIEW_PENDING",
+  "scope_precedence": "Latest owner direction: V2.3 is the minimum desired SwarmAI milestone and V2.7 is the target. Existing canonical V2.3 plan is active subject to dependencies/reviews. V2.7 has no accepted contract yet; V27_OWNER_REVIEW_PROPOSAL_20260922.md is proposal-only.",
   "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
-  "goal_version": "2.0",
+  "goal_version": "2.3",
   "allowed_phases": [
     "v17"
   ],
   "initial_phase": "v17",
   "future_implementation_authorized": true,
-  "future_planning_authorized": false,
-  "stop_after": "Genuinely live V2.0 handoff and review package; do not begin V2.3 or V3.",
+  "future_planning_authorized": true,
+  "stop_after": "Reach accepted V2.3 minimum; V2.7 implementation requires owner/lead acceptance of a V2.7 contract/packet DAG.",
   "implementation_branch": "cursor/v17-single-session",
   "audited_source_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
   "heartbeat_path": "heartbeats/CURSOR-V17-SINGLE.json",
@@ -135,12 +135,27 @@
       "base_sha": "a2cfb3c1d5e326a1b15d7d23cfe3c91ea2e40bf4",
       "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28D2-LEAD-REVIEW.md",
       "live_acceptance": false
+    },
+    "R30a": {
+      "decision": "bounded_infrastructure_slice_accepted",
+      "source_sha": "e46f5b63d3bef3e6ccb00c73fb2b1455b8abf264",
+      "base_sha": "e405077f8fbab4b9aa9630666fd697527c01b623",
+      "review_ref": "docs/coordination/reviews/ART-V17-INTEGRATION-MANIFEST-R30A-LEAD-REVIEW.md",
+      "live_acceptance": false
+    },
+    "R28d-successor-86f8e0c": {
+      "decision": "rework_found",
+      "source_sha": "86f8e0c90e399c683d68ba9628ef48af4723f33f",
+      "base_sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+      "review_ref": "docs/coordination/reviews/ASTRA_R28D_SUCCESSOR_REWORK_LEAD_20260922.md",
+      "live_acceptance": false
     }
   },
   "frozen_packets": [],
   "rules": [
-    "Current execution stays on V1.7 until its native handoff/review gates are satisfied; the V2.0 owner ceiling authorizes later V1.8/V1.9/V2.0 work only after normal phase/dependency release.",
-    "Historical V2.3/V3 packet graphs are reference material only and are not authorized by the V2.0 ceiling.",
+    "V2.3 is the current minimum owner goal and may advance only through the existing cemented dependency/review plan; do not skip unfinished predecessor acceptance gates.",
+    "V2.7 is a requested target only. No V2.7 implementation authority exists until its proposed definition and packet DAG are explicitly accepted.",
+    "Current owner hold forbids new live/model/provider/scheduler/spend/main-merge actions; earlier broad private-$0 live permission is superseded for new runs.",
     "Use methodical root-cause debugging: reproduce, map cause, repair narrowly, preserve detailed source-bound notes and adverse tests.",
     "Live means a running private/local candidate plus relevant real operational tests; a health endpoint or a local fixture alone is insufficient.",
     "Existing review holds remain mandatory; worker may prepare review bundles but may not invent reviews.",
@@ -153,21 +168,34 @@
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
   ],
   "current_direct_worker": "codex",
-  "current_direct_assignment": "docs/coordination/assignments/CODEX_R28D_LIVE_LOCAL_20260922.md",
+  "current_direct_assignment": "docs/coordination/assignments/CODEX_R28D_ADMISSION_ATOMICITY_20260922.md",
   "fable_handoff_authorized": false,
   "authorized_versions": [
     "1.7",
     "1.8",
     "1.9",
-    "2.0"
+    "2.0",
+    "2.3"
   ],
   "prohibited_versions": [
-    "2.3",
     "3.0"
   ],
   "phase_policy": "V1.7 remains the current executable phase. After its required handoff/review, the lead may release only V1.8/V1.9/V2.0 packets from the existing future queue; V2.3/V3 remain forbidden.",
-  "future_implementation_ceiling": "2.0",
+  "future_implementation_ceiling": "2.3",
   "method": "Reproduce actual failure first where possible, record root-cause/causal map and detailed source-bound notes, then make the smallest bounded repair and test adverse paths.",
-  "private_zero_cost_live_testing_authorized": true,
-  "private_zero_cost_live_testing_scope": "existing accounts/subscriptions and owned machines; no spend/public messages/posts/real job submissions/destructive actions/CAPTCHA-MFA bypass"
+  "private_zero_cost_live_testing_authorized": false,
+  "private_zero_cost_live_testing_scope": "SUPERSEDED: current owner turn prohibits new live/model/provider actions. No new live run may rely on earlier broad grant.",
+  "requested_target_version": "2.7",
+  "v27_contract_status": "proposed_not_accepted",
+  "v27_proposal_ref": "docs/coordination/V27_OWNER_REVIEW_PROPOSAL_20260922.md",
+  "secondary_safe_assignment": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
+  "current_action_holds": {
+    "live": true,
+    "model": true,
+    "provider": true,
+    "scheduler": true,
+    "spend": true,
+    "main_merge": true,
+    "note": "Current owner turn explicitly prohibits new live/model/provider/scheduler/spend/main-merge actions. Offline/source/evidence work may proceed only through released packets."
+  }
 }
