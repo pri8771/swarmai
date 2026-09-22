@@ -1,0 +1,35 @@
+{
+  "packet": "R02a",
+  "artifact": "ART-V14-REAL-E2E",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "c25182dfa5b03f3b9a4409282b6ea465484fe79f",
+  "tested_source_sha": "ef8a2cc25c9caf8665804a28453c6f81f82d4a11",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/mission/test_defect_proof_gate.py -v",
+      "result": "8 passed"
+    },
+    {
+      "argv": "uv run pytest tests/mission -q",
+      "result": "50 passed"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "433 passed, 2 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T01:36:42Z"
+}
