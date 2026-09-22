@@ -61,8 +61,34 @@ def heartbeat_assessment(heartbeat: dict[str, Any], now: datetime) -> dict[str, 
             'source_sha': hb.get('branch_sha')}
 
 
+def scope_denial(control: dict[str, Any], phase: str) -> dict[str, Any] | None:
+    """Apply the owner's active scope before reading queues or suggesting work."""
+    allowed = control.get('allowed_phases', tuple(FILES))
+    reason = None
+    if (
+        not isinstance(allowed, (list, tuple)) or not allowed
+        or any(not isinstance(name, str) or name not in FILES for name in allowed)
+    ):
+        reason = 'invalid_allowed_phases'
+    elif control.get('goal_version') == '1.7' and any(name != 'v17' for name in allowed):
+        reason = 'scope_ceiling_conflict:goal_version=1.7'
+    elif phase not in allowed:
+        reason = f'scope_forbidden:{phase}'
+    if reason is None:
+        return None
+    return {
+        'ok': False, 'phase': phase, 'ready': [], 'preflight_only': [],
+        'in_progress': [], 'blocked': [], 'errors': [reason],
+        'meaning': 'Owner scope forbids this phase; no continuation is authorized.',
+        'packet_count': 0,
+    }
+
+
 def evaluate(documents: dict[str, dict[str, Any]], control: dict[str, Any],
              phase: str = 'v17') -> dict[str, Any]:
+    denied = scope_denial(control, phase)
+    if denied is not None:
+        return denied
     nodes: dict[str, dict[str, Any]] = {}
     origins: dict[str, str] = {}
     gates: dict[str, dict[str, Any]] = {}
@@ -237,11 +263,17 @@ def main() -> int:
     args = parser.parse_args()
     try:
         control = json.loads((args.coord / 'EXECUTION_CONTROL.json').read_text())
-        documents = {
-            name: json.loads((args.coord / filename).read_text())
-            for name, filename in FILES.items()
-        }
-        result = evaluate(documents, control, args.phase)
+        denied = scope_denial(control, args.phase)
+        if denied is not None:
+            result = denied
+        else:
+            # Parked future plans must not be needed for a V1.7-only session.
+            files = {'v17': FILES['v17']} if control.get('allowed_phases') == ['v17'] else FILES
+            documents = {
+                name: json.loads((args.coord / filename).read_text())
+                for name, filename in files.items()
+            }
+            result = evaluate(documents, control, args.phase)
         hb_path = args.coord / control['heartbeat_path']
         if hb_path.exists():
             result['heartbeat'] = heartbeat_assessment(
