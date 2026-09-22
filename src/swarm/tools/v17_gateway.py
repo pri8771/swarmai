@@ -334,6 +334,8 @@ class ConsequentialToolGateway:
             result = self.adapter.reconcile(envelope, prior)
         except Exception as exc:  # noqa: BLE001
             result = {"state": "unknown", "error_type": type(exc).__name__}
+        if not isinstance(result, dict):
+            result = {"state": "unknown", "invalid_result_type": type(result).__name__}
         state = str(result.get("state", "unknown"))
         if state == "succeeded":
             return self._finalize(

@@ -360,3 +360,46 @@ def test_concurrent_reconcile_has_one_terminal_disposition(factory, tmp_path, mo
     assert row(store, env)["state"] == "succeeded"
     assert len(store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)) == 1
     assert path.read_text().splitlines() == [env.effect_key] and adapter.call_count == 0
+
+
+def test_public_repository_rejects_missing_execution_token(factory, tmp_path):
+    from swarm.contracts.actions import ActionReceiptV17
+
+    _, _, store, _, env = setup_effect(factory, tmp_path)
+    begin(store, env)
+    age(factory, env)
+    assert recover(store, env)
+    receipt = ActionReceiptV17(
+        action_id=env.action_id,
+        effect_key=env.effect_key,
+        project_id=env.project_id,
+        integration_id=env.integration_id,
+        integration_version=env.integration_version,
+        operation=env.operation,
+        destination=env.destination,
+        outcome="succeeded",
+    )
+    with pytest.raises(EffectConflictError, match="execution_token_required"):
+        store.finalize_with_receipt(
+            project_id=env.project_id, effect_key=env.effect_key, state="succeeded", receipt=receipt
+        )
+    with pytest.raises(EffectConflictError, match="execution_token_required"):
+        store.attach_pre_observation(
+            project_id=env.project_id, effect_key=env.effect_key, pre_observation={"stale": True}
+        )
+    assert row(store, env)["state"] == "unknown"
+    assert store.list_receipts(project_id=env.project_id, effect_key=env.effect_key) == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("bad_result", [None, [], "bad"])
+async def test_malformed_reconcile_result_is_pending(factory, tmp_path, monkeypatch, bad_result):
+    path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+    begin(store, env)
+    age(factory, env)
+    monkeypatch.setattr(adapter, "reconcile", lambda *_: bad_result)
+    with pytest.raises(ReconciliationRequiredError, match="external_outcome_still_unknown"):
+        await gateway.execute_envelope(env)
+    receipts = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
+    assert len(receipts) == 1 and receipts[0].reconciliation_state == "pending"
+    assert row(store, env)["state"] == "unknown" and not path.exists()

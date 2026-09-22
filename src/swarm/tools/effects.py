@@ -276,6 +276,8 @@ class InMemoryEffectStore:
         pre_observation: dict[str, Any],
         expected_execution: tuple[str | None, int, str] | None = None,
     ) -> dict[str, Any]:
+        if expected_execution is None:
+            raise EffectConflictError("execution_token_required")
         with self._lock:
             row = self._require(project_id, effect_key)
             if expected_execution is not None and expected_execution != (
@@ -300,6 +302,8 @@ class InMemoryEffectStore:
         reconciliation: dict[str, Any] | None = None,
         expected_execution: tuple[str | None, int, str] | None = None,
     ) -> ActionReceiptV17:
+        if expected_execution is None:
+            raise EffectConflictError("execution_token_required")
         with self._lock:
             row = self._require(project_id, effect_key)
             if expected_execution is not None and expected_execution != (
@@ -612,6 +616,8 @@ class DurableEffectRepository:
         pre_observation: dict[str, Any],
         expected_execution: tuple[str | None, int, str] | None = None,
     ) -> dict[str, Any]:
+        if expected_execution is None:
+            raise EffectConflictError("execution_token_required")
         guards = []
         if expected_execution is not None:
             executor, attempt, prior_state = expected_execution
@@ -649,6 +655,8 @@ class DurableEffectRepository:
         expected_execution: tuple[str | None, int, str] | None = None,
     ) -> ActionReceiptV17:
         """CAS executing/unknown -> new state and insert the receipt, one transaction."""
+        if expected_execution is None:
+            raise EffectConflictError("execution_token_required")
         values: dict[str, Any] = {
             "state": state,
             "state_reason": state_reason,

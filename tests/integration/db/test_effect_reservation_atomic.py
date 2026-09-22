@@ -202,6 +202,7 @@ def test_failed_without_not_applied_reason_is_terminal(factory) -> None:
         effect_key=env.effect_key,
         state="failed",
         receipt=_failed_receipt(env, admitted["effect_id"]),
+        expected_execution=(admitted["executor_id"], admitted["attempt_count"], "executing"),
     )
     with pytest.raises(EffectConflictError, match="effect_terminal:failed"):
         repo.begin_execution(env, executor_id="exe_2")
