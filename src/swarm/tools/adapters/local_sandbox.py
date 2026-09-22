@@ -71,7 +71,12 @@ class LocalSandboxAdapter:
         path.parent.mkdir(parents=True, exist_ok=True)
         text = str(envelope.normalized_payload.get("text", ""))
         path.write_text(text, encoding="utf-8")
-        return {"written": True, "bytes": len(text.encode("utf-8")), "path": str(path)}
+        return {
+            "outcome": "succeeded",
+            "written": True,
+            "bytes": len(text.encode("utf-8")),
+            "path": str(path),
+        }
 
     def observe_post_state(
         self, envelope: ActionEnvelope, execution_result: dict[str, Any]
