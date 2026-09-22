@@ -247,5 +247,16 @@
   "r30b_p0_resume_ref": "docs/coordination/OWNER_PAUSE_V20_20260922.md",
   "cp3_rerun_status": "evidence_locator_required_no_acceptance",
   "g13_platform_ruling": "platform_neutral_verification_allowed; no Windows-specific requirement for EVAL-131; sealed-reference binding still required",
-  "g13_sealed_reference_status": "blocked_real_non_worker_readable_bundle_and_binding_digest_required"
+  "g13_sealed_reference_status": "blocked_real_non_worker_readable_bundle_and_binding_digest_required",
+  "next_session_assignment": {
+    "owner_directive_ref": "docs/coordination/OWNER_RACE_V17_20260922.md",
+    "implementation_owner": "GPT-6 Sol in a new Codex task",
+    "prompt_ref": "docs/coordination/GPT6_SOL_SWARM_V17_RACE_20260922.md",
+    "state": "ASSIGNED_WAITING_FOR_WORKER",
+    "target_version": "1.7",
+    "auto_launch": false,
+    "new_live_grant": false,
+    "new_scheduler_grant": false,
+    "changes_acceptance": false
+  }
 }
