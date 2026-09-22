@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import threading
 from collections.abc import Callable, Mapping
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import and_, func, or_, select, update
@@ -54,6 +55,8 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
         "destination_digest": row.destination_digest,
         "payload_hash": row.payload_hash,
         "state": row.state,
+        "side_effect_class": (row.payload or {}).get("side_effect_class"),
+        "timeout_seconds": (row.payload or {}).get("timeout_seconds"),
         "lease_generation": row.lease_generation,
         "cancellation_generation": row.cancellation_generation,
         "pre_observation": dict(row.pre_observation or {}),
@@ -115,6 +118,10 @@ def _check_fence(stored: Mapping[str, Any], current: Mapping[str, int | None]) -
 
 def check_effect_binding(stored: Mapping[str, Any], envelope: ActionEnvelope) -> None:
     _check_binding(stored, envelope)
+    if stored.get("side_effect_class") not in (None, envelope.side_effect_class):
+        raise EffectConflictError("effect_class_binding_mismatch")
+    if stored.get("timeout_seconds") not in (None, envelope.timeout_seconds):
+        raise EffectConflictError("effect_timeout_binding_mismatch")
     for field in (
         "mission_id",
         "task_id",
@@ -198,6 +205,8 @@ class InMemoryEffectStore:
                 "destination_digest": payload_hash({"destination": envelope.destination}),
                 "payload_hash": envelope.payload_hash,
                 "state": "reserved",
+                "side_effect_class": envelope.side_effect_class,
+                "timeout_seconds": envelope.timeout_seconds,
                 "lease_generation": envelope.lease_generation,
                 "cancellation_generation": envelope.cancellation_generation,
                 "pre_observation": {},
@@ -260,11 +269,23 @@ class InMemoryEffectStore:
             return dict(row)
 
     def attach_pre_observation(
-        self, *, project_id: str, effect_key: str, pre_observation: dict[str, Any]
+        self,
+        *,
+        project_id: str,
+        effect_key: str,
+        pre_observation: dict[str, Any],
+        expected_execution: tuple[str | None, int, str] | None = None,
     ) -> dict[str, Any]:
-        row = self._require(project_id, effect_key)
-        row["pre_observation"] = dict(pre_observation)
-        return dict(row)
+        with self._lock:
+            row = self._require(project_id, effect_key)
+            if expected_execution is not None and expected_execution != (
+                row.get("executor_id"),
+                row["attempt_count"],
+                row["state"],
+            ):
+                raise EffectConflictError("pre_observation_state_conflict")
+            row["pre_observation"] = dict(pre_observation)
+            return dict(row)
 
     def finalize_with_receipt(
         self,
@@ -277,9 +298,16 @@ class InMemoryEffectStore:
         post_observation: dict[str, Any] | None = None,
         external_id: str | None = None,
         reconciliation: dict[str, Any] | None = None,
+        expected_execution: tuple[str | None, int, str] | None = None,
     ) -> ActionReceiptV17:
         with self._lock:
             row = self._require(project_id, effect_key)
+            if expected_execution is not None and expected_execution != (
+                row.get("executor_id"),
+                row["attempt_count"],
+                row["state"],
+            ):
+                raise EffectConflictError("finalize_state_conflict")
             if row["state"] not in FINALIZABLE_STATES:
                 raise EffectConflictError("finalize_state_conflict")
             row["state"] = state
@@ -293,6 +321,27 @@ class InMemoryEffectStore:
                 row["reconciliation"] = dict(reconciliation)
                 row["reconciled_at"] = utc_now()
             return self._store_receipt_locked(receipt)
+
+    def recover_orphaned(
+        self, *, project_id: str, effect_key: str, grace_seconds: int, timeout_seconds: int
+    ) -> bool:
+        _validate_recovery_window(grace_seconds, timeout_seconds)
+        with self._lock:
+            row = self._require(project_id, effect_key)
+            cutoff = utc_now() - timedelta(seconds=timeout_seconds + grace_seconds)
+            if row["state"] != "executing" or not row["started_at"] or row["started_at"] >= cutoff:
+                return False
+            row.update(state="unknown", state_reason="executor_lost", finished_at=utc_now())
+            return True
+
+    def rearm_irreversible(
+        self, *, project_id: str, effect_key: str, operator: str, reason: str
+    ) -> None:
+        with self._lock:
+            row = self._require(project_id, effect_key)
+            note = _rearm_note(row, operator, reason)
+            row["reconciliation"] = note
+            row["state_reason"] = "not_applied"
 
     def get(self, *, project_id: str, effect_key: str) -> dict[str, Any] | None:
         row = self.effects.get((project_id, effect_key))
@@ -461,7 +510,10 @@ class DurableEffectRepository:
                 pre_observation={},
                 post_observation={},
                 reconciliation={},
-                payload={},
+                payload={
+                    "side_effect_class": envelope.side_effect_class,
+                    "timeout_seconds": envelope.timeout_seconds,
+                },
                 attempt_count=0,
             )
             .on_conflict_do_nothing(constraint="uq_action_effect_project_key")
@@ -553,20 +605,34 @@ class DurableEffectRepository:
         row.payload = {**(row.payload or {}), "consumed_approval_ids": sorted(consumed_ids)}
 
     def attach_pre_observation(
-        self, *, project_id: str, effect_key: str, pre_observation: dict[str, Any]
+        self,
+        *,
+        project_id: str,
+        effect_key: str,
+        pre_observation: dict[str, Any],
+        expected_execution: tuple[str | None, int, str] | None = None,
     ) -> dict[str, Any]:
+        guards = []
+        if expected_execution is not None:
+            executor, attempt, prior_state = expected_execution
+            guards = [
+                ActionEffectRow.executor_id == executor,
+                ActionEffectRow.attempt_count == attempt,
+                ActionEffectRow.state == prior_state,
+            ]
         with session_scope(self.factory) as session:
             row = session.scalars(
                 update(ActionEffectRow)
                 .where(
                     ActionEffectRow.project_id == project_id,
                     ActionEffectRow.effect_key == effect_key,
+                    *guards,
                 )
                 .values(pre_observation=dict(pre_observation))
                 .returning(ActionEffectRow)
             ).first()
             if row is None:
-                raise EffectStoreError("effect_not_found")
+                raise EffectConflictError("pre_observation_state_conflict")
             return _effect_dict_from_row(row)
 
     def finalize_with_receipt(
@@ -580,6 +646,7 @@ class DurableEffectRepository:
         post_observation: dict[str, Any] | None = None,
         external_id: str | None = None,
         reconciliation: dict[str, Any] | None = None,
+        expected_execution: tuple[str | None, int, str] | None = None,
     ) -> ActionReceiptV17:
         """CAS executing/unknown -> new state and insert the receipt, one transaction."""
         values: dict[str, Any] = {
@@ -594,6 +661,14 @@ class DurableEffectRepository:
         if reconciliation is not None:
             values["reconciliation"] = dict(reconciliation)
             values["reconciled_at"] = func.now()
+        guards = []
+        if expected_execution is not None:
+            executor, attempt, prior_state = expected_execution
+            guards = [
+                ActionEffectRow.executor_id == executor,
+                ActionEffectRow.attempt_count == attempt,
+                ActionEffectRow.state == prior_state,
+            ]
         with session_scope(self.factory) as session:
             row = session.scalars(
                 update(ActionEffectRow)
@@ -601,6 +676,7 @@ class DurableEffectRepository:
                     ActionEffectRow.project_id == project_id,
                     ActionEffectRow.effect_key == effect_key,
                     ActionEffectRow.state.in_(FINALIZABLE_STATES),
+                    *guards,
                 )
                 .values(**values)
                 .returning(ActionEffectRow)
@@ -608,6 +684,42 @@ class DurableEffectRepository:
             if row is None:
                 raise EffectConflictError("finalize_state_conflict")
             return _insert_receipt(session, row, receipt)
+
+    def recover_orphaned(
+        self, *, project_id: str, effect_key: str, grace_seconds: int, timeout_seconds: int
+    ) -> bool:
+        _validate_recovery_window(grace_seconds, timeout_seconds)
+        cutoff = func.clock_timestamp() - timedelta(seconds=timeout_seconds + grace_seconds)
+        with session_scope(self.factory) as session:
+            changed = session.execute(
+                update(ActionEffectRow)
+                .where(
+                    ActionEffectRow.project_id == project_id,
+                    ActionEffectRow.effect_key == effect_key,
+                    ActionEffectRow.state == "executing",
+                    ActionEffectRow.started_at < cutoff,
+                )
+                .values(state="unknown", state_reason="executor_lost", finished_at=func.now())
+                .returning(ActionEffectRow.effect_id)
+            ).scalar_one_or_none()
+            return changed is not None
+
+    def rearm_irreversible(
+        self, *, project_id: str, effect_key: str, operator: str, reason: str
+    ) -> None:
+        with session_scope(self.factory) as session:
+            row = session.scalar(
+                select(ActionEffectRow)
+                .where(
+                    ActionEffectRow.project_id == project_id,
+                    ActionEffectRow.effect_key == effect_key,
+                )
+                .with_for_update()
+            )
+            if row is None:
+                raise EffectStoreError("effect_not_found")
+            row.reconciliation = _rearm_note(_effect_dict_from_row(row), operator, reason)
+            row.state_reason = "not_applied"
 
     def get(self, *, project_id: str, effect_key: str) -> dict[str, Any] | None:
         with session_scope(self.factory) as session:
@@ -794,3 +906,23 @@ def _grant_from_row(row: ApprovalRow) -> ApprovalGrant:
         constraints=dict(row.constraints or {}),
         created_at=row.created_at or utc_now(),
     )
+
+
+def _validate_recovery_window(grace_seconds: int, timeout_seconds: int) -> None:
+    if grace_seconds < 0 or timeout_seconds <= 0:
+        raise ValueError("invalid_recovery_window")
+
+
+def _rearm_note(row: Mapping[str, Any], operator: str, reason: str) -> dict[str, Any]:
+    if not operator.strip() or not reason.strip():
+        raise EffectStoreError("operator_and_reason_required")
+    if (
+        row["state"] != "failed"
+        or row.get("state_reason") != "irreversible_requires_operator_disposition"
+    ):
+        raise EffectConflictError("irreversible_rearm_not_allowed")
+    note = dict(row.get("reconciliation") or {})
+    notes = list(note.get("operator_rearms") or [])
+    notes.append({"operator": operator, "reason": reason, "at": utc_now().isoformat()})
+    note["operator_rearms"] = notes
+    return note
