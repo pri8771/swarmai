@@ -1,0 +1,67 @@
+{
+  "missions": [
+    {
+      "mission_id": "1a3d052c8b4048ec99fa8c574f0f88c6",
+      "status": "failed",
+      "goal": "Audit the current SwarmAI subsystem at src/swarm/runtime/backpressure.py together with tests/runtime/test_runtime.py for one real correctness, reliability, or security defect. Inspect the actual repository, identify one defensible issue with file/symbol evidence, propose a minimal patch only in an isolated worktree, add or update a regression test under tests/runtime that fails before the patch and passes after it, run the relevant check, and submit for review. Do not modify or merge the primary checkout. Do not use demo fixtures or known-answer substitution.",
+      "updated_at": "2026-09-22T01:44:00.314650+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/1a3d052c8b4048ec99fa8c574f0f88c6.json"
+    },
+    {
+      "mission_id": "demo-parser-issue",
+      "status": "planning",
+      "goal": "Investigate and fix a parser bug using two independent approaches; produce a tested reviewed patch.",
+      "updated_at": "2026-09-22T01:44:26.425167+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/demo-parser-issue.json"
+    },
+    {
+      "mission_id": "mission_cancel_001",
+      "status": "cancelled",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:20.625439+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_cancel_001.json"
+    },
+    {
+      "mission_id": "mission_demo_001",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:23.036504+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_demo_001.json"
+    },
+    {
+      "mission_id": "mission_evt_001",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:20.593433+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_evt_001.json"
+    },
+    {
+      "mission_id": "mission_idem_001",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:20.578339+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_idem_001.json"
+    },
+    {
+      "mission_id": "mission_idem_scope_a",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:22.924848+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_idem_scope_a.json"
+    },
+    {
+      "mission_id": "mission_idem_scope_c",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:22.926544+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_idem_scope_c.json"
+    },
+    {
+      "mission_id": "mission_sse_001",
+      "status": "planning",
+      "goal": "Investigate failing parser and produce a verified patch",
+      "updated_at": "2026-09-22T01:44:20.737806+00:00",
+      "path": "/Users/pchordia/swarmai-v17/var/missions/mission_sse_001.json"
+    }
+  ]
+}

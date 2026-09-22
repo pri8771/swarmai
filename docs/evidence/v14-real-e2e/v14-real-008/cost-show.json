@@ -1,0 +1,99 @@
+{
+  "spend_policy": "zero",
+  "allow_paid": false,
+  "total_usd": 0.0,
+  "entry_count": 9,
+  "entries": [
+    {
+      "source": "1a3d052c8b4048ec99fa8c574f0f88c6",
+      "route_id": null,
+      "model": null,
+      "requests": 3,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:00.314650+00:00"
+    },
+    {
+      "source": "demo-parser-issue",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:26.425167+00:00"
+    },
+    {
+      "source": "mission_cancel_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:20.625439+00:00"
+    },
+    {
+      "source": "mission_demo_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:23.036504+00:00"
+    },
+    {
+      "source": "mission_evt_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:20.593433+00:00"
+    },
+    {
+      "source": "mission_idem_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:20.578339+00:00"
+    },
+    {
+      "source": "mission_idem_scope_a",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:22.924848+00:00"
+    },
+    {
+      "source": "mission_idem_scope_c",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:22.926544+00:00"
+    },
+    {
+      "source": "mission_sse_001",
+      "route_id": null,
+      "model": null,
+      "requests": 0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "cost_usd": 0.0,
+      "at": "2026-09-22T01:44:20.737806+00:00"
+    }
+  ],
+  "note": "Zero-spend policy enforced; local inference recorded at $0.00"
+}

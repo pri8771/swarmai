@@ -1,0 +1,69 @@
+{
+  "run_id": "v14-real-008",
+  "attempt": 1,
+  "packet_id": "R02b",
+  "artifact_id": "ART-V14-REAL-E2E",
+  "checkpoint": "CP1",
+  "status": "failed_no_material_diff_preserved",
+  "self_accept": false,
+  "lead_review": "not_requested_for_a_failed_attempt",
+  "candidate_sha": "ffa33171180a8c918b87cd86d926c497a515b099",
+  "preregistration_commit": "e405077",
+  "mission_id": "1a3d052c8b4048ec99fa8c574f0f88c6",
+  "mission_status": "failed",
+  "project_id": null,
+  "entrypoint": "OLLAMA_BASE_URL=http://127.0.0.1:11434/v1 SWARM_ALLOW_PAID=false SWARM_DATABASE_URL=<local swarmai_v17_live> uv run swarm mission run --goal <goal> --model qwen2.5-coder:14b --no-evidence-router",
+  "model": "qwen2.5-coder:14b",
+  "broker_route": "rt_ollama_qwen2.5-coder:14b",
+  "inference_calls": 3,
+  "prompt_tokens": 5313,
+  "completion_tokens": 4728,
+  "spend_usd": 0.0,
+  "worktree": {
+    "path": "/Users/pchordia/swarmai-v17/var/mission-worktrees/1a3d052c8b4048ec99fa8c574f0f88c6/tsk_d058d2f8954c4346964e76b143b922d5-wrk_8382a8fcc5c341e0afdc48ebc5b90dcd",
+    "branch": "mission/1a3d052c8b40/tsk_d058d2f8954c4346964e76b143b922d5/wb546c14",
+    "worker_id": "wrk_8382a8fcc5c341e0afdc48ebc5b90dcd",
+    "mission_id": "1a3d052c8b4048ec99fa8c574f0f88c6",
+    "task_id": "tsk_d058d2f8954c4346964e76b143b922d5"
+  },
+  "changed_files": [],
+  "material_diff": false,
+  "primary_checkout_modified": false,
+  "auto_apply": false,
+  "defect_proof": {
+    "proven": false,
+    "reason": "no_regression_test_in_patch",
+    "regression_tests": [],
+    "pre_patch": {},
+    "post_patch": {}
+  },
+  "verify_commands": [
+    {
+      "cmd": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/runtime/test_runtime.py",
+        "-q",
+        "--tb=line"
+      ],
+      "exit_code": 0
+    },
+    {
+      "cmd": [
+        "uv",
+        "run",
+        "pytest",
+        "tests/runtime",
+        "-q",
+        "--tb=line"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "diagnosis": "In each of the three execution rounds the model returned the target file verbatim as a full-file rewrite (model_output_excerpt begins with the unchanged module docstring). The materialization fail-closed rule recorded implement_no_material_diff; the R02a gate recorded no_regression_test_in_patch; existing tests/runtime were green (12 + 18 passed) but that is explicitly insufficient. Review was never reached. Same failure class as v14-real-006.",
+  "decision": "No blind second attempt (delivery contract section 4, item 7). Proposed diagnosis/repair packet R02c: detect verbatim/near-verbatim echo before write, and re-prompt for a targeted change plus regression test (diff-shaped output) \u2014 product change in RepoWorker._implement, not evidence editing.",
+  "started_at": "2026-09-22T01:40:35.092602+00:00",
+  "finished_at": "2026-09-22T01:44:00.314650+00:00",
+  "recorded_at": "2026-09-22T01:47:02Z"
+}
