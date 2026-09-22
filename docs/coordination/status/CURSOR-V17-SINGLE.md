@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `b4e2a77b1e0e9d294e268ac931329ec4e7dc9733`
-- Coordination SHA: `4d1da16b515966d7a4351337263fa1991fc0a235`
-- Updated: `2026-09-22T01:59:45Z`
-- Trigger: `scheduler`
+- Branch SHA: `ebe71f237de2536890ef4f29f27e12efb8986641`
+- Coordination SHA: `b97b95ea5cca57178d143ed6bbccc5caae998d5f`
+- Updated: `2026-09-22T02:02:10Z`
+- Trigger: `manual`
 - Worker engine: `fable`
-- Status: **review_requested**
-- Current packet: `R27e`
-- Current artifact: `ART-V17-APPROVAL-BINDING`
-- Last meaningful activity: `2026-09-22T01:50:07Z`
+- Status: **working**
+- Current packet: `R02c`
+- Current artifact: `ART-V14-REAL-E2E`
+- Last meaningful activity: `2026-09-22T02:02:09Z`
 - Spend USD: `0.0`
 - Blocker: REV-R27C (lead diff review of 8dbe5d8 gates R27e/R28a and the whole wiring chain); EXT-ACTIONS-BILLING (apply coordination ci patch first); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST; EXT-V17-REALWORLD-GITHUB
 
 ## Update
 
-Fable session 1 ended 2026-09-22T01:5xZ at BLOCKED_FRONTIER. Pushed tip 889c9c1. Done: OPS-CI-01, R27a-d (R27c review bundle), R17a CP3 9/9 live, R02a gate, R02b attempt 1 failed+preserved, R30a fixture, candidate service http://127.0.0.1:18771 (launchd com.swarmai.v17-candidate). Handoff: docs/evidence/v17/FABLE_V17_HANDOFF_20260922.md. Ticks after this are timer publication only; no implementati
+Session 2 (hold-independent packets): TEST-HYGIENE-01 pushed b4e2a77; MISSION-CANCEL-01 pushed 2237eff (+bind e53da73) with CP3 rerun cp3-20260922T020141Z 9/9 (ebe71f2). Now R02c: echo detection + diff-shaped re-prompt in RepoWorker._implement. REV-R27C still gates R27e/R28a.
 
 ## Next
 
-After REV-R27C: R27e -> R28a -> R28b -> R28c -> R29a -> R28d -> R30b/R31a/R31b -> R32a -> R33a/b/c -> R25a/b -> R17b/c -> R34a/b. Hold-independent: R02c, mission-cancel packet, test-hygiene packet. V1.7 is NOT live.
+R02c implement + tests; then attempt 2 of v14-real-008 if the gate allows
