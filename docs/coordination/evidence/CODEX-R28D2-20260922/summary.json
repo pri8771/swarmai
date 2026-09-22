@@ -1,0 +1,43 @@
+{
+  "artifact": "R28d-2 worker boundary wiring",
+  "candidate": {
+    "branch": "codex/swarm-r28d1-local-sandbox-20260922",
+    "sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+    "tree": "36aadba9c0fdb63c015784bee311df7976e68c4f",
+    "expected_base": "a2cfb3c1d5e326a1b15d7d23cfe3c91ea2e40bf4"
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=$PWD/src:$PWD uv run pytest tests/mission/test_worker_effects_via_gateway.py tests/mission -q --tb=line",
+      "result": "65 passed"
+    },
+    {
+      "command": "PYTHONPATH=$PWD/src:$PWD uv run pytest tests/mission tests/api/test_art_v12_broker_contract.py -q --tb=line",
+      "result": "69 passed"
+    },
+    {
+      "command": "PYTHONPATH=$PWD/src:$PWD uv run pytest -q --tb=line",
+      "result": "421 passed, 208 skipped, 23.39s",
+      "classification": "offline"
+    },
+    {
+      "command": "SWARM_DATABASE_URL=<owned disposable PostgreSQL> PYTHONPATH=$PWD/src:$PWD uv run pytest -q --tb=line",
+      "result": "616 passed, 13 skipped, 27.68s",
+      "classification": "actual-postgresql",
+      "post_teardown_public_tables": 0
+    },
+    {
+      "command": "PYTHONPATH=$PWD/src:$PWD uv run ruff check src/swarm/mission src/swarm/tools tests/mission tests/api/test_art_v12_broker_contract.py",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=$PWD/src:$PWD uv run mypy src/swarm/mission src/swarm/tools/v17_gateway.py",
+      "result": "passed"
+    }
+  ],
+  "live_local_mission": {
+    "performed": false,
+    "reason": "R28d-2 assignment explicitly holds provider/model execution"
+  },
+  "review_state": "READY_FOR_LEAD_REVIEW"
+}
