@@ -54,6 +54,7 @@ testpaths = ["tests"]
 pythonpath = ["src", "."]
 markers = [
     "integration: requires local PostgreSQL (SWARM_DATABASE_URL)",
+    "live_local: requires SWARM_LIVE_LOCAL=1; real local fixture process + real HTTP",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
