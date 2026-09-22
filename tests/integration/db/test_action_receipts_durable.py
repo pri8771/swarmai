@@ -16,6 +16,7 @@ from swarm.db.models import ActionReceiptRow, Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError
 from swarm.tools.v17_gateway import ConsequentialToolGateway, ReconciliationRequiredError
+from tests.integration.db.effect_fixtures import bind_lease
 
 pytestmark = pytest.mark.integration
 
@@ -58,7 +59,10 @@ def factory(engine):
     yield fac
     with engine.begin() as conn:
         conn.execute(
-            text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE action_receipts, action_effects, approvals, missions, worker_leases "
+                "RESTART IDENTITY CASCADE"
+            )
         )
 
 
@@ -80,6 +84,7 @@ async def _execute_once(factory, project: str, body: str):
     env = adapter.normalize(
         {"project_id": project, "destination": "mcp://echo/default", "body": body}
     )
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env).approval_id
     receipt = await gw.execute_envelope(env)
     return env, receipt, adapter
@@ -107,9 +112,18 @@ async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
     gw = _gateway(adapter, store, "proj_a")
     req = {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay"}
     env = adapter.normalize(req)
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env).approval_id
     first = await gw.execute_envelope(env)
     env2 = adapter.normalize(req)
+    for field in (
+        "mission_id",
+        "task_id",
+        "attempt_id",
+        "lease_generation",
+        "cancellation_generation",
+    ):
+        setattr(env2, field, getattr(env, field))
     env2.approval_id = env.approval_id
     second = await gw.execute_envelope(env2)
     assert second.receipt_id == first.receipt_id
@@ -181,6 +195,14 @@ async def test_succeeded_effect_without_receipt_fails_closed(engine, factory) ->
     env2 = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "orphan-succeeded"}
     )
+    for field in (
+        "mission_id",
+        "task_id",
+        "attempt_id",
+        "lease_generation",
+        "cancellation_generation",
+    ):
+        setattr(env2, field, getattr(env, field))
     env2.approval_id = env.approval_id
     with pytest.raises(ReconciliationRequiredError, match="succeeded_effect_missing_receipt"):
         await gw.execute_envelope(env2)

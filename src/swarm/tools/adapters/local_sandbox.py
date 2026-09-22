@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest
+from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest, OperationDecl
 from swarm.contracts.common import utc_now
 
 
@@ -17,6 +17,15 @@ class LocalSandboxAdapter:
             integration_id="local.sandbox",
             integration_version="1.0",
             adapter_class="local_sandbox",
+            operations={
+                "write_text": OperationDecl(
+                    side_effect_class="idempotent",
+                    risk_class="low",
+                    scopes=["sandbox.fs"],
+                    read_data_classes=["workspace_file"],
+                    write_data_classes=["workspace_file"],
+                )
+            },
             read_data_classes=["workspace_file"],
             write_data_classes=["workspace_file"],
             scopes=["sandbox.fs"],
@@ -45,8 +54,8 @@ class LocalSandboxAdapter:
             requested_scopes=list(self.manifest.scopes),
             side_effect_class=self.manifest.side_effect_class,
             risk_class=self.manifest.risk_class,
-            lease_generation=int(request.get("lease_generation", 1)),
-            cancellation_generation=int(request.get("cancellation_generation", 0)),
+            lease_generation=request.get("lease_generation"),
+            cancellation_generation=request.get("cancellation_generation"),
             policy_version=str(request.get("policy_version", "v17-policy-1")),
             mission_id=request.get("mission_id"),
             task_id=request.get("task_id"),

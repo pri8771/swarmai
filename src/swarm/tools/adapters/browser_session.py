@@ -9,6 +9,7 @@ from swarm.contracts.actions import (
     ActionReceiptV17,
     AdapterManifest,
     BrowserSessionRef,
+    OperationDecl,
 )
 from swarm.contracts.common import utc_now
 
@@ -21,6 +22,22 @@ class BrowserSessionAdapter:
             integration_id="browser.session",
             integration_version="1.0",
             adapter_class="browser_session",
+            operations={
+                "navigate": OperationDecl(
+                    side_effect_class="none",
+                    risk_class="low",
+                    scopes=["browser.session"],
+                    read_data_classes=["page_dom"],
+                    write_data_classes=[],
+                ),
+                "submit": OperationDecl(
+                    side_effect_class="consequential",
+                    risk_class="high",
+                    scopes=["browser.session"],
+                    read_data_classes=["page_dom"],
+                    write_data_classes=["form_submit"],
+                ),
+            },
             read_data_classes=["page_dom"],
             write_data_classes=["form_submit"],
             scopes=["browser.session"],
@@ -56,8 +73,8 @@ class BrowserSessionAdapter:
             requested_scopes=list(self.manifest.scopes),
             side_effect_class=side,
             risk_class=risk,
-            lease_generation=int(request.get("lease_generation", 1)),
-            cancellation_generation=int(request.get("cancellation_generation", 0)),
+            lease_generation=request.get("lease_generation"),
+            cancellation_generation=request.get("cancellation_generation"),
             policy_version=str(request.get("policy_version", "v17-policy-1")),
             mission_id=request.get("mission_id"),
             task_id=request.get("task_id"),

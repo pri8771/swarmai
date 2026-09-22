@@ -19,6 +19,7 @@ from swarm.tools.v17_gateway import (
     ReconciliationRequiredError,
 )
 from tests.integration.db._effect_crash_child import FileEffectAdapter, run_crash
+from tests.integration.db.effect_fixtures import bind_lease
 
 pytestmark = pytest.mark.integration
 DATABASE_URL = os.environ.get(
@@ -43,7 +44,10 @@ def factory(engine):
     yield make_session_factory(engine)
     with engine.begin() as conn:
         conn.execute(
-            text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE action_receipts, action_effects, approvals, missions, worker_leases "
+                "RESTART IDENTITY CASCADE"
+            )
         )
 
 
@@ -60,6 +64,7 @@ def setup_effect(factory, tmp_path, side_effect_class="consequential"):
         orphan_grace_seconds=0,
     )
     env = adapter.normalize({"project_id": "crash_project", "body": str(path)})
+    env = bind_lease(factory, env)
     env.timeout_seconds = 1
     env.side_effect_class = side_effect_class
     env.approval_id = gateway.make_approval(env).approval_id
@@ -80,7 +85,8 @@ def age(factory, env):
     with factory.begin() as session:
         session.execute(
             text(
-                "UPDATE action_effects SET started_at=clock_timestamp()-interval '60 seconds' WHERE effect_key=:key"
+                "UPDATE action_effects SET started_at=clock_timestamp()-interval '60 seconds' "
+                "WHERE effect_key=:key"
             ),
             {"key": env.effect_key},
         )

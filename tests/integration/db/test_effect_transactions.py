@@ -25,6 +25,7 @@ from swarm.tools.adapters.base import AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
+from tests.integration.db.effect_fixtures import bind_lease
 
 pytestmark = pytest.mark.integration
 
@@ -52,7 +53,10 @@ def factory(engine):
     yield fac
     with engine.begin() as conn:
         conn.execute(
-            text("TRUNCATE action_receipts, action_effects, approvals RESTART IDENTITY CASCADE")
+            text(
+                "TRUNCATE action_receipts, action_effects, approvals, missions, worker_leases "
+                "RESTART IDENTITY CASCADE"
+            )
         )
 
 
@@ -94,6 +98,7 @@ async def test_reservation_visible_to_second_process_before_execute(factory) -> 
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-process"}
     )
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env).approval_id
 
     ctx = mp.get_context("spawn")
@@ -127,6 +132,7 @@ def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
     base = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "one-shot"}
     )
+    base = bind_lease(factory, base)
     # One-shot grant bound to payload/destination/operation but not to an effect key.
     grant = gw.put_approval(
         ApprovalGrant(
@@ -186,6 +192,7 @@ async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> 
     env = raising.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "retry-once"}
     )
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env, max_effect_count=1).approval_id
     first = await gw.execute_envelope(env)
     assert first.outcome == "failed"
@@ -216,6 +223,7 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
     env = raising.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": f"retry-{how}"}
     )
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env, max_effect_count=1).approval_id
     assert (await gw.execute_envelope(env)).outcome == "failed"
     assert (
@@ -248,10 +256,12 @@ async def test_denied_request_leaves_no_effect_row(factory) -> None:
     approved = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "approved-body"}
     )
+    approved = bind_lease(factory, approved)
     approval_id = gw.make_approval(approved).approval_id
     tampered = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "other-body"}
     )
+    tampered = bind_lease(factory, tampered)
     tampered.approval_id = approval_id
     with pytest.raises(ApprovalInvalidError, match="approval_payload_mismatch"):
         await gw.execute_envelope(tampered)
@@ -267,6 +277,7 @@ async def test_replay_of_succeeded_effect_works_after_approval_expiry(factory) -
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay-expired"}
     )
+    env = bind_lease(factory, env)
     env.approval_id = gw.make_approval(env).approval_id
     first = await gw.execute_envelope(env)
     assert first.outcome == "succeeded"
@@ -292,6 +303,8 @@ def test_finalize_state_conflict_when_not_executing(factory) -> None:
         normalized_payload={"body": "finalize-conflict"},
         side_effect_class="consequential",
         risk_class="medium",
+        lease_generation=1,
+        cancellation_generation=0,
     ).ensure_hashes()
     reserved = repo.reserve(env)
     receipt = ActionReceiptV17(
@@ -329,6 +342,7 @@ def test_fence_reader_mismatch_blocks_execution_and_adapter_not_called(factory) 
         normalized_payload={"body": "fence"},
         side_effect_class="consequential",
         risk_class="medium",
+        lease_generation=1,
         cancellation_generation=3,
     ).ensure_hashes()
     repo.reserve(env)
@@ -384,6 +398,7 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
             "body": "retry-with-replacement-grant",
         }
     )
+    envelope_a = bind_lease(factory, envelope_a)
     grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
 
@@ -454,6 +469,7 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
             "body": f"replacement-grant-{how}",
         }
     )
+    envelope_a = bind_lease(factory, envelope_a)
     grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
     assert (await gateway_a.execute_envelope(envelope_a)).outcome == "failed"
@@ -508,6 +524,8 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
             "project_id": "proj_a",
             "destination": "mcp://echo/default",
             "body": "already-executing-admission",
+            "lease_generation": 1,
+            "cancellation_generation": 0,
         }
     )
     grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
@@ -542,6 +560,7 @@ async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
     adapter = RaisingAdapter()
     gateway = _gateway(adapter, factory)
     env = adapter.normalize({"project_id": "proj_a", "body": "A-B-A-retry"})
+    env = bind_lease(factory, env)
     grant_a = gateway.make_approval(env)
     grant_b = _unbound_one_shot_approval(gateway, env)
     for number, grant in enumerate((grant_a, grant_b, grant_a, grant_b), start=1):
@@ -568,6 +587,7 @@ def test_durable_busy_effect_rolls_back_replacement_approval_and_ledger(factory)
     adapter = ApiMcpAdapter()
     gateway = _gateway(adapter, factory)
     env = adapter.normalize({"project_id": "proj_a", "body": "busy-durable-rollback"})
+    env = bind_lease(factory, env)
     grant_a = gateway.make_approval(env)
     env.approval_id = grant_a.approval_id
     gateway.store.reserve(env)

@@ -21,9 +21,7 @@ EffectState = Literal[
     "cancelled",
     "reconciled",
 ]
-ActionOutcomeV17 = Literal[
-    "succeeded", "failed", "unknown", "denied", "cancelled", "reconciled"
-]
+ActionOutcomeV17 = Literal["succeeded", "failed", "unknown", "denied", "cancelled", "reconciled"]
 
 
 class ActionEnvelope(StrictModel):
@@ -45,8 +43,8 @@ class ActionEnvelope(StrictModel):
     risk_class: RiskClass = "low"
     effect_key: str = ""
     idempotency_key: str = ""
-    lease_generation: int = 1
-    cancellation_generation: int = 0
+    lease_generation: int | None = None
+    cancellation_generation: int | None = None
     policy_version: str = "v17-policy-1"
     approval_id: str | None = None
     created_at: datetime = Field(default_factory=utc_now)
@@ -129,6 +127,9 @@ class ActionReceiptV17(StrictModel):
     finished_at: datetime | None = None
     external_id: str | None = None
     outcome: ActionOutcomeV17
+    # Older persisted receipts predate effective classification; do not invent it.
+    effective_side_effect_class: SideEffectClass | None = None
+    effective_risk_class: RiskClass | None = None
     reconciliation_state: str = "none"
     attempt_number: int = 0
     attempt_refs: list[str] = Field(default_factory=list)
@@ -136,11 +137,20 @@ class ActionReceiptV17(StrictModel):
     authorized_artifacts: list[str] = Field(default_factory=list)
 
 
+class OperationDecl(StrictModel):
+    side_effect_class: SideEffectClass
+    risk_class: RiskClass
+    scopes: list[str]
+    read_data_classes: list[str]
+    write_data_classes: list[str]
+
+
 class AdapterManifest(StrictModel):
     schema_version: str = "1.0"
     integration_id: str
     integration_version: str
     adapter_class: Literal["local_sandbox", "api_mcp", "browser_session"]
+    operations: dict[str, OperationDecl] = Field(default_factory=dict)
     read_data_classes: list[str] = Field(default_factory=list)
     write_data_classes: list[str] = Field(default_factory=list)
     scopes: list[str] = Field(default_factory=list)
