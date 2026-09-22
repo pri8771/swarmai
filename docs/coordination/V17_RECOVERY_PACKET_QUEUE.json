@@ -822,7 +822,8 @@
       "assignee": "codex",
       "assignment_ref": "docs/coordination/assignments/CODEX_R31A_OFFLINE_20260922.md",
       "active_slice": "offline implementation/test-source only",
-      "review_hold": "No session/network/live execution; R31b held."
+      "review_hold": "Offline implementation released under frozen safe request-proof contract; no session/network/live execution. R31b held.",
+      "contract_ref": "docs/coordination/reviews/R31A_CONTRACT_DISPOSITION_20260922.md"
     },
     {
       "id": "R31b",
