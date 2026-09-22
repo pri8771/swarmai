@@ -86,3 +86,16 @@ No review request exists on GitHub, and the repository currently lists only
 the owner as a collaborator. A green CI run or this return cannot substitute
 for a formal verdict. Continue other released Swarm prerequisites while any
 external gate waits.
+
+## Independent CP3 evidence locator correction
+
+The separately referenced `cp3-20260922T020141Z` package **does exist** in
+source at `docs/evidence/v17-checkpoints/CP3/cp3-20260922T020141Z/` and was
+added by `ebe71f237de2536890ef4f29f27e12efb8986641`. Its manifest binds
+the run to `e53da7305d138658edfb9bd8f47ebbd140a40a63`; its receipt reports
+9/9 harness requirements and 20/20 concurrent duplicate-result wins. The
+cancellation generation bump went through `DurableWorkerService.revoke_mission_work`.
+The run itself says independent review is pending, no second physical host
+was used, and operational product-mission wiring still needs R17b. This
+locates the evidence omitted by the earlier coordination disposition; it
+does not promote CP3 or authorize another live run.
