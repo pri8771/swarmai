@@ -1,0 +1,204 @@
+{
+  "packet_id": "R17a",
+  "run_id": "cp3-20260922T013226Z",
+  "artifact_id": "ART-V15-RECOVERY-EVIDENCE",
+  "checkpoint": "CP3",
+  "started_at": "2026-09-22T01:32:26.607515+00:00",
+  "mode": "separate_os_processes_shared_postgres",
+  "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host",
+  "self_accept": false,
+  "spend_usd": 0.0,
+  "dsn_note": "operator DB via SWARM_DATABASE_URL (not swarm:swarm)",
+  "project_id": "proj_demo",
+  "mission_id": "msn_7a043d537dee4615ba8b0175946dcc60",
+  "task_id": "tsk_bf6c634ef7504949a1394b1155b88ba9",
+  "steps": {
+    "victim_claim": {
+      "pid": 75818,
+      "lease_id": "tls_6c647fb8bb1f4e76963da154f16125be",
+      "attempt_id": "att_6116d39b61b448faa1a35ace2d3e04cc",
+      "killed": true
+    },
+    "expire_reassign": {
+      "expired_leases": [
+        "tls_6c647fb8bb1f4e76963da154f16125be"
+      ]
+    },
+    "survivor_submit": {
+      "pid": 75820,
+      "lease_id": "tls_0c02d82f0e5948adbb2c36b127a722d8",
+      "result_id": "wres_395d9854a8274c34b90e657750c18458"
+    },
+    "stale_reject": {
+      "pid": 75822,
+      "result_id": "wres_e3bab3b8aa0044a79099f36467cc2908",
+      "accept_rejected": true,
+      "reason": "lease_not_current:expired"
+    },
+    "exactly_one_accept": {
+      "accepted_result_id": "wres_395d9854a8274c34b90e657750c18458",
+      "accepted_attempt_id": "att_63f56a7ea8654bae97b24dbf8fdf7b9a",
+      "competing_stale_accept_rejected": true,
+      "competing_reason": "result_terminal:rejected",
+      "accepted_count_for_task": 1,
+      "exactly_one_accepted": true
+    }
+  },
+  "r17a": {
+    "cancellation_fence": {
+      "demonstrated": true,
+      "detail": {
+        "task_id": "tsk_7ca97ba4373d4372b27ed0ebb73d01fd",
+        "mission_id": "msn_12e12349713a4a7899f6508372a99314",
+        "worker_pid": 75824,
+        "lease_id": "tls_8bc50bfedf36414dba0dedce1f15ff24",
+        "generation_bumped": true,
+        "mission_cancellation_generation": 1,
+        "result_id": "wres_f0601c493662463488e25bdce487125a",
+        "accept_rejected": true,
+        "accept_reason": "cancellation_generation_stale",
+        "renew_rejected": true,
+        "renew_reason": "cancellation_generation_stale",
+        "advisory_cancel_applied": true,
+        "accept_after_advisory_cancel_rejected": true,
+        "accept_after_advisory_cancel_reason": "lease_not_current:cancelled",
+        "accepted_count_for_task": 0
+      }
+    },
+    "concurrent_duplicate_accept": {
+      "demonstrated": true,
+      "detail": {
+        "iterations": 20,
+        "iterations_with_exactly_one_accept": 20,
+        "winner_pids": [
+          75829,
+          75838,
+          75862,
+          75870,
+          75876,
+          75883,
+          75892,
+          75901,
+          75907,
+          75916,
+          75922,
+          75929,
+          75937,
+          75943,
+          75949,
+          75955,
+          75961,
+          75968,
+          75973,
+          75981
+        ]
+      }
+    }
+  },
+  "requirements": {
+    "durable_worker_registration": {
+      "demonstrated": true,
+      "detail": "victim/survivor/zombie/cancel/dup workers enrolled via DurableWorkerService"
+    },
+    "claim": {
+      "demonstrated": true,
+      "detail": {
+        "pid": 75818,
+        "lease_id": "tls_6c647fb8bb1f4e76963da154f16125be",
+        "attempt_id": "att_6116d39b61b448faa1a35ace2d3e04cc",
+        "killed": true
+      }
+    },
+    "renew": {
+      "demonstrated": true,
+      "detail": "renew exercised by the cancellation step (rejected by fence)"
+    },
+    "process_restart_real_kill": {
+      "demonstrated": true,
+      "detail": {
+        "pid": 75818,
+        "signal": "SIGKILL"
+      }
+    },
+    "expiry_reassignment": {
+      "demonstrated": true,
+      "detail": {
+        "expired_leases": [
+          "tls_6c647fb8bb1f4e76963da154f16125be"
+        ]
+      }
+    },
+    "stale_result_rejection": {
+      "demonstrated": true,
+      "detail": {
+        "pid": 75822,
+        "result_id": "wres_e3bab3b8aa0044a79099f36467cc2908",
+        "accept_rejected": true,
+        "reason": "lease_not_current:expired"
+      }
+    },
+    "duplicate_result_race_concurrent": {
+      "demonstrated": true,
+      "detail": {
+        "iterations": 20,
+        "iterations_with_exactly_one_accept": 20,
+        "winner_pids": [
+          75829,
+          75838,
+          75862,
+          75870,
+          75876,
+          75883,
+          75892,
+          75901,
+          75907,
+          75916,
+          75922,
+          75929,
+          75937,
+          75943,
+          75949,
+          75955,
+          75961,
+          75968,
+          75973,
+          75981
+        ]
+      }
+    },
+    "cancellation_generation_rejection": {
+      "demonstrated": true,
+      "detail": {
+        "task_id": "tsk_7ca97ba4373d4372b27ed0ebb73d01fd",
+        "mission_id": "msn_12e12349713a4a7899f6508372a99314",
+        "worker_pid": 75824,
+        "lease_id": "tls_8bc50bfedf36414dba0dedce1f15ff24",
+        "generation_bumped": true,
+        "mission_cancellation_generation": 1,
+        "result_id": "wres_f0601c493662463488e25bdce487125a",
+        "accept_rejected": true,
+        "accept_reason": "cancellation_generation_stale",
+        "renew_rejected": true,
+        "renew_reason": "cancellation_generation_stale",
+        "advisory_cancel_applied": true,
+        "accept_after_advisory_cancel_rejected": true,
+        "accept_after_advisory_cancel_reason": "lease_not_current:cancelled",
+        "accepted_count_for_task": 0
+      }
+    },
+    "exactly_one_accepted_result": {
+      "demonstrated": true,
+      "detail": {
+        "accepted_result_id": "wres_395d9854a8274c34b90e657750c18458",
+        "accepted_attempt_id": "att_63f56a7ea8654bae97b24dbf8fdf7b9a",
+        "competing_stale_accept_rejected": true,
+        "competing_reason": "result_terminal:rejected",
+        "accepted_count_for_task": 1,
+        "exactly_one_accepted": true
+      }
+    }
+  },
+  "ok": true,
+  "finished_at": "2026-09-22T01:32:44.873648+00:00",
+  "finding": "cancel_active_lease does not bump the durable mission cancellation_generation and no mission-cancel service method exists; the control plane (this harness) performed the durable bump directly. Follow-up: add a mission-cancel method that bumps the generation before advisory lease cancellation."
+}

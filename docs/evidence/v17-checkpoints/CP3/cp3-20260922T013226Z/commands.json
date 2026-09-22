@@ -1,0 +1,11 @@
+[
+  {
+    "argv": [
+      "uv",
+      "run",
+      "python",
+      "scripts/r17_cp3_separate_process_recovery.py"
+    ],
+    "exit_code": 0
+  }
+]
