@@ -4,11 +4,24 @@
   "integration_version": "1",
   "adapter_class": "local_sandbox",
   "operations": {
-    "write_text": {
+    "fs.write_text": {
       "side_effect_class": "idempotent",
       "risk_class": "low",
       "scopes": [
-        "sandbox.fs"
+        "fs.worktree"
+      ],
+      "read_data_classes": [
+        "workspace_file"
+      ],
+      "write_data_classes": [
+        "workspace_file"
+      ]
+    },
+    "proc.run": {
+      "side_effect_class": "idempotent",
+      "risk_class": "low",
+      "scopes": [
+        "proc.test"
       ],
       "read_data_classes": [
         "workspace_file"
