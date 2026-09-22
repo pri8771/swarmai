@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import threading
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select, update
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -51,12 +53,46 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
     }
 
 
+# States from which a new execution attempt may be admitted (R27b). `failed` is
+# re-executable only when the prior attempt provably did not apply.
+def _executable(state: str, state_reason: str | None) -> bool:
+    return state == "reserved" or (state == "failed" and state_reason == "not_applied")
+
+
+def _not_executable(state: str, state_reason: str | None) -> EffectConflictError:
+    if state == "succeeded":
+        return EffectConflictError("effect_already_succeeded")
+    if state == "unknown":
+        return EffectConflictError("effect_unknown_requires_reconcile")
+    if state == "executing":
+        return EffectConflictError("effect_already_executing")
+    return EffectConflictError(f"effect_terminal:{state}")
+
+
+def _binding_of(envelope: ActionEnvelope) -> dict[str, str]:
+    return {
+        "integration_id": envelope.integration_id,
+        "integration_version": envelope.integration_version,
+        "operation": envelope.operation,
+        "destination_digest": payload_hash({"destination": envelope.destination}),
+        "payload_hash": envelope.payload_hash,
+    }
+
+
+def _check_binding(stored: dict[str, Any], envelope: ActionEnvelope) -> None:
+    """An effect key identifies exactly one (integration, operation, destination, payload)."""
+    for field, value in _binding_of(envelope).items():
+        if str(stored.get(field)) != value:
+            raise EffectConflictError("effect_key_binding_mismatch")
+
+
 class InMemoryEffectStore:
     """Process-local effect store used by tests and single-host loops."""
 
     durable = False
 
     def __init__(self) -> None:
+        self._lock = threading.Lock()
         self.effects: dict[tuple[str, str], dict[str, Any]] = {}
         # receipt_id -> (effect_id, attempt_number, receipt); insert-only (R27a).
         self.receipts: dict[str, tuple[str, int, ActionReceiptV17]] = {}
@@ -79,7 +115,8 @@ class InMemoryEffectStore:
         key = (envelope.project_id, envelope.effect_key)
         existing = self.effects.get(key)
         if existing is not None:
-            return existing
+            _check_binding(existing, envelope)
+            return {**existing, "created": False}
         row: dict[str, Any] = {
             "effect_id": new_id("aef_"),
             "effect_key": envelope.effect_key,
@@ -105,21 +142,21 @@ class InMemoryEffectStore:
             "approval_consumed_at": None,
         }
         self.effects[key] = row
-        return row
+        return {**row, "created": True}
 
-    def mark_executing(self, *, project_id: str, effect_key: str) -> dict[str, Any]:
+    def mark_executing(
+        self, *, project_id: str, effect_key: str, executor_id: str
+    ) -> dict[str, Any]:
         row = self._require(project_id, effect_key)
-        if row["state"] == "succeeded":
-            raise EffectConflictError("effect_already_succeeded")
-        if row["state"] == "unknown":
-            raise EffectConflictError("effect_unknown_requires_reconcile")
-        if row["state"] == "executing":
-            raise EffectConflictError("effect_already_executing")
-        if row["state"] in {"denied", "cancelled"}:
-            raise EffectConflictError(f"effect_terminal:{row['state']}")
-        row["state"] = "executing"
-        row["started_at"] = utc_now()
-        return row
+        with self._lock:
+            if _executable(row["state"], row.get("state_reason")):
+                row["state"] = "executing"
+                row["state_reason"] = None
+                row["started_at"] = utc_now()
+                row["executor_id"] = executor_id
+                row["attempt_count"] = int(row.get("attempt_count") or 0) + 1
+                return dict(row)
+        raise _not_executable(row["state"], row.get("state_reason"))
 
     def attach_pre_observation(
         self, *, project_id: str, effect_key: str, pre_observation: dict[str, Any]
@@ -267,51 +304,79 @@ class DurableEffectRepository:
             self.session.flush()
 
     def reserve(self, envelope: ActionEnvelope) -> dict[str, Any]:
+        """Atomic reservation: INSERT … ON CONFLICT DO NOTHING on (project_id, effect_key)."""
         envelope.ensure_hashes()
-        existing = self.session.scalar(
-            select(ActionEffectRow).where(
-                ActionEffectRow.project_id == envelope.project_id,
-                ActionEffectRow.effect_key == envelope.effect_key,
+        binding = _binding_of(envelope)
+        stmt = (
+            pg_insert(ActionEffectRow)
+            .values(
+                effect_id=new_id("aef_"),
+                effect_key=envelope.effect_key,
+                project_id=envelope.project_id,
+                mission_id=envelope.mission_id,
+                task_id=envelope.task_id,
+                attempt_id=envelope.attempt_id,
+                action_id=envelope.action_id,
+                approval_id=envelope.approval_id,
+                integration_id=binding["integration_id"],
+                integration_version=binding["integration_version"],
+                operation=binding["operation"],
+                destination_digest=binding["destination_digest"],
+                payload_hash=binding["payload_hash"],
+                state="reserved",
+                lease_generation=envelope.lease_generation,
+                cancellation_generation=envelope.cancellation_generation,
+                pre_observation={},
+                post_observation={},
+                reconciliation={},
+                payload={},
+                attempt_count=0,
             )
+            .on_conflict_do_nothing(constraint="uq_action_effect_project_key")
+            .returning(ActionEffectRow.effect_id)
         )
-        if existing is not None:
-            return _effect_dict_from_row(existing)
-        row = ActionEffectRow(
-            effect_id=new_id("aef_"),
-            effect_key=envelope.effect_key,
-            project_id=envelope.project_id,
-            mission_id=envelope.mission_id,
-            task_id=envelope.task_id,
-            attempt_id=envelope.attempt_id,
-            action_id=envelope.action_id,
-            approval_id=envelope.approval_id,
-            integration_id=envelope.integration_id,
-            integration_version=envelope.integration_version,
-            operation=envelope.operation,
-            destination_digest=payload_hash({"destination": envelope.destination}),
-            payload_hash=envelope.payload_hash,
-            state="reserved",
-            lease_generation=envelope.lease_generation,
-            cancellation_generation=envelope.cancellation_generation,
-        )
-        self.session.add(row)
+        # RETURNING yields the id only for the caller whose INSERT actually landed.
+        created = self.session.execute(stmt).scalar_one_or_none() is not None
         self.session.flush()
-        return _effect_dict_from_row(row)
+        row = self._require_row(envelope.project_id, envelope.effect_key)
+        as_dict = _effect_dict_from_row(row)
+        _check_binding(as_dict, envelope)
+        as_dict["created"] = created
+        return as_dict
 
-    def mark_executing(self, *, project_id: str, effect_key: str) -> dict[str, Any]:
-        row = self._require_row(project_id, effect_key)
-        if row.state == "succeeded":
-            raise EffectConflictError("effect_already_succeeded")
-        if row.state == "unknown":
-            raise EffectConflictError("effect_unknown_requires_reconcile")
-        if row.state == "executing":
-            raise EffectConflictError("effect_already_executing")
-        if row.state in {"denied", "cancelled"}:
-            raise EffectConflictError(f"effect_terminal:{row.state}")
-        row.state = "executing"
-        row.started_at = utc_now()
-        self.session.flush()
-        return _effect_dict_from_row(row)
+    def mark_executing(
+        self, *, project_id: str, effect_key: str, executor_id: str
+    ) -> dict[str, Any]:
+        """Single-winner compare-and-swap into `executing` (R27b)."""
+        stmt = (
+            update(ActionEffectRow)
+            .where(
+                ActionEffectRow.project_id == project_id,
+                ActionEffectRow.effect_key == effect_key,
+                or_(
+                    ActionEffectRow.state == "reserved",
+                    and_(
+                        ActionEffectRow.state == "failed",
+                        ActionEffectRow.state_reason == "not_applied",
+                    ),
+                ),
+            )
+            .values(
+                state="executing",
+                state_reason=None,
+                started_at=func.now(),
+                executor_id=executor_id,
+                attempt_count=ActionEffectRow.attempt_count + 1,
+            )
+            .returning(ActionEffectRow)
+        )
+        row = self.session.scalars(stmt).first()
+        if row is not None:
+            self.session.flush()
+            return _effect_dict_from_row(row)
+        self.session.rollback()
+        current = self._require_row(project_id, effect_key)
+        raise _not_executable(current.state, current.state_reason)
 
     def attach_pre_observation(
         self, *, project_id: str, effect_key: str, pre_observation: dict[str, Any]

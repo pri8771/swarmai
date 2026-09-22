@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/Downloads/swarm-ai-fable-v17/.venv/bin/python
+rootdir: /Users/pchordia/Downloads/swarm-ai-fable-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/integration/db/test_effect_reservation_atomic.py::test_concurrent_reserve_same_key_one_row PASSED [ 14%]
+tests/integration/db/test_effect_reservation_atomic.py::test_concurrent_mark_executing_single_winner PASSED [ 28%]
+tests/integration/db/test_effect_reservation_atomic.py::test_reserve_binding_mismatch_payload PASSED [ 42%]
+tests/integration/db/test_effect_reservation_atomic.py::test_reserve_binding_mismatch_destination PASSED [ 57%]
+tests/integration/db/test_effect_reservation_atomic.py::test_reserve_binding_mismatch_operation PASSED [ 71%]
+tests/integration/db/test_effect_reservation_atomic.py::test_failed_without_not_applied_reason_is_terminal PASSED [ 85%]
+tests/integration/db/test_effect_reservation_atomic.py::test_project_b_same_effect_key_is_independent PASSED [100%]
+
+============================== 7 passed in 0.29s ===============================

@@ -141,7 +141,9 @@ class ConsequentialToolGateway:
 
         try:
             self.store.mark_executing(
-                project_id=envelope.project_id, effect_key=envelope.effect_key
+                project_id=envelope.project_id,
+                effect_key=envelope.effect_key,
+                executor_id=new_id("exe_"),
             )
         except EffectConflictError as exc:
             if "unknown" in str(exc):
