@@ -9,9 +9,11 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import subprocess
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
+from pathlib import Path
 from uuid import uuid4
 
 import httpx
@@ -23,6 +25,7 @@ from swarm.broker.durable_remote import (
     DurableRemoteCallGate,
     RemoteAdmissionDenied,
     remote_request_hash,
+    verified_source_tree,
 )
 from swarm.broker.errors import AmbiguousSendError, BrokerBypassError
 from swarm.broker.policy import RoutePolicyContext
@@ -56,13 +59,12 @@ from swarm.providers.core.adapters import GroqAdapter, OpenRouterAdapter, OpenRo
 from swarm.providers.multiplex import MultiplexProviderAdapter
 
 pytestmark = pytest.mark.integration
-SOURCE_TREE = "a" * 40
 EVIDENCE = "account-zero-price-ref"
 QUOTA_EVIDENCE = "account-quota-ref"
 
 
 @pytest.fixture()
-def factory():
+def factory(tmp_path: Path):
     url = os.environ.get("SWARM_DATABASE_URL")
     if not url:
         pytest.skip("SWARM_DATABASE_URL required")
@@ -79,9 +81,26 @@ def factory():
         pool_pre_ping=True,
         connect_args={"options": f"-csearch_path={schema}"},
     )
+    checkout = tmp_path / "clean-source"
+    checkout.mkdir()
+    subprocess.run(["git", "init", "-q", str(checkout)], check=True, capture_output=True)
+    (checkout / "source.txt").write_text("fixed source for grant binding\n")
+    subprocess.run(["git", "-C", str(checkout), "add", "source.txt"], check=True)
+    subprocess.run(
+        [
+            "git", "-C", str(checkout),
+            "-c", "user.name=Swarm Test", "-c", "user.email=test@example.invalid",
+            "-c", "core.hooksPath=/dev/null", "commit", "-qm", "seed",
+        ],
+        check=True,
+        capture_output=True,
+    )
     try:
         Base.metadata.create_all(engine)
-        yield make_session_factory(engine)
+        fac = make_session_factory(engine)
+        fac.source_checkout = checkout
+        fac.source_tree = verified_source_tree(checkout)
+        yield fac
     finally:
         engine.dispose()
         with admin.begin() as conn:
@@ -126,7 +145,7 @@ def _seed(factory, *, remaining: int = 1, observed_age: timedelta = timedelta())
         max_effect_count=1,
         used_count=0,
         constraints={
-            "source_tree": SOURCE_TREE,
+            "source_tree": factory.source_tree,
             "account_id": route.account_id,
             "model_id": route.model_id,
             "backend_slug": route.hosted_by,
@@ -189,10 +208,10 @@ def _seed(factory, *, remaining: int = 1, observed_age: timedelta = timedelta())
 
 def test_durable_unknown_call_never_resends_after_restart(factory):
     request, route, grant = _seed(factory)
-    gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     ticket = gate.reserve(request, route, grant_id=grant.id)
     gate.mark_sending(ticket)
-    restarted = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    restarted = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     with pytest.raises(RemoteAdmissionDenied, match="remote_call_not_resendable"):
         restarted.mark_sending(ticket)
     with pytest.raises(RemoteAdmissionDenied, match="cannot_release_sent_or_unknown_call"):
@@ -212,7 +231,7 @@ def test_durable_unknown_call_never_resends_after_restart(factory):
 
 def test_unsent_release_refunds_quota_but_not_operator_grant(factory):
     request, route, grant = _seed(factory)
-    gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     ticket = gate.reserve(request, route, grant_id=grant.id)
     forged = ticket.model_copy(
         update={"bucket_amounts": [BucketAmount(bucket_id="request-quota", dimension="requests", amount=99)]}
@@ -227,7 +246,7 @@ def test_unsent_release_refunds_quota_but_not_operator_grant(factory):
 
 def test_fresh_exact_evidence_and_request_binding_required(factory):
     request, route, grant = _seed(factory, observed_age=timedelta(minutes=11))
-    gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     with pytest.raises(RemoteAdmissionDenied, match="account_or_route_evidence_unverified"):
         gate.reserve(request, route, grant_id=grant.id)
     with factory.begin() as session:
@@ -238,6 +257,9 @@ def test_fresh_exact_evidence_and_request_binding_required(factory):
     changed = request.model_copy(update={"tools_requested": ["browser"]})
     with pytest.raises(RemoteAdmissionDenied, match="stored_owner_grant_mismatch_or_expired"):
         gate.reserve(changed, route, grant_id=grant.id)
+    other_attempt = request.model_copy(update={"attempt_id": "attempt-two"})
+    with pytest.raises(RemoteAdmissionDenied, match="stored_owner_grant_mismatch_or_expired"):
+        gate.reserve(other_attempt, route, grant_id=grant.id)
     with factory.begin() as session:
         session.get(QuotaBucketRow, "request-quota").payload = {
             "confidence": "exact", "quota_evidence_ref": "different"
@@ -249,9 +271,50 @@ def test_fresh_exact_evidence_and_request_binding_required(factory):
         assert session.get(ReservationRow, "missing") is None
 
 
+def test_dirty_checkout_denied_before_reservation_or_send(factory):
+    request, route, grant = _seed(factory)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
+    marker = factory.source_checkout / "new-untracked-file.txt"
+    marker.write_text("drift\n")
+    with pytest.raises(RemoteAdmissionDenied, match="source_checkout_dirty"):
+        gate.reserve(request, route, grant_id=grant.id)
+    marker.unlink()
+    ticket = gate.reserve(request, route, grant_id=grant.id)
+    marker.write_text("drift\n")
+    with pytest.raises(RemoteAdmissionDenied, match="source_checkout_dirty"):
+        gate.mark_sending(ticket)
+    assert gate.read_state(ticket.reservation_id)["phase"] == "reserved"
+    marker.unlink()
+    gate.release_unsent(ticket)
+
+
+def test_committed_tree_change_denied_before_reservation(factory):
+    request, route, grant = _seed(factory)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
+    source = factory.source_checkout / "source.txt"
+    source.write_text("changed source\n")
+    subprocess.run(
+        ["git", "-C", str(factory.source_checkout), "add", "source.txt"], check=True
+    )
+    subprocess.run(
+        [
+            "git", "-C", str(factory.source_checkout),
+            "-c", "user.name=Swarm Test", "-c", "user.email=test@example.invalid",
+            "-c", "core.hooksPath=/dev/null", "commit", "-qm", "change",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    with pytest.raises(RemoteAdmissionDenied, match="source_tree_changed"):
+        gate.reserve(request, route, grant_id=grant.id)
+    with factory() as session:
+        assert session.get(ApprovalRow, grant.id).used_count == 0
+        assert session.get(QuotaBucketRow, "request-quota").remaining == 1
+
+
 def test_settlement_needs_zero_cost_and_selected_free_backend(factory):
     request, route, grant = _seed(factory)
-    gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     ticket = gate.reserve(request, route, grant_id=grant.id)
     gate.mark_sending(ticket)
     receipt = AttemptReceipt(
@@ -280,7 +343,7 @@ def test_settlement_needs_zero_cost_and_selected_free_backend(factory):
 
 def test_missing_cost_report_retains_unknown_even_on_success(factory):
     request, route, grant = _seed(factory)
-    gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
     ticket = gate.reserve(request, route, grant_id=grant.id)
     gate.mark_sending(ticket)
     receipt = AttemptReceipt(
@@ -324,7 +387,7 @@ def test_parallel_reservations_have_one_postgres_winner(factory):
 
     def reserve_one(args):
         req, grant_id = args
-        gate = DurableRemoteCallGate(factory, source_tree=SOURCE_TREE)
+        gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
         barrier.wait()
         try:
             return gate.reserve(req, route, grant_id=grant_id)
@@ -394,7 +457,7 @@ def _broker(factory, route: RouteSnapshot, *, cost_known: bool = True):
                 charge_verified_free=True,
             )
         },
-        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+        remote_gate=DurableRemoteCallGate(factory, source_checkout=factory.source_checkout),
     )
     return broker, adapter
 
@@ -513,7 +576,7 @@ async def test_actual_openrouter_adapter_is_fenced_through_mock_http(
                 charge_verified_free=True,
             )
         },
-        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+        remote_gate=DurableRemoteCallGate(factory, source_checkout=factory.source_checkout),
     )
     ticket = await broker.reserve(request, route, grant_id=grant.id)
     await broker.invoke(ticket)
@@ -618,7 +681,7 @@ async def test_two_pinned_remote_calls_overlap_inside_http_transport(
                     max_effect_count=1,
                     used_count=0,
                     constraints={
-                        "source_tree": SOURCE_TREE,
+                        "source_tree": factory.source_tree,
                         "account_id": groq_route.account_id,
                         "model_id": groq_route.model_id,
                         "backend_slug": None,
@@ -678,7 +741,7 @@ async def test_two_pinned_remote_calls_overlap_inside_http_transport(
     broker = SharedInferenceBroker(
         multiplex,
         route_contexts=contexts,
-        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+        remote_gate=DurableRemoteCallGate(factory, source_checkout=factory.source_checkout),
     )
     assert len(await broker.assess(open_request)) == 1
     assert len(await broker.assess(groq_request)) == 1

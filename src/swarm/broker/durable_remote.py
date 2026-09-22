@@ -7,8 +7,10 @@ fresh account, route and quota records must already exist in the same database.
 from __future__ import annotations
 
 import hashlib
+import subprocess
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select
@@ -47,11 +49,41 @@ class RemoteAdmissionDenied(PermissionError):
     """A remote call was refused before any provider network request."""
 
 
+def verified_source_tree(checkout: Path) -> str:
+    """Read the exact committed source tree from a clean Git worktree root."""
+    root = checkout.resolve()
+
+    def git(*args: str) -> str:
+        try:
+            result = subprocess.run(
+                ["git", "-C", str(root), *args],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise RemoteAdmissionDenied("source_checkout_unverifiable") from exc
+        if result.returncode != 0:
+            raise RemoteAdmissionDenied("source_checkout_unverifiable")
+        return result.stdout.strip()
+
+    if Path(git("rev-parse", "--show-toplevel")).resolve() != root:
+        raise RemoteAdmissionDenied("source_checkout_not_git_root")
+    if git("status", "--porcelain=v1", "--untracked-files=normal"):
+        raise RemoteAdmissionDenied("source_checkout_dirty")
+    tree = git("rev-parse", "HEAD^{tree}")
+    if len(tree) != 40 or any(char not in "0123456789abcdef" for char in tree):
+        raise RemoteAdmissionDenied("source_tree_invalid")
+    return tree
+
+
 def remote_request_hash(request: InferenceRequest, route: RouteSnapshot) -> str:
     """Exact payload binding for one approved provider request."""
     return payload_hash(
         {
             "project_id": request.project_id,
+            "attempt_id": request.attempt_id,
             "route_id": route.route_id,
             "provider": route.provider,
             "account_id": route.account_id,
@@ -74,19 +106,23 @@ class DurableRemoteCallGate:
         self,
         factory: sessionmaker[Session],
         *,
-        source_tree: str,
+        source_checkout: Path,
         max_evidence_age: timedelta = timedelta(minutes=10),
     ) -> None:
-        if len(source_tree) != 40 or any(c not in "0123456789abcdef" for c in source_tree):
-            raise ValueError("source_tree must be an exact Git tree SHA")
         self.factory = factory
-        self.source_tree = source_tree
+        self.source_checkout = source_checkout.resolve()
+        self.source_tree = verified_source_tree(self.source_checkout)
         self.max_evidence_age = max_evidence_age
+
+    def _assert_source_unchanged(self) -> None:
+        if verified_source_tree(self.source_checkout) != self.source_tree:
+            raise RemoteAdmissionDenied("source_tree_changed")
 
     def reserve(
         self, request: InferenceRequest, route: RouteSnapshot, *, grant_id: str
     ) -> Reservation:
         """Atomically consume one grant use and one observed request allowance."""
+        self._assert_source_unchanged()
         if route.provider not in {"groq", "openrouter"}:
             raise RemoteAdmissionDenied("provider_not_released_for_remote_gate")
         if request.route_id != route.route_id or request.max_output_tokens is None:
@@ -168,6 +204,7 @@ class DurableRemoteCallGate:
 
     def mark_sending(self, ticket: Reservation) -> None:
         """Commit SENDING before the adapter can put bytes on the wire."""
+        self._assert_source_unchanged()
         with session_scope(self.factory) as session:
             row = session.scalar(
                 select(ReservationRow)
