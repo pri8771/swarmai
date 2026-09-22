@@ -677,14 +677,17 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28c.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "W2",
         "I1"
       ],
       "assignee": "codex",
       "assignment_ref": "docs/coordination/assignments/CODEX_R28C_20260922.md",
-      "review_hold": "R28d held pending exact-SHA R28c lead review"
+      "review_hold": "R28d held pending exact-SHA R28c lead review",
+      "implementation_ref": "codex/swarm-r28c-single-path-20260922@ba458eb1a9a1af5f7e022159f36e6ce296d472cc",
+      "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28C-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R29a",
@@ -697,10 +700,13 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R29a.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "I3"
-      ]
+      ],
+      "assignee": "codex",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R29A_20260922.md",
+      "review_hold": "R28d held pending exact-SHA R29a lead review"
     },
     {
       "id": "R28d",
@@ -716,7 +722,8 @@
       "status": "planned",
       "fixes": [
         "W1"
-      ]
+      ],
+      "review_hold": "R29a exact-SHA lead review required before release"
     },
     {
       "id": "R30a",
