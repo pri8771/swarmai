@@ -1,0 +1,332 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_gateway_fences_durable_change_after_local_precheck[cancel] ________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10a89c640>
+change = 'cancel'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
+    async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
+        adapter = ApiMcpAdapter()
+        env = _leased_envelope(factory, adapter)
+        gateway = _gateway(adapter, factory, project=env.project_id)
+        env.approval_id = gateway.make_approval(env).approval_id
+        original_reserve = gateway.store.reserve
+    
+        def reserve_then_change(envelope):
+            row = original_reserve(envelope)
+            # A distinct, committed transaction changes authority AFTER the gateway's
+            # local generation precheck. The gateway integers intentionally stay stale.
+            if change == "cancel":
+                with factory() as session:
+                    LeaseLifecycleService(session).revoke_mission_work(
+                        mission_id=env.mission_id, notify_leases=False
+                    )
+                    session.commit()
+            elif change == "worker_generation":
+                _sql(
+                    factory,
+                    "UPDATE worker_leases SET lease_generation=lease_generation+1 WHERE worker_id=:w",
+                    w=env.actor,
+                )
+            elif change == "expire":
+                _sql(
+                    factory,
+                    "UPDATE task_leases SET expires_at=now()-interval '1 second' WHERE attempt_id=:a",
+                    a=env.attempt_id,
+                )
+            elif change == "revoke":
+                _sql(
+                    factory, "UPDATE worker_leases SET revoked_at=now() WHERE worker_id=:w", w=env.actor
+                )
+            else:
+                _sql(factory, "DELETE FROM task_leases WHERE attempt_id=:a", a=env.attempt_id)
+            return row
+    
+        monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_admission_fences.py:124: Failed
+__ test_gateway_fences_durable_change_after_local_precheck[worker_generation] __
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10aaaca70>
+change = 'worker_generation'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
+    async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
+        adapter = ApiMcpAdapter()
+        env = _leased_envelope(factory, adapter)
+        gateway = _gateway(adapter, factory, project=env.project_id)
+        env.approval_id = gateway.make_approval(env).approval_id
+        original_reserve = gateway.store.reserve
+    
+        def reserve_then_change(envelope):
+            row = original_reserve(envelope)
+            # A distinct, committed transaction changes authority AFTER the gateway's
+            # local generation precheck. The gateway integers intentionally stay stale.
+            if change == "cancel":
+                with factory() as session:
+                    LeaseLifecycleService(session).revoke_mission_work(
+                        mission_id=env.mission_id, notify_leases=False
+                    )
+                    session.commit()
+            elif change == "worker_generation":
+                _sql(
+                    factory,
+                    "UPDATE worker_leases SET lease_generation=lease_generation+1 WHERE worker_id=:w",
+                    w=env.actor,
+                )
+            elif change == "expire":
+                _sql(
+                    factory,
+                    "UPDATE task_leases SET expires_at=now()-interval '1 second' WHERE attempt_id=:a",
+                    a=env.attempt_id,
+                )
+            elif change == "revoke":
+                _sql(
+                    factory, "UPDATE worker_leases SET revoked_at=now() WHERE worker_id=:w", w=env.actor
+                )
+            else:
+                _sql(factory, "DELETE FROM task_leases WHERE attempt_id=:a", a=env.attempt_id)
+            return row
+    
+        monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_admission_fences.py:124: Failed
+_______ test_gateway_fences_durable_change_after_local_precheck[expire] ________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10aa9ce20>
+change = 'expire'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
+    async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
+        adapter = ApiMcpAdapter()
+        env = _leased_envelope(factory, adapter)
+        gateway = _gateway(adapter, factory, project=env.project_id)
+        env.approval_id = gateway.make_approval(env).approval_id
+        original_reserve = gateway.store.reserve
+    
+        def reserve_then_change(envelope):
+            row = original_reserve(envelope)
+            # A distinct, committed transaction changes authority AFTER the gateway's
+            # local generation precheck. The gateway integers intentionally stay stale.
+            if change == "cancel":
+                with factory() as session:
+                    LeaseLifecycleService(session).revoke_mission_work(
+                        mission_id=env.mission_id, notify_leases=False
+                    )
+                    session.commit()
+            elif change == "worker_generation":
+                _sql(
+                    factory,
+                    "UPDATE worker_leases SET lease_generation=lease_generation+1 WHERE worker_id=:w",
+                    w=env.actor,
+                )
+            elif change == "expire":
+                _sql(
+                    factory,
+                    "UPDATE task_leases SET expires_at=now()-interval '1 second' WHERE attempt_id=:a",
+                    a=env.attempt_id,
+                )
+            elif change == "revoke":
+                _sql(
+                    factory, "UPDATE worker_leases SET revoked_at=now() WHERE worker_id=:w", w=env.actor
+                )
+            else:
+                _sql(factory, "DELETE FROM task_leases WHERE attempt_id=:a", a=env.attempt_id)
+            return row
+    
+        monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_admission_fences.py:124: Failed
+_______ test_gateway_fences_durable_change_after_local_precheck[revoke] ________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10aacd650>
+change = 'revoke'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
+    async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
+        adapter = ApiMcpAdapter()
+        env = _leased_envelope(factory, adapter)
+        gateway = _gateway(adapter, factory, project=env.project_id)
+        env.approval_id = gateway.make_approval(env).approval_id
+        original_reserve = gateway.store.reserve
+    
+        def reserve_then_change(envelope):
+            row = original_reserve(envelope)
+            # A distinct, committed transaction changes authority AFTER the gateway's
+            # local generation precheck. The gateway integers intentionally stay stale.
+            if change == "cancel":
+                with factory() as session:
+                    LeaseLifecycleService(session).revoke_mission_work(
+                        mission_id=env.mission_id, notify_leases=False
+                    )
+                    session.commit()
+            elif change == "worker_generation":
+                _sql(
+                    factory,
+                    "UPDATE worker_leases SET lease_generation=lease_generation+1 WHERE worker_id=:w",
+                    w=env.actor,
+                )
+            elif change == "expire":
+                _sql(
+                    factory,
+                    "UPDATE task_leases SET expires_at=now()-interval '1 second' WHERE attempt_id=:a",
+                    a=env.attempt_id,
+                )
+            elif change == "revoke":
+                _sql(
+                    factory, "UPDATE worker_leases SET revoked_at=now() WHERE worker_id=:w", w=env.actor
+                )
+            else:
+                _sql(factory, "DELETE FROM task_leases WHERE attempt_id=:a", a=env.attempt_id)
+            return row
+    
+        monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_admission_fences.py:124: Failed
+_______ test_gateway_fences_durable_change_after_local_precheck[missing] _______
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ab09040>
+change = 'missing'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
+    async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
+        adapter = ApiMcpAdapter()
+        env = _leased_envelope(factory, adapter)
+        gateway = _gateway(adapter, factory, project=env.project_id)
+        env.approval_id = gateway.make_approval(env).approval_id
+        original_reserve = gateway.store.reserve
+    
+        def reserve_then_change(envelope):
+            row = original_reserve(envelope)
+            # A distinct, committed transaction changes authority AFTER the gateway's
+            # local generation precheck. The gateway integers intentionally stay stale.
+            if change == "cancel":
+                with factory() as session:
+                    LeaseLifecycleService(session).revoke_mission_work(
+                        mission_id=env.mission_id, notify_leases=False
+                    )
+                    session.commit()
+            elif change == "worker_generation":
+                _sql(
+                    factory,
+                    "UPDATE worker_leases SET lease_generation=lease_generation+1 WHERE worker_id=:w",
+                    w=env.actor,
+                )
+            elif change == "expire":
+                _sql(
+                    factory,
+                    "UPDATE task_leases SET expires_at=now()-interval '1 second' WHERE attempt_id=:a",
+                    a=env.attempt_id,
+                )
+            elif change == "revoke":
+                _sql(
+                    factory, "UPDATE worker_leases SET revoked_at=now() WHERE worker_id=:w", w=env.actor
+                )
+            else:
+                _sql(factory, "DELETE FROM task_leases WHERE attempt_id=:a", a=env.attempt_id)
+            return row
+    
+        monkeypatch.setattr(gateway.store, "reserve", reserve_then_change)
+>       with pytest.raises(EffectConflictError, match="fence_changed_before_execute"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_admission_fences.py:124: Failed
+____________ test_not_applied_retry_rebinds_from_grant_a_to_b_once _____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None:
+        raising = RaisingAdapter()
+        gateway_a = _gateway(raising, factory)
+        envelope_a = raising.normalize(
+            {
+                "project_id": "proj_a",
+                "destination": "mcp://echo/default",
+                "body": "retry-with-replacement-grant",
+            }
+        )
+        grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+        envelope_a.approval_id = grant_a.approval_id
+    
+        first = await gateway_a.execute_envelope(envelope_a)
+        assert first.outcome == "failed"
+        assert _used_count(factory, grant_a.approval_id) == 1
+        _sql(
+            factory,
+            "UPDATE action_effects SET state_reason='not_applied' WHERE effect_key=:k",
+            k=envelope_a.effect_key,
+        )
+    
+        working = ApiMcpAdapter()
+        gateway_b = _gateway(working, factory)
+        grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
+        envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
+    
+        second = await gateway_b.execute_envelope(envelope_b)
+        assert second.outcome == "succeeded"
+        assert second.attempt_number == 2
+        assert working.call_count == 1
+        assert _used_count(factory, grant_a.approval_id) == 1
+>       assert _used_count(factory, grant_b.approval_id) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = _used_count(sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False), 'apr_899d4887c3694ec588aac1f5a9e2459c')
+E        +    where 'apr_899d4887c3694ec588aac1f5a9e2459c' = ApprovalGrant(schema_version='1.0', approval_id='apr_899d4887c3694ec588aac1f5a9e2459c', project_id='proj_a', actor='wo...7-policy-1', constraints={}, created_at=datetime.datetime(2026, 9, 22, 3, 3, 15, 153391, tzinfo=datetime.timezone.utc)).approval_id
+
+tests/integration/db/test_effect_transactions.py:402: AssertionError
+____ test_returning_to_consumed_grant_on_same_effect_does_not_consume_again ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again(factory):
+        adapter = RaisingAdapter()
+        gateway = _gateway(adapter, factory)
+        env = adapter.normalize({"project_id": "proj_a", "body": "A-B-A-retry"})
+        grant_a = gateway.make_approval(env)
+        grant_b = _unbound_one_shot_approval(gateway, env)
+        for number, grant in enumerate((grant_a, grant_b, grant_a, grant_b), start=1):
+            env.approval_id = grant.approval_id
+            receipt = await gateway.execute_envelope(env)
+            assert receipt.outcome == "failed"
+            assert receipt.approval_id == grant.approval_id
+            assert receipt.attempt_number == number
+>           assert _used_count(factory, grant.approval_id) == 1
+E           AssertionError: assert 0 == 1
+E            +  where 0 = _used_count(sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_checks?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False), 'apr_48037b9ad7b248769972dddcbd9fa48e')
+E            +    where 'apr_48037b9ad7b248769972dddcbd9fa48e' = ApprovalGrant(schema_version='1.0', approval_id='apr_48037b9ad7b248769972dddcbd9fa48e', project_id='proj_a', actor='wo...7-policy-1', constraints={}, created_at=datetime.datetime(2026, 9, 22, 3, 3, 15, 172809, tzinfo=datetime.timezone.utc)).approval_id
+
+tests/integration/db/test_effect_transactions.py:540: AssertionError
+=========================== short test summary info ============================
+FAILED tests/integration/db/test_effect_admission_fences.py::test_gateway_fences_durable_change_after_local_precheck[cancel]
+FAILED tests/integration/db/test_effect_admission_fences.py::test_gateway_fences_durable_change_after_local_precheck[worker_generation]
+FAILED tests/integration/db/test_effect_admission_fences.py::test_gateway_fences_durable_change_after_local_precheck[expire]
+FAILED tests/integration/db/test_effect_admission_fences.py::test_gateway_fences_durable_change_after_local_precheck[revoke]
+FAILED tests/integration/db/test_effect_admission_fences.py::test_gateway_fences_durable_change_after_local_precheck[missing]
+FAILED tests/integration/db/test_effect_transactions.py::test_not_applied_retry_rebinds_from_grant_a_to_b_once
+FAILED tests/integration/db/test_effect_transactions.py::test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
+7 failed, 16 deselected in 0.53s

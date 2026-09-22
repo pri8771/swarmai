@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-09-22T03:10:47.740874+00:00",
+  "evidence_class": "engineering_only",
+  "source_sha": "aa85f061afa50996c2b90732ecdb253d56c9bfcc",
+  "dispatched": false,
+  "formal_acceptance": false,
+  "files": {
+    "swarm-final-checks.txt": {
+      "sha256": "4ca6d4d43560ef810fde7ed6d7608b4e59067c4f5d9e80cc9c3f9ce25ca9f18f"
+    },
+    "swarm-complete-checks.txt": {
+      "sha256": "8436b87230eca91e273957e88535c64bfe458323532bfcf8a5ffe61d119c5c4a"
+    },
+    "swarm-final-checks.json": {
+      "sha256": "9616621c7ee6960d9bb816256eb9191bb477b2c26278393b551ea61f6f7f326c"
+    },
+    "swarm-repair-baseline-red.txt": {
+      "sha256": "62047169d111d3851ba3e794e1fa0db919a953901753a8370392d0f475b1e09e"
+    },
+    "swarm-repair-environment.json": {
+      "sha256": "b8784c2ad05e35650ffc32f01dd1157f20e2f5c4cbf2fed20b15a17a2e9e645c"
+    },
+    "swarm-local-fixture-checks.txt": {
+      "sha256": "bad1d8d5ed74d1f15b2d3c93d31854667c5511c98cdda831afe519ad9654a166"
+    },
+    "swarm-console-checks.txt": {
+      "sha256": "78b00db179987f0ae617728513b88d7c479a512dfe12ab74210a92d5a31b4959"
+    },
+    "swarm-console-install.txt": {
+      "sha256": "65d4b77e86311cc2511f573c4924bde1e0c33c5cb2b771f1f536afd3a6d64078"
+    }
+  }
+}

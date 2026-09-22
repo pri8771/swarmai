@@ -1,0 +1,111 @@
+{
+  "source_sha": "aa85f061afa50996c2b90732ecdb253d56c9bfcc",
+  "completed_utc": "2026-09-22T03:07:49.086321+00:00",
+  "runs": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/integration/db/test_effect_admission_fences.py",
+        "tests/integration/db/test_effect_transactions.py",
+        "tests/integration/db/test_effect_reservation_atomic.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/mypy",
+        "src"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs"
+      ],
+      "env_description": "isolated PG, SWARM_LIVE_LOCAL=1 synthetic loopback, console lockfile installed",
+      "exit": 0
+    }
+  ]
+}
