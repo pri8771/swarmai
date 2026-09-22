@@ -1,0 +1,31 @@
+{
+  "packet": "R30a",
+  "artifact": "ART-V17-INTEGRATION-MANIFEST",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "e405077f8fbab4b9aa9630666fd697527c01b623",
+  "tested_source_sha": "e46f5b63d3bef3e6ccb00c73fb2b1455b8abf264",
+  "commands": [
+    {
+      "argv": "SWARM_LIVE_LOCAL=1 uv run pytest tests/live_fixture -v",
+      "result": "11 passed"
+    },
+    {
+      "argv": "uv run pytest -q (SWARM_DATABASE_URL set, SWARM_LIVE_LOCAL unset)",
+      "result": "433 passed, 13 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T01:45:31Z"
+}
