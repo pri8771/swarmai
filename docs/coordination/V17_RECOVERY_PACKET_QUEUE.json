@@ -649,9 +649,15 @@
         "A6"
       ],
       "assignee": "codex",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R28B1_20260922.md",
-      "active_slice": "R28b-1 rules 1-3 only",
-      "review_hold": "R28b-2 rules 4-6 held pending exact-SHA R28b-1 lead review"
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28B2_20260922.md",
+      "active_slice": "R28b-2 rules 4-6 only",
+      "review_hold": "R28c held pending exact-SHA R28b-2 lead review",
+      "r28b1": {
+        "status": "impl_complete",
+        "implementation_ref": "codex/swarm-r28b1-classification-20260922@2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510",
+        "review_ref": "docs/coordination/reviews/ART-V17-APPROVAL-BINDING-R28B1-LEAD-REVIEW.md",
+        "review_decision": "bounded_slice_accepted"
+      }
     },
     {
       "id": "R28c",
