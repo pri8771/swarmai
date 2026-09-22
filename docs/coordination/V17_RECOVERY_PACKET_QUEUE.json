@@ -617,7 +617,7 @@
       "sp": 2,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28a.md",
-      "status": "ready",
+      "status": "impl_complete",
       "fixes": [
         "E6",
         "E7",
@@ -626,7 +626,10 @@
       ],
       "review_hold": "lead reviews exact R28a SHA before dependent work",
       "assignee": "codex",
-      "assignment_ref": "docs/coordination/assignments/CODEX_R28A_20260922.md"
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28A_20260922.md",
+      "implementation_ref": "codex/swarm-r28a-outcomes-20260922@b204fda738221787325ce8fd0b8db58e6e29b573",
+      "review_ref": "docs/coordination/reviews/ART-V17-TOOL-CONTRACT-R28A-LEAD-REVIEW.md",
+      "review_decision": "bounded_slice_accepted"
     },
     {
       "id": "R28b",
@@ -639,12 +642,16 @@
       "sp": 3,
       "tier": "mid",
       "spec": "docs/coordination/packets/R28b.md",
-      "status": "planned",
+      "status": "ready",
       "fixes": [
         "A1",
         "A2",
         "A6"
-      ]
+      ],
+      "assignee": "codex",
+      "assignment_ref": "docs/coordination/assignments/CODEX_R28B1_20260922.md",
+      "active_slice": "R28b-1 rules 1-3 only",
+      "review_hold": "R28b-2 rules 4-6 held pending exact-SHA R28b-1 lead review"
     },
     {
       "id": "R28c",
