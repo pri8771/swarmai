@@ -1,0 +1,54 @@
+{
+  "kind": "read_only_preflight",
+  "gate": "EXT-V17-REALWORLD-GITHUB",
+  "packet": "R33c",
+  "at": "2026-09-22T01:47:23Z",
+  "mutations_performed": false,
+  "gh_auth_status": {
+    "exit_code": 0,
+    "summary": [
+      "\u2713 Logged in to github.com account pri8771 (keyring)",
+      "- Git operations protocol: https",
+      "- Token scopes: 'gist', 'read:org', 'repo', 'workflow'"
+    ]
+  },
+  "gh_api_user": {
+    "exit_code": 0,
+    "login": "pri8771"
+  },
+  "repo_read": {
+    "exit_code": 0,
+    "result": {
+      "has_issues": true,
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "pull": true,
+        "push": true,
+        "triage": true
+      },
+      "private": true
+    }
+  },
+  "issues_read": {
+    "exit_code": 0,
+    "sample": [
+      {
+        "number": 16,
+        "state": "closed",
+        "title": "planning: canonicalize lead-reviewed V1.7\u2192V3 artifact execution system"
+      },
+      {
+        "number": 15,
+        "state": "closed",
+        "title": "planning: promote lead-reviewed Fable V1.7\u2192V3 artifact execution system"
+      },
+      {
+        "number": 14,
+        "state": "open",
+        "title": "V1.4 base candidate \u2014 historical foundation for V2 lanes"
+      }
+    ]
+  },
+  "conclusion": "host gh identity is authenticated with repo scope and can read the private repo and its issues; R33c mutations (create/comment/close one '[SwarmAI LIVE TEST] <run-id>' issue) remain gated on exact operator action approval and on the durable action boundary being on the operational path (R28a-R28d, R33a/b are behind REV-R27C)."
+}
