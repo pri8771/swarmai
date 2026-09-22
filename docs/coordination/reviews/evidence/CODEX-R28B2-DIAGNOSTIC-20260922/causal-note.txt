@@ -1,0 +1,31 @@
+R28b-2 held-packet mechanical diagnosis
+Date: 2026-09-22
+Source: /Users/pchordia/Downloads/swarm_codex/review/swarm-r28b1-source
+Exact source HEAD: 2ebaa5a0cd64b2de665202c5cf9db0dd4f0a1510
+Canonical packet: origin/coordination/swarm-control:docs/coordination/packets/R28b.md
+Assignment status: no R28b-2 assignment exists under canonical docs/coordination/assignments; only CODEX_R28B1_20260922.md exists. R28b-2 remains held. This artifact is diagnosis only under the root's explicit read-only request; it is not implementation, release, or permission to cross the hold.
+
+ONE REPRODUCED AUTHORITY MISMATCH: envelope actor is trusted because no authenticated ActorContext reaches the gateway.
+
+Native intended boundary (R28b rule 6, packet line 37):
+  execute_envelope(envelope, *, context: ActorContext)
+  context.project_id must equal envelope.project_id, then context.actor must equal envelope.actor; mismatch must raise actor_mismatch before policy, fences, reservation, or adapter execution.
+
+Current causal boundary:
+- src/swarm/tools/v17_gateway.py:64-85 accepts constructor project_id/allowed_scopes/generation constants and has no actor context/provider seams.
+- execute_envelope signature is `(envelope)` only.
+- src/swarm/tools/v17_gateway.py:484-494 checks project and scopes, but never binds envelope.actor to caller/authentication context.
+- ActionEnvelope.actor is caller-controlled input and is subsequently used when approvals are made/bound.
+
+Safe synthetic reproduction:
+  PYTHONPATH=src ../swarm-source/.venv/bin/python /tmp/swarm-r28b2-diagnostic-actor.py
+  Exit 0. Output: /tmp/swarm-r28b2-diagnostic-actor-output.txt
+Observed:
+  execute_envelope_signature= (envelope: 'ActionEnvelope') -> 'ActionReceiptV17'
+  forged_actor_reached_reservation= forged-untrusted-actor
+  adapter_execute_called=false (reserve raised before begin/execute)
+
+The store subclass raises STOP_BEFORE_EFFECT from reserve, proving the forged actor passed every current authorization/policy/generation check and reached the reservation boundary. It prevents begin_execution and adapter execution. The local adapter's execute method was never called; no external/provider/credential/PG access or actual effect occurred.
+
+Exact scope boundary:
+This finding establishes only rule 6 actor-context mismatch on submitted R28b-1 (formal verdict still pending). It does not diagnose or implement FenceProvider, LeaseFenceProvider, PolicyProvider, stale policy, dynamic scope, or in-transaction fence behavior; those remain held R28b-2 work.

@@ -1,0 +1,3 @@
+execute_envelope_signature= (envelope: 'ActionEnvelope') -> 'ActionReceiptV17'
+forged_actor_reached_reservation= forged-untrusted-actor
+adapter_execute_called=false (reserve raised before begin/execute)

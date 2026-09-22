@@ -1,0 +1,14 @@
+{
+  "causal-note.txt": {
+    "bytes": 2528,
+    "sha256": "d80c16aac80896b69fae818d5b1297d8f849bfab058a613969a0904cd9af207f"
+  },
+  "observed.txt": {
+    "bytes": 203,
+    "sha256": "0236c96c6d281e8afab5f0b83ce83d20019aa091208cca2f856f2cb47999766b"
+  },
+  "reproduce.py": {
+    "bytes": 1649,
+    "sha256": "b808b53df7eae5b770a69c3ba9ab941982cc08823b66665e153914d90b67e958"
+  }
+}
