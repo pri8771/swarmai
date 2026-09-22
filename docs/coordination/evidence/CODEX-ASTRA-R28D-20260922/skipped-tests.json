@@ -1,0 +1,54 @@
+[
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_idempotency_key_replay_creates_one_note",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_drop_response_after_commit_stores_note_and_client_sees_transport_error",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_fail_before_commit_stores_nothing",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_submit_without_session_redirects_and_stores_nothing",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_session_expires_after_ttl",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_submit_does_not_dedupe",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_login_next_rejects_absolute_and_scheme_relative_urls",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_service_binds_loopback_only",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_terminal_non_application_receipt_requires_stopped_handler",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_delayed_commit_is_in_flight_not_negative_proof",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.live_fixture.test_fixture_service::test_request_id_payload_conflict_and_duplicate_handler_rejected",
+    "reason": "live_local: SWARM_LIVE_LOCAL != 1"
+  },
+  {
+    "test": "tests.ui.test_console::test_console_vitest",
+    "reason": "npm install not run"
+  },
+  {
+    "test": "tests.ui.test_console::test_console_build_has_no_secret_literals",
+    "reason": "npm install not run"
+  }
+]
