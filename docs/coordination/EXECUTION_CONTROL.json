@@ -1,9 +1,15 @@
 {
-  "schema_version": "1.0",
-  "purpose": "Additive lead control over existing packet DAGs; not a second queue and not evidence of product completion",
+  "schema_version": "1.1",
+  "purpose": "Owner-scoped execution control over existing packet DAGs; not a second queue or evidence of completion",
+  "scope_directive": "OWNER_V17_LIVE_ONLY",
+  "scope_precedence": "The latest owner request supersedes all earlier continue-through-V3 instructions and historical scope fields. Artifact acceptance/evidence requirements are unchanged.",
   "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
-  "goal_version": "3.0",
+  "goal_version": "1.7",
+  "allowed_phases": ["v17"],
   "initial_phase": "v17",
+  "future_implementation_authorized": false,
+  "future_planning_authorized": false,
+  "stop_after": "V1.7 live handoff and review package; do not automatically begin V1.8 or later",
   "implementation_branch": "cursor/v17-single-session",
   "audited_source_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
   "heartbeat_path": "heartbeats/CURSOR-V17-SINGLE.json",
@@ -30,13 +36,16 @@
   "reviewed_packets": {},
   "frozen_packets": [],
   "rules": [
+    "Only V1.7 delivery and its required lower-version prerequisites are active. V1.8-V3 source work, roadmap elaboration and future packet selection are parked.",
+    "A passed V1.7 handoff does not unlock another phase. A new explicit owner directive is required.",
+    "Live means a running private/local candidate plus relevant real operational tests; a health endpoint or a local fixture alone is insufficient.",
     "Existing review holds remain mandatory; worker may prepare review bundles but may not invent reviews.",
     "A ready label never overrides dependencies or execution prerequisites.",
     "Evidence-only or review-pending can explain a historical code baseline, but cannot satisfy a live checkpoint.",
     "Existing GitHub account use is authorized for R33c only after a fresh read-only host probe and exact action approvals; tool connectivity elsewhere is not local gh authentication.",
     "Structural validate_plan.py output is not permission to execute. Apply execution_guard.py and packet/runtime checks.",
-    "Empty reviewed_packets and frozen_packets are intentional: this handoff does not preapprove future code or freeze unresolved acceptance thresholds.",
-    "Do not replace the artifact registry, duplicate the queues, or rewrite old evidence. Control only adds prerequisites.",
-    "A heartbeat tick is not progress; preserve the last real activity timestamp and inspect the actual worker or long-running test process."
+    "Empty reviewed_packets and frozen_packets do not preapprove future code or unresolved acceptance thresholds.",
+    "Do not replace the registry, duplicate queues, or rewrite historical evidence. Scope controls authorization, not artifact acceptance.",
+    "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
   ]
 }
