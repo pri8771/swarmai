@@ -18,13 +18,13 @@ from swarm.contracts.provider import ProviderAccount, RouteSnapshot
 from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
 from swarm.controller.mission import MissionController
 from swarm.evals.profiles import ProfileStore
-from swarm.mission.store import MissionRecord, MissionStore
 from swarm.mission.action_boundary import local_worktree_gateway
-from swarm.tools.fences import ActorContext
+from swarm.mission.store import MissionRecord, MissionStore
 from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
 from swarm.product.history import HistoryIndex
 from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
 from swarm.providers.catalog import list_providers
+from swarm.tools.fences import ActorContext
 from swarm.workers.registry import WorkerRegistryService
 
 
