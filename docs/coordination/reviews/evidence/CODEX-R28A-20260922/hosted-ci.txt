@@ -1,0 +1,39 @@
+R28a hosted Actions and canonical readback
+Exact source SHA: b204fda738221787325ce8fd0b8db58e6e29b573
+PR: https://github.com/pri8771/swarmai/pull/21 (open)
+Read-only GitHub API/CLI inspection; no rerun, billing, spend, or repository mutation.
+
+Workflow inventory for exact SHA
+- Workflow: ci (.github/workflows/ci.yml)
+- Runs: 2, both completed/failure, attempt 1
+  - 35689583522, run 1427, event push, 2026-09-22T05:09:05Z
+    https://github.com/pri8771/swarmai/actions/runs/35689583522
+  - 35689682073, run 1428, event pull_request, 2026-09-22T05:10:34Z
+    https://github.com/pri8771/swarmai/actions/runs/35689682073
+- Jobs: 3 per run, 6 total: offline, console, live-gated.
+- Executable steps returned by the Actions jobs API: 0 per job, 0 per run, 0 total.
+  Every job's steps array is empty; no checkout, install, lint, build, or test step started.
+
+Jobs and annotations
+- Run 35689583522:
+  - offline 106623508661: failure, 0 steps
+  - console 106623508803: failure, 0 steps
+  - live-gated 106623508841: failure, 0 steps
+- Run 35689682073:
+  - live-gated 106623804788: failure, 0 steps
+  - console 106623805064: failure, 0 steps
+  - offline 106623805125: failure, 0 steps
+- Each of all 6 check runs has the same failure annotation at .github:1:
+  "The job was not started because recent account payments have failed or your spending
+  limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+- Each also has one unrelated runner-image notice about ubuntu-latest migrating to Ubuntu
+  26 beginning October 19, 2026.
+- Annotation totals: 12 (6 failure, 6 notice). These are infrastructure/account-start
+  failures, not executable test failures. Hosted CI provides zero executed-step evidence.
+
+Canonical Swarm readback
+- Live coordination/swarm-control head: 33360842d994411c578e77d9589495dec775f53d
+- It is 3 commits beyond the prior live read 2e32530c; all three are the 05:12:44Z
+  heartbeat/status/heartbeat-state sequence.
+- No R28a verdict or acceptance was recorded.
+- No next native packet was released. R28a remains the latest released packet.
