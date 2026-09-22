@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `9ff6859d3920106af9a55937c78937b785506ede`
-- Coordination SHA: `168c6641bb12f570956932bae0a88f133794821e`
-- Updated: `2026-09-22T01:24:10Z`
-- Trigger: `scheduler`
+- Branch SHA: `1bbf316a0b370c29299f0b91205ffdf2d85bae67`
+- Coordination SHA: `9d3fe84f49e00fd8eb0881d7147ed434b38b9620`
+- Updated: `2026-09-22T01:27:14Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `R27d`
-- Current artifact: `ART-V17-APPROVAL-BINDING`
-- Last meaningful activity: `2026-09-22T00:49:46Z`
+- Current packet: `R30a`
+- Current artifact: `ART-V17-INTEGRATION-MANIFEST`
+- Last meaningful activity: `2026-09-22T01:27:13Z`
 - Spend USD: `0.0`
 - Blocker: REV-R27C (lead diff review before R27e/R28a); EXT-ACTIONS-BILLING; EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
 
 ## Update
 
-R27c review_pending: pushed 8dbe5d8 (feat) + 9ff6859 (bundle). Repository-owned transactions, committed begin_execution admission, exact-once approval consumption, real second-process test. 16 tests x5 green; full suite 416 passed/2 skipped. REV-R27C hold: R27e/R28a wait for lead diff review. Continuing R27d (approval immutability) which is not held.
+R27d impl_complete: pushed 1b9afc5 (feat) + 1bbf316 (bind). Approvals insert-only, monotonic revocation, project-filtered reads, legacy NULL rows non-operational. 6 tests; full suite 422 passed/2 skipped. R27 chain a-d done; REV-R27C hold gates R27e/R28a. Taking independent R30a (live fixture service).
 
 ## Next
 
-R27d approval insert-only + monotonic revocation; then R30a/R17a/R02a while REV-R27C waits
+R30a live local fixture service + markers; then R17a CP3 gaps; R02a defect-proof gate
