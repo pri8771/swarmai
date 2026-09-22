@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "run_id": "r28d-live-local-20260922-01",
+  "classification": "live_local",
+  "decision": "REWORK_FOUND",
+  "assignment": {
+    "ref": "coordination/swarm-control@0f8c9e3912c66622a32806514439a78376779866:docs/coordination/assignments/CODEX_R28D_LIVE_LOCAL_20260922.md",
+    "invocation_limit": 1,
+    "consumed": true
+  },
+  "source": {
+    "sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+    "tree": "36aadba9c0fdb63c015784bee311df7976e68c4f",
+    "bundle_sha256": "bf528b51be46d2272b91da3694b4b0ddc0801acaf13bcfd666677d49d0f69190"
+  },
+  "route": {
+    "provider": "ollama",
+    "model": "qwen3.5:4b",
+    "endpoint_class": "owner-local-loopback",
+    "paid_fallback": false,
+    "incremental_cost_policy_usd": 0.0
+  },
+  "runtime": {
+    "host_class": "owner-authorized R730",
+    "container_image": "agent0ai/agent-zero@sha256:0ba6bfd4b638b69396bfd65afbbd7e86a0bfca36292c5042b2aef5aaa2e41380",
+    "container_lifecycle": "one-shot --rm",
+    "scheduler_added": false,
+    "public_or_external_effect": false,
+    "model_download": false,
+    "credential_or_account_mutation": false
+  },
+  "invocation": {
+    "product_entrypoint": "MissionRuntime.run",
+    "count": 1,
+    "outcome": "exception_before_final_record",
+    "exception": {
+      "type": "RuntimeError",
+      "message": "sync_call_inside_running_loop"
+    }
+  },
+  "evidence": {
+    "action_receipt_ids": [],
+    "action_receipt_count": 0,
+    "mission_record": "absent",
+    "request_count": "UNKNOWN",
+    "recorded_cost_usd": "UNKNOWN",
+    "file_receipt_coverage": "not_available",
+    "command_receipt_coverage": "not_available",
+    "trace": "trace.txt"
+  },
+  "cleanup": {
+    "child_worktree_removed": true,
+    "transient_branch_removed": true,
+    "primary_source_clean_after_cleanup": true
+  },
+  "completion_claim": false,
+  "next_gate": "Independent exact-SHA review of e87c523 followed by a successor one-run release before any new live invocation."
+}

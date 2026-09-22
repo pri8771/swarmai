@@ -1,0 +1,16 @@
+Product exception from the one released invocation:
+
+RuntimeError: sync_call_inside_running_loop
+
+Relevant causal path:
+
+MissionRuntime.run (async event loop)
+  -> RepoWorker.run_task (synchronous call made on that loop)
+  -> RepoWorker._implement
+  -> RepoWorker._write_effect
+  -> RepoWorker._action_effect
+  -> ConsequentialToolGateway.execute_envelope_sync
+  -> RuntimeError: sync_call_inside_running_loop
+
+The failure occurred before the first worker write completed. No action receipt,
+final mission record, or final cost accounting was produced. No retry occurred.
