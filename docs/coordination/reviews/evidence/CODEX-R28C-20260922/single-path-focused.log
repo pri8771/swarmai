@@ -1,0 +1,5 @@
+created_db=swarm_r28c_single_path_77360
+..................                                                       [100%]
+18 passed in 0.92s
+cleanup_remaining=0
+pytest_exit=0 cleanup_exit=0

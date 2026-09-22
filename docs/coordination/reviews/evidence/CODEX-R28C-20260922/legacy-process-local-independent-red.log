@@ -1,0 +1,9 @@
+{
+  "accepted_source": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb",
+  "count_after_first_and_same_instance_replay": 1,
+  "count_after_fresh_gateway_replay": 2,
+  "finding": "process_local_dedupe_reexecutes_on_fresh_gateway",
+  "fresh_instance_receipt_external_id": "synthetic-2",
+  "same_instance_receipt_external_id": "synthetic-1",
+  "same_operation_id": "op-same-across-process-boundaries"
+}

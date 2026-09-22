@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.5.0",
+  "generated_at": "2026-09-22T09:01:00.661625+00:00",
+  "audit": [
+    {
+      "step": "allowed_read",
+      "outcome": "succeeded",
+      "ok": true
+    },
+    {
+      "step": "denied_outside_allowlist",
+      "ok": true,
+      "error": "path_denied:README.md"
+    },
+    {
+      "step": "human_gate_required",
+      "ok": true,
+      "error": "approval_required"
+    },
+    {
+      "step": "approved_write",
+      "outcome": "succeeded",
+      "ok": true,
+      "approval_id": "apr_2df42462893044bb990a17d819376e0b",
+      "durable_receipt_refs": [
+        "arc_82aa2186b526453ea874909e6df788dd"
+      ]
+    }
+  ],
+  "receipt_count": 4,
+  "probe_file_exists": true,
+  "cost_usd": 0.0,
+  "mock_vs_live": "engineering_local_durable_tool_permission_proof",
+  "mission_id": "msn_cadc05b402524ce68676e099898bf58b",
+  "task_id": "tsk_a89a310899ea40a6b686b58583611877",
+  "attempt_id": "att_264faf0e330c4d31be80ad3a94e31d22",
+  "ok": true,
+  "report_hash": "4c429e0712b839d864186c129b7005a5106f4d6481b7e6eab0971fe20ddcbb98"
+}
+{"durable_counts": {"action_effects": 1, "action_receipts": 1, "approvals": 1}, "state": "succeeded", "approval_used_count": 1, "result": "PASS_DURABLE_PERMISSION_PATH"}

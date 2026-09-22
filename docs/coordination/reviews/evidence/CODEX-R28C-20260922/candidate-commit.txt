@@ -1,0 +1,10 @@
+commit ba458eb1a9a1af5f7e022159f36e6ce296d472cc
+Author:     Priyansh Chordia <priyansh.chordia@gmail.com>
+AuthorDate: Tue Sep 22 04:59:36 2026 -0400
+Commit:     Priyansh Chordia <priyansh.chordia@gmail.com>
+CommitDate: Tue Sep 22 04:59:36 2026 -0400
+
+    test: initialize durable store for product journey proof
+
+ tests/product/test_product.py | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)

@@ -1,0 +1,8 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+database=swarm_r28c_network_78186_1790066926
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r28c_network_78186_1790066926?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/tools/test_single_consequential_path.py
+database_create_exit=0
+.........                                                                [100%]
+9 passed in 0.56s
+pytest_exit=0
+cleanup_remaining=0

@@ -1,0 +1,100 @@
+R28c legacy path reproduce-first causal map
+
+Accepted source: a06b8a82925daa4dd08a137cb1eb724aaa2d4efb
+Tree: 20a1c9b5ea240c009d41c5a5effb1c075aa78a70
+Assignment: ba82e62e7e9a6ad291d8d71ee55c54330dc37c72,
+docs/coordination/assignments/CODEX_R28C_20260922.md
+Acceptance/release: f804cb3760b469ec58549908623f62b9ecb38c3d
+Packet: docs/coordination/packets/R28c.md
+
+RED PROOF
+
+Command:
+  /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python \
+    /tmp/swarm-r28c-legacy-process-local-repro.py
+Exit: 0 (the harness asserts the current defect)
+Log: /tmp/swarm-r28c-legacy-process-local-repro.log
+
+One ToolGateway instance executed the synthetic counting side effect once and
+replayed its in-memory receipt on an identical second call. A fresh ToolGateway
+with the same CapabilityRegistry, approval and operation_id executed the handler
+again: count 1 -> 2 and external id synthetic-1 -> synthetic-2. No provider,
+network, filesystem effect, model or database was used.
+
+CAUSE
+
+- tools/gateway.py:41-42 stores receipts and `_seen_ops` on the gateway object.
+- gateway.py:89-91 checks only that process/object-local set.
+- gateway.py:93-99 calls the legacy handler directly.
+- gateway.py:124-125 records the operation only after the call in local memory.
+- Restart/new object therefore has no reservation, durable effect row, committed
+  admission fence, attempt token, or terminal receipt to replay.
+
+LEGACY PRODUCTION/CALLER MAP
+
+- runtime/session.py:34,74-80 accepts an injected ToolGateway; it does not build it.
+- tools/permission_mission.py:24-64 registers repo.read/repo.write handlers and
+  :91-95 constructs ToolGateway. Lines 135-159 approve and execute repo.write
+  through the legacy in-memory path. Lines 166-167 count local receipts.
+- cli.py:916-922 and release/demo_suite.py, release/v1_matrix.py call the permission
+  proof. CLI already exits 2 when proof.ok is false.
+- tests/runtime/test_runtime.py:60-75 builds the injected legacy gateway.
+- tests/tools/test_gateway_sandbox.py has all other legacy constructors; its
+  same-instance idempotency assertion at :132-149 is specifically superseded for
+  side effects, while non-side-effecting behavior remains compatible.
+
+V1.7 CONSTRUCTOR/CALL MAP
+
+- v17_gateway.py:65-81 currently requires one `adapter=` and stores it.
+- execute_request at :126-131 normalizes through that adapter; execute_envelope
+  validates/observes/executes/reconciles through the same object.
+- No production module constructs ConsequentialToolGateway at this source.
+  Constructors are in tools negative/authority/classification tests and real-PG
+  effect/approval/crash tests plus two child scripts.
+- session_recovery.py:29-35 receives both gateway and BrowserSessionAdapter; it
+  uses the adapter directly for session registration/pre-observation, then calls
+  gateway.execute_request at :85. R28c's added integration id/version keywords
+  are required at that call; retaining the adapter parameter is still needed for
+  the recovery-only session mutations unless separately refactored.
+
+MINIMAL INTERFACES / COMPATIBILITY
+
+1. adapter_registry.py: in-memory registry of adapter objects keyed only by the
+   manifest `(integration_id, integration_version)`; register duplicate raises
+   `ValueError("adapter_already_registered")`; resolve unknown raises the V1.7
+   `ToolAuthorizationError("unknown_integration")`; manifests sorted by key.
+   Avoid circular imports by keeping the authorization error in one importable
+   location (or late-importing it); packet requires the V1.7 error identity.
+2. ConsequentialToolGateway constructor replaces `adapter=` with `registry=`.
+   Every test helper/child constructor must create one registry and register its
+   adapter. execute_envelope resolves from envelope identity. execute_request
+   requires integration_id/version, resolves first, normalizes, and should then
+   ensure the normalized envelope identity matches the selected key before any
+   authorization/store work.
+3. LegacyToolCallAdapter wraps CapabilityRegistry handlers. Its manifest key is
+   `legacy.toolcall@1`; operations must reflect registered side-effecting tool
+   names as consequential/medium. AdapterManifest.adapter_class is a frozen
+   literal of local_sandbox/api_mcp/browser_session; R28c does not list the
+   contracts file, so `local_sandbox` is the compatible existing class unless
+   lead explicitly expands the schema.
+4. ToolGateway gains action_gateway/context. It can keep existing validation and
+   non-side-effecting direct handler behavior, but side effects must branch before
+   legacy approval execution/direct handler calls. Without boundary, raise the
+   new legacy denial. With boundary, use context.project_id/context.actor,
+   ToolCall task_id/attempt_id, normalized args, tool name as operation/destination,
+   and exact effect/idempotency key `{project}:legacy:{operation_id}`; delegate
+   to V1.7 and translate ActionReceiptV17 to ActionReceipt.
+5. ToolCall has no project_id, actor, mission_id or cancellation_generation.
+   ActorContext supplies project/actor; mission remains absent; current lease is
+   on ToolGateway/call. Consequential V1.7 admission requires both fence fields,
+   so the implementation must obtain the cancellation generation from the
+   configured FenceProvider current state rather than inventing 0. The legacy
+   approval dict is not a durable ApprovalGrant ledger and must not be treated as
+   one; callers need a V1.7 approval id already persisted for consequential work.
+6. permission_mission must build the adapter registry + V1.7 durable repository,
+   fence/policy/context and approval. `db.engine.database_url/create_db_engine/
+   make_session_factory` already fail closed when SWARM_DATABASE_URL is absent.
+   Catch that only to produce `ok:false` with `durable_store_required`; do not
+   instantiate InMemoryEffectStore for the write proof. Existing CLI then exits 2.
+
+No source/test edits, PostgreSQL, external calls or scheduler activity occurred.

@@ -1,0 +1,45 @@
+HEAD=22d935b4690195e6850e5fab5fa224165781b284
+TREE=1f21f61f9491c2cc7d5ffa45c0d6c7def6a2fa33
+CASE=empty DATABASE=swarm_r28c_product_empty_79109_1790067203
+COMMAND=/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python /tmp/swarm-r28c-run-permission-direct.py
+PERMISSION_RESULT={"cost_usd": 0.0, "error_type": "ProgrammingError", "ok": false, "reason": "durable_store_unavailable"}
+TABLE_COUNTS={"action_effects": "missing", "action_receipts": "missing", "approvals": "missing", "missions": "missing", "task_attempts": "missing", "worker_leases": "missing"}
+EXIT=0
+COMMAND=/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/product/test_product.py::test_product_journey_proof
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_product_journey_proof __________________________
+
+repo = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-419/test_product_journey_proof0')
+
+    def test_product_journey_proof(repo: Path) -> None:
+        proof = run_product_journey(repo)
+>       assert proof["ok"], proof
+E       AssertionError: {'schema_version': '0.8.0', 'generated_at': '2026-09-22T08:53:24.558933+00:00', 'project_id': 'proj_demo', 'mission_id': '2fa9012da83541d989b09db41b201279', ...}
+E       assert False
+
+tests/product/test_product.py:110: AssertionError
+=========================== short test summary info ============================
+FAILED tests/product/test_product.py::test_product_journey_proof - AssertionE...
+1 failed in 0.38s
+EXIT=1
+CASE=empty cleanup_remaining=0
+CASE=migrated DATABASE=swarm_r28c_product_migrated_79109_1790067204
+COMMAND=/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/alembic -c /Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source/alembic.ini upgrade head
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 9eb193b10f4e, p02_initial_domain_schema
+INFO  [alembic.runtime.migration] Running upgrade 9eb193b10f4e -> a15lease003a0001, V2A-003a / ART-V15-LEASE-FENCING — durable schema delta migration.
+INFO  [alembic.runtime.migration] Running upgrade a15lease003a0001 -> a16know003a0001, V2B-003a / ART-V16-DURABLE-SCHEMA — knowledge_items/links/tombstones.
+INFO  [alembic.runtime.migration] Running upgrade a16know003a0001 -> a17effect004a0001, V2B-004a / ART-V17-DURABLE-EFFECT-SCHEMA — approvals + action_effects.
+INFO  [alembic.runtime.migration] Running upgrade a17effect004a0001 -> a17effect004b0001, R27a / ART-V17-APPROVAL-BINDING — durable immutable action receipts + effect bookkeeping.
+EXIT=0
+COMMAND=/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python /tmp/swarm-r28c-run-permission-direct.py
+PERMISSION_RESULT={"attempt_id": "att_32cb7f870d2d497d8f77c5dc72348259", "audit": [{"ok": true, "outcome": "succeeded", "step": "allowed_read"}, {"error": "path_denied:README.md", "ok": true, "step": "denied_outside_allowlist"}, {"error": "approval_required", "ok": true, "step": "human_gate_required"}, {"approval_id": "apr_a45f32bb0ea841dbb74111875774e93c", "durable_receipt_refs": ["arc_f1cc9f7cb2924f0ba406e00335f9d05a"], "ok": true, "outcome": "succeeded", "step": "approved_write"}], "cost_usd": 0.0, "generated_at": "2026-09-22T08:53:25.470710+00:00", "mission_id": "msn_e4dcc6cb6a7b41c48fb6137f89a8109a", "mock_vs_live": "engineering_local_durable_tool_permission_proof", "ok": true, "probe_file_exists": true, "receipt_count": 4, "report_hash": "670dfd1aef3aba779e550894caba35e1bbbe21e46b024797e52e9d0e3fdd8497", "schema_version": "0.5.0", "task_id": "tsk_a5fdf98f329f4fa0bb6c4709aa7cb4e4"}
+TABLE_COUNTS={"action_effects": 1, "action_receipts": 1, "approvals": 1, "missions": 1, "task_attempts": 1, "worker_leases": 1}
+EXIT=0
+COMMAND=/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/product/test_product.py::test_product_journey_proof
+.                                                                        [100%]
+1 passed in 0.36s
+EXIT=0
+CASE=migrated cleanup_remaining=0

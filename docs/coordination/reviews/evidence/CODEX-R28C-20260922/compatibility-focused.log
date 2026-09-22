@@ -1,0 +1,9 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+database=swarm_r28c_compat_77505_1790066537
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r28c_compat_77505_1790066537?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/tools/test_v17_gateway_*.py tests/tools/test_adapter_registry.py tests/integration/db/test_action_receipts_durable.py tests/integration/db/test_approval_integrity.py tests/integration/db/test_effect_crash_window.py tests/integration/db/test_effect_transactions.py
+database_create_exit=0
+........................................................................ [ 53%]
+...............................................................          [100%]
+135 passed in 8.37s
+pytest_exit=0
+cleanup_remaining=0

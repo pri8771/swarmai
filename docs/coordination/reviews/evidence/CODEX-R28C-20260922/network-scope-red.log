@@ -1,0 +1,43 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+database=swarm_r28c_network_78147_1790066907
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r28c_network_78147_1790066907?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/tools/test_single_consequential_path.py::test_direct_v17_legacy_network_operation_retains_network_scope
+database_create_exit=0
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_direct_v17_legacy_network_operation_retains_network_scope ________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r28c_network_78147_1790066907?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_direct_v17_legacy_network_operation_retains_network_scope(factory) -> None:
+        from swarm.contracts.actions import ActionEnvelope
+        from swarm.tools.v17_gateway import ToolAuthorizationError
+    
+        calls = []
+        capability = CapabilityRegistry()
+        capability.register(
+            ToolSpec(name="legacy.send", version="1", required_scopes=("legacy.send",),
+                     side_effecting=True, network=True, description="Synthetic network-class tool"),
+            lambda args: calls.append(args) or {"outcome": "succeeded"},
+        )
+        adapter = LegacyToolCallAdapter(capability)
+        gateway = _action_gateway(factory, adapter)  # Policy grants legacy.send, not network.
+        context = ActorContext(actor="worker", project_id="proj_network_bridge")
+        envelope = bind_lease(factory, ActionEnvelope(
+            project_id=context.project_id, actor=context.actor,
+            integration_id="legacy.toolcall", integration_version="1",
+            operation="legacy.send", destination="legacy.send",
+            side_effect_class="consequential", risk_class="medium",
+        ).ensure_hashes())
+        envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+>       with pytest.raises(ToolAuthorizationError, match="denied_scopes.*network"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ToolAuthorizationError
+
+tests/tools/test_single_consequential_path.py:304: Failed
+=========================== short test summary info ============================
+FAILED tests/tools/test_single_consequential_path.py::test_direct_v17_legacy_network_operation_retains_network_scope
+1 failed in 0.27s
+pytest_exit=1
+cleanup_remaining=0

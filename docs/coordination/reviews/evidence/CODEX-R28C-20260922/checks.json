@@ -1,0 +1,103 @@
+{
+  "candidate": {
+    "accepted_base": "a06b8a82925daa4dd08a137cb1eb724aaa2d4efb",
+    "assignment_ref": "origin/coordination/swarm-control",
+    "clarification_ref": "83568d3",
+    "clean": true,
+    "commit": "ba458eb1a9a1af5f7e022159f36e6ce296d472cc",
+    "tree": "8c22e55f11351f567ae7d62b139383179caeb6fa",
+    "pull_request": "https://github.com/pri8771/swarmai/pull/24"
+  },
+  "checks": [
+    {
+      "exit": 0,
+      "log": "legacy-process-local-red.log",
+      "name": "accepted-base process-local replay red",
+      "result": "fresh gateway executed same operation a second time"
+    },
+    {
+      "exit": 0,
+      "log": "legacy-process-local-independent-red.log",
+      "name": "independent process-local red repeat",
+      "result": "same finding"
+    },
+    {
+      "exit": 1,
+      "log": "network-scope-red.log",
+      "name": "uncommitted candidate network-scope red",
+      "result": "1 failed; expected ToolAuthorizationError DID NOT RAISE"
+    },
+    {
+      "exit": 0,
+      "log": "network-scope-green.log",
+      "name": "candidate network-scope focused",
+      "result": "9 passed, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "single-path-focused.log",
+      "name": "single consequential path focused",
+      "result": "18 passed, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "compatibility-focused.log",
+      "name": "compatibility focused",
+      "result": "135 passed, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "permission-pg/run.json",
+      "name": "exact-source durable permission PostgreSQL",
+      "result": "migration0 workflow0 cleanup0; 1 effect, 1 receipt, 1 approval used"
+    },
+    {
+      "exit": 1,
+      "log": "first-full-schema-failure.log",
+      "name": "initial full",
+      "result": "579 passed, 13 skipped, 1 failed due disposable DB missing product schema; cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "product-fixture-green.log",
+      "name": "product fixture after schema diagnosis",
+      "result": "1 passed, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "final2-full.log",
+      "name": "superseded final2 full",
+      "result": "591 passed, 2 console-dependency skips, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "console-dependency-focused.log",
+      "name": "console dependency focused",
+      "result": "3 passed"
+    },
+    {
+      "exit": 0,
+      "log": "final3-full.log",
+      "name": "final full exact source",
+      "result": "593 passed, 0 skipped, 40.59s, cleanup0"
+    },
+    {
+      "exit": 0,
+      "log": "final2-ruff.log",
+      "name": "Ruff",
+      "result": "All checks passed"
+    },
+    {
+      "exit": 0,
+      "log": "final2-mypy.log",
+      "name": "mypy",
+      "result": "Success in 172 source files"
+    }
+  ],
+  "limitations": [
+    "engineering-only evidence",
+    "no provider/model/public action or live product qualification",
+    "no CP1 grant or attempt",
+    "R28d held"
+  ]
+}

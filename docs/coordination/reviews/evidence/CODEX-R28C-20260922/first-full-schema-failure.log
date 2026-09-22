@@ -1,0 +1,30 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+database=swarm_r28c_network_78303_1790066999
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r28c_network_78303_1790066999?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q 
+database_create_exit=0
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 36%]
+...............................................sssssssssss.............. [ 48%]
+..................................................................F..... [ 60%]
+........................................................................ [ 72%]
+........................................................................ [ 84%]
+........................................................ss.............. [ 97%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_product_journey_proof __________________________
+
+repo = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-418/test_product_journey_proof0')
+
+    def test_product_journey_proof(repo: Path) -> None:
+        proof = run_product_journey(repo)
+>       assert proof["ok"], proof
+E       AssertionError: {'schema_version': '0.8.0', 'generated_at': '2026-09-22T08:50:19.362613+00:00', 'project_id': 'proj_demo', 'mission_id': '225af30f204946babb8287477745940e', ...}
+E       assert False
+
+tests/product/test_product.py:110: AssertionError
+=========================== short test summary info ============================
+FAILED tests/product/test_product.py::test_product_journey_proof - AssertionE...
+1 failed, 579 passed, 13 skipped in 31.23s
+pytest_exit=1
+cleanup_remaining=0
