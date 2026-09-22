@@ -309,7 +309,9 @@ def _targeted_prompt(target_rel: Path, goal: str, original: str, *, retry_note: 
         "<complete new regression test: FAILS on the current file, PASSES after your edit>\n"
         "```\n\n"
         "Rules: one or more EDIT blocks; each SEARCH must be copied verbatim from the current "
-        "file; do not return the whole file; the NEW test file is mandatory.\n\n"
+        "file; preserve leading spaces exactly; no Markdown fences inside SEARCH or REPLACE "
+        "bodies; every EDIT path must equal the selected file; do not return the whole file; "
+        "the NEW test file is mandatory.\n\n"
         f"Current file ({target_rel}):\n{original}"
     )
 
@@ -699,7 +701,15 @@ class RepoWorker:
                     break
                 change = _parse_targeted_change(inference.text)
                 if change.edits:
-                    candidate, unmatched = _apply_edit_blocks(original, change.edits)
+                    wrong_paths = [path for path, _, _ in change.edits if path != str(target_rel)]
+                    if wrong_paths:
+                        candidate = original
+                        unmatched = [
+                            f"EDIT path differs from selected target: {path}"
+                            for path in wrong_paths
+                        ]
+                    else:
+                        candidate, unmatched = _apply_edit_blocks(original, change.edits)
                     if not unmatched:
                         patched = candidate
                         edits_applied = len(change.edits)
@@ -707,7 +717,10 @@ class RepoWorker:
                         break
                     retry_note = (
                         "Your previous EDIT blocks did not match the current file verbatim. "
-                        "Copy SEARCH lines exactly as they appear.\n\n"
+                        "Copy SEARCH lines exactly as they appear; "
+                        "preserve leading spaces exactly, "
+                        "use no Markdown fences inside SEARCH or REPLACE bodies, and use only "
+                        "the selected file's exact EDIT path.\n\n"
                     )
                 else:
                     # Some models still answer with a whole file; accept it only if it
