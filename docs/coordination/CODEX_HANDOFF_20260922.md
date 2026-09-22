@@ -21,6 +21,8 @@ Still needed: exact candidate verdicts; fresh grants for exhausted/failed missio
 
 ## Next bounded action
 
+Owner selected reuse of Groq/OpenRouter/Ollama. Additional draft PR32 is 7aa45a0c436598f5354540476410a0fd1f81bb07 / tree d41eb5e67addaea328cabcce1f56b171dfc2d03d, stacked on PR30: requested output caps now reach core HTTP payloads. Independent recommendation; 668 PG passed / 13 live skips, cleanup 0. Read CODEX_PROVIDER_REUSE_RETURN_20260922.md for exact validation, routing/admission/receipt/overlap prerequisites and the correction separating the stubbed local accounting script from actual historical Ollama proof. This adds no live grant. Do not ask for account recreation or claim that the current remote-canary CLI can execute these routes.
+
 Refresh native Git and PR verdicts first. If accepted, request/obey one precise next release; do not infer R31b or live authorization from offline acceptance. Preserve attempt identity, terminal-request proof, exact origin and unknown-result safety. Do not rerun settled tests without source drift or a specific new finding.
 
 No spend, inference, mailbox, public action, scheduler change, deployment or main merge is authorized. Keep this repository's runtime, receipts and grants separate. If blocked, record the exact decision/access dependency and move to another permitted project task. When none remain, return a compact HANDOFF_FOR_CODEX with SHAs, failures, checks and next step rather than repeated exploratory work.
