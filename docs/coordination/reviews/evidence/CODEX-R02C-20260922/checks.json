@@ -1,0 +1,43 @@
+{
+  "source_sha": "1c9ff44ec787508fb874f5ac7fde849f89bdfe42",
+  "tree_sha": "f3870e154e51f3174118a95d3fcc64cb6b0fea12",
+  "evidence_class": "engineering_only",
+  "environment": "existing Python3.13.12 environment; candidate src selected by absolute PYTHONPATH; synthetic inference and temporary repositories only",
+  "runs": [
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/mission"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff",
+        "check",
+        "src",
+        "tests"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy",
+        "src"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0
+    }
+  ],
+  "completed_utc": "2026-09-22T03:49:53.640544+00:00"
+}

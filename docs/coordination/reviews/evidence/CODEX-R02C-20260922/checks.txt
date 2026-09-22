@@ -1,0 +1,8 @@
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python -m pytest -q tests/mission
+............................................................             [100%]
+60 passed in 4.88s
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/ruff check src tests
+All checks passed!
+$ /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/mypy src
+Success: no issues found in 169 source files
+$ git diff --check
