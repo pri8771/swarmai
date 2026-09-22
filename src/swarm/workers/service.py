@@ -14,6 +14,7 @@ from swarm.contracts.common import new_id, utc_now
 from swarm.db.lease_fencing import (
     AcceptedResult,
     LeaseLifecycleService,
+    MissionCancellation,
     WorkerNotEligibleError,
     WorkerRegistrationRepository,
 )
@@ -246,6 +247,18 @@ class DurableWorkerService:
             lease_id=row.lease_id,
             submitted_at=row.submitted_at,
         )
+
+    def revoke_mission_work(
+        self, *, mission_id: str, reason: str = "revoked", notify_leases: bool = True
+    ) -> MissionCancellation:
+        """Control-plane durable cancellation bump (fences in-flight leases/results)."""
+        return self.lifecycle.revoke_mission_work(
+            mission_id=mission_id, reason=reason, notify_leases=notify_leases
+        )
+
+    def cancel_mission(self, *, mission_id: str, reason: str = "cancelled") -> MissionCancellation:
+        """Control-plane terminal mission cancellation."""
+        return self.lifecycle.cancel_mission(mission_id=mission_id, reason=reason)
 
     def accept_result(self, *, result_id: str, now: datetime | None = None) -> AcceptedResult:
         """Control-plane acceptance only (workers must not call this)."""

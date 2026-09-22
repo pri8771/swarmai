@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/swarmai-v17/.venv/bin/python
+rootdir: /Users/pchordia/swarmai-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 4 items
+
+tests/integration/db/test_mission_cancellation.py::test_revoke_without_notification_fences_result_and_renew PASSED [ 25%]
+tests/integration/db/test_mission_cancellation.py::test_revoke_notifies_leases_and_new_claim_carries_new_generation PASSED [ 50%]
+tests/integration/db/test_mission_cancellation.py::test_cancel_mission_is_terminal PASSED [ 75%]
+tests/integration/db/test_mission_cancellation.py::test_generation_is_monotonic_and_durable PASSED [100%]
+
+============================== 4 passed in 0.52s ===============================

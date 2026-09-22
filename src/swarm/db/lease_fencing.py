@@ -481,8 +481,20 @@ class TaskLeaseRepository:
         )
         return list(self.session.scalars(stmt))
 
+    def list_active_for_mission(self, mission_id: str) -> list[TaskLeaseRow]:
+        stmt = (
+            select(TaskLeaseRow)
+            .where(
+                TaskLeaseRow.mission_id == mission_id,
+                TaskLeaseRow.state.in_(tuple(_ACTIVE_LEASE_STATES)),
+            )
+            .order_by(TaskLeaseRow.lease_id.asc())
+        )
+        return list(self.session.scalars(stmt))
+
 
 class WorkerResultRepository:
+
     def __init__(self, session: Session) -> None:
         self.session = session
 
@@ -585,6 +597,17 @@ class ClaimedLease:
     task_revision: int
     expires_at: datetime
     state: str
+
+
+@dataclass(frozen=True)
+class MissionCancellation:
+    """Outcome of a durable mission cancellation-generation bump (MISSION-CANCEL-01)."""
+
+    mission_id: str
+    previous_generation: int
+    new_generation: int
+    terminal: bool
+    notified_lease_ids: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -1256,6 +1279,92 @@ class LeaseLifecycleService:
             project_id=result.project_id,
             acceptance_state=result.acceptance_state,
             accepted_at=clock,
+        )
+
+    def revoke_mission_work(
+        self,
+        *,
+        mission_id: str,
+        reason: str = "revoked",
+        notify_leases: bool = True,
+        now: datetime | None = None,
+    ) -> MissionCancellation:
+        """Durable cancellation authority (ART-V15-WORKER-PROTOCOL).
+
+        Increments the mission's ``cancellation_generation`` under a row lock so every
+        in-flight lease, result and renewal carrying the old generation is fenced
+        (``cancellation_generation_stale``) even if no worker is ever notified. The
+        mission itself stays runnable: cancelled attempts return their task to
+        ``ready`` and a fresh claim carries the new generation. Advisory per-lease
+        cancellation (worker notification) follows the durable bump and can be skipped
+        with ``notify_leases=False``; a lost notification never weakens the fence.
+        """
+        clock = now or utc_now()
+        mission = self.session.get(MissionRow, mission_id, with_for_update=True)
+        if mission is None:
+            raise ResultAcceptanceError("mission_missing")
+        previous = int(mission.cancellation_generation)
+        mission.cancellation_generation = previous + 1
+        self.session.add(
+            OutboxRow(
+                id=new_id("ob_"),
+                stable_workflow_id=f"mission-cancel-gen:{mission_id}:{previous + 1}",
+                aggregate_type="mission",
+                aggregate_id=mission_id,
+                event_type="mission.cancellation_generation_bumped",
+                payload={
+                    "mission_id": mission_id,
+                    "previous_generation": previous,
+                    "new_generation": previous + 1,
+                    "reason": reason,
+                },
+                status="pending",
+            )
+        )
+        self.session.flush()
+        notified: list[str] = []
+        if notify_leases:
+            for lease in self._leases.list_active_for_mission(mission_id):
+                # "revoked" returns the task to ready so it can be re-claimed under the
+                # new generation; "cancelled" makes the task terminal.
+                self.cancel_active_lease(lease_id=lease.lease_id, reason=reason, now=clock)
+                notified.append(lease.lease_id)
+        return MissionCancellation(
+            mission_id=mission_id,
+            previous_generation=previous,
+            new_generation=previous + 1,
+            terminal=False,
+            notified_lease_ids=tuple(notified),
+        )
+
+    def cancel_mission(
+        self,
+        *,
+        mission_id: str,
+        reason: str = "cancelled",
+        now: datetime | None = None,
+    ) -> MissionCancellation:
+        """Terminal mission cancellation: durable generation bump, then status ``cancelled``.
+
+        The generation bump happens first so the fence holds even if the status write
+        were lost; afterwards accept/renew/claim are denied by ``mission_cancelled`` /
+        non-runnable status, and cancelled tasks are terminal.
+        """
+        clock = now or utc_now()
+        outcome = self.revoke_mission_work(
+            mission_id=mission_id, reason="cancelled", notify_leases=True, now=clock
+        )
+        mission = self.session.get(MissionRow, mission_id, with_for_update=True)
+        assert mission is not None
+        mission.status = "cancelled"
+        mission.updated_at = clock
+        self.session.flush()
+        return MissionCancellation(
+            mission_id=mission_id,
+            previous_generation=outcome.previous_generation,
+            new_generation=outcome.new_generation,
+            terminal=True,
+            notified_lease_ids=outcome.notified_lease_ids,
         )
 
     def cancel_active_lease(

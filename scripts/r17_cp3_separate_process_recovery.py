@@ -376,10 +376,9 @@ def evaluate_concurrent_step(iterations: list[dict]) -> dict:
 def run_cancellation_step(session, dsn: str, ctx, *, bump_generation: bool = True) -> dict:
     """R17a step: durable cancellation generation bump fences a live worker's result/renew.
 
-    Finding recorded honestly: `LeaseLifecycleService.cancel_active_lease` cancels one
-    lease but does not bump the mission's durable `cancellation_generation`, and no
-    mission-cancel service method exists. The control plane (this harness) performs
-    the durable bump directly; the advisory per-lease cancel is applied afterwards.
+    The control plane uses `DurableWorkerService.revoke_mission_work` (MISSION-CANCEL-01),
+    which bumps the mission's durable `cancellation_generation` before any advisory
+    lease notification; the advisory per-lease cancel is applied afterwards here.
     `bump_generation=False` exists only so a test can prove this step is able to fail.
     """
     mission = _seed_mission(session)
@@ -402,21 +401,24 @@ def run_cancellation_step(session, dsn: str, ctx, *, bump_generation: bool = Tru
             return evaluate_cancellation_step(observed)
         observed["worker_pid"] = claimed["pid"]
         observed["lease_id"] = claimed["lease_id"]
-        # Control plane: durable cancellation authority.
+        # Control plane: durable cancellation authority through the product service
+        # (MISSION-CANCEL-01). notify_leases=False proves the fence holds even when the
+        # advisory worker notification is lost; it is applied explicitly afterwards.
+        service = DurableWorkerService(session)
         if bump_generation:
-            row = session.get(MissionRow, mission.id, with_for_update=True)
-            assert row is not None
-            row.cancellation_generation = int(row.cancellation_generation) + 1
+            outcome = service.revoke_mission_work(
+                mission_id=mission.id, reason="revoked", notify_leases=False
+            )
             session.commit()
             observed["generation_bumped"] = True
-            observed["mission_cancellation_generation"] = int(row.cancellation_generation)
+            observed["mission_cancellation_generation"] = outcome.new_generation
+            observed["durable_bump_via"] = "DurableWorkerService.revoke_mission_work"
         else:
             observed["generation_bumped"] = False
         # Worker (separate process) submits after the durable cancellation.
         commands.put("submit")
         submitted = q.get(timeout=60)
         observed["result_id"] = submitted.get("result_id")
-        service = DurableWorkerService(session)
         try:
             service.accept_result(result_id=submitted["result_id"])
             session.commit()
@@ -742,10 +744,9 @@ def main() -> int:
     )
     report["finished_at"] = utc_now().isoformat()
     report["finding"] = (
-        "cancel_active_lease does not bump the durable mission cancellation_generation and no "
-        "mission-cancel service method exists; the control plane (this harness) performed the "
-        "durable bump directly. Follow-up: add a mission-cancel method that bumps the generation "
-        "before advisory lease cancellation."
+        "Resolved by MISSION-CANCEL-01: the durable generation bump is performed through "
+        "DurableWorkerService.revoke_mission_work / cancel_mission (product code), not by the "
+        "harness. Earlier runs bumped the row directly; that history is preserved."
     )
 
     (out_dir / "receipt.json").write_text(json.dumps(report, indent=2) + "\n")
