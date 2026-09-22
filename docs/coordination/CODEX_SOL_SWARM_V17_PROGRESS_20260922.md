@@ -36,10 +36,10 @@ isolated-schema PostgreSQL cases passed;
 485 offline passed, 4 skipped, 223 deselected; Ruff, mypy (176 source files)
 and diff checks clean. The dual-remote test forces both HTTP handlers through
 a barrier, but uses synthetic grants/account data and `httpx.MockTransport`.
-Hosted PR40 exact-head checks were green as of 22:00:47 UTC. No real inference,
-real dual overlap, account charge readback, second-host proof, CP1/CP3/CP4/CP5
-or R33c action occurred. Authenticated metadata and local host observations are
-recorded below.
+Hosted PR40 exact-head checks were green as of 22:00:47 UTC. No remote
+inference, real dual overlap, account charge readback, second-host proof,
+CP1/CP3/CP4/CP5 or R33c action occurred. Authenticated metadata and one
+subsequent live local inference are recorded below.
 
 ### Read-only provider observations after owner request to proceed with live testing
 
@@ -69,9 +69,29 @@ available browser session, so account tier/remaining requests were not read
 there. OpenRouter's current key still had its full reported allowance at the
 prior readback; Ollama remained available. No evidence says these three
 selected routes are out of requests. No model generation or additional provider
-onboarding occurred, and current-source independent review remains open.
+onboarding occurred at that point, and current-source independent review
+remains open.
 
-## Exact prerequisite access proposal — **not granted**
+### Owner-directed live local canary
+
+The owner subsequently instructed: "Skip that do a live test now. Choose any
+model. Make any decision you want just get it done." One real inference then
+ran on the exact PR40 source through `build_local_mission_broker` →
+`brokered_local_chat` → loopback Ollama. Model `gemma3:4b`; public synthetic
+prompt `Return exactly this text: SWARM_LIVE_OK`; `max_tokens=32`, local
+request limit 1, `SWARM_ALLOW_PAID=false`, no remote route or retry. At
+2026-09-22T22:19:15Z the response was exactly `SWARM_LIVE_OK`, with 20 input
+and 8 output tokens, one adapter call, one settled local request, zero remaining
+in that in-memory test bucket, and `cost_usd=0`. `assert_all_calls_accounted`
+passed. Exact redacted receipt:
+`SWARM_V17_LIVE_LOCAL_CANARY_20260922.json`.
+
+This is a successful **live local** brokered canary, not remote qualification,
+durable remote accounting proof, operational mission proof or independent
+acceptance of PR40/LIVE V1.7. No new provider was added: existing routes were
+not shown to be request-exhausted.
+
+## Historical prerequisite access proposal — superseded by owner-directed checks
 
 The owner handoff explicitly holds authenticated provider metadata/session
 access and live host probes. Reuse the existing `OPENROUTER_API_KEY` and
@@ -107,11 +127,11 @@ Groq [rate limits](https://console.groq.com/docs/rate-limits),
 [billing](https://console.groq.com/docs/billing-faqs), and
 [models](https://console.groq.com/docs/models).
 
-## Next bounded owner action
+## Remaining review and remote gates
 
-Obtain the explicit read-only metadata/loopback grant above. If granted,
-perform only those observations, preserve exact redacted receipts, and decide
-whether two zero-charge remote routes can be proposed. Formal independent
+The read-only observations and owner-directed local inference are complete.
+Verify two zero-charge remote routes before proposing a bounded remote call.
+Formal independent
 review of PR30 must precede dispositions on its separate PR31/PR32 children;
 the new dependent draft chain then needs independent exact-tree review.
 No review request exists on GitHub, and the repository currently lists only

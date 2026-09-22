@@ -1,7 +1,8 @@
 # HANDOFF_FOR_NEXT_AGENT — Swarm V1.7, 2026-09-22
 
 **Status:** LIVE V1.7 not accepted. No self-acceptance, main merge,
-authenticated provider access, inference, public action or deployment.
+remote inference, public action or deployment. One real local Ollama canary
+succeeded on PR40 source after explicit owner direction.
 Owner task remains Swarm only.
 
 **Exact source:** draft PR40, `f25eb19e2cd84ab75fcad424e7d7b9ec05a95e2a`,
@@ -26,8 +27,11 @@ OpenRouter current-key GET 200 (`is_free_tier=false`, limit and remaining 1,
 usage 0); Groq models GET initially 403 via urllib but 200 via the Swarm
 worktree's `httpx` client (11 models, pinned `openai/gpt-oss-20b` present);
 Ollama loopback tags GET 200 with installed
-`qwen3.5:4b`/`qwen3.5:9b`. No inference or download. Details in
-`CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`. A model-call grant must bind the
+`qwen3.5:4b`/`qwen3.5:9b`. The later local `gemma3:4b` brokered call returned
+`SWARM_LIVE_OK` with one accounted request, 20 input/8 output tokens and
+zero local spend. Exact receipt: `SWARM_V17_LIVE_LOCAL_CANARY_20260922.json`.
+No remote inference or download. Details in
+`CODEX_SOL_SWARM_V17_PROGRESS_20260922.md`. A later remote-call grant must bind the
 independently reviewed source tree and exact request, model, backend, allowance
 and output cap.
 

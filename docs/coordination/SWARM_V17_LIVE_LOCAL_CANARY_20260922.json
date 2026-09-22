@@ -1,0 +1,26 @@
+{
+  "kind": "swarm_v17_live_local_canary",
+  "observed_at_utc": "2026-09-22T22:19:15.495836+00:00",
+  "source_sha": "f25eb19e2cd84ab75fcad424e7d7b9ec05a95e2a",
+  "source_tree": "cf913e49e9171e0d4073cdb19ea114e3ae6d1d32",
+  "path": "build_local_mission_broker -> brokered_local_chat -> local_chat -> loopback Ollama",
+  "project_id": "proj_swarm_v17_local_canary",
+  "purpose": "live_canary",
+  "route_id": "rt_ollama_gemma3:4b",
+  "prompt": "Return exactly this text: SWARM_LIVE_OK",
+  "max_output_tokens": 32,
+  "request_limit": 1,
+  "result": {
+    "ok": true,
+    "text": "SWARM_LIVE_OK",
+    "prompt_tokens": 20,
+    "completion_tokens": 8,
+    "cost_usd": 0.0,
+    "error": null,
+    "adapter_calls": 1,
+    "quota_settled": 1,
+    "quota_remaining": 0,
+    "all_calls_accounted": true
+  },
+  "scope": "One real local inference; in-memory local broker accounting only. No remote inference, operational mission, independent review, or LIVE V1.7 acceptance."
+}
