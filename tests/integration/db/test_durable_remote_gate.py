@@ -264,7 +264,7 @@ def test_fresh_exact_evidence_and_request_binding_required(factory):
         session.get(QuotaBucketRow, "request-quota").payload = {
             "confidence": "exact", "quota_evidence_ref": "different"
         }
-    with pytest.raises(RemoteAdmissionDenied, match="request_allowance_unverified_or_exhausted"):
+    with pytest.raises(RemoteAdmissionDenied, match="remote_allowance_unverified_or_exhausted"):
         gate.reserve(request, route, grant_id=grant.id)
     with factory() as session:
         assert session.get(ApprovalRow, grant.id).used_count == 0
@@ -306,6 +306,153 @@ def test_committed_tree_change_denied_before_reservation(factory):
         capture_output=True,
     )
     with pytest.raises(RemoteAdmissionDenied, match="source_tree_changed"):
+        gate.reserve(request, route, grant_id=grant.id)
+    with factory() as session:
+        assert session.get(ApprovalRow, grant.id).used_count == 0
+        assert session.get(QuotaBucketRow, "request-quota").remaining == 1
+
+
+def _mission_with_three_quotas(factory):
+    request, route, grant = _seed(factory, remaining=2)
+    request = request.model_copy(update={"purpose": "mission"})
+    route.quota_bucket_ids = ["request-quota", "token-quota", "concurrency-quota"]
+    now = utc_now()
+    with factory.begin() as session:
+        stored = session.get(ApprovalRow, grant.id)
+        stored.payload_hash = remote_request_hash(request, route)
+        stored.constraints = {
+            **stored.constraints,
+            "quota_evidence_refs": {
+                "requests": QUOTA_EVIDENCE,
+                "total_tokens": "token-evidence-ref",
+                "concurrency": "concurrency-evidence-ref",
+            },
+        }
+        session.add_all(
+            [
+                QuotaBucketRow(
+                    bucket_id="token-quota",
+                    scope_type="account",
+                    scope_id=route.account_id,
+                    dimension="total_tokens",
+                    limit=100,
+                    remaining=100,
+                    window_type="fixed",
+                    version=1,
+                    observed_at=now,
+                    payload={
+                        "confidence": "exact",
+                        "quota_evidence_ref": "token-evidence-ref",
+                    },
+                ),
+                QuotaBucketRow(
+                    bucket_id="concurrency-quota",
+                    scope_type="account",
+                    scope_id=route.account_id,
+                    dimension="concurrency",
+                    limit=1,
+                    remaining=1,
+                    window_type="fixed",
+                    version=1,
+                    observed_at=now,
+                    payload={
+                        "confidence": "exact",
+                        "quota_evidence_ref": "concurrency-evidence-ref",
+                    },
+                ),
+            ]
+        )
+    grant.constraints = stored.constraints
+    return request, route, grant
+
+
+def _zero_cost_receipt(ticket, route, *, total_tokens: int):
+    return AttemptReceipt(
+        logical_call_id=ticket.logical_call_id,
+        actual_route=ticket.route_id,
+        send_phase=ReservationPhase.SETTLED,
+        settlement_state=SettlementState.SETTLED,
+        normalized_usage=NormalizedUsage(
+            total_tokens=total_tokens,
+            extras={
+                "provider_cost_status": "reported",
+                "provider_cost_usd": "0",
+                "provider_cost_source": "response.usage.cost",
+                "openrouter_routing": {
+                    "selected_provider": "Liquid",
+                    "selected_model": route.model_id,
+                    "attempt": 1,
+                    "is_byok": False,
+                    "usage_is_byok": False,
+                },
+            },
+        ),
+    )
+
+
+def test_mission_reserves_request_tokens_and_concurrency_atomically(factory):
+    request, route, grant = _mission_with_three_quotas(factory)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
+    second = request.model_copy(update={"attempt_id": "attempt-two"})
+    with factory.begin() as session:
+        session.add(
+            ApprovalRow(
+                id="grant-two",
+                payload_hash=remote_request_hash(second, route),
+                permitted_operation="infer",
+                destination=route.route_id,
+                grantor="operator",
+                expires_at=utc_now() + timedelta(minutes=5),
+                project_id=request.project_id,
+                actor="operator",
+                integration_id="swarm.remote_inference",
+                integration_version="1",
+                operation="infer",
+                max_effect_count=1,
+                used_count=0,
+                constraints=grant.constraints,
+            )
+        )
+    first_ticket = gate.reserve(request, route, grant_id=grant.id)
+    with factory() as session:
+        assert session.get(QuotaBucketRow, "request-quota").remaining == 1
+        assert session.get(QuotaBucketRow, "token-quota").remaining == 72
+        assert session.get(QuotaBucketRow, "concurrency-quota").remaining == 0
+    with pytest.raises(RemoteAdmissionDenied, match="remote_allowance_unverified_or_exhausted"):
+        gate.reserve(second, route, grant_id="grant-two")
+    gate.mark_sending(first_ticket)
+    gate.record_result(first_ticket, _zero_cost_receipt(first_ticket, route, total_tokens=20))
+    with factory() as session:
+        assert session.get(QuotaBucketRow, "token-quota").remaining == 80
+        assert session.get(QuotaBucketRow, "concurrency-quota").remaining == 1
+    second_ticket = gate.reserve(second, route, grant_id="grant-two")
+    gate.release_unsent(second_ticket)
+    with factory() as session:
+        assert session.get(QuotaBucketRow, "request-quota").remaining == 1
+        assert session.get(QuotaBucketRow, "token-quota").remaining == 80
+        assert session.get(QuotaBucketRow, "concurrency-quota").remaining == 1
+        assert session.get(ApprovalRow, "grant-two").used_count == 1
+
+
+def test_token_overage_remains_unknown_and_holds_concurrency(factory):
+    request, route, grant = _mission_with_three_quotas(factory)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
+    ticket = gate.reserve(request, route, grant_id=grant.id)
+    gate.mark_sending(ticket)
+    gate.record_result(ticket, _zero_cost_receipt(ticket, route, total_tokens=29))
+    assert gate.read_state(ticket.reservation_id)["state"] == "unknown"
+    with factory() as session:
+        assert session.get(QuotaBucketRow, "token-quota").remaining == 72
+        assert session.get(QuotaBucketRow, "concurrency-quota").remaining == 0
+
+
+def test_mission_without_token_and_concurrency_evidence_denied(factory):
+    request, route, grant = _seed(factory)
+    request = request.model_copy(update={"purpose": "mission"})
+    with factory.begin() as session:
+        session.get(ApprovalRow, grant.id).payload_hash = remote_request_hash(request, route)
+    gate = DurableRemoteCallGate(factory, source_checkout=factory.source_checkout)
+    with pytest.raises(RemoteAdmissionDenied, match="mission_token_and_concurrency_allowance_missing"):
         gate.reserve(request, route, grant_id=grant.id)
     with factory() as session:
         assert session.get(ApprovalRow, grant.id).used_count == 0
