@@ -57,6 +57,7 @@ def _effect_dict_from_row(row: ActionEffectRow) -> dict[str, Any]:
         "state": row.state,
         "side_effect_class": (row.payload or {}).get("side_effect_class"),
         "timeout_seconds": (row.payload or {}).get("timeout_seconds"),
+        "legacy_disposition": (row.payload or {}).get("legacy_disposition"),
         "lease_generation": row.lease_generation,
         "cancellation_generation": row.cancellation_generation,
         "pre_observation": dict(row.pre_observation or {}),
@@ -332,6 +333,7 @@ class InMemoryEffectStore:
         _validate_recovery_window(grace_seconds, timeout_seconds)
         with self._lock:
             row = self._require(project_id, effect_key)
+            _require_stored_timeout(row, timeout_seconds)
             cutoff = utc_now() - timedelta(seconds=timeout_seconds + grace_seconds)
             if row["state"] != "executing" or not row["started_at"] or row["started_at"] >= cutoff:
                 return False
@@ -697,20 +699,60 @@ class DurableEffectRepository:
         self, *, project_id: str, effect_key: str, grace_seconds: int, timeout_seconds: int
     ) -> bool:
         _validate_recovery_window(grace_seconds, timeout_seconds)
-        cutoff = func.clock_timestamp() - timedelta(seconds=timeout_seconds + grace_seconds)
         with session_scope(self.factory) as session:
-            changed = session.execute(
-                update(ActionEffectRow)
-                .where(
-                    ActionEffectRow.project_id == project_id,
-                    ActionEffectRow.effect_key == effect_key,
-                    ActionEffectRow.state == "executing",
-                    ActionEffectRow.started_at < cutoff,
-                )
-                .values(state="unknown", state_reason="executor_lost", finished_at=func.now())
-                .returning(ActionEffectRow.effect_id)
-            ).scalar_one_or_none()
-            return changed is not None
+            row = _require_row(session, project_id, effect_key, lock=True)
+            _require_stored_timeout(_effect_dict_from_row(row), timeout_seconds)
+            now = session.execute(select(func.clock_timestamp())).scalar_one()
+            cutoff = now - timedelta(seconds=timeout_seconds + grace_seconds)
+            if row.state != "executing" or not row.started_at or row.started_at >= cutoff:
+                return False
+            row.state = "unknown"
+            row.state_reason = "executor_lost"
+            row.finished_at = now
+            return True
+
+    def disposition_legacy_executing(
+        self,
+        *,
+        project_id: str,
+        effect_key: str,
+        operator_subject: str,
+        reason: str,
+        evidence_ref: str,
+        expected_execution: tuple[str | None, int, str],
+    ) -> dict[str, Any]:
+        """Internal persistence primitive; use the authenticated recovery service.
+
+        Moves only a specifically observed legacy execution to unknown. Does not
+        guess missing policy metadata, rearm, execute or create an outcome receipt.
+        """
+        if not operator_subject.strip() or not reason.strip() or not evidence_ref.strip():
+            raise EffectStoreError("operator_reason_and_evidence_required")
+        with session_scope(self.factory) as session:
+            row = _require_row(session, project_id, effect_key, lock=True)
+            payload = dict(row.payload or {})
+            if expected_execution != (row.executor_id, row.attempt_count, row.state):
+                raise EffectConflictError("legacy_disposition_state_conflict")
+            if (
+                row.state != "executing"
+                or "timeout_seconds" in payload
+                or "side_effect_class" in payload
+            ):
+                raise EffectConflictError("legacy_disposition_not_allowed")
+            now = utc_now()
+            payload["legacy_disposition"] = {
+                "operator": operator_subject,
+                "reason": reason,
+                "evidence_ref": evidence_ref,
+                "at": now.isoformat(),
+                "executor_id": row.executor_id,
+                "attempt_count": row.attempt_count,
+            }
+            row.payload = payload
+            row.state = "unknown"
+            row.state_reason = "legacy_operator_disposition"
+            row.finished_at = now
+            return _effect_dict_from_row(row)
 
     def rearm_irreversible(
         self, *, project_id: str, effect_key: str, operator: str, reason: str
@@ -797,13 +839,16 @@ class DurableEffectRepository:
 # ---- transaction-internal helpers (take an open Session; never commit)
 
 
-def _require_row(session: Session, project_id: str, effect_key: str) -> ActionEffectRow:
-    row = session.scalar(
-        select(ActionEffectRow).where(
-            ActionEffectRow.project_id == project_id,
-            ActionEffectRow.effect_key == effect_key,
-        )
+def _require_row(
+    session: Session, project_id: str, effect_key: str, *, lock: bool = False
+) -> ActionEffectRow:
+    statement = select(ActionEffectRow).where(
+        ActionEffectRow.project_id == project_id,
+        ActionEffectRow.effect_key == effect_key,
     )
+    if lock:
+        statement = statement.with_for_update()
+    row = session.scalar(statement)
     if row is None:
         raise EffectStoreError("effect_not_found")
     return row
@@ -916,6 +961,13 @@ def _grant_from_row(row: ApprovalRow) -> ApprovalGrant:
     )
 
 
+def _require_stored_timeout(row: Mapping[str, Any], timeout_seconds: int) -> None:
+    if row.get("timeout_seconds") is None:
+        raise EffectConflictError("effect_recovery_timeout_unavailable")
+    if row["timeout_seconds"] != timeout_seconds:
+        raise EffectConflictError("effect_timeout_binding_mismatch")
+
+
 def _validate_recovery_window(grace_seconds: int, timeout_seconds: int) -> None:
     if grace_seconds < 0 or timeout_seconds <= 0:
         raise ValueError("invalid_recovery_window")
@@ -929,6 +981,10 @@ def _rearm_note(row: Mapping[str, Any], operator: str, reason: str) -> dict[str,
         or row.get("state_reason") != "irreversible_requires_operator_disposition"
     ):
         raise EffectConflictError("irreversible_rearm_not_allowed")
+    if row.get("legacy_disposition"):
+        # The old row has no trustworthy execution policy. Rearm requires a
+        # separately reviewed migration; an operator note cannot invent it.
+        raise EffectConflictError("legacy_effect_requires_policy_migration")
     note = dict(row.get("reconciliation") or {})
     notes = list(note.get("operator_rearms") or [])
     notes.append({"operator": operator, "reason": reason, "at": utc_now().isoformat()})
