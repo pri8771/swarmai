@@ -1,17 +1,17 @@
 {
   "schema_version": "1.2",
   "purpose": "Owner-scoped execution control over existing packet DAGs; not a second queue or evidence of completion",
-  "scope_directive": "OWNER_V23_MINIMUM_V27_TARGET_REVIEW_PENDING",
-  "scope_precedence": "Latest owner direction: V2.3 is the minimum desired SwarmAI milestone and V2.7 is the target. Existing canonical V2.3 plan is active subject to dependencies/reviews. V2.7 has no accepted contract yet; V27_OWNER_REVIEW_PROPOSAL_20260922.md is proposal-only.",
+  "scope_directive": "OWNER_PAUSE_V20_ALL_PROJECTS",
+  "scope_precedence": "Latest owner direction: engineering is paused and the target is V2.0 for SwarmAI, Jobs Automation, and Social Bots. This supersedes the V2.3 minimum/V2.7 target. V2.3/V2.7 work is deferred.",
   "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
-  "goal_version": "2.3",
+  "goal_version": "2.0",
   "allowed_phases": [
     "v17"
   ],
   "initial_phase": "v17",
-  "future_implementation_authorized": true,
-  "future_planning_authorized": true,
-  "stop_after": "Reach accepted V2.3 minimum; V2.7 implementation requires owner/lead acceptance of a V2.7 contract/packet DAG.",
+  "future_implementation_authorized": false,
+  "future_planning_authorized": false,
+  "stop_after": "PAUSED_BY_OWNER. On explicit resume, continue only toward accepted V2.0 unless the owner changes scope.",
   "implementation_branch": "cursor/v17-single-session",
   "audited_source_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
   "heartbeat_path": "heartbeats/CURSOR-V17-SINGLE.json",
@@ -149,13 +149,20 @@
       "base_sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
       "review_ref": "docs/coordination/reviews/ASTRA_R28D_SUCCESSOR_REWORK_LEAD_20260922.md",
       "live_acceptance": false
+    },
+    "R28d-admission-repair": {
+      "decision": "bounded_engineering_repair_accepted",
+      "source_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+      "base_sha": "86f8e0c90e399c683d68ba9628ef48af4723f33f",
+      "review_ref": "docs/coordination/reviews/ASTRA_R28D_ADMISSION_REPAIR_LEAD_20260922.md",
+      "live_acceptance": false
     }
   },
   "frozen_packets": [],
   "rules": [
-    "V2.3 is the current minimum owner goal and may advance only through the existing cemented dependency/review plan; do not skip unfinished predecessor acceptance gates.",
-    "V2.7 is a requested target only. No V2.7 implementation authority exists until its proposed definition and packet DAG are explicitly accepted.",
-    "Current owner hold forbids new live/model/provider/scheduler/spend/main-merge actions; earlier broad private-$0 live permission is superseded for new runs.",
+    "PAUSED_BY_OWNER: no new implementation/test execution/worker dispatch. Checkpointing, formal review of already-submitted work, and requested handoff documentation only.",
+    "V2.0 is the target for SwarmAI, Jobs Automation and Social Bots. V2.3/V2.7/V3.0 are deferred and are not current implementation authority.",
+    "On explicit resume, continue sequentially through unfinished predecessor gates; do not infer version acceptance from the target reset.",
     "Use methodical root-cause debugging: reproduce, map cause, repair narrowly, preserve detailed source-bound notes and adverse tests.",
     "Live means a running private/local candidate plus relevant real operational tests; a health endpoint or a local fixture alone is insufficient.",
     "Existing review holds remain mandatory; worker may prepare review bundles but may not invent reviews.",
@@ -167,37 +174,42 @@
     "Do not replace the registry, duplicate queues, or rewrite historical evidence. Scope controls authorization, not artifact acceptance.",
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
   ],
-  "current_direct_worker": "codex",
-  "current_direct_assignment": "docs/coordination/assignments/CODEX_R28D_ADMISSION_ATOMICITY_20260922.md",
+  "current_direct_worker": null,
+  "current_direct_assignment": null,
   "fable_handoff_authorized": false,
   "authorized_versions": [
     "1.7",
     "1.8",
     "1.9",
-    "2.0",
-    "2.3"
+    "2.0"
   ],
   "prohibited_versions": [
     "3.0"
   ],
-  "phase_policy": "V1.7 remains the current executable phase. After its required handoff/review, the lead may release only V1.8/V1.9/V2.0 packets from the existing future queue; V2.3/V3 remain forbidden.",
-  "future_implementation_ceiling": "2.3",
+  "phase_policy": "PAUSED_BY_OWNER. No implementation phase is currently executable. On explicit resume, progress sequentially through unfinished V1.7 -> V1.8 -> V1.9 -> V2.0 gates; V2.3/V2.7/V3.0 are deferred.",
+  "future_implementation_ceiling": "2.0",
   "method": "Reproduce actual failure first where possible, record root-cause/causal map and detailed source-bound notes, then make the smallest bounded repair and test adverse paths.",
   "private_zero_cost_live_testing_authorized": false,
-  "private_zero_cost_live_testing_scope": "SUPERSEDED: current owner turn prohibits new live/model/provider actions. No new live run may rely on earlier broad grant.",
-  "requested_target_version": "2.7",
-  "v27_contract_status": "proposed_not_accepted",
+  "private_zero_cost_live_testing_scope": "Closed by owner pause. Any future live/model/provider action requires a fresh explicit grant.",
+  "requested_target_version": "2.0",
+  "v27_contract_status": "deferred_by_owner",
   "v27_proposal_ref": "docs/coordination/V27_OWNER_REVIEW_PROPOSAL_20260922.md",
-  "secondary_safe_assignment": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md",
+  "secondary_safe_assignment": null,
   "current_action_holds": {
+    "engineering": true,
     "live": true,
     "model": true,
     "provider": true,
     "scheduler": true,
     "spend": true,
     "main_merge": true,
-    "note": "Current owner turn explicitly prohibits new live/model/provider/scheduler/spend/main-merge actions. Offline/source/evidence work may proceed only through released packets."
+    "deploy": true,
+    "public_action": true,
+    "note": "PAUSED_BY_OWNER. Checkpoint/review/documentation only; no implementation or execution dispatch."
   },
   "r30b_contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
-  "r30b_diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e"
+  "r30b_diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e",
+  "r30b_p0_status": "paused_uncommitted_unreviewed",
+  "r30b_p0_assignment_ref": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md",
+  "r30b_p0_resume_ref": "docs/coordination/OWNER_PAUSE_V20_20260922.md"
 }
