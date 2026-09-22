@@ -240,3 +240,41 @@ def test_targeted_fix_passes_the_defect_proof_gate_end_to_end(tmp_path: Path) ->
     )
     assert decision.proven is True, decision.to_dict()
     assert decision.reason == "red_green_demonstrated"
+
+
+
+def test_edit_for_a_different_path_cannot_mutate_selected_target(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path / "repo")
+    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    response = EDIT_RESPONSE.replace("### EDIT widgets/counter.py", "### EDIT other/counter.py")
+    with patch("swarm.mission.worker.local_chat", return_value=_inf(response)):
+        result, handle = worker._implement(_task("tsk_path"), mission_id="m_path", shared=None)
+    assert not result.ok
+    assert result.artifacts["inference_calls"] == 2
+    assert result.artifacts["edit_blocks_applied"] == 0
+    assert result.artifacts["diff"] == ""
+    assert (Path(handle.path) / "widgets/counter.py").read_text() == ORIGINAL
+
+
+def test_retry_requires_exact_indentation_and_unfenced_edit_bodies(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path / "repo")
+    worker = RepoWorker(repo=repo, worktree_root=tmp_path / "wt")
+    bad = EDIT_RESPONSE.replace("<<<<<<< SEARCH\n", "<<<<<<< SEARCH\n```python\n", 1)
+    responses = iter([_inf(bad), _inf(EDIT_RESPONSE)])
+    prompts: list[str] = []
+    def fake_chat(**kwargs):
+        prompts.append(kwargs["messages"][-1]["content"])
+        return next(responses)
+    with patch("swarm.mission.worker.local_chat", side_effect=fake_chat):
+        result, _ = worker._implement(_task("tsk_indent"), mission_id="m_indent", shared=None)
+    assert result.ok
+    assert "preserve leading spaces exactly" in prompts[0]
+    assert "no Markdown fences" in prompts[1]
+    assert result.artifacts["reprompted"] is True
+
+
+def test_dedented_class_method_remains_unmatched() -> None:
+    original = "class Counter:\n    def bump(self):\n        return 1\n"
+    for search in ("def bump(self):\n    return 1", "```python\ndef bump(self):\n    return 1\n```"):
+        patched, unmatched = _apply_edit_blocks(original, [("counter.py", search, "return 2")])
+        assert unmatched and patched == original
