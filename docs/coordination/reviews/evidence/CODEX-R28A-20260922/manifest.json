@@ -1,0 +1,42 @@
+{
+  "affected.txt": {
+    "bytes": 180,
+    "sha256": "0ddb281c8a7050e1f5e4bde28e330d8d1fa4613e754ece46c81b63885af880fc"
+  },
+  "baseline-observed.txt": {
+    "bytes": 946,
+    "sha256": "51147644caf6dd562ad35372b39b8e9feb83ef2e1289eb2f6ca1cd3576fd9a8e"
+  },
+  "baseline-reproduce.py": {
+    "bytes": 2410,
+    "sha256": "db95bd3b1d3a83fc813a3d697821dc551088ede027dd0486e3f361ab320842ca"
+  },
+  "canonical-readback.txt": {
+    "bytes": 1657,
+    "sha256": "b3aece24a5dd678049d0868816973900787aff1283c679cd0ea6011a43d486d7"
+  },
+  "causal-map.txt": {
+    "bytes": 3623,
+    "sha256": "48dbebebe26154a815bb48a8560d9db6c60337d7d18c5c560b236954e259fd4a"
+  },
+  "checks.json": {
+    "bytes": 1544,
+    "sha256": "ac378f7b5d8c1f35dea47eb95dfd874bd1a53ab6654090f97ee30d8018edc750"
+  },
+  "full.txt": {
+    "bytes": 661,
+    "sha256": "35212783e97167b115fbb58589cfe98d875eb3d8311fcb6543867ff4e057d570"
+  },
+  "mechanical-review.txt": {
+    "bytes": 1406,
+    "sha256": "235fd0dc21c462d732166f9692b5bec67b94591ca576d45e5601382bb3ba1c2b"
+  },
+  "mypy.txt": {
+    "bytes": 45,
+    "sha256": "90acfc2dd8ef96aecf92af2c2eeb276f66cb63023d07bf19074f3c4ae4fca52e"
+  },
+  "ruff.txt": {
+    "bytes": 19,
+    "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  }
+}

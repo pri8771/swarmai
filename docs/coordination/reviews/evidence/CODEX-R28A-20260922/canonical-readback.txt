@@ -1,0 +1,27 @@
+R28a bounded evidence refresh
+Time: 2026-09-22 (America/New_York)
+
+Candidate
+- Worktree: /Users/pchordia/Downloads/swarm_codex/review/swarm-r28a-source
+- Base HEAD: e924351bd93510eaae279225db3a2fa447dd6894
+- Candidate remains an uncommitted source/test diff; git diff --check is clean.
+- Gateway/adapters source diff digest (five scoped files):
+  fd1ab10d81e68ee4af58b745489d12d234d2d6cae3d4948a141454cbaea56745
+- Static mapping still matches native R28a: explicit outcome set and exception classes;
+  required store; durable gate; to_thread+wait_for for pre/execute/post/reconcile;
+  cancellation persists unknown then re-raises; timeout/generic exception unknown;
+  not-sent failed/not_applied; no blind execute retry; echo reconcile unknown;
+  LocalSandbox explicit success; Browser unknown operation explicit denial.
+- This refresh found no source change that invalidates the final no-defect review.
+- No tests were run during root's packaging gate.
+
+Canonical GitHub readback (GitHub API via gh; no fetch/write)
+- Local remote-tracking ref remained 8695019ffee77719ddd2fcc80affd7e42fe95bdd.
+- Live origin coordination/swarm-control head:
+  2e32530c0255e5ea09c1b517776099c677506e7e
+- Live head is 13 commits beyond 8695019. Twelve are heartbeat/status state updates;
+  the only lead commit is 16a248697b49f49d4ed0c27819f8aa48e9670a0e,
+  "lead: reconcile R27e acceptance and release R28a [skip ci]".
+- No R28a acceptance/review verdict exists beyond 8695019 in that live range.
+- No packet newer than R28a was newly released. R28b and later packet files exist in the
+  canonical packet directory, but the inspected lead history still releases R28a only.
