@@ -23,7 +23,9 @@ Independent review caught arbitrary cookie reflection and then an intermediate c
 - MockTransport cookie-negative checks also inspect actual persisted gateway effects/receipts and preserve onePOST/attempt1.
 - Independent exact-tree recommendation: ACCEPT bounded offline source, no remaining findings.
 
-Logs: `/tmp/swarm-r31a-evidence-20260922/settled/`; earlier red evidence retained in parent directory and `/tmp/swarm-r31a-cookie-red-20260922.log`, `/tmp/swarm-r31a-rotation-red-20260922.log`. Hosted exact-head CI pending readback.
+Logs: `/tmp/swarm-r31a-evidence-20260922/settled/`; earlier red evidence retained in parent directory and `/tmp/swarm-r31a-cookie-red-20260922.log`, `/tmp/swarm-r31a-rotation-red-20260922.log`.
+
+Exact-head hosted CI readback: runs `35777255861` and `35777260132` succeeded. Offline and console checks are green. The live-gated guard job is not genuine live execution evidence. Formal PR30 and PR31 lead verdicts remain outstanding as of this readback.
 
 ## Limits and request
 
