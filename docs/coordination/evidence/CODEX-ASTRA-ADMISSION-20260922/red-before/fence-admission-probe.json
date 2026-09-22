@@ -1,0 +1,13 @@
+{
+  "captured_generation": 0,
+  "effect_state_before_cancel": "reserved",
+  "cancel_returned_while_effect_reserved": true,
+  "current_generation_before_return": 1,
+  "worker_detected_cancel_after_receipt": true,
+  "late_file_exists": true,
+  "receipt_ids": [
+    "arc_39839cf023924319abe6b857d795389a"
+  ],
+  "final_effect_state": "succeeded",
+  "source": "86f8e0c90e399c683d68ba9628ef48af4723f33f"
+}

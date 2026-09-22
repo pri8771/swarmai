@@ -1,0 +1,544 @@
+..FF...................                                                  [100%]
+=================================== FAILURES ===================================
+_ test_local_cancel_and_admission_have_one_serialized_winner[postgres-admission] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x109eaee10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x108fbd010>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x109eaeb40>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x109eaff20>
+parameters = [{'id': 'apr_7731b0b34a9b4d048e7d7aec9a09a092', 'payload_hash': '330f5b6738902afa1b82913d1193fdef9779b1228205d30d78772...rs/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2/effect.txt', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=56421 user=pchordia database=swarm_astra_review_76748_1790096913) at 0x10982ac90>
+query = 'INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, ...(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)'
+params = {'id': 'apr_7731b0b34a9b4d048e7d7aec9a09a092', 'payload_hash': '330f5b6738902afa1b82913d1193fdef9779b1228205d30d787726...ers/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2/effect.txt', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.StringDataRightTruncation: value too long for type character varying(192)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: StringDataRightTruncation
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109104f50>
+effect_store = <swarm.tools.effects.DurableEffectRepository object at 0x109105400>
+winner = 'admission'
+
+    @pytest.mark.parametrize("winner", ["admission", "cancellation"])
+    def test_local_cancel_and_admission_have_one_serialized_winner(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, effect_store: Any, winner: str
+    ) -> None:
+        fences = RevocableFenceProvider()
+        gateway = local_worktree_gateway(tmp_path, store=effect_store, fences=fences)
+        adapter = gateway.registry.resolve("local.sandbox", "1")
+        context = ActorContext(actor="review", project_id="local_race")
+        envelope = adapter.normalize(
+            {
+                "project_id": context.project_id,
+                "actor": context.actor,
+                "mission_id": "mission",
+                "task_id": "task",
+                "attempt_id": "attempt",
+                "lease_generation": 1,
+                "cancellation_generation": 0,
+                "effect_key": "local_race:mission:task:effect1",
+                "operation": "fs.write_text",
+                "path": "effect.txt",
+                "text": "accounted effect",
+            }
+        )
+>       envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/tools/test_local_admission_guard.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:122: in make_approval
+    return self.put_approval(grant, context=context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:86: in put_approval
+    return self.store.put_approval(grant)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/effects.py:451: in put_approval
+    session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1049: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=56421 user=pchordia database=swarm_astra_review_76748_1790096913) at 0x10982ac90>
+query = 'INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, ...(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)'
+params = {'id': 'apr_7731b0b34a9b4d048e7d7aec9a09a092', 'payload_hash': '330f5b6738902afa1b82913d1193fdef9779b1228205d30d787726...ers/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2/effect.txt', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.StringDataRightTruncation) value too long for type character varying(192)
+E           [SQL: INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, project_id, actor, integration_id, integration_version, operation, effect_key, max_effect_count, used_count, policy_version, created_at, constraints) VALUES (%(id)s::VARCHAR, %(payload_hash)s::VARCHAR, %(permitted_operation)s::VARCHAR, %(destination)s::VARCHAR, %(grantor)s::VARCHAR, %(expires_at)s::TIMESTAMP WITH TIME ZONE, %(revoked_at)s::TIMESTAMP WITH TIME ZONE, %(payload)s::JSONB, %(project_id)s::VARCHAR, %(actor)s::VARCHAR, %(integration_id)s::VARCHAR, %(integration_version)s::VARCHAR, %(operation)s::VARCHAR, %(effect_key)s::VARCHAR, %(max_effect_count)s::INTEGER, %(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)]
+E           [parameters: {'id': 'apr_7731b0b34a9b4d048e7d7aec9a09a092', 'payload_hash': '330f5b6738902afa1b82913d1193fdef9779b1228205d30d7877266cbe521ca8', 'permitted_operation': 'local.sandbox.fs.write_text', 'destination': 'file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2/effect.txt', 'grantor': 'operator', 'expires_at': datetime.datetime(2026, 9, 22, 17, 13, 34, 63948, tzinfo=datetime.timezone.utc), 'revoked_at': None, 'payload': Jsonb({}), 'project_id': 'local_race', 'actor': 'review', 'integration_id': 'local.sandbox', 'integration_version': '1', 'operation': 'fs.write_text', 'effect_key': 'local_race:local.sandbox:fs.write_text:file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio2/effect.txt:330f5b6738902afa1b82913d1193fdef9779b1228205d30d7877266cbe521ca8', 'max_effect_count': 1, 'used_count': 0, 'policy_version': 'v17-policy-1', 'created_at': datetime.datetime(2026, 9, 22, 17, 8, 34, 63960, tzinfo=datetime.timezone.utc), 'constraints': Jsonb({})}]
+E           (Background on this error at: https://sqlalche.me/e/20/9h9h)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: DataError
+_ test_local_cancel_and_admission_have_one_serialized_winner[postgres-cancellation] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x10a22a6c0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x109feb680>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x10a22a4e0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x10a03a240>
+parameters = [{'id': 'apr_a2766e8c6422455ea4effe698b2a9810', 'payload_hash': '2d0fe9a9251555b3303cea78b43c624c273bb23ff45c925c39a67...rs/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3/effect.txt', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=56421 user=pchordia database=swarm_astra_review_76748_1790096913) at 0x10a084050>
+query = 'INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, ...(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)'
+params = {'id': 'apr_a2766e8c6422455ea4effe698b2a9810', 'payload_hash': '2d0fe9a9251555b3303cea78b43c624c273bb23ff45c925c39a67e...ers/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3/effect.txt', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.StringDataRightTruncation: value too long for type character varying(192)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: StringDataRightTruncation
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109febe60>
+effect_store = <swarm.tools.effects.DurableEffectRepository object at 0x109eeabd0>
+winner = 'cancellation'
+
+    @pytest.mark.parametrize("winner", ["admission", "cancellation"])
+    def test_local_cancel_and_admission_have_one_serialized_winner(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, effect_store: Any, winner: str
+    ) -> None:
+        fences = RevocableFenceProvider()
+        gateway = local_worktree_gateway(tmp_path, store=effect_store, fences=fences)
+        adapter = gateway.registry.resolve("local.sandbox", "1")
+        context = ActorContext(actor="review", project_id="local_race")
+        envelope = adapter.normalize(
+            {
+                "project_id": context.project_id,
+                "actor": context.actor,
+                "mission_id": "mission",
+                "task_id": "task",
+                "attempt_id": "attempt",
+                "lease_generation": 1,
+                "cancellation_generation": 0,
+                "effect_key": "local_race:mission:task:effect1",
+                "operation": "fs.write_text",
+                "path": "effect.txt",
+                "text": "accounted effect",
+            }
+        )
+>       envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/tools/test_local_admission_guard.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/swarm/tools/v17_gateway.py:122: in make_approval
+    return self.put_approval(grant, context=context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:86: in put_approval
+    return self.store.put_approval(grant)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/effects.py:451: in put_approval
+    session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1049: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=56421 user=pchordia database=swarm_astra_review_76748_1790096913) at 0x10a084050>
+query = 'INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, ...(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)'
+params = {'id': 'apr_a2766e8c6422455ea4effe698b2a9810', 'payload_hash': '2d0fe9a9251555b3303cea78b43c624c273bb23ff45c925c39a67e...ers/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3/effect.txt', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.StringDataRightTruncation) value too long for type character varying(192)
+E           [SQL: INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, project_id, actor, integration_id, integration_version, operation, effect_key, max_effect_count, used_count, policy_version, created_at, constraints) VALUES (%(id)s::VARCHAR, %(payload_hash)s::VARCHAR, %(permitted_operation)s::VARCHAR, %(destination)s::VARCHAR, %(grantor)s::VARCHAR, %(expires_at)s::TIMESTAMP WITH TIME ZONE, %(revoked_at)s::TIMESTAMP WITH TIME ZONE, %(payload)s::JSONB, %(project_id)s::VARCHAR, %(actor)s::VARCHAR, %(integration_id)s::VARCHAR, %(integration_version)s::VARCHAR, %(operation)s::VARCHAR, %(effect_key)s::VARCHAR, %(max_effect_count)s::INTEGER, %(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)]
+E           [parameters: {'id': 'apr_a2766e8c6422455ea4effe698b2a9810', 'payload_hash': '2d0fe9a9251555b3303cea78b43c624c273bb23ff45c925c39a67e356f314828', 'permitted_operation': 'local.sandbox.fs.write_text', 'destination': 'file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3/effect.txt', 'grantor': 'operator', 'expires_at': datetime.datetime(2026, 9, 22, 17, 13, 34, 271881, tzinfo=datetime.timezone.utc), 'revoked_at': None, 'payload': Jsonb({}), 'project_id': 'local_race', 'actor': 'review', 'integration_id': 'local.sandbox', 'integration_version': '1', 'operation': 'fs.write_text', 'effect_key': 'local_race:local.sandbox:fs.write_text:file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-572/test_local_cancel_and_admissio3/effect.txt:2d0fe9a9251555b3303cea78b43c624c273bb23ff45c925c39a67e356f314828', 'max_effect_count': 1, 'used_count': 0, 'policy_version': 'v17-policy-1', 'created_at': datetime.datetime(2026, 9, 22, 17, 8, 34, 271890, tzinfo=datetime.timezone.utc), 'constraints': Jsonb({})}]
+E           (Background on this error at: https://sqlalche.me/e/20/9h9h)
+
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: DataError
+=========================== short test summary info ============================
+FAILED tests/tools/test_local_admission_guard.py::test_local_cancel_and_admission_have_one_serialized_winner[postgres-admission]
+FAILED tests/tools/test_local_admission_guard.py::test_local_cancel_and_admission_have_one_serialized_winner[postgres-cancellation]
+2 failed, 21 passed in 2.25s

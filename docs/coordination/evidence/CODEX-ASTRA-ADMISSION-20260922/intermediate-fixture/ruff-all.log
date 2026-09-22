@@ -1,0 +1,49 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> src/swarm/api/store.py:3:1
+   |
+ 1 |   """In-memory product API store — wires controller, workers, events, approvals."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from dataclasses import dataclass, field
+ 6 | | from datetime import timedelta
+ 7 | | from pathlib import Path
+ 8 | | from typing import Any
+ 9 | |
+10 | | from swarm.api.errors import ApiError
+11 | | from swarm.api.events import EventLog
+12 | | from swarm.broker.explain import explain_capacity
+13 | | from swarm.contracts.common import new_id, payload_hash, utc_now
+14 | | from swarm.contracts.enums import MissionStatus, TaskStatus
+15 | | from swarm.contracts.fixtures import sample_provider_account, sample_route, sample_route_beta
+16 | | from swarm.contracts.mission import Mission
+17 | | from swarm.contracts.provider import ProviderAccount, RouteSnapshot
+18 | | from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
+19 | | from swarm.controller.mission import MissionController
+20 | | from swarm.evals.profiles import ProfileStore
+21 | | from swarm.mission.store import MissionRecord, MissionStore
+22 | | from swarm.mission.action_boundary import local_worktree_gateway
+23 | | from swarm.tools.fences import ActorContext
+24 | | from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
+25 | | from swarm.product.history import HistoryIndex
+26 | | from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
+27 | | from swarm.providers.catalog import list_providers
+28 | | from swarm.workers.registry import WorkerRegistryService
+   | |________________________________________________________^
+help: Organize imports
+   |
+20 | from swarm.evals.profiles import ProfileStore
+21 + from swarm.mission.action_boundary import local_worktree_gateway
+22 | from swarm.mission.store import MissionRecord, MissionStore
+   - from swarm.mission.action_boundary import local_worktree_gateway
+   - from swarm.tools.fences import ActorContext
+23 | from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
+24 | from swarm.product.history import HistoryIndex
+25 | from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
+26 | from swarm.providers.catalog import list_providers
+27 + from swarm.tools.fences import ActorContext
+28 | from swarm.workers.registry import WorkerRegistryService
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

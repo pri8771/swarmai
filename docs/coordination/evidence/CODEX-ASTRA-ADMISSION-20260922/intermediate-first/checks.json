@@ -1,0 +1,137 @@
+[
+  {
+    "name": "identity",
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD",
+      "HEAD^{tree}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.01,
+    "stdout_file": "identity.log"
+  },
+  {
+    "name": "status-before",
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "seconds": 0.01,
+    "stdout_file": "status-before.log"
+  },
+  {
+    "name": "import-provenance",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "python",
+      "-c",
+      "import swarm,sys; print(sys.executable); print(swarm.__file__)"
+    ],
+    "exit_code": 0,
+    "seconds": 0.05,
+    "stdout_file": "import-provenance.log"
+  },
+  {
+    "name": "focused-offline",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "pytest",
+      "tests/mission/test_mission_runtime_async_worker_bridge.py",
+      "tests/mission/test_no_auto_promote.py",
+      "tests/tools/test_local_admission_guard.py",
+      "-q",
+      "-rs",
+      "--junitxml=/tmp/swarm-astra-atomicity-checks-20260922/focused.xml"
+    ],
+    "exit_code": 0,
+    "seconds": 1.43,
+    "stdout_file": "focused-offline.log"
+  },
+  {
+    "name": "full-offline",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "pytest",
+      "-q",
+      "-rs",
+      "--tb=short"
+    ],
+    "exit_code": 0,
+    "seconds": 22.06,
+    "stdout_file": "full-offline.log"
+  },
+  {
+    "name": "ruff-all",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "ruff",
+      "check",
+      "."
+    ],
+    "exit_code": 1,
+    "seconds": 0.06,
+    "stdout_file": "ruff-all.log"
+  },
+  {
+    "name": "mypy",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "mypy",
+      "src/swarm"
+    ],
+    "exit_code": 0,
+    "seconds": 1.08,
+    "stdout_file": "mypy.log"
+  },
+  {
+    "name": "diff-check",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.01,
+    "stdout_file": "diff-check.log"
+  },
+  {
+    "name": "full-postgres",
+    "argv": [
+      "uv",
+      "run",
+      "--no-sync",
+      "pytest",
+      "-q",
+      "-rs",
+      "--tb=short",
+      "--junitxml=/tmp/swarm-astra-atomicity-checks-20260922/full-postgres.xml"
+    ],
+    "exit_code": 1,
+    "seconds": 31.66,
+    "stdout_file": "full-postgres.log"
+  },
+  {
+    "name": "status-after",
+    "argv": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit_code": 0,
+    "seconds": 0.01,
+    "stdout_file": "status-after.log"
+  }
+]

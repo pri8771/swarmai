@@ -1,0 +1,168 @@
+{"name": "identity", "argv": ["git", "rev-parse", "HEAD", "HEAD^{tree}"], "exit_code": 0, "seconds": 0.01, "stdout_file": "identity.log"}
+86f8e0c90e399c683d68ba9628ef48af4723f33f
+b42a7a11f298cdefe89319bfaa91f1ce91aa55d4
+
+{"name": "status-before", "argv": ["git", "status", "--short"], "exit_code": 0, "seconds": 0.01, "stdout_file": "status-before.log"}
+ M src/swarm/tools/effects.py
+ M src/swarm/tools/fences.py
+ M src/swarm/tools/v17_gateway.py
+ M tests/mission/test_mission_runtime_async_worker_bridge.py
+ M tests/tools/test_v17_gateway_authority.py
+?? tests/tools/test_local_admission_guard.py
+
+{"name": "import-provenance", "argv": ["uv", "run", "--no-sync", "python", "-c", "import swarm,sys; print(sys.executable); print(swarm.__file__)"], "exit_code": 0, "seconds": 0.05, "stdout_file": "import-provenance.log"}
+/private/tmp/swarm-r28d3-repair-20260922/.venv/bin/python3
+/private/tmp/swarm-r28d3-repair-20260922/src/swarm/__init__.py
+
+{"name": "focused-offline", "argv": ["uv", "run", "--no-sync", "pytest", "tests/mission/test_mission_runtime_async_worker_bridge.py", "tests/mission/test_no_auto_promote.py", "tests/tools/test_local_admission_guard.py", "-q", "-rs", "--junitxml=/tmp/swarm-astra-atomicity-checks-20260922/focused.xml"], "exit_code": 0, "seconds": 1.43, "stdout_file": "focused-offline.log"}
+.............ss                                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/tools/test_local_admission_guard.py:37: owned PostgreSQL not supplied
+13 passed, 2 skipped in 1.07s
+
+{"name": "full-offline", "argv": ["uv", "run", "--no-sync", "pytest", "-q", "-rs", "--tb=short"], "exit_code": 0, "seconds": 22.06, "stdout_file": "full-offline.log"}
+ols/test_gateway_sandbox.py:118: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:144: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:177: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_gateway_sandbox.py:199: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_integration_manifests.py:170: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_local_admission_guard.py:37: owned PostgreSQL not supplied
+SKIPPED [1] tests/tools/test_single_consequential_path.py:216: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_single_consequential_path.py:244: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_single_consequential_path.py:287: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/tools/test_v17_gateway_authority.py:109: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:162: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:190: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:206: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_authority.py:230: integration: SWARM_DATABASE_URL not set
+SKIPPED [6] tests/tools/test_v17_gateway_authority.py:258: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:288: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_authority.py:341: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_classification_fences.py:128: integration: SWARM_DATABASE_URL not set
+SKIPPED [2] tests/tools/test_v17_gateway_classification_fences.py:143: integration: SWARM_DATABASE_URL not set
+SKIPPED [5] tests/tools/test_v17_gateway_failclosed.py:109: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:120: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:133: integration: SWARM_DATABASE_URL not set
+SKIPPED [5] tests/tools/test_v17_gateway_failclosed.py:145: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:163: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:191: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:209: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_failclosed.py:226: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:100: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:150: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:185: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:220: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:286: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:337: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:377: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:449: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:525: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/tools/test_v17_gateway_negatives.py:568: integration: SWARM_DATABASE_URL not set
+SKIPPED [1] tests/ui/test_console.py:22: npm install not run
+SKIPPED [1] tests/ui/test_console.py:34: npm install not run
+SKIPPED [10] tests/workers/test_durable_worker_protocol.py: integration: SWARM_DATABASE_URL not set
+SKIPPED [4] tests/workers/test_recovery_harness.py: integration: SWARM_DATABASE_URL not set
+431 passed, 210 skipped in 21.35s
+
+{"name": "ruff-all", "argv": ["uv", "run", "--no-sync", "ruff", "check", "."], "exit_code": 1, "seconds": 0.06, "stdout_file": "ruff-all.log"}
+I001 [*] Import block is un-sorted or un-formatted
+  --> src/swarm/api/store.py:3:1
+   |
+ 1 |   """In-memory product API store — wires controller, workers, events, approvals."""
+ 2 |
+ 3 | / from __future__ import annotations
+ 4 | |
+ 5 | | from dataclasses import dataclass, field
+ 6 | | from datetime import timedelta
+ 7 | | from pathlib import Path
+ 8 | | from typing import Any
+ 9 | |
+10 | | from swarm.api.errors import ApiError
+11 | | from swarm.api.events import EventLog
+12 | | from swarm.broker.explain import explain_capacity
+13 | | from swarm.contracts.common import new_id, payload_hash, utc_now
+14 | | from swarm.contracts.enums import MissionStatus, TaskStatus
+15 | | from swarm.contracts.fixtures import sample_provider_account, sample_route, sample_route_beta
+16 | | from swarm.contracts.mission import Mission
+17 | | from swarm.contracts.provider import ProviderAccount, RouteSnapshot
+18 | | from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
+19 | | from swarm.controller.mission import MissionController
+20 | | from swarm.evals.profiles import ProfileStore
+21 | | from swarm.mission.store import MissionRecord, MissionStore
+22 | | from swarm.mission.action_boundary import local_worktree_gateway
+23 | | from swarm.tools.fences import ActorContext
+24 | | from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
+25 | | from swarm.product.history import HistoryIndex
+26 | | from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
+27 | | from swarm.providers.catalog import list_providers
+28 | | from swarm.workers.registry import WorkerRegistryService
+   | |________________________________________________________^
+help: Organize imports
+   |
+20 | from swarm.evals.profiles import ProfileStore
+21 + from swarm.mission.action_boundary import local_worktree_gateway
+22 | from swarm.mission.store import MissionRecord, MissionStore
+   - from swarm.mission.action_boundary import local_worktree_gateway
+   - from swarm.tools.fences import ActorContext
+23 | from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
+24 | from swarm.product.history import HistoryIndex
+25 | from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
+26 | from swarm.providers.catalog import list_providers
+27 + from swarm.tools.fences import ActorContext
+28 | from swarm.workers.registry import WorkerRegistryService
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+
+{"name": "mypy", "argv": ["uv", "run", "--no-sync", "mypy", "src/swarm"], "exit_code": 0, "seconds": 1.08, "stdout_file": "mypy.log"}
+Success: no issues found in 174 source files
+
+{"name": "diff-check", "argv": ["git", "diff", "--check"], "exit_code": 0, "seconds": 0.01, "stdout_file": "diff-check.log"}
+
+{"name": "full-postgres", "argv": ["uv", "run", "--no-sync", "pytest", "-q", "-rs", "--tb=short", "--junitxml=/tmp/swarm-astra-atomicity-checks-20260922/full-postgres.xml"], "exit_code": 1, "seconds": 31.66, "stdout_file": "full-postgres.log"}
+emy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1049: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   sqlalchemy.exc.DataError: (psycopg.errors.StringDataRightTruncation) value too long for type character varying(192)
+E   [SQL: INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, project_id, actor, integration_id, integration_version, operation, effect_key, max_effect_count, used_count, policy_version, created_at, constraints) VALUES (%(id)s::VARCHAR, %(payload_hash)s::VARCHAR, %(permitted_operation)s::VARCHAR, %(destination)s::VARCHAR, %(grantor)s::VARCHAR, %(expires_at)s::TIMESTAMP WITH TIME ZONE, %(revoked_at)s::TIMESTAMP WITH TIME ZONE, %(payload)s::JSONB, %(project_id)s::VARCHAR, %(actor)s::VARCHAR, %(integration_id)s::VARCHAR, %(integration_version)s::VARCHAR, %(operation)s::VARCHAR, %(effect_key)s::VARCHAR, %(max_effect_count)s::INTEGER, %(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)]
+E   [parameters: {'id': 'apr_d40a939e71c7456488d3d01a0b8fa48f', 'payload_hash': '52473841b8b31108c37c9556f41aa676d5b89e6ef34d6c606504a6335152f565', 'permitted_operation': 'local.sandbox.fs.write_text', 'destination': 'file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio3/effect.txt', 'grantor': 'operator', 'expires_at': datetime.datetime(2026, 9, 22, 17, 12, 28, 29727, tzinfo=datetime.timezone.utc), 'revoked_at': None, 'payload': Jsonb({}), 'project_id': 'local_race', 'actor': 'review', 'integration_id': 'local.sandbox', 'integration_version': '1', 'operation': 'fs.write_text', 'effect_key': 'local_race:local.sandbox:fs.write_text:file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio3/effect.txt:52473841b8b31108c37c9556f41aa676d5b89e6ef34d6c606504a6335152f565', 'max_effect_count': 1, 'used_count': 0, 'policy_version': 'v17-policy-1', 'created_at': datetime.datetime(2026, 9, 22, 17, 7, 28, 29736, tzinfo=datetime.timezone.utc), 'constraints': Jsonb({})}]
+E   (Background on this error at: https://sqlalche.me/e/20/9h9h)
+=========================== short test summary info ============================
+SKIPPED [11] tests/live_fixture/test_fixture_service.py: live_local: SWARM_LIVE_LOCAL != 1
+SKIPPED [1] tests/ui/test_console.py:22: npm install not run
+SKIPPED [1] tests/ui/test_console.py:34: npm install not run
+2 failed, 626 passed, 13 skipped in 30.83s
+
+{"socket": "/tmp/swarm-pgcheck.QxqRvZ", "port": "56421", "database": "swarm_astra_review_75488_1790096822", "created": true, "current_user": "pchordia", "data_directory": "/tmp/swarm-pgcheck.QxqRvZ/data", "unix_socket_directories": "/tmp/swarm-pgcheck.QxqRvZ", "listen_addresses": "", "public_tables_after_tests": 0, "cleanup_remaining": 0}
+{"name": "status-after", "argv": ["git", "status", "--short"], "exit_code": 0, "seconds": 0.01, "stdout_file": "status-after.log"}
+ M src/swarm/tools/effects.py
+ M src/swarm/tools/fences.py
+ M src/swarm/tools/v17_gateway.py
+ M tests/mission/test_mission_runtime_async_worker_bridge.py
+ M tests/tools/test_v17_gateway_authority.py
+?? tests/tools/test_local_admission_guard.py
+

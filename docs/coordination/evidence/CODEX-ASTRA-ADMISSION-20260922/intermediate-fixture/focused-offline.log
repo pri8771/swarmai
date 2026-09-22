@@ -1,0 +1,4 @@
+.............ss                                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/tools/test_local_admission_guard.py:37: owned PostgreSQL not supplied
+13 passed, 2 skipped in 0.99s

@@ -1,0 +1,166 @@
+FFss                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_local_cancel_and_admission_have_one_serialized_winner[memory-admission] _
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-561/test_local_cancel_and_admissio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10d212750>
+effect_store = <swarm.tools.effects.InMemoryEffectStore object at 0x10d23c770>
+winner = 'admission'
+
+    @pytest.mark.parametrize("winner", ["admission", "cancellation"])
+    def test_local_cancel_and_admission_have_one_serialized_winner(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, effect_store: Any, winner: str
+    ) -> None:
+        fences = RevocableFenceProvider()
+        gateway = local_worktree_gateway(tmp_path, store=effect_store, fences=fences)
+        adapter = gateway.registry.resolve("local.sandbox", "1")
+        context = ActorContext(actor="review", project_id="local_race")
+        envelope = adapter.normalize({
+            "project_id": context.project_id, "actor": context.actor,
+            "mission_id": "mission", "task_id": "task", "attempt_id": "attempt",
+            "lease_generation": 1, "cancellation_generation": 0,
+            "operation": "fs.write_text", "path": "effect.txt", "text": "accounted effect",
+        })
+        envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+        paused, release = threading.Event(), threading.Event()
+        cancel_started, cancelled = threading.Event(), threading.Event()
+        errors: list[BaseException] = []
+        receipts: list[Any] = []
+        observed_admission: list[tuple[str, int]] = []
+    
+        if winner == "admission":
+            original_reader = fences.reader
+    
+            def reader(**identity: Any) -> Any:
+                read = original_reader(**identity)
+    
+                def pause_after_snapshot(session: Any) -> Any:
+                    snapshot = read(session)
+                    assert snapshot["cancellation_generation"] == 0
+                    paused.set()
+                    assert release.wait(5)
+                    return snapshot
+    
+                return pause_after_snapshot
+    
+            monkeypatch.setattr(fences, "reader", reader)
+>           original_observe = adapter.observe
+                               ^^^^^^^^^^^^^^^
+E           AttributeError: 'LocalSandboxAdapter' object has no attribute 'observe'
+
+tests/tools/test_local_admission_guard.py:73: AttributeError
+_ test_local_cancel_and_admission_have_one_serialized_winner[memory-cancellation] _
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-561/test_local_cancel_and_admissio1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10d23da30>
+effect_store = <swarm.tools.effects.InMemoryEffectStore object at 0x10d23dc10>
+winner = 'cancellation'
+
+    @pytest.mark.parametrize("winner", ["admission", "cancellation"])
+    def test_local_cancel_and_admission_have_one_serialized_winner(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, effect_store: Any, winner: str
+    ) -> None:
+        fences = RevocableFenceProvider()
+        gateway = local_worktree_gateway(tmp_path, store=effect_store, fences=fences)
+        adapter = gateway.registry.resolve("local.sandbox", "1")
+        context = ActorContext(actor="review", project_id="local_race")
+        envelope = adapter.normalize({
+            "project_id": context.project_id, "actor": context.actor,
+            "mission_id": "mission", "task_id": "task", "attempt_id": "attempt",
+            "lease_generation": 1, "cancellation_generation": 0,
+            "operation": "fs.write_text", "path": "effect.txt", "text": "accounted effect",
+        })
+        envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+        paused, release = threading.Event(), threading.Event()
+        cancel_started, cancelled = threading.Event(), threading.Event()
+        errors: list[BaseException] = []
+        receipts: list[Any] = []
+        observed_admission: list[tuple[str, int]] = []
+    
+        if winner == "admission":
+            original_reader = fences.reader
+    
+            def reader(**identity: Any) -> Any:
+                read = original_reader(**identity)
+    
+                def pause_after_snapshot(session: Any) -> Any:
+                    snapshot = read(session)
+                    assert snapshot["cancellation_generation"] == 0
+                    paused.set()
+                    assert release.wait(5)
+                    return snapshot
+    
+                return pause_after_snapshot
+    
+            monkeypatch.setattr(fences, "reader", reader)
+            original_observe = adapter.observe
+    
+            def observe_after_guard(envelope: Any) -> Any:
+                # Cancellation must finish even while adapter observation is paused.
+                assert cancelled.wait(5), "admission guard leaked into adapter I/O"
+                row = effect_store.get(project_id=context.project_id, effect_key=envelope.effect_key)
+                grant = effect_store.get_approval(envelope.approval_id, project_id=context.project_id)
+                observed_admission.append((row["state"], grant.used_count))
+                return original_observe(envelope)
+    
+            monkeypatch.setattr(adapter, "observe", observe_after_guard)
+        else:
+            original_begin = effect_store.begin_execution
+    
+            def pause_before_admission(*args: Any, **kwargs: Any) -> Any:
+                paused.set()
+                assert release.wait(5)
+                return original_begin(*args, **kwargs)
+    
+            monkeypatch.setattr(effect_store, "begin_execution", pause_before_admission)
+    
+        def execute() -> None:
+            try:
+                receipts.append(gateway.execute_envelope_sync(envelope, context=context))
+            except BaseException as exc:
+                errors.append(exc)
+    
+        def cancel() -> None:
+            cancel_started.set()
+            fences.cancel()
+            cancelled.set()
+    
+        execution = threading.Thread(target=execute)
+        cancellation = threading.Thread(target=cancel)
+        execution.start()
+        try:
+            assert paused.wait(5)
+            cancellation.start()
+            assert cancel_started.wait(5)
+            if winner == "admission":
+                assert not cancelled.wait(0.1), "cancel returned before admission committed"
+            else:
+                assert cancelled.wait(5)
+        finally:
+            release.set()
+            execution.join(10)
+            if cancellation.ident is not None:
+                cancellation.join(10)
+        assert not execution.is_alive() and not cancellation.is_alive()
+        grant = effect_store.get_approval(envelope.approval_id, project_id=context.project_id)
+        stored_receipts = effect_store.list_receipts(
+            project_id=context.project_id, effect_key=envelope.effect_key
+        )
+        if winner == "admission":
+            assert errors == []
+            assert len(receipts) == len(stored_receipts) == 1
+            assert receipts[0].outcome == "succeeded"
+            assert (tmp_path / "effect.txt").read_text() == "accounted effect"
+            assert observed_admission and observed_admission[0] == ("executing", 1)
+            assert grant.used_count == 1
+        else:
+            assert len(errors) == 1 and isinstance(errors[0], EffectConflictError)
+>           assert "cancellation" in str(errors[0])
+E           AssertionError: assert 'cancellation' in 'fence_changed_before_execute'
+E            +  where 'fence_changed_before_execute' = str(EffectConflictError('fence_changed_before_execute'))
+
+tests/tools/test_local_admission_guard.py:135: AssertionError
+=========================== short test summary info ============================
+FAILED tests/tools/test_local_admission_guard.py::test_local_cancel_and_admission_have_one_serialized_winner[memory-admission]
+FAILED tests/tools/test_local_admission_guard.py::test_local_cancel_and_admission_have_one_serialized_winner[memory-cancellation]
+2 failed, 2 skipped in 0.41s

@@ -1,0 +1,62 @@
+F.ss...........                                                          [100%]
+=================================== FAILURES ===================================
+_ test_local_cancel_and_admission_have_one_serialized_winner[memory-admission] _
+
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-563/test_local_cancel_and_admissio0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10d7ba5a0>
+effect_store = <swarm.tools.effects.InMemoryEffectStore object at 0x10d7ba570>
+winner = 'admission'
+
+    @pytest.mark.parametrize("winner", ["admission", "cancellation"])
+    def test_local_cancel_and_admission_have_one_serialized_winner(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, effect_store: Any, winner: str
+    ) -> None:
+        fences = RevocableFenceProvider()
+        gateway = local_worktree_gateway(tmp_path, store=effect_store, fences=fences)
+        adapter = gateway.registry.resolve("local.sandbox", "1")
+        context = ActorContext(actor="review", project_id="local_race")
+        envelope = adapter.normalize(
+            {
+                "project_id": context.project_id,
+                "actor": context.actor,
+                "mission_id": "mission",
+                "task_id": "task",
+                "attempt_id": "attempt",
+                "lease_generation": 1,
+                "cancellation_generation": 0,
+                "operation": "fs.write_text",
+                "path": "effect.txt",
+                "text": "accounted effect",
+            }
+        )
+        envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+        paused, release = threading.Event(), threading.Event()
+        cancel_started, cancelled = threading.Event(), threading.Event()
+        errors: list[BaseException] = []
+        receipts: list[Any] = []
+        observed_admission: list[tuple[str, int]] = []
+    
+        if winner == "admission":
+            original_reader = fences.reader
+    
+            def reader(**identity: Any) -> Any:
+                read = original_reader(**identity)
+    
+                def pause_after_snapshot(session: Any) -> Any:
+                    snapshot = read(session)
+                    assert snapshot["cancellation_generation"] == 0
+                    paused.set()
+                    assert release.wait(5)
+                    return snapshot
+    
+                return pause_after_snapshot
+    
+            monkeypatch.setattr(fences, "reader", reader)
+>           original_observe = adapter.observe
+                               ^^^^^^^^^^^^^^^
+E           AttributeError: 'LocalSandboxAdapter' object has no attribute 'observe'
+
+tests/tools/test_local_admission_guard.py:82: AttributeError
+=========================== short test summary info ============================
+FAILED tests/tools/test_local_admission_guard.py::test_local_cancel_and_admission_have_one_serialized_winner[memory-admission]
+1 failed, 12 passed, 2 skipped in 0.95s

@@ -1,0 +1,8 @@
+{
+  "src/swarm/tools/effects.py": "0c13b9deb3084d64366dce222f066ced9b24698f149e8304e4cec31213797ab8",
+  "src/swarm/tools/fences.py": "9b85036a085b6131c977bcc9dd280525cbac123aabb9e8998570bfe161707520",
+  "src/swarm/tools/v17_gateway.py": "df3decee11d9c635a220f3056a9ea35a88492ef0decaedb01c07fd2b85e7fb76",
+  "tests/mission/test_mission_runtime_async_worker_bridge.py": "510ad26897295a2f3f0641866b8ebe1337d511d8fd307717c4d88c17649aac15",
+  "tests/tools/test_v17_gateway_authority.py": "35a8f38f63674c221c4494a0be7f818c95e5cc3a26700f6555e03ff76c5550fa",
+  "tests/tools/test_local_admission_guard.py": "ee2ec2ad3c09b2015594b48dd808ecadcaf289720fc1a30eb9d38f12095263d7"
+}

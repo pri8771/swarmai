@@ -1,0 +1,135 @@
+........................................................................ [ 11%]
+........................................................................ [ 22%]
+........................................................................ [ 33%]
+...............................................sssssssssss.............. [ 44%]
+........................................................................ [ 56%]
+........................................................................ [ 67%]
+...................................................................FF... [ 78%]
+........................................................................ [ 89%]
+................................ss...............................        [100%]
+=================================== FAILURES ===================================
+_ test_local_cancel_and_admission_have_one_serialized_winner[postgres-admission] _
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.StringDataRightTruncation: value too long for type character varying(192)
+
+The above exception was the direct cause of the following exception:
+tests/tools/test_local_admission_guard.py:59: in test_local_cancel_and_admission_have_one_serialized_winner
+    envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:122: in make_approval
+    return self.put_approval(grant, context=context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:86: in put_approval
+    return self.store.put_approval(grant)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/effects.py:451: in put_approval
+    session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1049: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   sqlalchemy.exc.DataError: (psycopg.errors.StringDataRightTruncation) value too long for type character varying(192)
+E   [SQL: INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, project_id, actor, integration_id, integration_version, operation, effect_key, max_effect_count, used_count, policy_version, created_at, constraints) VALUES (%(id)s::VARCHAR, %(payload_hash)s::VARCHAR, %(permitted_operation)s::VARCHAR, %(destination)s::VARCHAR, %(grantor)s::VARCHAR, %(expires_at)s::TIMESTAMP WITH TIME ZONE, %(revoked_at)s::TIMESTAMP WITH TIME ZONE, %(payload)s::JSONB, %(project_id)s::VARCHAR, %(actor)s::VARCHAR, %(integration_id)s::VARCHAR, %(integration_version)s::VARCHAR, %(operation)s::VARCHAR, %(effect_key)s::VARCHAR, %(max_effect_count)s::INTEGER, %(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)]
+E   [parameters: {'id': 'apr_ccf200bfa3894dc994b62b39f819d742', 'payload_hash': '7fbd9994ff0e6bd53cd8086530d25d61af579f5991174f6857fc5746f1342341', 'permitted_operation': 'local.sandbox.fs.write_text', 'destination': 'file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio2/effect.txt', 'grantor': 'operator', 'expires_at': datetime.datetime(2026, 9, 22, 17, 12, 27, 796347, tzinfo=datetime.timezone.utc), 'revoked_at': None, 'payload': Jsonb({}), 'project_id': 'local_race', 'actor': 'review', 'integration_id': 'local.sandbox', 'integration_version': '1', 'operation': 'fs.write_text', 'effect_key': 'local_race:local.sandbox:fs.write_text:file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio2/effect.txt:7fbd9994ff0e6bd53cd8086530d25d61af579f5991174f6857fc5746f1342341', 'max_effect_count': 1, 'used_count': 0, 'policy_version': 'v17-policy-1', 'created_at': datetime.datetime(2026, 9, 22, 17, 7, 27, 796356, tzinfo=datetime.timezone.utc), 'constraints': Jsonb({})}]
+E   (Background on this error at: https://sqlalche.me/e/20/9h9h)
+_ test_local_cancel_and_admission_have_one_serialized_winner[postgres-cancellation] _
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.StringDataRightTruncation: value too long for type character varying(192)
+
+The above exception was the direct cause of the following exception:
+tests/tools/test_local_admission_guard.py:59: in test_local_cancel_and_admission_have_one_serialized_winner
+    envelope.approval_id = gateway.make_approval(envelope, context=context).approval_id
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:122: in make_approval
+    return self.put_approval(grant, context=context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/v17_gateway.py:86: in put_approval
+    return self.store.put_approval(grant)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/swarm/tools/effects.py:451: in put_approval
+    session.flush()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4353: in flush
+    self._flush(objects)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py:4449: in _flush
+    flush_context.execute()
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:465: in execute
+    rec.execute(self)
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:94: in save_obj
+    _emit_insert_statements(
+.venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py:1049: in _emit_insert_statements
+    result = connection.execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1421: in execute
+    return meth(
+.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1848: in _execute_context
+    return self._exec_single_context(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+.venv/lib/python3.12/site-packages/psycopg/cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   sqlalchemy.exc.DataError: (psycopg.errors.StringDataRightTruncation) value too long for type character varying(192)
+E   [SQL: INSERT INTO approvals (id, payload_hash, permitted_operation, destination, grantor, expires_at, revoked_at, payload, project_id, actor, integration_id, integration_version, operation, effect_key, max_effect_count, used_count, policy_version, created_at, constraints) VALUES (%(id)s::VARCHAR, %(payload_hash)s::VARCHAR, %(permitted_operation)s::VARCHAR, %(destination)s::VARCHAR, %(grantor)s::VARCHAR, %(expires_at)s::TIMESTAMP WITH TIME ZONE, %(revoked_at)s::TIMESTAMP WITH TIME ZONE, %(payload)s::JSONB, %(project_id)s::VARCHAR, %(actor)s::VARCHAR, %(integration_id)s::VARCHAR, %(integration_version)s::VARCHAR, %(operation)s::VARCHAR, %(effect_key)s::VARCHAR, %(max_effect_count)s::INTEGER, %(used_count)s::INTEGER, %(policy_version)s::VARCHAR, %(created_at)s::TIMESTAMP WITH TIME ZONE, %(constraints)s::JSONB)]
+E   [parameters: {'id': 'apr_d40a939e71c7456488d3d01a0b8fa48f', 'payload_hash': '52473841b8b31108c37c9556f41aa676d5b89e6ef34d6c606504a6335152f565', 'permitted_operation': 'local.sandbox.fs.write_text', 'destination': 'file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio3/effect.txt', 'grantor': 'operator', 'expires_at': datetime.datetime(2026, 9, 22, 17, 12, 28, 29727, tzinfo=datetime.timezone.utc), 'revoked_at': None, 'payload': Jsonb({}), 'project_id': 'local_race', 'actor': 'review', 'integration_id': 'local.sandbox', 'integration_version': '1', 'operation': 'fs.write_text', 'effect_key': 'local_race:local.sandbox:fs.write_text:file:///private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-569/test_local_cancel_and_admissio3/effect.txt:52473841b8b31108c37c9556f41aa676d5b89e6ef34d6c606504a6335152f565', 'max_effect_count': 1, 'used_count': 0, 'policy_version': 'v17-policy-1', 'created_at': datetime.datetime(2026, 9, 22, 17, 7, 28, 29736, tzinfo=datetime.timezone.utc), 'constraints': Jsonb({})}]
+E   (Background on this error at: https://sqlalche.me/e/20/9h9h)
+=========================== short test summary info ============================
+SKIPPED [11] tests/live_fixture/test_fixture_service.py: live_local: SWARM_LIVE_LOCAL != 1
+SKIPPED [1] tests/ui/test_console.py:22: npm install not run
+SKIPPED [1] tests/ui/test_console.py:34: npm install not run
+2 failed, 626 passed, 13 skipped in 30.83s

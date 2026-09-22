@@ -1,0 +1,340 @@
+[
+  {
+    "run_id": 35759387329,
+    "jobs": {
+      "total_count": 3,
+      "jobs": [
+        {
+          "id": 106853284652,
+          "run_id": 35759387329,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759387329",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PO7LA",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853284652",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759387329/job/106853284652",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:32Z",
+          "started_at": "2026-09-22T17:14:32Z",
+          "completed_at": "2026-09-22T17:14:35Z",
+          "name": "live-gated",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853284652",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        },
+        {
+          "id": 106853284770,
+          "run_id": 35759387329,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759387329",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PO7og",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853284770",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759387329/job/106853284770",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:32Z",
+          "started_at": "2026-09-22T17:14:32Z",
+          "completed_at": "2026-09-22T17:14:35Z",
+          "name": "console",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853284770",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        },
+        {
+          "id": 106853284775,
+          "run_id": 35759387329,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759387329",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PO7pw",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853284775",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759387329/job/106853284775",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:32Z",
+          "started_at": "2026-09-22T17:14:32Z",
+          "completed_at": "2026-09-22T17:14:36Z",
+          "name": "offline",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853284775",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        }
+      ]
+    },
+    "annotations": {
+      "106853284652": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ],
+      "106853284770": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ],
+      "106853284775": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ]
+    }
+  },
+  {
+    "run_id": 35759392432,
+    "jobs": {
+      "total_count": 3,
+      "jobs": [
+        {
+          "id": 106853303409,
+          "run_id": 35759392432,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759392432",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PQEcQ",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853303409",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759392432/job/106853303409",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:35Z",
+          "started_at": "2026-09-22T17:14:35Z",
+          "completed_at": "2026-09-22T17:14:38Z",
+          "name": "live-gated",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853303409",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        },
+        {
+          "id": 106853303721,
+          "run_id": 35759392432,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759392432",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PQFqQ",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853303721",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759392432/job/106853303721",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:35Z",
+          "started_at": "2026-09-22T17:14:35Z",
+          "completed_at": "2026-09-22T17:14:38Z",
+          "name": "console",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853303721",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        },
+        {
+          "id": 106853303759,
+          "run_id": 35759392432,
+          "workflow_name": "ci",
+          "head_branch": "codex/swarm-r28d3-async-gateway-20260922",
+          "run_url": "https://api.github.com/repos/pri8771/swarmai/actions/runs/35759392432",
+          "run_attempt": 1,
+          "node_id": "CR_kwDOUifvss8AAAAY4PQFzw",
+          "head_sha": "fb58a751d40f1828990d7a0d687ad30de6eb6103",
+          "url": "https://api.github.com/repos/pri8771/swarmai/actions/jobs/106853303759",
+          "html_url": "https://github.com/pri8771/swarmai/actions/runs/35759392432/job/106853303759",
+          "status": "completed",
+          "conclusion": "failure",
+          "created_at": "2026-09-22T17:14:35Z",
+          "started_at": "2026-09-22T17:14:35Z",
+          "completed_at": "2026-09-22T17:14:38Z",
+          "name": "offline",
+          "steps": [],
+          "check_run_url": "https://api.github.com/repos/pri8771/swarmai/check-runs/106853303759",
+          "labels": [
+            "ubuntu-latest"
+          ],
+          "runner_id": 0,
+          "runner_name": "",
+          "runner_group_id": 0,
+          "runner_group_name": ""
+        }
+      ]
+    },
+    "annotations": {
+      "106853303409": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ],
+      "106853303721": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ],
+      "106853303759": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/pri8771/swarmai/blob/fb58a751d40f1828990d7a0d687ad30de6eb6103/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "notice",
+          "title": "",
+          "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\"",
+          "raw_details": ""
+        }
+      ]
+    }
+  }
+]
