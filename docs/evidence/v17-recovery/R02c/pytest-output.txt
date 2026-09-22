@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/swarmai-v17/.venv/bin/python
+rootdir: /Users/pchordia/swarmai-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/mission/test_r02c_targeted_edits.py::test_parse_and_apply_edit_blocks PASSED [ 14%]
+tests/mission/test_r02c_targeted_edits.py::test_echo_detection_and_new_test_path_rules PASSED [ 28%]
+tests/mission/test_r02c_targeted_edits.py::test_echo_is_reprompted_then_targeted_edit_and_new_test_land_in_diff PASSED [ 42%]
+tests/mission/test_r02c_targeted_edits.py::test_double_echo_is_no_material_diff_without_writing PASSED [ 57%]
+tests/mission/test_r02c_targeted_edits.py::test_unmatched_edit_block_is_reprompted_and_then_fails_honestly PASSED [ 71%]
+tests/mission/test_r02c_targeted_edits.py::test_rejected_new_test_path_is_not_written PASSED [ 85%]
+tests/mission/test_r02c_targeted_edits.py::test_targeted_fix_passes_the_defect_proof_gate_end_to_end PASSED [100%]
+
+============================== 7 passed in 1.00s ===============================

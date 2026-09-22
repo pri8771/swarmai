@@ -104,3 +104,9 @@ def remove_worktree(repo: Path, handle: WorktreeHandle, *, force: bool = True) -
 def worktree_diff(handle: WorktreeHandle) -> str:
     result = _run_git(handle.path, "diff", "--", ".", check=False)
     return result.stdout
+
+
+def intent_to_add(handle: WorktreeHandle, paths: list[str]) -> None:
+    """Register new files so `git diff` (and therefore the diff-based gates) can see them."""
+    if paths:
+        _run_git(handle.path, "add", "-N", "--", *paths, check=False)

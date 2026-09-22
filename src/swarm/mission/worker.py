@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import difflib
 import re
 import subprocess
 from dataclasses import dataclass, field
@@ -19,7 +20,12 @@ from swarm.mission.acceptance import (
     review_attempt,
 )
 from swarm.mission.inference import InferenceResult, local_chat
-from swarm.mission.worktree import WorktreeHandle, create_worktree, worktree_diff
+from swarm.mission.worktree import (
+    WorktreeHandle,
+    create_worktree,
+    intent_to_add,
+    worktree_diff,
+)
 
 # Known dogfood target inside the SwarmAI repo.
 OFF_BY_ONE_REL = Path("sandbox/selfdev_issue/parser_helper.py")
@@ -191,6 +197,153 @@ def _extract_python_file(text: str) -> str | None:
             body = _normalize_python_source(raw[start:])
             return body if _looks_like_python_source(body) else None
     return None
+
+
+# ---- R02c: targeted (diff-shaped) changes and echo detection -------------------------
+#
+# Full-file rewrites let a model "answer" by echoing the file back unchanged
+# (v14-real-006/008). The generic implement path therefore asks for SEARCH/REPLACE
+# edit blocks against the current file plus a NEW regression test file, detects an
+# echo before writing anything, and re-prompts once with an explicit note.
+
+_EDIT_BLOCK_RE = re.compile(
+    r"^###\s*EDIT\s+(?P<path>\S+)[ \t]*\n<{7} SEARCH\n(?P<search>.*?)\n={7}\n"
+    r"(?P<replace>.*?)\n>{7} REPLACE",
+    re.S | re.M,
+)
+_NEW_FILE_RE = re.compile(
+    r"^###\s*NEW\s+(?P<path>\S+)[ \t]*\n```(?:python)?[ \t]*\n(?P<body>.*?)\n```",
+    re.S | re.M,
+)
+_ECHO_RATIO = 0.995
+
+
+@dataclass
+class TargetedChange:
+    edits: list[tuple[str, str, str]] = field(default_factory=list)  # (path, search, replace)
+    new_files: dict[str, str] = field(default_factory=dict)
+
+
+def _parse_targeted_change(text: str) -> TargetedChange:
+    change = TargetedChange()
+    for m in _EDIT_BLOCK_RE.finditer(text or ""):
+        change.edits.append((m.group("path").strip(), m.group("search"), m.group("replace")))
+    for m in _NEW_FILE_RE.finditer(text or ""):
+        change.new_files[m.group("path").strip()] = m.group("body").rstrip("\n") + "\n"
+    return change
+
+
+def _apply_edit_blocks(
+    original: str, edits: list[tuple[str, str, str]]
+) -> tuple[str, list[str]]:
+    """Apply SEARCH/REPLACE blocks on whole lines; each SEARCH must match exactly once.
+
+    Matching is line-based (never substring) so `return valu` cannot silently match
+    inside `return value`; trailing whitespace per line is ignored.
+    """
+    lines = original.split("\n")
+    unmatched: list[str] = []
+    for _path, search, replace in edits:
+        needle = [ln.rstrip() for ln in search.strip("\n").split("\n")]
+        if not needle or needle == [""]:
+            unmatched.append(search[:160])
+            continue
+        hits = [
+            i
+            for i in range(len(lines) - len(needle) + 1)
+            if [ln.rstrip() for ln in lines[i : i + len(needle)]] == needle
+        ]
+        if len(hits) != 1:
+            unmatched.append(search[:160])
+            continue
+        start = hits[0]
+        replacement = replace.strip("\n").split("\n") if replace.strip("\n") else []
+        lines[start : start + len(needle)] = replacement
+    return "\n".join(lines), unmatched
+
+
+def _is_echo(original: str, patched: str | None) -> bool:
+    """The model returned the file (nearly) unchanged."""
+    if patched is None:
+        return False
+    a = _normalize_python_source(original).strip()
+    b = _normalize_python_source(_extract_python_file(patched) or patched).strip()
+    if a == b:
+        return True
+    return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio() >= _ECHO_RATIO
+
+
+def _valid_new_test_path(path: str) -> bool:
+    pure = Path(path)
+    return (
+        len(pure.parts) >= 2
+        and pure.parts[0] == "tests"
+        and ".." not in pure.parts
+        and not pure.is_absolute()
+        and pure.name.startswith("test_")
+        and pure.suffix == ".py"
+    )
+
+
+_TARGETED_SYSTEM = (
+    "You change code with small, exact edit blocks and you always add a regression test. "
+    "Never return the whole file. Copy SEARCH text verbatim from the current file."
+)
+
+
+def _targeted_prompt(target_rel: Path, goal: str, original: str, *, retry_note: str = "") -> str:
+    test_dir = target_rel.parts[-2] if len(target_rel.parts) > 1 else "unit"
+    return (
+        f"{retry_note}"
+        f"You are editing {target_rel} in a software mission.\n"
+        f"Goal: {goal}\n\n"
+        "Respond in EXACTLY this format and nothing else:\n\n"
+        f"### EDIT {target_rel}\n"
+        "<<<<<<< SEARCH\n"
+        "<lines copied verbatim from the current file>\n"
+        "=======\n"
+        "<replacement lines>\n"
+        ">>>>>>> REPLACE\n\n"
+        f"### NEW tests/{test_dir}/test_<short_name>.py\n"
+        "```python\n"
+        "<complete new regression test: FAILS on the current file, PASSES after your edit>\n"
+        "```\n\n"
+        "Rules: one or more EDIT blocks; each SEARCH must be copied verbatim from the current "
+        "file; do not return the whole file; the NEW test file is mandatory.\n\n"
+        f"Current file ({target_rel}):\n{original}"
+    )
+
+
+def _r02c_fields(
+    calls: list[InferenceResult],
+    edits_applied: int,
+    written_tests: list[str],
+    rejected_tests: list[str],
+    echo_detected: bool,
+    reprompted: bool,
+    unmatched: list[str],
+) -> dict[str, Any]:
+    return {
+        "inference_calls": len(calls),
+        "edit_blocks_applied": edits_applied,
+        "new_test_files": list(written_tests),
+        "rejected_new_files": list(rejected_tests),
+        "echo_detected": echo_detected,
+        "reprompted": reprompted,
+        "unmatched_edit_blocks": list(unmatched),
+    }
+
+
+def _merged_inference(calls: list[InferenceResult]) -> dict[str, Any] | None:
+    """Last call's record with token/cost totals across all calls of this attempt."""
+    if not calls:
+        return None
+    merged = calls[-1].to_dict()
+    merged["prompt_tokens"] = sum(int(c.prompt_tokens or 0) for c in calls)
+    merged["completion_tokens"] = sum(int(c.completion_tokens or 0) for c in calls)
+    merged["cost_usd"] = sum(float(c.cost_usd or 0.0) for c in calls)
+    merged["calls"] = len(calls)
+    return merged
 
 
 class RepoWorker:
@@ -497,35 +650,111 @@ class RepoWorker:
             require_inclusive = True
         else:
             goal = str(task.inputs.get("goal") or task.objective or "")
-            prompt = (
-                f"You are editing {target_rel} in a software mission. "
-                f"Goal: {goal}\n"
-                "Return ONLY the COMPLETE corrected file contents as valid Python. "
-                "Do not truncate. Do not omit trailing functions or classes. "
-                "Do not wrap the answer in commentary outside a single optional "
-                "```python fenced block.\n\n"
-                f"Current file:\n{original}"
-            )
+            prompt = ""
             require_inclusive = False
-        inference = self._chat(
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Return only complete, syntactically valid Python source for the "
-                        "entire file. Never truncate mid-function."
-                    ),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            model=self._model_for("implement"),
-            # Full-file rewrites need headroom; 800 often truncates mid-fence.
-            max_tokens=4096,
-        )
-        patched = _extract_python_file(inference.text) if inference.ok else None
+        calls: list[InferenceResult] = []
+        new_files: dict[str, str] = {}
+        edits_applied = 0
+        echo_detected = False
+        reprompted = False
+        unmatched: list[str] = []
+        patched: str | None = None
+        if self.parser_dogfood_fixture:
+            inference = self._chat(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Return only complete, syntactically valid Python source for the "
+                            "entire file. Never truncate mid-function."
+                        ),
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                model=self._model_for("implement"),
+                # Full-file rewrites need headroom; 800 often truncates mid-fence.
+                max_tokens=4096,
+            )
+            calls.append(inference)
+            patched = _extract_python_file(inference.text) if inference.ok else None
+        else:
+            # R02c: targeted edit blocks + mandatory new regression test; echo => one re-prompt.
+            retry_note = ""
+            for attempt in range(2):
+                inference = self._chat(
+                    messages=[
+                        {"role": "system", "content": _TARGETED_SYSTEM},
+                        {
+                            "role": "user",
+                            "content": _targeted_prompt(
+                                target_rel, goal, original, retry_note=retry_note
+                            ),
+                        },
+                    ],
+                    model=self._model_for("implement"),
+                    max_tokens=4096,
+                )
+                calls.append(inference)
+                if not inference.ok:
+                    break
+                change = _parse_targeted_change(inference.text)
+                if change.edits:
+                    candidate, unmatched = _apply_edit_blocks(original, change.edits)
+                    if not unmatched:
+                        patched = candidate
+                        edits_applied = len(change.edits)
+                        new_files = dict(change.new_files)
+                        break
+                    retry_note = (
+                        "Your previous EDIT blocks did not match the current file verbatim. "
+                        "Copy SEARCH lines exactly as they appear.\n\n"
+                    )
+                else:
+                    # Some models still answer with a whole file; accept it only if it
+                    # is not an echo of the current file.
+                    full = _extract_python_file(inference.text)
+                    if full is not None and not _is_echo(original, full):
+                        patched = full
+                        new_files = dict(change.new_files)
+                        break
+                    echo_detected = echo_detected or _is_echo(original, full)
+                    retry_note = (
+                        "Your previous answer repeated the file unchanged (no edit). Identify "
+                        "one concrete defect and return ONLY edit blocks plus the NEW test "
+                        "file.\n\n"
+                    )
+                if attempt == 0:
+                    reprompted = True
+            inference = calls[-1]
         # Operational path: never substitute a known-answer GOOD_FIX. Failed or
         # non-matching model output is a real failure for bounded repair/escalation.
         used_fallback = False
+        if patched is None and echo_detected:
+            # R02c: the model echoed the file back even after the explicit re-prompt.
+            # Nothing was written; this is a no-material-diff outcome, not a parse failure.
+            result = WorkerResult(
+                worker_id=self.worker_id,
+                task_id=task.id,
+                task_family="implement",
+                ok=False,
+                summary="implement_no_material_diff",
+                artifacts={
+                    "worktree": handle.to_dict(),
+                    "changed_files": [],
+                    "diff": "",
+                    "used_model_fallback": False,
+                    "known_answer_forbidden": True,
+                    "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                    "target_file": str(target_rel),
+                    "noop_or_untracked": True,
+                    "model_output_excerpt": (inference.text or "")[:500],
+                    **_r02c_fields(calls, 0, [], [], True, reprompted, unmatched),
+                },
+                inference=_merged_inference(calls),
+                cost_usd=sum(c.cost_usd for c in calls),
+                finished_at=utc_now().isoformat(),
+            )
+            return result, handle
         if patched is None or (require_inclusive and "end - start + 1" not in patched):
             result = WorkerResult(
                 worker_id=self.worker_id,
@@ -542,8 +771,10 @@ class RepoWorker:
                     "parser_dogfood_fixture": self.parser_dogfood_fixture,
                     "target_file": str(target_rel),
                     "model_output_excerpt": (inference.text or "")[:500],
+                    **_r02c_fields(calls, 0, [], [], echo_detected, reprompted, unmatched),
                 },
-                inference=inference.to_dict(),
+                inference=_merged_inference(calls),
+                cost_usd=sum(c.cost_usd for c in calls),
                 finished_at=utc_now().isoformat(),
             )
             return result, handle
@@ -563,8 +794,10 @@ class RepoWorker:
                     "parser_dogfood_fixture": self.parser_dogfood_fixture,
                     "target_file": str(target_rel),
                     "model_output_excerpt": (inference.text or "")[:500],
+                    **_r02c_fields(calls, 0, [], [], echo_detected, reprompted, unmatched),
                 },
-                inference=inference.to_dict(),
+                inference=_merged_inference(calls),
+                cost_usd=sum(c.cost_usd for c in calls),
                 finished_at=utc_now().isoformat(),
             )
             return result, handle
@@ -586,13 +819,38 @@ class RepoWorker:
                     "original_top_level_defs": sorted(_top_level_defs(original)),
                     "patched_top_level_defs": sorted(_top_level_defs(patched)),
                     "model_output_excerpt": (inference.text or "")[:500],
+                    **_r02c_fields(calls, 0, [], [], echo_detected, reprompted, unmatched),
                 },
-                inference=inference.to_dict(),
+                inference=_merged_inference(calls),
+                cost_usd=sum(c.cost_usd for c in calls),
                 finished_at=utc_now().isoformat(),
             )
             return result, handle
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(patched, encoding="utf-8")
+        written_tests: list[str] = []
+        rejected_tests: list[str] = []
+        for rel, body in new_files.items():
+            acceptable = (
+                _valid_new_test_path(rel) and _valid_python_syntax(body) and "def test_" in body
+            )
+            if not acceptable:
+                rejected_tests.append(rel)
+                continue
+            dest = handle.path / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(body, encoding="utf-8")
+            written_tests.append(rel)
+        intent_to_add(handle, written_tests)
+        r02c = _r02c_fields(
+            calls,
+            edits_applied,
+            written_tests,
+            rejected_tests,
+            echo_detected,
+            reprompted,
+            unmatched,
+        )
         # Material git diff is the sole authority for "work changed". In-memory
         # inequality or a write attempt must never count as success alone.
         diff = worktree_diff(handle)
@@ -615,9 +873,10 @@ class RepoWorker:
                     "target_file": str(target_rel),
                     "noop_or_untracked": patched == original,
                     "model_output_excerpt": (inference.text or "")[:500],
+                    **r02c,
                 },
-                inference=inference.to_dict(),
-                cost_usd=inference.cost_usd,
+                inference=_merged_inference(calls),
+                cost_usd=sum(c.cost_usd for c in calls),
                 finished_at=utc_now().isoformat(),
             )
             return result, handle
@@ -629,14 +888,15 @@ class RepoWorker:
             summary="implement_applied",
             artifacts={
                 "worktree": handle.to_dict(),
-                "changed_files": [str(target_rel)],
+                "changed_files": [str(target_rel), *written_tests],
                 "diff": diff[-12000:],
                 "used_model_fallback": used_fallback,
                 "known_answer_forbidden": True,
                 "parser_dogfood_fixture": self.parser_dogfood_fixture,
+                **r02c,
             },
-            inference=inference.to_dict(),
-            cost_usd=inference.cost_usd,
+            inference=_merged_inference(calls),
+            cost_usd=sum(c.cost_usd for c in calls),
             finished_at=utc_now().isoformat(),
         )
         return result, handle
