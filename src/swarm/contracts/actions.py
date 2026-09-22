@@ -49,23 +49,24 @@ class ActionEnvelope(StrictModel):
     approval_id: str | None = None
     created_at: datetime = Field(default_factory=utc_now)
     timeout_seconds: int = 30
+    # Gateway-owned runtime correlation; never serialized as logical action identity.
+    execution_attempt: int | None = Field(default=None, exclude=True)
+
+    def canonical_payload_hash(self) -> str:
+        """Hash only the logical approval-bound payload and destination."""
+        return payload_hash(
+            {
+                "integration": f"{self.integration_id}@{self.integration_version}",
+                "operation": self.operation,
+                "destination": self.destination,
+                "payload": dict(self.normalized_payload),
+            }
+        )
 
     def ensure_hashes(self) -> ActionEnvelope:
         """Fill payload_hash / effect_key / idempotency_key when empty."""
-        data = dict(self.normalized_payload)
         if not self.payload_hash:
-            object.__setattr__(
-                self,
-                "payload_hash",
-                payload_hash(
-                    {
-                        "integration": f"{self.integration_id}@{self.integration_version}",
-                        "operation": self.operation,
-                        "destination": self.destination,
-                        "payload": data,
-                    }
-                ),
-            )
+            object.__setattr__(self, "payload_hash", self.canonical_payload_hash())
         if not self.effect_key:
             object.__setattr__(
                 self,

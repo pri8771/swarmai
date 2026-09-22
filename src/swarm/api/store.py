@@ -18,13 +18,13 @@ from swarm.contracts.provider import ProviderAccount, RouteSnapshot
 from swarm.contracts.workspace import Approval, EventEnvelope, WorkerLease
 from swarm.controller.mission import MissionController
 from swarm.evals.profiles import ProfileStore
-from swarm.mission.store import MissionRecord, MissionStore
 from swarm.mission.action_boundary import local_worktree_gateway
-from swarm.tools.fences import ActorContext
+from swarm.mission.store import MissionRecord, MissionStore
 from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
 from swarm.product.history import HistoryIndex
 from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
 from swarm.providers.catalog import list_providers
+from swarm.tools.fences import ActorContext
 from swarm.workers.registry import WorkerRegistryService
 
 
@@ -87,9 +87,7 @@ class ProductStore:
             self._mission_store = MissionStore(root)
         return self._mission_store
 
-    def operational_mission_broker(
-        self, *, models: list[str] | None = None
-    ) -> Any:
+    def operational_mission_broker(self, *, models: list[str] | None = None) -> Any:
         """Reuse the existing governed local mission broker (no second broker)."""
         from swarm.mission.brokered_inference import build_local_mission_broker
 
@@ -106,9 +104,7 @@ class ProductStore:
     def history_index(self) -> HistoryIndex:
         return HistoryIndex(self.repo_root or Path.cwd())
 
-    def _persist_mission_record(
-        self, mission: Mission, *, source: str = "api"
-    ) -> MissionRecord:
+    def _persist_mission_record(self, mission: Mission, *, source: str = "api") -> MissionRecord:
         store = self.mission_store()
         existing: MissionRecord | None = None
         path = store._path(mission.id)
@@ -377,9 +373,7 @@ class ProductStore:
         # Backward-compatible bare-key lookup only when scope omitted (legacy callers).
         if actor is None or project_id is None or operation is None:
             return self.idempotency.get(key)
-        scoped = self._idem_key(
-            actor=actor, project_id=project_id, operation=operation, key=key
-        )
+        scoped = self._idem_key(actor=actor, project_id=project_id, operation=operation, key=key)
         entry = self.idempotency.get(scoped)
         if entry is None:
             return None
@@ -406,9 +400,7 @@ class ProductStore:
         if actor is None or project_id is None or operation is None:
             self.idempotency[key] = body
             return body
-        scoped = self._idem_key(
-            actor=actor, project_id=project_id, operation=operation, key=key
-        )
+        scoped = self._idem_key(actor=actor, project_id=project_id, operation=operation, key=key)
         self.idempotency[scoped] = {
             "request_digest": request_digest,
             "body": body,
@@ -1019,9 +1011,7 @@ class ProductStore:
             capabilities=capabilities,
             labels=["api"],
         )
-        registered = await self.workers.register(
-            lease, token=token, project_id=project_id
-        )
+        registered = await self.workers.register(lease, token=token, project_id=project_id)
         rec = self.workers._workers[registered.worker_id]
         rec.privacy_classes = set(privacy_classes)
         rec.named_inference_urls = list(named_inference_urls or [])
