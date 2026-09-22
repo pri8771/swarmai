@@ -17,6 +17,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest, manifest_digest
 from swarm.tools.v17_gateway import ConsequentialToolGateway, ReconciliationRequiredError
 from tests.integration.db.effect_fixtures import bind_lease
 
@@ -25,6 +26,7 @@ def _registry(adapter):
     registry = AdapterRegistry()
     registry.register(adapter)
     return registry
+
 
 pytestmark = pytest.mark.integration
 
@@ -89,7 +91,9 @@ def _context(project: str) -> ActorContext:
 
 async def _execute_once(factory, project: str, body: str):
     """Approve + execute one consequential MCP echo; return (envelope, receipt, adapter)."""
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gateway(adapter, store, project)
     env = adapter.normalize(
@@ -103,12 +107,14 @@ async def _execute_once(factory, project: str, body: str):
 
 @pytest.mark.asyncio
 async def test_receipt_survives_new_repository_instance(factory) -> None:
-    env, receipt, _ = await _execute_once(factory, "proj_a", "r27a-durable")
+    env, receipt, adapter = await _execute_once(factory, "proj_a", "r27a-durable")
     assert receipt.outcome == "succeeded"
+    assert receipt.manifest_digest == manifest_digest(adapter.manifest)
     fresh = DurableEffectRepository(factory)
     again = fresh.get_receipt(env.action_id)
     assert again is not None
     assert again.receipt_id == receipt.receipt_id
+    assert again.manifest_digest == receipt.manifest_digest
     assert again.attempt_number == 1
     listed = fresh.list_receipts(project_id="proj_a", effect_key=env.effect_key)
     assert [r.receipt_id for r in listed] == [receipt.receipt_id]
@@ -118,7 +124,9 @@ async def test_receipt_survives_new_repository_instance(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gateway(adapter, store, "proj_a")
     req = {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay"}
@@ -200,7 +208,9 @@ async def test_succeeded_effect_without_receipt_fails_closed(engine, factory) ->
     env, receipt, _ = await _execute_once(factory, "proj_a", "orphan-succeeded")
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM action_receipts"))
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gateway(adapter, store, "proj_a")
     env2 = adapter.normalize(

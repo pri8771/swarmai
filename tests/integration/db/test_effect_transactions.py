@@ -30,6 +30,7 @@ from swarm.tools.fences import (
     StaticFenceProvider,
     StaticPolicyProvider,
 )
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
 from tests.integration.db.effect_fixtures import bind_lease
@@ -39,6 +40,7 @@ def _registry(adapter):
     registry = AdapterRegistry()
     registry.register(adapter)
     return registry
+
 
 pytestmark = pytest.mark.integration
 
@@ -74,6 +76,9 @@ def factory(engine):
 
 
 class RaisingAdapter(ApiMcpAdapter):
+    def __init__(self) -> None:
+        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
+
     def execute(self, envelope: ActionEnvelope) -> dict[str, Any]:
         self._calls.append({"effect_key": envelope.effect_key})
         raise AdapterNotSentError("transport_not_started")
@@ -109,7 +114,9 @@ def _used_count(factory, approval_id: str) -> int:
 
 @pytest.mark.asyncio
 async def test_reservation_visible_to_second_process_before_execute(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-process"}
@@ -143,7 +150,9 @@ async def test_reservation_visible_to_second_process_before_execute(factory) -> 
 
 
 def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     base = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "one-shot"}
@@ -180,7 +189,9 @@ def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
     def run(index: int) -> None:
         import asyncio
 
-        own_adapter = ApiMcpAdapter()
+        own_adapter = ApiMcpAdapter(
+            load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+        )
         own_gw = _gateway(own_adapter, factory)
         barrier.wait(timeout=10)
         try:
@@ -221,7 +232,9 @@ async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> 
         )
         == "not_applied"
     )
-    working = ApiMcpAdapter()
+    working = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw2 = _gateway(working, factory)
     second = await gw2.execute_envelope(env, context=_context())
     assert second.outcome == "succeeded"
@@ -257,7 +270,9 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
             "UPDATE approvals SET expires_at=now() - interval '1 second' WHERE id=:a",
             a=env.approval_id,
         )
-    working = ApiMcpAdapter()
+    working = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw2 = _gateway(working, factory)
     with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
         await gw2.execute_envelope(env, context=_context())
@@ -268,7 +283,9 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
 
 @pytest.mark.asyncio
 async def test_denied_request_leaves_no_effect_row(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     approved = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "approved-body"}
@@ -289,7 +306,9 @@ async def test_denied_request_leaves_no_effect_row(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_replay_of_succeeded_effect_works_after_approval_expiry(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay-expired"}
@@ -331,6 +350,7 @@ def test_finalize_state_conflict_when_not_executing(factory) -> None:
         project_id="proj_a",
         integration_id="mcp.echo",
         integration_version="1",
+        manifest_digest="0" * 64,
         operation="echo",
         destination=env.destination,
         outcome="succeeded",
@@ -432,7 +452,9 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
         == "not_applied"
     )
 
-    working = ApiMcpAdapter()
+    working = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gateway_b = _gateway(working, factory)
     grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
     envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
@@ -460,7 +482,9 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
 
     # B was deliberately unbound to an effect key, so this denial proves exhaustion,
     # rather than approval_effect_key_mismatch. No adapter call may occur.
-    other_adapter = ApiMcpAdapter()
+    other_adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     other_gateway = _gateway(other_adapter, factory)
     other = envelope_b.model_copy(
         update={
@@ -500,7 +524,9 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
         == "not_applied"
     )
 
-    adapter_b = ApiMcpAdapter()
+    adapter_b = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gateway_b = _gateway(adapter_b, factory)
     grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
     if how == "revoked":
@@ -529,7 +555,9 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
 @pytest.mark.asyncio
 async def test_in_memory_already_executing_does_not_consume_replacement_grant() -> None:
     store = InMemoryEffectStore()
-    first_adapter = ApiMcpAdapter()
+    first_adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gateway_a = ConsequentialToolGateway(
         registry=_registry(first_adapter),
         store=store,
@@ -551,7 +579,9 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
     store.begin_execution(envelope_a, executor_id="exe_first")
     assert store.get_approval(grant_a.approval_id, project_id="proj_a").used_count == 1
 
-    second_adapter = ApiMcpAdapter()
+    second_adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gateway_b = ConsequentialToolGateway(
         registry=_registry(second_adapter),
         store=store,
@@ -600,7 +630,9 @@ async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
 
 
 def test_durable_busy_effect_rolls_back_replacement_approval_and_ledger(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gateway = _gateway(adapter, factory)
     env = adapter.normalize({"project_id": "proj_a", "body": "busy-durable-rollback"})
     env = bind_lease(factory, env)

@@ -15,6 +15,7 @@ from swarm.db.models import Base
 from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
+from swarm.tools.manifests import manifest_digest
 from swarm.tools.v17_gateway import (
     ApprovalInvalidError,
     ConsequentialToolGateway,
@@ -28,6 +29,7 @@ def _registry(adapter):
     registry = AdapterRegistry()
     registry.register(adapter)
     return registry
+
 
 pytestmark = pytest.mark.integration
 DATABASE_URL = os.environ.get(
@@ -264,7 +266,8 @@ async def test_reconciliation_does_not_restore_revoked_approval(factory, tmp_pat
 
 @pytest.mark.parametrize("new_attempt", [False, True])
 def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_path, new_attempt):
-    _, _, store, gateway, env = setup_effect(factory, tmp_path)
+    _, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+    manifest_hash = manifest_digest(adapter.manifest)
     old = begin(store, env)
     age(factory, env)
     assert recover(store, env)
@@ -278,12 +281,21 @@ def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_p
             state_reason="not_applied",
             pre={},
             post={"state": "not_applied"},
+            manifest_hash=manifest_hash,
         )
         store.begin_execution(env, executor_id="executor_new")
     before = row(store, env)
     receipts_before = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
     with pytest.raises(EffectConflictError, match="finalize_state_conflict"):
-        gateway._finalize(env, old, state="succeeded", outcome="succeeded", pre={}, post={})
+        gateway._finalize(
+            env,
+            old,
+            state="succeeded",
+            outcome="succeeded",
+            pre={},
+            post={},
+            manifest_hash=manifest_hash,
+        )
     with pytest.raises(EffectConflictError, match="pre_observation_state_conflict"):
         store.attach_pre_observation(
             project_id=env.project_id,
@@ -398,6 +410,7 @@ def test_public_repository_rejects_missing_execution_token(factory, tmp_path):
         project_id=env.project_id,
         integration_id=env.integration_id,
         integration_version=env.integration_version,
+        manifest_digest="0" * 64,
         operation=env.operation,
         destination=env.destination,
         outcome="succeeded",

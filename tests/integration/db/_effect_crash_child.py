@@ -13,6 +13,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -24,7 +25,7 @@ def _registry(adapter):
 
 class FileEffectAdapter(ApiMcpAdapter):
     def __init__(self, path: str, crash: str | None = None) -> None:
-        super().__init__()
+        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
         self.path = Path(path)
         self.crash = crash
         self.reconcile_calls = 0

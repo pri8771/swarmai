@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from swarm.contracts.common import StrictModel, new_id, payload_hash, utc_now
 
@@ -119,6 +119,7 @@ class ActionReceiptV17(StrictModel):
     project_id: str
     integration_id: str
     integration_version: str
+    manifest_digest: str
     operation: str
     destination: str
     pre_observation: dict[str, Any] = Field(default_factory=dict)
@@ -149,20 +150,26 @@ class AdapterManifest(StrictModel):
     schema_version: str = "1.0"
     integration_id: str
     integration_version: str
-    adapter_class: Literal["local_sandbox", "api_mcp", "browser_session"]
+    adapter_class: Literal[
+        "local_sandbox", "api_mcp", "browser_session", "http_api", "http_session"
+    ]
     operations: dict[str, OperationDecl] = Field(default_factory=dict)
     read_data_classes: list[str] = Field(default_factory=list)
     write_data_classes: list[str] = Field(default_factory=list)
-    scopes: list[str] = Field(default_factory=list)
-    secrets_required: list[str] = Field(default_factory=list)
-    network_allowed: bool = False
-    filesystem_allowed: bool = False
-    filesystem_roots: list[str] = Field(default_factory=list)
-    side_effect_class: SideEffectClass = "none"
+    secrets_refs_required: list[str] = Field(default_factory=list)
+    network_scopes: list[str] = Field(default_factory=list)
+    filesystem_scopes: list[str] = Field(default_factory=list)
     risk_class: RiskClass = "low"
     sandbox_required: bool = False
     host_requirements: list[str] = Field(default_factory=list)
     user_interaction_consequential: bool = False
+
+    @model_validator(mode="after")
+    def operation_risk_ceiling(self) -> AdapterManifest:
+        rank = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+        if any(rank[op.risk_class] > rank[self.risk_class] for op in self.operations.values()):
+            raise ValueError("operation_risk_exceeds_manifest")
+        return self
 
 
 class BrowserSessionRef(StrictModel):

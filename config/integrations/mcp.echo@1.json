@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "integration_id": "mcp.echo",
+  "integration_version": "1",
+  "adapter_class": "api_mcp",
+  "operations": {
+    "echo": {
+      "side_effect_class": "consequential",
+      "risk_class": "medium",
+      "scopes": [
+        "network.https",
+        "mcp.call"
+      ],
+      "read_data_classes": [
+        "remote_resource"
+      ],
+      "write_data_classes": [
+        "remote_resource"
+      ]
+    }
+  },
+  "read_data_classes": [
+    "remote_resource"
+  ],
+  "write_data_classes": [
+    "remote_resource"
+  ],
+  "network_scopes": [
+    "mcp://echo"
+  ],
+  "filesystem_scopes": [],
+  "secrets_refs_required": [
+    "mcp_token_ref"
+  ],
+  "risk_class": "medium",
+  "sandbox_required": false,
+  "host_requirements": [],
+  "user_interaction_consequential": false
+}

@@ -323,4 +323,4 @@ async def test_direct_v17_legacy_network_operation_retains_network_scope(factory
     with pytest.raises(ToolAuthorizationError, match="denied_scopes.*network"):
         await gateway.execute_envelope(envelope, context=context)
     assert calls == []
-    assert adapter.manifest.network_allowed is True
+    assert adapter.manifest.network_scopes

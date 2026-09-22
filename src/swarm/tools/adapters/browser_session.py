@@ -9,54 +9,22 @@ from swarm.contracts.actions import (
     ActionReceiptV17,
     AdapterManifest,
     BrowserSessionRef,
-    OperationDecl,
 )
 from swarm.contracts.common import utc_now
 
 
 class BrowserSessionAdapter:
-    def __init__(self) -> None:
+    def __init__(self, manifest: AdapterManifest) -> None:
         self.sessions: dict[str, BrowserSessionRef] = {}
         self._submitted: set[str] = set()
-        self.manifest = AdapterManifest(
-            integration_id="browser.session",
-            integration_version="1.0",
-            adapter_class="browser_session",
-            operations={
-                "navigate": OperationDecl(
-                    side_effect_class="none",
-                    risk_class="low",
-                    scopes=["browser.session"],
-                    read_data_classes=["page_dom"],
-                    write_data_classes=[],
-                ),
-                "submit": OperationDecl(
-                    side_effect_class="consequential",
-                    risk_class="high",
-                    scopes=["browser.session"],
-                    read_data_classes=["page_dom"],
-                    write_data_classes=["form_submit"],
-                ),
-            },
-            read_data_classes=["page_dom"],
-            write_data_classes=["form_submit"],
-            scopes=["browser.session"],
-            secrets_required=[],  # cookies/credentials never in Git / never in envelope
-            network_allowed=True,
-            filesystem_allowed=False,
-            side_effect_class="consequential",
-            risk_class="high",
-            sandbox_required=False,
-            user_interaction_consequential=True,
-            host_requirements=["browser_runtime"],
-        )
+        if manifest.adapter_class != "browser_session":
+            raise ValueError("adapter_class_mismatch")
+        self.manifest = AdapterManifest.model_validate(manifest.model_dump())
 
     def normalize(self, request: dict[str, Any]) -> ActionEnvelope:
         dest = str(request.get("destination") or request.get("intended_destination") or "")
         operation = str(request.get("operation", "navigate"))
-        # Navigation/recovery is non-submitting; submit remains consequential.
-        side = "none" if operation == "navigate" else self.manifest.side_effect_class
-        risk = "low" if operation == "navigate" else self.manifest.risk_class
+        declaration = self.manifest.operations[operation]
         env = ActionEnvelope(
             project_id=str(request["project_id"]),
             actor=str(request.get("actor", "worker")),
@@ -70,9 +38,9 @@ class BrowserSessionAdapter:
                 "site_origin": str(request.get("site_origin", "https://example.test")),
                 "form": dict(request.get("form") or {}),
             },
-            requested_scopes=list(self.manifest.scopes),
-            side_effect_class=side,
-            risk_class=risk,
+            requested_scopes=list(declaration.scopes),
+            side_effect_class=declaration.side_effect_class,
+            risk_class=declaration.risk_class,
             lease_generation=request.get("lease_generation"),
             cancellation_generation=request.get("cancellation_generation"),
             policy_version=str(request.get("policy_version", "v17-policy-1")),

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest, OperationDecl
+from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest
 from swarm.contracts.common import new_id, utc_now
 
 
@@ -14,34 +14,15 @@ class ApiMcpAdapter:
 
     def __init__(
         self,
+        manifest: AdapterManifest,
         *,
         transport: Callable[[str, dict[str, Any]], dict[str, Any]] | None = None,
     ) -> None:
         self._transport = transport or self._default_transport
         self._calls: list[dict[str, Any]] = []
-        self.manifest = AdapterManifest(
-            integration_id="api.mcp.echo",
-            integration_version="1.0",
-            adapter_class="api_mcp",
-            operations={
-                "echo": OperationDecl(
-                    side_effect_class="consequential",
-                    risk_class="medium",
-                    scopes=["network.https", "mcp.call"],
-                    read_data_classes=["remote_resource"],
-                    write_data_classes=["remote_resource"],
-                )
-            },
-            read_data_classes=["remote_resource"],
-            write_data_classes=["remote_resource"],
-            scopes=["network.https", "mcp.call"],
-            secrets_required=["mcp_token_ref"],
-            network_allowed=True,
-            filesystem_allowed=False,
-            side_effect_class="consequential",
-            risk_class="medium",
-            sandbox_required=False,
-        )
+        if manifest.adapter_class != "api_mcp":
+            raise ValueError("adapter_class_mismatch")
+        self.manifest = AdapterManifest.model_validate(manifest.model_dump())
 
     @staticmethod
     def _default_transport(operation: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -56,20 +37,22 @@ class ApiMcpAdapter:
 
     def normalize(self, request: dict[str, Any]) -> ActionEnvelope:
         dest = str(request.get("destination") or "mcp://echo/default")
+        operation = str(request.get("operation", "echo"))
+        declaration = self.manifest.operations[operation]
         env = ActionEnvelope(
             project_id=str(request["project_id"]),
             actor=str(request.get("actor", "worker")),
             integration_id=self.manifest.integration_id,
             integration_version=self.manifest.integration_version,
-            operation=str(request.get("operation", "echo")),
+            operation=operation,
             destination=dest,
             normalized_payload={
                 "body": request.get("body"),
                 "force_unknown": bool(request.get("force_unknown", False)),
             },
-            requested_scopes=list(self.manifest.scopes),
-            side_effect_class=self.manifest.side_effect_class,
-            risk_class=self.manifest.risk_class,
+            requested_scopes=list(declaration.scopes),
+            side_effect_class=declaration.side_effect_class,
+            risk_class=declaration.risk_class,
             lease_generation=request.get("lease_generation"),
             cancellation_generation=request.get("cancellation_generation"),
             policy_version=str(request.get("policy_version", "v17-policy-1")),

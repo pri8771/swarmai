@@ -188,6 +188,7 @@ def _failed_receipt(env: ActionEnvelope, effect_id: str) -> ActionReceiptV17:
         project_id=env.project_id,
         integration_id=env.integration_id,
         integration_version=env.integration_version,
+        manifest_digest="0" * 64,
         operation=env.operation,
         destination=env.destination,
         outcome="failed",

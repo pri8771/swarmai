@@ -22,6 +22,7 @@ from swarm.tools.fences import (
     StaticFenceProvider,
     StaticPolicyProvider,
 )
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import (
     ConsequentialToolGateway,
     ReconciliationRequiredError,
@@ -44,7 +45,7 @@ def effect_store(request):
 
 class ResultAdapter(ApiMcpAdapter):
     def __init__(self, result=None, error=None):
-        super().__init__()
+        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
         self.result = result
         self.error = error
         self.pre_calls = 0
@@ -69,7 +70,6 @@ class ResultAdapter(ApiMcpAdapter):
 
 def setup(adapter, store, timeout=1):
     # No-effect unit fixtures are explicit. Consequential semantics use real PG.
-    adapter.manifest.side_effect_class = "consequential" if store.durable else "none"
     if not store.durable:
         adapter.manifest.operations["echo"].side_effect_class = "none"
         adapter.manifest.operations["echo"].risk_class = "low"
@@ -241,7 +241,7 @@ async def test_post_observation_error_keeps_execute_outcome(effect_store):
 @pytest.mark.parametrize("side_effect_class", ["consequential", "irreversible"])
 async def test_consequential_with_in_memory_store_denied_before_execute(side_effect_class):
     adapter = ResultAdapter({"outcome": "succeeded"})
-    adapter.manifest.side_effect_class = side_effect_class
+    adapter.manifest.operations["echo"].side_effect_class = side_effect_class
     store = InMemoryEffectStore()
     gateway = ConsequentialToolGateway(
         registry=_registry(adapter),
@@ -263,14 +263,20 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
 def test_gateway_requires_store_argument():
     with pytest.raises(TypeError):
         ConsequentialToolGateway(
-            registry=_registry(ApiMcpAdapter()),
+            registry=_registry(
+                ApiMcpAdapter(
+                    load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+                )
+            ),
             fences=StaticFenceProvider(1, 0),
             policy=StaticPolicyProvider(set(), "v17-policy-1"),
         )
 
 
 def test_echo_adapter_reconcile_never_claims_not_applied():
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = adapter.normalize(
         {"project_id": "r28a", "lease_generation": 1, "cancellation_generation": 0}
     )

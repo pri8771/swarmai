@@ -216,10 +216,9 @@ class LegacyToolCallAdapter:
             integration_version="1",
             adapter_class="local_sandbox",
             operations=operations,
-            network_allowed=any(
-                spec.network and spec.side_effecting for spec in registry.tools.values()
-            ),
-            side_effect_class="consequential",
+            network_scopes=["*"]
+            if any(spec.network and spec.side_effecting for spec in registry.tools.values())
+            else [],
             risk_class="medium",
         )
 

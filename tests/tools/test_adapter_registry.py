@@ -47,8 +47,6 @@ class ReadOnlyAdapter:
                 )
             },
             read_data_classes=["fixture"],
-            scopes=[f"read.{integration_id}"],
-            side_effect_class="none",
             risk_class="low",
         )
 

@@ -11,6 +11,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import ConsequentialToolGateway
 
 
@@ -24,7 +25,7 @@ class PausingAdapter(ApiMcpAdapter):
     """Signals `started` once inside execute(), then blocks until `release`."""
 
     def __init__(self, started: Any, release: Any) -> None:
-        super().__init__()
+        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
         self._started = started
         self._release = release
 

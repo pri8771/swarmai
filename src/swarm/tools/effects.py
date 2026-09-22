@@ -807,7 +807,7 @@ class DurableEffectRepository:
                 )
                 .limit(1)
             )
-            return None if row is None else ActionReceiptV17.model_validate(row.receipt)
+            return None if row is None else _receipt_from_payload(row.receipt)
 
     def list_receipts(self, *, project_id: str, effect_key: str) -> list[ActionReceiptV17]:
         with session_scope(self.factory) as session:
@@ -819,7 +819,7 @@ class DurableEffectRepository:
                 )
                 .order_by(ActionReceiptRow.attempt_number.asc())
             )
-            return [ActionReceiptV17.model_validate(r.receipt) for r in rows]
+            return [_receipt_from_payload(r.receipt) for r in rows]
 
     def terminal_receipt(self, *, project_id: str, effect_key: str) -> ActionReceiptV17 | None:
         with session_scope(self.factory) as session:
@@ -833,10 +833,17 @@ class DurableEffectRepository:
                 .order_by(ActionReceiptRow.attempt_number.desc())
                 .limit(1)
             )
-            return None if row is None else ActionReceiptV17.model_validate(row.receipt)
+            return None if row is None else _receipt_from_payload(row.receipt)
 
 
 # ---- transaction-internal helpers (take an open Session; never commit)
+
+
+def _receipt_from_payload(payload: dict[str, Any]) -> ActionReceiptV17:
+    """Read old JSONB honestly without inventing or backfilling a manifest binding."""
+    if "manifest_digest" not in payload:
+        payload = {**payload, "manifest_digest": "historical-unbound"}
+    return ActionReceiptV17.model_validate(payload)
 
 
 def _require_row(
