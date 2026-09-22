@@ -76,6 +76,9 @@ def factory(engine):
 
 
 class RaisingAdapter(ApiMcpAdapter):
+    def __init__(self) -> None:
+        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
+
     def execute(self, envelope: ActionEnvelope) -> dict[str, Any]:
         self._calls.append({"effect_key": envelope.effect_key})
         raise AdapterNotSentError("transport_not_started")
