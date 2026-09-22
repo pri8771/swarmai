@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `939ab596c578b083b11aa465ae6ae894d81c2905`
-- Coordination SHA: `be1d0c592c7fb6c1bfdeffd7bbc234fec3965cc3`
-- Updated: `2026-09-22T00:38:24Z`
-- Trigger: `scheduler`
+- Branch SHA: `0130105e826f02d5e2a5809072712fc310b96274`
+- Coordination SHA: `b74227a9e7e6b03449cec2b107181534d29da927`
+- Updated: `2026-09-22T00:40:29Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `R27b`
+- Current packet: `R27c`
 - Current artifact: `ART-V17-APPROVAL-BINDING`
-- Last meaningful activity: `2026-09-22T00:37:52Z`
+- Last meaningful activity: `2026-09-22T00:40:28Z`
 - Spend USD: `0.0`
 - Blocker: EXT-ACTIONS-BILLING (apply coordination ci patch first); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST
 
 ## Update
 
-R27a impl_complete: pushed 0505c24 (feat) + 939ab59 (receipt bind). action_receipts migration a17effect004b0001, insert-only receipts, replay returns original receipt. 6 integration tests + full suite 400 passed/2 skipped on real Postgres. Starting R27b atomic reserve/CAS.
+R27b impl_complete: pushed d3a7b56 (feat) + 0130105 (bind). Atomic INSERT..ON CONFLICT reserve, single-winner UPDATE..RETURNING CAS, effect_key binding mismatch. 7 tests x5 green on real Postgres; full suite 407 passed/2 skipped. Starting R27c repository-owned transactions.
 
 ## Next
 
-R27b atomic reserve + compare-and-swap execute
+R27c begin_execution transaction + atomic approval consumption (review hold before R27e)
