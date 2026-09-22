@@ -1,0 +1,14 @@
+{
+  "checkpoint": "CP3",
+  "run_id": "cp3-20260922T020141Z",
+  "packet": "R17a",
+  "artifact": "ART-V15-RECOVERY-EVIDENCE",
+  "source_sha": "e53da7305d138658edfb9bd8f47ebbd140a40a63",
+  "worktree_clean": true,
+  "started_at": "2026-09-22T02:01:41.051170+00:00",
+  "finished_at": "2026-09-22T02:01:59.824531+00:00",
+  "result": "pass",
+  "spend_usd": 0.0,
+  "self_accept": false,
+  "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host"
+}

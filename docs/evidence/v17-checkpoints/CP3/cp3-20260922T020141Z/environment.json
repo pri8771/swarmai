@@ -1,0 +1,9 @@
+{
+  "env_var_names_used": [
+    "SWARM_DATABASE_URL",
+    "CP3_RUN_ID"
+  ],
+  "python": "3.12.13",
+  "platform": "darwin",
+  "database": "PostgreSQL via SWARM_DATABASE_URL (value not recorded)"
+}
