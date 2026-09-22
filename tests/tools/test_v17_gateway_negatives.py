@@ -11,6 +11,7 @@ from tests.integration.db.test_effect_transactions import factory as factory
 
 from swarm.contracts.actions import BrowserSessionRef
 from swarm.db.lease_fencing import LeaseLifecycleService
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters import ApiMcpAdapter, BrowserSessionAdapter, LocalSandboxAdapter
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
 from swarm.tools.fences import (
@@ -30,9 +31,15 @@ from swarm.tools.v17_gateway import (
 )
 
 
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
+
+
 def _gw(adapter, *, project: str, scopes: set[str], store, lease: int = 1, cancel: int = 0):
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=(
             LeaseFenceProvider(store.factory)
@@ -450,6 +457,8 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
             "lease_generation": 1,
             "cancellation_generation": 0,
         },
+        integration_id=local.manifest.integration_id,
+        integration_version=local.manifest.integration_version,
         context=_context(),
     )
     env_api = api.normalize(

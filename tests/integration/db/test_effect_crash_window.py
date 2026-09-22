@@ -12,6 +12,7 @@ from sqlalchemy import text
 
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import (
@@ -21,6 +22,12 @@ from swarm.tools.v17_gateway import (
 )
 from tests.integration.db._effect_crash_child import FileEffectAdapter, run_crash
 from tests.integration.db.effect_fixtures import bind_lease
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 pytestmark = pytest.mark.integration
 DATABASE_URL = os.environ.get(
@@ -58,7 +65,7 @@ def setup_effect(factory, tmp_path, side_effect_class="consequential"):
     adapter = FileEffectAdapter(str(path))
     store = DurableEffectRepository(factory)
     gateway = ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=LeaseFenceProvider(factory),
         policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
@@ -162,7 +169,7 @@ async def test_live_executor_is_not_taken_over(factory, tmp_path):
     assert row(store, env)["state"] == "executing"
     assert (
         ConsequentialToolGateway(
-            adapter=adapter,
+            registry=_registry(adapter),
             store=store,
             fences=LeaseFenceProvider(factory),
             policy=StaticPolicyProvider(set(), "v17-policy-1"),

@@ -12,6 +12,7 @@ from tests.integration.db.effect_fixtures import bind_lease
 from tests.integration.db.test_effect_crash_window import engine as engine
 from tests.integration.db.test_effect_crash_window import factory as factory
 
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.base import AdapterDeniedError, AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
@@ -26,6 +27,12 @@ from swarm.tools.v17_gateway import (
     ReconciliationRequiredError,
     StaleLeaseError,
 )
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 
 @pytest.fixture(params=["memory", pytest.param("postgres", marks=pytest.mark.integration)])
@@ -77,7 +84,7 @@ def setup(adapter, store, timeout=1):
     if store.durable:
         envelope = bind_lease(store.factory, envelope)
     gateway = ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=(
             LeaseFenceProvider(store.factory)
@@ -237,7 +244,7 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
     adapter.manifest.side_effect_class = side_effect_class
     store = InMemoryEffectStore()
     gateway = ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=StaticFenceProvider(1, 0),
         policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
@@ -256,7 +263,7 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
 def test_gateway_requires_store_argument():
     with pytest.raises(TypeError):
         ConsequentialToolGateway(
-            adapter=ApiMcpAdapter(),
+            registry=_registry(ApiMcpAdapter()),
             fences=StaticFenceProvider(1, 0),
             policy=StaticPolicyProvider(set(), "v17-policy-1"),
         )

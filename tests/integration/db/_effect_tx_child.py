@@ -7,10 +7,17 @@ from typing import Any
 
 from swarm.contracts.actions import ActionEnvelope
 from swarm.db.engine import create_db_engine, make_session_factory
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 
 class PausingAdapter(ApiMcpAdapter):
@@ -38,7 +45,7 @@ def run_paused_execution(
         envelope = ActionEnvelope.model_validate_json(envelope_json)
         adapter = PausingAdapter(started, release)
         gateway = ConsequentialToolGateway(
-            adapter=adapter,
+            registry=_registry(adapter),
             store=DurableEffectRepository(factory),
             fences=LeaseFenceProvider(factory),
             policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),

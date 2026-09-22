@@ -13,11 +13,18 @@ from sqlalchemy import inspect, select, text
 
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import ActionReceiptRow, Base
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway, ReconciliationRequiredError
 from tests.integration.db.effect_fixtures import bind_lease
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 pytestmark = pytest.mark.integration
 
@@ -69,7 +76,7 @@ def factory(engine):
 
 def _gateway(adapter: ApiMcpAdapter, store: DurableEffectRepository, project: str):
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=LeaseFenceProvider(store.factory),
         policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),

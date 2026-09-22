@@ -15,6 +15,7 @@ from swarm.db.lease_fencing import (
     read_current_fence,
 )
 from swarm.db.models import ApprovalRow
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
 from swarm.tools.fences import (
@@ -31,6 +32,12 @@ from swarm.tools.v17_gateway import (
     StaleLeaseError,
     ToolAuthorizationError,
 )
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 pytestmark = pytest.mark.integration
 
@@ -67,7 +74,7 @@ def gateway(
     policy_version: str = "v17-policy-1",
 ):
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=DurableEffectRepository(factory),
         fences=fences or LeaseFenceProvider(factory),
         policy=StaticPolicyProvider(scopes, policy_version),
@@ -132,7 +139,7 @@ async def test_policy_denial_precedes_missing_fence_and_all_effect_boundaries(
     assert envelope.mission_id is None and envelope.lease_generation is None
     envelope.requested_scopes = requested_scopes
     subject = ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=ForbiddenStore(),
         fences=ForbiddenFence(),
         policy=StaticPolicyProvider(SCOPES, policy_version),
@@ -161,7 +168,7 @@ async def test_context_denied_before_reservation(factory, context, reason):
     envelope = leased(factory, adapter)
     store = DurableEffectRepository(factory)
     subject = ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=LeaseFenceProvider(factory),
         policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),

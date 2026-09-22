@@ -82,7 +82,12 @@ class SessionRecoveryService:
             "attempt_id": approved_envelope.attempt_id,
         }
         # Navigate uses a distinct operation → distinct effect key from submit.
-        nav_receipt = await self.gateway.execute_request(navigate_req, context=context)
+        nav_receipt = await self.gateway.execute_request(
+            navigate_req,
+            integration_id=approved_envelope.integration_id,
+            integration_version=approved_envelope.integration_version,
+            context=context,
+        )
         return SessionRecoveryResult(
             session_alias=alias,
             signed_out_detected=signed_out,
