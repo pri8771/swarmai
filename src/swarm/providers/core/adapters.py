@@ -79,6 +79,33 @@ class GroqAdapter(BaseCoreAdapter):
     provider_id = "groq"
     default_model = "llama-3.1-8b-instant"
 
+    def __init__(self, *, pinned_model_id: str | None = None, **kwargs: Any) -> None:
+        if pinned_model_id is not None and not re.fullmatch(
+            r"[a-zA-Z0-9][a-zA-Z0-9._/-]*", pinned_model_id
+        ):
+            raise ValueError("Groq model requires one exact model ID")
+        self.pinned_model_id = pinned_model_id
+        super().__init__(**kwargs)
+        route = self._routes[f"rt_{self.provider_id}_default"]
+        if self.mode != "replay" and pinned_model_id is None:
+            route.availability_status = AvailabilityStatus.DISABLED
+            route.status = "requires_explicit_model"
+        elif pinned_model_id is not None:
+            route.model_id = pinned_model_id
+            route.billing_origin = "groq_free_unverified"
+
+    async def discover(self) -> list[RouteSnapshot]:
+        # Authenticated /models metadata requires its own exact grant.
+        return list(self._routes.values())
+
+    def _invoke(self, model_id: str, request: InferenceRequest) -> dict[str, Any]:
+        if self.mode != "replay":
+            if self.pinned_model_id is None or model_id != self.pinned_model_id:
+                raise ValueError("Groq requires an exact pinned model before network")
+            if request.max_output_tokens is None:
+                raise ValueError("Groq requires a finite output limit")
+        return super()._invoke(model_id, request)
+
 
 class GeminiAdapter(BaseCoreAdapter):
     provider_id = "gemini"

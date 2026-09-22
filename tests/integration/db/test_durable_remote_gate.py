@@ -6,6 +6,7 @@ tables in a product or shared test schema.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import threading
@@ -51,7 +52,8 @@ from swarm.db.models import (
     ReservationRow,
     RouteSnapshotRow,
 )
-from swarm.providers.core.adapters import OpenRouterAdapter, OpenRouterFreeRoute
+from swarm.providers.core.adapters import GroqAdapter, OpenRouterAdapter, OpenRouterFreeRoute
+from swarm.providers.multiplex import MultiplexProviderAdapter
 
 pytestmark = pytest.mark.integration
 SOURCE_TREE = "a" * 40
@@ -526,3 +528,165 @@ async def test_actual_openrouter_adapter_is_fenced_through_mock_http(
     with pytest.raises(RemoteAdmissionDenied, match="already_sent"):
         await broker.invoke(ticket)
     assert len(sent) == 1
+
+
+@pytest.mark.asyncio
+async def test_two_pinned_remote_calls_overlap_inside_http_transport(
+    factory, monkeypatch: pytest.MonkeyPatch
+):
+    open_request, open_route, open_grant = _seed(factory)
+    open_adapter = OpenRouterAdapter(
+        mode="live",
+        enabled=True,
+        secret_ref_names=[],
+        account_id=open_route.account_id,
+        free_route=OpenRouterFreeRoute(model_id=open_route.model_id, provider_slug="liquid"),
+    )
+    open_adapter._routes = {open_route.route_id: open_route}
+    groq_adapter = GroqAdapter(
+        mode="live",
+        enabled=True,
+        secret_ref_names=[],
+        account_id="account-groq",
+        pinned_model_id="openai/gpt-oss-20b",
+    )
+    groq_route = (await groq_adapter.discover())[0]
+    groq_route.quota_bucket_ids = ["groq-request-quota"]
+    groq_request = InferenceRequest(
+        project_id=open_request.project_id,
+        attempt_id="attempt-groq",
+        route_id=groq_route.route_id,
+        purpose="probe",
+        messages=[{"role": "user", "content": "one short answer"}],
+        estimated_input_tokens=12,
+        max_output_tokens=16,
+    )
+    now = utc_now()
+    with factory.begin() as session:
+        session.add_all(
+            [
+                ProviderAccountRow(
+                    id=groq_route.account_id,
+                    service_id="groq",
+                    account_alias="groq-free-account",
+                    owner="operator",
+                    account_status="authenticated",
+                    purpose_eligibility="prototype",
+                    billing_mode="free",
+                    verified_at=now,
+                    payload={"tier": "free", "zero_charge_evidence_ref": "groq-zero-ref"},
+                ),
+                RouteSnapshotRow(
+                    route_id=groq_route.route_id,
+                    provider="groq",
+                    account_id=groq_route.account_id,
+                    model_id=groq_route.model_id,
+                    endpoint=groq_route.endpoint,
+                    billing_origin=groq_route.billing_origin,
+                    availability_status="available",
+                    status="observed",
+                    observed_at=now,
+                    payload={
+                        "zero_price_verified": True,
+                        "zero_charge_evidence_ref": "groq-zero-ref",
+                    },
+                ),
+                QuotaBucketRow(
+                    bucket_id="groq-request-quota",
+                    scope_type="account",
+                    scope_id=groq_route.account_id,
+                    dimension="requests",
+                    limit=1,
+                    remaining=1,
+                    window_type="fixed",
+                    version=1,
+                    observed_at=now,
+                    payload={"confidence": "exact", "quota_evidence_ref": "groq-quota-ref"},
+                ),
+                ApprovalRow(
+                    id="grant-groq",
+                    payload_hash=remote_request_hash(groq_request, groq_route),
+                    permitted_operation="infer",
+                    destination=groq_route.route_id,
+                    grantor="operator",
+                    expires_at=now + timedelta(minutes=5),
+                    project_id=groq_request.project_id,
+                    actor="operator",
+                    integration_id="swarm.remote_inference",
+                    integration_version="1",
+                    operation="infer",
+                    max_effect_count=1,
+                    used_count=0,
+                    constraints={
+                        "source_tree": SOURCE_TREE,
+                        "account_id": groq_route.account_id,
+                        "model_id": groq_route.model_id,
+                        "backend_slug": None,
+                        "max_output_tokens": groq_request.max_output_tokens,
+                        "zero_charge_evidence_ref": "groq-zero-ref",
+                        "quota_evidence_ref": "groq-quota-ref",
+                    },
+                ),
+            ]
+        )
+    barrier = threading.Barrier(2)
+    entered = []
+
+    def handler(http_request: httpx.Request) -> httpx.Response:
+        entered.append(http_request.url.host)
+        barrier.wait(timeout=3)
+        if http_request.url.host == "openrouter.ai":
+            return httpx.Response(
+                200,
+                json={
+                    "model": open_route.model_id,
+                    "openrouter_metadata": {
+                        "attempt": 1,
+                        "is_byok": False,
+                        "endpoints": {
+                            "available": [
+                                {
+                                    "provider": "Liquid",
+                                    "model": open_route.model_id,
+                                    "selected": True,
+                                }
+                            ]
+                        },
+                    },
+                    "usage": {"cost": 0, "is_byok": False},
+                },
+            )
+        return httpx.Response(200, json={"model": groq_route.model_id, "usage": {"cost": 0}})
+
+    original = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kwargs: original(transport=httpx.MockTransport(handler), **kwargs),
+    )
+    multiplex = MultiplexProviderAdapter([open_adapter, groq_adapter])
+    assert len(await multiplex.discover()) == 2
+    contexts = {
+        route.route_id: RoutePolicyContext(
+            route=route,
+            billing_mode=BillingMode.FREE,
+            purpose_eligibility=PurposeEligibility.PROTOTYPE,
+            charge_verified_free=True,
+        )
+        for route in (open_route, groq_route)
+    }
+    broker = SharedInferenceBroker(
+        multiplex,
+        route_contexts=contexts,
+        remote_gate=DurableRemoteCallGate(factory, source_tree=SOURCE_TREE),
+    )
+    assert len(await broker.assess(open_request)) == 1
+    assert len(await broker.assess(groq_request)) == 1
+    open_ticket = await broker.reserve(open_request, open_route, grant_id=open_grant.id)
+    groq_ticket = await broker.reserve(groq_request, groq_route, grant_id="grant-groq")
+    assert entered == []
+    receipts = await asyncio.gather(broker.invoke(open_ticket), broker.invoke(groq_ticket))
+    assert len(receipts) == 2
+    assert set(entered) == {"openrouter.ai", "api.groq.com"}
+    assert broker.remote_gate.read_state(open_ticket.reservation_id)["state"] == "committed"
+    assert broker.remote_gate.read_state(groq_ticket.reservation_id)["state"] == "committed"

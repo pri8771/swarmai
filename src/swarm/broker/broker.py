@@ -502,13 +502,24 @@ class SharedInferenceBroker:
         raise AmbiguousSendError(ticket.logical_call_id)
 
     def _assert_remote_adapter(self, route: RouteSnapshot) -> None:
-        if getattr(self.adapter, "provider_id", None) != route.provider:
+        target = self.adapter
+        lookup = getattr(target, "for_route", None)
+        if callable(lookup):
+            try:
+                target = lookup(route.route_id)
+            except (KeyError, ValueError) as exc:
+                raise RemoteAdmissionDenied("remote_adapter_route_missing") from exc
+        if getattr(target, "provider_id", None) != route.provider:
             raise RemoteAdmissionDenied("remote_adapter_provider_mismatch")
         if route.provider == "openrouter":
-            free_route = getattr(self.adapter, "free_route", None)
+            free_route = getattr(target, "free_route", None)
             if (
                 free_route is None
                 or getattr(free_route, "model_id", None) != route.model_id
                 or getattr(free_route, "provider_slug", None) != route.hosted_by
             ):
                 raise RemoteAdmissionDenied("openrouter_adapter_pin_mismatch")
+        elif route.provider == "groq" and (
+            getattr(target, "pinned_model_id", None) != route.model_id
+        ):
+            raise RemoteAdmissionDenied("groq_adapter_pin_mismatch")
