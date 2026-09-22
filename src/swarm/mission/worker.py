@@ -14,6 +14,8 @@ from swarm.mission.acceptance import (
     changed_paths_from_diff,
     classify_task_support,
     ground_semantic_review,
+    is_defect_repair_goal,
+    prove_defect,
     review_attempt,
 )
 from swarm.mission.inference import InferenceResult, local_chat
@@ -727,6 +729,20 @@ class RepoWorker:
                 finished_at=utc_now().isoformat(),
             )
         ok = all(c.get("ok") for c in commands) if commands else False
+        defect_proof: dict[str, Any] | None = None
+        if is_defect_repair_goal(goal, task.inputs):
+            # R02a: defect repairs must demonstrate red->green with their own regression.
+            head = _run_cmd(self.repo, ["git", "rev-parse", "HEAD"], timeout=30)
+            candidate_sha = str(head.get("stdout") or "").strip() or "HEAD"
+            decision = prove_defect(
+                repo=self.repo,
+                candidate_sha=candidate_sha,
+                worktree=handle.path,
+                diff_text=worktree_diff(handle),
+                run=lambda cwd, argv: _run_cmd(cwd, ["uv", "run", *argv], timeout=180),
+            )
+            defect_proof = decision.to_dict()
+            ok = ok and decision.proven
         return WorkerResult(
             worker_id=self.worker_id,
             task_id=task.id,
@@ -740,6 +756,7 @@ class RepoWorker:
                 "focused_check_paths": (
                     [str(test_rel)] if test_rel is not None else []
                 ),
+                "defect_proof": defect_proof,
             },
             finished_at=utc_now().isoformat(),
         )
@@ -854,6 +871,7 @@ class RepoWorker:
             },
             "intentionally_wrong": decision != "accept",
         }
+        goal_text = str(task.inputs.get("goal") or "")
         independent = review_attempt(
             produced=produced,
             required_checks={
@@ -862,6 +880,8 @@ class RepoWorker:
                 "diff_clean": True,
                 "review_grounded": True,
             },
+            defect_repair=is_defect_repair_goal(goal_text, task.inputs),
+            defect_proof=(verify.artifacts.get("defect_proof") if verify else None),
         )
         if not independent.accepted:
             decision = "reject"

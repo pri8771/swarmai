@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/Downloads/swarm-ai-fable-v17/.venv/bin/python
+rootdir: /Users/pchordia/Downloads/swarm-ai-fable-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tests/mission/test_defect_proof_gate.py::test_patch_without_regression_test_is_unproven PASSED [ 12%]
+tests/mission/test_defect_proof_gate.py::test_regression_that_passes_pre_patch_is_unproven PASSED [ 25%]
+tests/mission/test_defect_proof_gate.py::test_pre_patch_collection_error_is_not_counted_as_red PASSED [ 37%]
+tests/mission/test_defect_proof_gate.py::test_regression_failing_post_patch_is_unproven PASSED [ 50%]
+tests/mission/test_defect_proof_gate.py::test_true_red_green_is_proven PASSED [ 62%]
+tests/mission/test_defect_proof_gate.py::test_second_worktree_removed_on_exception PASSED [ 75%]
+tests/mission/test_defect_proof_gate.py::test_review_attempt_never_passes_unproven_defect_repair PASSED [ 87%]
+tests/mission/test_defect_proof_gate.py::test_defect_repair_goal_detection PASSED [100%]
+
+============================== 8 passed in 2.28s ===============================

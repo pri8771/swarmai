@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
+import shutil
+import subprocess
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 # Families the current generic runtime can execute. Others must stay unsupported.
@@ -283,6 +287,160 @@ def ground_semantic_review(
     )
 
 
+_DEFECT_GOAL_RE = re.compile(r"\b(defect|bug|regression|fix|fixes|fixed|repair)\b", re.IGNORECASE)
+_PYTEST_TEST_FAILURE = 1
+_PYTEST_NOT_A_CLEAN_FAILURE = {2, 3, 4, 5}
+
+
+@dataclass
+class DefectProofDecision:
+    """R02a: proven only by a regression that fails pre-patch and passes post-patch."""
+
+    proven: bool
+    reason: str
+    regression_tests: list[str] = field(default_factory=list)
+    pre_patch: dict[str, Any] = field(default_factory=dict)
+    post_patch: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "proven": self.proven,
+            "reason": self.reason,
+            "regression_tests": list(self.regression_tests),
+            "pre_patch": dict(self.pre_patch),
+            "post_patch": dict(self.post_patch),
+        }
+
+
+def is_defect_repair_goal(goal: str | None, inputs: dict[str, Any] | None = None) -> bool:
+    """Defect-repair missions are gated by red->green proof (R02a)."""
+    if inputs and inputs.get("defect_repair") is True:
+        return True
+    return bool(goal) and bool(_DEFECT_GOAL_RE.search(goal or ""))
+
+
+def regression_tests_in_diff(diff_text: str) -> list[str]:
+    """Test files added or modified by the diff (tests/**/test_*.py)."""
+    found: list[str] = []
+    for path in changed_paths_from_diff(diff_text):
+        pure = PurePosixPath(path)
+        is_test = pure.name.startswith("test_") and pure.suffix == ".py"
+        if pure.parts and pure.parts[0] == "tests" and is_test:
+            found.append(path)
+    return found
+
+
+def _command_summary(result: dict[str, Any]) -> dict[str, Any]:
+    stdout = str(result.get("stdout") or "")
+    stderr = str(result.get("stderr") or "")
+    return {
+        "cmd": list(result.get("cmd") or []),
+        "exit_code": result.get("exit_code"),
+        "stdout_sha256": hashlib.sha256(stdout.encode()).hexdigest(),
+        "stderr_sha256": hashlib.sha256(stderr.encode()).hexdigest(),
+        "stdout_tail": stdout[-1200:],
+        "stderr_tail": stderr[-600:],
+    }
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args], cwd=str(repo), capture_output=True, text=True, check=False
+    )
+
+
+def prove_defect(
+    *,
+    repo: Path,
+    candidate_sha: str,
+    worktree: Path,
+    diff_text: str,
+    run: Callable[[Path, list[str]], dict[str, Any]],
+) -> DefectProofDecision:
+    """Red->green proof: the patch's own regression tests must fail on a clean
+    checkout of ``candidate_sha`` (production files pre-patch) and pass in the
+    patched worktree. Collection/usage/internal errors are not "red"; a test
+    that cannot be collected proves nothing about pre-patch behavior.
+    """
+    regressions = regression_tests_in_diff(diff_text)
+    if not regressions:
+        return DefectProofDecision(
+            proven=False, reason="no_regression_test_in_patch", regression_tests=[]
+        )
+    present = [p for p in regressions if (worktree / p).is_file()]
+    if not present:
+        return DefectProofDecision(
+            proven=False, reason="no_regression_test_in_patch", regression_tests=regressions
+        )
+
+    repo = repo.resolve()
+    clean = repo / "var" / "defect-proof" / f"clean-{candidate_sha[:12]}-{worktree.name[:24]}"
+    if clean.exists():
+        shutil.rmtree(clean, ignore_errors=True)
+        _git(repo, "worktree", "prune")
+    clean.parent.mkdir(parents=True, exist_ok=True)
+    added = _git(repo, "worktree", "add", "--detach", str(clean), candidate_sha)
+    if added.returncode != 0:
+        return DefectProofDecision(
+            proven=False,
+            reason="clean_worktree_unavailable",
+            regression_tests=present,
+            pre_patch={"error": (added.stderr or added.stdout).strip()[-600:]},
+        )
+    try:
+        # Only the regression tests cross over; production files stay pre-patch.
+        for rel in present:
+            target = clean / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(worktree / rel, target)
+        pre = run(clean, ["pytest", *present, "-q", "--tb=line"])
+        pre_summary = _command_summary(pre)
+        code = pre.get("exit_code")
+        if code in _PYTEST_NOT_A_CLEAN_FAILURE:
+            return DefectProofDecision(
+                proven=False,
+                reason="pre_patch_not_a_clean_failure",
+                regression_tests=present,
+                pre_patch=pre_summary,
+            )
+        if code == 0:
+            return DefectProofDecision(
+                proven=False,
+                reason="regression_passes_without_patch",
+                regression_tests=present,
+                pre_patch=pre_summary,
+            )
+        if code != _PYTEST_TEST_FAILURE:
+            return DefectProofDecision(
+                proven=False,
+                reason=f"pre_patch_unexpected_exit:{code}",
+                regression_tests=present,
+                pre_patch=pre_summary,
+            )
+        post = run(worktree, ["pytest", *present, "-q", "--tb=line"])
+        post_summary = _command_summary(post)
+        if post.get("exit_code") != 0:
+            return DefectProofDecision(
+                proven=False,
+                reason="regression_fails_with_patch",
+                regression_tests=present,
+                pre_patch=pre_summary,
+                post_patch=post_summary,
+            )
+        return DefectProofDecision(
+            proven=True,
+            reason="red_green_demonstrated",
+            regression_tests=present,
+            pre_patch=pre_summary,
+            post_patch=post_summary,
+        )
+    finally:
+        removed = _git(repo, "worktree", "remove", "--force", str(clean))
+        if removed.returncode != 0 and clean.exists():
+            shutil.rmtree(clean, ignore_errors=True)
+            _git(repo, "worktree", "prune")
+
+
 def classify_task_support(task_family: str) -> SupportDecision:
     family = (task_family or "").strip().lower()
     if not family:
@@ -378,6 +536,8 @@ def review_attempt(
     required_checks: dict[str, Any] | None = None,
     force_wrong: bool = False,
     hidden_acceptance: dict[str, Any] | None = None,
+    defect_repair: bool = False,
+    defect_proof: dict[str, Any] | None = None,
 ) -> ReviewDecision:
     """Independent checks control accept/reject. Wrong results cannot be accepted.
 
@@ -404,6 +564,18 @@ def review_attempt(
         reasons.append(str(produced.get("unsupported_reason") or "unsupported_task"))
         checks["supported"] = False
         return ReviewDecision(accepted=False, reasons=reasons, checks=checks)
+
+    if defect_repair:
+        # R02a: a material diff with green existing tests is never enough; the
+        # patch's own regression must have failed before it and pass after it.
+        proof = defect_proof or {}
+        proven = proof.get("proven") is True
+        checks["defect_proven"] = proven
+        if not proven:
+            reasons.append("no_defect_demonstrated")
+            if proof.get("reason"):
+                reasons.append(f"defect_proof:{proof['reason']}")
+            return ReviewDecision(accepted=False, reasons=reasons, checks=checks)
 
     if not required and not hidden_acceptance:
         # No independent checks ⇒ cannot accept (review must control acceptance).
