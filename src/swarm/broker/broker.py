@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from swarm.broker.circuit import CircuitBreaker
+from swarm.broker.durable_remote import DurableRemoteCallGate, RemoteAdmissionDenied
 from swarm.broker.errors import (
     AmbiguousSendError,
     BrokerBypassError,
@@ -77,6 +78,7 @@ class SharedInferenceBroker:
         retry_owner: RetryOwner | None = None,
         clock: Clock | None = None,
         reservation_ttl: timedelta | None = None,
+        remote_gate: DurableRemoteCallGate | None = None,
     ) -> None:
         self.adapter = adapter
         self.policy = policy or AdmissionPolicy()
@@ -85,6 +87,7 @@ class SharedInferenceBroker:
         self.retry = retry_owner or RetryOwner(clock=clock)
         self._clock: Clock = clock or utc_now
         self._ttl = reservation_ttl or timedelta(minutes=5)
+        self.remote_gate = remote_gate
         self._contexts: dict[str, RoutePolicyContext] = {}
         for route_id, ctx in (route_contexts or {}).items():
             if route_id != ctx.route.route_id:
@@ -136,6 +139,15 @@ class SharedInferenceBroker:
         )
         eligible: list[RouteSnapshot] = []
         for route in routes:
+            if route.provider in {"groq", "openrouter"} and self.remote_gate is None:
+                record.blocked.append(
+                    {
+                        "route_id": route.route_id,
+                        "reason": "durable_remote_gate_missing",
+                        "dimension": "accounting",
+                    }
+                )
+                continue
             ctx = self._contexts.get(route.route_id)
             if ctx is None or not self._same_admission_route(ctx.route, route):
                 record.blocked.append(
@@ -173,7 +185,9 @@ class SharedInferenceBroker:
         self.last_decision_id = decision_id
         return eligible
 
-    async def reserve(self, request: InferenceRequest, route: RouteSnapshot) -> Reservation:
+    async def reserve(
+        self, request: InferenceRequest, route: RouteSnapshot, *, grant_id: str | None = None
+    ) -> Reservation:
         if request.route_id is not None and request.route_id != route.route_id:
             raise BrokerBypassError("request_route_mismatch")
         ctx = self._contexts.get(route.route_id)
@@ -189,35 +203,47 @@ class SharedInferenceBroker:
             weight = self._queue_weights.get(request.purpose, 1.0)
             self._queue_weights[request.purpose] = weight + 0.01
 
-        amounts = self.ledger.estimate_amounts(
-            bucket_ids=list(ctx.route.quota_bucket_ids),
-            estimated_input_tokens=request.estimated_input_tokens,
-            max_output_tokens=request.max_output_tokens,
-            purpose=request.purpose,
-        )
-        probe = request.purpose in {"probe", "catalog"}
-        reserved = await self.ledger.reserve(
-            amounts, route_id=route.route_id, purpose=request.purpose, probe=probe
-        )
+        remote = route.provider in {"groq", "openrouter"}
+        if remote:
+            self._assert_remote_adapter(route)
+            if self.remote_gate is None or not grant_id:
+                raise RemoteAdmissionDenied("durable_remote_gate_or_exact_grant_missing")
+            ticket = await asyncio.to_thread(
+                self.remote_gate.reserve, request, route, grant_id=grant_id
+            )
+            reserved = ticket.bucket_amounts
+        else:
+            if grant_id is not None:
+                raise BrokerBypassError("remote_grant_on_local_route")
+            amounts = self.ledger.estimate_amounts(
+                bucket_ids=list(ctx.route.quota_bucket_ids),
+                estimated_input_tokens=request.estimated_input_tokens,
+                max_output_tokens=request.max_output_tokens,
+                purpose=request.purpose,
+            )
+            probe = request.purpose in {"probe", "catalog"}
+            reserved = await self.ledger.reserve(
+                amounts, route_id=route.route_id, purpose=request.purpose, probe=probe
+            )
 
-        logical_call_id = new_id("lc_")
-        # Unique logical-call/attempt keys.
-        attempts = self._logical_attempts.setdefault(logical_call_id, set())
-        if request.attempt_id in attempts:
-            await self.ledger.release(reserved)
-            raise BrokerBypassError("duplicate_attempt_id_for_logical_call")
-        attempts.add(request.attempt_id)
-        self.retry.note_attempt(logical_call_id)
+            logical_call_id = new_id("lc_")
+            # Unique logical-call/attempt keys.
+            attempts = self._logical_attempts.setdefault(logical_call_id, set())
+            if request.attempt_id in attempts:
+                await self.ledger.release(reserved)
+                raise BrokerBypassError("duplicate_attempt_id_for_logical_call")
+            attempts.add(request.attempt_id)
+            self.retry.note_attempt(logical_call_id)
 
-        ticket = Reservation(
-            logical_call_id=logical_call_id,
-            attempt_id=request.attempt_id,
-            route_id=route.route_id,
-            bucket_amounts=reserved,
-            expires_at=self._clock() + self._ttl,
-            phase=ReservationPhase.RESERVED,
-            state=ReservationState.OPEN,
-        )
+            ticket = Reservation(
+                logical_call_id=logical_call_id,
+                attempt_id=request.attempt_id,
+                route_id=route.route_id,
+                bucket_amounts=reserved,
+                expires_at=self._clock() + self._ttl,
+                phase=ReservationPhase.RESERVED,
+                state=ReservationState.OPEN,
+            )
         decision_id = self._attempt_decisions.get(request.attempt_id) or self.last_decision_id
         if decision_id is None or decision_id not in self._decisions:
             decision_id = new_id("dec_")
@@ -233,7 +259,7 @@ class SharedInferenceBroker:
             {"bucket_id": a.bucket_id, "dimension": a.dimension.value, "amount": a.amount}
             for a in reserved
         ]
-        rec.bottleneck = self.ledger.bottleneck(reserved)
+        rec.bottleneck = None if remote else self.ledger.bottleneck(reserved)
 
         self._tickets[ticket.reservation_id] = PendingCall(
             request=request,
@@ -247,6 +273,8 @@ class SharedInferenceBroker:
         pending = self._tickets.get(ticket.reservation_id)
         if pending is None:
             raise BrokerBypassError("invoke requires a reserved ticket")
+        if pending.route.provider in {"groq", "openrouter"}:
+            return await self._invoke_remote(pending, ticket)
         if pending.sent and pending.receipt is not None:
             # Idempotent re-entry after ambiguous send: return retained receipt.
             return pending.receipt
@@ -341,6 +369,8 @@ class SharedInferenceBroker:
                 actual[QuotaDimension.UNCACHED_TOKENS] = u.uncached_tokens
 
         if pending is not None:
+            if pending.route.provider in {"groq", "openrouter"}:
+                raise BrokerBypassError("remote_settlement_requires_durable_gate")
             await self.ledger.settle(
                 pending.ticket.bucket_amounts,
                 settlement_key=key,
@@ -405,5 +435,80 @@ class SharedInferenceBroker:
         pending = self._tickets.get(reservation_id)
         if pending is None or pending.sent:
             return
+        if pending.route.provider in {"groq", "openrouter"}:
+            assert self.remote_gate is not None
+            await asyncio.to_thread(self.remote_gate.release_unsent, pending.ticket)
+            pending.ticket.state = ReservationState.EXPIRED
+            return
         await self.ledger.release(pending.ticket.bucket_amounts)
         pending.ticket.state = ReservationState.EXPIRED
+
+    async def _invoke_remote(self, pending: PendingCall, ticket: Reservation) -> AttemptReceipt:
+        gate = self.remote_gate
+        assert gate is not None
+        self._assert_remote_adapter(pending.route)
+        if pending.sent:
+            raise RemoteAdmissionDenied("remote_ticket_already_sent")
+        if (
+            ticket.reservation_id != pending.ticket.reservation_id
+            or ticket.fence_token != pending.ticket.fence_token
+        ):
+            raise RemoteAdmissionDenied("remote_ticket_fence_mismatch")
+        try:
+            await asyncio.to_thread(gate.mark_sending, ticket)
+        except RemoteAdmissionDenied:
+            # Only a still-RESERVED row can be refunded. Never refund SENDING.
+            if self._clock() >= ticket.expires_at:
+                try:
+                    await asyncio.to_thread(gate.release_unsent, ticket)
+                except RemoteAdmissionDenied:
+                    pass
+            raise
+        pending.sent = True
+        ticket.phase = ReservationPhase.SENDING
+        self.request_count += 1
+        self.invocations.append(ticket)
+        try:
+            receipt: AttemptReceipt = await self.adapter.execute_one(pending.request, ticket)
+        except Exception as exc:
+            classified = await self.adapter.classify_error(exc)
+            receipt = AttemptReceipt(
+                logical_call_id=ticket.logical_call_id,
+                send_phase=ReservationPhase.UNKNOWN,
+                actual_route=ticket.route_id,
+                error_class=ErrorClass(classified)
+                if classified in ErrorClass._value2member_map_
+                else ErrorClass.UNKNOWN_OUTCOME,
+                settlement_state=SettlementState.UNKNOWN,
+            )
+        pending.receipt = receipt
+        try:
+            await asyncio.to_thread(gate.record_result, ticket, receipt)
+            state = await asyncio.to_thread(gate.read_state, ticket.reservation_id)
+        except Exception as exc:
+            ticket.state = ReservationState.UNKNOWN
+            ticket.phase = ReservationPhase.UNKNOWN
+            raise AmbiguousSendError(ticket.logical_call_id) from exc
+        if state is not None and state["state"] == ReservationState.COMMITTED.value:
+            ticket.state = ReservationState.COMMITTED
+            ticket.phase = ReservationPhase.SETTLED
+            self.circuit.record_success(ticket.route_id)
+            return receipt
+        ticket.state = ReservationState.UNKNOWN
+        ticket.phase = ReservationPhase.UNKNOWN
+        self.circuit.record_error(
+            ticket.route_id, receipt.error_class or ErrorClass.UNKNOWN_OUTCOME
+        )
+        raise AmbiguousSendError(ticket.logical_call_id)
+
+    def _assert_remote_adapter(self, route: RouteSnapshot) -> None:
+        if getattr(self.adapter, "provider_id", None) != route.provider:
+            raise RemoteAdmissionDenied("remote_adapter_provider_mismatch")
+        if route.provider == "openrouter":
+            free_route = getattr(self.adapter, "free_route", None)
+            if (
+                free_route is None
+                or getattr(free_route, "model_id", None) != route.model_id
+                or getattr(free_route, "provider_slug", None) != route.hosted_by
+            ):
+                raise RemoteAdmissionDenied("openrouter_adapter_pin_mismatch")
