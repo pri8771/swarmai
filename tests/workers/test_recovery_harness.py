@@ -76,3 +76,93 @@ def test_recovery_harness_all_scenarios_pass(session) -> None:
         "drain_blocks_new_leases",
         "restart_reconnect_recovers_leases",
     }
+
+
+# ---- R17a: CP3 harness requirement map and "the step can fail" negatives
+
+
+def _load_cp3_harness():
+    # Imported by module path so spawned child processes can unpickle its targets.
+    import importlib
+
+    return importlib.import_module("scripts.r17_cp3_separate_process_recovery")
+
+
+def test_cp3_report_lists_all_nine_requirements() -> None:
+    harness = _load_cp3_harness()
+    assert set(harness.REQUIREMENTS) == {
+        "durable_worker_registration",
+        "claim",
+        "renew",
+        "process_restart_real_kill",
+        "expiry_reassignment",
+        "stale_result_rejection",
+        "duplicate_result_race_concurrent",
+        "cancellation_generation_rejection",
+        "exactly_one_accepted_result",
+    }
+    report = {
+        "steps": {
+            "victim_claim": {"pid": 1, "lease_id": "l1", "attempt_id": "a1", "killed": True},
+            "expire_reassign": {"expired_leases": ["l1"]},
+            "survivor_submit": {"pid": 2, "lease_id": "l2", "result_id": "r2"},
+            "stale_reject": {"accept_rejected": True},
+            "exactly_one_accept": {"exactly_one_accepted": True},
+        },
+        "r17a": {
+            "cancellation_fence": {"demonstrated": True, "detail": {"renew_rejected": True}},
+            "concurrent_duplicate_accept": {"demonstrated": True, "detail": {}},
+        },
+    }
+    requirements = harness.build_requirements(report)
+    assert set(requirements) == set(harness.REQUIREMENTS)
+    assert all(r["demonstrated"] for r in requirements.values())
+
+
+def test_cancellation_step_detects_missing_fence(session) -> None:
+    """Prove the step can fail: with the durable generation bump disabled the accept
+    succeeds and the step must report demonstrated=false (real Postgres, real process)."""
+    import multiprocessing as mp
+
+    harness = _load_cp3_harness()
+    ctx = mp.get_context("spawn")
+    outcome = harness.run_cancellation_step(
+        session, DATABASE_URL, ctx, bump_generation=False
+    )
+    assert outcome["demonstrated"] is False
+    detail = outcome["detail"]
+    assert detail["generation_bumped"] is False
+    assert detail["accept_rejected"] is False  # accept went through: fence was not triggered
+    assert detail["accepted_count_for_task"] == 1
+    # And the pure evaluator rejects any reason other than the exact fence reason.
+    bad = dict(detail, generation_bumped=True, accept_rejected=True, accept_reason="lease_expired")
+    assert harness.evaluate_cancellation_step(bad)["demonstrated"] is False
+
+
+def test_concurrent_accept_step_detects_double_accept() -> None:
+    harness = _load_cp3_harness()
+    double = [
+        {
+            "index": 0,
+            "outcomes": [
+                {"accepted": True, "pid": 1},
+                {"accepted": True, "pid": 2},
+            ],
+            "accepted_count_for_task": 2,
+            "winner_pid": None,
+        }
+    ]
+    assert harness.evaluate_concurrent_step(double)["demonstrated"] is False
+    assert harness.evaluate_concurrent_step([])["demonstrated"] is False
+    good = [
+        {
+            "index": 0,
+            "outcomes": [
+                {"accepted": True, "pid": 1},
+                {"accepted": False, "pid": 2, "reason": "attempt_already_accepted"},
+            ],
+            "accepted_count_for_task": 1,
+            "winner_pid": 1,
+        }
+    ]
+    assert harness.evaluate_concurrent_step(good)["demonstrated"] is True
