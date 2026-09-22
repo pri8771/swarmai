@@ -1,0 +1,35 @@
+{
+  "packet": "R02c",
+  "artifact": "ART-V14-REAL-E2E",
+  "worker_engine": "fable",
+  "epoch": "fable-v17-20260922-01",
+  "base_source_sha": "ebe71f237de2536890ef4f29f27e12efb8986641",
+  "tested_source_sha": "42f8323f9022145a0467767ebe307a0f117c94d9",
+  "commands": [
+    {
+      "argv": "uv run pytest tests/mission/test_r02c_targeted_edits.py -v",
+      "result": "7 passed"
+    },
+    {
+      "argv": "uv run pytest tests/mission -q",
+      "result": "57 passed"
+    },
+    {
+      "argv": "uv run pytest -q",
+      "result": "444 passed, 13 skipped"
+    },
+    {
+      "argv": "uv run ruff check .",
+      "result": "clean"
+    },
+    {
+      "argv": "uv run mypy src/swarm",
+      "result": "clean"
+    }
+  ],
+  "status": "impl_complete",
+  "live_checkpoint": false,
+  "self_accept": false,
+  "hosted_ci": "blocked (EXT-ACTIONS-BILLING)",
+  "recorded_at": "2026-09-22T02:08:11Z"
+}
