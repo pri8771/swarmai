@@ -381,8 +381,9 @@ class MissionRuntime:
                     "changed_files": changed,
                     "worktree": shared_wt.to_dict(),
                     "note": (
-                        "accepted worktree changes are isolated; "
-                        "automatic primary-checkout promotion is disabled"
+                        "accepted worktree changes are isolated and retained for explicit "
+                        "reviewed application or disposal; automatic primary-checkout "
+                        "promotion is disabled"
                     ),
                 }
                 self.store.append_timeline(
@@ -411,15 +412,31 @@ class MissionRuntime:
                 if returned_worktree is not None:
                     shared_wt = returned_worktree
             cleanup_wt = shared_wt or getattr(worker, "active_worktree", None)
+            # G11 pending-apply is an actionable isolated artifact.  A normal
+            # accepted return must retain its worktree until a separate
+            # reviewed apply or disposal action occurs.  Failed, interrupted,
+            # and exception paths remain disposable so they cannot leak.
+            retain_for_explicit_apply = bool(
+                accepted
+                and not cancellation_requested
+                and terminal_error is None
+                and cleanup_wt is not None
+                and "pending_apply" in record.artifacts
+            )
             cleanup: dict[str, Any] = {
                 "attempted": False,
                 "completed": cleanup_wt is None,
                 "deferred_worker_still_running": bool(
                     worker_turn is not None and not worker_turn.done()
                 ),
+                "retained_for_explicit_apply": retain_for_explicit_apply,
                 "error_type": None,
             }
-            if cleanup_wt is not None and not cleanup["deferred_worker_still_running"]:
+            if (
+                cleanup_wt is not None
+                and not cleanup["deferred_worker_still_running"]
+                and not retain_for_explicit_apply
+            ):
                 cleanup["attempted"] = True
                 try:
                     remove_worktree(self.repo, cleanup_wt, force=True)

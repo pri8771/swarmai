@@ -15,7 +15,7 @@ from swarm.mission.action_boundary import local_worktree_gateway
 from swarm.mission.inference import InferenceResult
 from swarm.mission.runtime import MissionRuntime
 from swarm.mission.worker import RepoWorker, WorkerResult
-from swarm.mission.worktree import WorktreeHandle
+from swarm.mission.worktree import WorktreeHandle, create_worktree, remove_worktree
 from swarm.tools.adapters.local_sandbox import LocalSandboxAdapter
 from swarm.tools.fences import ActorContext, RevocableFenceProvider
 from swarm.tools.v17_gateway import CancellationFenceError
@@ -224,6 +224,97 @@ def _assert_worktree_removed(repo: Path, handle: WorktreeHandle) -> None:
         text=True,
     )
     assert not branches.stdout.strip()
+
+
+@pytest.mark.asyncio
+async def test_accepted_mission_retains_worktree_for_explicit_apply(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A normal accepted mission keeps its isolated artifact until reviewed apply."""
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _init_fixture_repo(repo)
+    target_rel = Path("sandbox/selfdev_issue/parser_helper.py")
+    parent_before = (repo / target_rel).read_text(encoding="utf-8")
+
+    class AcceptedWorktreeWorker:
+        def __init__(self, worker_repo: Path, **_kwargs: Any) -> None:
+            self.repo = worker_repo
+            self.active_worktree: WorktreeHandle | None = None
+            self.active_action_receipt_ids: list[str] = []
+
+        def run_task(
+            self,
+            task: Any,
+            *,
+            mission_id: str,
+            prior: dict[str, WorkerResult],
+            shared_worktree: WorktreeHandle | None,
+        ) -> tuple[WorkerResult, WorktreeHandle | None]:
+            del prior
+            handle = shared_worktree
+            artifacts: dict[str, Any] = {}
+            if task.task_family == "implement":
+                handle = create_worktree(
+                    self.repo,
+                    mission_id=mission_id,
+                    task_id=task.id,
+                    worker_id="wrk_pending_apply",
+                )
+                self.active_worktree = handle
+                (handle.path / target_rel).write_text(
+                    "def inclusive_range_count(start: int, end: int) -> int:\n"
+                    "    return end - start + 1\n",
+                    encoding="utf-8",
+                )
+                artifacts["changed_files"] = [str(target_rel)]
+            return (
+                WorkerResult(
+                    worker_id="wrk_pending_apply",
+                    task_id=task.id,
+                    task_family=task.task_family,
+                    ok=True,
+                    summary=f"{task.task_family}_complete",
+                    artifacts=artifacts,
+                ),
+                handle,
+            )
+
+    monkeypatch.setattr("swarm.mission.runtime.RepoWorker", AcceptedWorktreeWorker)
+    runtime = MissionRuntime(
+        repo=repo,
+        store_dir=tmp_path / "missions",
+        use_evidence_router=False,
+        max_repair_rounds=0,
+    )
+    monkeypatch.setattr(runtime, "_mission_broker", lambda **_kwargs: object())
+
+    record = await runtime.run("exercise explicit apply retention")
+
+    assert record.status == "completed"
+    pending_apply = record.artifacts["pending_apply"]
+    assert pending_apply["status"] == "pending_explicit_apply"
+    serialized = pending_apply["worktree"]
+    handle = WorktreeHandle(
+        path=Path(serialized["path"]),
+        branch=serialized["branch"],
+        worker_id=serialized["worker_id"],
+        mission_id=serialized["mission_id"],
+        task_id=serialized["task_id"],
+    )
+    try:
+        assert handle.path.exists()
+        assert (repo / target_rel).read_text(encoding="utf-8") == parent_before
+        with pytest.raises(PermissionError, match="explicit_apply_requires_approved_true"):
+            runtime.apply_worktree_changes(handle, [str(target_rel)], approved=False)
+        assert runtime.apply_worktree_changes(handle, [str(target_rel)], approved=True) == [
+            str(target_rel)
+        ]
+        assert "end - start + 1" in (repo / target_rel).read_text(encoding="utf-8")
+    finally:
+        remove_worktree(repo, handle, force=True)
+    _assert_worktree_removed(repo, handle)
 
 
 @pytest.mark.asyncio
