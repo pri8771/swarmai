@@ -5,6 +5,7 @@ from tests.integration.db.effect_fixtures import bind_lease
 from tests.integration.db.test_effect_admission_fences import engine as engine
 from tests.integration.db.test_effect_admission_fences import factory as factory
 
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.browser_session import BrowserSessionAdapter
 from swarm.tools.adapters.local_sandbox import LocalSandboxAdapter
@@ -23,9 +24,15 @@ from swarm.tools.v17_gateway import (
 )
 
 
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
+
+
 def gateway(adapter, store, project="r28b1"):
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=store,
         fences=(
             LeaseFenceProvider(store.factory)

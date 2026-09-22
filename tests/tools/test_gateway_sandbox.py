@@ -2,24 +2,33 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from tests.integration.db.effect_fixtures import bind_lease
+from tests.tools.test_single_consequential_path import engine as engine
+from tests.tools.test_single_consequential_path import factory as factory
 
-from swarm.contracts.common import utc_now
 from swarm.contracts.enums import ActionOutcome
 from swarm.contracts.workspace import ToolCall
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.builtins import FakeExternalActionProvider, register_builtin_tools
+from swarm.tools.effects import DurableEffectRepository
+from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.gateway import (
-    ApprovalInvalidError,
+    LegacyToolCallAdapter,
     StaleLeaseError,
     ToolAuthorizationError,
     ToolGateway,
-    make_approval,
 )
 from swarm.tools.registry import CapabilityRegistry, hash_operation
 from swarm.tools.sandbox_runner import IsolatedCodeRunner, SandboxPolicyError, self_test
+from swarm.tools.v17_gateway import (
+    ApprovalInvalidError,
+    ConsequentialToolGateway,
+    PolicyDeniedError,
+    ReconciliationRequiredError,
+)
 
 
 @pytest.fixture()
@@ -50,6 +59,41 @@ def _call(
     )
 
 
+def _durable_gateway(registry: CapabilityRegistry, factory) -> ToolGateway:
+    adapter = LegacyToolCallAdapter(registry)
+    adapters = AdapterRegistry()
+    adapters.register(adapter)
+    action_gateway = ConsequentialToolGateway(
+        registry=adapters,
+        store=DurableEffectRepository(factory),
+        fences=LeaseFenceProvider(factory),
+        policy=StaticPolicyProvider({"artifact.write"}, "v17-policy-1"),
+    )
+    return ToolGateway(
+        registry,
+        allowed_scopes={"artifact.write"},
+        current_lease_generation=1,
+        action_gateway=action_gateway,
+        context=ActorContext(actor="worker", project_id="proj_legacy_sandbox"),
+        mission_id="unbound-mission",
+        cancellation_generation=0,
+    )
+
+
+def _bind_and_approve(factory, gateway: ToolGateway, call: ToolCall, **approval_kwargs) -> None:
+    assert gateway.action_gateway is not None and gateway.context is not None
+    bound = bind_lease(factory, gateway.action_envelope(call))
+    gateway.mission_id = bound.mission_id
+    gateway.cancellation_generation = bound.cancellation_generation
+    gateway.current_lease_generation = int(bound.lease_generation)
+    call.task_id = str(bound.task_id)
+    call.attempt_id = str(bound.attempt_id)
+    call.lease_generation = int(bound.lease_generation)
+    call.approval_id = gateway.action_gateway.make_approval(
+        gateway.action_envelope(call), context=gateway.context, **approval_kwargs
+    ).approval_id
+
+
 @pytest.mark.asyncio
 async def test_calc_and_workspace(registry: CapabilityRegistry) -> None:
     gw = ToolGateway(
@@ -72,54 +116,55 @@ async def test_unauthorized_network_and_scope(registry: CapabilityRegistry) -> N
 
 
 @pytest.mark.asyncio
-async def test_approval_required_and_payload_change(registry: CapabilityRegistry) -> None:
+@pytest.mark.integration
+async def test_approval_required_and_payload_change(
+    registry: CapabilityRegistry, factory
+) -> None:
     args = {"uri": "memory://x", "destination": "local", "operation_id": "op_pub"}
-    approval = make_approval(tool_version="artifact.publish@1", args=args, destination="local")
-    gw = ToolGateway(
-        registry,
-        allowed_scopes={"artifact.write"},
-        current_lease_generation=1,
-        approvals={approval.id: approval},
-    )
-    ok = await gw.execute_or_reconcile(
-        _call("artifact.publish@1", args, approval_id=approval.id)
-    )
-    assert ok.outcome == ActionOutcome.SUCCEEDED
+    registry.handlers["artifact.publish@1"] = lambda _args: {
+        "outcome": "succeeded",
+        "external_id": "artifact-op_pub",
+    }
+    gateway = _durable_gateway(registry, factory)
+    call = _call("artifact.publish@1", args)
+    with pytest.raises(PolicyDeniedError, match="approval_required"):
+        await gateway.execute_or_reconcile(call.model_copy(deep=True))
 
+    _bind_and_approve(factory, gateway, call)
     changed = dict(args)
     changed["uri"] = "memory://changed"
-    with pytest.raises(ApprovalInvalidError):
-        await gw.execute_or_reconcile(
-            _call("artifact.publish@1", changed, approval_id=approval.id, lease=1)
-        )
+    changed_call = call.model_copy(deep=True, update={"normalized_args": changed})
+    with pytest.raises(ApprovalInvalidError, match="approval_payload_mismatch"):
+        await gateway.execute_or_reconcile(changed_call)
+
+    receipt = await gateway.execute_or_reconcile(call.model_copy(deep=True))
+    assert receipt.outcome == ActionOutcome.SUCCEEDED
 
 
 @pytest.mark.asyncio
-async def test_expired_and_revoked_approval(registry: CapabilityRegistry) -> None:
+@pytest.mark.integration
+async def test_expired_and_revoked_approval(registry: CapabilityRegistry, factory) -> None:
     args = {"uri": "memory://x", "destination": "local", "operation_id": "op_rev"}
-    approval = make_approval(
-        tool_version="artifact.publish@1", args=args, destination="local", revoked=True
+    revoked_gateway = _durable_gateway(registry, factory)
+    revoked_call = _call("artifact.publish@1", args)
+    _bind_and_approve(factory, revoked_gateway, revoked_call)
+    assert revoked_gateway.action_gateway is not None
+    assert revoked_gateway.context is not None
+    revoked_gateway.action_gateway.revoke_approval(
+        revoked_call.approval_id,
+        context=revoked_gateway.context,
+        reason="synthetic_revocation",
     )
-    gw = ToolGateway(
-        registry,
-        allowed_scopes={"artifact.write"},
-        current_lease_generation=1,
-        approvals={approval.id: approval},
-    )
-    with pytest.raises(ApprovalInvalidError):
-        await gw.execute_or_reconcile(_call("artifact.publish@1", args, approval_id=approval.id))
+    with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
+        await revoked_gateway.execute_or_reconcile(revoked_call)
 
-    expired = make_approval(
-        tool_version="artifact.publish@1",
-        args=args,
-        destination="local",
-        expires_in_seconds=-1,
+    expired_gateway = _durable_gateway(registry, factory)
+    expired_call = _call(
+        "artifact.publish@1", {**args, "operation_id": "op_expired"}
     )
-    # Force expiry in the past.
-    expired.expires_at = utc_now() - timedelta(seconds=1)
-    gw.approvals[expired.id] = expired
-    with pytest.raises(ApprovalInvalidError):
-        await gw.execute_or_reconcile(_call("artifact.publish@1", args, approval_id=expired.id))
+    _bind_and_approve(factory, expired_gateway, expired_call, expires_in_seconds=-1)
+    with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
+        await expired_gateway.execute_or_reconcile(expired_call)
 
 
 @pytest.mark.asyncio
@@ -130,27 +175,32 @@ async def test_stale_lease_cannot_act(registry: CapabilityRegistry) -> None:
 
 
 @pytest.mark.asyncio
-async def test_idempotent_action_not_duplicated(registry: CapabilityRegistry) -> None:
+@pytest.mark.integration
+async def test_idempotent_action_not_duplicated(registry: CapabilityRegistry, factory) -> None:
     args = {"uri": "memory://x", "destination": "local", "operation_id": "op_once"}
-    approval = make_approval(tool_version="artifact.publish@1", args=args, destination="local")
-    gw = ToolGateway(
-        registry,
-        allowed_scopes={"artifact.write"},
-        current_lease_generation=1,
-        approvals={approval.id: approval},
-    )
-    first = await gw.execute_or_reconcile(
-        _call("artifact.publish@1", args, approval_id=approval.id)
-    )
-    second = await gw.execute_or_reconcile(
-        _call("artifact.publish@1", args, approval_id=approval.id)
-    )
+    calls = {"count": 0}
+
+    def publish(payload):
+        calls["count"] += 1
+        return {"outcome": "succeeded", "external_id": f"artifact-{calls['count']}"}
+
+    registry.handlers["artifact.publish@1"] = publish
+    gateway = _durable_gateway(registry, factory)
+    call = _call("artifact.publish@1", args)
+    _bind_and_approve(factory, gateway, call)
+    first = await gateway.execute_or_reconcile(call.model_copy(deep=True))
+    second = await gateway.execute_or_reconcile(call.model_copy(deep=True))
+    assert calls["count"] == 1
     assert first.operation_id == second.operation_id
-    assert first.after_observation["artifact_id"] == second.after_observation["artifact_id"]
+    assert first.external_id == second.external_id == "artifact-1"
+    assert first.evidence_refs == second.evidence_refs
 
 
 @pytest.mark.asyncio
-async def test_unknown_outcome_pauses_and_reconciles(registry: CapabilityRegistry) -> None:
+@pytest.mark.integration
+async def test_unknown_outcome_pauses_and_reconciles(
+    registry: CapabilityRegistry, factory
+) -> None:
     external = FakeExternalActionProvider()
     external.force_unknown_once.add("idem-1")
 
@@ -159,21 +209,14 @@ async def test_unknown_outcome_pauses_and_reconciles(registry: CapabilityRegistr
 
     registry.handlers["artifact.publish@1"] = publish
     args = {"uri": "memory://x", "destination": "local", "operation_id": "idem-1"}
-    approval = make_approval(tool_version="artifact.publish@1", args=args, destination="local")
-    gw = ToolGateway(
-        registry,
-        allowed_scopes={"artifact.write"},
-        current_lease_generation=1,
-        approvals={approval.id: approval},
-        external=external,
-    )
-    receipt = await gw.execute_or_reconcile(
-        _call("artifact.publish@1", args, approval_id=approval.id)
-    )
+    gateway = _durable_gateway(registry, factory)
+    call = _call("artifact.publish@1", args)
+    _bind_and_approve(factory, gateway, call)
+    receipt = await gateway.execute_or_reconcile(call.model_copy(deep=True))
     assert receipt.outcome == ActionOutcome.UNKNOWN
     assert "reconcile" in receipt.reconciliation_steps
-    reconciled = external.execute(idempotency_key="idem-1", payload=args)
-    assert reconciled["outcome"] == "succeeded"
+    with pytest.raises(ReconciliationRequiredError, match="external_outcome_still_unknown"):
+        await gateway.execute_or_reconcile(call.model_copy(deep=True))
 
 
 def test_sandbox_blocks_traversal_and_symlink(tmp_path: Path) -> None:

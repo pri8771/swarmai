@@ -20,6 +20,7 @@ from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, ApprovalGr
 from swarm.contracts.common import new_id, utc_now
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import Base
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.base import AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
@@ -32,6 +33,12 @@ from swarm.tools.fences import (
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
 from tests.integration.db.effect_fixtures import bind_lease
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 pytestmark = pytest.mark.integration
 
@@ -74,7 +81,7 @@ class RaisingAdapter(ApiMcpAdapter):
 
 def _gateway(adapter: ApiMcpAdapter, factory, project: str = "proj_a") -> ConsequentialToolGateway:
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=DurableEffectRepository(factory),
         fences=LeaseFenceProvider(factory),
         policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),
@@ -524,7 +531,7 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
     store = InMemoryEffectStore()
     first_adapter = ApiMcpAdapter()
     gateway_a = ConsequentialToolGateway(
-        adapter=first_adapter,
+        registry=_registry(first_adapter),
         store=store,
         fences=StaticFenceProvider(1, 0),
         policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),
@@ -546,7 +553,7 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
 
     second_adapter = ApiMcpAdapter()
     gateway_b = ConsequentialToolGateway(
-        adapter=second_adapter,
+        registry=_registry(second_adapter),
         store=store,
         fences=StaticFenceProvider(1, 0),
         policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),

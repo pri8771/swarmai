@@ -19,11 +19,12 @@ from swarm.contracts.actions import (
 )
 from swarm.contracts.common import new_id, payload_hash, utc_now
 from swarm.db.lease_fencing import LeaseClaimError
+from swarm.tools.adapter_registry import AdapterRegistry
+from swarm.tools.adapter_registry import ToolAuthorizationError as ToolAuthorizationError
 from swarm.tools.adapters.base import (
     ADAPTER_OUTCOMES,
     AdapterDeniedError,
     AdapterNotSentError,
-    IntegrationAdapter,
 )
 from swarm.tools.effects import (
     DurableEffectRepository,
@@ -33,10 +34,6 @@ from swarm.tools.effects import (
     check_effect_binding,
 )
 from swarm.tools.fences import ActorContext, FenceProvider, PolicyProvider
-
-
-class ToolAuthorizationError(PermissionError):
-    pass
 
 
 class ApprovalInvalidError(PermissionError):
@@ -65,7 +62,7 @@ class ConsequentialToolGateway:
     def __init__(
         self,
         *,
-        adapter: IntegrationAdapter,
+        registry: AdapterRegistry,
         store: InMemoryEffectStore | DurableEffectRepository,
         fences: FenceProvider,
         policy: PolicyProvider,
@@ -75,7 +72,7 @@ class ConsequentialToolGateway:
         if orphan_grace_seconds < 0:
             raise ValueError("invalid_recovery_window")
         self.orphan_grace_seconds = orphan_grace_seconds
-        self.adapter = adapter
+        self.registry = registry
         self.fences = fences
         self.policy = policy
         self.store = store
@@ -124,19 +121,31 @@ class ConsequentialToolGateway:
         return self.put_approval(grant, context=context)
 
     async def execute_request(
-        self, request: dict[str, Any], *, context: ActorContext
+        self,
+        request: dict[str, Any],
+        *,
+        integration_id: str,
+        integration_version: str,
+        context: ActorContext,
     ) -> ActionReceiptV17:
-        # 1) normalize
-        envelope = self.adapter.normalize(request)
+        # Resolve the declared integration before normalization, then retain it.
+        adapter = self.registry.resolve(integration_id, integration_version)
+        envelope = adapter.normalize(request)
+        if (envelope.integration_id, envelope.integration_version) != (
+            integration_id,
+            integration_version,
+        ):
+            raise ToolAuthorizationError("normalized_integration_mismatch")
         return await self.execute_envelope(envelope, context=context)
 
     async def execute_envelope(
         self, envelope: ActionEnvelope, *, context: ActorContext
     ) -> ActionReceiptV17:
         self._authorize_context(envelope, context)
+        adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
-        self.adapter.validate(envelope)
+        adapter.validate(envelope)
 
         # 2) authorize project/resource
         self._authorize_policy(envelope, context)
@@ -233,7 +242,7 @@ class ConsequentialToolGateway:
 
         try:
             pre = await asyncio.wait_for(
-                asyncio.to_thread(self.adapter.observe_pre_state, envelope),
+                asyncio.to_thread(adapter.observe_pre_state, envelope),
                 timeout=envelope.timeout_seconds,
             )
             if not isinstance(pre, dict):
@@ -258,7 +267,7 @@ class ConsequentialToolGateway:
         try:
             try:
                 result = await asyncio.wait_for(
-                    asyncio.to_thread(self.adapter.execute, envelope),
+                    asyncio.to_thread(adapter.execute, envelope),
                     timeout=envelope.timeout_seconds,
                 )
             except AdapterNotSentError:
@@ -284,7 +293,7 @@ class ConsequentialToolGateway:
             if isinstance(result, dict):
                 try:
                     post = await asyncio.wait_for(
-                        asyncio.to_thread(self.adapter.observe_post_state, envelope, result),
+                        asyncio.to_thread(adapter.observe_post_state, envelope, result),
                         timeout=envelope.timeout_seconds,
                     )
                     if not isinstance(post, dict):
@@ -359,9 +368,10 @@ class ConsequentialToolGateway:
         self, envelope: ActionEnvelope, *, context: ActorContext
     ) -> ActionReceiptV17:
         self._authorize_context(envelope, context)
+        adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
-        self.adapter.validate(envelope)
+        adapter.validate(envelope)
         self._authorize_policy(envelope, context)
         self._require_fence_fields(envelope)
         self._require_durable_store(envelope)
@@ -378,12 +388,13 @@ class ConsequentialToolGateway:
     async def _reconcile_unknown(
         self, envelope: ActionEnvelope, effect: dict[str, Any], *, context: ActorContext
     ) -> ActionReceiptV17:
+        adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
         prior = self.store.list_receipts(
             project_id=envelope.project_id, effect_key=envelope.effect_key
         )
         try:
             result = await asyncio.wait_for(
-                asyncio.to_thread(self.adapter.reconcile, envelope, prior),
+                asyncio.to_thread(adapter.reconcile, envelope, prior),
                 timeout=envelope.timeout_seconds,
             )
         except asyncio.CancelledError as cancelled:
@@ -454,7 +465,8 @@ class ConsequentialToolGateway:
         raise ReconciliationRequiredError("external_outcome_still_unknown")
 
     def _effective_envelope(self, envelope: ActionEnvelope) -> ActionEnvelope:
-        declaration = self.adapter.manifest.operations.get(envelope.operation)
+        adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
+        declaration = adapter.manifest.operations.get(envelope.operation)
         if declaration is None:
             raise ToolAuthorizationError("operation_not_declared")
         effect_rank = {"none": 0, "idempotent": 1, "consequential": 2, "irreversible": 3}
@@ -501,7 +513,8 @@ class ConsequentialToolGateway:
             integration_id=envelope.integration_id,
             integration_version=envelope.integration_version,
         )
-        required = set(self.adapter.manifest.operations[envelope.operation].scopes)
+        adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
+        required = set(adapter.manifest.operations[envelope.operation].scopes)
         required.update(envelope.requested_scopes)
         missing = required - scopes
         if missing:

@@ -16,11 +16,18 @@ from sqlalchemy import text
 from swarm.contracts.common import new_id, utc_now
 from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import ApprovalRow, Base
+from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db.effect_fixtures import bind_lease
+
+
+def _registry(adapter):
+    registry = AdapterRegistry()
+    registry.register(adapter)
+    return registry
 
 pytestmark = pytest.mark.integration
 
@@ -57,7 +64,7 @@ def factory(engine):
 
 def _gateway(adapter: ApiMcpAdapter, factory, project: str = "proj_a") -> ConsequentialToolGateway:
     return ConsequentialToolGateway(
-        adapter=adapter,
+        registry=_registry(adapter),
         store=DurableEffectRepository(factory),
         fences=LeaseFenceProvider(factory),
         policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),

@@ -411,6 +411,10 @@ def main() -> None:
         help="Skip live Ollama supervisor call (still real file work)",
     )
 
+    tools = sub.add_parser("tools", help="Permissioned local tool proofs")
+    tools_sub = tools.add_subparsers(dest="tools_command", required=True)
+    tools_sub.add_parser("permission-proof", help="Run durable local permission proof")
+
     mem = sub.add_parser("memory", help="V0.4 memory + recovery")
     mem_sub = mem.add_subparsers(dest="memory_command", required=True)
     mret = mem_sub.add_parser("retrieve", help="Retrieve bounded context for a query")
