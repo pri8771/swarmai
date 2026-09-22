@@ -10,8 +10,15 @@ from tests.integration.db.test_effect_transactions import engine as engine
 from tests.integration.db.test_effect_transactions import factory as factory
 
 from swarm.contracts.actions import BrowserSessionRef
+from swarm.db.lease_fencing import LeaseLifecycleService
 from swarm.tools.adapters import ApiMcpAdapter, BrowserSessionAdapter, LocalSandboxAdapter
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
+from swarm.tools.fences import (
+    ActorContext,
+    LeaseFenceProvider,
+    StaticFenceProvider,
+    StaticPolicyProvider,
+)
 from swarm.tools.session_recovery import SessionRecoveryService
 from swarm.tools.v17_gateway import (
     ApprovalInvalidError,
@@ -25,13 +32,19 @@ from swarm.tools.v17_gateway import (
 
 def _gw(adapter, *, project: str, scopes: set[str], store, lease: int = 1, cancel: int = 0):
     return ConsequentialToolGateway(
-        adapter,
-        project_id=project,
-        allowed_scopes=scopes,
-        current_lease_generation=lease,
-        current_cancellation_generation=cancel,
+        adapter=adapter,
         store=store,
+        fences=(
+            LeaseFenceProvider(store.factory)
+            if isinstance(store, DurableEffectRepository)
+            else StaticFenceProvider(lease, cancel)
+        ),
+        policy=StaticPolicyProvider(scopes, "v17-policy-1"),
     )
+
+
+def _context(project: str = "proj_a", actor: str = "worker") -> ActorContext:
+    return ActorContext(actor=actor, project_id=project)
 
 
 def _bind(factory, envelope):
@@ -69,7 +82,7 @@ async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
         )
     )
     # local is idempotent — no approval required at low risk
-    receipt = await gw.execute_envelope(env)
+    receipt = await gw.execute_envelope(env, context=_context())
     assert receipt.outcome == "succeeded"
     assert (tmp_path / "note.txt").read_text() == "hello"
 
@@ -93,16 +106,16 @@ async def test_d3_api_mcp_requires_approval_and_dedupes(factory) -> None:
     }
     env = _bind(factory, adapter.normalize(req))
     gw = _gw(adapter, project=env.project_id, scopes={"network.https", "mcp.call"}, store=store)
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.approval_id = approval.approval_id
-    first = await gw.execute_envelope(env)
+    first = await gw.execute_envelope(env, context=_context())
     assert first.outcome == "succeeded"
     assert adapter.call_count == 1
     # Retry same effect — no second execution
     env2 = _reuse_binding(env, adapter.normalize(req))
     env2.approval_id = approval.approval_id
     # Same payload → same effect_key; reserve returns succeeded
-    second = await gw.execute_envelope(env2)
+    second = await gw.execute_envelope(env2, context=_context())
     assert second.outcome == "succeeded"
     assert adapter.call_count == 1
 
@@ -117,7 +130,7 @@ async def test_wrong_project_denied() -> None:
         {"project_id": "proj_b", "destination": "mcp://echo/default", "body": "x"}
     )
     with pytest.raises(ToolAuthorizationError, match="wrong_project"):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
 
 
 @pytest.mark.integration
@@ -142,7 +155,7 @@ async def test_altered_payload_after_approval(factory) -> None:
         lease=env.lease_generation,
         cancel=env.cancellation_generation,
     )
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.normalized_payload["body"] = "two"
     env.payload_hash = ""
     env.effect_key = ""
@@ -150,7 +163,7 @@ async def test_altered_payload_after_approval(factory) -> None:
     env.ensure_hashes()
     env.approval_id = approval.approval_id
     with pytest.raises(ApprovalInvalidError, match="payload"):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
 
 
 @pytest.mark.integration
@@ -175,7 +188,7 @@ async def test_changed_destination_denied(factory) -> None:
         lease=env.lease_generation,
         cancel=env.cancellation_generation,
     )
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.destination = "mcp://echo/other"
     env.payload_hash = ""
     env.effect_key = ""
@@ -183,7 +196,7 @@ async def test_changed_destination_denied(factory) -> None:
     env.ensure_hashes()
     env.approval_id = approval.approval_id
     with pytest.raises(ApprovalInvalidError, match="destination"):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
 
 
 @pytest.mark.integration
@@ -208,19 +221,19 @@ async def test_expired_and_revoked_approval(factory) -> None:
         lease=env.lease_generation,
         cancel=env.cancellation_generation,
     )
-    expired = gw.make_approval(env, expires_in_seconds=-1)
+    expired = gw.make_approval(env, context=_context(), expires_in_seconds=-1)
     env.approval_id = expired.approval_id
     with pytest.raises(ApprovalInvalidError):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
     env2 = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "y"}
     )
     env2 = _reuse_binding(env, env2)
-    revoked = gw.make_approval(env2)
-    assert gw.revoke_approval(revoked.approval_id, revoked_by="operator", reason="test")
+    revoked = gw.make_approval(env2, context=_context())
+    assert gw.revoke_approval(revoked.approval_id, context=_context(actor="operator"), reason="test")
     env2.approval_id = revoked.approval_id
     with pytest.raises(ApprovalInvalidError):
-        await gw.execute_envelope(env2)
+        await gw.execute_envelope(env2, context=_context())
 
 
 @pytest.mark.asyncio
@@ -237,13 +250,13 @@ async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
         }
     )
     with pytest.raises(PermissionError, match="unsafe_redirect|destination"):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
 
     local = LocalSandboxAdapter(root=tmp_path)
     gw2 = _gw(local, project="proj_a", scopes=set(), store=InMemoryEffectStore())
     env2 = local.normalize({"project_id": "proj_a", "text": "x", "path": "a.txt"})
     with pytest.raises(ToolAuthorizationError):
-        await gw2.execute_envelope(env2)
+        await gw2.execute_envelope(env2, context=_context())
 
 
 @pytest.mark.integration
@@ -272,10 +285,10 @@ async def test_stale_lease_and_cancel_generation(factory) -> None:
     )
     env.lease_generation = current_lease
     env.cancellation_generation = current_cancel + 3
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.approval_id = approval.approval_id
-    with pytest.raises(StaleLeaseError):
-        await gw.execute_envelope(env)
+    with pytest.raises(CancellationFenceError):
+        await gw.execute_envelope(env, context=_context())
 
     env2 = adapter.normalize(
         {
@@ -289,10 +302,10 @@ async def test_stale_lease_and_cancel_generation(factory) -> None:
     env2 = _reuse_binding(env, env2)
     env2.lease_generation = current_lease + 1
     env2.cancellation_generation = current_cancel
-    approval2 = gw.make_approval(env2)
+    approval2 = gw.make_approval(env2, context=_context())
     env2.approval_id = approval2.approval_id
-    with pytest.raises(CancellationFenceError):
-        await gw.execute_envelope(env2)
+    with pytest.raises(StaleLeaseError):
+        await gw.execute_envelope(env2, context=_context())
 
 
 @pytest.mark.integration
@@ -322,14 +335,14 @@ async def test_unknown_outcome_requires_reconcile_no_blind_retry(factory) -> Non
         scopes={"network.https", "mcp.call"},
         store=DurableEffectRepository(factory),
     )
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.approval_id = approval.approval_id
-    receipt = await gw.execute_envelope(env)
+    receipt = await gw.execute_envelope(env, context=_context())
     assert receipt.outcome == "unknown"
     calls_after_unknown = adapter.call_count
     # Blind retry must not execute again
     with pytest.raises(ReconciliationRequiredError):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
     assert adapter.call_count == calls_after_unknown
 
 
@@ -364,7 +377,7 @@ async def test_session_recovery_login_does_not_submit(factory) -> None:
         cancel=submit_env.cancellation_generation,
         store=DurableEffectRepository(factory),
     )
-    approval = gw.make_approval(submit_env)
+    approval = gw.make_approval(submit_env, context=_context())
     submit_env.approval_id = approval.approval_id
 
     ref = BrowserSessionRef(
@@ -383,7 +396,7 @@ async def test_session_recovery_login_does_not_submit(factory) -> None:
 
     adapter.normalize = normalize_with_authority
     result = await recovery.recover(
-        session_ref=ref, approved_envelope=submit_env, perform_human_login=True
+        session_ref=ref, approved_envelope=submit_env, context=_context(), perform_human_login=True
     )
     assert result.signed_out_detected is True
     assert result.login_implied_submit is False
@@ -398,7 +411,7 @@ async def test_filesystem_escape_denied(tmp_path: Path) -> None:
     gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
     env = adapter.normalize({"project_id": "proj_a", "text": "x", "path": "../escape.txt"})
     with pytest.raises(PermissionError, match="filesystem_path_escape"):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
 
 
 @pytest.mark.integration
@@ -436,7 +449,8 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
             "path": "a.txt",
             "lease_generation": 1,
             "cancellation_generation": 0,
-        }
+        },
+        context=_context(),
     )
     env_api = api.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "b"}
@@ -450,8 +464,8 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
         cancel=env_api.cancellation_generation,
         store=DurableEffectRepository(factory),
     )
-    env_api.approval_id = gw_api.make_approval(env_api).approval_id
-    r2 = await gw_api.execute_envelope(env_api)
+    env_api.approval_id = gw_api.make_approval(env_api, context=_context()).approval_id
+    r2 = await gw_api.execute_envelope(env_api, context=_context())
     env_br = browser.normalize(
         {
             "project_id": "proj_a",
@@ -463,7 +477,7 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
     )
     env_br.lease_generation = 1
     env_br.cancellation_generation = 0
-    r3 = await gw_browser.execute_envelope(env_br)
+    r3 = await gw_browser.execute_envelope(env_br, context=_context())
     assert {r1.outcome, r2.outcome, r3.outcome} == {"succeeded"}
     assert r1.integration_id == "local.sandbox"
     assert r2.integration_id == "api.mcp.echo"
@@ -499,10 +513,15 @@ async def test_cancel_before_execute(factory) -> None:
         cancel=env.cancellation_generation + 1,
         store=store,
     )
-    approval = gw.make_approval(env)
+    approval = gw.make_approval(env, context=_context())
     env.approval_id = approval.approval_id
+    with factory() as session:
+        LeaseLifecycleService(session).revoke_mission_work(
+            mission_id=env.mission_id, notify_leases=False
+        )
+        session.commit()
     with pytest.raises(CancellationFenceError):
-        await gw.execute_envelope(env)
+        await gw.execute_envelope(env, context=_context())
     assert adapter.call_count == 0
 
 
@@ -525,12 +544,12 @@ async def test_durable_effect_repository_reserve_finalize_idempotent(factory) ->
     }
     env = _bind(factory, adapter.normalize(req))
     gw = _gw(adapter, project=env.project_id, scopes={"network.https", "mcp.call"}, store=store)
-    env.approval_id = gw.make_approval(env).approval_id
-    first = await gw.execute_envelope(env)
+    env.approval_id = gw.make_approval(env, context=_context()).approval_id
+    first = await gw.execute_envelope(env, context=_context())
     assert first.outcome == "succeeded"
     env2 = _reuse_binding(env, adapter.normalize(req))
     env2.approval_id = env.approval_id
-    second = await gw.execute_envelope(env2)
+    second = await gw.execute_envelope(env2, context=_context())
     assert second.outcome == "succeeded"
     assert adapter.call_count == 1
     stored = store.get(project_id="proj_a", effect_key=env.effect_key)

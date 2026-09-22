@@ -18,7 +18,7 @@ from swarm.contracts.actions import (
     ApprovalGrant,
 )
 from swarm.contracts.common import new_id, payload_hash, utc_now
-from swarm.db.lease_fencing import LeaseRenewError, effect_fence_reader
+from swarm.db.lease_fencing import LeaseClaimError
 from swarm.tools.adapters.base import (
     ADAPTER_OUTCOMES,
     AdapterDeniedError,
@@ -32,6 +32,7 @@ from swarm.tools.effects import (
     InMemoryEffectStore,
     check_effect_binding,
 )
+from swarm.tools.fences import ActorContext, FenceProvider, PolicyProvider
 
 
 class ToolAuthorizationError(PermissionError):
@@ -63,13 +64,11 @@ class ConsequentialToolGateway:
 
     def __init__(
         self,
-        adapter: IntegrationAdapter,
         *,
-        project_id: str,
-        allowed_scopes: set[str],
-        current_lease_generation: int,
-        current_cancellation_generation: int = 0,
+        adapter: IntegrationAdapter,
         store: InMemoryEffectStore | DurableEffectRepository,
+        fences: FenceProvider,
+        policy: PolicyProvider,
         max_risk_without_approval: str = "low",
         orphan_grace_seconds: int = 30,
     ) -> None:
@@ -77,24 +76,22 @@ class ConsequentialToolGateway:
             raise ValueError("invalid_recovery_window")
         self.orphan_grace_seconds = orphan_grace_seconds
         self.adapter = adapter
-        self.project_id = project_id
-        self.allowed_scopes = allowed_scopes
-        self.current_lease_generation = current_lease_generation
-        self.current_cancellation_generation = current_cancellation_generation
+        self.fences = fences
+        self.policy = policy
         self.store = store
         self.max_risk_without_approval = max_risk_without_approval
         self._risk_rank = {"low": 0, "medium": 1, "high": 2, "critical": 3}
 
-    def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
-        if grant.project_id != self.project_id:
+    def put_approval(self, grant: ApprovalGrant, *, context: ActorContext) -> ApprovalGrant:
+        if grant.project_id != context.project_id:
             raise ApprovalInvalidError("approval_project_mismatch")
         return self.store.put_approval(grant)
 
-    def revoke_approval(self, approval_id: str, *, revoked_by: str, reason: str) -> bool:
+    def revoke_approval(self, approval_id: str, *, context: ActorContext, reason: str) -> bool:
         return self.store.revoke_approval(
-            project_id=self.project_id,
+            project_id=context.project_id,
             approval_id=approval_id,
-            revoked_by=revoked_by,
+            revoked_by=context.actor,
             reason=reason,
         )
 
@@ -102,10 +99,12 @@ class ConsequentialToolGateway:
         self,
         envelope: ActionEnvelope,
         *,
+        context: ActorContext,
         grantor: str = "operator",
         expires_in_seconds: int = 300,
         max_effect_count: int = 1,
     ) -> ApprovalGrant:
+        self._authorize_context(envelope, context)
         envelope.ensure_hashes()
         now = utc_now()
         grant = ApprovalGrant(
@@ -122,20 +121,25 @@ class ConsequentialToolGateway:
             expires_at=now + timedelta(seconds=expires_in_seconds),
             policy_version=envelope.policy_version,
         )
-        return self.put_approval(grant)
+        return self.put_approval(grant, context=context)
 
-    async def execute_request(self, request: dict[str, Any]) -> ActionReceiptV17:
+    async def execute_request(
+        self, request: dict[str, Any], *, context: ActorContext
+    ) -> ActionReceiptV17:
         # 1) normalize
         envelope = self.adapter.normalize(request)
-        return await self.execute_envelope(envelope)
+        return await self.execute_envelope(envelope, context=context)
 
-    async def execute_envelope(self, envelope: ActionEnvelope) -> ActionReceiptV17:
+    async def execute_envelope(
+        self, envelope: ActionEnvelope, *, context: ActorContext
+    ) -> ActionReceiptV17:
+        self._authorize_context(envelope, context)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
         self.adapter.validate(envelope)
 
         # 2) authorize project/resource
-        self._authorize_project(envelope)
+        self._authorize_policy(envelope, context)
         self._require_fence_fields(envelope)
 
         # 3) evaluate policy/risk
@@ -171,7 +175,7 @@ class ConsequentialToolGateway:
             if existing["state"] == "succeeded":
                 return self._terminal_or_fail(envelope)
             if existing["state"] == "unknown":
-                return await self._reconcile_unknown(envelope, existing)
+                return await self._reconcile_unknown(envelope, existing, context=context)
 
         # 4) exact approval is validated before any durable row exists; a denied
         # request leaves nothing behind.
@@ -181,17 +185,12 @@ class ConsequentialToolGateway:
         # consumption + single-winner CAS in one transaction).
         self.store.reserve(envelope)
         try:
-            # Standalone actions have no mission lease. Any linked action must
-            # re-read its complete durable authority inside committed admission.
-            reader = None
-            if isinstance(self.store, DurableEffectRepository) and any(
-                (envelope.mission_id, envelope.task_id, envelope.attempt_id)
-            ):
-                reader = effect_fence_reader(envelope)
             effect = self.store.begin_execution(
-                envelope, executor_id=new_id("exe_"), fence_reader=reader
+                envelope,
+                executor_id=new_id("exe_"),
+                fence_reader=self.fences.reader(**self._fence_identity(envelope)),
             )
-        except LeaseRenewError as exc:
+        except LeaseClaimError as exc:
             raise EffectConflictError(f"fence_changed_before_execute:{exc}") from exc
         except EffectConflictError as exc:
             if "unknown" in str(exc):
@@ -356,11 +355,14 @@ class ConsequentialToolGateway:
             ),
         )
 
-    async def reconcile(self, envelope: ActionEnvelope) -> ActionReceiptV17:
+    async def reconcile(
+        self, envelope: ActionEnvelope, *, context: ActorContext
+    ) -> ActionReceiptV17:
+        self._authorize_context(envelope, context)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
         self.adapter.validate(envelope)
-        self._authorize_project(envelope)
+        self._authorize_policy(envelope, context)
         self._require_fence_fields(envelope)
         self._require_durable_store(envelope)
         self._evaluate_policy(envelope)
@@ -371,10 +373,10 @@ class ConsequentialToolGateway:
         check_effect_binding(effect, envelope)
         if effect["state"] != "unknown":
             raise EffectConflictError("effect_not_unknown")
-        return await self._reconcile_unknown(envelope, effect)
+        return await self._reconcile_unknown(envelope, effect, context=context)
 
     async def _reconcile_unknown(
-        self, envelope: ActionEnvelope, effect: dict[str, Any]
+        self, envelope: ActionEnvelope, effect: dict[str, Any], *, context: ActorContext
     ) -> ActionReceiptV17:
         prior = self.store.list_receipts(
             project_id=envelope.project_id, effect_key=envelope.effect_key
@@ -436,7 +438,7 @@ class ConsequentialToolGateway:
             )
             if irreversible:
                 raise ReconciliationRequiredError("irreversible_requires_operator_disposition")
-            return await self.execute_envelope(envelope)
+            return await self.execute_envelope(envelope, context=context)
         self._finalize(
             envelope,
             effect,
@@ -481,17 +483,29 @@ class ConsequentialToolGateway:
         ):
             raise StaleLeaseError("fence_missing")
 
-    def _authorize_project(self, envelope: ActionEnvelope) -> None:
-        if envelope.project_id != self.project_id:
+    @staticmethod
+    def _authorize_context(envelope: ActionEnvelope, context: ActorContext) -> None:
+        if envelope.project_id != context.project_id:
             raise ToolAuthorizationError("wrong_project")
-        missing = set(envelope.requested_scopes) - self.allowed_scopes
+        if envelope.actor != context.actor:
+            raise ToolAuthorizationError("actor_mismatch")
+
+    def _authorize_policy(self, envelope: ActionEnvelope, context: ActorContext) -> None:
+        if envelope.policy_version != self.policy.current_policy_version(
+            project_id=context.project_id
+        ):
+            raise PolicyDeniedError("policy_version_stale")
+        scopes = self.policy.effective_scopes(
+            project_id=context.project_id,
+            actor=context.actor,
+            integration_id=envelope.integration_id,
+            integration_version=envelope.integration_version,
+        )
+        required = set(self.adapter.manifest.operations[envelope.operation].scopes)
+        required.update(envelope.requested_scopes)
+        missing = required - scopes
         if missing:
             raise ToolAuthorizationError(f"denied_scopes:{sorted(missing)}")
-        man = self.adapter.manifest
-        if not set(man.scopes).issubset(self.allowed_scopes | set(envelope.requested_scopes)):
-            # Allow if all manifest scopes are in the gateway allow-list.
-            if not set(man.scopes).issubset(self.allowed_scopes):
-                raise ToolAuthorizationError("adapter_scope_denied")
 
     def _evaluate_policy(self, envelope: ActionEnvelope) -> None:
         if envelope.side_effect_class in {"consequential", "irreversible"}:
@@ -545,10 +559,20 @@ class ConsequentialToolGateway:
             raise ApprovalInvalidError("approval_policy_version_mismatch")
 
     def _check_generations(self, envelope: ActionEnvelope) -> None:
-        if envelope.lease_generation != self.current_lease_generation:
+        current = self.fences.current(**self._fence_identity(envelope))
+        if envelope.lease_generation != current.lease_generation:
             raise StaleLeaseError("stale_lease_generation")
-        if envelope.cancellation_generation != self.current_cancellation_generation:
+        if envelope.cancellation_generation != current.cancellation_generation:
             raise CancellationFenceError("cancellation_generation_mismatch")
+
+    @staticmethod
+    def _fence_identity(envelope: ActionEnvelope) -> dict[str, Any]:
+        return {
+            "project_id": envelope.project_id,
+            "mission_id": envelope.mission_id,
+            "task_id": envelope.task_id,
+            "attempt_id": envelope.attempt_id,
+        }
 
     def _require_durable_store(self, envelope: ActionEnvelope) -> None:
         if (

@@ -1593,6 +1593,40 @@ class LeaseLifecycleService:
         # Keep submitted_at; rejection is a disposition only.
 
 
+def read_current_fence(
+    session: Session,
+    *,
+    project_id: str,
+    mission_id: str | None,
+    task_id: str | None,
+    attempt_id: str | None,
+) -> dict[str, int]:
+    """Read authoritative generations without modifying lease or worker state."""
+    if not mission_id or not task_id or not attempt_id:
+        raise LeaseClaimError("lease_not_current")
+    mission = session.scalar(
+        select(MissionRow).where(MissionRow.id == mission_id).with_for_update(read=True)
+    )
+    attempt = session.scalar(
+        select(TaskAttemptRow)
+        .where(TaskAttemptRow.attempt_id == attempt_id)
+        .with_for_update(read=True)
+    )
+    if (
+        mission is None
+        or attempt is None
+        or mission.project_id != project_id
+        or attempt.project_id != project_id
+        or attempt.mission_id != mission_id
+        or attempt.task_id != task_id
+    ):
+        raise LeaseClaimError("lease_not_current")
+    return {
+        "lease_generation": int(attempt.lease_generation),
+        "cancellation_generation": int(mission.cancellation_generation),
+    }
+
+
 def effect_fence_reader(envelope: ActionEnvelope) -> Callable[[Session], Mapping[str, int]]:
     """Bind the owning lease service to one envelope, without opening a transaction."""
     project_id, mission_id, task_id, attempt_id = (

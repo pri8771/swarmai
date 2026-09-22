@@ -15,6 +15,7 @@ from swarm.db.engine import create_db_engine, make_session_factory, ping
 from swarm.db.models import ActionReceiptRow, Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError
+from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
 from swarm.tools.v17_gateway import ConsequentialToolGateway, ReconciliationRequiredError
 from tests.integration.db.effect_fixtures import bind_lease
 
@@ -68,12 +69,15 @@ def factory(engine):
 
 def _gateway(adapter: ApiMcpAdapter, store: DurableEffectRepository, project: str):
     return ConsequentialToolGateway(
-        adapter,
-        project_id=project,
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
+        adapter=adapter,
         store=store,
+        fences=LeaseFenceProvider(store.factory),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
     )
+
+
+def _context(project: str) -> ActorContext:
+    return ActorContext(actor="worker", project_id=project)
 
 
 async def _execute_once(factory, project: str, body: str):
@@ -85,8 +89,8 @@ async def _execute_once(factory, project: str, body: str):
         {"project_id": project, "destination": "mcp://echo/default", "body": body}
     )
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env).approval_id
-    receipt = await gw.execute_envelope(env)
+    env.approval_id = gw.make_approval(env, context=_context(project)).approval_id
+    receipt = await gw.execute_envelope(env, context=_context(project))
     return env, receipt, adapter
 
 
@@ -113,8 +117,8 @@ async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
     req = {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay"}
     env = adapter.normalize(req)
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env).approval_id
-    first = await gw.execute_envelope(env)
+    env.approval_id = gw.make_approval(env, context=_context("proj_a")).approval_id
+    first = await gw.execute_envelope(env, context=_context("proj_a"))
     env2 = adapter.normalize(req)
     for field in (
         "mission_id",
@@ -125,7 +129,7 @@ async def test_replay_returns_original_receipt_not_reminted(factory) -> None:
     ):
         setattr(env2, field, getattr(env, field))
     env2.approval_id = env.approval_id
-    second = await gw.execute_envelope(env2)
+    second = await gw.execute_envelope(env2, context=_context("proj_a"))
     assert second.receipt_id == first.receipt_id
     assert second.finished_at == first.finished_at
     assert second.attempt_refs == first.attempt_refs
@@ -205,7 +209,7 @@ async def test_succeeded_effect_without_receipt_fails_closed(engine, factory) ->
         setattr(env2, field, getattr(env, field))
     env2.approval_id = env.approval_id
     with pytest.raises(ReconciliationRequiredError, match="succeeded_effect_missing_receipt"):
-        await gw.execute_envelope(env2)
+        await gw.execute_envelope(env2, context=_context("proj_a"))
     assert adapter.call_count == 0
 
 

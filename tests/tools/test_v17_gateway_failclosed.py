@@ -15,6 +15,12 @@ from tests.integration.db.test_effect_crash_window import factory as factory
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.base import AdapterDeniedError, AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
+from swarm.tools.fences import (
+    ActorContext,
+    LeaseFenceProvider,
+    StaticFenceProvider,
+    StaticPolicyProvider,
+)
 from swarm.tools.v17_gateway import (
     ConsequentialToolGateway,
     ReconciliationRequiredError,
@@ -71,16 +77,22 @@ def setup(adapter, store, timeout=1):
     if store.durable:
         envelope = bind_lease(store.factory, envelope)
     gateway = ConsequentialToolGateway(
-        adapter,
-        project_id=envelope.project_id,
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=envelope.lease_generation,
-        current_cancellation_generation=envelope.cancellation_generation,
+        adapter=adapter,
         store=store,
+        fences=(
+            LeaseFenceProvider(store.factory)
+            if isinstance(store, DurableEffectRepository)
+            else StaticFenceProvider(1, 0)
+        ),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
     )
     envelope.timeout_seconds = timeout
-    envelope.approval_id = gateway.make_approval(envelope).approval_id
+    envelope.approval_id = gateway.make_approval(envelope, context=context()).approval_id
     return gateway, envelope
+
+
+def context():
+    return ActorContext(actor="worker", project_id="r28a")
 
 
 def row(store, envelope):
@@ -92,7 +104,7 @@ def row(store, envelope):
 async def test_empty_or_unrecognized_result_is_unknown_not_succeeded(effect_store, result):
     adapter = ResultAdapter(result)
     gateway, envelope = setup(adapter, effect_store)
-    receipt = await gateway.execute_envelope(envelope)
+    receipt = await gateway.execute_envelope(envelope, context=context())
     assert receipt.outcome == "unknown"
     assert row(effect_store, envelope)["state_reason"] == "unrecognized_outcome"
     assert all(tid != threading.get_ident() for tid in adapter.thread_ids)
@@ -102,12 +114,12 @@ async def test_empty_or_unrecognized_result_is_unknown_not_succeeded(effect_stor
 async def test_exception_is_unknown_and_second_call_does_not_execute(effect_store):
     adapter = ResultAdapter(error=RuntimeError("synthetic private transport detail"))
     gateway, envelope = setup(adapter, effect_store)
-    receipt = await gateway.execute_envelope(envelope)
+    receipt = await gateway.execute_envelope(envelope, context=context())
     assert receipt.outcome == "unknown"
     assert row(effect_store, envelope)["state_reason"] == "exception:RuntimeError"
     assert "private transport" not in receipt.model_dump_json()
     with pytest.raises(ReconciliationRequiredError):
-        await gateway.execute_envelope(envelope)
+        await gateway.execute_envelope(envelope, context=context())
     assert adapter.call_count == 1
 
 
@@ -115,10 +127,10 @@ async def test_exception_is_unknown_and_second_call_does_not_execute(effect_stor
 async def test_not_sent_error_is_failed_not_applied_and_retry_executes_once_more(effect_store):
     adapter = ResultAdapter(error=AdapterNotSentError("synthetic pre-send failure"))
     gateway, envelope = setup(adapter, effect_store)
-    assert (await gateway.execute_envelope(envelope)).outcome == "failed"
+    assert (await gateway.execute_envelope(envelope, context=context())).outcome == "failed"
     assert row(effect_store, envelope)["state_reason"] == "not_applied"
     adapter.error, adapter.result = None, {"outcome": "succeeded"}
-    assert (await gateway.execute_envelope(envelope)).outcome == "succeeded"
+    assert (await gateway.execute_envelope(envelope, context=context())).outcome == "succeeded"
     assert adapter.call_count == 2
     assert row(effect_store, envelope)["attempt_count"] == 2
 
@@ -137,7 +149,7 @@ async def test_not_sent_error_is_failed_not_applied_and_retry_executes_once_more
 async def test_explicit_outcome_mapping(effect_store, outcome, state, reason):
     adapter = ResultAdapter({"outcome": outcome, "detail": "explicit denial"})
     gateway, envelope = setup(adapter, effect_store)
-    assert (await gateway.execute_envelope(envelope)).outcome == state
+    assert (await gateway.execute_envelope(envelope, context=context())).outcome == state
     assert row(effect_store, envelope)["state_reason"] == reason
 
 
@@ -145,7 +157,7 @@ async def test_explicit_outcome_mapping(effect_store, outcome, state, reason):
 async def test_adapter_denial_is_explicit(effect_store):
     adapter = ResultAdapter(error=AdapterDeniedError("explicit adapter denial"))
     gateway, envelope = setup(adapter, effect_store)
-    assert (await gateway.execute_envelope(envelope)).outcome == "denied"
+    assert (await gateway.execute_envelope(envelope, context=context())).outcome == "denied"
     assert row(effect_store, envelope)["state_reason"] == "explicit adapter denial"
 
 
@@ -174,11 +186,11 @@ async def test_timeout_is_unknown(effect_store):
     adapter = BlockingAdapter()
     gateway, envelope = setup(adapter, effect_store)
     try:
-        receipt = await gateway.execute_envelope(envelope)
+        receipt = await gateway.execute_envelope(envelope, context=context())
         assert adapter.entered.is_set() and receipt.outcome == "unknown"
         assert row(effect_store, envelope)["state_reason"] == "timeout"
         with pytest.raises(ReconciliationRequiredError):
-            await gateway.execute_envelope(envelope)
+            await gateway.execute_envelope(envelope, context=context())
         assert adapter.call_count == 1
     finally:
         adapter.release.set()
@@ -191,7 +203,7 @@ async def test_timeout_is_unknown(effect_store):
 async def test_cancellation_records_unknown_and_reraises(effect_store):
     adapter = BlockingAdapter()
     gateway, envelope = setup(adapter, effect_store, timeout=5)
-    task = asyncio.create_task(gateway.execute_envelope(envelope))
+    task = asyncio.create_task(gateway.execute_envelope(envelope, context=context()))
     try:
         assert await asyncio.to_thread(adapter.entered.wait, 1)
         task.cancel()
@@ -213,7 +225,7 @@ async def test_post_observation_error_keeps_execute_outcome(effect_store):
 
     adapter.observe_post_state = fail_post
     gateway, envelope = setup(adapter, effect_store)
-    receipt = await gateway.execute_envelope(envelope)
+    receipt = await gateway.execute_envelope(envelope, context=context())
     assert receipt.outcome == "succeeded"
     assert receipt.post_observation == {"post_observation_error": "LookupError"}
 
@@ -225,19 +237,18 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
     adapter.manifest.side_effect_class = side_effect_class
     store = InMemoryEffectStore()
     gateway = ConsequentialToolGateway(
-        adapter,
-        project_id="r28a",
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
+        adapter=adapter,
         store=store,
+        fences=StaticFenceProvider(1, 0),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
     )
     envelope = adapter.normalize(
         {"project_id": "r28a", "lease_generation": 1, "cancellation_generation": 0}
     )
     with pytest.raises(StaleLeaseError, match="fence_missing"):
-        await gateway.execute_envelope(envelope)
+        await gateway.execute_envelope(envelope, context=context())
     with pytest.raises(StaleLeaseError, match="fence_missing"):
-        await gateway.reconcile(envelope)
+        await gateway.reconcile(envelope, context=context())
     assert adapter.pre_calls == adapter.call_count == 0
     assert row(store, envelope) is None
 
@@ -245,7 +256,9 @@ async def test_consequential_with_in_memory_store_denied_before_execute(side_eff
 def test_gateway_requires_store_argument():
     with pytest.raises(TypeError):
         ConsequentialToolGateway(
-            ApiMcpAdapter(), project_id="r28a", allowed_scopes=set(), current_lease_generation=1
+            adapter=ApiMcpAdapter(),
+            fences=StaticFenceProvider(1, 0),
+            policy=StaticPolicyProvider(set(), "v17-policy-1"),
         )
 
 

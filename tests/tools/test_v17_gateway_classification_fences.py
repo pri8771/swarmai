@@ -9,6 +9,12 @@ from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.browser_session import BrowserSessionAdapter
 from swarm.tools.adapters.local_sandbox import LocalSandboxAdapter
 from swarm.tools.effects import DurableEffectRepository, InMemoryEffectStore
+from swarm.tools.fences import (
+    ActorContext,
+    LeaseFenceProvider,
+    StaticFenceProvider,
+    StaticPolicyProvider,
+)
 from swarm.tools.v17_gateway import (
     ConsequentialToolGateway,
     PolicyDeniedError,
@@ -19,13 +25,19 @@ from swarm.tools.v17_gateway import (
 
 def gateway(adapter, store, project="r28b1"):
     return ConsequentialToolGateway(
-        adapter,
-        project_id=project,
-        allowed_scopes={"network.https", "mcp.call"},
-        current_lease_generation=1,
-        current_cancellation_generation=0,
+        adapter=adapter,
         store=store,
+        fences=(
+            LeaseFenceProvider(store.factory)
+            if isinstance(store, DurableEffectRepository)
+            else StaticFenceProvider(1, 0)
+        ),
+        policy=StaticPolicyProvider({"network.https", "mcp.call"}, "v17-policy-1"),
     )
+
+
+def context(project="r28b1"):
+    return ActorContext(actor="worker", project_id=project)
 
 
 def complete_claim(adapter):
@@ -53,7 +65,7 @@ async def test_undeclared_operation_denied_before_adapter_action():
     adapter = ApiMcpAdapter()
     envelope = adapter.normalize({"project_id": "r28b1", "operation": "undeclared.synthetic"})
     with pytest.raises(ToolAuthorizationError, match="operation_not_declared"):
-        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope)
+        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
 
 
@@ -76,7 +88,7 @@ async def test_missing_authority_is_denied_before_action(side, field):
     envelope.side_effect_class = "none"
     setattr(envelope, field, None)
     with pytest.raises(StaleLeaseError, match="fence_missing"):
-        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope)
+        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
 
 
@@ -86,7 +98,7 @@ async def test_underclassification_cannot_skip_durability():
     envelope = complete_claim(adapter)
     envelope.side_effect_class, envelope.risk_class = "none", "low"
     with pytest.raises(PolicyDeniedError, match="durable_store_required"):
-        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope)
+        await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
 
 
@@ -98,7 +110,7 @@ async def test_underclassification_cannot_skip_approval(factory):
     envelope.side_effect_class, envelope.risk_class = "none", "low"
     store = DurableEffectRepository(factory)
     with pytest.raises(PolicyDeniedError, match="approval_required"):
-        await gateway(adapter, store).execute_envelope(envelope)
+        await gateway(adapter, store).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
     assert store.get(project_id=envelope.project_id, effect_key=envelope.effect_key) is None
 
@@ -120,8 +132,8 @@ async def test_receipt_persists_higher_classification_without_mutating_claim(
     envelope.side_effect_class, envelope.risk_class = claim
     store = DurableEffectRepository(factory)
     gw = gateway(adapter, store)
-    envelope.approval_id = gw.make_approval(envelope).approval_id
-    receipt = await gw.execute_envelope(envelope)
+    envelope.approval_id = gw.make_approval(envelope, context=context()).approval_id
+    receipt = await gw.execute_envelope(envelope, context=context())
     assert receipt.outcome == "succeeded"
     assert (receipt.effective_side_effect_class, receipt.effective_risk_class) == expected
     assert (envelope.side_effect_class, envelope.risk_class) == claim

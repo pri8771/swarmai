@@ -23,6 +23,12 @@ from swarm.db.models import Base
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.adapters.base import AdapterNotSentError
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, InMemoryEffectStore
+from swarm.tools.fences import (
+    ActorContext,
+    LeaseFenceProvider,
+    StaticFenceProvider,
+    StaticPolicyProvider,
+)
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db._effect_tx_child import run_paused_execution
 from tests.integration.db.effect_fixtures import bind_lease
@@ -68,12 +74,15 @@ class RaisingAdapter(ApiMcpAdapter):
 
 def _gateway(adapter: ApiMcpAdapter, factory, project: str = "proj_a") -> ConsequentialToolGateway:
     return ConsequentialToolGateway(
-        adapter,
-        project_id=project,
-        allowed_scopes=SCOPES,
-        current_lease_generation=1,
+        adapter=adapter,
         store=DurableEffectRepository(factory),
+        fences=LeaseFenceProvider(factory),
+        policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),
     )
+
+
+def _context(project: str = "proj_a", actor: str = "worker") -> ActorContext:
+    return ActorContext(actor=actor, project_id=project)
 
 
 def _sql(factory, statement: str, **params: Any) -> Any:
@@ -99,7 +108,7 @@ async def test_reservation_visible_to_second_process_before_execute(factory) -> 
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-process"}
     )
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env).approval_id
+    env.approval_id = gw.make_approval(env, context=_context()).approval_id
 
     ctx = mp.get_context("spawn")
     started, release, results = ctx.Event(), ctx.Event(), ctx.Queue()
@@ -112,7 +121,7 @@ async def test_reservation_visible_to_second_process_before_execute(factory) -> 
         assert started.wait(timeout=60), "child never reached the adapter"
         # Process A is inside adapter.execute; its admission is already committed.
         with pytest.raises(EffectConflictError, match="effect_already_executing"):
-            await gw.execute_envelope(env)
+            await gw.execute_envelope(env, context=_context())
         assert adapter.call_count == 0
     finally:
         release.set()
@@ -121,7 +130,7 @@ async def test_reservation_visible_to_second_process_before_execute(factory) -> 
     outcome = results.get(timeout=10)
     assert outcome.get("outcome") == "succeeded", outcome
     # Now the replay from this process returns the child's original receipt.
-    replay = await gw.execute_envelope(env)
+    replay = await gw.execute_envelope(env, context=_context())
     assert replay.receipt_id == outcome["receipt_id"]
     assert adapter.call_count == 0
 
@@ -148,7 +157,8 @@ def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
             max_effect_count=1,
             expires_at=utc_now() + timedelta(seconds=300),
             policy_version=base.policy_version,
-        )
+        ),
+        context=_context(),
     )
 
     def envelope_with_key(key: str) -> ActionEnvelope:
@@ -167,7 +177,7 @@ def test_one_shot_approval_two_effect_keys_single_consume(factory) -> None:
         own_gw = _gateway(own_adapter, factory)
         barrier.wait(timeout=10)
         try:
-            receipt = asyncio.run(own_gw.execute_envelope(envelopes[index]))
+            receipt = asyncio.run(own_gw.execute_envelope(envelopes[index], context=_context()))
             outcomes[index] = ("ok", receipt.outcome, own_adapter.call_count)
         except ApprovalInvalidError as exc:
             outcomes[index] = ("denied", str(exc), own_adapter.call_count)
@@ -193,8 +203,8 @@ async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> 
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "retry-once"}
     )
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env, max_effect_count=1).approval_id
-    first = await gw.execute_envelope(env)
+    env.approval_id = gw.make_approval(env, context=_context(), max_effect_count=1).approval_id
+    first = await gw.execute_envelope(env, context=_context())
     assert first.outcome == "failed"
     assert _used_count(factory, env.approval_id) == 1
     # A proven pre-send failure now writes not_applied through the gateway.
@@ -206,7 +216,7 @@ async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> 
     )
     working = ApiMcpAdapter()
     gw2 = _gateway(working, factory)
-    second = await gw2.execute_envelope(env)
+    second = await gw2.execute_envelope(env, context=_context())
     assert second.outcome == "succeeded"
     assert second.attempt_number == 2
     assert working.call_count == 1
@@ -224,8 +234,8 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": f"retry-{how}"}
     )
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env, max_effect_count=1).approval_id
-    assert (await gw.execute_envelope(env)).outcome == "failed"
+    env.approval_id = gw.make_approval(env, context=_context(), max_effect_count=1).approval_id
+    assert (await gw.execute_envelope(env, context=_context())).outcome == "failed"
     assert (
         _sql(
             factory, "SELECT state_reason FROM action_effects WHERE effect_key=:k", k=env.effect_key
@@ -243,7 +253,7 @@ async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> 
     working = ApiMcpAdapter()
     gw2 = _gateway(working, factory)
     with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
-        await gw2.execute_envelope(env)
+        await gw2.execute_envelope(env, context=_context())
     assert working.call_count == 0
     row = gw2.store.get(project_id="proj_a", effect_key=env.effect_key)
     assert row is not None and row["state"] == "failed" and row["attempt_count"] == 1
@@ -257,14 +267,14 @@ async def test_denied_request_leaves_no_effect_row(factory) -> None:
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "approved-body"}
     )
     approved = bind_lease(factory, approved)
-    approval_id = gw.make_approval(approved).approval_id
+    approval_id = gw.make_approval(approved, context=_context()).approval_id
     tampered = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "other-body"}
     )
     tampered = bind_lease(factory, tampered)
     tampered.approval_id = approval_id
     with pytest.raises(ApprovalInvalidError, match="approval_payload_mismatch"):
-        await gw.execute_envelope(tampered)
+        await gw.execute_envelope(tampered, context=_context())
     assert adapter.call_count == 0
     assert gw.store.get(project_id="proj_a", effect_key=tampered.effect_key) is None
     assert _sql(factory, "SELECT count(*) FROM action_effects") == 0
@@ -278,15 +288,15 @@ async def test_replay_of_succeeded_effect_works_after_approval_expiry(factory) -
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "replay-expired"}
     )
     env = bind_lease(factory, env)
-    env.approval_id = gw.make_approval(env).approval_id
-    first = await gw.execute_envelope(env)
+    env.approval_id = gw.make_approval(env, context=_context()).approval_id
+    first = await gw.execute_envelope(env, context=_context())
     assert first.outcome == "succeeded"
     _sql(
         factory,
         "UPDATE approvals SET expires_at=now() - interval '1 second' WHERE id=:a",
         a=env.approval_id,
     )
-    replay = await gw.execute_envelope(env)
+    replay = await gw.execute_envelope(env, context=_context())
     assert replay.receipt_id == first.receipt_id
     assert adapter.call_count == 1
 
@@ -383,7 +393,8 @@ def _unbound_one_shot_approval(gateway, envelope):
             max_effect_count=1,
             expires_at=utc_now() + timedelta(seconds=300),
             policy_version=envelope.policy_version,
-        )
+        ),
+        context=_context(envelope.project_id, envelope.actor),
     )
 
 
@@ -399,10 +410,10 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
         }
     )
     envelope_a = bind_lease(factory, envelope_a)
-    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    grant_a = gateway_a.make_approval(envelope_a, context=_context(), max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
 
-    first = await gateway_a.execute_envelope(envelope_a)
+    first = await gateway_a.execute_envelope(envelope_a, context=_context())
     assert first.outcome == "failed"
     assert _used_count(factory, grant_a.approval_id) == 1
     assert (
@@ -419,7 +430,7 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
     grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
     envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
 
-    second = await gateway_b.execute_envelope(envelope_b)
+    second = await gateway_b.execute_envelope(envelope_b, context=_context())
     assert second.outcome == "succeeded"
     assert second.attempt_number == 2
     assert working.call_count == 1
@@ -435,7 +446,7 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
 
     # A same-effect replay under B returns the immutable success receipt and must not
     # consume B twice or invoke the adapter again.
-    replay = await gateway_b.execute_envelope(envelope_b)
+    replay = await gateway_b.execute_envelope(envelope_b, context=_context())
     assert replay.receipt_id == second.receipt_id
     assert _used_count(factory, grant_b.approval_id) == 1
     assert working.call_count == 1
@@ -452,7 +463,7 @@ async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None
         }
     )
     with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
-        await other_gateway.execute_envelope(other)
+        await other_gateway.execute_envelope(other, context=_context())
     assert other_adapter.call_count == 0
     assert _used_count(factory, grant_b.approval_id) == 1
 
@@ -470,9 +481,9 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
         }
     )
     envelope_a = bind_lease(factory, envelope_a)
-    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    grant_a = gateway_a.make_approval(envelope_a, context=_context(), max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
-    assert (await gateway_a.execute_envelope(envelope_a)).outcome == "failed"
+    assert (await gateway_a.execute_envelope(envelope_a, context=_context())).outcome == "failed"
     assert (
         _sql(
             factory,
@@ -496,7 +507,7 @@ async def test_not_applied_retry_replacement_grant_must_still_be_active(factory,
     envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
 
     with pytest.raises(ApprovalInvalidError, match="approval_expired_or_revoked_or_exhausted"):
-        await gateway_b.execute_envelope(envelope_b)
+        await gateway_b.execute_envelope(envelope_b, context=_context())
     assert adapter_b.call_count == 0
     assert _used_count(factory, grant_a.approval_id) == 1
     assert _used_count(factory, grant_b.approval_id) == 0
@@ -513,11 +524,10 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
     store = InMemoryEffectStore()
     first_adapter = ApiMcpAdapter()
     gateway_a = ConsequentialToolGateway(
-        first_adapter,
-        project_id="proj_a",
-        allowed_scopes=SCOPES,
-        current_lease_generation=1,
+        adapter=first_adapter,
         store=store,
+        fences=StaticFenceProvider(1, 0),
+        policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),
     )
     envelope_a = first_adapter.normalize(
         {
@@ -528,7 +538,7 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
             "cancellation_generation": 0,
         }
     )
-    grant_a = gateway_a.make_approval(envelope_a, max_effect_count=1)
+    grant_a = gateway_a.make_approval(envelope_a, context=_context(), max_effect_count=1)
     envelope_a.approval_id = grant_a.approval_id
     store.reserve(envelope_a)
     store.begin_execution(envelope_a, executor_id="exe_first")
@@ -536,11 +546,10 @@ async def test_in_memory_already_executing_does_not_consume_replacement_grant() 
 
     second_adapter = ApiMcpAdapter()
     gateway_b = ConsequentialToolGateway(
-        second_adapter,
-        project_id="proj_a",
-        allowed_scopes=SCOPES,
-        current_lease_generation=1,
+        adapter=second_adapter,
         store=store,
+        fences=StaticFenceProvider(1, 0),
+        policy=StaticPolicyProvider(SCOPES, "v17-policy-1"),
     )
     grant_b = _unbound_one_shot_approval(gateway_b, envelope_a)
     envelope_b = envelope_a.model_copy(update={"approval_id": grant_b.approval_id})
@@ -561,11 +570,11 @@ async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again
     gateway = _gateway(adapter, factory)
     env = adapter.normalize({"project_id": "proj_a", "body": "A-B-A-retry"})
     env = bind_lease(factory, env)
-    grant_a = gateway.make_approval(env)
+    grant_a = gateway.make_approval(env, context=_context())
     grant_b = _unbound_one_shot_approval(gateway, env)
     for number, grant in enumerate((grant_a, grant_b, grant_a, grant_b), start=1):
         env.approval_id = grant.approval_id
-        receipt = await gateway.execute_envelope(env)
+        receipt = await gateway.execute_envelope(env, context=_context())
         assert receipt.outcome == "failed"
         assert receipt.approval_id == grant.approval_id
         assert receipt.attempt_number == number
@@ -588,7 +597,7 @@ def test_durable_busy_effect_rolls_back_replacement_approval_and_ledger(factory)
     gateway = _gateway(adapter, factory)
     env = adapter.normalize({"project_id": "proj_a", "body": "busy-durable-rollback"})
     env = bind_lease(factory, env)
-    grant_a = gateway.make_approval(env)
+    grant_a = gateway.make_approval(env, context=_context())
     env.approval_id = grant_a.approval_id
     gateway.store.reserve(env)
     gateway.store.begin_execution(env, executor_id="original-executor")
