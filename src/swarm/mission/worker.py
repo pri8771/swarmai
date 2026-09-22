@@ -224,9 +224,7 @@ def _parse_targeted_change(text: str) -> TargetedChange:
     return change
 
 
-def _apply_edit_blocks(
-    original: str, edits: list[tuple[str, str, str]]
-) -> tuple[str, list[str]]:
+def _apply_edit_blocks(original: str, edits: list[tuple[str, str, str]]) -> tuple[str, list[str]]:
     """Apply SEARCH/REPLACE blocks on whole lines; each SEARCH must match exactly once.
 
     Matching is line-based (never substring) so `return valu` cannot silently match
@@ -300,7 +298,9 @@ def _targeted_prompt(target_rel: Path, goal: str, original: str, *, retry_note: 
         "<complete new regression test: FAILS on the current file, PASSES after your edit>\n"
         "```\n\n"
         "Rules: one or more EDIT blocks; each SEARCH must be copied verbatim from the current "
-        "file; do not return the whole file; the NEW test file is mandatory.\n\n"
+        "file; preserve leading spaces exactly; no Markdown fences inside SEARCH or REPLACE "
+        "bodies; every EDIT path must equal the selected file; do not return the whole file; "
+        "the NEW test file is mandatory.\n\n"
         f"Current file ({target_rel}):\n{original}"
     )
 
@@ -480,17 +480,13 @@ class RepoWorker:
             update={"effect_key": effect_key, "idempotency_key": effect_key}
         ).ensure_hashes()
         self._raise_if_cancelled()
-        receipt = self.action_gateway.execute_envelope_sync(
-            envelope, context=self.actor_context
-        )
+        receipt = self.action_gateway.execute_envelope_sync(envelope, context=self.actor_context)
         self._effect_receipt_ids.append(receipt.receipt_id)
         self._raise_if_cancelled()
         return receipt
 
     def _run_effect(self, cmd: list[str], *, timeout: float = 120.0) -> dict[str, Any]:
-        receipt = self._action_effect(
-            "proc.run", {"argv": cmd, "timeout_s": timeout}
-        )
+        receipt = self._action_effect("proc.run", {"argv": cmd, "timeout_s": timeout})
         result = dict(receipt.post_observation.get("result") or {})
         exit_code = int(result.get("exit_code", 1))
         return {
@@ -693,9 +689,7 @@ class RepoWorker:
                 findings["candidate_files"].append(str(target_rel))
                 findings["file_preview"] = text[:500]
                 if self.parser_dogfood_fixture:
-                    findings["off_by_one_suspected"] = (
-                        "end - start" in text and "+ 1" not in text
-                    )
+                    findings["off_by_one_suspected"] = "end - start" in text and "+ 1" not in text
         elif not self.parser_dogfood_fixture:
             # Generic path: accept explicit goal path mentions, never invent dogfood.
             goal = str(task.inputs.get("goal") or "")
@@ -841,7 +835,15 @@ class RepoWorker:
                     break
                 change = _parse_targeted_change(inference.text)
                 if change.edits:
-                    candidate, unmatched = _apply_edit_blocks(original, change.edits)
+                    wrong_paths = [path for path, _, _ in change.edits if path != str(target_rel)]
+                    if wrong_paths:
+                        candidate = original
+                        unmatched = [
+                            f"EDIT path differs from selected target: {path}"
+                            for path in wrong_paths
+                        ]
+                    else:
+                        candidate, unmatched = _apply_edit_blocks(original, change.edits)
                     if not unmatched:
                         patched = candidate
                         edits_applied = len(change.edits)
@@ -849,7 +851,10 @@ class RepoWorker:
                         break
                     retry_note = (
                         "Your previous EDIT blocks did not match the current file verbatim. "
-                        "Copy SEARCH lines exactly as they appear.\n\n"
+                        "Copy SEARCH lines exactly as they appear; "
+                        "preserve leading spaces exactly, "
+                        "use no Markdown fences inside SEARCH or REPLACE bodies, and use only "
+                        "the selected file's exact EDIT path.\n\n"
                     )
                 else:
                     # Some models still answer with a whole file; accept it only if it
@@ -1051,9 +1056,7 @@ class RepoWorker:
             for match in re.findall(r"(?:[\w.-]+/)+[\w.-]+\.py", goal):
                 cand = Path(match)
                 name = cand.name.lower()
-                if (
-                    "test" in name or cand.parts[0] == "tests"
-                ) and (handle.path / cand).exists():
+                if ("test" in name or cand.parts[0] == "tests") and (handle.path / cand).exists():
                     test_rel = cand
                     break
         if test_rel is not None:
@@ -1151,9 +1154,7 @@ class RepoWorker:
                 "commands": commands,
                 "worktree": handle.to_dict(),
                 "parser_dogfood_fixture": self.parser_dogfood_fixture,
-                "focused_check_paths": (
-                    [str(test_rel)] if test_rel is not None else []
-                ),
+                "focused_check_paths": ([str(test_rel)] if test_rel is not None else []),
                 "defect_proof": defect_proof,
             },
             finished_at=utc_now().isoformat(),
@@ -1198,12 +1199,8 @@ class RepoWorker:
                 if path and path not in changed_paths:
                     changed_paths.append(path)
         target_hint = ", ".join(changed_paths[:5]) if changed_paths else "the changed file"
-        verify_commands = (
-            list((verify.artifacts or {}).get("commands") or []) if verify else []
-        )
-        focused_raw = task.inputs.get("focused_check_paths") or task.inputs.get(
-            "test_file"
-        )
+        verify_commands = list((verify.artifacts or {}).get("commands") or []) if verify else []
+        focused_raw = task.inputs.get("focused_check_paths") or task.inputs.get("test_file")
         focused_paths: list[str] = []
         if isinstance(focused_raw, list):
             focused_paths = [str(x) for x in focused_raw if str(x).strip()]
