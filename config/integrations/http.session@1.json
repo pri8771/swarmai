@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "integration_id": "http.session",
+  "integration_version": "1",
+  "adapter_class": "http_session",
+  "operations": {
+    "page.open": {
+      "side_effect_class": "none",
+      "risk_class": "low",
+      "scopes": [
+        "web.read"
+      ],
+      "read_data_classes": [
+        "page_state"
+      ],
+      "write_data_classes": []
+    },
+    "form.submit": {
+      "side_effect_class": "consequential",
+      "risk_class": "medium",
+      "scopes": [
+        "web.submit",
+        "web.read"
+      ],
+      "read_data_classes": [
+        "request_receipt",
+        "submission"
+      ],
+      "write_data_classes": [
+        "submission"
+      ]
+    }
+  },
+  "read_data_classes": [
+    "page_state",
+    "request_receipt",
+    "submission"
+  ],
+  "write_data_classes": [
+    "submission"
+  ],
+  "network_scopes": [
+    "http://127.0.0.1"
+  ],
+  "filesystem_scopes": [],
+  "secrets_refs_required": [],
+  "risk_class": "medium",
+  "sandbox_required": false,
+  "host_requirements": [
+    "owner_authorized_session"
+  ],
+  "user_interaction_consequential": true
+}
