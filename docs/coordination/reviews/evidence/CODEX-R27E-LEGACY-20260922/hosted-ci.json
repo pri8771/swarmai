@@ -1,0 +1,16 @@
+{
+  "source_sha": "e924351bd93510eaae279225db3a2fa447dd6894",
+  "runs": [
+    35687989458,
+    35687985663
+  ],
+  "observed_checks": [
+    "offline",
+    "console",
+    "live-gated"
+  ],
+  "conclusion": "FAILURE",
+  "executable_steps_per_job": 0,
+  "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the Billing & plans section in your settings",
+  "interpretation": "Hosted account prerequisite blocked job start; not CI green, no executed code-test failure observed. No billing/spend changes made."
+}

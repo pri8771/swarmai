@@ -16,6 +16,9 @@
     },
     "checks.txt": {
       "sha256": "d6c5c2a8db62c0a4c429a5bca40963f926384fcb6700f85edb390fe7984b3fd8"
+    },
+    "hosted-ci.json": {
+      "sha256": "c6f41bf965174cde904fb0df4ecc34e4169efc2bca9f23c549cb2dbc798b4b02"
     }
   }
 }
