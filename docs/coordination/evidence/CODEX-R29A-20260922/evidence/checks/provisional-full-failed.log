@@ -1,0 +1,1100 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+database=swarm_r29a_check_87598_1790069776
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests -rs
+database_create_exit=0
+........................................................................ [ 11%]
+........................................................................ [ 23%]
+.....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.......F.FFF....FFF.F............. [ 35%]
+........................................................................ [ 47%]
+........................................................................ [ 58%]
+........................................................................ [ 70%]
+........................................................................ [ 82%]
+........................................................................ [ 94%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+___ test_kill_after_side_effect_before_finalize_reconciles_to_succeeded_once ___
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_kill_after_side_effect_be0')
+
+    @pytest.mark.asyncio
+    async def test_kill_after_side_effect_before_finalize_reconciles_to_succeeded_once(
+        factory, tmp_path
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110f2dfd0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_kill_after_side_effect_be0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+______________ test_kill_before_side_effect_retries_exactly_once _______________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_kill_before_side_effect_r0')
+
+    @pytest.mark.asyncio
+    async def test_kill_before_side_effect_retries_exactly_once(factory, tmp_path):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111057d90>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_kill_before_side_effect_r0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____________________ test_live_executor_is_not_taken_over _____________________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_live_executor_is_not_take0')
+
+    @pytest.mark.asyncio
+    async def test_live_executor_is_not_taken_over(factory, tmp_path):
+>       _, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111054550>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_live_executor_is_not_take0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+______ test_orphan_never_returns_to_reserved_and_recovery_has_one_winner _______
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_orphan_never_returns_to_r0')
+
+    def test_orphan_never_returns_to_reserved_and_recovery_has_one_winner(factory, tmp_path):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x1111df230>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_orphan_never_returns_to_r0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+____________ test_irreversible_not_applied_requires_operator_rearm _____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_irreversible_not_applied_0')
+
+    @pytest.mark.asyncio
+    async def test_irreversible_not_applied_requires_operator_rearm(factory, tmp_path):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path, "irreversible")
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x10d4643e0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_irreversible_not_applied_0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___ test_reconcile_garbage_verdict_stays_unknown_and_never_executes[unknown] ___
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1110071c0>
+verdict = 'unknown'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("verdict", ["unknown", "garbage", "failed"])
+    async def test_reconcile_garbage_verdict_stays_unknown_and_never_executes(
+        factory, tmp_path, monkeypatch, verdict
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x1110ea690>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___ test_reconcile_garbage_verdict_stays_unknown_and_never_executes[garbage] ___
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x111007690>
+verdict = 'garbage'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("verdict", ["unknown", "garbage", "failed"])
+    async def test_reconcile_garbage_verdict_stays_unknown_and_never_executes(
+        factory, tmp_path, monkeypatch, verdict
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111157570>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___ test_reconcile_garbage_verdict_stays_unknown_and_never_executes[failed] ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x111006dd0>
+verdict = 'failed'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("verdict", ["unknown", "garbage", "failed"])
+    async def test_reconcile_garbage_verdict_stays_unknown_and_never_executes(
+        factory, tmp_path, monkeypatch, verdict
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111113df0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_garbage_verdict2/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+____________ test_reconciliation_does_not_restore_revoked_approval _____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconciliation_does_not_r0')
+
+    @pytest.mark.asyncio
+    async def test_reconciliation_does_not_restore_revoked_approval(factory, tmp_path):
+>       path, _, store, gateway, env = setup_effect(factory, tmp_path)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:252: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110f11050>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconciliation_does_not_r0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____ test_stale_executor_cannot_finalize_or_overwrite_observations[False] _____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_stale_executor_cannot_fin0')
+new_attempt = False
+
+    @pytest.mark.parametrize("new_attempt", [False, True])
+    def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_path, new_attempt):
+>       _, _, store, gateway, env = setup_effect(factory, tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111378750>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_stale_executor_cannot_fin0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____ test_stale_executor_cannot_finalize_or_overwrite_observations[True] ______
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_stale_executor_cannot_fin1')
+new_attempt = True
+
+    @pytest.mark.parametrize("new_attempt", [False, True])
+    def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_path, new_attempt):
+>       _, _, store, gateway, env = setup_effect(factory, tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110dffd40>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_stale_executor_cannot_fin1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_recovery_cannot_reclassify_effect_or_change_timeout[change0-effect_class_binding_mismatch] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recovery_cannot_reclassif0')
+change = {'side_effect_class': 'consequential'}
+error = 'effect_class_binding_mismatch'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "change, error",
+        [
+            ({"side_effect_class": "consequential"}, "effect_class_binding_mismatch"),
+            ({"timeout_seconds": 2}, "effect_timeout_binding_mismatch"),
+        ],
+    )
+    async def test_recovery_cannot_reclassify_effect_or_change_timeout(
+        factory, tmp_path, change, error
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path, "irreversible")
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110dff7a0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recovery_cannot_reclassif0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_recovery_cannot_reclassify_effect_or_change_timeout[change1-effect_timeout_binding_mismatch] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recovery_cannot_reclassif1')
+change = {'timeout_seconds': 2}, error = 'effect_timeout_binding_mismatch'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "change, error",
+        [
+            ({"side_effect_class": "consequential"}, "effect_class_binding_mismatch"),
+            ({"timeout_seconds": 2}, "effect_timeout_binding_mismatch"),
+        ],
+    )
+    async def test_recovery_cannot_reclassify_effect_or_change_timeout(
+        factory, tmp_path, change, error
+    ):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path, "irreversible")
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110e17a10>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recovery_cannot_reclassif1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+____________ test_rearm_rejects_unknown_project_and_nonfailed_state ____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_rearm_rejects_unknown_pro0')
+
+    def test_rearm_rejects_unknown_project_and_nonfailed_state(factory, tmp_path):
+>       _, _, store, _, env = setup_effect(factory, tmp_path, "irreversible")
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:322: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110e149f0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_rearm_rejects_unknown_pro0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___________ test_reconcile_exception_is_retained_as_pending_receipt ____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_exception_is_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1110c8980>
+
+    @pytest.mark.asyncio
+    async def test_reconcile_exception_is_retained_as_pending_receipt(factory, tmp_path, monkeypatch):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11105c7a0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_reconcile_exception_is_re0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+____________ test_concurrent_reconcile_has_one_terminal_disposition ____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_concurrent_reconcile_has_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1110caba0>
+
+    def test_concurrent_reconcile_has_one_terminal_disposition(factory, tmp_path, monkeypatch):
+        import asyncio
+        import threading
+    
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:362: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111163650>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_concurrent_reconcile_has_0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+____________ test_public_repository_rejects_missing_execution_token ____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_public_repository_rejects0')
+
+    def test_public_repository_rejects_missing_execution_token(factory, tmp_path):
+        from swarm.contracts.actions import ActionReceiptV17
+    
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111162ed0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_public_repository_rejects0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_______________ test_malformed_reconcile_result_is_pending[None] _______________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11115cbb0>
+bad_result = None
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("bad_result", [None, [], "bad"])
+    async def test_malformed_reconcile_result_is_pending(factory, tmp_path, monkeypatch, bad_result):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:422: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x1111f9180>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___________ test_malformed_reconcile_result_is_pending[bad_result1] ____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1096ecb40>
+bad_result = []
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("bad_result", [None, [], "bad"])
+    async def test_malformed_reconcile_result_is_pending(factory, tmp_path, monkeypatch, bad_result):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:422: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110f922b0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_______________ test_malformed_reconcile_result_is_pending[bad] ________________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1096ec0c0>
+bad_result = 'bad'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("bad_result", [None, [], "bad"])
+    async def test_malformed_reconcile_result_is_pending(factory, tmp_path, monkeypatch, bad_result):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_crash_window.py:422: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111238050>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_malformed_reconcile_resul2/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____ test_legacy_disposition_service_auth[roles0-projects0--unauthorized] _____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic0')
+roles = {'operator'}, projects = {'crash_project'}, authorization = ''
+code = 'unauthorized'
+
+    @pytest.mark.parametrize(
+        ("roles", "projects", "authorization", "code"),
+        [
+            ({"operator"}, {"crash_project"}, "", "unauthorized"),
+            ({"operator"}, {"crash_project"}, None, "unauthorized"),
+            ({"operator"}, {"crash_project"}, "Bearer unregistered", "unauthorized"),
+            ({"viewer"}, {"crash_project"}, "bearer atk_r27e_auth", "operator_required"),
+            ({"operator"}, {"other_project"}, "bearer atk_r27e_auth", "forbidden_project"),
+        ],
+    )
+    def test_legacy_disposition_service_auth(factory, tmp_path, roles, projects, authorization, code):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110db49b0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+___ test_legacy_disposition_service_auth[roles1-projects1-None-unauthorized] ___
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic1')
+roles = {'operator'}, projects = {'crash_project'}, authorization = None
+code = 'unauthorized'
+
+    @pytest.mark.parametrize(
+        ("roles", "projects", "authorization", "code"),
+        [
+            ({"operator"}, {"crash_project"}, "", "unauthorized"),
+            ({"operator"}, {"crash_project"}, None, "unauthorized"),
+            ({"operator"}, {"crash_project"}, "Bearer unregistered", "unauthorized"),
+            ({"viewer"}, {"crash_project"}, "bearer atk_r27e_auth", "operator_required"),
+            ({"operator"}, {"other_project"}, "bearer atk_r27e_auth", "forbidden_project"),
+        ],
+    )
+    def test_legacy_disposition_service_auth(factory, tmp_path, roles, projects, authorization, code):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110e2ecc0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_legacy_disposition_service_auth[roles2-projects2-Bearer unregistered-unauthorized] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic2')
+roles = {'operator'}, projects = {'crash_project'}
+authorization = 'Bearer unregistered', code = 'unauthorized'
+
+    @pytest.mark.parametrize(
+        ("roles", "projects", "authorization", "code"),
+        [
+            ({"operator"}, {"crash_project"}, "", "unauthorized"),
+            ({"operator"}, {"crash_project"}, None, "unauthorized"),
+            ({"operator"}, {"crash_project"}, "Bearer unregistered", "unauthorized"),
+            ({"viewer"}, {"crash_project"}, "bearer atk_r27e_auth", "operator_required"),
+            ({"operator"}, {"other_project"}, "bearer atk_r27e_auth", "forbidden_project"),
+        ],
+    )
+    def test_legacy_disposition_service_auth(factory, tmp_path, roles, projects, authorization, code):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x1110cdb50>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic2/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_legacy_disposition_service_auth[roles3-projects3-bearer atk_r27e_auth-operator_required] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic3')
+roles = {'viewer'}, projects = {'crash_project'}
+authorization = 'bearer atk_r27e_auth', code = 'operator_required'
+
+    @pytest.mark.parametrize(
+        ("roles", "projects", "authorization", "code"),
+        [
+            ({"operator"}, {"crash_project"}, "", "unauthorized"),
+            ({"operator"}, {"crash_project"}, None, "unauthorized"),
+            ({"operator"}, {"crash_project"}, "Bearer unregistered", "unauthorized"),
+            ({"viewer"}, {"crash_project"}, "bearer atk_r27e_auth", "operator_required"),
+            ({"operator"}, {"other_project"}, "bearer atk_r27e_auth", "forbidden_project"),
+        ],
+    )
+    def test_legacy_disposition_service_auth(factory, tmp_path, roles, projects, authorization, code):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11118e150>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic3/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_legacy_disposition_service_auth[roles4-projects4-bearer atk_r27e_auth-forbidden_project] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic4')
+roles = {'operator'}, projects = {'other_project'}
+authorization = 'bearer atk_r27e_auth', code = 'forbidden_project'
+
+    @pytest.mark.parametrize(
+        ("roles", "projects", "authorization", "code"),
+        [
+            ({"operator"}, {"crash_project"}, "", "unauthorized"),
+            ({"operator"}, {"crash_project"}, None, "unauthorized"),
+            ({"operator"}, {"crash_project"}, "Bearer unregistered", "unauthorized"),
+            ({"viewer"}, {"crash_project"}, "bearer atk_r27e_auth", "operator_required"),
+            ({"operator"}, {"other_project"}, "bearer atk_r27e_auth", "forbidden_project"),
+        ],
+    )
+    def test_legacy_disposition_service_auth(factory, tmp_path, roles, projects, authorization, code):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11120dc50>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_servic4/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+________________ test_legacy_disposition_exact_token_and_audit _________________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_exact_0')
+
+    def test_legacy_disposition_exact_token_and_audit(factory, tmp_path):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x110b5aa50>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_exact_0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____________ test_legacy_not_applied_keeps_audit_and_cannot_rearm _____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_not_applied_keeps_0')
+
+    @pytest.mark.asyncio
+    async def test_legacy_not_applied_keeps_audit_and_cannot_rearm(factory, tmp_path):
+>       path, adapter, store, gateway, env = setup_effect(factory, tmp_path)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111279490>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_not_applied_keeps_0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+________ test_recover_orphaned_binds_stored_timeout_and_rejects_legacy _________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recover_orphaned_binds_st0')
+
+    def test_recover_orphaned_binds_stored_timeout_and_rejects_legacy(factory, tmp_path):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11127b170>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_recover_orphaned_binds_st0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+______________ test_concurrent_legacy_disposition_has_one_winner _______________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_concurrent_legacy_disposi0')
+
+    def test_concurrent_legacy_disposition_has_one_winner(factory, tmp_path):
+        """Race regression: repository must lock or CAS the exact execution token."""
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111225090>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_concurrent_legacy_disposi0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_ test_legacy_disposition_rejects_missing_audit_or_new_format[operator_subject] _
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject0')
+missing = 'operator_subject'
+
+    @pytest.mark.parametrize("missing", ["operator_subject", "reason", "evidence_ref", None])
+    def test_legacy_disposition_rejects_missing_audit_or_new_format(factory, tmp_path, missing):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111224e10>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject0/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+_____ test_legacy_disposition_rejects_missing_audit_or_new_format[reason] ______
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject1')
+missing = 'reason'
+
+    @pytest.mark.parametrize("missing", ["operator_subject", "reason", "evidence_ref", None])
+    def test_legacy_disposition_rejects_missing_audit_or_new_format(factory, tmp_path, missing):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11124bd90>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject1/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+__ test_legacy_disposition_rejects_missing_audit_or_new_format[evidence_ref] ___
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject2')
+missing = 'evidence_ref'
+
+    @pytest.mark.parametrize("missing", ["operator_subject", "reason", "evidence_ref", None])
+    def test_legacy_disposition_rejects_missing_audit_or_new_format(factory, tmp_path, missing):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x11122b430>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject2/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+______ test_legacy_disposition_rejects_missing_audit_or_new_format[None] _______
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+tmp_path = PosixPath('/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject3')
+missing = None
+
+    @pytest.mark.parametrize("missing", ["operator_subject", "reason", "evidence_ref", None])
+    def test_legacy_disposition_rejects_missing_audit_or_new_format(factory, tmp_path, missing):
+>       _, _, store, _, env = setup_effect(factory, tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/db/test_effect_legacy_recovery.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/integration/db/test_effect_crash_window.py:66: in setup_effect
+    adapter = FileEffectAdapter(str(path))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <tests.integration.db._effect_crash_child.FileEffectAdapter object at 0x111228ff0>
+path = '/private/var/folders/fg/lmdhrms177s93m879bkgvjzr0000gn/T/pytest-of-pchordia/pytest-430/test_legacy_disposition_reject3/effects.txt'
+crash = None
+
+    def __init__(self, path: str, crash: str | None = None) -> None:
+>       super().__init__()
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/_effect_crash_child.py:27: TypeError
+__________ test_reservation_visible_to_second_process_before_execute ___________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_reservation_visible_to_second_process_before_execute(factory) -> None:
+        adapter = ApiMcpAdapter(
+            load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+        )
+        gw = _gateway(adapter, factory)
+        env = adapter.normalize(
+            {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-process"}
+        )
+        env = bind_lease(factory, env)
+        env.approval_id = gw.make_approval(env, context=_context()).approval_id
+    
+        ctx = mp.get_context("spawn")
+        started, release, results = ctx.Event(), ctx.Event(), ctx.Queue()
+        child = ctx.Process(
+            target=run_paused_execution,
+            args=(DATABASE_URL, env.model_dump_json(), started, release, results),
+        )
+        child.start()
+        try:
+            assert started.wait(timeout=60), "child never reached the adapter"
+            # Process A is inside adapter.execute; its admission is already committed.
+>           with pytest.raises(EffectConflictError, match="effect_already_executing"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE EffectConflictError
+
+tests/integration/db/test_effect_transactions.py:134: Failed
+__________ test_retry_of_same_effect_does_not_consume_approval_twice ___________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_retry_of_same_effect_does_not_consume_approval_twice(factory) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:215: TypeError
+___________ test_retry_after_revocation_or_expiry_is_denied[revoked] ___________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+how = 'revoked'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("how", ["revoked", "expired"])
+    async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:248: TypeError
+___________ test_retry_after_revocation_or_expiry_is_denied[expired] ___________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+how = 'expired'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("how", ["revoked", "expired"])
+    async def test_retry_after_revocation_or_expiry_is_denied(factory, how: str) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:248: TypeError
+____________ test_not_applied_retry_rebinds_from_grant_a_to_b_once _____________
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_not_applied_retry_rebinds_from_grant_a_to_b_once(factory) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:427: TypeError
+____ test_not_applied_retry_replacement_grant_must_still_be_active[revoked] ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+how = 'revoked'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("how", ["revoked", "expired"])
+    async def test_not_applied_retry_replacement_grant_must_still_be_active(factory, how: str) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:502: TypeError
+____ test_not_applied_retry_replacement_grant_must_still_be_active[expired] ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+how = 'expired'
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("how", ["revoked", "expired"])
+    async def test_not_applied_retry_replacement_grant_must_still_be_active(factory, how: str) -> None:
+>       raising = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:502: TypeError
+____ test_returning_to_consumed_grant_on_same_effect_does_not_consume_again ____
+
+factory = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg:///swarm_r29a_check_87598_1790069776?host=%2Ftmp%2Fswarm-pgcheck.QxqRvZ&port=56421), autoflush=False, expire_on_commit=False)
+
+    @pytest.mark.asyncio
+    async def test_returning_to_consumed_grant_on_same_effect_does_not_consume_again(factory):
+>       adapter = RaisingAdapter()
+                  ^^^^^^^^^^^^^^^^
+E       TypeError: ApiMcpAdapter.__init__() missing 1 required positional argument: 'manifest'
+
+tests/integration/db/test_effect_transactions.py:603: TypeError
+41 failed, 571 passed in 38.94s
+pytest_exit=1
+cleanup_remaining=0

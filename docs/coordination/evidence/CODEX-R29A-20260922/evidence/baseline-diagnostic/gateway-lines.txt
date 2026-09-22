@@ -1,0 +1,95 @@
+   320	        if terminal is None:
+   321	            raise ReconciliationRequiredError("succeeded_effect_missing_receipt")
+   322	        return terminal
+   323	
+   324	    def _finalize(
+   325	        self,
+   326	        envelope: ActionEnvelope,
+   327	        effect: dict[str, Any],
+   328	        *,
+   329	        state: str,
+   330	        outcome: str,
+   331	        pre: dict[str, Any],
+   332	        post: dict[str, Any],
+   333	        started: Any = None,
+   334	        external_id: str | None = None,
+   335	        reconciliation: dict[str, Any] | None = None,
+   336	        reconciliation_state: str = "none",
+   337	        artifacts: list[str] | None = None,
+   338	        state_reason: str | None = None,
+   339	    ) -> ActionReceiptV17:
+   340	        receipt = self._build_receipt(
+   341	            envelope,
+   342	            effect_id=effect["effect_id"],
+   343	            outcome=outcome,
+   344	            pre=pre,
+   345	            post=post,
+   346	            started=started,
+   347	            reconciliation_state=reconciliation_state,
+   348	            external_id=external_id,
+   349	            artifacts=artifacts,
+   350	        )
+   351	        return self.store.finalize_with_receipt(
+   352	            project_id=envelope.project_id,
+   353	            effect_key=envelope.effect_key,
+   354	            state=state,
+   355	            state_reason=state_reason,
+   356	            post_observation=post,
+   357	            external_id=external_id,
+   358	            reconciliation=reconciliation,
+   359	            receipt=receipt,
+   360	            expected_execution=(
+   361	                effect.get("executor_id"),
+   362	                effect["attempt_count"],
+   363	                effect["state"],
+   364	            ),
+   365	        )
+   600	        arts: list[str] = []
+   601	        result = post.get("result") if isinstance(post.get("result"), dict) else post
+   602	        if isinstance(result, dict):
+   603	            if result.get("path"):
+   604	                arts.append(f"file:{result['path']}")
+   605	            if result.get("external_id"):
+   606	                arts.append(f"ext:{result['external_id']}")
+   607	            if result.get("navigated_to"):
+   608	                arts.append(f"url:{result['navigated_to']}")
+   609	        return arts
+   610	
+   611	    def _build_receipt(
+   612	        self,
+   613	        envelope: ActionEnvelope,
+   614	        *,
+   615	        effect_id: str,
+   616	        outcome: str,
+   617	        pre: dict[str, Any],
+   618	        post: dict[str, Any],
+   619	        started: Any = None,
+   620	        reconciliation_state: str = "none",
+   621	        external_id: str | None = None,
+   622	        artifacts: list[str] | None = None,
+   623	    ) -> ActionReceiptV17:
+   624	        finished = utc_now()
+   625	        digest = payload_hash({"pre": pre, "post": post, "outcome": outcome})
+   626	        return ActionReceiptV17(
+   627	            action_id=envelope.action_id,
+   628	            effect_key=envelope.effect_key,
+   629	            effect_id=effect_id,
+   630	            approval_id=envelope.approval_id,
+   631	            project_id=envelope.project_id,
+   632	            integration_id=envelope.integration_id,
+   633	            integration_version=envelope.integration_version,
+   634	            operation=envelope.operation,
+   635	            destination=envelope.destination,
+   636	            pre_observation=pre,
+   637	            post_observation=post,
+   638	            started_at=started,
+   639	            finished_at=finished,
+   640	            external_id=external_id,
+   641	            outcome=outcome,  # type: ignore[arg-type]
+   642	            effective_side_effect_class=envelope.side_effect_class,
+   643	            effective_risk_class=envelope.risk_class,
+   644	            reconciliation_state=reconciliation_state,
+   645	            attempt_refs=[new_id("aat_")],
+   646	            evidence_digest=digest,
+   647	            authorized_artifacts=list(artifacts or []),
+   648	        )

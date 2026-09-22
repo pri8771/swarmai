@@ -1,0 +1,101 @@
+diff --git a/tests/integration/db/_effect_crash_child.py b/tests/integration/db/_effect_crash_child.py
+index 3f04a0b..0f746a7 100644
+--- a/tests/integration/db/_effect_crash_child.py
++++ b/tests/integration/db/_effect_crash_child.py
+@@ -13,6 +13,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
+ from swarm.tools.adapters.api_mcp import ApiMcpAdapter
+ from swarm.tools.effects import DurableEffectRepository
+ from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
++from swarm.tools.manifests import MANIFEST_DIR, load_manifest
+ from swarm.tools.v17_gateway import ConsequentialToolGateway
+ 
+ 
+@@ -24,7 +25,7 @@ def _registry(adapter):
+ 
+ class FileEffectAdapter(ApiMcpAdapter):
+     def __init__(self, path: str, crash: str | None = None) -> None:
+-        super().__init__()
++        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
+         self.path = Path(path)
+         self.crash = crash
+         self.reconcile_calls = 0
+diff --git a/tests/integration/db/_effect_tx_child.py b/tests/integration/db/_effect_tx_child.py
+index 0f117f2..9f15c6f 100644
+--- a/tests/integration/db/_effect_tx_child.py
++++ b/tests/integration/db/_effect_tx_child.py
+@@ -11,6 +11,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
+ from swarm.tools.adapters.api_mcp import ApiMcpAdapter
+ from swarm.tools.effects import DurableEffectRepository
+ from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
++from swarm.tools.manifests import MANIFEST_DIR, load_manifest
+ from swarm.tools.v17_gateway import ConsequentialToolGateway
+ 
+ 
+@@ -24,7 +25,7 @@ class PausingAdapter(ApiMcpAdapter):
+     """Signals `started` once inside execute(), then blocks until `release`."""
+ 
+     def __init__(self, started: Any, release: Any) -> None:
+-        super().__init__()
++        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
+         self._started = started
+         self._release = release
+ 
+diff --git a/tests/integration/db/test_effect_crash_window.py b/tests/integration/db/test_effect_crash_window.py
+index 1b5b71e..9c2401b 100644
+--- a/tests/integration/db/test_effect_crash_window.py
++++ b/tests/integration/db/test_effect_crash_window.py
+@@ -15,6 +15,7 @@ from swarm.db.models import Base
+ from swarm.tools.adapter_registry import AdapterRegistry
+ from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
+ from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
++from swarm.tools.manifests import manifest_digest
+ from swarm.tools.v17_gateway import (
+     ApprovalInvalidError,
+     ConsequentialToolGateway,
+@@ -265,7 +266,8 @@ async def test_reconciliation_does_not_restore_revoked_approval(factory, tmp_pat
+ 
+ @pytest.mark.parametrize("new_attempt", [False, True])
+ def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_path, new_attempt):
+-    _, _, store, gateway, env = setup_effect(factory, tmp_path)
++    _, adapter, store, gateway, env = setup_effect(factory, tmp_path)
++    manifest_hash = manifest_digest(adapter.manifest)
+     old = begin(store, env)
+     age(factory, env)
+     assert recover(store, env)
+@@ -279,12 +281,21 @@ def test_stale_executor_cannot_finalize_or_overwrite_observations(factory, tmp_p
+             state_reason="not_applied",
+             pre={},
+             post={"state": "not_applied"},
++            manifest_hash=manifest_hash,
+         )
+         store.begin_execution(env, executor_id="executor_new")
+     before = row(store, env)
+     receipts_before = store.list_receipts(project_id=env.project_id, effect_key=env.effect_key)
+     with pytest.raises(EffectConflictError, match="finalize_state_conflict"):
+-        gateway._finalize(env, old, state="succeeded", outcome="succeeded", pre={}, post={})
++        gateway._finalize(
++            env,
++            old,
++            state="succeeded",
++            outcome="succeeded",
++            pre={},
++            post={},
++            manifest_hash=manifest_hash,
++        )
+     with pytest.raises(EffectConflictError, match="pre_observation_state_conflict"):
+         store.attach_pre_observation(
+             project_id=env.project_id,
+diff --git a/tests/integration/db/test_effect_transactions.py b/tests/integration/db/test_effect_transactions.py
+index 2400375..6a6139a 100644
+--- a/tests/integration/db/test_effect_transactions.py
++++ b/tests/integration/db/test_effect_transactions.py
+@@ -76,6 +76,9 @@ def factory(engine):
+ 
+ 
+ class RaisingAdapter(ApiMcpAdapter):
++    def __init__(self) -> None:
++        super().__init__(load_manifest(MANIFEST_DIR / "mcp.echo@1.json"))
++
+     def execute(self, envelope: ActionEnvelope) -> dict[str, Any]:
+         self._calls.append({"effect_key": envelope.effect_key})
+         raise AdapterNotSentError("transport_not_started")

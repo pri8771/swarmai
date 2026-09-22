@@ -1,0 +1,8 @@
+repo=/Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+database=swarm_r29a_check_88613_1790069965
+command=PYTHONPATH="$PWD/src:$PWD" SWARM_DATABASE_URL="postgresql+psycopg:///swarm_r29a_check_88613_1790069965?host=/tmp/swarm-pgcheck.QxqRvZ&port=56421" /Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/pytest -q tests/integration/db/test_effect_crash_window.py tests/integration/db/test_effect_transactions.py
+database_create_exit=0
+...................................                                      [100%]
+35 passed in 4.60s
+pytest_exit=0
+cleanup_remaining=0

@@ -1,0 +1,7 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 9eb193b10f4e, p02_initial_domain_schema
+INFO  [alembic.runtime.migration] Running upgrade 9eb193b10f4e -> a15lease003a0001, V2A-003a / ART-V15-LEASE-FENCING — durable schema delta migration.
+INFO  [alembic.runtime.migration] Running upgrade a15lease003a0001 -> a16know003a0001, V2B-003a / ART-V16-DURABLE-SCHEMA — knowledge_items/links/tombstones.
+INFO  [alembic.runtime.migration] Running upgrade a16know003a0001 -> a17effect004a0001, V2B-004a / ART-V17-DURABLE-EFFECT-SCHEMA — approvals + action_effects.
+INFO  [alembic.runtime.migration] Running upgrade a17effect004a0001 -> a17effect004b0001, R27a / ART-V17-APPROVAL-BINDING — durable immutable action receipts + effect bookkeeping.

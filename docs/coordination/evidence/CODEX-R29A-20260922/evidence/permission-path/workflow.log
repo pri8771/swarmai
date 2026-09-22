@@ -1,0 +1,41 @@
+{
+  "schema_version": "0.5.0",
+  "generated_at": "2026-09-22T09:45:58.640051+00:00",
+  "audit": [
+    {
+      "step": "allowed_read",
+      "outcome": "succeeded",
+      "ok": true
+    },
+    {
+      "step": "denied_outside_allowlist",
+      "ok": true,
+      "error": "path_denied:README.md"
+    },
+    {
+      "step": "human_gate_required",
+      "ok": true,
+      "error": "approval_required"
+    },
+    {
+      "step": "approved_write",
+      "outcome": "succeeded",
+      "ok": true,
+      "approval_id": "apr_2a495ff92d434da996ac9e60baf4a183",
+      "durable_receipt_refs": [
+        "arc_675d62a26b034f44934b690827c0dd16"
+      ]
+    }
+  ],
+  "receipt_count": 4,
+  "probe_file_exists": true,
+  "cost_usd": 0.0,
+  "mock_vs_live": "engineering_local_durable_tool_permission_proof",
+  "mission_id": "msn_d4ebeee309b141718b4a9308df0955f4",
+  "task_id": "tsk_92712928fe814255883e2dea23bd4b9b",
+  "attempt_id": "att_72c6b9fd98474e3eb43c935f3d9e42ef",
+  "ok": true,
+  "report_hash": "034e1178023708a2e5162adbcb36bcd36917b8c82f1abea14a52965f52b7935b"
+}
+{"stored_manifest_digest": "8519620db8d2b5361bcce7da2a28d2b8ce12a2937eacdabaeb5d8335b13b1c00"}
+{"durable_counts": {"action_effects": 1, "action_receipts": 1, "approvals": 1}, "state": "succeeded", "approval_used_count": 1, "result": "PASS_DURABLE_PERMISSION_PATH"}

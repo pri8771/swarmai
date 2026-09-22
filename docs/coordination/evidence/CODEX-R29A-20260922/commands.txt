@@ -1,0 +1,39 @@
+# Baseline diagnostic (accepted base ba458eb)
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+PYTHONPATH=src .venv/bin/python /tmp/swarm-r29a-diagnostic-20260922/baseline_probe.py
+
+# Corrected independent baseline repeat
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/python /tmp/swarm-r29a-diagnostic-20260922/baseline_probe.py
+
+# Focused actual-PostgreSQL proof; wrapper creates and removes one unique DB
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python /tmp/swarm-r29a-bounded-run.py /tmp/swarm-r29a-manifests-pg.log tests/tools/test_integration_manifests.py -rs
+
+# Offline focused selection
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/pytest -q tests/tools/test_integration_manifests.py -m 'not integration'
+
+# Static checks at provisional source
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/ruff check src tests
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/mypy src
+
+# Provisional full run used the same disposable-DB wrapper; exact generated DB/URL is retained in its log header where present.
+
+# Settled compatibility proof (exact generated DB/URL retained in log)
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python /tmp/swarm-r29a-bounded-run.py /tmp/swarm-r29a-compat-pg-green.log tests/integration/db/test_effect_crash_window.py tests/integration/db/test_effect_transactions.py
+
+# Settled full suite (exact generated DB/URL retained in log)
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+/Users/pchordia/Downloads/swarm_codex/review/swarm-source/.venv/bin/python /tmp/swarm-r29a-bounded-run.py /tmp/swarm-r29a-final2-full.log tests -rs
+
+# Settled static checks
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/ruff check src tests
+PYTHONPATH="$PWD/src:$PWD" ../swarm-source/.venv/bin/mypy src
+
+# Exact-source migrated production permission-path proof
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r29a-source
+../swarm-source/.venv/bin/python /tmp/swarm-r29a-permission-final-run.py

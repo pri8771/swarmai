@@ -1,0 +1,6 @@
+1ea1ca5 (HEAD -> codex/swarm-r29a-manifests-20260922, mission/mission_x/tsk_no_goodfix/wbe35105, mission/mission_gene/tsk_generic/wf05328f, mission/mission_fixt/tsk_fixture/w8cf6460) test: migrate crash helpers to versioned manifest constructors
+ tests/integration/db/_effect_crash_child.py      |  3 ++-
+ tests/integration/db/_effect_tx_child.py         |  3 ++-
+ tests/integration/db/test_effect_crash_window.py | 15 +++++++++++++--
+ tests/integration/db/test_effect_transactions.py |  3 +++
+ 4 files changed, 20 insertions(+), 4 deletions(-)

@@ -1,0 +1,7 @@
+cd /Users/pchordia/Downloads/swarm_codex/review/swarm-r28c-source
+git status --short
+git rev-parse HEAD
+git rev-parse HEAD^{tree}
+PYTHONPATH=src .venv/bin/python /tmp/swarm-r29a-diagnostic-20260922/baseline_probe.py > /tmp/swarm-r29a-diagnostic-20260922/baseline_probe.log
+rg -n 'AdapterManifest\(' src/swarm/tools > /tmp/swarm-r29a-diagnostic-20260922/inline_manifest_hits.txt
+rg -n 'integration_version="1\.0"|integration_version\s*==\s*"1\.0"|api\.mcp\.echo|local\.sandbox|browser\.session' src tests > /tmp/swarm-r29a-diagnostic-20260922/version_callers.txt

@@ -1,0 +1,9 @@
+{
+  "database": "swarm_r29a_permission_08ef1d934e",
+  "source_head": "1ea1ca55a2470d94fe704d64c029a991c3c0dea5",
+  "provisional_uncommitted": false,
+  "source_tree": "1b8577c91b2984b804ea6df259e6a47a697ccc31",
+  "migration_exit": 0,
+  "workflow_exit": 0,
+  "cleanup_remaining": 0
+}

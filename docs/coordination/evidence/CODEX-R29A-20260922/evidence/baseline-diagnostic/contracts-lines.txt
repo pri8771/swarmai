@@ -1,0 +1,94 @@
+    85	    actor: str | None = None
+    86	    grantor: str
+    87	    integration_id: str
+    88	    integration_version: str
+    89	    operation: str
+    90	    destination: str
+    91	    payload_hash: str
+    92	    effect_key: str | None = None
+    93	    max_effect_count: int = 1
+    94	    used_count: int = 0
+    95	    expires_at: datetime
+    96	    revoked_at: datetime | None = None
+    97	    policy_version: str = "v17-policy-1"
+    98	    constraints: dict[str, Any] = Field(default_factory=dict)
+    99	    created_at: datetime = Field(default_factory=utc_now)
+   100	
+   101	    def is_active(self, *, now: datetime | None = None, ignore_usage: bool = False) -> bool:
+   102	        clock = now or utc_now()
+   103	        if self.revoked_at is not None:
+   104	            return False
+   105	        if self.expires_at <= clock:
+   106	            return False
+   107	        if not ignore_usage and self.used_count >= self.max_effect_count:
+   108	            return False
+   109	        return True
+   110	
+   111	
+   112	class ActionReceiptV17(StrictModel):
+   113	    schema_version: str = "1.0"
+   114	    receipt_id: str = Field(default_factory=lambda: new_id("arc_"))
+   115	    action_id: str
+   116	    effect_key: str
+   117	    effect_id: str | None = None
+   118	    approval_id: str | None = None
+   119	    project_id: str
+   120	    integration_id: str
+   121	    integration_version: str
+   122	    operation: str
+   123	    destination: str
+   124	    pre_observation: dict[str, Any] = Field(default_factory=dict)
+   125	    post_observation: dict[str, Any] = Field(default_factory=dict)
+   126	    started_at: datetime | None = None
+   127	    finished_at: datetime | None = None
+   128	    external_id: str | None = None
+   129	    outcome: ActionOutcomeV17
+   130	    # Older persisted receipts predate effective classification; do not invent it.
+   131	    effective_side_effect_class: SideEffectClass | None = None
+   132	    effective_risk_class: RiskClass | None = None
+   133	    reconciliation_state: str = "none"
+   134	    attempt_number: int = 0
+   135	    attempt_refs: list[str] = Field(default_factory=list)
+   136	    evidence_digest: str | None = None
+   137	    authorized_artifacts: list[str] = Field(default_factory=list)
+   138	
+   139	
+   140	class OperationDecl(StrictModel):
+   141	    side_effect_class: SideEffectClass
+   142	    risk_class: RiskClass
+   143	    scopes: list[str]
+   144	    read_data_classes: list[str]
+   145	    write_data_classes: list[str]
+   146	
+   147	
+   148	class AdapterManifest(StrictModel):
+   149	    schema_version: str = "1.0"
+   150	    integration_id: str
+   151	    integration_version: str
+   152	    adapter_class: Literal["local_sandbox", "api_mcp", "browser_session"]
+   153	    operations: dict[str, OperationDecl] = Field(default_factory=dict)
+   154	    read_data_classes: list[str] = Field(default_factory=list)
+   155	    write_data_classes: list[str] = Field(default_factory=list)
+   156	    scopes: list[str] = Field(default_factory=list)
+   157	    secrets_required: list[str] = Field(default_factory=list)
+   158	    network_allowed: bool = False
+   159	    filesystem_allowed: bool = False
+   160	    filesystem_roots: list[str] = Field(default_factory=list)
+   161	    side_effect_class: SideEffectClass = "none"
+   162	    risk_class: RiskClass = "low"
+   163	    sandbox_required: bool = False
+   164	    host_requirements: list[str] = Field(default_factory=list)
+   165	    user_interaction_consequential: bool = False
+   166	
+   167	
+   168	class BrowserSessionRef(StrictModel):
+   169	    """Safe browser/session alias only — never cookies/credentials."""
+   170	
+   171	    schema_version: str = "1.0"
+   172	    session_alias: str
+   173	    profile_alias: str
+   174	    site_origin: str
+   175	    intended_destination: str
+   176	    approved_action_id: str | None = None
+   177	    signed_out: bool = False
+   178	    last_health: str = "unknown"

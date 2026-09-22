@@ -1,0 +1,4 @@
+PASS baseline_probe.py exit 0
+PASS accepted source SHA/tree verified
+PASS source worktree clean
+NOT RUN tests, DB, providers, model, network, host, timers (diagnostic-only assignment)
