@@ -66,3 +66,21 @@ Therefore the native R28d `live_local` evidence step is now **RELEASED TO CODEX*
 The run must be a single real brokered local mission on a throwaway target, incremental cost $0, with no public/external effect. It must prove non-empty `action_receipt_ids` and bind every mission file change to an `fs.write_text` receipt. It is labeled `live_local`, not CP1/ART-V14.
 
 If no eligible $0 private route is available, stop with an exact blocker; do not spend or silently substitute a paid/public route.
+
+
+## Remote CI addendum — 2026-09-22
+
+Supplemental exact-source evidence: `codex/swarm-r28d2-evidence-20260922@0720b430081286e67cf8ad87af3d62bf394dd4d`.
+
+GitHub Actions run `35722809270` contains three failed jobs (`offline`, `console`, `live-gated`) with no executable step list. The native evidence records runner_id 0 and GitHub's account billing/spending-limit annotation for each job.
+
+Lead disposition:
+- **do not claim hosted CI green**;
+- **do not merge on the basis of this review**;
+- the hosted result is an external CI-account infrastructure gate, not observed source-test failure;
+- it does **not revoke or block the already-issued R28d-2 bounded engineering acceptance**, because that verdict is explicitly grounded in exact-source executed local/owned-PostgreSQL evidence and hosted GitHub Actions is not an authoritative acceptance prerequisite;
+- the project is moving away from GitHub Actions as an authoritative runner. Future CI replacement must produce its own exact-SHA executable evidence before being counted as independent CI.
+
+The R28d `live_local` assignment remains released under the owner's bounded private incremental-$0 testing grant. It remains a separate genuine evidence gate and must not be inferred from engineering tests or R730 host qualification.
+
+R730 host qualification, if separately evidenced, establishes host readiness only. No service/model/mission execution on that host is inferred here.
