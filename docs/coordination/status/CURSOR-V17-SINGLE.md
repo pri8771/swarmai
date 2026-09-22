@@ -3,22 +3,22 @@
 - Session: `CURSOR-V17-SINGLE`
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
-- Branch SHA: `ebe71f237de2536890ef4f29f27e12efb8986641`
-- Coordination SHA: `baddd46a3bc38240435c04f8e4688ccadffd6a83`
-- Updated: `2026-09-22T02:04:49Z`
-- Trigger: `scheduler`
+- Branch SHA: `05fe7807db3509d68dd8a86a0616c9e8ffaa2307`
+- Coordination SHA: `8733600176c415f6076bee1391c7a1a261010bca`
+- Updated: `2026-09-22T02:08:49Z`
+- Trigger: `manual`
 - Worker engine: `fable`
 - Status: **working**
-- Current packet: `R02c`
+- Current packet: `R02b`
 - Current artifact: `ART-V14-REAL-E2E`
-- Last meaningful activity: `2026-09-22T02:02:09Z`
+- Last meaningful activity: `2026-09-22T02:08:48Z`
 - Spend USD: `0.0`
 - Blocker: REV-R27C (lead diff review of 8dbe5d8 gates R27e/R28a and the whole wiring chain); EXT-ACTIONS-BILLING (apply coordination ci patch first); EXT-V14-LEAD-REVIEW; EXT-G13-*; EXT-G12-REMOTE-ROUTES; EXT-V15-SECOND-HOST; EXT-V17-REALWORLD-GITHUB
 
 ## Update
 
-Session 2 (hold-independent packets): TEST-HYGIENE-01 pushed b4e2a77; MISSION-CANCEL-01 pushed 2237eff (+bind e53da73) with CP3 rerun cp3-20260922T020141Z 9/9 (ebe71f2). Now R02c: echo detection + diff-shaped re-prompt in RepoWorker._implement. REV-R27C still gates R27e/R28a.
+R02c pushed 42f8323 (bind 32ddb91): targeted edit blocks + mandatory regression test, echo detection/re-prompt; 7 tests + end-to-end prove_defect; full suite 444 passed/13 skipped. v14-real-008 attempt 2 RUNNING on candidate 32ddb91 (preregistered 05fe780). REV-R27C still gates R27e/R28a.
 
 ## Next
 
-R02c implement + tests; then attempt 2 of v14-real-008 if the gate allows
+package attempt 2 honestly; then session handoff update
