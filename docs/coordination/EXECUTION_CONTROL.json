@@ -188,7 +188,7 @@
   "requested_target_version": "2.7",
   "v27_contract_status": "proposed_not_accepted",
   "v27_proposal_ref": "docs/coordination/V27_OWNER_REVIEW_PROPOSAL_20260922.md",
-  "secondary_safe_assignment": "docs/coordination/assignments/CODEX_R30B_OFFLINE_DIAGNOSTIC_20260922.md",
+  "secondary_safe_assignment": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md",
   "current_action_holds": {
     "live": true,
     "model": true,
@@ -197,5 +197,7 @@
     "spend": true,
     "main_merge": true,
     "note": "Current owner turn explicitly prohibits new live/model/provider/scheduler/spend/main-merge actions. Offline/source/evidence work may proceed only through released packets."
-  }
+  },
+  "r30b_contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
+  "r30b_diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e"
 }
