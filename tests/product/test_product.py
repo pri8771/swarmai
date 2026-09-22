@@ -9,6 +9,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from swarm.api.app import create_app
+from swarm.db.engine import create_db_engine
+from swarm.db.models import Base
 from swarm.product.contracts import public_product_contract, strip_internal
 from swarm.product.history import HistoryIndex
 from swarm.product.journey import run_product_journey
@@ -25,6 +27,17 @@ def repo(tmp_path: Path) -> Path:
     (tmp_path / "tests").mkdir()
     (tmp_path / "src" / "swarm").mkdir(parents=True)
     return tmp_path
+
+
+@pytest.fixture
+def durable_schema():
+    engine = create_db_engine()
+    Base.metadata.create_all(engine)
+    try:
+        yield
+    finally:
+        Base.metadata.drop_all(engine)
+        engine.dispose()
 
 
 def test_project_store_scrubs_secrets(repo: Path) -> None:
@@ -105,7 +118,8 @@ def test_api_projects_and_contract(repo: Path) -> None:
     assert "sk-" not in blob
 
 
-def test_product_journey_proof(repo: Path) -> None:
+@pytest.mark.integration
+def test_product_journey_proof(repo: Path, durable_schema) -> None:
     proof = run_product_journey(repo)
     assert proof["ok"], proof
     assert proof["cost_usd"] == 0.0
