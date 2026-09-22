@@ -20,6 +20,7 @@ from swarm.tools.fences import (
     StaticFenceProvider,
     StaticPolicyProvider,
 )
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.session_recovery import SessionRecoveryService
 from swarm.tools.v17_gateway import (
     ApprovalInvalidError,
@@ -76,7 +77,9 @@ def _explicit_generations(envelope):
 
 @pytest.mark.asyncio
 async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
-    adapter = LocalSandboxAdapter(root=tmp_path)
+    adapter = LocalSandboxAdapter(
+        load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
+    )
     gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
     env = _explicit_generations(
         adapter.normalize(
@@ -97,7 +100,9 @@ async def test_d3_local_sandbox_adapter(tmp_path: Path) -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_d3_api_mcp_requires_approval_and_dedupes(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gw(
         adapter,
@@ -129,7 +134,9 @@ async def test_d3_api_mcp_requires_approval_and_dedupes(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_wrong_project_denied() -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gw(
         adapter, project="proj_a", scopes={"network.https", "mcp.call"}, store=InMemoryEffectStore()
     )
@@ -143,7 +150,9 @@ async def test_wrong_project_denied() -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_altered_payload_after_approval(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gw(
         adapter,
         project="proj_a",
@@ -176,7 +185,9 @@ async def test_altered_payload_after_approval(factory) -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_changed_destination_denied(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gw(
         adapter,
         project="proj_a",
@@ -209,7 +220,9 @@ async def test_changed_destination_denied(factory) -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_expired_and_revoked_approval(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gw(
         adapter,
         project="proj_a",
@@ -237,7 +250,9 @@ async def test_expired_and_revoked_approval(factory) -> None:
     )
     env2 = _reuse_binding(env, env2)
     revoked = gw.make_approval(env2, context=_context())
-    assert gw.revoke_approval(revoked.approval_id, context=_context(actor="operator"), reason="test")
+    assert gw.revoke_approval(
+        revoked.approval_id, context=_context(actor="operator"), reason="test"
+    )
     env2.approval_id = revoked.approval_id
     with pytest.raises(ApprovalInvalidError):
         await gw.execute_envelope(env2, context=_context())
@@ -245,7 +260,9 @@ async def test_expired_and_revoked_approval(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
-    browser = BrowserSessionAdapter()
+    browser = BrowserSessionAdapter(
+        load_manifest(MANIFEST_DIR / "browser.session@1.json"),
+    )
     gw = _gw(browser, project="proj_a", scopes={"browser.session"}, store=InMemoryEffectStore())
     env = browser.normalize(
         {
@@ -259,7 +276,7 @@ async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
     with pytest.raises(PermissionError, match="unsafe_redirect|destination"):
         await gw.execute_envelope(env, context=_context())
 
-    local = LocalSandboxAdapter(root=tmp_path)
+    local = LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path)
     gw2 = _gw(local, project="proj_a", scopes=set(), store=InMemoryEffectStore())
     env2 = local.normalize({"project_id": "proj_a", "text": "x", "path": "a.txt"})
     with pytest.raises(ToolAuthorizationError):
@@ -269,7 +286,9 @@ async def test_unsafe_redirect_and_denied_scopes(tmp_path: Path) -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_stale_lease_and_cancel_generation(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env = adapter.normalize(
         {
             "project_id": "proj_a",
@@ -318,7 +337,9 @@ async def test_stale_lease_and_cancel_generation(factory) -> None:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_unknown_outcome_requires_reconcile_no_blind_retry(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gw(
         adapter,
         project="proj_a",
@@ -356,7 +377,9 @@ async def test_unknown_outcome_requires_reconcile_no_blind_retry(factory) -> Non
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_session_recovery_login_does_not_submit(factory) -> None:
-    adapter = BrowserSessionAdapter()
+    adapter = BrowserSessionAdapter(
+        load_manifest(MANIFEST_DIR / "browser.session@1.json"),
+    )
     gw = _gw(
         adapter,
         project="proj_a",
@@ -414,7 +437,9 @@ async def test_session_recovery_login_does_not_submit(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_filesystem_escape_denied(tmp_path: Path) -> None:
-    adapter = LocalSandboxAdapter(root=tmp_path)
+    adapter = LocalSandboxAdapter(
+        load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path
+    )
     gw = _gw(adapter, project="proj_a", scopes={"sandbox.fs"}, store=InMemoryEffectStore())
     env = adapter.normalize({"project_id": "proj_a", "text": "x", "path": "../escape.txt"})
     with pytest.raises(PermissionError, match="filesystem_path_escape"):
@@ -425,9 +450,13 @@ async def test_filesystem_escape_denied(tmp_path: Path) -> None:
 @pytest.mark.asyncio
 async def test_three_integration_classes_share_boundary(tmp_path: Path, factory) -> None:
     """V1.7 acceptance: local + API/MCP + browser use same gateway boundary."""
-    local = LocalSandboxAdapter(root=tmp_path)
-    api = ApiMcpAdapter()
-    browser = BrowserSessionAdapter()
+    local = LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path)
+    api = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
+    browser = BrowserSessionAdapter(
+        load_manifest(MANIFEST_DIR / "browser.session@1.json"),
+    )
     browser.register_session(
         BrowserSessionRef(
             session_alias="s1",
@@ -489,14 +518,16 @@ async def test_three_integration_classes_share_boundary(tmp_path: Path, factory)
     r3 = await gw_browser.execute_envelope(env_br, context=_context())
     assert {r1.outcome, r2.outcome, r3.outcome} == {"succeeded"}
     assert r1.integration_id == "local.sandbox"
-    assert r2.integration_id == "api.mcp.echo"
+    assert r2.integration_id == "mcp.echo"
     assert r3.integration_id == "browser.session"
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_cancel_before_execute(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gw(
         adapter,
@@ -538,7 +569,9 @@ async def test_cancel_before_execute(factory) -> None:
 @pytest.mark.asyncio
 async def test_durable_effect_repository_reserve_finalize_idempotent(factory) -> None:
     """Postgres-backed D1 path through the shared isolated fixture."""
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     store = DurableEffectRepository(factory)
     gw = _gw(
         adapter,

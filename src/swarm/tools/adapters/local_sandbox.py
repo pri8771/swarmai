@@ -5,55 +5,36 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest, OperationDecl
+from swarm.contracts.actions import ActionEnvelope, ActionReceiptV17, AdapterManifest
 from swarm.contracts.common import utc_now
 
 
 class LocalSandboxAdapter:
-    def __init__(self, *, root: Path | None = None) -> None:
+    def __init__(self, manifest: AdapterManifest, *, root: Path | None = None) -> None:
+        if manifest.adapter_class != "local_sandbox":
+            raise ValueError("adapter_class_mismatch")
+        self.manifest = AdapterManifest.model_validate(manifest.model_dump())
         self.root = (root or Path("/tmp/swarm-sandbox")).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
-        self.manifest = AdapterManifest(
-            integration_id="local.sandbox",
-            integration_version="1.0",
-            adapter_class="local_sandbox",
-            operations={
-                "write_text": OperationDecl(
-                    side_effect_class="idempotent",
-                    risk_class="low",
-                    scopes=["sandbox.fs"],
-                    read_data_classes=["workspace_file"],
-                    write_data_classes=["workspace_file"],
-                )
-            },
-            read_data_classes=["workspace_file"],
-            write_data_classes=["workspace_file"],
-            scopes=["sandbox.fs"],
-            secrets_required=[],
-            network_allowed=False,
-            filesystem_allowed=True,
-            filesystem_roots=[str(self.root)],
-            side_effect_class="idempotent",
-            risk_class="low",
-            sandbox_required=True,
-        )
 
     def normalize(self, request: dict[str, Any]) -> ActionEnvelope:
         dest = str(request.get("destination") or f"file://{self.root / 'out.txt'}")
+        operation = str(request.get("operation", "write_text"))
+        declaration = self.manifest.operations[operation]
         env = ActionEnvelope(
             project_id=str(request["project_id"]),
             actor=str(request.get("actor", "worker")),
             integration_id=self.manifest.integration_id,
             integration_version=self.manifest.integration_version,
-            operation=str(request.get("operation", "write_text")),
+            operation=operation,
             destination=dest,
             normalized_payload={
                 "text": str(request.get("text", "")),
                 "path": str(request.get("path", "out.txt")),
             },
-            requested_scopes=list(self.manifest.scopes),
-            side_effect_class=self.manifest.side_effect_class,
-            risk_class=self.manifest.risk_class,
+            requested_scopes=list(declaration.scopes),
+            side_effect_class=declaration.side_effect_class,
+            risk_class=declaration.risk_class,
             lease_generation=request.get("lease_generation"),
             cancellation_generation=request.get("cancellation_generation"),
             policy_version=str(request.get("policy_version", "v17-policy-1")),

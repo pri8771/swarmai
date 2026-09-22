@@ -12,6 +12,7 @@ from swarm.db.repositories import MissionRepository
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import EffectConflictError
 from swarm.tools.fences import ActorContext
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import StaleLeaseError
 from tests.integration.db.test_effect_transactions import (
     _gateway,
@@ -75,7 +76,9 @@ def _leased_envelope(factory, adapter):
 
 @pytest.mark.asyncio
 async def test_gateway_admits_current_durable_lease(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
     env.approval_id = gateway.make_approval(env, context=context).approval_id
@@ -88,7 +91,9 @@ async def test_gateway_admits_current_durable_lease(factory):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("change", ["cancel", "worker_generation", "expire", "revoke", "missing"])
 async def test_gateway_fences_durable_change_after_local_precheck(factory, monkeypatch, change):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
     env.approval_id = gateway.make_approval(env, context=context).approval_id
@@ -137,7 +142,9 @@ async def test_gateway_fences_durable_change_after_local_precheck(factory, monke
 
 @pytest.mark.asyncio
 async def test_partial_lease_context_fails_closed(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     env.attempt_id = None
     gateway = _gateway(adapter, factory, project=env.project_id)
@@ -150,7 +157,9 @@ async def test_partial_lease_context_fails_closed(factory):
 
 @pytest.mark.asyncio
 async def test_reserved_effect_cannot_strip_lease_binding(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
     env.approval_id = gateway.make_approval(env, context=context).approval_id
@@ -169,7 +178,9 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
 
     import swarm.tools.effects as effects
 
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     gateway = _gateway(adapter, factory, project=env.project_id)
     env.approval_id = gateway.make_approval(env, context=context).approval_id
@@ -237,7 +248,9 @@ def test_authority_lock_is_held_through_admission_commit(factory, monkeypatch):
 async def test_terminal_or_unknown_effect_cannot_be_reused_by_another_mission(
     factory, monkeypatch, outcome
 ):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     env, context = _leased_envelope(factory, adapter)
     if outcome == "unknown":
         env.normalized_payload["force_unknown"] = True

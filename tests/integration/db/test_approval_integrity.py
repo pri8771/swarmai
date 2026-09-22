@@ -20,6 +20,7 @@ from swarm.tools.adapter_registry import AdapterRegistry
 from swarm.tools.adapters.api_mcp import ApiMcpAdapter
 from swarm.tools.effects import DurableEffectRepository, EffectConflictError, EffectStoreError
 from swarm.tools.fences import ActorContext, LeaseFenceProvider, StaticPolicyProvider
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import ApprovalInvalidError, ConsequentialToolGateway
 from tests.integration.db.effect_fixtures import bind_lease
 
@@ -28,6 +29,7 @@ def _registry(adapter):
     registry = AdapterRegistry()
     registry.register(adapter)
     return registry
+
 
 pytestmark = pytest.mark.integration
 
@@ -92,7 +94,9 @@ def _row(factory, approval_id: str) -> dict[str, Any]:
 
 
 def test_put_approval_twice_rejected_and_row_unchanged(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "insert-only"}
@@ -112,7 +116,9 @@ def test_put_approval_twice_rejected_and_row_unchanged(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_put_cannot_reset_used_count(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "consume-once"}
@@ -135,7 +141,9 @@ async def test_put_cannot_reset_used_count(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_revocation_is_monotonic_and_blocks_execution(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "revoke-me"}
@@ -164,7 +172,9 @@ async def test_revocation_is_monotonic_and_blocks_execution(factory) -> None:
 
 
 def test_revoke_wrong_project_returns_false_and_leaves_grant_active(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw_a = _gateway(adapter, factory, "proj_a")
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "cross-revoke"}
@@ -185,7 +195,9 @@ def test_revoke_wrong_project_returns_false_and_leaves_grant_active(factory) -> 
 
 @pytest.mark.asyncio
 async def test_legacy_null_binding_row_is_non_operational(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw = _gateway(adapter, factory)
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "legacy"}
@@ -235,7 +247,9 @@ async def test_legacy_null_binding_row_is_non_operational(factory) -> None:
 
 @pytest.mark.asyncio
 async def test_project_b_cannot_fetch_project_a_approval(factory) -> None:
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     gw_a = _gateway(adapter, factory, "proj_a")
     env = adapter.normalize(
         {"project_id": "proj_a", "destination": "mcp://echo/default", "body": "isolation"}
@@ -247,7 +261,13 @@ async def test_project_b_cannot_fetch_project_a_approval(factory) -> None:
     assert repo.get_approval(new_id("apr_"), project_id="proj_b") is None  # same answer
     assert repo.get_approval(grant.approval_id, project_id="proj_a") is not None
     # Through the gateway, project B presenting A's approval id sees only unknown_approval.
-    gw_b = _gateway(ApiMcpAdapter(), factory, "proj_b")
+    gw_b = _gateway(
+        ApiMcpAdapter(
+            load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+        ),
+        factory,
+        "proj_b",
+    )
     env_b = adapter.normalize(
         {"project_id": "proj_b", "destination": "mcp://echo/default", "body": "isolation"}
     )

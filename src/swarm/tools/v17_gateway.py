@@ -34,6 +34,7 @@ from swarm.tools.effects import (
     check_effect_binding,
 )
 from swarm.tools.fences import ActorContext, FenceProvider, PolicyProvider
+from swarm.tools.manifests import manifest_digest
 
 
 class ApprovalInvalidError(PermissionError):
@@ -143,6 +144,7 @@ class ConsequentialToolGateway:
     ) -> ActionReceiptV17:
         self._authorize_context(envelope, context)
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
+        definition_digest = manifest_digest(adapter.manifest)
         envelope = self._effective_envelope(envelope)
         envelope.ensure_hashes()
         adapter.validate(envelope)
@@ -226,6 +228,7 @@ class ConsequentialToolGateway:
             return self._finalize(
                 envelope,
                 effect,
+                manifest_hash=definition_digest,
                 state=state,
                 outcome=state,
                 state_reason=reason,
@@ -326,6 +329,7 @@ class ConsequentialToolGateway:
         envelope: ActionEnvelope,
         effect: dict[str, Any],
         *,
+        manifest_hash: str,
         state: str,
         outcome: str,
         pre: dict[str, Any],
@@ -339,6 +343,7 @@ class ConsequentialToolGateway:
     ) -> ActionReceiptV17:
         receipt = self._build_receipt(
             envelope,
+            manifest_hash=manifest_hash,
             effect_id=effect["effect_id"],
             outcome=outcome,
             pre=pre,
@@ -389,6 +394,7 @@ class ConsequentialToolGateway:
         self, envelope: ActionEnvelope, effect: dict[str, Any], *, context: ActorContext
     ) -> ActionReceiptV17:
         adapter = self.registry.resolve(envelope.integration_id, envelope.integration_version)
+        definition_digest = manifest_digest(adapter.manifest)
         prior = self.store.list_receipts(
             project_id=envelope.project_id, effect_key=envelope.effect_key
         )
@@ -402,6 +408,7 @@ class ConsequentialToolGateway:
                 self._finalize(
                     envelope,
                     effect,
+                    manifest_hash=definition_digest,
                     state="unknown",
                     outcome="unknown",
                     state_reason="cancelled_during_execute",
@@ -423,6 +430,7 @@ class ConsequentialToolGateway:
             return self._finalize(
                 envelope,
                 effect,
+                manifest_hash=definition_digest,
                 state="succeeded",
                 outcome="succeeded",
                 pre=effect.get("pre_observation") or {},
@@ -438,6 +446,7 @@ class ConsequentialToolGateway:
             self._finalize(
                 envelope,
                 effect,
+                manifest_hash=definition_digest,
                 state="failed",
                 outcome="failed",
                 state_reason=reason,
@@ -453,6 +462,7 @@ class ConsequentialToolGateway:
         self._finalize(
             envelope,
             effect,
+            manifest_hash=definition_digest,
             state="unknown",
             outcome="unknown",
             state_reason=result.get("reason", effect.get("state_reason")),
@@ -613,6 +623,7 @@ class ConsequentialToolGateway:
         envelope: ActionEnvelope,
         *,
         effect_id: str,
+        manifest_hash: str,
         outcome: str,
         pre: dict[str, Any],
         post: dict[str, Any],
@@ -624,6 +635,7 @@ class ConsequentialToolGateway:
         finished = utc_now()
         digest = payload_hash({"pre": pre, "post": post, "outcome": outcome})
         return ActionReceiptV17(
+            manifest_digest=manifest_hash,
             action_id=envelope.action_id,
             effect_key=envelope.effect_key,
             effect_id=effect_id,

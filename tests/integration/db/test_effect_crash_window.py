@@ -29,6 +29,7 @@ def _registry(adapter):
     registry.register(adapter)
     return registry
 
+
 pytestmark = pytest.mark.integration
 DATABASE_URL = os.environ.get(
     "SWARM_DATABASE_URL", "postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm"
@@ -398,6 +399,7 @@ def test_public_repository_rejects_missing_execution_token(factory, tmp_path):
         project_id=env.project_id,
         integration_id=env.integration_id,
         integration_version=env.integration_version,
+        manifest_digest="0" * 64,
         operation=env.operation,
         destination=env.destination,
         outcome="succeeded",

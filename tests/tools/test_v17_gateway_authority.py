@@ -25,6 +25,7 @@ from swarm.tools.fences import (
     StaticFenceProvider,
     StaticPolicyProvider,
 )
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import (
     CancellationFenceError,
     ConsequentialToolGateway,
@@ -38,6 +39,7 @@ def _registry(adapter):
     registry = AdapterRegistry()
     registry.register(adapter)
     return registry
+
 
 pytestmark = pytest.mark.integration
 
@@ -128,7 +130,9 @@ class ForbiddenStore(InMemoryEffectStore):
 async def test_policy_denial_precedes_missing_fence_and_all_effect_boundaries(
     entrypoint, case, policy_version, requested_scopes, error, reason
 ):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = adapter.normalize(
         {
             "project_id": "proj_a",
@@ -164,7 +168,9 @@ async def test_policy_denial_precedes_missing_fence_and_all_effect_boundaries(
     ],
 )
 async def test_context_denied_before_reservation(factory, context, reason):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     store = DurableEffectRepository(factory)
     subject = ConsequentialToolGateway(
@@ -183,7 +189,9 @@ async def test_context_denied_before_reservation(factory, context, reason):
 
 @pytest.mark.asyncio
 async def test_stale_policy_denied_before_reservation(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     store = DurableEffectRepository(factory)
     subject = gateway(factory, adapter, policy_version="v17-policy-2")
@@ -204,7 +212,9 @@ async def test_stale_policy_denied_before_reservation(factory):
     ],
 )
 async def test_policy_requires_declaration_union_requested(factory, requested, allowed, missing):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     envelope.requested_scopes = requested
     store = DurableEffectRepository(factory)
@@ -220,7 +230,9 @@ async def test_policy_requires_declaration_union_requested(factory, requested, a
 @pytest.mark.asyncio
 @pytest.mark.parametrize("field", ["lease", "cancellation"])
 async def test_provider_generation_is_authority(factory, field):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     lease = int(envelope.lease_generation)
     cancellation = int(envelope.cancellation_generation)
@@ -255,7 +267,12 @@ async def test_provider_generation_is_authority(factory, field):
     ],
 )
 def test_read_current_fence_rejects_missing_or_mismatched_binding(factory, change, value):
-    envelope = leased(factory, ApiMcpAdapter())
+    envelope = leased(
+        factory,
+        ApiMcpAdapter(
+            load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+        ),
+    )
     identity = {
         "project_id": envelope.project_id,
         "mission_id": envelope.mission_id,
@@ -270,7 +287,9 @@ def test_read_current_fence_rejects_missing_or_mismatched_binding(factory, chang
 
 @pytest.mark.asyncio
 async def test_cancellation_bump_between_precheck_and_begin_fails_closed(factory, monkeypatch):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     subject = gateway(factory, adapter)
     approval = subject.make_approval(envelope, context=TRUSTED)
@@ -318,7 +337,9 @@ class FutureAuthorityFence:
 
 @pytest.mark.asyncio
 async def test_v17_does_not_consume_reserved_future_authority(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = leased(factory, adapter)
     subject = gateway(factory, adapter, fences=FutureAuthorityFence(LeaseFenceProvider(factory)))
     approval = subject.make_approval(envelope, context=TRUSTED)

@@ -16,6 +16,7 @@ from swarm.tools.fences import (
     StaticFenceProvider,
     StaticPolicyProvider,
 )
+from swarm.tools.manifests import MANIFEST_DIR, load_manifest
 from swarm.tools.v17_gateway import (
     ConsequentialToolGateway,
     PolicyDeniedError,
@@ -61,7 +62,15 @@ def complete_claim(adapter):
 
 
 def test_normalizers_do_not_invent_generations(tmp_path):
-    for adapter in (ApiMcpAdapter(), BrowserSessionAdapter(), LocalSandboxAdapter(root=tmp_path)):
+    for adapter in (
+        ApiMcpAdapter(
+            load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+        ),
+        BrowserSessionAdapter(
+            load_manifest(MANIFEST_DIR / "browser.session@1.json"),
+        ),
+        LocalSandboxAdapter(load_manifest(MANIFEST_DIR / "local.sandbox@1.json"), root=tmp_path),
+    ):
         envelope = adapter.normalize({"project_id": "r28b1"})
         assert envelope.lease_generation is None
         assert envelope.cancellation_generation is None
@@ -69,8 +78,11 @@ def test_normalizers_do_not_invent_generations(tmp_path):
 
 @pytest.mark.asyncio
 async def test_undeclared_operation_denied_before_adapter_action():
-    adapter = ApiMcpAdapter()
-    envelope = adapter.normalize({"project_id": "r28b1", "operation": "undeclared.synthetic"})
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
+    envelope = adapter.normalize({"project_id": "r28b1"})
+    envelope.operation = "undeclared.synthetic"
     with pytest.raises(ToolAuthorizationError, match="operation_not_declared"):
         await gateway(adapter, InMemoryEffectStore()).execute_envelope(envelope, context=context())
     assert adapter.call_count == 0
@@ -89,7 +101,9 @@ async def test_undeclared_operation_denied_before_adapter_action():
     ],
 )
 async def test_missing_authority_is_denied_before_action(side, field):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     adapter.manifest.operations["echo"].side_effect_class = side
     envelope = complete_claim(adapter)
     envelope.side_effect_class = "none"
@@ -101,7 +115,9 @@ async def test_missing_authority_is_denied_before_action(side, field):
 
 @pytest.mark.asyncio
 async def test_underclassification_cannot_skip_durability():
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = complete_claim(adapter)
     envelope.side_effect_class, envelope.risk_class = "none", "low"
     with pytest.raises(PolicyDeniedError, match="durable_store_required"):
@@ -112,7 +128,9 @@ async def test_underclassification_cannot_skip_durability():
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_underclassification_cannot_skip_approval(factory):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = bind_lease(factory, adapter.normalize({"project_id": "r28b1"}))
     envelope.side_effect_class, envelope.risk_class = "none", "low"
     store = DurableEffectRepository(factory)
@@ -134,7 +152,9 @@ async def test_underclassification_cannot_skip_approval(factory):
 async def test_receipt_persists_higher_classification_without_mutating_claim(
     factory, claim, expected
 ):
-    adapter = ApiMcpAdapter()
+    adapter = ApiMcpAdapter(
+        load_manifest(MANIFEST_DIR / "mcp.echo@1.json"),
+    )
     envelope = bind_lease(factory, adapter.normalize({"project_id": "r28b1"}))
     envelope.side_effect_class, envelope.risk_class = claim
     store = DurableEffectRepository(factory)

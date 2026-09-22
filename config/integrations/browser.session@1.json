@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "integration_id": "browser.session",
+  "integration_version": "1",
+  "adapter_class": "browser_session",
+  "operations": {
+    "navigate": {
+      "side_effect_class": "none",
+      "risk_class": "low",
+      "scopes": [
+        "browser.session"
+      ],
+      "read_data_classes": [
+        "page_dom"
+      ],
+      "write_data_classes": []
+    },
+    "submit": {
+      "side_effect_class": "consequential",
+      "risk_class": "high",
+      "scopes": [
+        "browser.session"
+      ],
+      "read_data_classes": [
+        "page_dom"
+      ],
+      "write_data_classes": [
+        "form_submit"
+      ]
+    }
+  },
+  "read_data_classes": [
+    "page_dom"
+  ],
+  "write_data_classes": [
+    "form_submit"
+  ],
+  "network_scopes": [
+    "https://example.test"
+  ],
+  "filesystem_scopes": [],
+  "secrets_refs_required": [],
+  "risk_class": "high",
+  "sandbox_required": false,
+  "host_requirements": [
+    "browser_runtime"
+  ],
+  "user_interaction_consequential": true
+}
