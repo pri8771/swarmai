@@ -1,17 +1,17 @@
 {
   "schema_version": "1.2",
   "purpose": "Owner-scoped execution control over existing packet DAGs; not a second queue or evidence of completion",
-  "scope_directive": "OWNER_PAUSE_V20_ALL_PROJECTS",
-  "scope_precedence": "Latest owner direction: engineering is paused and the target is V2.0 for SwarmAI, Jobs Automation, and Social Bots. This supersedes the V2.3 minimum/V2.7 target. V2.3/V2.7 work is deferred.",
+  "scope_directive": "OWNER_TARGET_V17_FASTEST_ACCEPTED",
+  "scope_precedence": "Latest owner direction: clear blockers now and stop at genuinely accepted V1.7. V2.0/V2.3/V2.7/V3.0 are deferred.",
   "contract": "docs/coordination/FABLE_DELIVERY_CONTRACT.md",
-  "goal_version": "2.0",
+  "goal_version": "1.7",
   "allowed_phases": [
     "v17"
   ],
   "initial_phase": "v17",
-  "future_implementation_authorized": false,
+  "future_implementation_authorized": true,
   "future_planning_authorized": false,
-  "stop_after": "PAUSED_BY_OWNER. On explicit resume, continue only toward accepted V2.0 unless the owner changes scope.",
+  "stop_after": "Stop new forward engineering when V1.7 is genuinely accepted.",
   "implementation_branch": "cursor/v17-single-session",
   "audited_source_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
   "heartbeat_path": "heartbeats/CURSOR-V17-SINGLE.json",
@@ -156,13 +156,47 @@
       "base_sha": "86f8e0c90e399c683d68ba9628ef48af4723f33f",
       "review_ref": "docs/coordination/reviews/ASTRA_R28D_ADMISSION_REPAIR_LEAD_20260922.md",
       "live_acceptance": false
+    },
+    "R30b-P0": {
+      "decision": "bounded_prerequisite_accepted",
+      "source_sha": "11bd4b5276458b2b7adc11528f117e919524f035",
+      "base_sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md",
+      "live_acceptance": false,
+      "followup_required": "make_approval canonical payload-integrity check on composition tip"
+    },
+    "STORE-RUFF-I001": {
+      "decision": "mechanical_lint_slice_accepted",
+      "source_sha": "349c732c335d83eaa431d30ea7f2b52b8d4431a3",
+      "base_sha": "6dbf8c43463cbdbd8c87561af2abcdde59969765",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md",
+      "live_acceptance": false
+    },
+    "R27a": {
+      "decision": "bounded_engineering_slice_accepted",
+      "source_sha": "0505c24576259d8cf54fa2ec07590a789b398d52",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md",
+      "live_acceptance": false
+    },
+    "R27b": {
+      "decision": "bounded_engineering_slice_accepted",
+      "source_sha": "d3a7b56fa98feea332d819e5e8400fd2c1928bc7",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md",
+      "live_acceptance": false
+    },
+    "MISSION-CANCEL-01": {
+      "decision": "bounded_engineering_slice_accepted",
+      "source_sha": "2237effbd09ea5fff90d132e88da2ac7996d4177",
+      "evidence_binding_sha": "e53da7305d138658edfb9bd8f47ebbd140a40a63",
+      "review_ref": "docs/coordination/V17_BLOCKER_CLEARANCE_DISPOSITION_20260922.md",
+      "live_acceptance": false
     }
   },
   "frozen_packets": [],
   "rules": [
-    "PAUSED_BY_OWNER: no new implementation/test execution/worker dispatch. Checkpointing, formal review of already-submitted work, and requested handoff documentation only.",
-    "V2.0 is the target for SwarmAI, Jobs Automation and Social Bots. V2.3/V2.7/V3.0 are deferred and are not current implementation authority.",
-    "On explicit resume, continue sequentially through unfinished predecessor gates; do not infer version acceptance from the target reset.",
+    "V1.7 is the only current target; stop new forward engineering once V1.7 is genuinely accepted.",
+    "Codex is the single direct integrator; Claude/Fable handoff is complete. Preserve at most the one existing watcher/heartbeat producer; do not dispatch or create timers/watchers.",
+    "Engineering is open only for released offline/source/test packets. Live/model/provider/network/session/public/scheduler/spend/deploy/main-merge actions remain held without a fresh exact grant.",
     "Use methodical root-cause debugging: reproduce, map cause, repair narrowly, preserve detailed source-bound notes and adverse tests.",
     "Live means a running private/local candidate plus relevant real operational tests; a health endpoint or a local fixture alone is insufficient.",
     "Existing review holds remain mandatory; worker may prepare review bundles but may not invent reviews.",
@@ -174,42 +208,44 @@
     "Do not replace the registry, duplicate queues, or rewrite historical evidence. Scope controls authorization, not artifact acceptance.",
     "A heartbeat tick is not progress; preserve last real activity time and inspect the actual worker or long-running test process."
   ],
-  "current_direct_worker": null,
-  "current_direct_assignment": null,
+  "current_direct_worker": "codex",
+  "current_direct_assignment": "docs/coordination/assignments/CODEX_V17_COMPOSITION_20260922.md",
   "fable_handoff_authorized": false,
   "authorized_versions": [
-    "1.7",
-    "1.8",
-    "1.9",
-    "2.0"
+    "1.7"
   ],
   "prohibited_versions": [
     "3.0"
   ],
-  "phase_policy": "PAUSED_BY_OWNER. No implementation phase is currently executable. On explicit resume, progress sequentially through unfinished V1.7 -> V1.8 -> V1.9 -> V2.0 gates; V2.3/V2.7/V3.0 are deferred.",
-  "future_implementation_ceiling": "2.0",
+  "phase_policy": "V1.7 is the only executable product phase. Engineering is allowed only for released V1.7 packets/composition. V1.8+ is deferred.",
+  "future_implementation_ceiling": "1.7",
   "method": "Reproduce actual failure first where possible, record root-cause/causal map and detailed source-bound notes, then make the smallest bounded repair and test adverse paths.",
   "private_zero_cost_live_testing_authorized": false,
-  "private_zero_cost_live_testing_scope": "Closed by owner pause. Any future live/model/provider action requires a fresh explicit grant.",
-  "requested_target_version": "2.0",
+  "private_zero_cost_live_testing_scope": "No broad live grant. Fresh exact action grants required.",
+  "requested_target_version": "1.7",
   "v27_contract_status": "deferred_by_owner",
   "v27_proposal_ref": "docs/coordination/V27_OWNER_REVIEW_PROPOSAL_20260922.md",
-  "secondary_safe_assignment": null,
+  "secondary_safe_assignment": "docs/coordination/assignments/CODEX_R31A_OFFLINE_20260922.md",
   "current_action_holds": {
-    "engineering": true,
+    "engineering": false,
     "live": true,
     "model": true,
     "provider": true,
+    "network": true,
+    "session": true,
     "scheduler": true,
     "spend": true,
     "main_merge": true,
     "deploy": true,
     "public_action": true,
-    "note": "PAUSED_BY_OWNER. Checkpoint/review/documentation only; no implementation or execution dispatch."
+    "note": "V1.7 offline/source/test engineering resumed. External/live actions remain held unless separately granted."
   },
   "r30b_contract_ref": "docs/coordination/reviews/R30B_CONTRACT_DISPOSITION_20260922.md",
   "r30b_diagnostic_ref": "codex/portfolio-review-20260922@4f017c95ac472b976b564c1bd59693a941ffef1e",
-  "r30b_p0_status": "paused_uncommitted_unreviewed",
+  "r30b_p0_status": "accepted_with_make_approval_followup_required_on_composition",
   "r30b_p0_assignment_ref": "docs/coordination/assignments/CODEX_R30B_P0_INTEGRITY_ATTEMPT_CONTEXT_20260922.md",
-  "r30b_p0_resume_ref": "docs/coordination/OWNER_PAUSE_V20_20260922.md"
+  "r30b_p0_resume_ref": "docs/coordination/OWNER_PAUSE_V20_20260922.md",
+  "cp3_rerun_status": "evidence_locator_required_no_acceptance",
+  "g13_platform_ruling": "platform_neutral_verification_allowed; no Windows-specific requirement for EVAL-131; sealed-reference binding still required",
+  "g13_sealed_reference_status": "blocked_real_non_worker_readable_bundle_and_binding_digest_required"
 }
