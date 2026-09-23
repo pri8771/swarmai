@@ -1,4 +1,9 @@
-"""Bounded canary probes — mock by default; live only for known-zero local routes."""
+"""Bounded canary probes — mock by default; live only for known-zero routes.
+
+Known-zero live paths (fail-closed):
+- loopback local runtimes in ``LOCAL_ZERO_COST_PROVIDERS`` (ollama)
+- explicit OpenRouter free-route allowlist (``:free`` model + pinned backend)
+"""
 
 from __future__ import annotations
 
@@ -16,9 +21,11 @@ from swarm.contracts.provider import InferenceRequest, Reservation
 from swarm.envfile import load_repo_dotenv
 from swarm.onboarding.status import RouteOnboardingStatus
 from swarm.providers.catalog import DEFAULT_ENDPOINTS
+from swarm.providers.openrouter_free import resolve_openrouter_free_route
 
 # Local operator compute — no cloud bill when bound to loopback.
 LOCAL_ZERO_COST_PROVIDERS = frozenset({"ollama"})
+OPENROUTER_SECRET_REF = "OPENROUTER_API_KEY"
 
 
 class CanaryDeniedError(PermissionError):
@@ -209,9 +216,141 @@ async def _live_local_zero_canary(
     }
     if not ok:
         result["reason"] = "live_local_probe_failed"
+    result["cost_usd"] = 0.0
     evidence_path = _write_canary_evidence(target.route_id, result)
     result["evidence_path"] = str(evidence_path.relative_to(_repo_root()))
     # Also alias requested route id when it differed (e.g. rt_ollama_default).
+    if target.route_id != route_id:
+        _write_canary_evidence(route_id, result)
+    return result
+
+
+async def _live_openrouter_free_canary(
+    *,
+    route_id: str,
+    purpose: str,
+) -> dict[str, Any]:
+    """Execute one synthetic live probe against an allowlisted OpenRouter free route."""
+    load_repo_dotenv(_repo_root())
+    free = resolve_openrouter_free_route(route_id)
+    if free is None:
+        return {
+            "route_id": route_id,
+            "status": RouteOnboardingStatus.DISABLED.value,
+            "denied": True,
+            "reason": "openrouter_route_not_on_free_allowlist",
+            "mock_vs_live": "not_live",
+            "cost_usd": 0.0,
+            "secret_ref_names": [OPENROUTER_SECRET_REF],
+            "consumed_allowance": 0,
+        }
+
+    if not os.environ.get(OPENROUTER_SECRET_REF, "").strip():
+        return {
+            "route_id": route_id,
+            "model_id": free.model_id,
+            "provider_id": "openrouter",
+            "status": RouteOnboardingStatus.DISABLED.value,
+            "denied": True,
+            "reason": "missing_OPENROUTER_API_KEY",
+            "mock_vs_live": "not_live",
+            "cost_usd": 0.0,
+            "secret_ref_names": [OPENROUTER_SECRET_REF],
+            "user_action_required": [
+                "USER_ACTION: Set OPENROUTER_API_KEY in the gitignored repo .env "
+                "(or process environment). Do not paste the key into chat.",
+                "Then re-run: swarm providers canary "
+                f"--route {free.route_id} --policy bounded_probe "
+                "--mode live --billing-known-zero",
+            ],
+            "consumed_allowance": 0,
+        }
+
+    from swarm.providers.core.adapters import OpenRouterAdapter
+
+    adapter = OpenRouterAdapter(
+        mode="live",
+        enabled=True,
+        free_route=free,
+        secret_ref_names=[OPENROUTER_SECRET_REF],
+        account_id="pa_openrouter_operator",
+    )
+    routes = await adapter.discover()
+    target = next((r for r in routes if r.route_id == free.route_id), None)
+    if target is None:
+        return {
+            "route_id": route_id,
+            "status": RouteOnboardingStatus.DISABLED.value,
+            "denied": True,
+            "reason": "openrouter_free_route_not_seeded",
+            "mock_vs_live": "not_live",
+            "cost_usd": 0.0,
+            "secret_ref_names": [OPENROUTER_SECRET_REF],
+            "consumed_allowance": 0,
+        }
+
+    request = InferenceRequest(
+        project_id="proj_onboarding",
+        attempt_id="att_canary_live_openrouter_free",
+        route_id=target.route_id,
+        purpose=purpose,
+        messages=[{"role": "user", "content": "Reply with exactly: OK"}],
+        estimated_input_tokens=16,
+        max_output_tokens=8,
+        secret_ref_names=[OPENROUTER_SECRET_REF],
+    )
+    ticket = Reservation(
+        logical_call_id="lc_canary_live_openrouter_free",
+        attempt_id=request.attempt_id,
+        route_id=target.route_id,
+        expires_at=utc_now() + timedelta(minutes=2),
+        phase=ReservationPhase.RESERVED,
+    )
+    receipt = await adapter.execute_one(request, ticket)
+    ok = (
+        receipt.error_class is None
+        and receipt.settlement_state == SettlementState.SETTLED
+    )
+    result: dict[str, Any] = {
+        "route_id": target.route_id,
+        "requested_route_id": route_id,
+        "provider_id": "openrouter",
+        "model_id": free.model_id,
+        "hosted_by": free.provider_slug,
+        "status": (
+            RouteOnboardingStatus.CANARIED.value
+            if ok
+            else RouteOnboardingStatus.DISABLED.value
+        ),
+        "denied": not ok,
+        "probe_counted": True,
+        "consumed_allowance": 1,
+        "mock_vs_live": "live_remote_zero_cost",
+        "billing_known_zero": True,
+        "cost_usd": 0.0,
+        "secret_ref_names": [OPENROUTER_SECRET_REF],
+        "purpose": purpose,
+        "settlement_state": receipt.settlement_state.value,
+        "error_class": None if receipt.error_class is None else receipt.error_class.value,
+        "provider_request_id": receipt.provider_request_id,
+        "model_fingerprint": (
+            (receipt.normalized_usage.extras or {}).get("upstream_model")
+            if receipt.normalized_usage is not None
+            else None
+        )
+        or free.model_id,
+        "layers": {
+            "cataloged": True,
+            "configured": True,
+            "authenticated": ok,
+            "inference_tested": ok,
+            "free_allowlisted": True,
+        },
+    }
+    if not ok:
+        result["reason"] = "live_openrouter_free_probe_failed"
+    evidence_path = _write_canary_evidence(target.route_id, result)
+    result["evidence_path"] = str(evidence_path.relative_to(_repo_root()))
     if target.route_id != route_id:
         _write_canary_evidence(route_id, result)
     return result
@@ -228,7 +367,8 @@ async def bounded_canary(
 ) -> dict[str, Any]:
     """Run a counted synthetic probe through the broker when allowed.
 
-    Live probes run only for explicit known-zero local runtimes (loopback Ollama).
+    Live probes run only for known-zero local runtimes (loopback Ollama) or
+    explicit OpenRouter free-route allowlist entries.
     """
     if policy != "bounded_probe":
         raise CanaryDeniedError(f"unsupported_policy:{policy}")
@@ -244,6 +384,26 @@ async def bounded_canary(
             "consumed_allowance": 0,
         }
     if mode == "live" and billing_known_zero:
+        free = resolve_openrouter_free_route(route_id)
+        if free is not None:
+            return await _live_openrouter_free_canary(route_id=route_id, purpose=purpose)
+        # Non-allowlisted openrouter (including :free models not pinned) stay denied.
+        if route_id.startswith("rt_openrouter_"):
+            return {
+                "route_id": route_id,
+                "status": RouteOnboardingStatus.DISABLED.value,
+                "denied": True,
+                "reason": "openrouter_route_not_on_free_allowlist",
+                "mock_vs_live": "not_live",
+                "cost_usd": 0.0,
+                "secret_ref_names": [OPENROUTER_SECRET_REF],
+                "user_action_required": [
+                    "Only allowlisted OpenRouter :free routes may live-canary "
+                    "under SWARM_ALLOW_PAID=false",
+                    "Use an allowlisted route id (see openrouter_free_route_ids)",
+                ],
+                "consumed_allowance": 0,
+            }
         provider_id = _provider_from_route(route_id)
         if provider_id is None or provider_id not in LOCAL_ZERO_COST_PROVIDERS:
             return {
@@ -253,10 +413,11 @@ async def bounded_canary(
                 "reason": "live_canary_requires_operator_keys_and_zero_charge_proof",
                 "mock_vs_live": "not_live",
                 "user_action_required": [
-                    "Only loopback local runtimes (ollama) are live-canary eligible "
-                    "under spend=zero without cloud keys",
-                    "For cloud free tiers: place zero-charge-eligible keys in local "
-                    ".env, confirm billing=0, then re-run with --billing-known-zero",
+                    "Only loopback local runtimes (ollama) or allowlisted "
+                    "OpenRouter free routes are live-canary eligible under spend=zero",
+                    "For OpenRouter: set OPENROUTER_API_KEY in local .env, use an "
+                    "allowlisted rt_openrouter_<model:free> route, then re-run with "
+                    "--billing-known-zero",
                     "Re-run: swarm providers canary --route ROUTE_ID "
                     "--policy bounded_probe --mode live --billing-known-zero",
                 ],

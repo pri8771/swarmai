@@ -205,7 +205,11 @@ def _resolve_cost_policy(
     paid: bool,
     health: str,
 ) -> tuple[str, str]:
-    """Return (cost_policy, note_fragment). Never derives free from paid=false alone."""
+    """Return (cost_policy, note_fragment). Never derives free from paid=false alone.
+
+    OpenRouter free eligibility is route-level (see ``openrouter_free`` allowlist),
+    never provider-level: a healthy auth probe does not make openrouter zero_spend_ok.
+    """
     if retired:
         return "retired", "retired"
     if pid in DEFERRED_PROVIDERS:
@@ -221,6 +225,12 @@ def _resolve_cost_policy(
     if pid in LOCAL_FREE_PROVIDERS and health == "healthy":
         return "zero_spend_ok", "local free route verified by healthy probe"
     # Remote / unprobed / unhealthy: price and free-eligibility remain unknown.
+    # OpenRouter :free allowlist is checked at canary/admission route scope only.
+    if pid == "openrouter":
+        return (
+            "price_unverified",
+            "provider-level free not granted; use openrouter_free allowlisted routes only",
+        )
     return "price_unverified", "free eligibility not proven; paid-mode=false is not sufficient"
 
 

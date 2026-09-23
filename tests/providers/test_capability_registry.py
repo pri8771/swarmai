@@ -55,6 +55,26 @@ def test_paid_false_alone_never_zero_spend_ok(monkeypatch) -> None:
     assert groq["available"] is False  # not free-eligible without price proof
 
 
+def test_openrouter_healthy_probe_never_provider_zero_spend(monkeypatch) -> None:
+    """Free eligibility stays route-level; provider cost_policy remains unverified."""
+    monkeypatch.setenv("SWARM_ALLOW_PAID", "false")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-fake-for-registry-test")
+    with patch(
+        "swarm.providers.capability_registry._probe",
+        side_effect=lambda pid: (
+            ("healthy", 9.0, 20, "auth probe ok")
+            if pid == "openrouter"
+            else ("unprobed", None, None, "skipped")
+        ),
+    ):
+        report = build_capability_registry(probe=True, repo=Path.cwd())
+    openrouter = next(p for p in report["providers"] if p["provider_id"] == "openrouter")
+    assert openrouter["health"] == "healthy"
+    assert openrouter["cost_policy"] == "price_unverified"
+    assert openrouter["available"] is False
+    assert "allowlisted routes" in openrouter["notes"]
+
+
 def test_cloudflare_unprobed_not_promoted(monkeypatch) -> None:
     monkeypatch.setenv("SWARM_ALLOW_PAID", "false")
     monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "cf_fake")
