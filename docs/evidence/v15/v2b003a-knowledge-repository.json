@@ -1,0 +1,37 @@
+{
+  "artifact_id": "ART-V16-DURABLE-SCHEMA",
+  "related_artifacts": [
+    "ART-V16-PROVENANCE",
+    "ART-V16-KNOWLEDGE-CONTRACT"
+  ],
+  "packet_id": "V2B-003a",
+  "scenario": "versioned_knowledge_item_link_tombstone_repository",
+  "status": "pass_local",
+  "recorded_at": "2026-09-21T18:49:31Z",
+  "base_sha": "5dd8e2be9670132f33ffac27a91686fff05c1cff",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest tests/knowledge/test_knowledge_repository.py -q"
+  ],
+  "landed": [
+    "KnowledgeItem/KnowledgeLink/KnowledgeTombstone contracts",
+    "SQLAlchemy models + Alembic a16know003a0001",
+    "KnowledgeRepository create/version/accept/link/tombstone/list_visible",
+    "project-tenant scope isolation",
+    "model output cannot be accepted_fact"
+  ],
+  "still_drafting": [
+    "C2 permission-first retrieval receipts (V2B-003b)",
+    "C3 supersession/contradiction workflow polish",
+    "MemoryStore migration adapter (V2B-003d)",
+    "ART-V16 lead acceptance"
+  ],
+  "results": {
+    "pytest": "pass"
+  },
+  "note": "C1 repository foundation; ART-V16 artifacts remain drafting except accepted durable schema design",
+  "candidate_sha": "7f8698159acc91eb5e6a2e41d4ad17031e9fbea1"
+}

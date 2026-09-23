@@ -1,0 +1,10 @@
+{
+  "identity": {
+    "calibration_split": "calibration",
+    "held_out_and_calibration_ids_disjoint": true,
+    "held_out_split": "holdout",
+    "shard_table": "CORPUS_SHARD_DIGESTS.txt",
+    "split_id": "g13-split-v3"
+  },
+  "spec_of": "split"
+}
