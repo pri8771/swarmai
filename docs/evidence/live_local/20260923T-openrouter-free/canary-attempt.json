@@ -1,0 +1,30 @@
+{
+  "evidence_kind": "live_remote_zero_cost_canary_attempt",
+  "captured_at": "2026-09-23T17:46:43.702158+00:00",
+  "swarm_allow_paid": false,
+  "route_id": "rt_openrouter_qwen/qwen3.8-27b:free",
+  "model_id": "qwen/qwen3.8-27b:free",
+  "hosted_by": "modelrun",
+  "secret_ref_names": [
+    "OPENROUTER_API_KEY"
+  ],
+  "status": "disabled",
+  "denied": true,
+  "reason": "missing_OPENROUTER_API_KEY",
+  "cost_usd": 0.0,
+  "mock_vs_live": "not_live",
+  "allowlist_rationale": {
+    "source": "anonymous OpenRouter public models+endpoints metadata",
+    "prompt_price": "0",
+    "completion_price": "0",
+    "backend_slug": "modelrun",
+    "note": "candidate pin transplanted from PR #33 / OPENROUTER_FREE_ROUTE_PREREQUISITE; not account entitlement"
+  },
+  "command": [
+    "SWARM_ALLOW_PAID=false uv run swarm providers canary --route rt_openrouter_qwen/qwen3.8-27b:free --policy bounded_probe --mode live --billing-known-zero"
+  ],
+  "user_action_required": [
+    "USER_ACTION: Set OPENROUTER_API_KEY in the gitignored repo .env (or Cloud Agent environment secrets). Do not paste the key into chat.",
+    "Then re-run the command above on this branch."
+  ]
+}
