@@ -3,6 +3,12 @@ name: ci
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      run_live_local:
+        description: "Run SWARM_LIVE_LOCAL=1 pytest (loopback fixture / Ollama only)"
+        type: boolean
+        default: false
 
 jobs:
   offline:
@@ -47,6 +53,7 @@ jobs:
           tests/workers
           tests/workspace
           tests/e2e
+          tests/live_fixture
           -q
           --ignore=tests/integration
       - name: Integration pytest (requires SWARM_DATABASE_URL)
@@ -78,6 +85,7 @@ jobs:
   live-gated:
     runs-on: ubuntu-latest
     # Does not claim live success. Documents that live gates are not executed here.
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_live_local != true }}
     steps:
       - uses: actions/checkout@v4
       - name: Live gates not run in default CI
@@ -88,3 +96,26 @@ jobs:
           echo "and protected browser profiles in this runner. Live evidence is collected"
           echo "in the authorized local/private environment under V1_4_EXECUTION_CONTRACT."
           echo "status=blocked_not_skipped_green"
+          echo "Manual path: workflow_dispatch with run_live_local=true (requires Ollama/secrets)."
+
+  live-local:
+    runs-on: ubuntu-latest
+    # Manual only. Never turns default PR CI red when Ollama is absent.
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_local == true }}
+    env:
+      SWARM_LIVE_LOCAL: "1"
+      SWARM_ALLOW_PAID: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - name: Live local pytest (zero-spend loopback)
+        run: |
+          if ! curl -fsS -m 2 http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+            echo "::notice title=live-local-ollama-absent::Ollama loopback unavailable;"
+            echo "running fixture live_local suite only (no paid/cloud routes)."
+          fi
+          uv run pytest -m live_local -q --tb=short
+          echo "::notice title=live-local-ran::SWARM_LIVE_LOCAL=1 suite executed under SWARM_ALLOW_PAID=false."

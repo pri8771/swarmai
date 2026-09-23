@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0 -- /Users/pchordia/swarmai-v17/.venv/bin/python
+rootdir: /Users/pchordia/swarmai-v17
+configfile: pyproject.toml
+plugins: logfire-5.1.0, asyncio-1.4.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 11 items
+
+tests/live_fixture/test_fixture_service.py::test_idempotency_key_replay_creates_one_note PASSED [  9%]
+tests/live_fixture/test_fixture_service.py::test_drop_response_after_commit_stores_note_and_client_sees_transport_error PASSED [ 18%]
+tests/live_fixture/test_fixture_service.py::test_fail_before_commit_stores_nothing PASSED [ 27%]
+tests/live_fixture/test_fixture_service.py::test_submit_without_session_redirects_and_stores_nothing PASSED [ 36%]
+tests/live_fixture/test_fixture_service.py::test_session_expires_after_ttl PASSED [ 45%]
+tests/live_fixture/test_fixture_service.py::test_submit_does_not_dedupe PASSED [ 54%]
+tests/live_fixture/test_fixture_service.py::test_login_next_rejects_absolute_and_scheme_relative_urls PASSED [ 63%]
+tests/live_fixture/test_fixture_service.py::test_service_binds_loopback_only PASSED [ 72%]
+tests/live_fixture/test_fixture_service.py::test_terminal_non_application_receipt_requires_stopped_handler PASSED [ 81%]
+tests/live_fixture/test_fixture_service.py::test_delayed_commit_is_in_flight_not_negative_proof PASSED [ 90%]
+tests/live_fixture/test_fixture_service.py::test_request_id_payload_conflict_and_duplicate_handler_rejected PASSED [100%]
+
+============================= 11 passed in 11.83s ==============================
