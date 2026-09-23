@@ -17,6 +17,7 @@ from swarm.contracts.actions import (
     ApprovalGrant,
 )
 from swarm.contracts.common import new_id, payload_hash, utc_now
+from swarm.recovery.authority import SiteAuthorityService, StaleEpochError
 from swarm.tools.adapters.base import IntegrationAdapter
 from swarm.tools.effects import (
     DurableEffectRepository,
@@ -63,6 +64,8 @@ class ConsequentialToolGateway:
         current_cancellation_generation: int = 0,
         store: InMemoryEffectStore | DurableEffectRepository | None = None,
         max_risk_without_approval: str = "low",
+        site_authority: SiteAuthorityService | None = None,
+        site_id: str | None = None,
     ) -> None:
         self.adapter = adapter
         self.project_id = project_id
@@ -71,6 +74,8 @@ class ConsequentialToolGateway:
         self.current_cancellation_generation = current_cancellation_generation
         self.store = store or InMemoryEffectStore()
         self.max_risk_without_approval = max_risk_without_approval
+        self.site_authority = site_authority
+        self.site_id = site_id
         self._risk_rank = {"low": 0, "medium": 1, "high": 2, "critical": 3}
 
     def put_approval(self, grant: ApprovalGrant) -> ApprovalGrant:
@@ -127,8 +132,9 @@ class ConsequentialToolGateway:
         # 3) evaluate policy/risk
         self._evaluate_policy(envelope)
 
-        # lease / cancel fences
+        # lease / cancel / site-epoch fences
         self._check_generations(envelope)
+        self._check_site_epoch(envelope)
 
         # Read-only replay/unknown short-circuit BEFORE approval validation, so a
         # succeeded effect replays even after its approval expired (R27c).
@@ -367,6 +373,19 @@ class ConsequentialToolGateway:
             raise StaleLeaseError("stale_lease_generation")
         if envelope.cancellation_generation != self.current_cancellation_generation:
             raise CancellationFenceError("cancellation_generation_mismatch")
+
+    def _check_site_epoch(self, envelope: ActionEnvelope) -> None:
+        """V1.8: consequential effects are epoch-bound when site authority is wired."""
+        if self.site_authority is None or self.site_id is None:
+            return
+        consequential = envelope.side_effect_class in {"consequential", "irreversible"}
+        if not consequential and envelope.site_epoch is None:
+            return
+        if envelope.site_epoch is None:
+            raise StaleEpochError("site_epoch_required_for_effect")
+        self.site_authority.require_epoch(
+            self.site_id, int(envelope.site_epoch), action="effect"
+        )
 
     @staticmethod
     def _outcome_from_result(result: dict[str, Any]) -> str:

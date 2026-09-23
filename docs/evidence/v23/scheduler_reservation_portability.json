@@ -1,12 +1,10 @@
 {
   "status": "implementation_complete",
-  "multi_process_live": "UNKNOWN",
-  "components": [
-    "fairness",
-    "reservations",
-    "receipts",
-    "packs",
-    "portability",
-    "allocator"
-  ]
+  "fairness": true,
+  "reservations_drain_cancel_backpressure": true,
+  "capability_signature_revocation": true,
+  "portability": true,
+  "fleet_tenant": true,
+  "ops_events": true,
+  "multi_process_live": "UNKNOWN"
 }

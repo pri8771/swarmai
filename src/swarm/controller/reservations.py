@@ -47,13 +47,21 @@ class ReservationIntent:
 
 
 class ReservationService:
-    def __init__(self, *, current_epoch: int) -> None:
+    def __init__(self, *, current_epoch: int, backpressure_floor: float = 0.0) -> None:
         self.current_epoch = current_epoch
+        self.backpressure_floor = backpressure_floor
         self._by_attempt: dict[str, ReservationIntent] = {}
         self._capacity: dict[tuple[str, str], float] = {}
+        self._draining: bool = False
 
     def set_capacity(self, kind: str, resource_id: str, units: float) -> None:
         self._capacity[(kind, resource_id)] = units
+
+    def begin_drain(self) -> None:
+        self._draining = True
+
+    def end_drain(self) -> None:
+        self._draining = False
 
     def reserve(
         self,
@@ -66,6 +74,8 @@ class ReservationService:
     ) -> ReservationIntent:
         if site_epoch != self.current_epoch:
             raise ReservationError(f"stale_epoch:{site_epoch}")
+        if self._draining:
+            raise ReservationError("drain_active")
         if attempt_id in self._by_attempt:
             raise ReservationError(f"duplicate_attempt_reservation:{attempt_id}")
         # Fail closed if any component exceeds capacity.
@@ -76,6 +86,9 @@ class ReservationService:
                 raise ReservationError(f"unknown_resource:{key}")
             if component.units > available:
                 raise ReservationError(f"insufficient_capacity:{key}")
+            remaining = available - component.units
+            if remaining < self.backpressure_floor:
+                raise ReservationError(f"backpressure:{key}")
         for component in components:
             key = (component.kind, component.resource_id)
             self._capacity[key] -= component.units
@@ -89,6 +102,12 @@ class ReservationService:
         )
         self._by_attempt[attempt_id] = intent
         return intent
+
+    def cancel(self, attempt_id: str, *, site_epoch: int) -> ReservationIntent:
+        """Fenced cancel: only current epoch may release reserved capacity."""
+        if site_epoch != self.current_epoch:
+            raise ReservationError(f"stale_epoch:{site_epoch}")
+        return self.release(attempt_id)
 
     def release(self, attempt_id: str) -> ReservationIntent:
         intent = self._by_attempt.get(attempt_id)

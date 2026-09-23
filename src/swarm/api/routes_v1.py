@@ -837,3 +837,178 @@ async def product_contract(
 ) -> dict[str, Any]:
     _ = principal
     return store.public_contract()
+
+
+def _objective_repo(request: Request) -> Any:
+    repo = getattr(request.app.state, "objective_repo", None)
+    if repo is None:
+        from swarm.objectives import ObjectiveRepository
+
+        repo = ObjectiveRepository()
+        request.app.state.objective_repo = repo
+    return repo
+
+
+def _learning_repo(request: Request) -> Any:
+    repo = getattr(request.app.state, "learning_repo", None)
+    if repo is None:
+        from swarm.learning import LearningRepository
+
+        repo = LearningRepository()
+        request.app.state.learning_repo = repo
+    return repo
+
+
+@router.post("/objectives")
+async def create_objective(
+    request: Request,
+    body: dict[str, Any],
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+) -> dict[str, Any]:
+    from swarm.objectives import ObjectiveContract, ObjectiveError
+
+    project_id = str(body.get("project_id") or "")
+    auth.require_project(principal, project_id)
+    repo = _objective_repo(request)
+    try:
+        templates = list(body.get("allowed_mission_templates") or ["generic"])
+        obj = repo.create(
+            ObjectiveContract(
+                project_id=project_id,
+                goal=str(body.get("goal") or ""),
+                allowed_mission_templates=templates,
+                spend_usd_ceiling=float(body.get("spend_usd_ceiling") or 0.0),
+                tool_envelope=list(body.get("tool_envelope") or []),
+                data_envelope=list(body.get("data_envelope") or []),
+                provider_envelope=list(body.get("provider_envelope") or []),
+            )
+        )
+    except ObjectiveError as exc:
+        raise ApiError("objective_error", str(exc), status_code=400) from exc
+    return {"objective": obj.model_dump(mode="json")}
+
+
+@router.post("/objectives/{objective_id}/trigger")
+async def trigger_objective(
+    objective_id: str,
+    request: Request,
+    body: dict[str, Any],
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+) -> dict[str, Any]:
+    from swarm.objectives import ObjectiveError
+
+    repo = _objective_repo(request)
+    try:
+        obj = repo.get(objective_id)
+        auth.require_project(principal, obj.project_id)
+        proposal = repo.trigger(
+            objective_id,
+            dedupe_key=str(body.get("dedupe_key") or new_id("dk_")),
+            trigger_kind=str(body.get("trigger_kind") or "manual"),
+            template_id=body.get("template_id"),
+        )
+    except ObjectiveError as exc:
+        raise ApiError("objective_error", str(exc), status_code=400) from exc
+    return {"proposal": proposal.model_dump(mode="json")}
+
+
+@router.post("/objectives/{objective_id}/admit")
+async def admit_objective_proposal(
+    objective_id: str,
+    request: Request,
+    body: dict[str, Any],
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+) -> dict[str, Any]:
+    from swarm.objectives import ObjectiveError
+
+    repo = _objective_repo(request)
+    try:
+        obj = repo.get(objective_id)
+        auth.require_project(principal, obj.project_id)
+        admitted = repo.admit_to_mission(str(body.get("proposal_id") or ""))
+    except ObjectiveError as exc:
+        raise ApiError("objective_error", str(exc), status_code=400) from exc
+    return {"proposal": admitted.model_dump(mode="json")}
+
+
+@router.post("/learning/proposals")
+async def create_learning_proposal(
+    request: Request,
+    body: dict[str, Any],
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+) -> dict[str, Any]:
+    from swarm.learning import LearningError, LearningProposal
+
+    project_id = str(body.get("project_id") or "")
+    auth.require_project(principal, project_id)
+    repo = _learning_repo(request)
+    try:
+        prop = repo.create(
+            LearningProposal(
+                project_id=project_id,
+                change_summary=str(body.get("change_summary") or ""),
+                sealed_holdout_ref=body.get("sealed_holdout_ref"),
+            )
+        )
+    except LearningError as exc:
+        raise ApiError("learning_error", str(exc), status_code=400) from exc
+    return {"proposal": prop.model_dump(mode="json")}
+
+
+@router.get("/recovery/drill")
+async def recovery_drill(
+    principal: Principal = Depends(get_principal),
+) -> dict[str, Any]:
+    _ = principal
+    from swarm.recovery import OutageDrillHarness
+
+    return OutageDrillHarness().run_local(commit_sha="api-drill").to_dict()
+
+
+@router.get("/install/clean-plan")
+async def install_clean_plan(
+    principal: Principal = Depends(get_principal),
+) -> dict[str, Any]:
+    _ = principal
+    from swarm.deploy.install import InstallOrchestrator
+
+    return InstallOrchestrator().clean_install_plan().to_dict()
+
+
+@router.get("/ops/events")
+async def list_ops_events(
+    request: Request,
+    project_id: str | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+) -> dict[str, Any]:
+    from swarm.observability import OpsEventLog
+
+    log = getattr(request.app.state, "ops_events", None)
+    if log is None:
+        log = OpsEventLog()
+        request.app.state.ops_events = log
+    if project_id:
+        auth.require_project(principal, project_id)
+    return {"events": log.list_events(project_id=project_id)}
+
+
+@router.post("/release/candidate-freeze")
+async def freeze_candidate(
+    principal: Principal = Depends(get_principal),
+) -> dict[str, Any]:
+    _ = principal
+    import subprocess
+    from pathlib import Path
+
+    from swarm.release.candidate import CandidateFreezer
+
+    root = Path(__file__).resolve().parents[3]
+    sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+    return CandidateFreezer(root).freeze(
+        source_sha=sha, schema_revision="a18tov30schema0001"
+    ).to_dict()

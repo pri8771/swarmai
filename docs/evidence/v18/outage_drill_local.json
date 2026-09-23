@@ -1,47 +1,8 @@
 {
-  "status": "pass",
-  "rpo_seconds": 0.0,
-  "rto_seconds": 0.0,
-  "checks": {
-    "backup_created": true,
-    "secrets_names_only": true,
-    "stale_dispatch_rejected": true,
-    "unknown_effect_preserved": true,
-    "epoch_advanced": true,
-    "post_restore_stale_rejected": true
-  },
-  "detail": {
-    "backup_id": "bak_e39d9cffa6dd456eb29c8762844a933b",
-    "recovery": {
-      "recovery_id": "rcv_9d92328faafb4899b11c1db3ea423229",
-      "backup_id": "bak_e39d9cffa6dd456eb29c8762844a933b",
-      "old_site_id": "site_local",
-      "old_epoch": 1,
-      "new_site_id": "site_local",
-      "new_epoch": 2,
-      "final_state": "recovered",
-      "lease_actions": [
-        {
-          "lease_id": "ls_1",
-          "action": "expire_uncertain",
-          "prior_epoch": 1
-        }
-      ],
-      "unknown_effects": [
-        {
-          "effect_key": "eff_unknown",
-          "state": "unknown_preserved",
-          "retry": false
-        }
-      ],
-      "fenced_stale_epochs": [
-        1
-      ],
-      "evidence_digest": "ded9fc3833731fed27bb966c54fe9c5f9234fe26c2d783e9af21b7c1f5b5671c",
-      "started_at": "2026-09-23T15:09:00.024255+00:00",
-      "finished_at": "2026-09-23T15:09:00.024293+00:00"
-    }
-  },
-  "generated_at": "2026-09-23T15:09:00.024349+00:00",
-  "digest": "b8d4b76ea1c33c9aba7cb255fcd37e11a7eb05f777a88b9644143df1b489796b"
+  "status": "implementation_complete",
+  "epoch_wired_gateway": true,
+  "epoch_wired_scheduler": true,
+  "local_drill": "pass",
+  "multi_host_live": "pending",
+  "cli": ["swarm recovery drill", "swarm recovery backup"]
 }

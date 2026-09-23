@@ -167,6 +167,13 @@ def create_app(
     app.state.store = store
     app.state.auth = auth
     app.state.repo_root = root
+    from swarm.learning import LearningRepository
+    from swarm.objectives import ObjectiveRepository
+    from swarm.observability import OpsEventLog
+
+    app.state.objective_repo = ObjectiveRepository()
+    app.state.learning_repo = LearningRepository()
+    app.state.ops_events = OpsEventLog()
     if not hasattr(app.state, "install_project_id"):
         app.state.install_project_id = None
 

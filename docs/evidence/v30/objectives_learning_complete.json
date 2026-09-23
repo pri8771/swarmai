@@ -2,5 +2,9 @@
   "status": "implementation_complete",
   "live_integrated_evidence": "pending",
   "self_permission": false,
-  "paid_spend_ceiling_blocked": true
+  "paid_spend_ceiling_blocked": true,
+  "rate_expiry_stop_authority": true,
+  "cli_api_wired": true,
+  "learning_governance_selfdev": true,
+  "fleet_cross_tenant_negatives": true
 }

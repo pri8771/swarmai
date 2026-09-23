@@ -47,6 +47,7 @@ class ActionEnvelope(StrictModel):
     idempotency_key: str = ""
     lease_generation: int = 1
     cancellation_generation: int = 0
+    site_epoch: int | None = None
     policy_version: str = "v17-policy-1"
     approval_id: str | None = None
     created_at: datetime = Field(default_factory=utc_now)

@@ -16,6 +16,8 @@ def test_objective_trigger_dedupe_and_admission() -> None:
             goal="keep parser green",
             allowed_mission_templates=["parser_health"],
             spend_usd_ceiling=0.0,
+            rate_limit_per_hour=10,
+            max_active_missions=1,
         )
     )
     p1 = repo.trigger(obj.objective_id, dedupe_key="slot-1", trigger_kind="schedule")
