@@ -580,3 +580,213 @@ class KnowledgeTombstoneRow(Base):
     replacement_item_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     replacement_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class SiteAuthorityRow(Base):
+    """V1.8 site authority / epoch — only one active epoch authorizes work."""
+
+    __tablename__ = "site_authority"
+    __table_args__ = (UniqueConstraint("site_id", "epoch", name="uq_site_authority_epoch"),)
+
+    authority_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    site_id: Mapped[str] = mapped_column(String(64), index=True)
+    epoch: Mapped[int] = mapped_column(Integer, index=True)
+    state: Mapped[str] = mapped_column(String(32), index=True, default="active")
+    activated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    fenced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    source_site_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    recovery_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    policy_version: Mapped[str] = mapped_column(String(64), default="v18")
+    content_digest: Mapped[str] = mapped_column(String(128), default="")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class AuthorityTransitionReceiptRow(Base):
+    __tablename__ = "authority_transition_receipts"
+
+    receipt_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    site_id: Mapped[str] = mapped_column(String(64), index=True)
+    from_epoch: Mapped[int] = mapped_column(Integer)
+    to_epoch: Mapped[int] = mapped_column(Integer)
+    reason: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class BackupManifestRow(Base):
+    __tablename__ = "backup_manifests"
+
+    backup_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_site_id: Mapped[str] = mapped_column(String(64), index=True)
+    source_epoch: Mapped[int] = mapped_column(Integer)
+    source_commit_sha: Mapped[str] = mapped_column(String(64))
+    schema_revision: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    integrity_digest: Mapped[str] = mapped_column(String(128))
+    secret_refs: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class RecoveryRunRow(Base):
+    __tablename__ = "recovery_runs"
+
+    recovery_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    backup_id: Mapped[str] = mapped_column(String(64), index=True)
+    old_site_id: Mapped[str] = mapped_column(String(64))
+    old_epoch: Mapped[int] = mapped_column(Integer)
+    new_site_id: Mapped[str] = mapped_column(String(64))
+    new_epoch: Mapped[int] = mapped_column(Integer)
+    final_state: Mapped[str] = mapped_column(String(32), default="pending")
+    evidence_digest: Mapped[str] = mapped_column(String(128), default="")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ExtensionManifestRow(Base):
+    __tablename__ = "extension_manifests"
+    __table_args__ = (
+        UniqueConstraint("extension_id", "version", name="uq_extension_id_version"),
+    )
+
+    manifest_pk: Mapped[str] = mapped_column(String(64), primary_key=True)
+    extension_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[str] = mapped_column(String(32))
+    content_digest: Mapped[str] = mapped_column(String(128))
+    risk_class: Mapped[str] = mapped_column(String(32), default="low")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ProjectExtensionGrantRow(Base):
+    __tablename__ = "project_extension_grants"
+    __table_args__ = (
+        UniqueConstraint(
+            "project_id", "extension_id", "version", name="uq_project_extension_grant"
+        ),
+    )
+
+    grant_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    extension_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[str] = mapped_column(String(32))
+    enabled: Mapped[str] = mapped_column(String(16), default="true")
+    state: Mapped[str] = mapped_column(String(32), default="enabled")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ProductCandidateRow(Base):
+    __tablename__ = "product_candidates"
+
+    candidate_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    source_sha: Mapped[str] = mapped_column(String(64), index=True)
+    schema_revision: Mapped[str] = mapped_column(String(64))
+    dependency_lock_digest: Mapped[str] = mapped_column(String(128))
+    frozen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    invalidated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class SchedulerPolicyRow(Base):
+    __tablename__ = "scheduler_policies"
+
+    policy_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    version: Mapped[str] = mapped_column(String(32))
+    digest: Mapped[str] = mapped_column(String(128))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ProjectSchedulingStateRow(Base):
+    __tablename__ = "project_scheduling_state"
+
+    project_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    fairness_debt: Mapped[float] = mapped_column(Float, default=0.0)
+    weight: Mapped[float] = mapped_column(Float, default=1.0)
+    site_epoch: Mapped[int] = mapped_column(Integer, default=0)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ResourceReservationIntentRow(Base):
+    __tablename__ = "resource_reservation_intents"
+    __table_args__ = (
+        UniqueConstraint("attempt_id", name="uq_reservation_attempt"),
+    )
+
+    intent_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    mission_id: Mapped[str] = mapped_column(String(64), index=True)
+    attempt_id: Mapped[str] = mapped_column(String(64), index=True)
+    site_epoch: Mapped[int] = mapped_column(Integer)
+    state: Mapped[str] = mapped_column(String(32), default="reserved")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class CapabilityPackRow(Base):
+    __tablename__ = "capability_packs"
+    __table_args__ = (
+        UniqueConstraint("pack_id", "version", name="uq_capability_pack_version"),
+    )
+
+    pack_pk: Mapped[str] = mapped_column(String(64), primary_key=True)
+    pack_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[str] = mapped_column(String(32))
+    content_digest: Mapped[str] = mapped_column(String(128))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ObjectiveRow(Base):
+    __tablename__ = "objectives"
+
+    objective_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    current_version: Mapped[int] = mapped_column(Integer, default=1)
+    state: Mapped[str] = mapped_column(String(32), default="active")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class ObjectiveVersionRow(Base):
+    __tablename__ = "objective_versions"
+    __table_args__ = (
+        UniqueConstraint("objective_id", "version", name="uq_objective_version"),
+    )
+
+    version_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    objective_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    goal: Mapped[str] = mapped_column(Text)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TriggerReceiptRow(Base):
+    __tablename__ = "trigger_receipts"
+    __table_args__ = (
+        UniqueConstraint("objective_id", "dedupe_key", name="uq_trigger_dedupe"),
+    )
+
+    receipt_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    objective_id: Mapped[str] = mapped_column(String(64), index=True)
+    dedupe_key: Mapped[str] = mapped_column(String(192))
+    trigger_kind: Mapped[str] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class MissionProposalRow(Base):
+    __tablename__ = "mission_proposals"
+
+    proposal_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    objective_id: Mapped[str] = mapped_column(String(64), index=True)
+    objective_version: Mapped[int] = mapped_column(Integer)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    state: Mapped[str] = mapped_column(String(32), default="proposed")
+    mission_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+class LearningProposalRow(Base):
+    __tablename__ = "learning_proposals"
+
+    proposal_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    state: Mapped[str] = mapped_column(String(32), default="proposed")
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)

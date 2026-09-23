@@ -92,3 +92,13 @@ def validate_worker_patch(
         reasons.append(f"privilege_expansion:{hit}")
 
     return PolicyVerdict(allowed=len(reasons) == 0, reasons=reasons)
+
+
+def assert_cannot_self_merge(*, merged: bool, author_id: str, merger_id: str) -> PolicyVerdict:
+    """V1.9/V3.0: selfdev may produce a PR candidate but never self-merge/release."""
+    reasons: list[str] = []
+    if merged:
+        reasons.append("selfdev_merge_forbidden")
+    if author_id == merger_id:
+        reasons.append("author_cannot_be_merger")
+    return PolicyVerdict(allowed=len(reasons) == 0, reasons=reasons)

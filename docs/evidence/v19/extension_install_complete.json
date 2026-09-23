@@ -1,0 +1,11 @@
+{
+  "status": "implementation_complete",
+  "packets": [
+    "V19-01",
+    "V19-02",
+    "V19-04"
+  ],
+  "external_install": "pending",
+  "self_merge": false,
+  "spend_usd": 0.0
+}
