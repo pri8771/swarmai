@@ -1,7 +1,9 @@
 # V3.0 exit requirement audit (implementation-complete)
 
-**Tip:** see `git rev-parse HEAD` on branch `cursor/cloud-agent-1790175458840-642hd`  
-**Verdict:** V3.0 **implementation-complete is proven for local/deterministic scope** — **not** accepted, **not** launched. Integrated live evidence remains pending.
+**Tip:** see `git rev-parse HEAD` on accept/launch lane (PR #41)  
+**Verdict:** V3.0 **implementation-complete** for local/deterministic scope.  
+Accept/launch **track** authorized 2026-09-23: zero-spend live proofs executed (Ollama loopback, local drill, release verify).  
+**Lead accept not invented.** Wall-clock / multi-host / external install / integrated live V3 remain **USER_ACTION**. Public launch complete **not** claimed.
 
 ## V1.8
 
@@ -16,7 +18,8 @@
 | Restore/reconcile | `recovery/restore.py` | pass |
 | Split-brain negatives | drill + stale epoch tests | pass |
 | Outage drill harness | `recovery/drill.py`, CLI `swarm recovery drill` | pass |
-| Live outage/restore | multi-host | pending |
+| Live outage/restore | multi-host | USER_ACTION |
+| Local outage drill (this session) | `docs/evidence/launch/recovery_drill_local.json` | pass |
 
 ## V1.9
 
@@ -43,7 +46,9 @@
 | Security review mapped | `docs/evidence/v20/security_review_map.json` | pass |
 | Performance baseline executable | `docs/evidence/v20/performance_baseline.json` | pass |
 | Reliability protocol frozen | `docs/evidence/v20/reliability_protocol_freeze.json` | pass |
-| Wall-clock campaign | | pending |
+| Wall-clock campaign | | USER_ACTION |
+| Ollama loopback canary (this session) | `docs/evidence/launch/ollama_live_canary.json` | pass (`$0`) |
+| Release verify offline+live binds | `var/evidence/*_pass.json` | pass |
 
 ## V2.3
 
@@ -79,6 +84,10 @@
 | Tenant fleet/audit + cross-tenant negatives | fleet tests | pass |
 | Integrated live evidence suite | | pending |
 
-## Operator-gated remaining
+## Operator-gated remaining (USER_ACTION)
 
-- Lead accept; FIX-004 Cursor CLI login; remote dual; LIVE-142; second host; wall-clock campaign; main merge; public launch; paid spend
+- Lead accept of ART-* (packages: `docs/evidence/v20/LEAD_ACCEPT_PACKAGE.md`, `docs/evidence/v30/LEAD_ACCEPT_PACKAGE.md`)
+- FIX-004 Cursor CLI login; remote dual; LIVE-142; second host; wall-clock campaign
+- Fresh/external install; integrated live V3 suite
+- Main merge / tag / publish clicks if agent tools blocked
+- Paid spend (`SWARM_ALLOW_PAID` stays false)

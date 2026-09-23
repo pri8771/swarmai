@@ -1,0 +1,49 @@
+{
+  "candidate_sha": "e2b194391455409051b78a95bd9ebd655239ca72",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
+  "spend": "zero",
+  "SWARM_ALLOW_PAID": false,
+  "commands": {
+    "harden": {
+      "ok": true,
+      "cost_usd": 0.0
+    },
+    "install_check": {
+      "ok": true
+    },
+    "first_run": {
+      "ok": true
+    },
+    "freeze": {
+      "ok": true
+    },
+    "demo_suite": {
+      "ok": true,
+      "cost_usd": 0.0
+    },
+    "validate_cells_except_verify": "all_true_before_evidence_rebind",
+    "reliability_proof": {
+      "ok": true,
+      "cost_usd": 0.0
+    },
+    "load_mock_fixed": {
+      "ok": true,
+      "mock_vs_live": "simulated_load_not_live"
+    },
+    "chaos_mock": {
+      "ok": true,
+      "all_passed": true,
+      "mock_vs_live": "simulated_chaos_not_live"
+    },
+    "ollama_live_canary": {
+      "ok": true,
+      "cost_usd": 0.0,
+      "mock_vs_live": "live_local_zero_cost"
+    }
+  },
+  "ci": {
+    "offline_green_run": "35890028419",
+    "push_green_run": "35890021376",
+    "tip_at_ci": "e2b1943"
+  }
+}

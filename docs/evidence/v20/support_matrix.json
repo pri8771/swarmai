@@ -1,20 +1,46 @@
 {
   "artifact": "ART-V20-SUPPORT_MATRIX",
   "status": "evidence_grounded_local",
-  "generated_at": "2026-09-23T15:30:00+00:00",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
   "spend": "zero",
   "public_launch": false,
   "surfaces": {
-    "api": {"status": "implemented", "evidence": "tests/api/test_api.py"},
-    "cli": {"status": "implemented", "evidence": "src/swarm/cli.py install/recovery/objectives"},
-    "console": {"status": "packaging_present", "evidence": "apps/console"},
-    "workers": {"status": "implemented_local", "evidence": "tests/workers (DB-gated skips without Postgres)"},
-    "postgres": {"status": "schema_present", "evidence": "migrations a15–a18tov30; live DSN optional"},
-    "ollama_local": {"status": "live_pending", "evidence": "var/evidence/live_local_pass.json status=pending"},
-    "paid_cloud": {"status": "blocked", "evidence": "SWARM_ALLOW_PAID=false"}
+    "api": {
+      "status": "implemented",
+      "evidence": "tests/api/test_api.py"
+    },
+    "cli": {
+      "status": "implemented",
+      "evidence": "src/swarm/cli.py install/recovery/objectives"
+    },
+    "console": {
+      "status": "packaging_present",
+      "evidence": "apps/console"
+    },
+    "workers": {
+      "status": "implemented_local",
+      "evidence": "tests/workers (DB-gated skips without Postgres)"
+    },
+    "postgres": {
+      "status": "schema_present",
+      "evidence": "migrations a15\u2013a18tov30; live DSN optional"
+    },
+    "ollama_local": {
+      "status": "supported_local_loopback",
+      "evidence": "docs/evidence/launch/ollama_live_canary.json"
+    },
+    "paid_cloud": {
+      "status": "blocked",
+      "evidence": "SWARM_ALLOW_PAID=false"
+    },
+    "recovery_drill_local": {
+      "status": "supported_local",
+      "evidence": "docs/evidence/launch/recovery_drill_local.json"
+    }
   },
   "notes": [
-    "Matrix cells claim only what local deterministic tests or packaging prove.",
-    "No remote dual, multi-host, or paid provider cells marked qualified."
+    "Matrix cells claim only what local deterministic tests, packaging, or this-session live loopback prove.",
+    "No remote dual, multi-host, wall-clock reliability, or paid provider cells marked qualified.",
+    "Lead accept remains USER_ACTION \u2014 not claimed."
   ]
 }

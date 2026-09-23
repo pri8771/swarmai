@@ -1,8 +1,9 @@
 # ART-V20-ACCEPTANCE — V2.0 integrated product candidate contract
 
-Status: drafting
+Status: reviewable_candidate — lead_accept USER_ACTION (not invented)
 Target: V2.0
 Owner: ChatGPT lead
+Worker package: docs/evidence/v20/LEAD_ACCEPT_PACKAGE.md (2026-09-23)
 
 ## V2.0 candidate definition
 

@@ -1,7 +1,7 @@
 {
   "artifact": "ART-V20-RELIABILITY_PROTOCOL",
   "status": "frozen_for_candidate",
-  "generated_at": "2026-09-23T15:30:00+00:00",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
   "source_doc": "docs/artifacts/future/ART-V20-RELIABILITY_PROTOCOL.md",
   "rules": [
     "Record started_at only when frozen candidate is actually running",
@@ -10,5 +10,6 @@
     "Campaign may remain pending while candidate is implementation-complete"
   ],
   "campaign_status": "pending_not_started",
-  "lead_accept": false
+  "lead_accept": false,
+  "user_action": "Start wall-clock campaign only after CandidateManifest freeze on accepted tip; never backfill elapsed time."
 }

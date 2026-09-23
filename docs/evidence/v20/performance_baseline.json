@@ -1,16 +1,22 @@
 {
   "artifact": "ART-V20-PERFORMANCE_BASELINE",
   "status": "protocol_executable_local",
-  "generated_at": "2026-09-23T15:30:00+00:00",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
   "source_doc": "docs/artifacts/future/ART-V20-PERFORMANCE_BASELINE.md",
   "harness": {
     "load": "swarm load run --mode mock",
     "chaos": "swarm chaos run --mode mock",
     "reliability_scenarios": "swarm reliability proof"
   },
-  "wall_clock_campaign": "pending",
+  "wall_clock_campaign": "USER_ACTION_pending",
   "notes": [
     "Baselines may be executed offline/mock; do not invent elapsed latency campaigns.",
     "Accepted V2.0 still requires independent review + elapsed reliability."
-  ]
+  ],
+  "local_executions": {
+    "load_mock_fixed": "pass",
+    "chaos_mock": "pass",
+    "reliability_proof": "pass"
+  },
+  "lead_accept": false
 }
