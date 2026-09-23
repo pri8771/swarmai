@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "packet": "live_local_restore",
+  "branch": "cursor/restore-live-local-tests-712f",
+  "source_sha_at_pytest": "042844bfbe5a1aa73854bee2dcad7b64f847bc32",
+  "pytest": {
+    "command": "SWARM_LIVE_LOCAL=1 SWARM_ALLOW_PAID=false uv run pytest -m live_local -q --tb=short",
+    "passed": 10,
+    "skipped": 1,
+    "failed": 0,
+    "skip_reason": "test_service_binds_loopback_only: no non-loopback address to probe on this host"
+  },
+  "canary": {
+    "command": "SWARM_ALLOW_PAID=false uv run swarm providers canary --route rt_ollama_default --policy bounded_probe --mode live --billing-known-zero",
+    "status": "canaried",
+    "cost_usd": 0.0,
+    "model": "gemma3:4b",
+    "route_id": "rt_ollama_gemma3:4b"
+  },
+  "allow_paid": false,
+  "generated_at": "2026-09-23T17:14:13.091833+00:00"
+}

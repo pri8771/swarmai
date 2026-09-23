@@ -9,4 +9,7 @@ Regenerate after each commit that must pass `swarm release verify`:
 # CandidateManifest tracked copy: docs/evidence/v20/candidate_manifest.json
 ```
 
-Gap-close tip (2026-09-23): offline_ci_pass rebound; live_local left `pending` (no invented live pass).
+Gap-close tip (2026-09-23): offline_ci_pass rebound.
+live_local (2026-09-23): pytest suite restored on `cursor/restore-live-local-tests-712f`;
+local run **10 passed / 1 skipped** (loopback-only host skip) + Ollama canary canaried at cost 0.
+Evidence: `docs/evidence/live_local/20260923T-restore/`; runtime bind `var/evidence/live_local_pass.json`.
