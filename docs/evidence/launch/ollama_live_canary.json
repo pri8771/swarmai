@@ -21,10 +21,10 @@
     "authenticated": true,
     "inference_tested": true
   },
-  "bound_candidate_sha": "e2b194391455409051b78a95bd9ebd655239ca72",
+  "bound_candidate_sha": "a05e7fb7ec4babbd1ec5e2abd2d604ec6bd86498",
   "cost_usd": 0.0,
   "evidence_kind": "live_local_zero_cost_canary",
-  "captured_at": "2026-09-23T16:40:19.617217+00:00",
+  "captured_at": "2026-09-23T16:41:58.247864+00:00",
   "command": [
     "uv run swarm providers canary --route rt_ollama_default --policy bounded_probe --mode live --billing-known-zero"
   ]
