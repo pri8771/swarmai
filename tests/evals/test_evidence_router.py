@@ -16,8 +16,12 @@ def test_task_benchmark_map_covers_mission_roles() -> None:
     assert set(TASK_TO_BENCHMARK) >= {"inspect", "implement", "verify", "review"}
 
 
-def test_build_route_plan_heterogeneous(tmp_path: Path) -> None:
+def test_build_route_plan_heterogeneous(tmp_path: Path, monkeypatch) -> None:
     # Seed a synthetic benchmark report favoring different models per family.
+    # Fail-closed ollama probe is not under test here — stub local readiness.
+    monkeypatch.setattr(
+        "swarm.evals.evidence_router._ollama_routable", lambda repo=None: True
+    )
     qual = tmp_path / "var" / "reports" / "qualification"
     qual.mkdir(parents=True)
     report = {

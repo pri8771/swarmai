@@ -15,12 +15,18 @@ from swarm.product.projects import ProjectStore
 from swarm.tools.permission_mission import run_permission_mission
 
 
-def _api_client(repo: Path):
+def _api_client(repo: Path) -> Any:
     from fastapi.testclient import TestClient
 
     from swarm.api.app import create_app
 
-    app = create_app(require_auth=True, db_reachable=True, repo_root=repo)
+    app = create_app(
+        require_auth=True,
+        db_reachable=True,
+        repo_root=repo,
+        seed_loopback_token="atk_loopback_demo",
+        seed_fixtures=True,
+    )
     return TestClient(app)
 
 
@@ -84,7 +90,11 @@ async def _run_journey(repo: Path) -> dict[str, Any]:
             "step": "api_submit_mission",
             "ok": created.status_code == 200,
             "status_code": created.status_code,
-            "mission_id": created.json().get("mission", {}).get("id") if created.status_code == 200 else None,
+            "mission_id": (
+                created.json().get("mission", {}).get("id")
+                if created.status_code == 200
+                else None
+            ),
         }
     )
     mid = created.json()["mission"]["id"] if created.status_code == 200 else mission.id

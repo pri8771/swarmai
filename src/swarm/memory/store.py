@@ -55,7 +55,9 @@ class MemoryStore:
             rows.append(MemoryRecord(**data))
         return rows
 
-    def remember_mission(self, record: MissionRecord, *, project_id: str = "proj_local") -> list[str]:
+    def remember_mission(
+        self, record: MissionRecord, *, project_id: str = "proj_local"
+    ) -> list[str]:
         ids: list[str] = []
         # Durable: goal + final outcome
         durable = MemoryRecord(
@@ -328,8 +330,9 @@ def run_interrupt_resume_proof(
     record = None
     # Launch async run synchronously but interrupt via store after first timeline event
     # by seeding an interrupted record from a planned graph.
-    from swarm.mission.planner import build_software_mission, inspect_repo, plan_task_graph
     import asyncio
+
+    from swarm.mission.planner import build_software_mission, inspect_repo, plan_task_graph
 
     async def _seed() -> MissionRecord:
         inspection = inspect_repo(repo)

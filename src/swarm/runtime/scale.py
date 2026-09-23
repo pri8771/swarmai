@@ -128,7 +128,12 @@ def bounded_consensus(results: list[AgentResult]) -> dict[str, Any]:
     """Majority ok among non-isolated results; critics = failed/isolated count."""
     active = [r for r in results if not r.isolated]
     if not active:
-        return {"decision": "reject", "reason": "all_isolated", "votes_accept": 0, "votes_reject": 0}
+        return {
+            "decision": "reject",
+            "reason": "all_isolated",
+            "votes_accept": 0,
+            "votes_reject": 0,
+        }
     accept = sum(1 for r in active if r.ok)
     reject = len(active) - accept
     decision = "accept" if accept > reject else "reject"
@@ -253,7 +258,12 @@ def run_scale_mission(
             lane=i,
             model="gemma3:4b" if role == "supervisor" else None,
         )
-        family = "implement" if role == "worker" else ("supervise" if role == "supervisor" else "review")
+        if role == "worker":
+            family = "implement"
+        elif role == "supervisor":
+            family = "supervise"
+        else:
+            family = "review"
         task = sample_task(mission_id=mission.id).model_copy(
             update={
                 "id": new_id("tsk_"),
@@ -280,7 +290,7 @@ def run_scale_mission(
 
     unique, dupes = detect_duplicate_work(pending)
     sched = make_scale_scheduler(max_concurrency=max_concurrency, ollama_in_flight=max_concurrency)
-    for agent, task, _path in unique:
+    for _agent, task, _path in unique:
         sched.enqueue(task, provider_id="ollama", timeout_s=60.0)
 
     # Drain via backpressure dispatcher in waves.
@@ -294,16 +304,9 @@ def run_scale_mission(
                 mission, inference_slots=max_concurrency, worker_slots=max_concurrency
             )
             if not dispatched:
-                # Nothing runnable — clear timeouts already counted; break if empty queue.
-                if sched.stats()["queue_depth"] == 0:
-                    break
-                # Force-progress: pop one without quota to avoid deadlock in tests.
-                item = None
-                if sched.queue:
-                    item = sched.queue.popleft()
-                if item is None:
-                    break
-                dispatched = [item]
+                # Nothing runnable under admission — stop without bypassing quota.
+                # Remaining work stays queued/blocked; report reflects incomplete drain.
+                break
             futures = []
             for item in dispatched:
                 trip = remaining.pop(item.task.id, None)

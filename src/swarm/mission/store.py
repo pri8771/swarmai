@@ -18,6 +18,9 @@ class MissionRecord:
     created_at: str
     updated_at: str
     revision: int = 1
+    project_id: str | None = None
+    source: str = "mission_store"
+    contract: dict[str, Any] = field(default_factory=dict)
     plan: dict[str, Any] = field(default_factory=dict)
     tasks: list[dict[str, Any]] = field(default_factory=list)
     timeline: list[dict[str, Any]] = field(default_factory=list)
@@ -37,6 +40,9 @@ class MissionRecord:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "revision": self.revision,
+            "project_id": self.project_id,
+            "source": self.source,
+            "contract": self.contract,
             "plan": self.plan,
             "tasks": self.tasks,
             "timeline": self.timeline,
@@ -66,7 +72,9 @@ class MissionStore:
 
     def load(self, mission_id: str) -> MissionRecord:
         raw = json.loads(self._path(mission_id).read_text())
-        return MissionRecord(**raw)
+        known = set(MissionRecord.__dataclass_fields__.keys())
+        clean = {k: v for k, v in raw.items() if k in known}
+        return MissionRecord(**clean)
 
     def list_missions(self) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []

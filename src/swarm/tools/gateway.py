@@ -135,6 +135,7 @@ def make_approval(
     args: dict[str, Any],
     destination: str,
     grantor: str = "operator",
+    project_id: str = "proj_demo",
     expires_in_seconds: int = 300,
     revoked: bool = False,
 ) -> Approval:
@@ -146,6 +147,7 @@ def make_approval(
         permitted_operation=tool_version,
         destination=destination,
         grantor=grantor,
+        project_id=project_id,
         expires_at=now + timedelta(seconds=expires_in_seconds),
         revoked_at=now if revoked else None,
     )

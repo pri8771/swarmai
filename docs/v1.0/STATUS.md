@@ -27,3 +27,9 @@ swarm release validate → ok, cost_usd 0.0, public_launch false
 
 **Ready:** local zero-spend product path (projects, missions, history, console, install/harden/demo/validate).  
 **Deferred:** public launch, OpenAI (payment-gated), cloud live qualification, statistical model qualification, production hosting.
+
+## Post-RC track B (2026-09-23) — not launch
+
+Operator authorized live zero-spend / integration resume. Work is on uncommitted branch
+`cursor/v1.4-zero-spend-slice-main` (slice from V1.4, not full PR #14). See
+`docs/handoff/CURRENT.md`. Main tip remains offline RC; public launch still **no**.
