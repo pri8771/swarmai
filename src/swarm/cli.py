@@ -531,19 +531,19 @@ def main() -> None:
         sha = subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
         ).strip()
-        manifest = BackupService(root=out).create(
+        backup_manifest = BackupService(root=out).create(
             site_id=args.site_id,
             epoch=args.epoch,
             commit_sha=sha,
             schema_revision="a18tov30schema0001",
             secret_ref_names=["SWARM_DATABASE_URL"],
         )
-        print(json.dumps(manifest.to_dict(), indent=2))
+        print(json.dumps(backup_manifest.to_dict(), indent=2))
     elif args.command == "install" and args.install_command == "clean-plan":
         from swarm.deploy.install import InstallOrchestrator
 
-        plan = InstallOrchestrator(root=_repo_root()).clean_install_plan()
-        print(json.dumps(plan.to_dict(), indent=2))
+        install_plan = InstallOrchestrator(root=_repo_root()).clean_install_plan()
+        print(json.dumps(install_plan.to_dict(), indent=2))
     elif args.command == "install" and args.install_command == "upgrade-plan":
         from swarm.deploy.install import InstallOrchestrator
 
@@ -583,8 +583,8 @@ def main() -> None:
             ProjectExtensionGrant,
         )
 
-        reg = ExtensionRegistry()
-        reg.register(
+        ext_reg = ExtensionRegistry()
+        ext_reg.register(
             ExtensionManifest(
                 extension_id="ext.demo",
                 version="1.0.0",
@@ -594,7 +594,7 @@ def main() -> None:
                 provider_access=[],
             )
         )
-        reg.grant(
+        ext_reg.grant(
             ProjectExtensionGrant(
                 project_id="proj_demo",
                 extension_id="ext.demo",
@@ -603,7 +603,7 @@ def main() -> None:
                 granted_tool_scopes=["write_text"],
             )
         )
-        scopes = reg.effective_scopes("proj_demo", "ext.demo", "1.0.0")
+        scopes = ext_reg.effective_scopes("proj_demo", "ext.demo", "1.0.0")
         print(
             json.dumps(
                 {k: sorted(v) for k, v in scopes.items()},
@@ -613,11 +613,11 @@ def main() -> None:
     elif args.command == "objectives" and args.objectives_command == "create":
         from swarm.objectives import ObjectiveContract, ObjectiveRepository
 
-        repo = _CLI_STATE.get("objective_repo")
-        if repo is None:
-            repo = ObjectiveRepository()
-            _CLI_STATE["objective_repo"] = repo
-        obj = repo.create(
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
+            objective_repo = ObjectiveRepository()
+            _CLI_STATE["objective_repo"] = objective_repo
+        obj = objective_repo.create(
             ObjectiveContract(
                 project_id=args.project_id,
                 goal=args.goal,
@@ -627,40 +627,52 @@ def main() -> None:
         )
         print(json.dumps(obj.model_dump(mode="json"), indent=2))
     elif args.command == "objectives" and args.objectives_command == "trigger":
-        repo = _CLI_STATE.get("objective_repo")
-        if repo is None:
+        from swarm.objectives import ObjectiveRepository
+
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
             raise SystemExit("no_objectives_in_process; run objectives create first")
-        prop = repo.trigger(
+        mission_prop = objective_repo.trigger(
             args.objective_id, dedupe_key=args.dedupe_key, trigger_kind=args.kind
         )
-        print(json.dumps(prop.model_dump(mode="json"), indent=2))
+        print(json.dumps(mission_prop.model_dump(mode="json"), indent=2))
     elif args.command == "objectives" and args.objectives_command == "pause":
-        repo = _CLI_STATE.get("objective_repo")
-        if repo is None:
+        from swarm.objectives import ObjectiveRepository
+
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
             raise SystemExit("no_objectives_in_process; run objectives create first")
-        print(json.dumps(repo.pause(args.objective_id).model_dump(mode="json"), indent=2))
+        print(
+            json.dumps(
+                objective_repo.pause(args.objective_id).model_dump(mode="json"), indent=2
+            )
+        )
     elif args.command == "learning" and args.learning_command == "create":
         from swarm.learning import LearningProposal, LearningRepository
 
-        repo = _CLI_STATE.get("learning_repo")
-        if repo is None:
-            repo = LearningRepository()
-            _CLI_STATE["learning_repo"] = repo
-        prop = repo.create(
+        learning_repo = _CLI_STATE.get("learning_repo")
+        if not isinstance(learning_repo, LearningRepository):
+            learning_repo = LearningRepository()
+            _CLI_STATE["learning_repo"] = learning_repo
+        learning_prop = learning_repo.create(
             LearningProposal(
                 project_id=args.project_id,
                 change_summary=args.summary,
                 sealed_holdout_ref=args.holdout_ref,
             )
         )
-        print(json.dumps(prop.model_dump(mode="json"), indent=2))
+        print(json.dumps(learning_prop.model_dump(mode="json"), indent=2))
     elif args.command == "learning" and args.learning_command == "transition":
-        repo = _CLI_STATE.get("learning_repo")
-        if repo is None:
+        from swarm.learning import LearningRepository
+
+        learning_repo = _CLI_STATE.get("learning_repo")
+        if not isinstance(learning_repo, LearningRepository):
             raise SystemExit("no_learning_in_process; run learning create first")
         print(
             json.dumps(
-                repo.transition(args.proposal_id, args.state).model_dump(mode="json"),
+                learning_repo.transition(args.proposal_id, args.state).model_dump(
+                    mode="json"
+                ),
                 indent=2,
             )
         )
@@ -669,7 +681,7 @@ def main() -> None:
         from swarm.workers.fleet import FleetError, FleetPlacementService
         from swarm.workers.registry import WorkerRegistryService
 
-        reg = WorkerRegistryService()
+        worker_reg = WorkerRegistryService()
         import asyncio
 
         lease = WorkerLease(
@@ -680,8 +692,8 @@ def main() -> None:
             capacity_units=1.0,
             lease_generation=1,
         )
-        asyncio.run(reg.register(lease, token="wt_ok", project_id="proj_a"))
-        fleet_svc = FleetPlacementService(reg)
+        asyncio.run(worker_reg.register(lease, token="wt_ok", project_id="proj_a"))
+        fleet_svc = FleetPlacementService(worker_reg)
         fleet_svc.bind_project_tenant("proj_a", "ten_a")
         fleet_svc.annotate_worker("wrk_a", tenant_id="ten_a", locality="local")
         decision = fleet_svc.place(project_id="proj_a")
@@ -834,11 +846,11 @@ def main() -> None:
         from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
 
         load_repo_dotenv(_repo_root())
-        plan = build_mission_route_plan(
+        route_plan = build_mission_route_plan(
             repo=_repo_root(), models=getattr(args, "models", None)
         )
-        path = save_route_plan(plan, repo=_repo_root())
-        payload = plan.to_dict()
+        path = save_route_plan(route_plan, repo=_repo_root())
+        payload = route_plan.to_dict()
         payload["saved_to"] = str(path)
         print(json.dumps(payload, indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "dynamic":
@@ -981,10 +993,10 @@ def main() -> None:
         sha = _sp.check_output(
             ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
         ).strip()
-        manifest = CandidateFreezer(_repo_root()).freeze(
+        candidate_manifest = CandidateFreezer(_repo_root()).freeze(
             source_sha=sha, schema_revision="a18tov30schema0001"
         )
-        print(json.dumps(manifest.to_dict(), indent=2))
+        print(json.dumps(candidate_manifest.to_dict(), indent=2))
     elif args.command == "mission" and args.mission_command == "plan":
         from swarm.mission.planner import (
             build_software_mission,
