@@ -1,0 +1,7 @@
+{
+  "status": "implementation_complete",
+  "extension_gateway_only": true,
+  "install_cli": true,
+  "external_install": "pending",
+  "self_merge_forbidden": true
+}

@@ -16,7 +16,6 @@ from swarm.contracts.enums import GraphOperation, RiskLevel
 from swarm.contracts.mission import GraphProposal, Mission, SizeFeatures, TaskSpec
 from swarm.mission.planner import RepoInspection
 
-
 ROLE_CAPS: dict[str, list[str]] = {
     "supervisor": ["repo_read", "local_inference"],
     "specialist": ["repo_read", "local_inference"],

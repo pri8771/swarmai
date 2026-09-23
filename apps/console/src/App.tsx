@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { loadSnapshot, scrubSecrets } from './api/client'
+import { emptyLiveSnapshot, loadSnapshot, resolveConsoleLoadOpts, scrubSecrets } from './api/client'
 import type { ConsoleSnapshot } from './api/types'
 import { Panel } from './components/Panel'
 import { StatusBadge } from './components/StatusBadge'
 import {
-  MOCK_SNAPSHOT,
   contractMission,
   expandMission,
   interruptStream,
@@ -28,11 +27,31 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('mission')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadOpts, setLoadOpts] = useState(() => resolveConsoleLoadOpts())
+
+  const reload = () => {
+    const opts = resolveConsoleLoadOpts()
+    setLoadOpts(opts)
+    setLoading(true)
+    setError(null)
+    loadSnapshot(opts)
+      .then((s) => {
+        setSnap(s)
+        setError(null)
+      })
+      .catch((e: unknown) => {
+        setError(e instanceof Error ? e.message : 'load_failed')
+        setSnap(null)
+      })
+      .finally(() => setLoading(false))
+  }
 
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    loadSnapshot({ mode: 'mock' })
+    const opts = resolveConsoleLoadOpts()
+    setLoadOpts(opts)
+    loadSnapshot(opts)
       .then((s) => {
         if (!cancelled) {
           setSnap(s)
@@ -62,13 +81,18 @@ export default function App() {
     return (
       <div className="shell" data-testid="error-state">
         <p>Console failed to load: {error ?? 'empty'}</p>
-        <button type="button" onClick={() => setSnap(structuredClone(MOCK_SNAPSHOT))}>
-          Recover with mock fixtures
+        <button type="button" data-testid="retry-load" onClick={reload}>
+          Retry
         </button>
+        <p className="muted" data-testid="error-no-mock-recover">
+          Operational console does not fall back to mock fixtures. Use ?mode=mock only for
+          isolated fixture UI.
+        </p>
       </div>
     )
   }
 
+  const fixtureControls = snap.mode === 'mock'
   const tabs: { id: Tab; label: string }[] = [
     { id: 'mission', label: 'Mission' },
     { id: 'projects', label: 'Projects' },
@@ -131,7 +155,7 @@ export default function App() {
           <dl className="metrics">
             <div>
               <dt>Planning roles</dt>
-              <dd>{snap.mission.planningRoles.join(', ')}</dd>
+              <dd>{snap.mission.planningRoles.join(', ') || '—'}</dd>
             </div>
             <div>
               <dt>Logical agents</dt>
@@ -146,18 +170,29 @@ export default function App() {
               <dd>{snap.mission.inFlightInference}</dd>
             </div>
           </dl>
-          <div className="actions">
-            <button type="button" data-testid="expand-mission" onClick={() => setSnap(expandMission(snap))}>
-              Expand (spawn)
-            </button>
-            <button
-              type="button"
-              data-testid="contract-mission"
-              onClick={() => setSnap(contractMission(snap))}
-            >
-              Contract
-            </button>
-          </div>
+          {fixtureControls ? (
+            <div className="actions">
+              <button
+                type="button"
+                data-testid="expand-mission"
+                onClick={() => setSnap(expandMission(snap))}
+              >
+                Expand (spawn)
+              </button>
+              <button
+                type="button"
+                data-testid="contract-mission"
+                onClick={() => setSnap(contractMission(snap))}
+              >
+                Contract
+              </button>
+            </div>
+          ) : (
+            <p className="muted" data-testid="live-no-fixture-mutate">
+              Expand/Contract are fixture-only controls. Live mode reflects API state (
+              {loadOpts.baseUrl ?? 'no baseUrl'}).
+            </p>
+          )}
           <table className="grid">
             <thead>
               <tr>
@@ -231,6 +266,9 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          {snap.projects.length === 0 ? (
+            <p data-testid="empty-projects">No projects configured.</p>
+          ) : null}
         </Panel>
       ) : null}
 
@@ -321,6 +359,9 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          {snap.routes.length === 0 ? (
+            <p data-testid="empty-routes">No routes configured or observed.</p>
+          ) : null}
         </Panel>
       ) : null}
 
@@ -356,6 +397,9 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          {snap.capacity.length === 0 ? (
+            <p data-testid="empty-capacity">Capacity unknown until accounts are configured and probed.</p>
+          ) : null}
         </Panel>
       ) : null}
 
@@ -391,6 +435,9 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          {snap.workers.length === 0 ? (
+            <p data-testid="empty-workers">No workers enrolled.</p>
+          ) : null}
         </Panel>
       ) : null}
 
@@ -408,7 +455,7 @@ export default function App() {
             </thead>
             <tbody>
               {snap.profiles.map((p) => (
-                <tr key={p.key} data-testid={`profile-${p.state}`}>
+                <tr key={p.key} data-testid={`profile-${p.key}`}>
                   <td>
                     <code>{p.key}</code>
                   </td>
@@ -424,6 +471,9 @@ export default function App() {
               ))}
             </tbody>
           </table>
+          {snap.profiles.length === 0 ? (
+            <p data-testid="empty-profiles">No profiles measured yet.</p>
+          ) : null}
         </Panel>
       ) : null}
 
@@ -443,20 +493,25 @@ export default function App() {
               <pre data-testid="approval-payload">{JSON.stringify(a.payloadPreview, null, 2)}</pre>
             </article>
           ))}
+          {snap.approvals.length === 0 ? (
+            <p data-testid="empty-approvals">No pending approvals.</p>
+          ) : null}
         </Panel>
       ) : null}
 
       {tab === 'events' ? (
         <Panel title="Event timeline" subtitle="At-least-once; reconnect recovers missed state" testId="events-panel">
-          <div className="actions">
-            <button
-              type="button"
-              data-testid="interrupt-stream"
-              onClick={() => setSnap(interruptStream(snap))}
-            >
-              Simulate stream interrupt
-            </button>
-          </div>
+          {fixtureControls ? (
+            <div className="actions">
+              <button
+                type="button"
+                data-testid="interrupt-stream"
+                onClick={() => setSnap(interruptStream(snap))}
+              >
+                Simulate stream interrupt
+              </button>
+            </div>
+          ) : null}
           {snap.streamInterrupted ? (
             <p data-testid="stream-interrupted">Stream interrupted — use continuation cursor.</p>
           ) : null}
@@ -472,3 +527,6 @@ export default function App() {
     </div>
   )
 }
+
+/** Test helper export — empty live baseline without fixtures. */
+export { emptyLiveSnapshot }

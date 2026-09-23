@@ -6,10 +6,12 @@ import asyncio
 from pathlib import Path
 from typing import Any
 
+from swarm.broker.broker import SharedInferenceBroker
 from swarm.contracts.common import utc_now
 from swarm.contracts.enums import MissionStatus, TaskStatus
 from swarm.controller.mission import MissionController
 from swarm.cost.ledger import CostEntry, CostLedger
+from swarm.mission.brokered_inference import build_local_mission_broker
 from swarm.mission.planner import (
     build_software_mission,
     inspect_repo,
@@ -30,13 +32,21 @@ class MissionRuntime:
         model: str = "gemma3:4b",
         max_repair_rounds: int = 2,
         use_evidence_router: bool = True,
+        parser_dogfood_fixture: bool = False,
     ) -> None:
         self.repo = repo.resolve()
         self.store = MissionStore(store_dir or (self.repo / "var" / "missions"))
         self.model = model
         self.max_repair_rounds = max_repair_rounds
         self.use_evidence_router = use_evidence_router
+        self.parser_dogfood_fixture = parser_dogfood_fixture
         self.controller = MissionController(inference_slots=2, worker_slots=2)
+        self._broker: SharedInferenceBroker | None = None
+
+    def _mission_broker(self) -> SharedInferenceBroker:
+        if self._broker is None:
+            self._broker = build_local_mission_broker(repo_root=self.repo)
+        return self._broker
 
     async def run(self, goal: str) -> MissionRecord:
         from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
@@ -104,7 +114,12 @@ class MissionRuntime:
         self.store.save(record)
 
         worker = RepoWorker(
-            self.repo, model=default_model, model_by_family=model_by_family
+            self.repo,
+            model=default_model,
+            model_by_family=model_by_family,
+            broker=self._mission_broker(),
+            project_id=mission.project_id,
+            parser_dogfood_fixture=self.parser_dogfood_fixture,
         )
         prior: dict[str, WorkerResult] = {}
         shared_wt: WorktreeHandle | None = None
@@ -243,9 +258,24 @@ class MissionRuntime:
             record.artifacts = {
                 "worker_results": {k: v.to_dict() for k, v in prior.items()},
             }
-            # Promote accepted worktree changes into the primary checkout for dogfood proof.
+            # G11: never auto-promote accepted worktree files into the primary
+            # checkout. Return isolated worktree diff/artifacts; apply requires
+            # an explicit reviewed action outside this path.
             if accepted and shared_wt is not None:
-                self._promote_changes(shared_wt, changed)
+                record.artifacts["pending_apply"] = {
+                    "status": "pending_explicit_apply",
+                    "changed_files": changed,
+                    "worktree": shared_wt.to_dict(),
+                    "note": (
+                        "accepted worktree changes are isolated; "
+                        "automatic primary-checkout promotion is disabled"
+                    ),
+                }
+                self.store.append_timeline(
+                    record,
+                    "apply_pending",
+                    {"changed_files": changed, "auto_promote": False},
+                )
             report_dir = self.repo / "var" / "reports" / "missions" / mission.id
             paths = write_reports(record, report_dir)
             record.artifacts["reports"] = paths
@@ -259,13 +289,25 @@ class MissionRuntime:
                 except Exception:  # noqa: BLE001
                     pass
 
-    def _promote_changes(self, handle: WorktreeHandle, changed_files: list[str]) -> None:
+    def apply_worktree_changes(
+        self,
+        handle: WorktreeHandle,
+        changed_files: list[str],
+        *,
+        approved: bool,
+    ) -> list[str]:
+        """Explicit reviewed apply into the primary checkout — never automatic."""
+        if not approved:
+            raise PermissionError("explicit_apply_requires_approved_true")
+        applied: list[str] = []
         for rel in changed_files:
             src = handle.path / rel
             dst = self.repo / rel
             if src.exists():
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+                applied.append(rel)
+        return applied
 
     def status(self, mission_id: str) -> dict[str, Any]:
         record = self.store.load(mission_id)
@@ -279,11 +321,13 @@ def run_mission(
     model: str = "gemma3:4b",
     store_dir: Path | None = None,
     use_evidence_router: bool = True,
+    parser_dogfood_fixture: bool = False,
 ) -> MissionRecord:
     runtime = MissionRuntime(
         repo,
         store_dir=store_dir,
         model=model,
         use_evidence_router=use_evidence_router,
+        parser_dogfood_fixture=parser_dogfood_fixture,
     )
     return asyncio.run(runtime.run(goal))

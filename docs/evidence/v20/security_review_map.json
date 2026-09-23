@@ -1,0 +1,39 @@
+{
+  "artifact": "ART-V20-SECURITY_THREAT_MODEL",
+  "status": "mapped_to_candidate",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
+  "source_doc": "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md",
+  "candidate_schema_revision": "a18tov30schema0001",
+  "controls_mapped": [
+    {
+      "threat": "secret_exfiltration_in_backup",
+      "control": "src/swarm/recovery/backup.py secret_value_forbidden"
+    },
+    {
+      "threat": "stale_authority_dispatch",
+      "control": "SiteAuthorityService + gateway/scheduler epoch fence"
+    },
+    {
+      "threat": "tool_permission_bypass_via_extension",
+      "control": "ExtensionLoader \u2192 ConsequentialToolGateway only"
+    },
+    {
+      "threat": "selfdev_self_merge",
+      "control": "assert_cannot_self_merge + assert_learning_governance"
+    },
+    {
+      "threat": "cross_tenant_effect",
+      "control": "FleetPlacementService.assert_same_tenant"
+    },
+    {
+      "threat": "paid_spend_via_objective",
+      "control": "ObjectiveRepository paid_spend_requires_operator_auth"
+    },
+    {
+      "threat": "holdout_contamination",
+      "control": "LearningRepository holdout_plaintext_forbidden + contaminated terminal"
+    }
+  ],
+  "independent_review": "USER_ACTION_pending_operator",
+  "lead_accept": false
+}

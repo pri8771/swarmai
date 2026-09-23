@@ -1,0 +1,106 @@
+{
+  "identity": {
+    "binding": "every counted held-out observation must quote exactly one conforming exact_model_config object",
+    "exact_model_config_id_rule": "sha256 of json.dumps(exact_model_config, sort_keys=True, separators=(',',':'), ensure_ascii=True), first 32 hex characters, prefixed with g13emc3-",
+    "required_fields": [
+      "provider",
+      "model_id",
+      "model_version_or_snapshot",
+      "temperature",
+      "top_p",
+      "max_output_tokens",
+      "stop_sequences_present",
+      "seed_present",
+      "reasoning_effort",
+      "system_prompt_present",
+      "tool_surface_id",
+      "prompt_id",
+      "scorer_id",
+      "pool_id"
+    ],
+    "schema_id": "g13-exact-model-config-v3",
+    "schema_version": 3,
+    "unspecified_field_policy": "no field may be omitted and no field may be null"
+  },
+  "json_schema": {
+    "$id": "g13-exact-model-config-v3",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "max_output_tokens": {
+        "minimum": 1,
+        "type": "integer"
+      },
+      "model_id": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "model_version_or_snapshot": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "pool_id": {
+        "const": "g13-pool-freeze-v3",
+        "type": "string"
+      },
+      "prompt_id": {
+        "const": "g13-prompt-v3",
+        "type": "string"
+      },
+      "provider": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "reasoning_effort": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "scorer_id": {
+        "const": "g13-scorer-v3",
+        "type": "string"
+      },
+      "seed_present": {
+        "type": "boolean"
+      },
+      "stop_sequences_present": {
+        "type": "boolean"
+      },
+      "system_prompt_present": {
+        "type": "boolean"
+      },
+      "temperature": {
+        "maximum": 2,
+        "minimum": 0,
+        "type": "number"
+      },
+      "tool_surface_id": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "top_p": {
+        "exclusiveMinimum": 0,
+        "maximum": 1,
+        "type": "number"
+      }
+    },
+    "required": [
+      "provider",
+      "model_id",
+      "model_version_or_snapshot",
+      "temperature",
+      "top_p",
+      "max_output_tokens",
+      "stop_sequences_present",
+      "seed_present",
+      "reasoning_effort",
+      "system_prompt_present",
+      "tool_surface_id",
+      "prompt_id",
+      "scorer_id",
+      "pool_id"
+    ],
+    "title": "EVAL-131 exact model configuration, G13 freeze v3",
+    "type": "object"
+  },
+  "spec_of": "model_config_schema"
+}

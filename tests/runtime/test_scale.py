@@ -7,12 +7,12 @@ from pathlib import Path
 from swarm.contracts.fixtures import sample_mission, sample_task
 from swarm.runtime.backpressure import ProviderQuota, make_scale_scheduler
 from swarm.runtime.scale import (
+    AgentResult,
+    LightAgent,
     bounded_consensus,
     detect_duplicate_work,
     isolate_failures,
     run_scale_mission,
-    LightAgent,
-    AgentResult,
 )
 
 

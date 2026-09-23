@@ -8,6 +8,7 @@ from typing import Any
 from swarm.contracts.enums import RoutingState, TaskStatus
 from swarm.contracts.mission import Mission, TaskSpec
 from swarm.evals.profiles import ProfileStore
+from swarm.recovery.authority import SiteAuthorityService, StaleEpochError
 
 
 @dataclass
@@ -16,6 +17,7 @@ class SchedulerConfig:
     overload_cooldown_ticks: int = 3
     priority_aging_per_tick: int = 1
     max_concurrency: int = 8
+    backpressure_min_slots: int = 1
 
 
 @dataclass
@@ -24,6 +26,7 @@ class SchedulerState:
     cooldown_remaining: int = 0
     last_overload: bool = False
     mission_fairness: dict[str, float] = field(default_factory=dict)
+    draining: bool = False
 
 
 class AdaptiveScheduler:
@@ -31,14 +34,28 @@ class AdaptiveScheduler:
         self,
         profiles: ProfileStore | None = None,
         config: SchedulerConfig | None = None,
+        *,
+        site_authority: SiteAuthorityService | None = None,
+        site_id: str | None = None,
+        site_epoch: int | None = None,
     ) -> None:
         self.profiles = profiles or ProfileStore()
         self.config = config or SchedulerConfig()
         self.state = SchedulerState()
+        self.site_authority = site_authority
+        self.site_id = site_id
+        self.site_epoch = site_epoch
 
     def note_overload(self) -> None:
         self.state.last_overload = True
         self.state.cooldown_remaining = self.config.overload_cooldown_ticks
+
+    def begin_drain(self) -> None:
+        """V2.3: cancel/drain is fenced — no new dispatch while draining."""
+        self.state.draining = True
+
+    def end_drain(self) -> None:
+        self.state.draining = False
 
     def tick(self) -> None:
         self.state.tick += 1
@@ -55,8 +72,21 @@ class AdaptiveScheduler:
         inference_slots: int,
         worker_slots: int,
         privacy_ok: bool = True,
+        site_epoch: int | None = None,
     ) -> tuple[list[TaskSpec], dict[str, Any]]:
         self.tick()
+        epoch = site_epoch if site_epoch is not None else self.site_epoch
+        if self.site_authority is not None and self.site_id is not None:
+            if epoch is None:
+                raise StaleEpochError("site_epoch_required_for_dispatch")
+            self.site_authority.require_epoch(self.site_id, int(epoch), action="dispatch")
+        if self.state.draining:
+            return [], {
+                "reason": "draining",
+                "selected": 0,
+                "hysteresis_hold": True,
+                "site_epoch": epoch,
+            }
         # Impossible privacy/quality: wait, do not weaken.
         if not privacy_ok:
             return [], {
@@ -87,7 +117,10 @@ class AdaptiveScheduler:
         slots = min(inference_slots, worker_slots, self.config.max_concurrency)
         if self.state.cooldown_remaining > 0:
             # Hysteresis: do not expand aggressively after overload.
-            slots = max(1, slots // 2)
+            slots = max(self.config.backpressure_min_slots, slots // 2)
+        # Bounded backpressure when under capacity pressure.
+        if inference_slots <= self.config.backpressure_min_slots:
+            slots = min(slots, self.config.backpressure_min_slots)
 
         # Protect control reserve.
         usable = max(0, slots - self.config.control_reserve_slots)
@@ -116,5 +149,7 @@ class AdaptiveScheduler:
             "hysteresis_hold": self.state.cooldown_remaining > 0,
             "fairness_debt": self.state.mission_fairness[mission.id],
             "task_ids": [t.id for t in selected],
+            "site_epoch": epoch,
+            "draining": self.state.draining,
         }
         return selected, explanation

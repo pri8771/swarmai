@@ -24,6 +24,7 @@ class StaleGenerationError(PermissionError):
 class WorkerRecord:
     lease: WorkerLease
     token: str
+    project_id: str | None = None
     revoked: bool = False
     privacy_classes: set[str] = field(default_factory=lambda: {"local"})
     named_inference_urls: list[str] = field(default_factory=list)
@@ -42,13 +43,24 @@ class WorkerRegistryService:
         self._quarantine: set[str] = set()
         self._dispatch_queue: list[TaskSpec] = []
 
-    async def register(self, lease: WorkerLease, *, token: str | None = None) -> WorkerLease:
+    async def register(
+        self,
+        lease: WorkerLease,
+        *,
+        token: str | None = None,
+        project_id: str | None = None,
+    ) -> WorkerLease:
         token = token or new_id("wt_")
         # Never store provider secrets — token is membership only.
         if any(k in token.lower() for k in ("sk-", "api_key", "secret=")):
             raise WorkerAuthError("provider_secret_forbidden_on_worker_token")
         lease = lease.model_copy(update={"status": WorkerStatus.ONLINE})
-        rec = WorkerRecord(lease=lease, token=token, measured_capacity=lease.capacity_units)
+        rec = WorkerRecord(
+            lease=lease,
+            token=token,
+            project_id=project_id,
+            measured_capacity=lease.capacity_units,
+        )
         self._workers[lease.worker_id] = rec
         self._tokens[token] = lease.worker_id
         return lease
@@ -155,22 +167,37 @@ class WorkerRegistryService:
             if r.lease.status == WorkerStatus.ONLINE and not r.revoked
         )
 
-    def inspect(self) -> dict[str, Any]:
-        return {
-            "workers": [
+    def inspect(self, *, project_id: str | None = None) -> dict[str, Any]:
+        rows: list[dict[str, Any]] = []
+        for r in self._workers.values():
+            if project_id is not None and r.project_id != project_id:
+                continue
+            rows.append(
                 {
                     "worker_id": r.lease.worker_id,
+                    "project_id": r.project_id,
                     "status": r.lease.status.value,
                     "generation": r.lease.lease_generation,
-                    "capacity": r.measured_capacity,
+                    "capacity": float(r.measured_capacity),
                     "privacy": sorted(r.privacy_classes),
                     "claimed": r.claimed_task_id,
                     "revoked": r.revoked,
                 }
-                for r in self._workers.values()
-            ],
-            "total_capacity": self.total_capacity(),
-            "quarantine": sorted(self._quarantine),
+            )
+        online = [
+            row
+            for row in rows
+            if row["status"] == WorkerStatus.ONLINE.value and not row["revoked"]
+        ]
+        return {
+            "workers": rows,
+            "total_capacity": sum(float(row["capacity"]) for row in online),
+            "quarantine": sorted(
+                wid
+                for wid in self._quarantine
+                if project_id is None
+                or (self._workers.get(wid) and self._workers[wid].project_id == project_id)
+            ),
         }
 
 

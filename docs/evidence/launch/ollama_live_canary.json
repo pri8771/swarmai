@@ -1,0 +1,31 @@
+{
+  "route_id": "rt_ollama_gemma3:4b",
+  "requested_route_id": "rt_ollama_default",
+  "provider_id": "ollama",
+  "model_id": "gemma3:4b",
+  "status": "canaried",
+  "denied": false,
+  "probe_counted": true,
+  "consumed_allowance": 1,
+  "mock_vs_live": "live_local_zero_cost",
+  "billing_known_zero": true,
+  "endpoint_loopback": true,
+  "purpose": "prototype",
+  "settlement_state": "settled",
+  "error_class": null,
+  "provider_request_id": "chatcmpl-229",
+  "model_fingerprint": "gemma3:4b",
+  "layers": {
+    "cataloged": true,
+    "configured": true,
+    "authenticated": true,
+    "inference_tested": true
+  },
+  "bound_candidate_sha": "a05e7fb7ec4babbd1ec5e2abd2d604ec6bd86498",
+  "cost_usd": 0.0,
+  "evidence_kind": "live_local_zero_cost_canary",
+  "captured_at": "2026-09-23T16:41:58.247864+00:00",
+  "command": [
+    "uv run swarm providers canary --route rt_ollama_default --policy bounded_probe --mode live --billing-known-zero"
+  ]
+}

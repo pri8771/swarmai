@@ -83,13 +83,15 @@ class ProjectConfig:
     schema_version: str = "0.8.0"
 
     def to_dict(self) -> dict[str, Any]:
-        return scrub_config(asdict(self))
+        result = scrub_config(asdict(self))
+        assert isinstance(result, dict)
+        return result
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ProjectConfig:
         known = set(cls.__dataclass_fields__.keys())
         clean = scrub_config({k: v for k, v in data.items() if k in known})
-        return cls(**clean)  # type: ignore[arg-type]
+        return cls(**clean)
 
 
 class ProjectStore:

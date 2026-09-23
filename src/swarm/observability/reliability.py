@@ -112,23 +112,45 @@ def run_reliability_scenarios(*, repo: Path) -> dict[str, Any]:
         results["provider_unavailable"] = {"ok": False, "error": "circuit_should_be_open"}
     except CircuitOpenError:
         trace.emit("circuit_open", "reliability", {"route_id": route})
-        results["provider_unavailable"] = {"ok": True, "routed_around": True, "fallback": "rt_ollama_gemma3:4b"}
+        results["provider_unavailable"] = {
+            "ok": True,
+            "routed_around": True,
+            "fallback": "rt_ollama_gemma3:4b",
+        }
 
     # 2) Timeout simulation
     started = time.perf_counter()
     time.sleep(0.01)
     duration = (time.perf_counter() - started) * 1000
-    timed_out = duration > 0  # structural
-    trace.emit("timeout_guard", "reliability", {"limit_ms": 5000}, duration_ms=duration)
-    results["timeout"] = {"ok": True, "simulated_ms": duration, "cancelled": False}
+    timed_out = duration > 0  # structural helper label (not process kill)
+    trace.emit(
+        "timeout_guard",
+        "reliability",
+        {"limit_ms": 5000, "timed_out_label": timed_out},
+        duration_ms=duration,
+    )
+    results["timeout"] = {
+        "ok": True,
+        "simulated_ms": duration,
+        "cancelled": False,
+        "timed_out_label": timed_out,
+    }
 
     # 3) Validation failure → escalate
     validation_ok = False
     try:
         raise ValueError("validation_failed:acceptance_criteria")
     except ValueError as exc:
-        trace.emit("validation_failed", "eval", {"error": str(exc), "escalate": "human_review"})
-        results["validation_failure"] = {"ok": True, "escalated": True}
+        trace.emit(
+            "validation_failed",
+            "eval",
+            {"error": str(exc), "escalate": "human_review", "validation_ok": validation_ok},
+        )
+        results["validation_failure"] = {
+            "ok": True,
+            "escalated": True,
+            "validation_ok": validation_ok,
+        }
 
     # 4) Budget / zero-spend
     try:

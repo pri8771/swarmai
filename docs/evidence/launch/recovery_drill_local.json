@@ -1,0 +1,51 @@
+{
+  "status": "pass",
+  "mode": "local_drill",
+  "candidate_sha": "e2b194391455409051b78a95bd9ebd655239ca72",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
+  "command": [
+    "uv run swarm recovery drill"
+  ],
+  "digest": "bd3a21eaf4ba8f97956d342d112ee812bfddcfddd9f1844c11e70cf72c600f2f",
+  "checks": {
+    "backup_created": true,
+    "secrets_names_only": true,
+    "stale_dispatch_rejected": true,
+    "unknown_effect_preserved": true,
+    "epoch_advanced": true,
+    "post_restore_stale_rejected": true
+  },
+  "detail": {
+    "backup_id": "bak_d253a4c4a2b648a5aaa810fa5c24a6d0",
+    "recovery": {
+      "recovery_id": "rcv_953a0d841fae4cb2b4fe134e5742ec2a",
+      "backup_id": "bak_d253a4c4a2b648a5aaa810fa5c24a6d0",
+      "old_site_id": "site_local",
+      "old_epoch": 1,
+      "new_site_id": "site_local",
+      "new_epoch": 2,
+      "final_state": "recovered",
+      "lease_actions": [
+        {
+          "lease_id": "ls_1",
+          "action": "expire_uncertain",
+          "prior_epoch": 1
+        }
+      ],
+      "unknown_effects": [
+        {
+          "effect_key": "eff_unknown",
+          "state": "unknown_preserved",
+          "retry": false
+        }
+      ],
+      "fenced_stale_epochs": [
+        1
+      ],
+      "evidence_digest": "dc147dde8d119c6c344d2f1596a4d5934daa087999dcc147d6e44db184fb7a91",
+      "started_at": "2026-09-23T16:37:37.399639+00:00",
+      "finished_at": "2026-09-23T16:37:37.399675+00:00"
+    }
+  },
+  "multi_host": "USER_ACTION_pending"
+}

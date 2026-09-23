@@ -1,0 +1,10 @@
+{
+  "mission_id": "06ffec6da20a45b6a872f48dd7c1c863",
+  "api_list_contains": true,
+  "reopened_after_restart": true,
+  "list_after_restart_contains": true,
+  "store_goal": "triage unfamiliar intermittent timeout family",
+  "store_source": "api",
+  "fixture_seeded": false,
+  "spend": 0
+}

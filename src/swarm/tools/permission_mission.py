@@ -16,10 +16,9 @@ from swarm.tools.gateway import (
     ApprovalInvalidError,
     ToolAuthorizationError,
     ToolGateway,
-    hash_operation,
     make_approval,
 )
-from swarm.tools.registry import CapabilityRegistry, ToolSpec
+from swarm.tools.registry import CapabilityRegistry, ToolSpec, hash_operation
 
 
 def _register_repo_tools(registry: CapabilityRegistry, repo: Path, allow_roots: list[Path]) -> None:

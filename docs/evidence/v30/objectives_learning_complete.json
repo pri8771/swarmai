@@ -1,0 +1,14 @@
+{
+  "status": "implementation_complete",
+  "live_integrated_evidence": "USER_ACTION_pending",
+  "self_permission": false,
+  "paid_spend_ceiling_blocked": true,
+  "rate_expiry_stop_authority": true,
+  "cli_api_wired": true,
+  "learning_governance_selfdev": true,
+  "fleet_cross_tenant_negatives": true,
+  "candidate_sha": "e2b194391455409051b78a95bd9ebd655239ca72",
+  "generated_at": "2026-09-23T16:40:19.617217+00:00",
+  "lead_accept": false,
+  "local_deterministic": "pass"
+}

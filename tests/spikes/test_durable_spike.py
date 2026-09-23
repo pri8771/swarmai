@@ -82,7 +82,7 @@ async def test_completed_step_not_reissued_semantics(tmp_path: Path) -> None:
 
 
 def test_health_endpoints_smoke() -> None:
-    client = TestClient(create_app())
+    client = TestClient(create_app(seed_loopback_token="atk_loopback_demo", seed_fixtures=True))
     live = client.get("/health/live")
     ready = client.get("/health/ready")
     assert live.status_code == 200

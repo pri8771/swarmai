@@ -1,0 +1,13 @@
+{
+  "api": "http://127.0.0.1:18765",
+  "console": "http://127.0.0.1:43127",
+  "live_console_query": "?mode=live&baseUrl=http://127.0.0.1:18765&token=<redacted>",
+  "health_live": "ok",
+  "mission_store_count": 2,
+  "sample_mission_ids": [
+    "69e17aa643aa4f508b53f7dd7f6c09a1",
+    "9433021d6c884ed3ad282ee7f45f4426"
+  ],
+  "spend": 0,
+  "public_bind": false
+}

@@ -298,6 +298,7 @@ def all_required_type_instances() -> dict[str, object]:
             permitted_operation="publish",
             destination="local",
             grantor="operator",
+            project_id="proj_demo",
             expires_at=utc_now() + timedelta(hours=1),
         ),
         "ActionReceipt": ActionReceipt(

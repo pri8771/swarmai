@@ -1,0 +1,36 @@
+{
+  "gate": "FIX-004",
+  "scenario": "cursor_agent_login_verify_after_browser_all_set",
+  "recorded_at": "2026-09-20T21:11:12.945207+00:00",
+  "operator_signal": "Browser showed: All set! Feel free to return to the CLI.",
+  "cursor_agent_status": "Not logged in",
+  "cursor_agent_whoami": "Not logged in",
+  "invented_success": false,
+  "hourly_spawn_resumed": false,
+  "skip_cursor_probe_cleared": false,
+  "interpretation": "Browser completion message is a strong signal but not sufficient. CLI still Not logged in \u2014 likely prior loginDeepControl challenge completed in browser after the waiting CLI process had already timed out, so the token was never received.",
+  "checks": {
+    "immediate_status": "Not logged in",
+    "immediate_whoami": "Not logged in",
+    "retry_login_no_open_browser": {
+      "timed_out_seconds": 45,
+      "cli_state": "Waiting for browser authentication...",
+      "login_url": "https://cursor.com/loginDeepControl?challenge=J9zm5tl1VyVQwsyidDRj2gHJecu5TvNaclcNatAL3C0&uuid=310c0872-ff2f-4abe-ac01-ddad8b62653d&mode=login&redirectTarget=cli",
+      "status_during_wait": "Not logged in"
+    },
+    "launchagent": {
+      "SWARM_HOURLY_SKIP_CURSOR_PROBE": "1",
+      "unchanged": true,
+      "reason": "not cleared \u2014 agent CLI still Not logged in"
+    }
+  },
+  "remaining_operator_step": {
+    "action": "Keep a live `cursor agent login` process waiting, then open the fresh loginDeepControl URL it prints (or the URL below if still valid). Complete browser auth and wait until the CLI process itself exits successfully BEFORE relying on the browser 'All set' page alone. Then verify `cursor agent status` no longer prints Not logged in.",
+    "cli": "cursor agent login",
+    "url": "https://cursor.com/loginDeepControl?challenge=J9zm5tl1VyVQwsyidDRj2gHJecu5TvNaclcNatAL3C0&uuid=310c0872-ff2f-4abe-ac01-ddad8b62653d&mode=login&redirectTarget=cli",
+    "verify_after": [
+      "cursor agent status",
+      "cursor agent whoami"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "artifact_id": "ART-V15-LEASE-FENCING",
+  "packet_id": "V2A-003c",
+  "scenario": "durable_result_submission_and_acceptance_fence",
+  "status": "pass_local",
+  "recorded_at": "2026-09-21T18:38:56Z",
+  "candidate_sha_pre": "fe6acbf6097bb32250115c5cd8b6a21acf9d060a",
+  "spend_usd": 0.0,
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "multi_host_recovery_live_evidence": "UNKNOWN_single_host_only",
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest tests/integration/db/test_lease_result_acceptance.py tests/integration/db/test_lease_claim_renew_expire.py tests/db/test_token_hash.py tests/workers/test_workers.py -q",
+    "PYTHONPATH=src .venv/bin/python -m ruff check src/swarm/db/lease_fencing.py src/swarm/db/__init__.py src/swarm/workers/durable_protocol.py src/swarm/workers/__init__.py tests/integration/db/test_lease_result_acceptance.py",
+    "PYTHONPATH=src .venv/bin/python -m mypy src/swarm/db/lease_fencing.py src/swarm/workers/durable_protocol.py"
+  ],
+  "results": {
+    "pytest": "40 passed",
+    "ruff": "All checks passed",
+    "mypy": "clean",
+    "accept_happy_path": true,
+    "duplicate_second_rejected": true,
+    "stale_generation_rejected": true,
+    "expired_lease_rejected": true,
+    "cancelled_mission_rejected": true,
+    "task_revision_mismatch_rejected": true,
+    "cancel_lease_blocks_accept": true,
+    "drain_blocks_new_claims": true,
+    "review_checks_required": true,
+    "reservation_refs_reconciled": true,
+    "api_routes_wired": false,
+    "http_worker_transport": false,
+    "multi_host_live": false
+  },
+  "landed": [
+    "submit_result immutable durable row",
+    "accept_result atomic fence (project/lease/generation/revision/cancel/review/reservations/exactly-one)",
+    "request_drain on WorkerRegistrationRepository",
+    "cancel_active_lease",
+    "DurableWorkerProtocol sync fa\u00e7ade",
+    "integration race/negative suite"
+  ],
+  "still_drafting": [
+    "HTTP/queue worker transport (B2 remainder)",
+    "multi-host/recovery live harness evidence (B3)",
+    "ART-V15 lead acceptance"
+  ],
+  "note": "V2A-003c result acceptance fencing on cursor/v17-single-session; V14 ART remains drafting; no self-accept",
+  "candidate_sha": "ddd96a6a577f45f419ce9868506688ed4b08b5cf"
+}

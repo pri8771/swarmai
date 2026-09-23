@@ -1,0 +1,78 @@
+{
+  "at": "2026-09-20T20:20:05+00:00",
+  "trigger": "manual",
+  "host_alias": "test-host",
+  "pid": 4326,
+  "lock_started_at": "2026-09-20T20:20:05+00:00",
+  "elapsed_seconds": 0.583,
+  "max_seconds": 3000,
+  "bounded_ok": true,
+  "cursor": {
+    "auth_status": "auth_required",
+    "version_stdout": "3.21.16\n8ae78e8eee1e63479c7e0504b664bc0a80c68000\narm64\n"
+  },
+  "git": {
+    "head": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/pchordia/Downloads/swarm-ai-v14",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "stdout_tail": "2f91d7d97dd6f027b1d86295eec303e095340381\n",
+      "stderr_tail": ""
+    },
+    "branch": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/pchordia/Downloads/swarm-ai-v14",
+        "branch",
+        "--show-current"
+      ],
+      "returncode": 0,
+      "stdout_tail": "cursor/v1.4-live-integration-11e2\n",
+      "stderr_tail": ""
+    },
+    "origin_main": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/pchordia/Downloads/swarm-ai-v14",
+        "rev-parse",
+        "origin/main"
+      ],
+      "returncode": 0,
+      "stdout_tail": "b9141fa3150f853586dede0334a47b344571bc16\n",
+      "stderr_tail": ""
+    },
+    "origin_coord": {
+      "argv": [
+        "git",
+        "-C",
+        "/Users/pchordia/Downloads/swarm-ai-v14",
+        "rev-parse",
+        "origin/coordination/swarm-control"
+      ],
+      "returncode": 0,
+      "stdout_tail": "e12c564777ec28a72bfcd577228b7233ff6299f3\n",
+      "stderr_tail": ""
+    },
+    "fetch": {
+      "skipped": true,
+      "reason": "SWARM_HOURLY_FETCH!=1"
+    }
+  },
+  "agent_spawn": {
+    "attempted": false,
+    "reason": "probe_only_default"
+  },
+  "state_snapshot": {
+    "invocation_count": 1,
+    "scheduler_checkins": 0,
+    "manual_checkins": 1,
+    "recurring_verified": false
+  }
+}

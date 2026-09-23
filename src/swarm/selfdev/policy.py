@@ -92,3 +92,45 @@ def validate_worker_patch(
         reasons.append(f"privilege_expansion:{hit}")
 
     return PolicyVerdict(allowed=len(reasons) == 0, reasons=reasons)
+
+
+def assert_cannot_self_merge(*, merged: bool, author_id: str, merger_id: str) -> PolicyVerdict:
+    """V1.9/V3.0: selfdev may produce a PR candidate but never self-merge/release."""
+    reasons: list[str] = []
+    if merged:
+        reasons.append("selfdev_merge_forbidden")
+    if author_id == merger_id:
+        reasons.append("author_cannot_be_merger")
+    return PolicyVerdict(allowed=len(reasons) == 0, reasons=reasons)
+
+
+def assert_learning_governance(
+    *,
+    learning_proposal_id: str | None,
+    learning_state: str | None,
+    expands_spend: bool = False,
+    expands_secrets: bool = False,
+    expands_merge_authority: bool = False,
+    expands_deploy_authority: bool = False,
+) -> PolicyVerdict:
+    """V3.0: controlled selfdev must use learning governance and cannot expand authority."""
+    reasons: list[str] = []
+    if not learning_proposal_id:
+        reasons.append("learning_proposal_required")
+    if learning_state not in {
+        "frozen",
+        "held_out_eval",
+        "review",
+        "canary",
+        "accepted",
+    }:
+        reasons.append(f"learning_state_not_governed:{learning_state}")
+    if expands_spend:
+        reasons.append("selfdev_cannot_expand_spend")
+    if expands_secrets:
+        reasons.append("selfdev_cannot_expand_secrets")
+    if expands_merge_authority:
+        reasons.append("selfdev_cannot_expand_merge")
+    if expands_deploy_authority:
+        reasons.append("selfdev_cannot_expand_deploy")
+    return PolicyVerdict(allowed=len(reasons) == 0, reasons=reasons)

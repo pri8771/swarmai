@@ -1,0 +1,25 @@
+{
+  "identity": {
+    "bundle_id": "g13-sealed-reference-bundle-v3",
+    "commitment_digest_algorithm": "sha256",
+    "commitment_file": "SEALED_REFERENCE_IDS.txt",
+    "hidden_reference_id_derived_from_reference_content": false,
+    "hidden_reference_id_kind": "opaque_surrogate_key",
+    "hidden_reference_id_pattern": "^g13hr3-[0-9]{4}$",
+    "interface_id": "g13-sealed-reference-interface-v3",
+    "interface_version": 3,
+    "local_fallback_paths": 0,
+    "reference_content_digest_declared_by_this_freeze": false,
+    "reference_content_digest_reason": "the sealed bundle is not authored by this packet and must not be, so a content digest quoted here would be fabricated. It is bound at seal time by whoever mints the bundle.",
+    "reference_content_location": "outside_the_worker_visible_branch",
+    "resolver_behaviour_without_source": "raise SealedReferenceUnavailable",
+    "resolver_default_source_present": false,
+    "resolver_requires_commitment_match": true,
+    "worker_visible_fields": [
+      "hidden_reference_id",
+      "interface_id"
+    ]
+  },
+  "implementation_module": "src/swarm/evals/g13_sealed_reference_v3.py",
+  "spec_of": "sealed_reference_interface"
+}

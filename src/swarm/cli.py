@@ -18,6 +18,9 @@ from swarm.evals.dataset import validate_dataset
 from swarm.providers.catalog import list_providers
 from swarm.tools.sandbox_runner import self_test as sandbox_self_test
 
+# Process-local CLI demo state (not multi-process durable).
+_CLI_STATE: dict[str, object] = {}
+
 
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -291,6 +294,54 @@ def main() -> None:
     recovery_sub = recovery.add_subparsers(dest="recovery_command", required=True)
     rv = recovery_sub.add_parser("verify", help="Verify recovery profile artifacts")
     rv.add_argument("--profile", default="recovery", choices=["recovery"])
+    recovery_sub.add_parser("drill", help="Run local V1.8 outage drill harness")
+    rb = recovery_sub.add_parser("backup", help="Create redacted backup manifest")
+    rb.add_argument("--site-id", default="site_local")
+    rb.add_argument("--epoch", type=int, default=1)
+    rb.add_argument("--out", type=Path, default=None)
+
+    install = sub.add_parser("install", help="V1.9 install/upgrade/rollback plans")
+    install_sub = install.add_subparsers(dest="install_command", required=True)
+    install_sub.add_parser("clean-plan", help="Emit clean install plan JSON")
+    iup = install_sub.add_parser("upgrade-plan", help="Emit upgrade plan JSON")
+    iup.add_argument("--from-revision", required=True)
+    iup.add_argument("--to-revision", default="head")
+    irb = install_sub.add_parser("rollback-plan", help="Emit rollback plan JSON")
+    irb.add_argument("--from-revision", required=True)
+    irb.add_argument("--to-revision", required=True)
+    isb = install_sub.add_parser("support-bundle", help="Write redacted support bundle")
+    isb.add_argument("--out", type=Path, default=None)
+
+    extensions = sub.add_parser("extensions", help="V1.9 extension registry (local)")
+    ext_sub = extensions.add_subparsers(dest="extensions_command", required=True)
+    ext_sub.add_parser("demo-scopes", help="Show demo extension scope intersection")
+
+    objectives = sub.add_parser("objectives", help="V3.0 persistent objectives")
+    obj_sub = objectives.add_subparsers(dest="objectives_command", required=True)
+    oc = obj_sub.add_parser("create", help="Create an objective (zero-spend)")
+    oc.add_argument("--project-id", required=True)
+    oc.add_argument("--goal", required=True)
+    oc.add_argument("--template", default="generic")
+    ot = obj_sub.add_parser("trigger", help="Trigger objective → MissionProposal")
+    ot.add_argument("--objective-id", required=True)
+    ot.add_argument("--dedupe-key", required=True)
+    ot.add_argument("--kind", default="manual")
+    op = obj_sub.add_parser("pause", help="Pause an objective")
+    op.add_argument("--objective-id", required=True)
+
+    learning = sub.add_parser("learning", help="V3.0 governed learning proposals")
+    lrn_sub = learning.add_subparsers(dest="learning_command", required=True)
+    lc = lrn_sub.add_parser("create", help="Create learning proposal")
+    lc.add_argument("--project-id", required=True)
+    lc.add_argument("--summary", required=True)
+    lc.add_argument("--holdout-ref", default="seal:holdout/demo#digest")
+    lt = lrn_sub.add_parser("transition", help="Advance learning state machine")
+    lt.add_argument("--proposal-id", required=True)
+    lt.add_argument("--state", required=True)
+
+    fleet = sub.add_parser("fleet", help="V2.3/V3.0 fleet placement (local)")
+    fleet_sub = fleet.add_subparsers(dest="fleet_command", required=True)
+    fleet_sub.add_parser("self-check", help="Run fleet tenant isolation self-check")
 
     load = sub.add_parser("load", help="Synthetic load scenarios (offline)")
     load_sub = load.add_subparsers(dest="load_command", required=True)
@@ -341,6 +392,9 @@ def main() -> None:
     release_sub.add_parser(
         "validate", help="V1.0 real-world validation matrix"
     )
+    release_sub.add_parser(
+        "candidate-freeze", help="V2.0 freeze CandidateManifest to tip"
+    )
 
     mission = sub.add_parser("mission", help="V0.1 real mission runtime")
     mission_sub = mission.add_subparsers(dest="mission_command", required=True)
@@ -365,6 +419,14 @@ def main() -> None:
         type=Path,
         default=None,
         help="Target repository (default: this SwarmAI checkout)",
+    )
+    mrun.add_argument(
+        "--fixture-parser-dogfood",
+        action="store_true",
+        help=(
+            "Opt into the sandbox off-by-one parser dogfood path "
+            "(explicit fixture only; not the default generic mission path)"
+        ),
     )
     mstatus = mission_sub.add_parser("status", help="Show live mission state")
     mstatus.add_argument("--mission-id", required=True)
@@ -452,6 +514,199 @@ def main() -> None:
         print(
             json.dumps(
                 recovery_verify(profile=args.profile, repo_root=_repo_root()).to_dict(),
+                indent=2,
+            )
+        )
+    elif args.command == "recovery" and args.recovery_command == "drill":
+        from swarm.recovery import OutageDrillHarness
+
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
+        ).strip()
+        print(json.dumps(OutageDrillHarness().run_local(commit_sha=sha).to_dict(), indent=2))
+    elif args.command == "recovery" and args.recovery_command == "backup":
+        from swarm.recovery import BackupService
+
+        out = args.out or (_repo_root() / "var" / "recovery" / "backups")
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
+        ).strip()
+        backup_manifest = BackupService(root=out).create(
+            site_id=args.site_id,
+            epoch=args.epoch,
+            commit_sha=sha,
+            schema_revision="a18tov30schema0001",
+            secret_ref_names=["SWARM_DATABASE_URL"],
+        )
+        print(json.dumps(backup_manifest.to_dict(), indent=2))
+    elif args.command == "install" and args.install_command == "clean-plan":
+        from swarm.deploy.install import InstallOrchestrator
+
+        install_plan = InstallOrchestrator(root=_repo_root()).clean_install_plan()
+        print(json.dumps(install_plan.to_dict(), indent=2))
+    elif args.command == "install" and args.install_command == "upgrade-plan":
+        from swarm.deploy.install import InstallOrchestrator
+
+        print(
+            json.dumps(
+                InstallOrchestrator(root=_repo_root())
+                .upgrade_plan(from_revision=args.from_revision, to_revision=args.to_revision)
+                .to_dict(),
+                indent=2,
+            )
+        )
+    elif args.command == "install" and args.install_command == "rollback-plan":
+        from swarm.deploy.install import InstallOrchestrator
+
+        print(
+            json.dumps(
+                InstallOrchestrator(root=_repo_root())
+                .rollback_plan(from_revision=args.from_revision, to_revision=args.to_revision)
+                .to_dict(),
+                indent=2,
+            )
+        )
+    elif args.command == "install" and args.install_command == "support-bundle":
+        from swarm.deploy.install import InstallOrchestrator
+
+        out = args.out or (_repo_root() / "var" / "support")
+        print(
+            json.dumps(
+                InstallOrchestrator(root=_repo_root()).support_bundle(out_dir=out).to_dict(),
+                indent=2,
+            )
+        )
+    elif args.command == "extensions" and args.extensions_command == "demo-scopes":
+        from swarm.extensions import (
+            ExtensionManifest,
+            ExtensionRegistry,
+            ProjectExtensionGrant,
+        )
+
+        ext_reg = ExtensionRegistry()
+        ext_reg.register(
+            ExtensionManifest(
+                extension_id="ext.demo",
+                version="1.0.0",
+                content_digest="d" * 64,
+                declared_capabilities=["sandbox.fs"],
+                tool_operations=["write_text"],
+                provider_access=[],
+            )
+        )
+        ext_reg.grant(
+            ProjectExtensionGrant(
+                project_id="proj_demo",
+                extension_id="ext.demo",
+                version="1.0.0",
+                granted_capabilities=["sandbox.fs"],
+                granted_tool_scopes=["write_text"],
+            )
+        )
+        scopes = ext_reg.effective_scopes("proj_demo", "ext.demo", "1.0.0")
+        print(
+            json.dumps(
+                {k: sorted(v) for k, v in scopes.items()},
+                indent=2,
+            )
+        )
+    elif args.command == "objectives" and args.objectives_command == "create":
+        from swarm.objectives import ObjectiveContract, ObjectiveRepository
+
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
+            objective_repo = ObjectiveRepository()
+            _CLI_STATE["objective_repo"] = objective_repo
+        obj = objective_repo.create(
+            ObjectiveContract(
+                project_id=args.project_id,
+                goal=args.goal,
+                allowed_mission_templates=[args.template],
+                spend_usd_ceiling=0.0,
+            )
+        )
+        print(json.dumps(obj.model_dump(mode="json"), indent=2))
+    elif args.command == "objectives" and args.objectives_command == "trigger":
+        from swarm.objectives import ObjectiveRepository
+
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
+            raise SystemExit("no_objectives_in_process; run objectives create first")
+        mission_prop = objective_repo.trigger(
+            args.objective_id, dedupe_key=args.dedupe_key, trigger_kind=args.kind
+        )
+        print(json.dumps(mission_prop.model_dump(mode="json"), indent=2))
+    elif args.command == "objectives" and args.objectives_command == "pause":
+        from swarm.objectives import ObjectiveRepository
+
+        objective_repo = _CLI_STATE.get("objective_repo")
+        if not isinstance(objective_repo, ObjectiveRepository):
+            raise SystemExit("no_objectives_in_process; run objectives create first")
+        print(
+            json.dumps(
+                objective_repo.pause(args.objective_id).model_dump(mode="json"), indent=2
+            )
+        )
+    elif args.command == "learning" and args.learning_command == "create":
+        from swarm.learning import LearningProposal, LearningRepository
+
+        learning_repo = _CLI_STATE.get("learning_repo")
+        if not isinstance(learning_repo, LearningRepository):
+            learning_repo = LearningRepository()
+            _CLI_STATE["learning_repo"] = learning_repo
+        learning_prop = learning_repo.create(
+            LearningProposal(
+                project_id=args.project_id,
+                change_summary=args.summary,
+                sealed_holdout_ref=args.holdout_ref,
+            )
+        )
+        print(json.dumps(learning_prop.model_dump(mode="json"), indent=2))
+    elif args.command == "learning" and args.learning_command == "transition":
+        from swarm.learning import LearningRepository
+
+        learning_repo = _CLI_STATE.get("learning_repo")
+        if not isinstance(learning_repo, LearningRepository):
+            raise SystemExit("no_learning_in_process; run learning create first")
+        print(
+            json.dumps(
+                learning_repo.transition(args.proposal_id, args.state).model_dump(
+                    mode="json"
+                ),
+                indent=2,
+            )
+        )
+    elif args.command == "fleet" and args.fleet_command == "self-check":
+        from swarm.contracts.workspace import WorkerLease
+        from swarm.workers.fleet import FleetError, FleetPlacementService
+        from swarm.workers.registry import WorkerRegistryService
+
+        worker_reg = WorkerRegistryService()
+        import asyncio
+
+        lease = WorkerLease(
+            worker_id="wrk_a",
+            node_identity="node_a",
+            architecture="x86_64",
+            runtime_version="1.0",
+            capacity_units=1.0,
+            lease_generation=1,
+        )
+        asyncio.run(worker_reg.register(lease, token="wt_ok", project_id="proj_a"))
+        fleet_svc = FleetPlacementService(worker_reg)
+        fleet_svc.bind_project_tenant("proj_a", "ten_a")
+        fleet_svc.annotate_worker("wrk_a", tenant_id="ten_a", locality="local")
+        decision = fleet_svc.place(project_id="proj_a")
+        denied = False
+        try:
+            fleet_svc.assert_same_tenant(
+                actor_tenant="ten_a", resource_tenant="ten_b", action="effect"
+            )
+        except FleetError:
+            denied = True
+        print(
+            json.dumps(
+                {"placement": decision.to_dict(), "cross_tenant_denied": denied},
                 indent=2,
             )
         )
@@ -556,7 +811,7 @@ def main() -> None:
         if not ds.is_absolute():
             ds = _repo_root() / ds
         try:
-            report = run_live_benchmarks(
+            live_bench = run_live_benchmarks(
                 repo=_repo_root(),
                 dataset=ds,
                 models=getattr(args, "models", None),
@@ -568,18 +823,22 @@ def main() -> None:
             print(json.dumps({"error": str(exc)}, indent=2))
             raise SystemExit(2) from exc
         summary = {
-            "run_id": report.run_id,
-            "models": report.models,
-            "case_ids": report.case_ids,
-            "trial_count": len(report.trials),
-            "passed": sum(1 for t in report.trials if t.correct),
-            "failed": sum(1 for t in report.trials if not t.correct and not t.error),
-            "errors": sum(1 for t in report.trials if t.error),
-            "total_cost_usd": report.total_cost_usd,
-            "mock_vs_live": report.mock_vs_live,
-            "cells": report.cells,
-            "profiles_summary": report.profiles_summary,
-            "report_hash": report.report_hash,
+            "run_id": live_bench.run_id,
+            "models": live_bench.models,
+            "case_ids": live_bench.case_ids,
+            "trial_count": len(live_bench.trials),
+            "passed": sum(1 for trial in live_bench.trials if trial.correct),
+            "failed": sum(
+                1
+                for trial in live_bench.trials
+                if not trial.correct and not trial.error
+            ),
+            "errors": sum(1 for trial in live_bench.trials if trial.error),
+            "total_cost_usd": live_bench.total_cost_usd,
+            "mock_vs_live": live_bench.mock_vs_live,
+            "cells": live_bench.cells,
+            "profiles_summary": live_bench.profiles_summary,
+            "report_hash": live_bench.report_hash,
         }
         print(json.dumps(summary, indent=2, default=str))
     elif args.command == "eval" and args.eval_command == "route":
@@ -587,11 +846,11 @@ def main() -> None:
         from swarm.evals.evidence_router import build_mission_route_plan, save_route_plan
 
         load_repo_dotenv(_repo_root())
-        plan = build_mission_route_plan(
+        route_plan = build_mission_route_plan(
             repo=_repo_root(), models=getattr(args, "models", None)
         )
-        path = save_route_plan(plan, repo=_repo_root())
-        payload = plan.to_dict()
+        path = save_route_plan(route_plan, repo=_repo_root())
+        payload = route_plan.to_dict()
         payload["saved_to"] = str(path)
         print(json.dumps(payload, indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "dynamic":
@@ -610,10 +869,10 @@ def main() -> None:
             report_dir = Path(args.report_dir)
         else:
             report_dir = root / "var" / "reports" / "demo"
-        report = asyncio.run(
+        demo_report = asyncio.run(
             run_parser_issue_demo(mode=args.mode, report_dir=report_dir.resolve())
         )
-        print(json.dumps(report.to_dict(), indent=2, default=str))
+        print(json.dumps(demo_report.to_dict(), indent=2, default=str))
     elif args.command == "demo" and args.demo_command == "self-development":
         from swarm.selfdev.runner import run_self_development
 
@@ -701,9 +960,9 @@ def main() -> None:
     elif args.command == "release" and args.release_command == "demo-suite":
         from swarm.release.demo_suite import run_public_demo_suite
 
-        demo = run_public_demo_suite(_repo_root())
-        print(json.dumps(demo, indent=2, default=str))
-        if not demo.get("ok"):
+        demo_suite = run_public_demo_suite(_repo_root())
+        print(json.dumps(demo_suite, indent=2, default=str))
+        if not demo_suite.get("ok"):
             raise SystemExit(2)
     elif args.command == "release" and args.release_command == "freeze":
         from swarm.release.contract_freeze import freeze_public_contracts
@@ -726,6 +985,18 @@ def main() -> None:
         print(json.dumps(matrix, indent=2, default=str))
         if not matrix.get("ok"):
             raise SystemExit(2)
+    elif args.command == "release" and args.release_command == "candidate-freeze":
+        import subprocess as _sp
+
+        from swarm.release.candidate import CandidateFreezer
+
+        sha = _sp.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
+        ).strip()
+        candidate_manifest = CandidateFreezer(_repo_root()).freeze(
+            source_sha=sha, schema_revision="a18tov30schema0001"
+        )
+        print(json.dumps(candidate_manifest.to_dict(), indent=2))
     elif args.command == "mission" and args.mission_command == "plan":
         from swarm.mission.planner import (
             build_software_mission,
@@ -781,6 +1052,9 @@ def main() -> None:
             repo=repo,
             model=args.model,
             use_evidence_router=not getattr(args, "no_evidence_router", False),
+            parser_dogfood_fixture=bool(
+                getattr(args, "fixture_parser_dogfood", False)
+            ),
         )
         print(json.dumps(record.to_dict(), indent=2, default=str))
         if record.status != "completed":
@@ -810,7 +1084,7 @@ def main() -> None:
         from swarm.runtime.scale import run_scale_mission
 
         load_repo_dotenv(_repo_root())
-        report = run_scale_mission(
+        scale_report = run_scale_mission(
             repo=_repo_root(),
             goal=args.goal,
             agent_count=args.agents,
@@ -818,30 +1092,30 @@ def main() -> None:
             use_supervisor_model=not args.no_supervisor_model,
         )
         summary = {
-            "run_id": report.run_id,
-            "agent_count": report.agent_count,
-            "task_count": report.task_count,
-            "completed": report.completed,
-            "failed": report.failed,
-            "duplicates_suppressed": report.duplicates_suppressed,
-            "consensus": report.consensus,
-            "total_cost_usd": report.total_cost_usd,
-            "runtime_ms": report.runtime_ms,
-            "scheduler_stats": report.scheduler_stats,
-            "report_hash": report.report_hash,
-            "mock_vs_live": report.mock_vs_live,
+            "run_id": scale_report.run_id,
+            "agent_count": scale_report.agent_count,
+            "task_count": scale_report.task_count,
+            "completed": scale_report.completed,
+            "failed": scale_report.failed,
+            "duplicates_suppressed": scale_report.duplicates_suppressed,
+            "consensus": scale_report.consensus,
+            "total_cost_usd": scale_report.total_cost_usd,
+            "runtime_ms": scale_report.runtime_ms,
+            "scheduler_stats": scale_report.scheduler_stats,
+            "report_hash": scale_report.report_hash,
+            "mock_vs_live": scale_report.mock_vs_live,
         }
         print(json.dumps(summary, indent=2, default=str))
-        if report.consensus.get("decision") != "accept":
+        if scale_report.consensus.get("decision") != "accept":
             raise SystemExit(2)
     elif args.command == "memory" and args.memory_command == "retrieve":
         from swarm.memory.store import MemoryStore, retrieve_context
 
-        store = MemoryStore(_repo_root() / "var" / "memory")
+        mem_store = MemoryStore(_repo_root() / "var" / "memory")
         print(
             json.dumps(
                 retrieve_context(
-                    store, query=args.query, token_budget=args.token_budget
+                    mem_store, query=args.query, token_budget=args.token_budget
                 ),
                 indent=2,
                 default=str,
@@ -871,8 +1145,8 @@ def main() -> None:
     elif args.command == "projects" and args.projects_command == "create":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        cfg = store.create(
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        cfg = proj_store.create(
             name=args.name,
             repo_path=Path(args.repo).resolve() if args.repo else _repo_root(),
             project_id=args.project_id,
@@ -881,17 +1155,17 @@ def main() -> None:
     elif args.command == "projects" and args.projects_command == "list":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        print(json.dumps({"projects": store.list_projects()}, indent=2, default=str))
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps({"projects": proj_store.list_projects()}, indent=2, default=str))
     elif args.command == "projects" and args.projects_command == "show":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
-        print(json.dumps(store.get(args.project_id).to_dict(), indent=2, default=str))
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
+        print(json.dumps(proj_store.get(args.project_id).to_dict(), indent=2, default=str))
     elif args.command == "projects" and args.projects_command == "update":
         from swarm.product.projects import ProjectStore
 
-        store = ProjectStore(_repo_root() / "var" / "projects")
+        proj_store = ProjectStore(_repo_root() / "var" / "projects")
         patch: dict[str, object] = {}
         for item in args.set:
             if "=" not in item:
@@ -901,7 +1175,13 @@ def main() -> None:
                 patch[key] = json.loads(raw)
             except json.JSONDecodeError:
                 patch[key] = raw
-        print(json.dumps(store.update(args.project_id, **patch).to_dict(), indent=2, default=str))
+        print(
+            json.dumps(
+                proj_store.update(args.project_id, **patch).to_dict(),
+                indent=2,
+                default=str,
+            )
+        )
     elif args.command == "product" and args.product_command == "contract":
         from swarm.product.contracts import public_product_contract
 

@@ -12,11 +12,22 @@ from swarm.contracts.mission import Mission
 
 class MissionCreateRequest(StrictModel):
     mission: Mission
+    task_family: str | None = None
+    required_checks: dict[str, Any] | None = None
     idempotency_key: str | None = None
 
 
 class CancelRequest(StrictModel):
     reason: str | None = None
+    idempotency_key: str | None = None
+
+
+class MissionReviewRequest(StrictModel):
+    """Independent review controls acceptance — not decorative post-success notes."""
+
+    produced: dict[str, Any] = Field(default_factory=dict)
+    required_checks: dict[str, Any] | None = None
+    force_wrong: bool = False
     idempotency_key: str | None = None
 
 

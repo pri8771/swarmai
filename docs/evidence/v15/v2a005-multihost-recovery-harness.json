@@ -1,0 +1,32 @@
+{
+  "artifact_id": "ART-V15-RECOVERY-EVIDENCE",
+  "related_artifact_id": "ART-V15-MULTIHOST-EVIDENCE",
+  "packet_id": "V2A-005",
+  "scenario": "simulated_multi_worker_recovery_harness",
+  "status": "harness_pass_live_multihost_UNKNOWN",
+  "recorded_at": "2026-09-21T18:49:31Z",
+  "base_sha": "5dd8e2be9670132f33ffac27a91686fff05c1cff",
+  "spend_usd": 0.0,
+  "mode": "simulated_multi_worker_single_process",
+  "live_multi_host_evidence": "UNKNOWN_pending_second_physical_host",
+  "g15_lead_accept_invented": false,
+  "art_v14_real_e2e_status": "drafting_awaiting_independent_review",
+  "g13_task_pool_status": "blocked_HOST-WIN-DEV",
+  "commands": [
+    "PYTHONPATH=src .venv/bin/python -m pytest tests/workers/test_recovery_harness.py -q"
+  ],
+  "scenarios": [
+    "host_enrollment",
+    "dispatch_exactly_one_lease",
+    "worker_kill_lease_expiry_reassignment",
+    "stale_result_after_reassignment_rejected",
+    "drain_blocks_new_leases",
+    "restart_reconnect_recovers_leases"
+  ],
+  "results": {
+    "pytest": "pass",
+    "live_mac_windows": false
+  },
+  "note": "B3 harness complete on single Darwin host; do not treat as ART-V15-MULTIHOST-EVIDENCE acceptance",
+  "candidate_sha": "ab6cd8d62e18ea025ac60351faf9a4d83416773a"
+}
