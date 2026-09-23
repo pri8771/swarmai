@@ -90,6 +90,6 @@
     "secrets_policy": "never_persist_or_return_secret_values",
     "spend_policy_default": "zero"
   },
-  "frozen_at": "2026-09-20T18:21:25.256076+00:00",
-  "hash": "6891d2c0bf2c8372a9c71c4b5b7664f913584d62852cfbc462ccdde6f190724c"
+  "frozen_at": "2026-09-23T16:42:16.155094+00:00",
+  "hash": "90b39972254c343a351c88af08dabffdaa38916c04aa24f969fb584c1c605de4"
 }

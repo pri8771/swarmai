@@ -12,7 +12,7 @@ Use before any **authorized** public launch.
 - [x] `uv run swarm release freeze` — pass (this session)
 - [x] `uv run swarm release harden` — pass (this session)
 - [x] `uv run swarm release verify` — pass (`offline-and-live-evidence-present-validated` at tip bind)
-- [ ] `uv run swarm release validate` — re-confirm on **final** tip after CandidateManifest rebind
+- [x] `uv run swarm release validate` — pass on tip (`ok: true`, `cost_usd: 0.0`) after evidence rebind
 - [x] `uv run swarm release demo-suite` — pass, `cost_usd: 0.0`
 - [x] `uv run pytest tests/contracts tests/product tests/release -q` — pass (plus recovery/objectives suites)
 - [x] Zero-spend proofs show `cost_usd: 0.0` — Ollama live canary + demo-suite
