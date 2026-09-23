@@ -4,8 +4,8 @@
 - Epoch: `fable-v17-20260922-01`
 - Branch: `cursor/v17-single-session`
 - Branch SHA: `05fe7807db3509d68dd8a86a0616c9e8ffaa2307`
-- Coordination SHA: `d71292a3a967a1eecee2ed7b2cabc86c5844b1fe`
-- Updated: `2026-09-23T15:54:18Z`
+- Coordination SHA: `d30389164fb57e7c502b0cf6ca88eb34e0af165f`
+- Updated: `2026-09-23T15:59:23Z`
 - Trigger: `scheduler`
 - Worker engine: `fable`
 - Status: **working**
