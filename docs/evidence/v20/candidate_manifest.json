@@ -1,6 +1,6 @@
 {
-  "candidate_id": "cand_6f8f46b5e7fa48b29b11ef83892db6c3",
-  "source_sha": "a88c039420b2ba4177ea20043521f465b6062f96",
+  "candidate_id": "cand_6671754784f7458999666f3ef36ec15b",
+  "source_sha": "93cda0c96e77b8e95b7722e83d9daf7c8de75203",
   "schema_revision": "a18tov30schema0001",
   "dependency_lock_digest": "9b017641c72d5dd8cae17388f51f86323ed06f43b48a7108936535f992bfc782",
   "runtime_manifest_digest": "6c4acf24d0e6970bf2bc531a8e96d5c7b0e79c4771a00753a8dd1b49e01f12fb",
@@ -20,7 +20,7 @@
   "eval_protocol_versions": {
     "starter": "provisional"
   },
-  "frozen_at": "2026-09-23T15:29:04.998225+00:00",
+  "frozen_at": "2026-09-23T15:30:16.913352+00:00",
   "invalidated_at": null,
   "invalidation_reason": null
 }
