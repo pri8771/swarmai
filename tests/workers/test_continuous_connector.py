@@ -11,7 +11,13 @@ from swarm.api.app import create_app
 from swarm.contracts.common import new_id
 from swarm.contracts.fixtures import sample_task
 from swarm.contracts.workspace import WorkerLease
-from swarm.workers.continuous_connector import ContinuousMacConnector, default_mac_executor
+from swarm.workers.continuous_connector import (
+    ContinuousMacConnector,
+    default_mac_executor,
+    execute_assigned_work,
+    fixture_demo_executor,
+    resolve_connector_mode,
+)
 from swarm.workers.registry import WorkerRegistryService
 
 HEADERS = {"Authorization": "Bearer test-token"}
@@ -288,6 +294,7 @@ def test_leases_survive_app_reconstruction(tmp_path: Path) -> None:
 
 
 def test_continuous_config_and_executor(tmp_path: Path) -> None:
+    # Operational default: no fixture invent / no echo success without input.
     claim = {
         "task": {
             "id": "tsk_x",
@@ -296,7 +303,7 @@ def test_continuous_config_and_executor(tmp_path: Path) -> None:
         }
     }
     produced = default_mac_executor(claim, tmp_path / "fx")
-    assert produced["checks"]["placement"] == "mac_local"
+    assert produced["status"] == "blocked"
     assert produced["usage"]["spend_usd"] == 0.0
     connector = ContinuousMacConnector(
         max_iterations=3,
@@ -304,5 +311,98 @@ def test_continuous_config_and_executor(tmp_path: Path) -> None:
         evidence_dir=tmp_path / "ev",
         poll_interval_seconds=0.01,
     )
+    assert connector.mode == "operational"
     assert connector.max_iterations == 3
     assert connector.poll_interval_seconds == 0.01
+
+
+def test_operational_default_rejects_fixture_echo_success(tmp_path: Path) -> None:
+    """Protected regression: operational mode must not echo-complete unsupported work."""
+    assert resolve_connector_mode(env={}) == "operational"
+    unsupported = execute_assigned_work(
+        {"task": {"id": "tsk_plain", "scopes": ["cloud"], "required_capabilities": ["chat"]}},
+        tmp_path / "fx",
+        mode="operational",
+    )
+    assert unsupported["status"] == "unsupported"
+    assert unsupported["status"] != "completed"
+    assert unsupported["checks"]["unsupported"] is True
+
+    # Fixture/echo only in explicit test/demo modes.
+    demo = fixture_demo_executor(
+        {"task": {"id": "tsk_echo", "scopes": ["other"], "required_capabilities": []}},
+        tmp_path / "fx",
+    )
+    assert demo["status"] == "completed"
+    assert demo["artifact_manifest"]["kind"] == "echo"
+    assert demo["artifact_manifest"]["mode"] == "fixture_demo"
+
+    fixture_claim = {
+        "task": {
+            "id": "tsk_fx",
+            "scopes": ["mac_local"],
+            "required_capabilities": ["mac.local.extract"],
+        }
+    }
+    demo_extract = execute_assigned_work(fixture_claim, tmp_path / "fx", mode="demo")
+    assert demo_extract["status"] == "completed"
+    assert demo_extract["checks"]["placement"] == "mac_local"
+
+
+def test_operational_executes_assigned_input_via_permitted_runtime(tmp_path: Path) -> None:
+    """Protected regression: operational path executes real assigned input path."""
+    src = tmp_path / "assigned.txt"
+    src.write_text(
+        "Assigned mac-local extract input.\n"
+        "Contact worker@example.com and ops@example.org.\n",
+        encoding="utf-8",
+    )
+    claim = {
+        "task": {
+            "id": "tsk_assigned",
+            "scopes": ["mac_local"],
+            "required_capabilities": ["mac.local.extract"],
+            "input_path": str(src),
+        }
+    }
+    produced = default_mac_executor(claim, tmp_path / "work")
+    assert produced["status"] == "completed"
+    assert produced["checks"]["email_count"] == 2
+    assert produced["artifact_manifest"]["runtime"] == "mac_local_extract"
+    assert produced["usage"]["spend_usd"] == 0.0
+
+
+def test_connector_reuses_p4_identity_and_support_matrix() -> None:
+    """Protected regression: connector gates platform via P4 SupportMatrix / identity."""
+    from swarm.product.portable_config import (
+        PortableConfigError,
+        PublicEndpointConfig,
+        WorkerIdentitySpec,
+        default_support_matrix,
+    )
+
+    endpoint = PublicEndpointConfig(
+        public_hostname="worker-a.example.test",
+        api_base_url="http://worker-a.example.test:8765",
+    )
+    identity = WorkerIdentitySpec(
+        worker_id="wk_p1",
+        node_identity="node-p1",
+        platform="darwin",
+        architecture="arm64",
+        capabilities=["mac.local.extract", "extract"],
+        verified_capabilities=["mac.local.extract", "extract"],
+        role="worker",
+    )
+    connector = ContinuousMacConnector(
+        endpoint=endpoint,
+        worker_identity=identity,
+        support_matrix=default_support_matrix(),
+        max_iterations=1,
+    )
+    assert connector.endpoint is not None
+    assert connector.endpoint.matches_configured_hostname("worker-a.example.test")
+    assert identity.effective_capabilities() == {"mac.local.extract", "extract"}
+    connector.support_matrix.require(identity.platform, identity.architecture)
+    with pytest.raises(PortableConfigError, match="unsupported_platform_arch"):
+        connector.support_matrix.require("windows", "amd64")

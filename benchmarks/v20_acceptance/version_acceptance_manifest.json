@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "freeze_id": "v20-acceptance-campaign-20260925",
+  "hostname_validation": "match_deployment_config",
+  "literal_hostname_forbidden": true,
+  "any_version_accepted": false,
+  "scope_note": "Validate freeze.public_hostname against PublicEndpointConfig (SWARM_PUBLIC_HOSTNAME / SWARM_API_BASE_URL). Do not hardcode product hostnames in integrity checks. Update this manifest when version matrix required_scenarios change.",
+  "deployment_contract": "swarm.product.portable_config.PublicEndpointConfig",
+  "version_matrices": {
+    "V1.7": {
+      "required_scenarios": ["V20-S05", "V20-S06", "V20-S07", "V20-S08", "V20-S12"],
+      "accepted": false
+    },
+    "V1.8": {
+      "required_scenarios": ["V20-S01", "V20-S03", "V20-S04", "V20-S08", "V20-S09"],
+      "accepted": false
+    },
+    "V1.9": {
+      "required_scenarios": ["V20-S01", "V20-S02", "V20-S03", "V20-S04", "V20-S05", "V20-S08", "V20-S09", "V20-S10"],
+      "accepted": false
+    },
+    "V2.0": {
+      "required_scenarios": [
+        "V20-S01", "V20-S02", "V20-S03", "V20-S04", "V20-S05", "V20-S06",
+        "V20-S07", "V20-S08", "V20-S09", "V20-S10", "V20-S11", "V20-S12"
+      ],
+      "accepted": false
+    }
+  }
+}

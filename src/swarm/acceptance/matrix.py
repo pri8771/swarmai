@@ -60,8 +60,10 @@ def build_version_matrices(
             in {
                 "pass_deterministic",
                 "pass_deterministic_gate_only",
+                "pass_fake_upstream_wiring",
                 "scaffold_ready_not_integrated",
                 "blocked_live_grant",
+                "blocked_missing_implementation",
                 "blocked_host_gate",
                 "blocked_elapsed_window",
                 "not_run",

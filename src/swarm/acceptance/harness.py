@@ -3,6 +3,10 @@
 Deterministic probes may execute. Live requires an operator-supplied approved
 LiveGrant (never invented). Host and elapsed gates remain external/not_started
 unless explicitly configured without simulating wall-clock time.
+
+When an approved grant is present, the harness distinguishes missing
+authorization from missing live implementation, and exercises fake-upstream
+wiring first. It never fabricates grants or performs unauthorized live calls.
 """
 
 from __future__ import annotations
@@ -17,7 +21,13 @@ from typing import Any, Literal
 from swarm.acceptance.freeze import AcceptanceFreeze, ScenarioSpec, load_freeze
 from swarm.acceptance.probes import PROBES, ProbeResult
 from swarm.contracts.common import new_id, utc_now
+from swarm.contracts.fixtures import sample_route
+from swarm.contracts.provider import InferenceRequest
 from swarm.evals.synthetic_harness import LiveGateBlocked, LiveGrant
+from swarm.fakes.broker import FakeInferenceBroker
+from swarm.fakes.provider import FakeProviderAdapter
+from swarm.mission.protected_verify import protected_review
+from swarm.workspace.artifacts import ArtifactStore
 
 HARNESS_VERSION = "v20-acceptance-campaign-v1"
 
@@ -26,6 +36,8 @@ ScenarioStatus = Literal[
     "scaffold_ready_not_integrated",
     "pass_deterministic_gate_only",
     "blocked_live_grant",
+    "blocked_missing_implementation",
+    "pass_fake_upstream_wiring",
     "blocked_host_gate",
     "blocked_elapsed_window",
     "fail",
@@ -103,6 +115,7 @@ def _live_meta(grant: LiveGrant | None) -> dict[str, Any]:
             "grant_approved": False,
             "invented": False,
             "blocked": True,
+            "authorization": "missing",
             "reason": "no_operator_live_grant",
         }
     return {
@@ -114,6 +127,7 @@ def _live_meta(grant: LiveGrant | None) -> dict[str, Any]:
         "free_routes_only": grant.free_routes_only,
         "invented": False,
         "blocked": not grant.approved,
+        "authorization": "approved" if grant.approved else "not_approved",
         "reason": "operator_grant" if grant.approved else "grant_not_approved",
     }
 
@@ -129,6 +143,69 @@ def _run_deterministic(spec: ScenarioSpec, work: Path) -> ProbeResult:
     return PROBES[probe_name](work)
 
 
+def run_fake_upstream_wiring(work: Path) -> dict[str, Any]:
+    """Exercise authorized-route mechanics against fake upstreams (no spend).
+
+    This is the required first step when an approved LiveGrant is present.
+    It does not perform live provider calls.
+    """
+    adapter = FakeProviderAdapter([sample_route()])
+    broker = FakeInferenceBroker(adapter)
+    request = InferenceRequest(
+        project_id="proj_accept_fake_upstream",
+        attempt_id=new_id("att_"),
+        route_id="rt_fake_alpha",
+        purpose="v20_campaign_fake_upstream_wiring",
+        messages=[{"role": "user", "content": "extract contacts"}],
+        estimated_input_tokens=12,
+    )
+
+    async def _run() -> dict[str, Any]:
+        routes = await broker.assess(request)
+        if not routes:
+            return {"ok": False, "error": "no_routes_assessed"}
+        ticket = await broker.reserve(request, routes[0])
+        receipt = await broker.invoke(ticket)
+        broker.assert_all_calls_accounted()
+        cas = ArtifactStore(work / "cas")
+        raw = (
+            b"Fake-upstream campaign wiring extract.\n"
+            b"Contact fake-agent@example.com and ops@example.com.\n"
+        )
+        art = cas.put(raw, media_type="text/plain", owner_scope="proj_accept_fake_upstream")
+        decision = protected_review(
+            task_family="extract",
+            required_checks={"email_count": 2, "artifact_sha256": art.content_hash},
+            artifact_id=art.id,
+            artifact_bytes=raw,
+            content_hash=art.content_hash,
+            worker_produced={"checks": {"email_count": 999, "artifact_sha256": "deadbeef"}},
+        )
+        return {
+            "ok": bool(decision.accepted),
+            "route_id": receipt.actual_route,
+            "model_calls": broker.request_count,
+            "artifact_id": art.id,
+            "protected_accepted": decision.accepted,
+            "spend_usd": 0.0,
+            "live_dispatch": False,
+            "solver": "fake_inference_broker",
+        }
+
+    import asyncio
+
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(_run())
+    # Nested event loop (rare in harness): run in a fresh threadless path via
+    # a dedicated loop so pytest-asyncio hosts still work.
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(lambda: asyncio.run(_run())).result()
+
+
 def _also_gate_statuses(
     spec: ScenarioSpec,
     *,
@@ -141,12 +218,14 @@ def _also_gate_statuses(
     for gate in spec.also_gates:
         if gate == "live":
             meta = _live_meta(live_grant)
+            if meta["blocked"]:
+                status = "blocked_live_grant"
+            else:
+                # Grant present/approved: also-gate is authorized but live
+                # implementation is a separate primary-path concern.
+                status = "grant_approved_implementation_separate"
             out[gate] = {
-                "status": (
-                    "blocked_live_grant"
-                    if meta["blocked"]
-                    else "grant_present_no_auto_dispatch"
-                ),
+                "status": status,
                 **meta,
             }
         elif gate == "host":
@@ -168,6 +247,119 @@ def _also_gate_statuses(
     return out
 
 
+def _evaluate_live_primary(
+    spec: ScenarioSpec,
+    *,
+    work: Path,
+    live_grant: LiveGrant | None,
+    also: dict[str, dict[str, Any]],
+    live_dispatcher: Any | None = None,
+) -> ScenarioResult:
+    """Evaluate a live-primary scenario with auth vs implementation separation."""
+    meta = _live_meta(live_grant)
+    det = _run_deterministic(spec, work)
+    detail: dict[str, Any] = {
+        "live_gate": meta,
+        "deterministic_side": det.to_dict(),
+        "also_gates": also,
+        "spend_usd": 0.0,
+    }
+
+    # Missing / unapproved authorization → blocked_live_grant only.
+    if live_grant is None or not live_grant.approved:
+        detail["note"] = "Live path blocked: missing or unapproved operator LiveGrant"
+        detail["blocker_class"] = "authorization"
+        return ScenarioResult(
+            scenario_id=spec.id,
+            title=spec.title,
+            primary_gate="live",
+            status="blocked_live_grant",
+            ok=True,
+            version_accepted=False,
+            detail=detail,
+        )
+
+    try:
+        live_grant.assert_usable()
+    except LiveGateBlocked as exc:
+        detail["error"] = str(exc)
+        detail["blocker_class"] = "authorization"
+        detail["note"] = "Grant present but not usable"
+        return ScenarioResult(
+            scenario_id=spec.id,
+            title=spec.title,
+            primary_gate="live",
+            status="blocked_live_grant",
+            ok=True,
+            version_accepted=False,
+            detail=detail,
+        )
+
+    # Authorization OK — fake-upstream wiring first (no live spend).
+    wiring = run_fake_upstream_wiring(work / "fake_upstream")
+    detail["fake_upstream_wiring"] = wiring
+    detail["blocker_class"] = "implementation"
+    detail["authorization"] = "approved"
+
+    if not wiring.get("ok"):
+        detail["note"] = "Approved grant acknowledged; fake-upstream wiring failed"
+        return ScenarioResult(
+            scenario_id=spec.id,
+            title=spec.title,
+            primary_gate="live",
+            status="fail",
+            ok=False,
+            version_accepted=False,
+            detail=detail,
+        )
+
+    # Optional explicit live dispatcher (qualification runner). Never invented.
+    if live_dispatcher is not None:
+        try:
+            live_result = live_dispatcher(live_grant, work)
+        except LiveGateBlocked as exc:
+            detail["live_dispatch_error"] = str(exc)
+            detail["note"] = (
+                "Approved grant + fake-upstream wiring OK; live dispatcher blocked"
+            )
+            return ScenarioResult(
+                scenario_id=spec.id,
+                title=spec.title,
+                primary_gate="live",
+                status="blocked_missing_implementation",
+                ok=True,
+                version_accepted=False,
+                detail=detail,
+            )
+        detail["live_dispatch"] = live_result
+        detail["note"] = "Scoped live dispatcher consumed approved grant"
+        return ScenarioResult(
+            scenario_id=spec.id,
+            title=spec.title,
+            primary_gate="live",
+            status=str(live_result.get("status") or "pass_fake_upstream_wiring"),
+            ok=bool(live_result.get("ok", True)),
+            version_accepted=False,
+            detail=detail,
+        )
+
+    # Default: wiring proven; live adapter not enabled — not an auth block.
+    detail["note"] = (
+        "Approved grant acknowledged; fake-upstream wiring exercised; "
+        "live adapter dispatch not enabled (missing implementation, not missing auth)"
+    )
+    detail["live_dispatch"] = False
+    return ScenarioResult(
+        scenario_id=spec.id,
+        title=spec.title,
+        primary_gate="live",
+        status="blocked_missing_implementation",
+        ok=True,
+        version_accepted=False,
+        detail=detail,
+    )
+
+
 def _evaluate_scenario(
     spec: ScenarioSpec,
     *,
@@ -176,6 +368,7 @@ def _evaluate_scenario(
     host_qualified: bool,
     elapsed_window_started: bool,
     gates_filter: set[str] | None,
+    live_dispatcher: Any | None = None,
 ) -> ScenarioResult:
     gate = spec.primary_gate
     also = _also_gate_statuses(
@@ -201,32 +394,12 @@ def _evaluate_scenario(
         )
 
     if gate == "live":
-        meta = _live_meta(live_grant)
-        det = _run_deterministic(spec, work)
-        detail: dict[str, Any] = {
-            "live_gate": meta,
-            "deterministic_side": det.to_dict(),
-            "also_gates": also,
-            "note": "Live path not auto-dispatched; grant not invented",
-        }
-        if live_grant is not None and live_grant.approved:
-            try:
-                live_grant.assert_usable()
-            except LiveGateBlocked as exc:
-                detail["error"] = str(exc)
-            else:
-                detail["note"] = (
-                    "Approved grant acknowledged but campaign harness refuses "
-                    "auto live dispatch/spend; operator live qualification is separate"
-                )
-        return ScenarioResult(
-            scenario_id=spec.id,
-            title=spec.title,
-            primary_gate=gate,
-            status="blocked_live_grant",
-            ok=True,
-            version_accepted=False,
-            detail=detail,
+        return _evaluate_live_primary(
+            spec,
+            work=work,
+            live_grant=live_grant,
+            also=also,
+            live_dispatcher=live_dispatcher,
         )
 
     if gate == "host":
@@ -297,10 +470,13 @@ def run_acceptance_campaign(
     out_dir: Path | None = None,
     work_dir: Path | None = None,
     invent_live_grant: bool = False,
+    live_dispatcher: Any | None = None,
 ) -> CampaignReport:
     """Run frozen §10 scenarios with explicit gate separation.
 
     ``invent_live_grant`` is always refused — present only to hard-fail misuse.
+    ``live_dispatcher`` is an optional qualification runner that may consume a
+    scoped approved grant; the default path only exercises fake-upstream wiring.
     """
     if invent_live_grant:
         raise LiveGateBlocked(
@@ -329,6 +505,7 @@ def run_acceptance_campaign(
                     host_qualified=host_qualified,
                     elapsed_window_started=elapsed_window_started,
                     gates_filter=gates_filter,
+                    live_dispatcher=live_dispatcher,
                 )
             )
 

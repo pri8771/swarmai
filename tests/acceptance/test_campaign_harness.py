@@ -58,7 +58,8 @@ def test_invent_live_grant_hard_refused() -> None:
         run_acceptance_campaign(invent_live_grant=True)
 
 
-def test_approved_grant_still_no_auto_dispatch_spend() -> None:
+def test_approved_grant_not_false_blocked_live_grant() -> None:
+    """Approved grant must not be reported as blocked_live_grant (auth vs impl)."""
     grant = LiveGrant(
         grant_id="op_real_not_invented",
         routes=("rt_free",),
@@ -73,8 +74,13 @@ def test_approved_grant_still_no_auto_dispatch_spend() -> None:
     report = run_acceptance_campaign(live_grant=grant, gates=["live"])
     assert report.spend_usd == 0.0
     live = next(r for r in report.results if r.scenario_id == "V20-S12")
-    assert live.status == "blocked_live_grant"
-    assert "auto live dispatch" in live.detail["note"].lower() or "refuses" in live.detail["note"]
+    assert live.status == "blocked_missing_implementation", live.status
+    assert live.status != "blocked_live_grant"
+    assert live.detail["blocker_class"] == "implementation"
+    assert live.detail["live_gate"]["grant_approved"] is True
+    assert live.detail["fake_upstream_wiring"]["ok"] is True
+    assert live.detail["fake_upstream_wiring"]["spend_usd"] == 0.0
+    assert live.detail["live_dispatch"] is False
 
 
 def test_host_also_gate_recorded_blocked() -> None:
@@ -102,3 +108,68 @@ def test_matrices_never_accepted() -> None:
     assert "V1.7" in matrices["versions"]
     assert "V2.0" in matrices["versions"]
     assert matrices["versions"]["V2.0"]["readiness"].startswith("harness_")
+
+
+def test_missing_grant_still_blocked_live_grant() -> None:
+    """Protected regression: missing auth remains blocked_live_grant."""
+    report = run_acceptance_campaign(gates=["live"])
+    live = next(r for r in report.results if r.scenario_id == "V20-S12")
+    assert live.status == "blocked_live_grant"
+    assert live.detail["blocker_class"] == "authorization"
+    assert live.detail["live_gate"]["grant_present"] is False
+
+
+def test_approved_grant_fake_upstream_wiring_before_live() -> None:
+    """Protected regression: approved grant → fake-upstream first, not false auth block."""
+    grant = LiveGrant(
+        grant_id="op_wiring_test",
+        routes=("rt_free",),
+        budget_usd=0.0,
+        purpose="fake_upstream_first",
+        approved=True,
+        free_routes_only=True,
+        max_calls=1,
+        max_tokens=100,
+        max_wall_seconds=30,
+    )
+    report = run_acceptance_campaign(live_grant=grant, gates=["live"])
+    live = next(r for r in report.results if r.scenario_id == "V20-S12")
+    assert live.status == "blocked_missing_implementation"
+    wiring = live.detail["fake_upstream_wiring"]
+    assert wiring["ok"] is True
+    assert wiring["live_dispatch"] is False
+    assert wiring["route_id"] == "rt_fake_alpha"
+    assert report.spend_usd == 0.0
+
+
+def test_live_dispatcher_consumes_scoped_grant_without_invent() -> None:
+    grant = LiveGrant(
+        grant_id="op_dispatch_test",
+        routes=("rt_free",),
+        budget_usd=0.0,
+        purpose="scoped_dispatch",
+        approved=True,
+        free_routes_only=True,
+        max_calls=1,
+        max_tokens=100,
+        max_wall_seconds=30,
+    )
+
+    def _dispatcher(g: LiveGrant, work: Path) -> dict:
+        assert g.grant_id == "op_dispatch_test"
+        assert g.approved is True
+        (work / "receipt.txt").write_text("authentic_receipt\n", encoding="utf-8")
+        return {
+            "ok": True,
+            "status": "pass_fake_upstream_wiring",
+            "receipt": "authentic_receipt",
+            "spend_usd": 0.0,
+        }
+
+    report = run_acceptance_campaign(
+        live_grant=grant, gates=["live"], live_dispatcher=_dispatcher
+    )
+    live = next(r for r in report.results if r.scenario_id == "V20-S12")
+    assert live.status == "pass_fake_upstream_wiring"
+    assert live.detail["live_dispatch"]["receipt"] == "authentic_receipt"
+    assert live.status != "blocked_live_grant"
