@@ -1,0 +1,37 @@
+version: 1
+status: planning
+protocol: docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md
+roadmap: docs/redesign/EPIC_ROADMAP.md
+total_atomic_packets: 96
+files:
+  - {path: docs/redesign/backlog/E00_E01.yaml, packets: 15}
+  - {path: docs/redesign/backlog/E02_E04.yaml, packets: 18}
+  - {path: docs/redesign/backlog/E05_E07.yaml, packets: 18}
+  - {path: docs/redesign/backlog/E08_E09.yaml, packets: 14}
+  - {path: docs/redesign/backlog/E10_E12.yaml, packets: 18}
+  - {path: docs/redesign/backlog/E13_E14.yaml, packets: 13}
+
+selection_algorithm:
+  - "Load all packet files."
+  - "Treat a dependency as satisfied only when its evidence is accepted."
+  - "Select packets whose deps are all satisfied."
+  - "Prefer packets marked by the current epic gate; otherwise choose the lowest ready id."
+  - "Parallel workers may take different ready packets when their allowed outputs do not overlap."
+  - "A worker owns exactly one packet at a time."
+  - "After evidence submission, stop and release the worker."
+  - "Do not infer completion from a commit or chat message."
+
+mandatory_preimplementation_gate: A-0005
+final_acceptance_packet: A-1407
+
+invariants:
+  - "No implementation packet may bypass E00 reuse/gap mapping."
+  - "Agent identity is independent of model and context."
+  - "Crew is optional; swarm is an agent population."
+  - "Inference is portable; SplitSignal is reference integration, not required."
+  - "Native and MCP tools share the tool capability abstraction."
+  - "Working context is disposable; durable memory/state is external."
+  - "Lessons require evidence and explicit validation state."
+  - "Autonomous organization stays inside mission/resource/capability/stop boundaries."
+  - "Completion requires evidence."
+  - "Unknown usage/cost/model metadata stays unknown rather than becoming zero."
