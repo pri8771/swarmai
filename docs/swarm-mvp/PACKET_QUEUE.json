@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:26:00Z",
+  "updated_at": "2026-09-25T15:40:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -62,10 +62,20 @@
     {
       "id": "TH-04",
       "title": "Durable artifacts and restart recovery",
-      "status": "planned",
+      "status": "impl_complete",
       "depends_on": [
         "TH-02"
-      ]
+      ],
+      "evidence": "docs/evidence/two-host/TH-04/",
+      "acceptance_notes": [
+        "POST /v1/missions/{id}/artifacts publishes content-addressed blob under /app/var/artifacts/cas",
+        "GET artifacts returns content_hash",
+        "identical sha256 after docker compose restart api",
+        "content reopen + volume CAS blob verified",
+        "worker re-enroll leaves artifact intact"
+      ],
+      "mac_verify": "passed",
+      "r730_verify": "blocked"
     },
     {
       "id": "TH-05",

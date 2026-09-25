@@ -254,6 +254,145 @@ class ProductStore:
         except (OSError, FileNotFoundError, TypeError, KeyError):
             return []
 
+    def artifact_store(self):
+        """Content-addressed blob store under durable ``var/artifacts/cas``."""
+        from swarm.workspace.artifacts import ArtifactStore
+
+        root = (self.repo_root or Path.cwd()) / "var" / "artifacts" / "cas"
+        return ArtifactStore(root)
+
+    def publish_mission_artifact(
+        self,
+        mission_id: str,
+        *,
+        kind: str,
+        content: bytes,
+        media_type: str,
+        owner_scope: str,
+        retention_class: str = "mission",
+        summary: str | None = None,
+        expected_hash: str | None = None,
+        actor: str = "api",
+    ) -> dict[str, Any]:
+        """Write blob to durable CAS, attach ref on mission record, best-effort PG meta."""
+        mission = self.get_mission(mission_id)
+        store = self.artifact_store()
+        ref = store.put(
+            content,
+            media_type=media_type,
+            owner_scope=owner_scope,
+            retention_class=retention_class,
+            expected_hash=expected_hash,
+        )
+        record = self.mission_store().load(mission_id)
+        arts = dict(record.artifacts or {})
+        arts[kind] = {
+            "id": ref.id,
+            "kind": kind,
+            "uri": ref.uri,
+            "media_type": ref.media_type,
+            "content_hash": ref.content_hash,
+            "byte_length": ref.byte_length,
+            "owner_scope": ref.owner_scope,
+            "retention_class": ref.retention_class,
+            "summary": summary or f"{kind} artifact",
+        }
+        record.artifacts = arts
+        self.mission_store().append_timeline(
+            record,
+            "artifact.published",
+            {
+                "artifact_id": ref.id,
+                "kind": kind,
+                "content_hash": ref.content_hash,
+                "byte_length": ref.byte_length,
+                "actor": actor,
+            },
+        )
+        self.mission_store().save(record)
+        self._persist_artifact_metadata(ref)
+        self.publish(
+            project_id=mission.project_id,
+            type="artifact.published",
+            actor=actor,
+            mission_id=mission_id,
+            payload={
+                "artifact_id": ref.id,
+                "kind": kind,
+                "content_hash": ref.content_hash,
+            },
+            dedupe_key=f"artifact.published:{mission_id}:{ref.content_hash}",
+        )
+        return {
+            "artifact_id": ref.id,
+            "kind": kind,
+            "uri": ref.uri,
+            "media_type": ref.media_type,
+            "content_hash": ref.content_hash,
+            "byte_length": ref.byte_length,
+            "owner_scope": ref.owner_scope,
+            "retention_class": ref.retention_class,
+            "summary": summary or f"{kind} artifact",
+            "mission_id": mission_id,
+            "project_id": mission.project_id,
+        }
+
+    def read_mission_artifact_bytes(
+        self, mission_id: str, artifact_id: str
+    ) -> tuple[bytes, dict[str, Any]]:
+        """Reopen artifact bytes by mission ref; verify sha256 against durable CAS."""
+        _ = self.get_mission(mission_id)
+        record = self.mission_store().load(mission_id)
+        arts = record.artifacts or {}
+        meta: dict[str, Any] | None = None
+        if isinstance(arts, dict):
+            for key, val in arts.items():
+                if not isinstance(val, dict):
+                    continue
+                if str(val.get("id") or key) == artifact_id:
+                    meta = dict(val)
+                    meta.setdefault("kind", key)
+                    break
+        if meta is None:
+            raise ApiError("not_found", "artifact not found on mission", status_code=404)
+        content_hash = str(meta.get("content_hash") or meta.get("sha256") or "")
+        if not content_hash:
+            raise ApiError(
+                "artifact_incomplete",
+                "mission artifact missing content_hash",
+                status_code=409,
+            )
+        data = self.artifact_store().get_bytes_by_hash(content_hash)
+        return data, meta
+
+    def _persist_artifact_metadata(self, ref: Any) -> None:
+        """Best-effort Postgres metadata row — blob remains authoritative on volume."""
+        import os
+
+        from swarm.contracts.workspace import ArtifactRef
+
+        if not isinstance(ref, ArtifactRef):
+            return
+        url = (os.environ.get("SWARM_DATABASE_URL") or "").strip()
+        if not url:
+            return
+        try:
+            from swarm.db.engine import create_db_engine, make_session_factory
+            from swarm.db.repositories import ArtifactRepository
+
+            engine = create_db_engine(url)
+            session = make_session_factory(engine)()
+            try:
+                ArtifactRepository(session).put_metadata(ref)
+                session.commit()
+            except Exception:
+                session.rollback()
+            finally:
+                session.close()
+        except Exception:
+            # Volume-backed CAS + mission JSON already durable; PG meta is secondary.
+            return
+
     def public_mission_view(self, mission_id: str) -> dict[str, Any]:
         mission = self.get_mission(mission_id)
         graph = self.graph_view(mission_id)

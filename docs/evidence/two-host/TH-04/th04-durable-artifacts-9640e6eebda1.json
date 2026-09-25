@@ -1,0 +1,119 @@
+{
+  "packet": "TH-04",
+  "hostname_public": "swarm.splitsignal.ai",
+  "server_url": "http://127.0.0.1:18766",
+  "started_at": "2026-09-25T15:38:07.636159+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "expected_content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+  "steps": [
+    {
+      "step": "health_ready_before",
+      "ok": true
+    },
+    {
+      "step": "create_project",
+      "ok": true,
+      "project_id": "proj_install_004b3a4d00be47a29e8271e6d378f00e"
+    },
+    {
+      "step": "create_mission",
+      "ok": true,
+      "mission_id": "9cf531a7e66e4454b931f69ced6a0e13"
+    },
+    {
+      "step": "enroll_worker_before",
+      "ok": true,
+      "worker_id": "wk_662ba439146f4140a47f19bceb176458"
+    },
+    {
+      "step": "publish_artifact",
+      "ok": true,
+      "artifact_id": "art_914acd848a00479293fe5aedd5029ec5",
+      "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99"
+    },
+    {
+      "step": "list_artifacts_before",
+      "ok": true,
+      "count": 1
+    },
+    {
+      "step": "read_content_before",
+      "ok": true,
+      "byte_length": 71
+    },
+    {
+      "step": "restart_api_container",
+      "ok": true,
+      "returncode": 0,
+      "stderr_tail": " Container swarm-server-api-1 Restarting \n Container swarm-server-api-1 Started \n"
+    },
+    {
+      "step": "health_ready_after_restart",
+      "ok": true,
+      "database": "up"
+    },
+    {
+      "step": "hydrate_mission_after_restart",
+      "ok": true,
+      "status": "planning"
+    },
+    {
+      "step": "list_artifacts_after_restart",
+      "ok": true,
+      "count": 1,
+      "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99"
+    },
+    {
+      "step": "read_content_after_restart",
+      "ok": true,
+      "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+      "byte_length": 71
+    },
+    {
+      "step": "volume_cas_blob_verified",
+      "ok": true,
+      "returncode": 0,
+      "volume_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+      "stderr_tail": ""
+    },
+    {
+      "step": "worker_reenroll_artifact_intact",
+      "ok": true,
+      "worker_id": "wk_7d2ca44398b04a2ca5fedc8c8b5c269c"
+    }
+  ],
+  "health_ready_before": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "project_id": "proj_install_004b3a4d00be47a29e8271e6d378f00e",
+  "mission_id": "9cf531a7e66e4454b931f69ced6a0e13",
+  "worker_id_before": "wk_662ba439146f4140a47f19bceb176458",
+  "artifact_id": "art_914acd848a00479293fe5aedd5029ec5",
+  "content_hash_before": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+  "health_ready_after": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "content_hash_after": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+  "worker_id_after": "wk_7d2ca44398b04a2ca5fedc8c8b5c269c",
+  "ok": true,
+  "finished_at": "2026-09-25T15:38:11.691860+00:00"
+}

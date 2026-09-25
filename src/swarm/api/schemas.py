@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from swarm.contracts.common import StrictModel
 from swarm.contracts.mission import Mission
@@ -28,6 +28,26 @@ class MissionReviewRequest(StrictModel):
     produced: dict[str, Any] = Field(default_factory=dict)
     required_checks: dict[str, Any] | None = None
     force_wrong: bool = False
+    idempotency_key: str | None = None
+
+
+class MissionArtifactPublishRequest(StrictModel):
+    """Publish a content-addressed artifact into durable managed storage.
+
+    ``str_strip_whitespace`` is disabled so content bytes (and their hashes)
+    are not silently altered by the strict product schema defaults.
+    """
+
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=False)
+
+    kind: str = "result"
+    content_text: str | None = None
+    content_base64: str | None = None
+    media_type: str = "text/plain"
+    owner_scope: str | None = None
+    retention_class: str = "mission"
+    summary: str | None = None
+    expected_hash: str | None = None
     idempotency_key: str | None = None
 
 

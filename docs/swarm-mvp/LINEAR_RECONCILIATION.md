@@ -19,6 +19,7 @@
 | TH-01 server compose | Containerized API+Postgres durable path | Done (Mac eng) | TH-01, deploy | 3 |
 | TH-02 native mission | Native worker completes mission on authoritative loopback path | Done (Mac eng) | TH-02, worker | 5 |
 | TH-03 Mac connector | Mac connector completes mac_local scoped task through server | Done (Mac eng) | TH-03, connector | 3 |
+| TH-04 durable artifacts | Content-addressed artifacts reopen identical sha256 after API restart | Done (Mac eng) | TH-04, artifacts | 3 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
 | Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |
 

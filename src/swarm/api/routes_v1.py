@@ -13,6 +13,7 @@ from swarm.api.schemas import (
     ApprovalResolveRequest,
     CancelRequest,
     EvaluationCreateRequest,
+    MissionArtifactPublishRequest,
     MissionCreateRequest,
     MissionReviewRequest,
     PageMeta,
@@ -691,6 +692,114 @@ async def mission_artifacts(
             raise ApiError("not_found", "mission artifacts not found", status_code=404) from exc
         auth.require_project(principal, project_id)
     return {"artifacts": store.mission_artifacts(mission_id)}
+
+
+@router.post("/missions/{mission_id}/artifacts")
+async def publish_mission_artifact(
+    mission_id: str,
+    body: MissionArtifactPublishRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    import base64
+
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    if body.content_text is None and body.content_base64 is None:
+        raise ApiError(
+            "invalid_request",
+            "content_text or content_base64 required",
+            status_code=400,
+        )
+    if body.content_text is not None and body.content_base64 is not None:
+        raise ApiError(
+            "invalid_request",
+            "provide only one of content_text or content_base64",
+            status_code=400,
+        )
+    if body.content_base64 is not None:
+        try:
+            content = base64.b64decode(body.content_base64, validate=True)
+        except Exception as exc:
+            raise ApiError(
+                "invalid_request", "content_base64 is not valid base64", status_code=400
+            ) from exc
+    else:
+        content = (body.content_text or "").encode("utf-8")
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(
+        {
+            "mission_id": mission_id,
+            "kind": body.kind,
+            "media_type": body.media_type,
+            "content_sha256": payload_hash({"b": body.content_base64 or body.content_text}),
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.artifacts.publish",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    owner_scope = body.owner_scope or mission.project_id
+    published = store.publish_mission_artifact(
+        mission_id,
+        kind=body.kind,
+        content=content,
+        media_type=body.media_type,
+        owner_scope=owner_scope,
+        retention_class=body.retention_class,
+        summary=body.summary,
+        expected_hash=body.expected_hash,
+        actor=principal.subject,
+    )
+    return store.store_idempotent(
+        key,
+        {"artifact": published, "mock_vs_live": "durable_cas_volume"},
+        actor=principal.subject,
+        project_id=mission.project_id,
+        operation="missions.artifacts.publish",
+        request_digest=digest,
+    )
+
+
+@router.get("/missions/{mission_id}/artifacts/{artifact_id}/content")
+async def mission_artifact_content(
+    mission_id: str,
+    artifact_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    import base64
+    import hashlib
+
+    mission = store.get_mission(mission_id)
+    auth.require_project(principal, mission.project_id)
+    try:
+        data, meta = store.read_mission_artifact_bytes(mission_id, artifact_id)
+    except FileNotFoundError as exc:
+        raise ApiError("not_found", "artifact blob missing", status_code=404) from exc
+    except KeyError as exc:
+        raise ApiError("not_found", "artifact not found", status_code=404) from exc
+    digest = hashlib.sha256(data).hexdigest()
+    expected = str(meta.get("content_hash") or meta.get("sha256") or "")
+    if expected and expected != digest:
+        raise ApiError("checksum_mismatch", "artifact checksum failed", status_code=409)
+    return {
+        "artifact_id": artifact_id,
+        "mission_id": mission_id,
+        "content_hash": digest,
+        "byte_length": len(data),
+        "media_type": meta.get("media_type"),
+        "content_base64": base64.b64encode(data).decode("ascii"),
+        "mock_vs_live": "durable_cas_reopen",
+    }
 
 
 @router.get("/projects")

@@ -153,6 +153,9 @@ class HistoryIndex:
                                     "kind": val.get("kind") or key,
                                     "uri": val.get("uri") or val.get("path"),
                                     "media_type": val.get("media_type"),
+                                    "content_hash": val.get("content_hash")
+                                    or val.get("sha256"),
+                                    "byte_length": val.get("byte_length"),
                                     "summary": val.get("summary") or val.get("preview"),
                                 }
                             )
