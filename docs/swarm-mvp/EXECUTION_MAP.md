@@ -70,3 +70,17 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 1. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
 2. Hold #51 until #46+#48 landed; then rebase/CI.  
 3. Do **not** merge `main`.
+
+## Lane D — V1.9 pursuit (this increment)
+
+| Packet | Status | Notes |
+|---|---|---|
+| Observe→assess→propose→admit→execute→verify→update | **eng done** | `src/swarm/pursuit/` + `PursuitEngine.tick` |
+| Justified frontier + act/ask/experiment/wait/request-human | **eng done** | `frontier.py` |
+| Schedules/backoff (no endless polling) | **eng done** | injectable clock; `PursuitScheduler` |
+| Anti-duplicate + stagnation | **eng done** | dedupe keys; waiting transition on stagnation |
+| Learning adopt/rollback (held-out required) | **eng done** | `PursuitLessonStore`; never expands envelopes |
+| Deterministic tests (zero-spend) | **pass** | `tests/pursuit/test_v19_pursuit_loop.py` + Goal regressions |
+| HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
+| Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
+| Goal schema | **uses Lane C** | no fork; rebase on `05c0bc4b` |

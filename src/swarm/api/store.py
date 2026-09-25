@@ -69,6 +69,8 @@ class ProductStore:
     repo_root: Path | None = None
     _project_store: ProjectStore | None = field(default=None, repr=False)
     _mission_store: MissionStore | None = field(default=None, repr=False)
+    _goal_store: Any = field(default=None, repr=False)
+    _pursuit_engine: Any = field(default=None, repr=False)
     _durable_bootstrapped: bool = field(default=False, repr=False)
 
     def bootstrap_durable(self) -> None:
@@ -104,10 +106,23 @@ class ProductStore:
         return self._project_store
 
     def goal_store(self) -> Any:
-        from swarm.goals.models import GoalStore
+        if self._goal_store is None:
+            from swarm.goals.models import GoalStore
 
-        root = (self.repo_root or Path.cwd()) / "var" / "goals"
-        return GoalStore(root)
+            root = (self.repo_root or Path.cwd()) / "var" / "goals"
+            self._goal_store = GoalStore(root)
+        return self._goal_store
+
+    def pursuit_engine(self) -> Any:
+        """V1.9 autonomous pursuit loop (deterministic RecordingExecutor by default)."""
+        if self._pursuit_engine is None:
+            from swarm.pursuit import PursuitEngine, RecordingExecutor
+
+            self._pursuit_engine = PursuitEngine(
+                self.goal_store(),
+                executor=RecordingExecutor(default_success=True),
+            )
+        return self._pursuit_engine
 
     def mission_store(self) -> MissionStore:
         """Durable mission identity shared by API / CLI / console reopen paths."""
