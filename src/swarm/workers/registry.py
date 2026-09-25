@@ -10,6 +10,7 @@ from swarm.contracts.common import new_id, utc_now
 from swarm.contracts.enums import WorkerStatus
 from swarm.contracts.mission import TaskSpec
 from swarm.contracts.workspace import WorkerLease
+from swarm.workers.placement_contracts import PlacementContract
 
 
 class WorkerAuthError(PermissionError):
@@ -61,6 +62,11 @@ class WorkerRecord:
     claimed_task_id: str | None = None
     active_lease_ids: list[str] = field(default_factory=list)
     last_heartbeat: Any = field(default_factory=utc_now)
+    # Self-reported claims are stored but never used for eligibility alone.
+    claimed_capabilities: set[str] = field(default_factory=set)
+    capabilities_verified: bool = False
+    host_alias: str | None = None
+    workspace_grant_ids: list[str] = field(default_factory=list)
 
 
 class WorkerRegistryService:
@@ -137,15 +143,20 @@ class WorkerRegistryService:
         self._dispatch_queue.append(task)
 
     def _task_matches_worker(self, task: TaskSpec, rec: WorkerRecord) -> bool:
-        needed = set(task.required_capabilities)
-        have = set(rec.lease.capabilities)
-        if needed and not needed.issubset(have):
-            return False
-        if "local_only" in task.scopes and "local" not in rec.privacy_classes:
-            return False
-        if "mac_local" in task.scopes and "mac_local" not in rec.privacy_classes:
-            return False
-        return True
+        """Eligibility by placement contracts — labels/host aliases never authorize."""
+        contract = PlacementContract.for_task(
+            required_capabilities=task.required_capabilities,
+            scopes=task.scopes,
+        )
+        locality = set(rec.privacy_classes)
+        if rec.lease.data_locality and isinstance(rec.lease.data_locality, dict):
+            locality |= set(rec.lease.data_locality.get("classes") or [])
+        return contract.worker_eligible(
+            granted_capabilities=rec.lease.capabilities,
+            authorized_locality=locality,
+            labels=rec.lease.labels,
+            host_alias=rec.host_alias or rec.lease.node_identity,
+        )
 
     async def claim_dispatch(self, worker_id: str, *, token: str) -> TaskSpec | None:
         """Backward-compatible claim — returns TaskSpec or None."""

@@ -1,57 +1,41 @@
-"""Mac connector — outbound worker client for Mac-local scoped tasks.
+"""Worker HTTP client + optional Mac adapter re-exports.
 
-Runs on the Mac (or mac-connector container). Talks only to the SwarmAI server
-HTTP API. Never hosts Postgres. Mac disconnect must not take the server down.
+The HTTP client is platform-generic. Mac-local extract helpers live in
+``swarm.workers.adapters.macos_local`` and are re-exported here for compatibility.
 """
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
-import re
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
 import httpx
 
+from swarm.workers.adapters.macos_local import (
+    MAC_CAPABILITIES,
+    MAC_PRIVACY,
+    MacLocalWork,
+    perform_mac_local_extract,
+    write_mac_local_fixture,
+)
+
+# Re-export adapter symbols for P1 continuous_connector and TH-03 scripts.
+__all__ = [
+    "DEFAULT_SERVER_URL",
+    "MAC_CAPABILITIES",
+    "MAC_PRIVACY",
+    "MacConnectorClient",
+    "MacLocalWork",
+    "dump_evidence",
+    "load_bearer_token",
+    "perform_mac_local_extract",
+    "write_mac_local_fixture",
+]
+
+
 DEFAULT_SERVER_URL = "http://127.0.0.1:18766"
-MAC_CAPABILITIES = ("mac.local.extract", "extract", "chat", "code.read")
-MAC_PRIVACY = ("mac_local", "local")
-
-
-@dataclass(frozen=True)
-class MacLocalWork:
-    """Result of Mac-only local work (file must not live on the server)."""
-
-    path: str
-    email_count: int
-    artifact_sha256: str
-    emails: tuple[str, ...]
-    placement: str = "mac_local"
-    host_role: str = "mac_connector"
-    runtime: str = "mac_connector_native"
-    spend_usd: float = 0.0
-
-    def required_checks(self) -> dict[str, Any]:
-        return {
-            "email_count": self.email_count,
-            "artifact_sha256": self.artifact_sha256,
-            "placement": self.placement,
-            "host_role": self.host_role,
-            "runtime": self.runtime,
-        }
-
-    def produced(self, *, worker_id: str, run_id: str) -> dict[str, Any]:
-        return {
-            "checks": self.required_checks(),
-            "worker_id": worker_id,
-            "mac_local_path": self.path,
-            "emails": list(self.emails),
-            "fixture_run_id": run_id,
-            "spend_usd": self.spend_usd,
-        }
 
 
 def load_bearer_token(*, root: Path | None = None) -> str:
@@ -64,6 +48,7 @@ def load_bearer_token(*, root: Path | None = None) -> str:
         return env_token
     base = root or Path.cwd()
     for rel in (
+        "deploy/env/worker.env",
         "deploy/env/mac-connector.env",
         "deploy/env/server.env",
     ):
@@ -78,37 +63,6 @@ def load_bearer_token(*, root: Path | None = None) -> str:
                 if token and "replace-with" not in token:
                     return token
     raise RuntimeError("connector_auth_token_missing")
-
-
-def perform_mac_local_extract(path: Path) -> MacLocalWork:
-    """Read a Mac-local fixture and produce protected checks. No model calls."""
-    payload = path.read_text(encoding="utf-8")
-    emails = tuple(
-        sorted(set(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", payload)))
-    )
-    digest = hashlib.sha256(
-        (path.resolve().as_posix() + "\n" + "|".join(emails) + "\n" + payload).encode("utf-8")
-    ).hexdigest()
-    return MacLocalWork(
-        path=str(path.resolve()),
-        email_count=len(emails),
-        artifact_sha256=digest,
-        emails=emails,
-    )
-
-
-def write_mac_local_fixture(directory: Path, *, run_id: str) -> Path:
-    """Create a fixture that exists on the Mac connector host only."""
-    directory.mkdir(parents=True, exist_ok=True)
-    path = directory / f"th03-mac-local-{run_id}.txt"
-    path.write_text(
-        "TH-03 Mac-local fixture for swarm.splitsignal.ai connector.\n"
-        "Contact mac-agent@splitsignal.ai and ops@example.com.\n"
-        f"run_id={run_id}\n"
-        "placement=mac_local\n",
-        encoding="utf-8",
-    )
-    return path
 
 
 class MacConnectorClient:

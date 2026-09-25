@@ -63,14 +63,14 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
         )
     )
     # Wrong/missing secret refuses startup for non-mock / non-connector profiles.
-    if profile in {"mock", "mac_connector"}:
-        detail = (
-            "mock profile skips DB requirement"
-            if profile == "mock"
-            else "mac_connector uses server DB via SWARM_SERVER_URL"
-        )
+    if profile in {"mock", "mac_connector", "worker"}:
+        detail = {
+            "mock": "mock profile skips DB requirement",
+            "mac_connector": "mac_connector (adapter example) uses server DB via SWARM_SERVER_URL",
+            "worker": "generic worker uses server DB via SWARM_SERVER_URL",
+        }[profile]
         checks.append(_check("database_url_configured", True, detail))
-        if profile == "mac_connector":
+        if profile in {"mac_connector", "worker"}:
             server_url = (os.environ.get("SWARM_SERVER_URL") or "").strip()
             checks.append(
                 _check(

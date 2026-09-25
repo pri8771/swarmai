@@ -536,6 +536,16 @@ async def enroll_worker(
         named_inference_urls=body.named_inference_urls,
         project_id=body.project_id,
         actor=principal.subject,
+        host_alias=body.host_alias,
+        architecture=body.architecture,
+        runtime_version=body.runtime_version,
+        labels=body.labels,
+        platform=body.platform,
+        runtimes=body.runtimes,
+        resource_limits=body.resource_limits,
+        data_locality=body.data_locality,
+        workspace_grant_ids=body.workspace_grant_ids,
+        role=body.role,
     )
     # Return membership token once; not a provider secret.
     result = {

@@ -57,6 +57,17 @@ class WorkerEnrollRequest(StrictModel):
     capacity_units: float = 1.0
     privacy_classes: list[str] = Field(default_factory=lambda: ["local"])
     named_inference_urls: list[str] = Field(default_factory=list)
+    # Portable enrollment identity (P4 WorkerIdentitySpec fields).
+    host_alias: str | None = None
+    architecture: str | None = None
+    runtime_version: str | None = None
+    labels: list[str] = Field(default_factory=list)
+    platform: dict[str, Any] | str | None = None
+    runtimes: list[dict[str, Any]] | list[str] = Field(default_factory=list)
+    resource_limits: dict[str, Any] | None = None
+    data_locality: dict[str, Any] | str | None = None
+    workspace_grant_ids: list[str] = Field(default_factory=list)
+    role: str = "worker"  # server | worker | combined
     idempotency_key: str | None = None
 
 

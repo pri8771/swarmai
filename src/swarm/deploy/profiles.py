@@ -1,11 +1,25 @@
-"""Deployment profiles — mock, standalone, hybrid, recovery (offline-safe)."""
+"""Deployment profiles — topology + portable process roles.
+
+Process roles (``server`` / ``worker`` / ``combined``) live in
+:mod:`swarm.deploy.roles` and :class:`~swarm.product.portable_config.WorkerIdentitySpec`.
+Profiles describe compose/DB binds; personal host names belong in labelled examples only.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any
 
-PROFILES = ("mock", "standalone", "hybrid", "recovery", "server", "mac_connector")
+PROFILES = (
+    "mock",
+    "standalone",
+    "hybrid",
+    "recovery",
+    "server",
+    "worker",
+    "combined",
+    "mac_connector",  # labelled example / optional macOS adapter profile
+)
 
 
 @dataclass(frozen=True)
@@ -21,6 +35,7 @@ class DeployProfile:
     secret_backend: str
     network_mode: str
     resource_limits: dict[str, Any] = field(default_factory=dict)
+    process_role: str = "combined"  # server | worker | combined
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -35,6 +50,7 @@ class DeployProfile:
             "secret_backend": self.secret_backend,
             "network_mode": self.network_mode,
             "resource_limits": self.resource_limits,
+            "process_role": self.process_role,
             "production": False,
             "mock_vs_live": "local_artifacts_only",
         }
@@ -54,6 +70,7 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_refs_only",
             network_mode="loopback",
             resource_limits={"api_workers": 1, "pool_size": 5, "max_sessions": 32},
+            process_role="combined",
         ),
         "standalone": DeployProfile(
             name="standalone",
@@ -67,6 +84,7 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_or_file_refs",
             network_mode="bridge_internal",
             resource_limits={"api_workers": 2, "pool_size": 10, "max_sessions": 64},
+            process_role="combined",
         ),
         "hybrid": DeployProfile(
             name="hybrid",
@@ -80,6 +98,7 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_refs_only",
             network_mode="bridge_internal",
             resource_limits={"api_workers": 2, "pool_size": 10, "max_sessions": 64},
+            process_role="combined",
         ),
         "recovery": DeployProfile(
             name="recovery",
@@ -93,10 +112,11 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_refs_only",
             network_mode="loopback",
             resource_limits={"api_workers": 1, "pool_size": 5, "max_sessions": 16},
+            process_role="server",
         ),
         "server": DeployProfile(
             name="server",
-            description="Two-host always-on server (R730 target; Mac loopback verify)",
+            description="Control-plane server role (Linux container baseline)",
             database="postgresql on compose network only",
             bind_host="127.0.0.1",
             public_db_port=False,
@@ -106,10 +126,39 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_or_file_refs",
             network_mode="bridge_internal",
             resource_limits={"api_workers": 2, "pool_size": 10, "max_sessions": 128},
+            process_role="server",
+        ),
+        "worker": DeployProfile(
+            name="worker",
+            description="Generic worker connector; outbound to server; bounded task workspaces",
+            database="none_on_worker_authoritative_on_server",
+            bind_host="127.0.0.1",
+            public_db_port=False,
+            public_inference_admin=False,
+            non_root=True,
+            allow_paid_cloud=False,
+            secret_backend="env_refs_only",
+            network_mode="bridge_outbound",
+            resource_limits={"api_workers": 0, "pool_size": 0, "max_sessions": 8},
+            process_role="worker",
+        ),
+        "combined": DeployProfile(
+            name="combined",
+            description="Single process hosting server + worker roles",
+            database="postgresql on compose network only",
+            bind_host="127.0.0.1",
+            public_db_port=False,
+            public_inference_admin=False,
+            non_root=True,
+            allow_paid_cloud=False,
+            secret_backend="env_or_file_refs",
+            network_mode="bridge_internal",
+            resource_limits={"api_workers": 2, "pool_size": 10, "max_sessions": 64},
+            process_role="combined",
         ),
         "mac_connector": DeployProfile(
             name="mac_connector",
-            description="Mac worker connector; outbound to server; no local Postgres",
+            description="Optional macOS adapter example; outbound to server; no local Postgres",
             database="none_on_mac_authoritative_on_server",
             bind_host="127.0.0.1",
             public_db_port=False,
@@ -119,6 +168,7 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_refs_only",
             network_mode="bridge_outbound",
             resource_limits={"api_workers": 0, "pool_size": 0, "max_sessions": 8},
+            process_role="worker",
         ),
     }
     if name not in profiles:
