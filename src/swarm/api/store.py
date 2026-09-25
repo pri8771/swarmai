@@ -410,7 +410,11 @@ class ProductStore:
             # Authoritative deletion/scope check — never bypass via bare hash read.
             ref = store.resolve(
                 artifact_id,
-                allowed_scopes={str(meta.get("owner_scope") or mission.project_id), "*", mission.project_id},
+                allowed_scopes={
+                    str(meta.get("owner_scope") or mission.project_id),
+                    "*",
+                    mission.project_id,
+                },
             )
         except FileNotFoundError as exc:
             raise ApiError("not_found", str(exc), status_code=404) from exc

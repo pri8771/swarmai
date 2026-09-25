@@ -1,8 +1,8 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:00Z  
+**Updated:** 2026-09-25T17:30Z  
 **Integration branch:** `dev`  
-**Implementation branch:** `cursor/v2-foundation-r1r9-b28d`  
+**Lane B impl branch:** `cursor/foundation-ci-c8a3`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`
 
@@ -30,9 +30,9 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | R4 | **fixed** | Content reads enforce tombstone via `resolve` |
 | R5 | **fixed** | Harness-owned nonce verdict; path-gated sandbox |
 | R6 | **fixed** | `kernel_mediation_proven=false`; admission requires mandatory caps |
-| R7 | **in progress** | Introduced lint/type errors repaired; full CI + ephemeral PG job still required |
+| R7 | **fixed (eng)** | Ruff/mypy/offline pytest/console green locally; CI adds ephemeral Postgres `integration` job; suites `foundation`/`knowledge`/`objectives`/`extensions`/`recovery` collected; protected `test_r7_*` |
 | R8 | **fixed** | Zero-$ free-route grants with ceilings; frozen report hash |
-| R9 | **partial** | Manifest hash refreshed; Linear still needsAuth queue; connector mount hardening deferred |
+| R9 | **partial** | PLAN_MANIFEST file hashes verified (`test_r9_*`); Linear still needsAuth queue; connector mount hardening deferred (Lane A) |
 
 ## Access gates (continue Mac eng)
 
@@ -45,6 +45,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 ## Next
 
-1. Finish R7 CI (ephemeral Postgres job) + R2 continuous connector on HTTP path.  
-2. V1.7 integrated mission lifecycle with protected verification + ≥1 authorized model-backed run.  
-3. V1.8 Goal entity → V1.9 pursuit loop → V2.0 product UI/SDK + acceptance campaign freeze.
+1. Hosted CI confirmation on `cursor/foundation-ci-c8a3` PR (Lane B).  
+2. R2 continuous connector on HTTP path (Lane A).  
+3. V1.7 integrated mission lifecycle with ≥1 authorized model-backed run.  
+4. V1.8 Goal lifecycle campaign → V1.9 pursuit → V2.0 product UI/SDK + acceptance freeze.

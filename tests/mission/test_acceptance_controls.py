@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -74,6 +76,16 @@ async def test_wrong_output_review_rejects_and_blocks_receipt(tmp_path: Path) ->
         required_checks={"root_cause_identified": True},
     )
     assert created.status != MissionStatus.FAILED
+    # R1: acceptance requires a published artifact; publish before review.
+    store.publish_mission_artifact(
+        created.id,
+        kind="result",
+        content=b"triage candidate notes\n",
+        media_type="text/plain",
+        owner_scope=created.project_id,
+        summary="candidate output",
+        actor="tester",
+    )
     rejected = await store.review_mission_attempt(
         created.id,
         actor="tester",
@@ -89,6 +101,16 @@ async def test_wrong_output_review_rejects_and_blocks_receipt(tmp_path: Path) ->
 @pytest.mark.asyncio
 async def test_correct_review_sets_acceptance_receipt(tmp_path: Path) -> None:
     store = ProductStore(repo_root=tmp_path)
+    emails = ["one@example.com", "two@example.com"]
+    content = json.dumps({"emails": emails, "body": "contact " + " ".join(emails)}).encode()
+    digest = hashlib.sha256(content).hexdigest()
+    required = {
+        "email_count": 2,
+        "artifact_sha256": digest,
+        "placement": "server_verified",
+        "host_role": "protected_verifier",
+        "runtime": "swarm_kernel",
+    }
     mission = sample_mission().model_copy(
         update={"objective": "extract unfamiliar receipt line items"}
     )
@@ -96,13 +118,23 @@ async def test_correct_review_sets_acceptance_receipt(tmp_path: Path) -> None:
         mission,
         actor="tester",
         task_family="extract",
-        required_checks={"fields_extracted": True},
+        required_checks=required,
     )
+    store.publish_mission_artifact(
+        created.id,
+        kind="result",
+        content=content,
+        media_type="application/json",
+        owner_scope=created.project_id,
+        summary="extract output",
+        actor="tester",
+    )
+    # Worker-supplied checks are ignored; server recomputes from artifact (V1.7).
     accepted = await store.review_mission_attempt(
         created.id,
         actor="tester",
-        produced={"checks": {"fields_extracted": True}},
-        required_checks={"fields_extracted": True},
+        produced={"checks": {"email_count": 99}},
+        required_checks=required,
     )
     assert accepted["accepted"] is True
     assert accepted["acceptance_receipt_id"]
