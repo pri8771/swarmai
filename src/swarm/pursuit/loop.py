@@ -7,6 +7,7 @@ from typing import Any, Protocol
 
 from swarm.contracts.common import new_id
 from swarm.goals.models import Goal, GoalError, GoalKind, GoalStatus, GoalStore
+from swarm.pursuit.accounting import AccountingError, GoalResourceLedger
 from swarm.pursuit.frontier import assess_gap, build_frontier, choose_contribution
 from swarm.pursuit.learning import PursuitLessonStore
 from swarm.pursuit.models import (
@@ -20,6 +21,11 @@ from swarm.pursuit.models import (
 from swarm.pursuit.policy import admit_proposal, dedupe_key_for
 from swarm.pursuit.schedule import PursuitScheduler
 from swarm.pursuit.stagnation import detect_stagnation
+from swarm.pursuit.verification import (
+    artifact_digest_for_refs,
+    issue_criterion_receipt,
+    verify_execution_outcome,
+)
 
 
 class MissionExecutor(Protocol):
@@ -27,16 +33,22 @@ class MissionExecutor(Protocol):
 
 
 class RecordingExecutor:
-    """Deterministic zero-spend executor for tests and dry runs."""
+    """Deterministic zero-spend executor for tests and dry runs.
+
+    Successful runs emit protected criterion receipts (verifier-bound digests).
+    Bare ``satisfied_criteria`` claims without receipts are not authoritative.
+    """
 
     def __init__(
         self,
         *,
         outcomes: dict[str, ExecutionOutcome] | None = None,
         default_success: bool = True,
+        issue_receipts: bool = True,
     ) -> None:
         self.outcomes = outcomes or {}
         self.default_success = default_success
+        self.issue_receipts = issue_receipts
         self.calls: list[MissionProposalDraft] = []
 
     def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome:
@@ -45,18 +57,40 @@ class RecordingExecutor:
             return self.outcomes[proposal.dedupe_key]
         mission_id = proposal.mission_id or new_id("msn_")
         if self.default_success:
+            evidence_refs = [f"ev:{mission_id}"]
+            criteria = list(proposal.addresses_criteria)
+            receipts: list[dict[str, Any]] = []
+            if self.issue_receipts:
+                digest = artifact_digest_for_refs(evidence_refs, mission_id=mission_id)
+                for criterion_id in criteria:
+                    receipt = issue_criterion_receipt(
+                        goal_id=proposal.goal_id,
+                        criterion_id=criterion_id,
+                        mission_id=mission_id,
+                        artifact_digest=digest,
+                        evidence_ref=evidence_refs[0],
+                    )
+                    receipts.append(receipt.model_dump(mode="json"))
             return ExecutionOutcome(
                 mission_id=mission_id,
                 success=True,
-                evidence_refs=[f"ev:{mission_id}"],
-                satisfied_criteria=list(proposal.addresses_criteria),
+                evidence_refs=evidence_refs,
+                # Claims retained for observation; receipts are authoritative.
+                satisfied_criteria=criteria,
+                criterion_receipts=receipts,
                 cost_usd=proposal.admitted_budget_usd,
+                model_calls=0,
+                tool_calls=0,
+                runtime="recording_executor",
             )
         return ExecutionOutcome(
             mission_id=mission_id,
             success=False,
             failure_class="deterministic_failure",
             cost_usd=0.0,
+            model_calls=0,
+            tool_calls=0,
+            runtime="recording_executor",
         )
 
 
@@ -72,6 +106,7 @@ class PursuitEngine:
         scheduler: PursuitScheduler | None = None,
         clock: Callable[[], float] | None = None,
         max_active_missions: int = 1,
+        ledgers: dict[str, GoalResourceLedger] | None = None,
     ) -> None:
         self.goals = goals
         self.executor = executor or RecordingExecutor()
@@ -84,6 +119,15 @@ class PursuitEngine:
         self._failed_approaches: dict[str, set[str]] = {}
         self._active_missions: dict[str, set[str]] = {}
         self._commitments: dict[str, list[str]] = {}  # goal_id -> commitment keys across missions
+        self._ledgers: dict[str, GoalResourceLedger] = ledgers or {}
+
+    def resource_ledger(self, goal_id: str) -> GoalResourceLedger:
+        goal = self.goals.get(goal_id)
+        ledger = self._ledgers.get(goal_id)
+        if ledger is None:
+            ledger = GoalResourceLedger.from_envelope(goal_id, goal.resource_envelope)
+            self._ledgers[goal_id] = ledger
+        return ledger
 
     def observe(self, goal_id: str) -> Goal:
         goal = self.goals.get(goal_id)
@@ -258,8 +302,71 @@ class PursuitEngine:
         if chosen.commitment_key:
             self._commitments.setdefault(goal_id, []).append(chosen.commitment_key)
 
+        ledger = self.resource_ledger(goal_id)
+        hold = None
+        accounting_notes: list[str] = []
+        try:
+            hold = ledger.reserve(
+                mission_id=mission_id,
+                spend_usd=float(draft.admitted_budget_usd),
+                model_calls=1 if draft.admitted_providers else 0,
+                tool_calls=len(draft.admitted_tools),
+                runtime="pursuit",
+            )
+        except AccountingError as exc:
+            self._active_missions.get(goal_id, set()).discard(mission_id)
+            self.scheduler.defer(goal_id, reason=f"accounting:{exc}")
+            if goal.status == GoalStatus.ACTIVE:
+                self._safe_transition(
+                    goal_id, GoalStatus.WAITING, reason=f"accounting:{exc}"
+                )
+            return self._record(
+                goal_id,
+                CyclePhase.ADMIT,
+                gap=gap,
+                frontier=frontier,
+                proposal=draft,
+                notes=f"accounting:{exc}",
+                decided=chosen.kind,
+                meta={"accounting_error": str(exc)},
+            )
+
         outcome = self.executor.execute(draft)
         self._active_missions.get(goal_id, set()).discard(mission_id)
+
+        if hold is not None:
+            try:
+                if outcome.usage_unknown:
+                    ledger.settle(
+                        hold.hold_id,
+                        spend_usd=float(outcome.cost_usd),
+                        model_calls=int(outcome.model_calls),
+                        tool_calls=int(outcome.tool_calls),
+                        prompt_tokens=outcome.prompt_tokens,
+                        completion_tokens=outcome.completion_tokens,
+                        route_id=outcome.route_id,
+                        runtime=outcome.runtime,
+                        usage_unknown=True,
+                    )
+                    accounting_notes.append("usage_unknown_preserved")
+                else:
+                    ledger.settle(
+                        hold.hold_id,
+                        spend_usd=float(outcome.cost_usd),
+                        model_calls=int(outcome.model_calls),
+                        tool_calls=int(outcome.tool_calls),
+                        prompt_tokens=outcome.prompt_tokens,
+                        completion_tokens=outcome.completion_tokens,
+                        route_id=outcome.route_id,
+                        runtime=outcome.runtime,
+                        usage_unknown=False,
+                    )
+            except AccountingError as exc:
+                accounting_notes.append(f"settle:{exc}")
+                try:
+                    ledger.release(hold.hold_id)
+                except AccountingError as inner:
+                    accounting_notes.append(f"reconcile:{inner}")
 
         # Lane C: mission outcome never implies goal achievement.
         self.goals.record_mission_outcome(
@@ -272,18 +379,23 @@ class PursuitEngine:
         )
 
         verification = self._verify(goal, outcome)
+        # Only protected newly_met advance progress (never raw worker claims).
         for c in verification.newly_met:
             satisfied.add(c)
 
         strategy = self.lessons.applied_strategy(goal_id, goal.strategy)
-        notes = ""
+        notes = "|".join(accounting_notes)
         if verification.invalidated_assumptions:
             strategy = (
                 f"{strategy} | invalidate:{','.join(verification.invalidated_assumptions)}".strip(
                     " |"
                 )
             )
-            notes = "assumptions_invalidated"
+            notes = (notes + "|assumptions_invalidated").strip("|")
+        if verification.rejection_reasons:
+            notes = (
+                notes + "|" + ",".join(verification.rejection_reasons[:3])
+            ).strip("|")
 
         if outcome.success and verification.newly_met:
             self.scheduler.note_success(goal_id, kind=chosen.kind)
@@ -305,6 +417,8 @@ class PursuitEngine:
                 "success": outcome.success,
                 "newly_met": list(verification.newly_met),
                 "still_unmet": list(verification.still_unmet),
+                "verification_passed": verification.passed,
+                "accounting": ledger.snapshot(),
             },
         )
         if strategy != goal.strategy:
@@ -345,31 +459,14 @@ class PursuitEngine:
             strategy_after=strategy,
             notes=notes,
             decided=chosen.kind,
+            meta={"accounting": ledger.snapshot()} if hold is not None else {},
         )
 
     def _verify(self, goal: Goal, outcome: ExecutionOutcome) -> VerificationResult:
-        criteria = list(goal.verification_criteria)
-        claimed = set(outcome.satisfied_criteria)
-        newly = [c for c in criteria if c in claimed]
-        still = [
-            c for c in criteria if c not in claimed and c not in self._satisfied.get(goal.id, set())
-        ]
-        # Already satisfied stay met.
-        already = self._satisfied.get(goal.id, set())
-        still = [c for c in criteria if c not in already and c not in claimed]
-        invalidated: list[str] = []
-        if not outcome.success and goal.strategy:
-            # Evidence of failure can invalidate a named assumption token in strategy.
-            for token in goal.strategy.split("|"):
-                token = token.strip()
-                if token.startswith("assume:") and outcome.failure_class:
-                    invalidated.append(token)
-        return VerificationResult(
-            passed=outcome.success and bool(newly or not criteria),
-            checked_criteria=criteria,
-            newly_met=newly,
-            still_unmet=still,
-            invalidated_assumptions=invalidated,
+        return verify_execution_outcome(
+            goal,
+            outcome,
+            already_satisfied=self._satisfied.get(goal.id, set()),
         )
 
     def _safe_transition(
