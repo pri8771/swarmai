@@ -1,16 +1,11 @@
 # SwarmAI execution map (reconciled)
 
-<<<<<<< HEAD
-**Updated:** 2026-09-25T17:45Z  
-**Integration branch:** `dev` @ `5236fbba`  
-=======
-**Updated:** 2026-09-25T17:30Z  
-**Integration branch:** `dev`  
+**Updated:** 2026-09-25T17:50Z  
+**Integration branch:** `dev` @ `e9ae85c4`  
 **Lane F branch:** `cursor/v20-acceptance-freeze-92df`  
->>>>>>> 3d1b8358 (feat(V2.0): freeze acceptance campaign scenarios and harness)
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Other lane drafts blocked on failing offline CI and/or rebase onto `5236fbba`.
+**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Lane F rebasing onto `e9ae85c4` for offline CI green. Other lane drafts may still need rebase.
 
 ## Single authority
 
@@ -50,26 +45,6 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | Linear MCP | needsAuth — reconciliation queue only |
 | Live paid providers | blocked — fake upstreams first |
 
-<<<<<<< HEAD
-## Dev consolidate status (2026-09-25)
-
-| PR | Lane | Tip | Disposition |
-|---|---|---|---|
-| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba`) |
-| #46 | C V1.8 Goals | `2ea1e655` | blocked — offline ruff fail; rebase onto `dev` |
-| #48 | D V1.9 Pursuit | `1f6c0ddd` | blocked — offline pytest fail (`artifact_required`); skip until newer tip green |
-| #45 | A connector | `e4212873` | blocked — offline ruff; superseded content in #49 |
-| #49 | A connector+E2E | `330277b3` | blocked — offline ruff; prefer over #45 when green |
-| #47 | F acceptance | `3d1b8358` | blocked — offline ruff |
-| #51 | E product UI | `3ae1e31f` | blocked — offline ruff; needs #46+#48 first |
-
-## Next
-
-1. Lanes rebase onto `origin/dev` @ `5236fbba` and re-run hosted CI.  
-2. Merge next green non-conflicting drafts in order: #49 (or #45) → #46 → #48 (when green) → #47 → #51.  
-3. R2 continuous connector + V1.7 integrated mission with ≥1 authorized model-backed run.  
-4. Do **not** merge `main`.
-=======
 ## Lane F packet (this map owner)
 
 | Packet | Status | Notes |
@@ -79,10 +54,22 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | V20-ACCEPT-MATRICES | **done** | V1.7–V2.0 matrices always `accepted: false` |
 | V20-ACCEPT-LIVE/HOST/ELAPSED | **blocked external** | No invented LiveGrant; host/elapsed not started |
 
+## Dev consolidate status (2026-09-25)
+
+| PR | Lane | Tip | Disposition |
+|---|---|---|---|
+| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba` → `e9ae85c4`) |
+| #46 | C V1.8 Goals | `2ea1e655` | blocked — offline ruff fail; rebase onto `dev` |
+| #48 | D V1.9 Pursuit | `1f6c0ddd` | blocked — offline pytest fail (`artifact_required`); skip until newer tip green |
+| #45 | A connector | `e4212873` | blocked — offline ruff; superseded content in #49 |
+| #49 | A connector+E2E | `330277b3` | blocked — offline ruff; prefer over #45 when green |
+| #47 | F acceptance | rebasing → CI | rebased onto `e9ae85c4`; offline/ruff/mypy fixes; target green |
+| #51 | E product UI | `3ae1e31f` | blocked — offline ruff; needs #46+#48 first |
+
 ## Next
 
-1. Finish R7 CI (ephemeral Postgres job) + R2 continuous connector on HTTP path.  
-2. V1.7 integrated mission lifecycle with protected verification + ≥1 authorized model-backed run.  
-3. Lanes C/D/E integrate product hooks into freeze probes (replace scaffolds).  
-4. Operator LiveGrant + host qualification + elapsed windows — separate from harness green.
->>>>>>> 3d1b8358 (feat(V2.0): freeze acceptance campaign scenarios and harness)
+1. Land Lane F (#47) when offline CI green on `e9ae85c4`.  
+2. Other lanes rebase onto `origin/dev` and re-run hosted CI.  
+3. Merge next green non-conflicting drafts in order: #49 (or #45) → #46 → #48 (when green) → #47 → #51.  
+4. R2 continuous connector + V1.7 integrated mission with ≥1 authorized model-backed run.  
+5. Do **not** merge `main`.

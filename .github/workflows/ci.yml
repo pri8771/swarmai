@@ -54,6 +54,7 @@ jobs:
           tests/workers
           tests/workspace
           tests/e2e
+          tests/acceptance
           -q
           --ignore=tests/integration
 

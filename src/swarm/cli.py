@@ -1024,8 +1024,8 @@ def main() -> None:
     elif args.command == "acceptance" and args.acceptance_command == "freeze":
         from swarm.acceptance.freeze import load_freeze
 
-        freeze = load_freeze()
-        print(json.dumps(freeze.to_dict(), indent=2, default=str))
+        acceptance_freeze = load_freeze()
+        print(json.dumps(acceptance_freeze.to_dict(), indent=2, default=str))
     elif args.command == "acceptance" and args.acceptance_command == "run":
         from swarm.acceptance.harness import run_acceptance_campaign
         from swarm.acceptance.matrix import build_version_matrices
@@ -1036,33 +1036,39 @@ def main() -> None:
             if args.out_dir
             else (_repo_root() / "var" / "reports" / "acceptance")
         )
-        report = run_acceptance_campaign(
+        campaign_report = run_acceptance_campaign(
             gates=gate_list or None,
             out_dir=out,
             live_grant=None,
             host_qualified=False,
             elapsed_window_started=False,
         )
-        matrices = build_version_matrices(campaign=report)
+        acceptance_matrices = build_version_matrices(campaign=campaign_report)
         print(
             json.dumps(
                 {
-                    "report": report.to_dict(),
-                    "matrices": matrices,
+                    "report": campaign_report.to_dict(),
+                    "matrices": acceptance_matrices,
                     "any_version_accepted": False,
                 },
                 indent=2,
                 default=str,
             )
         )
-        if any(not r.ok for r in report.results):
+        if any(not r.ok for r in campaign_report.results):
             raise SystemExit(2)
     elif args.command == "acceptance" and args.acceptance_command == "matrix":
         from swarm.acceptance.harness import run_acceptance_campaign
         from swarm.acceptance.matrix import build_version_matrices
 
-        campaign = run_acceptance_campaign(live_grant=None)
-        print(json.dumps(build_version_matrices(campaign=campaign), indent=2, default=str))
+        acceptance_campaign = run_acceptance_campaign(live_grant=None)
+        print(
+            json.dumps(
+                build_version_matrices(campaign=acceptance_campaign),
+                indent=2,
+                default=str,
+            )
+        )
     elif args.command == "mission" and args.mission_command == "plan":
         from swarm.mission.planner import (
             build_software_mission,
