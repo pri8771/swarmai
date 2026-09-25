@@ -26,7 +26,7 @@
 | R1–R9 foundation repairs | Close review blockers with protected regressions on `dev` lane | In Progress | foundation, R1-R9 | 8 |
 | V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Planned | V1.7 | 8 |
 | V1.8 durable goals | Persistent Goal entity + pause/resume/cancel/restart/dedupe + protected tests | Eng complete (Lane C) — review pending | V1.8 | 5 |
-| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Planned | V1.9 | 8 |
+| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Eng complete (draft PR; rebased on Lane C) — not operator-accepted | V1.9 | 8 |
 | V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Planned | V2.0 | 13 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked | TH-07, live | 2 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |

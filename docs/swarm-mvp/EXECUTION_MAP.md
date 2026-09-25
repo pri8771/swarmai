@@ -48,5 +48,19 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 1. Finish R7 CI (ephemeral Postgres job) + R2 continuous connector on HTTP path.  
 2. V1.7 integrated mission lifecycle with protected verification + ≥1 authorized model-backed run.  
 3. **V1.8 Goal entity (Lane C):** eng lifecycle campaign on `cursor/v18-goals-lifecycle-614f` — see `docs/evidence/v18/`.  
-4. V1.9 pursuit loop → V2.0 product UI/SDK + acceptance campaign freeze.
+4. **V1.9 pursuit loop (Lane D):** eng complete on `cursor/v19-pursuit-7ae9` (rebased on Lane C Goal tip) — see `docs/evidence/v19/`.  
+5. V2.0 product UI/SDK + acceptance campaign freeze.
 
+## Lane D — V1.9 pursuit (this increment)
+
+| Packet | Status | Notes |
+|---|---|---|
+| Observe→assess→propose→admit→execute→verify→update | **eng done** | `src/swarm/pursuit/` + `PursuitEngine.tick` |
+| Justified frontier + act/ask/experiment/wait/request-human | **eng done** | `frontier.py` |
+| Schedules/backoff (no endless polling) | **eng done** | injectable clock; `PursuitScheduler` |
+| Anti-duplicate + stagnation | **eng done** | dedupe keys; waiting transition on stagnation |
+| Learning adopt/rollback (held-out required) | **eng done** | `PursuitLessonStore`; never expands envelopes |
+| Deterministic tests (zero-spend) | **pass** | `tests/pursuit/test_v19_pursuit_loop.py` + Goal regressions |
+| HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
+| Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
+| Goal schema | **uses Lane C** | no fork; rebase on `2ea1e655` |
