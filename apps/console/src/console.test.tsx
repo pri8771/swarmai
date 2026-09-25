@@ -135,7 +135,7 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
-        if url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
+        if (url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
           return new Response(
             JSON.stringify({
               routes: [],
