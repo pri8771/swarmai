@@ -49,18 +49,39 @@ class NativeRuntimeAdapter:
             ),
             "cancel_termination": CapabilityQualification(
                 capability="cancel_termination",
-                status=CapabilityStatus.UNPROVEN,
-                reason="Cancel routes exist; dedicated cancel-during-tool proof not in TH-06 scope",
+                status=CapabilityStatus.AVAILABLE,
+                reason=(
+                    "Lane A continuous connector cancel-lease fences submit; "
+                    "cancel notices on heartbeat/renew"
+                ),
+                evidence_refs=(
+                    "docs/evidence/v17/continuous-connector/SUMMARY.md",
+                    "tests/workers/test_continuous_connector.py",
+                ),
             ),
             "model_routing_usage": CapabilityQualification(
                 capability="model_routing_usage",
                 status=CapabilityStatus.UNPROVEN,
-                reason="Free-only default; live route qualification not authorized this packet",
+                reason=(
+                    "Fake-upstream E2E proves broker accounting; live route "
+                    "qualification blocked pending approved LiveGrant (no spend)"
+                ),
+                evidence_refs=(
+                    "docs/evidence/v17/fake-e2e/SUMMARY.md",
+                    "docs/evidence/v17/live-grant-gate.json",
+                ),
             ),
             "context_occupancy_xy_succession": CapabilityQualification(
                 capability="context_occupancy_xy_succession",
-                status=CapabilityStatus.UNPROVEN,
-                reason="X/Y succession not exercised in two-host TH packets yet",
+                status=CapabilityStatus.AVAILABLE,
+                reason=(
+                    "X→Y context handoff digests + generation bump; predecessor "
+                    "claim fenced after adopt on continuous connector path"
+                ),
+                evidence_refs=(
+                    "docs/evidence/v17/collab/SUMMARY.md",
+                    "tests/mission/test_v17_collab_connector_campaign.py",
+                ),
             ),
             "nested_delegation_accounting": CapabilityQualification(
                 capability="nested_delegation_accounting",
@@ -92,11 +113,19 @@ class NativeRuntimeAdapter:
             notes=[
                 "Native availability is partial: only narrowly proven capabilities may dispatch.",
                 (
-                    "kernel_mediation_proven remains false until "
-                    "cancel/permissions/succession evidence exists."
+                    "kernel_mediation_proven remains false until full permission "
+                    "matrix + live routing evidence exists."
+                ),
+                (
+                    "Cancel + X/Y succession proven on continuous connector / "
+                    "collab campaign (Mac loopback)."
                 ),
                 "CAS persistence is not knowledge-transfer qualification.",
                 "SwarmAI kernel owns admission; native code is not a third-party framework.",
+                (
+                    "Live model routes remain gated by approved LiveGrant — "
+                    "fake upstream only for mechanics."
+                ),
             ],
         )
 
