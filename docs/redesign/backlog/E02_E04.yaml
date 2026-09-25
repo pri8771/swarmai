@@ -1,0 +1,167 @@
+version: 1
+epics: [E02, E03, E04]
+packets:
+- id: A-0201
+  epic: E02
+  goal: Add durable schema for agent identity and execution attempts using existing DB conventions.
+  inputs: [docs/redesign/reuse/gap_register.yaml, src/swarm/contracts/agent_v2.py, src/swarm/contracts/execution_v2.py, src/swarm/db, migrations]
+  outputs: [migrations/versions/<next>_agent_execution_v2.py]
+  steps: [Follow discovered migration pattern, add only required columns/indexes/FKs, include downgrade.]
+  test: "Run repository migration upgrade/downgrade test identified by E00."
+  acceptance: "Fresh DB and upgrade path create required structures."
+  deps: [A-0110]
+- id: A-0202
+  epic: E02
+  goal: Persist and retrieve AgentIdentity.
+  inputs: [src/swarm/contracts/agent_v2.py, A-0201]
+  outputs: [src/swarm/db/agent_identity_store.py, tests/integration/test_agent_identity_store.py]
+  steps: [Implement create/get/update-profile/list-by-mission using existing DB style.]
+  test: "uv run pytest tests/integration/test_agent_identity_store.py -q"
+  acceptance: "Identity survives a new DB session and id never changes."
+  deps: [A-0201]
+- id: A-0203
+  epic: E02
+  goal: Persist and query ExecutionAttempt records.
+  inputs: [src/swarm/contracts/execution_v2.py, A-0201]
+  outputs: [src/swarm/db/execution_attempt_store.py, tests/integration/test_execution_attempt_store.py]
+  steps: [Create attempt, append outcome/receipt, query by agent and assignment.]
+  test: "uv run pytest tests/integration/test_execution_attempt_store.py -q"
+  acceptance: "Same agent may have multiple attempts with distinct receipts."
+  deps: [A-0201]
+- id: A-0204
+  epic: E02
+  goal: Persist crew membership as events and reconstruct current organization.
+  inputs: [src/swarm/contracts/organization_v2.py, src/swarm/db]
+  outputs: [src/swarm/db/organization_store.py, tests/integration/test_organization_store.py]
+  steps: [Persist create/join/leave/dissolve events, implement current-membership projection.]
+  test: "uv run pytest tests/integration/test_organization_store.py -q"
+  acceptance: "Crew state reconstructs only from durable events."
+  deps: [A-0201]
+- id: A-0205
+  epic: E02
+  goal: Persist artifact lifecycle state.
+  inputs: [src/swarm/contracts/artifact_v2.py, src/swarm/db]
+  outputs: [src/swarm/db/artifact_store_v2.py, tests/integration/test_artifact_store_v2.py]
+  steps: [Create artifact, transition status, attach evidence reference, query dependency readiness.]
+  test: "uv run pytest tests/integration/test_artifact_store_v2.py -q"
+  acceptance: "Dependency readiness is reproducible from DB state."
+  deps: [A-0201]
+- id: A-0206
+  epic: E02
+  goal: Prove mission/agent/attempt/crew/artifact recovery after restart.
+  inputs: [A-0202, A-0203, A-0204, A-0205, existing mission persistence]
+  outputs: [tests/recovery/test_redesign_restart_continuity.py]
+  steps: [Create state, dispose runtime objects, recreate services from DB, assert identical ids/status/links.]
+  test: "uv run pytest tests/recovery/test_redesign_restart_continuity.py -q"
+  acceptance: "No in-memory object is required to recover durable project state."
+  deps: [A-0202, A-0203, A-0204, A-0205]
+
+- id: A-0301
+  epic: E03
+  goal: Define portable inference adapter protocol.
+  inputs: [src/swarm/contracts/inference_v2.py, docs/redesign/reuse/inference_inventory.yaml]
+  outputs: [src/swarm/providers/inference_adapter_v2.py, tests/providers/test_inference_adapter_v2.py]
+  steps: [Expose capability probe and invoke methods, return normalized receipt, keep caller provider-agnostic.]
+  test: "uv run pytest tests/providers/test_inference_adapter_v2.py -q"
+  acceptance: "Fake adapter satisfies protocol."
+  deps: [A-0110]
+- id: A-0302
+  epic: E03
+  goal: Wrap one existing provider route behind inference adapter v2.
+  inputs: [A-0301, docs/redesign/reuse/inference_inventory.yaml, docs/redesign/reuse/gap_register.yaml]
+  outputs: [src/swarm/providers/adapters/existing_v2.py, tests/providers/test_existing_adapter_v2.py]
+  steps: [Use reuse candidate named by gap register, map request/response, preserve actual usage metadata.]
+  test: "uv run pytest tests/providers/test_existing_adapter_v2.py -q"
+  acceptance: "Existing provider route is callable through portable protocol."
+  deps: [A-0301]
+- id: A-0303
+  epic: E03
+  goal: Add OpenAI-compatible BYO endpoint adapter.
+  inputs: [A-0301]
+  outputs: [src/swarm/providers/adapters/openai_compatible_v2.py, tests/providers/test_openai_compatible_v2.py]
+  steps: [Accept base URL/key reference/model id, normalize response/usage/errors, never store secret in receipt.]
+  test: "uv run pytest tests/providers/test_openai_compatible_v2.py -q"
+  acceptance: "Mock compatible endpoint completes one request and normalized receipt."
+  deps: [A-0301]
+- id: A-0304
+  epic: E03
+  goal: Resolve InferenceProfile against configured adapters.
+  inputs: [A-0301, src/swarm/contracts/inference_v2.py]
+  outputs: [src/swarm/providers/profile_resolver_v2.py, tests/providers/test_profile_resolver_v2.py]
+  steps: [Filter by required capabilities/constraints, support pinned/pool/capability modes, return explicit no-match.]
+  test: "uv run pytest tests/providers/test_profile_resolver_v2.py -q"
+  acceptance: "Resolver never silently weakens required capability."
+  deps: [A-0301]
+- id: A-0305
+  epic: E03
+  goal: Persist requested and applied model/effort on each attempt.
+  inputs: [A-0203, A-0304]
+  outputs: [src/swarm/providers/execution_recorder_v2.py, tests/providers/test_execution_recorder_v2.py]
+  steps: [Write requested profile before call, append resolved receipt after call, preserve unknown values as unknown.]
+  test: "uv run pytest tests/providers/test_execution_recorder_v2.py -q"
+  acceptance: "Fallback or route change is visible in persisted receipt."
+  deps: [A-0203, A-0304]
+- id: A-0306
+  epic: E03
+  goal: Prove one persistent agent can use two inference configurations.
+  inputs: [A-0302, A-0303, A-0305]
+  outputs: [tests/integration/test_heterogeneous_agent_execution.py]
+  steps: [Create one agent, run two attempts through different adapters/profiles, reload from DB, compare identity and receipts.]
+  test: "uv run pytest tests/integration/test_heterogeneous_agent_execution.py -q"
+  acceptance: "Agent id is unchanged while provider/model/effort may differ."
+  deps: [A-0302, A-0303, A-0305]
+
+- id: A-0401
+  epic: E04
+  goal: Implement unified ToolRegistry.
+  inputs: [src/swarm/contracts/tool_v2.py, docs/redesign/reuse/runtime_inventory.yaml]
+  outputs: [src/swarm/capabilities/tool_registry_v2.py, tests/tools/test_tool_registry_v2.py]
+  steps: [Register/unregister/list/get capability descriptors, reject duplicate ids, expose transport-neutral invocation handle.]
+  test: "uv run pytest tests/tools/test_tool_registry_v2.py -q"
+  acceptance: "Registry stores native and MCP descriptors identically."
+  deps: [A-0110]
+- id: A-0402
+  epic: E04
+  goal: Adapt isolated terminal execution into ToolRegistry.
+  inputs: [A-0401, sandbox, docs/redesign/reuse/runtime_inventory.yaml]
+  outputs: [src/swarm/capabilities/terminal_tool_v2.py, tests/tools/test_terminal_tool_v2.py]
+  steps: [Reuse existing sandbox boundary, define command input/result receipt, enforce timeout/workspace scope.]
+  test: "uv run pytest tests/tools/test_terminal_tool_v2.py -q"
+  acceptance: "Command runs in sandbox fixture and cannot address forbidden host path fixture."
+  deps: [A-0401]
+- id: A-0403
+  epic: E04
+  goal: Register web search/browse capability through ToolRegistry.
+  inputs: [A-0401, docs/redesign/reuse/runtime_inventory.yaml]
+  outputs: [src/swarm/capabilities/web_tool_v2.py, tests/tools/test_web_tool_v2.py]
+  steps: [Wrap existing web capability if present; otherwise define adapter seam and fake; normalize source/provenance receipt.]
+  test: "uv run pytest tests/tools/test_web_tool_v2.py -q"
+  acceptance: "Agent-facing tool contract is transport-neutral and preserves source provenance."
+  deps: [A-0401]
+- id: A-0404
+  epic: E04
+  goal: Implement MCP client adapter into ToolRegistry.
+  inputs: [A-0401]
+  outputs: [src/swarm/extensions/mcp_adapter_v2.py, tests/extensions/test_mcp_adapter_v2.py]
+  steps: [Discover MCP tools, map schemas to ToolCapability, invoke selected tool, map result to ToolReceipt.]
+  test: "uv run pytest tests/extensions/test_mcp_adapter_v2.py -q"
+  acceptance: "Fake MCP server tool is discoverable and invokable through registry."
+  deps: [A-0401]
+- id: A-0405
+  epic: E04
+  goal: Enforce tool capability scope before invocation.
+  inputs: [A-0401, src/swarm/contracts/mission_v2.py]
+  outputs: [src/swarm/capabilities/tool_authorizer_v2.py, tests/tools/test_tool_authorizer_v2.py]
+  steps: [Compare requested tool/scope/side-effect against mission capabilities, return allow/deny reason, do not rely on prompt compliance.]
+  test: "uv run pytest tests/tools/test_tool_authorizer_v2.py -q"
+  acceptance: "Denied fixture never reaches underlying tool invocation."
+  deps: [A-0401]
+- id: A-0406
+  epic: E04
+  goal: Prove native and MCP tools share one invocation path.
+  inputs: [A-0402, A-0403, A-0404, A-0405]
+  outputs: [tests/integration/test_unified_tool_invocation.py]
+  steps: [Register native fake and MCP fake, authorize, invoke both through same service, compare normalized receipts.]
+  test: "uv run pytest tests/integration/test_unified_tool_invocation.py -q"
+  acceptance: "Caller requires no transport-specific branch."
+  deps: [A-0402, A-0403, A-0404, A-0405]
