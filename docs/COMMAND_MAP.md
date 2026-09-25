@@ -10,6 +10,9 @@
 | API (mock mode) | `uv run swarm serve --port 8765` |
 | Health live | `curl -s http://127.0.0.1:8765/health/live` |
 | Health ready | `curl -s http://127.0.0.1:8765/health/ready` |
+| Deploy doctor | `uv run swarm deploy doctor --profile mock` |
+| Deploy doctor (require start refs) | `uv run swarm deploy doctor --profile standalone --require-start` |
+| Portable install docs | see `docs/install/` |
 | Export JSON Schema | `uv run python -m swarm.contracts.export_schemas` |
 | DB migrate | `uv run swarm db migrate` |
 | DB validate | `uv run swarm db validate` |

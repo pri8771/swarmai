@@ -1,4 +1,6 @@
-> **Adopted revision 2026-09-25:** Two-host architecture (R730 server, Mac connector, `swarm.splitsignal.ai`, Compose packaging, Cloudflare Tunnel) supersedes local-only deployment scope for this build. Product packets P00–P19 remain; see `ADR-002-two-host-architecture.md` and Project doc `docs/two-host-implementation-plan.md`. Implementation branch: `cursor/two-host-mvp-b28d` (not V1.7 `cursor/v17-single-session`).
+> **Portable product install (2026-09-25+):** primary path is [`docs/install/`](../install/README.md) — configurable server/worker roles, placeholder hostnames, no personal credentials/paths.  
+> **REFERENCE ONLY** named topology (R730 / Mac connector / Cloudflare / operator DNS): [`docs/reference/`](../reference/README.md) and `ADR-002-two-host-architecture.md`. Missing named-host access blocks that deployment’s qualification, not portable eng.  
+> Product packets P00–P19 remain. Historical two-host implementation notes: Project `docs/two-host-implementation-plan.md`.
 
 # Start here: SwarmAI execution handoff
 

@@ -1,6 +1,7 @@
-# Always-on SwarmAI server stack (R730 target; Mac loopback verify allowed).
-# Does not publish Postgres. Does not start Cloudflare Tunnel by default.
-# Requires an operator-supplied auth token env file (see deploy/env/server.env.example).
+# Always-on SwarmAI server stack (portable server role).
+# Does not publish Postgres. Does not start optional tunnel profile by default.
+# Requires an operator-supplied auth token env file (see deploy/env/portable.env.example).
+# Named-host notes: docs/reference/R730-SERVER.md (REFERENCE ONLY).
 name: swarm-server
 
 services:
@@ -23,9 +24,9 @@ services:
       SWARM_ALLOW_PAID: "false"
       SWARM_EXECUTION_MODE: ${SWARM_EXECUTION_MODE:-standalone}
     ports:
-      # Host loopback only. Default 18766 avoids common local 8765 conflicts on Mac verify.
-      # R730 publish remains config/override — never public without auth.
-      - "127.0.0.1:${SWARM_HOST_PORT:-18766}:8765"
+      # Host loopback only. Override SWARM_HOST_PORT when local ports collide.
+      # Never publish publicly without authenticated ingress.
+      - "127.0.0.1:${SWARM_HOST_PORT:-8765}:8765"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health/live"]
       interval: 10s
