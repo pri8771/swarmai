@@ -62,7 +62,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
-| #48 | D V1.9 Pursuit | (rebased tip — see tip SHA after push) | rebased onto `05c0bc4b`; await hosted CI |
+| #48 | D V1.9 Pursuit | 4bef5dfb | rebased onto `05c0bc4b`; await hosted CI |
 | #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
 
 ## Next
