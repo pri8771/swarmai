@@ -32,7 +32,7 @@ def test_profiles_security_defaults() -> None:
 
 
 def test_compose_no_public_db_ports() -> None:
-    for name in ("standalone", "hybrid", "recovery", "server"):
+    for name in ("standalone", "hybrid", "recovery", "server", "product"):
         text = (ROOT / "deploy" / "compose" / f"{name}.yml").read_text()
         db_idx = text.index("\n  db:")
         # Slice until next root-level key after services (networks/volumes).
@@ -44,6 +44,16 @@ def test_compose_no_public_db_ports() -> None:
                 end = min(end, at)
         chunk = tail[:end]
         assert "ports:" not in chunk
+
+
+def test_product_compose_present() -> None:
+    path = ROOT / "deploy" / "compose" / "product.yml"
+    assert path.is_file()
+    text = path.read_text()
+    assert "\n  console:" in text
+    assert "\n  worker:" in text
+    assert (ROOT / "deploy" / "console" / "Dockerfile").is_file()
+    assert (ROOT / "deploy" / "env" / "product.env.example").is_file()
 
 
 def test_doctor_standalone(monkeypatch: pytest.MonkeyPatch) -> None:

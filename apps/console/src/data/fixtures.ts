@@ -199,6 +199,7 @@ export const MOCK_SNAPSHOT: ConsoleSnapshot = {
       capacity: 2,
       privacy: ['local'],
       claimed: 'task_child_a',
+      activeLeases: ['lease_demo_1'],
       revoked: false,
     },
     {
@@ -208,6 +209,7 @@ export const MOCK_SNAPSHOT: ConsoleSnapshot = {
       capacity: 1,
       privacy: ['local'],
       claimed: null,
+      activeLeases: [],
       revoked: false,
       stale: true,
     },

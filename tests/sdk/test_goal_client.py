@@ -153,3 +153,25 @@ def test_sdk_matches_http_create_shape(tmp_path: Path) -> None:
         )
     assert via_sdk.project_id == "proj_sdk"
     assert set(via_http.json()["goal"].keys()) == set(via_sdk.model_dump(mode="json").keys())
+
+
+def test_sdk_workers_approvals_artifacts_parity(tmp_path: Path) -> None:
+    """SDK mirrors console control surfaces for workers/approvals/artifacts/events."""
+    with _client(tmp_path / "server") as client:
+        workers = client.list_workers()
+        assert isinstance(workers, list)
+        approvals = client.list_approvals()
+        assert isinstance(approvals, list)
+        mission = client.create_mission(
+            project_id="proj_sdk",
+            objective="artifact parity mission",
+        )
+        mid = str(mission.get("id") or mission.get("mission_id") or "")
+        assert mid
+        arts = client.list_mission_artifacts(mid)
+        assert isinstance(arts, list)
+        events = client.list_events(mission_id=mid, limit=10)
+        assert isinstance(events, list)
+        with pytest.raises(SwarmClientError) as exc:
+            client.cancel_worker_lease("lease_missing")
+        assert exc.value.status_code in {404, 400, 422}

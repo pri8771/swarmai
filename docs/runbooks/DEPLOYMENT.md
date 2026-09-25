@@ -13,6 +13,7 @@
 | hybrid | Local control + private model endpoint |
 | recovery | Restore drill with side-effect freeze |
 | server | Always-on server role (API + Postgres; optional tunnel profile) |
+| product | Console + API/coordinator + worker + Postgres (loopback product path) |
 | mac_connector | Outbound worker connector (no local Postgres; historical name) |
 
 Portable product target is **configurable server/worker/combined roles** with placeholder hostnames. Named hardware and DNS are deployment qualification — see reference guides.
@@ -31,7 +32,19 @@ uv run swarm recovery verify --profile recovery
 
 `ok` = security posture. `ready_to_start` = required env refs present. `--require-start` exits non-zero when start refs are missing (values never printed).
 
-## Portable startup (loopback)
+## Portable product startup (console + API + worker)
+
+```sh
+cp deploy/env/product.env.example deploy/env/product.env
+# Set SWARM_SEED_LOOPBACK_TOKEN and SWARM_PG_PASSWORD to local random values only.
+
+docker compose -f deploy/compose/product.yml --env-file deploy/env/product.env up --build -d
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/live"
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/ready"
+# UI: http://127.0.0.1:${SWARM_CONSOLE_HOST_PORT:-43127}/?mode=live
+```
+
+## Portable server-only startup (loopback)
 
 ```sh
 cp deploy/env/portable.env.example deploy/env/portable.env

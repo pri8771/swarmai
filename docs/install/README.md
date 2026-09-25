@@ -35,6 +35,14 @@ curl -fsS http://127.0.0.1:8765/health/live
 curl -fsS http://127.0.0.1:8765/health/ready
 ```
 
+Product stack (console + API + worker + Postgres, loopback):
+
+```sh
+cp deploy/env/product.env.example deploy/env/product.env
+# Set SWARM_PG_PASSWORD, SWARM_SEED_LOOPBACK_TOKEN, SWARM_API_AUTH_TOKEN locally.
+docker compose -f deploy/compose/product.yml --env-file deploy/env/product.env up --build -d
+```
+
 Standalone (API + Postgres, loopback only):
 
 ```sh
