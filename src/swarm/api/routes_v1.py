@@ -2202,6 +2202,6 @@ async def freeze_candidate(
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     return (
         CandidateFreezer(root)
-        .freeze(source_sha=sha, schema_revision="a18tov30schema0001")
+        .freeze(source_sha=sha, schema_revision="a20pursuitpersist0001")
         .to_dict()
     )

@@ -1075,7 +1075,7 @@ def main() -> None:
             ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
         ).strip()
         candidate_manifest = CandidateFreezer(_repo_root()).freeze(
-            source_sha=sha, schema_revision="a18tov30schema0001"
+            source_sha=sha, schema_revision="a20pursuitpersist0001"
         )
         print(json.dumps(candidate_manifest.to_dict(), indent=2))
     elif args.command == "acceptance" and args.acceptance_command == "freeze":

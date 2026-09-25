@@ -59,7 +59,7 @@ class CandidateFreezer:
         self,
         *,
         source_sha: str,
-        schema_revision: str = "a18site001",
+        schema_revision: str = "a20pursuitpersist0001",
         policy_versions: dict[str, str] | None = None,
     ) -> CandidateManifest:
         lock = self.root / "uv.lock"
