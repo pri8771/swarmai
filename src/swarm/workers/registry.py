@@ -104,6 +104,10 @@ class WorkerRegistryService:
             if "local_only" in task.scopes and "local" not in rec.privacy_classes:
                 self._dispatch_queue.insert(0, task)
                 return None
+            # Mac-local tasks require an enrolled Mac connector privacy class.
+            if "mac_local" in task.scopes and "mac_local" not in rec.privacy_classes:
+                self._dispatch_queue.insert(0, task)
+                return None
             rec.claimed_task_id = task.id
             return task
         return None

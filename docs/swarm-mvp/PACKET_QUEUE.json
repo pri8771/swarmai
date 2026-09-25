@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:19:00Z",
+  "updated_at": "2026-09-25T15:26:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -45,10 +45,18 @@
     {
       "id": "TH-03",
       "title": "Mac connector scoped task via server",
-      "status": "planned",
+      "status": "impl_complete",
       "depends_on": [
         "TH-01",
         "TH-02"
+      ],
+      "evidence": "docs/evidence/two-host/TH-03/",
+      "acceptance_notes": [
+        "Mac connector enrolls outbound with mac_local privacy",
+        "mac_local fixture drives protected checks",
+        "forged/wrong-host review rejected",
+        "mission completed via authoritative API",
+        "server remains ready after connector exits (host + compose)"
       ]
     },
     {

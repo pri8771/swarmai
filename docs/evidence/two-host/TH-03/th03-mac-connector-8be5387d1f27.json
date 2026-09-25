@@ -1,0 +1,126 @@
+{
+  "packet": "TH-03",
+  "hostname_public": "swarm.splitsignal.ai",
+  "server_url": "http://host.docker.internal:18766",
+  "connector_role": "mac_connector",
+  "started_at": "2026-09-25T15:26:11.618070+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "steps": [
+    {
+      "step": "mac_local_fixture",
+      "ok": true,
+      "email_count": 2
+    },
+    {
+      "step": "server_ready_before",
+      "ok": true
+    },
+    {
+      "step": "ensure_project",
+      "ok": true,
+      "project_id": "proj_install_004b3a4d00be47a29e8271e6d378f00e"
+    },
+    {
+      "step": "enroll_mac_connector",
+      "ok": true,
+      "worker_id": "wk_e21425bdc5e04cb89e4393fdb7b7d2f4",
+      "privacy": [
+        "mac_local",
+        "local"
+      ],
+      "membership_token_prefix": "wt_a8f"
+    },
+    {
+      "step": "heartbeat",
+      "ok": true
+    },
+    {
+      "step": "list_workers_mac_privacy",
+      "ok": true,
+      "worker_listed": true,
+      "privacy_ok": true
+    },
+    {
+      "step": "create_mac_scoped_mission",
+      "ok": true,
+      "mission_id": "9095b8ca48bd47069d1d53a0d283607f",
+      "support": {
+        "supported": true,
+        "family": "extract",
+        "reason": "supported"
+      }
+    },
+    {
+      "step": "reject_non_mac_or_forged",
+      "ok": true,
+      "reasons": [
+        "check_failed:artifact_sha256",
+        "check_failed:host_role",
+        "wrong_result_rejected"
+      ]
+    },
+    {
+      "step": "mac_local_review_accepted",
+      "ok": true,
+      "acceptance_receipt_id": "acr_5b7519666a6d40b3b8f6b1253dcd8610"
+    },
+    {
+      "step": "get_mission_completed",
+      "ok": true,
+      "status": "completed"
+    },
+    {
+      "step": "server_ready_after_work",
+      "ok": true
+    },
+    {
+      "step": "server_survives_connector_exit",
+      "ok": true
+    }
+  ],
+  "mac_local_fixture": "/work/var/mac-connector/fixtures/th03-mac-local-8be5387d1f27.txt",
+  "health_ready": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "project_id": "proj_install_004b3a4d00be47a29e8271e6d378f00e",
+  "worker_id": "wk_e21425bdc5e04cb89e4393fdb7b7d2f4",
+  "mission_id": "9095b8ca48bd47069d1d53a0d283607f",
+  "acceptance_receipt_id": "acr_5b7519666a6d40b3b8f6b1253dcd8610",
+  "final_mission_status": "completed",
+  "health_ready_after_work": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "health_ready_after_connector_exit": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "finished_at": "2026-09-25T15:26:11.654766+00:00",
+  "ok": true
+}

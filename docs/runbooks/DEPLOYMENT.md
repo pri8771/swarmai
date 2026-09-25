@@ -46,8 +46,15 @@ docker compose -f deploy/compose/server.yml --profile tunnel up -d
 Mac connector (TH-03; after server is up):
 
 ```sh
+# Preferred Mac-host one-shot (authoritative evidence path)
 cp deploy/env/mac-connector.env.example deploy/env/mac-connector.env
-docker compose -f deploy/compose/mac-connector.yml up -d
+# copy SWARM_SEED_LOOPBACK_TOKEN from server.env into mac-connector.env for loopback verify
+uv run python scripts/th03_mac_connector.py
+
+# Optional compose one-shot (uses host.docker.internal → published server port)
+docker compose -f deploy/compose/mac-connector.yml up --abort-on-container-exit
+# Server must still answer:
+curl -fsS http://127.0.0.1:18766/health/ready
 ```
 
 ## Restore (local)
