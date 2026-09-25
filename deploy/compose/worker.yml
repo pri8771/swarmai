@@ -1,0 +1,48 @@
+# Generic worker connector — outbound to SwarmAI server only.
+# Bounded task workspace volume (NOT whole-repo mount).
+# Optional macOS adapter is a separate labelled profile (mac-connector.yml).
+name: swarm-worker
+
+services:
+  worker:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: swarm-ai:local
+    user: "1000:1000"
+    env_file:
+      - ../env/worker.env
+    environment:
+      SWARM_ALLOW_PAID: "false"
+      SWARM_PROCESS_ROLE: worker
+      SWARM_ROLE: worker
+      SWARM_SERVER_URL: ${SWARM_SERVER_URL:-http://host.docker.internal:18766}
+      SWARM_PUBLIC_HOSTNAME: ${SWARM_PUBLIC_HOSTNAME:-worker.example.local}
+      SWARM_WORKER_WORKSPACE: /var/swarm/workspaces
+      SWARM_ENABLE_MACOS_ADAPTER: "false"
+      SWARM_CONNECTOR_MAX_ITERATIONS: ${SWARM_CONNECTOR_MAX_ITERATIONS:-}
+      SWARM_CONNECTOR_POLL: ${SWARM_CONNECTOR_POLL:-1.0}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Bounded task workspaces only — never mount the full checkout.
+      - worker_workspaces:/var/swarm/workspaces
+    working_dir: /app
+    entrypoint: ["/app/.venv/bin/python"]
+    command: ["-m", "swarm.workers.connector"]
+    networks:
+      - swarm_worker
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    stop_grace_period: 30s
+    restart: "unless-stopped"
+
+volumes:
+  worker_workspaces:
+
+networks:
+  swarm_worker:
+    driver: bridge

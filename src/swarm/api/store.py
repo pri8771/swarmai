@@ -21,9 +21,18 @@ from swarm.evals.profiles import ProfileStore
 from swarm.mission.store import MissionRecord, MissionStore
 from swarm.product.contracts import mission_public_view, public_product_contract, strip_internal
 from swarm.product.history import HistoryIndex
+from swarm.product.portable_config import WorkerIdentitySpec, default_support_matrix
 from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
 from swarm.providers.catalog import list_providers
+from swarm.workers.capability_authority import CapabilityAuthority
+from swarm.workers.identity import (
+    identity_from_authorization,
+    normalize_architecture,
+    normalize_platform,
+    primary_locality,
+)
 from swarm.workers.registry import WorkerRegistryService
+from swarm.workspace.grants import WorkspaceGrantRegistry
 
 
 def _scrub(obj: dict[str, Any]) -> dict[str, Any]:
@@ -67,6 +76,8 @@ class ProductStore:
     allow_paid: bool = False
     providers_network: bool = False
     repo_root: Path | None = None
+    capability_authority: CapabilityAuthority = field(default_factory=CapabilityAuthority)
+    workspace_grants: WorkspaceGrantRegistry = field(default_factory=WorkspaceGrantRegistry)
     _project_store: ProjectStore | None = field(default=None, repr=False)
     _mission_store: MissionStore | None = field(default=None, repr=False)
     _goal_store: Any = field(default=None, repr=False)
@@ -1019,23 +1030,115 @@ class ProductStore:
         named_inference_urls: list[str] | None = None,
         project_id: str,
         actor: str,
+        host_alias: str | None = None,
+        architecture: str | None = None,
+        runtime_version: str | None = None,
+        labels: list[str] | None = None,
+        platform: dict[str, Any] | str | None = None,
+        runtimes: list[dict[str, Any]] | list[str] | None = None,
+        resource_limits: dict[str, Any] | None = None,
+        data_locality: dict[str, Any] | str | None = None,
+        workspace_grant_ids: list[str] | None = None,
+        role: str = "worker",
     ) -> tuple[WorkerLease, str]:
         token = new_id("wt_")
+        authz = self.capability_authority.authorize(
+            project_id=project_id,
+            requested=capabilities,
+            labels=labels or [],
+        )
+        # Platform may arrive as P4 string or legacy dict {os_family, arch}.
+        if isinstance(platform, dict):
+            plat_name = str(
+                platform.get("os_family") or platform.get("platform") or "unknown"
+            )
+            arch_from_plat = platform.get("arch") or platform.get("architecture")
+        elif isinstance(platform, str) and platform.strip():
+            plat_name = platform
+            arch_from_plat = None
+        else:
+            plat_name = "unknown"
+            arch_from_plat = None
+        arch = normalize_architecture(
+            str(architecture or arch_from_plat or "unknown")
+        )
+        plat_name = normalize_platform(plat_name)
+        runtime_names: list[str] = []
+        for item in runtimes or []:
+            if isinstance(item, str):
+                runtime_names.append(item)
+            elif isinstance(item, dict):
+                kind = str(item.get("kind") or "runtime")
+                ver = str(item.get("version") or "")
+                runtime_names.append(f"{kind}:{ver}" if ver else kind)
+        primary_runtime = runtime_version or (
+            runtime_names[0] if runtime_names else "unknown"
+        )
+        if isinstance(data_locality, dict):
+            classes_raw = [str(c) for c in (data_locality.get("classes") or []) if c]
+            primary_raw = data_locality.get("primary")
+            locality_str = primary_locality(
+                privacy_classes,
+                str(primary_raw) if primary_raw else (classes_raw[0] if classes_raw else None),
+            )
+            loc_classes = sorted(set(privacy_classes) | set(classes_raw) | {locality_str})
+        else:
+            locality_str = primary_locality(
+                privacy_classes,
+                data_locality if isinstance(data_locality, str) else None,
+            )
+            loc_classes = sorted(set(privacy_classes) | {locality_str})
+        node = host_alias or f"worker-{new_id('node_')[:8]}"
+        worker_id = new_id("wk_")
+        identity: WorkerIdentitySpec = identity_from_authorization(
+            worker_id=worker_id,
+            node_identity=node,
+            platform_name=plat_name,
+            architecture=arch,
+            authz=authz,
+            runtime_version=primary_runtime,
+            runtimes=runtime_names,
+            resource_limits=resource_limits,
+            workspace_grants=list(workspace_grant_ids or []),
+            privacy_classes=loc_classes,
+            data_locality=locality_str,
+            role=role,
+            support_matrix=default_support_matrix(),
+        )
+        # Scheduling-eligible set — never labels, never unverified claims.
+        granted = sorted(identity.effective_capabilities())
         lease = WorkerLease(
-            worker_id=new_id("wk_"),
-            node_identity=f"api-{new_id('node_')[:8]}",
-            architecture="api",
-            runtime_version="0.1.0",
+            worker_id=identity.worker_id,
+            node_identity=identity.node_identity,
+            architecture=identity.architecture,
+            runtime_version=identity.runtime_version,
             capacity_units=capacity_units,
-            capabilities=capabilities,
-            labels=["api"],
+            capabilities=granted,
+            labels=list(labels or []),
+            claimed_capabilities=list(identity.capabilities),
+            capabilities_verified=bool(identity.verified_capabilities),
+            platform={
+                "platform": identity.platform,
+                "architecture": identity.architecture,
+            },
+            runtimes=[{"name": r} for r in identity.runtimes],
+            data_locality={
+                "primary": identity.data_locality,
+                "classes": loc_classes,
+            },
+            resource_limits=dict(identity.resource_limits),
+            workspace_grant_ids=list(identity.workspace_grants),
         )
         registered = await self.workers.register(
             lease, token=token, project_id=project_id
         )
         rec = self.workers._workers[registered.worker_id]
-        rec.privacy_classes = set(privacy_classes)
+        rec.privacy_classes = set(loc_classes)
         rec.named_inference_urls = list(named_inference_urls or [])
+        rec.claimed_capabilities = set(identity.capabilities)
+        rec.capabilities_verified = bool(identity.verified_capabilities)
+        rec.host_alias = node
+        rec.workspace_grant_ids = list(identity.workspace_grants)
         self._persist_durable_workers()
         self.publish(
             project_id=project_id,
@@ -1044,7 +1147,15 @@ class ProductStore:
             payload={
                 "worker_id": registered.worker_id,
                 "capacity": capacity_units,
-                "privacy": privacy_classes,
+                "privacy": loc_classes,
+                "capabilities_granted": granted,
+                "capabilities_claimed": list(identity.capabilities),
+                "capabilities_verified": bool(identity.verified_capabilities),
+                "architecture": identity.architecture,
+                "platform": identity.platform,
+                "role": identity.role,
+                "data_locality": identity.data_locality,
+                "identity": identity.model_dump(mode="json"),
             },
             dedupe_key=f"worker.joined:{registered.worker_id}",
         )

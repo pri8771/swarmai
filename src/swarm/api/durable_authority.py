@@ -76,6 +76,10 @@ def save_worker_registry(repo_root: Path, registry: WorkerRegistryService) -> No
                     if hasattr(rec.last_heartbeat, "isoformat")
                     else str(rec.last_heartbeat)
                 ),
+                "claimed_capabilities": sorted(rec.claimed_capabilities),
+                "capabilities_verified": rec.capabilities_verified,
+                "host_alias": rec.host_alias,
+                "workspace_grant_ids": list(rec.workspace_grant_ids),
             }
         )
     lease_rows: list[dict[str, Any]] = []
@@ -146,6 +150,10 @@ def load_worker_registry(repo_root: Path, registry: WorkerRegistryService) -> No
                 measured_capacity=float(row.get("measured_capacity") or 1.0),
                 claimed_task_id=row.get("claimed_task_id"),
                 active_lease_ids=list(row.get("active_lease_ids") or []),
+                claimed_capabilities=set(row.get("claimed_capabilities") or []),
+                capabilities_verified=bool(row.get("capabilities_verified")),
+                host_alias=row.get("host_alias"),
+                workspace_grant_ids=list(row.get("workspace_grant_ids") or []),
             )
             registry._workers[lease.worker_id] = rec
             registry._tokens[token] = lease.worker_id

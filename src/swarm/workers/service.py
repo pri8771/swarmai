@@ -67,9 +67,41 @@ class DurableWorkerService:
         self.heartbeat_interval_seconds = heartbeat_interval_seconds
 
     def enroll(self, request: EnrollmentRequest) -> EnrollmentResponse:
+        from swarm.product.portable_config import default_support_matrix
+        from swarm.workers.capability_authority import CapabilityAuthority
+        from swarm.workers.identity import (
+            identity_from_authorization,
+            normalize_architecture,
+            normalize_platform,
+        )
+
         self._require_protocol(request.protocol_version)
         self._reject_secret_bearing_nonce(request)
-        granted_caps = self._grant_capabilities(request.capabilities)
+        from swarm.workers.capability_authority import AuthorizationResult
+
+        claimed = tuple(sorted({str(c) for c in request.capabilities if str(c).strip()}))
+        if self.granted_capability_allowlist is None:
+            # Preserve prior semantics: grant all requested; mark unverified.
+            authz = AuthorizationResult(
+                claimed=claimed,
+                granted=claimed,
+                verified=False,
+                rejected=(),
+            )
+        else:
+            authority = CapabilityAuthority(
+                default_grants=frozenset(self.granted_capability_allowlist),
+                strict_without_project_grant=True,
+            )
+            authority.set_project_grants(
+                request.project_id, self.granted_capability_allowlist
+            )
+            authz = authority.authorize(
+                project_id=request.project_id,
+                requested=request.capabilities,
+                labels=request.labels,
+            )
+        granted_caps = list(authz.granted)
         if request.trust_class in _DEFAULT_TRUST_ALLOW:
             trust = request.trust_class
         else:
@@ -86,25 +118,80 @@ class DurableWorkerService:
         if existing is not None:
             # Re-enrollment under same id bumps generation and replaces credentials.
             generation = int(existing.lease_generation) + 1
+        plat = "unknown"
+        if isinstance(request.platform, dict):
+            plat = normalize_platform(
+                str(
+                    request.platform.get("os_family")
+                    or request.platform.get("platform")
+                    or "unknown"
+                )
+            )
+        arch = normalize_architecture(request.architecture)
+        runtime_names = []
+        for item in request.runtimes or []:
+            if isinstance(item, dict):
+                kind = str(item.get("kind") or "runtime")
+                ver = str(item.get("version") or "")
+                runtime_names.append(f"{kind}:{ver}" if ver else kind)
+            else:
+                runtime_names.append(str(item))
+        identity = identity_from_authorization(
+            worker_id=worker_id,
+            node_identity=request.host_alias,
+            platform_name=plat,
+            architecture=arch,
+            authz=authz,
+            runtime_version=request.runtime_version,
+            runtimes=runtime_names,
+            resource_limits=(
+                request.resource_limits
+                if request.resource_limits is not None
+                else request.resources.model_dump(mode="json")
+            ),
+            workspace_grants=list(request.workspace_grant_ids),
+            privacy_classes=list(request.privacy_classes),
+            data_locality=(
+                str(request.data_locality.get("primary"))
+                if isinstance(request.data_locality, dict) and request.data_locality.get("primary")
+                else None
+            ),
+            role="worker",
+            support_matrix=default_support_matrix(),
+        )
+        effective = sorted(identity.effective_capabilities())
+        scheduling_caps = effective if effective else granted_caps
+        resource_payload = {
+            "resources": request.resources.model_dump(mode="json"),
+            "artifact_transport": request.artifact_transport.model_dump(mode="json"),
+            "worker_nonce": request.worker_nonce,
+            "platform": {"platform": identity.platform, "architecture": identity.architecture},
+            "runtimes": list(identity.runtimes),
+            "resource_limits": dict(identity.resource_limits),
+            "data_locality": {
+                "primary": identity.data_locality,
+                "classes": list(request.privacy_classes),
+            },
+            "workspace_grant_ids": list(identity.workspace_grants),
+            "claimed_capabilities": list(identity.capabilities),
+            "verified_capabilities": list(identity.verified_capabilities),
+            "identity": identity.model_dump(mode="json"),
+        }
         row, token_id = self.workers.upsert_registration(
             worker_id=worker_id,
             project_id=request.project_id,
             node_identity=request.host_alias,
-            architecture=request.architecture,
-            runtime_version=request.runtime_version,
+            architecture=identity.architecture,
+            runtime_version=identity.runtime_version,
             capacity_units=float(request.capacity_units),
             membership_token=membership_token,
             status="online",
             generation=generation,
             trust_class=trust,
             labels=list(request.labels),
-            capabilities=granted_caps,
+            capabilities=scheduling_caps,
             privacy_classes=list(request.privacy_classes),
-            resource_payload={
-                "resources": request.resources.model_dump(mode="json"),
-                "artifact_transport": request.artifact_transport.model_dump(mode="json"),
-                "worker_nonce": request.worker_nonce,
-            },
+            resource_payload=resource_payload,
             policy_version=request.policy_version,
             software_version=request.software.swarm_version,
             build_sha=request.software.worker_build_sha,
@@ -115,11 +202,22 @@ class DurableWorkerService:
             membership_token=membership_token,
             token_id=token_id,
             scopes_granted=scopes,
-            capabilities_granted=granted_caps,
+            capabilities_granted=scheduling_caps,
+            capabilities_claimed=list(identity.capabilities),
+            capabilities_verified=bool(identity.verified_capabilities),
             trust_class=trust,
             heartbeat_interval_seconds=self.heartbeat_interval_seconds,
             policy_version=request.policy_version,
             project_id=request.project_id,
+            workspace_grant_ids=list(identity.workspace_grants),
+            platform={
+                "platform": identity.platform,
+                "architecture": identity.architecture,
+            },
+            data_locality={
+                "primary": identity.data_locality,
+                "classes": list(request.privacy_classes),
+            },
         )
 
     def heartbeat(self, request: WorkerHeartbeatRequest) -> WorkerHeartbeatResponse:

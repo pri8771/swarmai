@@ -102,6 +102,14 @@ class WorkerLease(StrictModel):
     lease_generation: int = 1
     heartbeat_at: datetime = Field(default_factory=utc_now)
     status: WorkerStatus = WorkerStatus.ONLINE
+    # Portable identity (optional; omitted by older clients).
+    platform: dict[str, Any] | None = None
+    runtimes: list[dict[str, Any]] = Field(default_factory=list)
+    claimed_capabilities: list[str] = Field(default_factory=list)
+    capabilities_verified: bool = False
+    workspace_grant_ids: list[str] = Field(default_factory=list)
+    data_locality: dict[str, Any] | None = None
+    resource_limits: dict[str, Any] | None = None
 
 
 class ToolCall(StrictModel):

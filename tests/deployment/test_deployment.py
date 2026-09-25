@@ -14,7 +14,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_profiles_security_defaults() -> None:
-    for name in ("mock", "standalone", "hybrid", "recovery", "server", "mac_connector"):
+    for name in (
+        "mock",
+        "standalone",
+        "hybrid",
+        "recovery",
+        "server",
+        "worker",
+        "combined",
+        "mac_connector",
+    ):
         p = get_profile(name)
         assert p.non_root is True
         assert p.public_db_port is False
@@ -58,6 +67,14 @@ def test_doctor_server_and_mac_connector(monkeypatch: pytest.MonkeyPatch) -> Non
     names = {c["name"]: c for c in mac.checks}
     assert names["server_url_configured"]["ok"] is False
     assert (ROOT / "deploy" / "compose" / "mac-connector.yml").is_file()
+    worker = doctor(profile="worker", repo_root=ROOT)
+    assert worker.ok is True
+    wnames = {c["name"]: c for c in worker.checks}
+    assert wnames["server_url_configured"]["ok"] is False
+    assert (ROOT / "deploy" / "compose" / "worker.yml").is_file()
+    text = (ROOT / "deploy" / "compose" / "worker.yml").read_text()
+    assert "../..:/work" not in text
+    assert "worker_workspaces" in text
 
 
 def test_doctor_wrong_secret_refuses_non_mock(monkeypatch: pytest.MonkeyPatch) -> None:

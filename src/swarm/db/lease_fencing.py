@@ -1017,16 +1017,26 @@ class LeaseLifecycleService:
 
     @staticmethod
     def _worker_eligible_for_task(worker: WorkerLeaseRow, task: TaskRow) -> bool:
+        from swarm.workers.placement_contracts import PlacementContract
+
         payload = task.payload if isinstance(task.payload, dict) else {}
-        required = set(payload.get("required_capabilities") or [])
-        have = set(worker.capabilities or [])
-        if required and not required.issubset(have):
-            return False
-        scopes = set(task.scopes or [])
-        privacy = set(worker.privacy_classes or [])
-        if "local_only" in scopes and "local" not in privacy:
-            return False
-        return True
+        required = payload.get("required_capabilities") or []
+        scopes = list(task.scopes or [])
+        contract = PlacementContract.for_task(
+            required_capabilities=required,
+            scopes=scopes,
+        )
+        locality = set(str(p) for p in (worker.privacy_classes or []))
+        resource = worker.resource_payload if isinstance(worker.resource_payload, dict) else {}
+        locality_payload = resource.get("data_locality") or {}
+        if isinstance(locality_payload, dict):
+            locality |= set(str(c) for c in (locality_payload.get("classes") or []))
+        return contract.worker_eligible(
+            granted_capabilities=worker.capabilities or [],
+            authorized_locality=locality,
+            labels=worker.labels or [],
+            host_alias=worker.node_identity,
+        )
 
     def _has_active_lease(self, task_id: str) -> bool:
         stmt = (

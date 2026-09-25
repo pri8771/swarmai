@@ -11,6 +11,9 @@ All notable changes to SwarmAI are documented here.
 - Lead-accept packages and launch-track evidence under `docs/evidence/v20/`, `v30/`, `launch/`
 - P4 portable acceptance: `tests/portability/`, `PublicEndpointConfig` / support matrix contracts,
   in-process protocol harness, and generic two-container `deploy/compose/portable-protocol.yml`
+- P2 portable roles: `server`/`worker`/`combined` process roles, enrollment via P4
+  `WorkerIdentitySpec` / `SupportMatrix`, capability authority (labels ≠ access), placement
+  contracts, bounded workspace grants, generic `deploy/compose/worker.yml` (+ optional macOS adapter)
 
 ### Fixed
 - CLI mypy type conflicts that failed GitHub Actions offline CI

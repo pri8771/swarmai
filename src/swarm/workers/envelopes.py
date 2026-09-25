@@ -43,12 +43,19 @@ class EnrollmentRequest(StrictModel):
     trust_class: str = "compute_only"
     resources: WorkerResources = Field(default_factory=WorkerResources)
     artifact_transport: ArtifactTransportInfo = Field(default_factory=ArtifactTransportInfo)
-    architecture: str = "arm64"
-    runtime_version: str = "py3.12"
+    # Prefer platform.arch when provided; default unknown (no Apple Silicon bias).
+    architecture: str = "unknown"
+    runtime_version: str = "unknown"
     capacity_units: float = 1.0
     privacy_classes: list[str] = Field(default_factory=lambda: ["local"])
     labels: list[str] = Field(default_factory=list)
     policy_version: str | None = None
+    # Portable identity extensions (optional for backward compatibility).
+    platform: dict[str, Any] | None = None
+    runtimes: list[dict[str, Any]] = Field(default_factory=list)
+    resource_limits: dict[str, Any] | None = None
+    data_locality: dict[str, Any] | None = None
+    workspace_grant_ids: list[str] = Field(default_factory=list)
     # Optional re-enrollment under existing worker_id (generation bump).
     worker_id: str | None = None
 
@@ -61,6 +68,8 @@ class EnrollmentResponse(StrictModel):
     token_id: str
     scopes_granted: list[str] = Field(default_factory=list)
     capabilities_granted: list[str] = Field(default_factory=list)
+    capabilities_claimed: list[str] = Field(default_factory=list)
+    capabilities_verified: bool = False
     trust_class: str
     heartbeat_interval_seconds: int = 30
     lease_defaults: dict[str, int] = Field(
@@ -73,6 +82,9 @@ class EnrollmentResponse(StrictModel):
     server_protocol_version: str = PROTOCOL_VERSION
     policy_version: str | None = None
     project_id: str
+    workspace_grant_ids: list[str] = Field(default_factory=list)
+    platform: dict[str, Any] | None = None
+    data_locality: dict[str, Any] | None = None
 
 
 class WorkerHeartbeatRequest(StrictModel):
