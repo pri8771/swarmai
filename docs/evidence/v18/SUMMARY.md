@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-25  
 **Lane:** C — durable Goal entity  
-**Branch:** `cursor/v18-goals-lifecycle-614f` @ `c8f93d42`  
+**Branch:** `cursor/v18-goals-lifecycle-614f` @ `269d161f`  
 **Base:** `origin/dev` @ `748078f2` (extended; not rewritten)  
 **Status:** eng_verified (deterministic) — **not** operator-accepted
 

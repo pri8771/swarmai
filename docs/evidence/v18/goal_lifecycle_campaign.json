@@ -3,7 +3,7 @@
   "lane": "C",
   "date_utc": "2026-09-25T17:27:00Z",
   "base_sha": "748078f2fd253329c8cc53d28f0ec7ba11585ff0",
-  "tip_sha": "c8f93d42261e0790c380664a1f3730fb46fd9988",
+  "tip_sha": "269d161fc9e3bef26a8bbac62aa00f8609c38e16",
   "branch": "cursor/v18-goals-lifecycle-614f",
   "schema_version": "1.8",
   "tests": {
