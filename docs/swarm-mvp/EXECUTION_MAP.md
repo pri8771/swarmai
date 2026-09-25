@@ -1,11 +1,11 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T18:55Z  
-**Integration branch:** `dev` @ `f39e0032`  
+**Updated:** 2026-09-25T20:35Z  
+**Integration branch:** `dev` @ `c294d8ca` (+ L2 pursuit PR pending)  
 **Hostname:** configurable (operator deploy may use `swarm.splitsignal.ai`; freeze is config-driven — PORT-01 **closed**)  
-**Mandate:** portable product (Project Context `docs/v2-portable-product-plan.md`) + prior goal-pursuit plan  
-**Consolidate:** #50/#49/#46/#47/#51/#52 + portable #53/#54/#55/#56/#57 merged into `dev` @ `f39e0032`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
-**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed with Docker)  
+**Mandate:** portable product (Project Context `docs/v2-portable-product-plan.md`) + prior goal-pursuit plan + FAST_TRACK  
+**Consolidate:** #50/#49/#46/#47/#51/#52 + portable #53/#54/#55/#56/#57 + L5 #61 merged into `dev` @ `c294d8ca`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
+**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed with Docker) — recheck after L2 pursuit merge  
 **Portable tracking branch:** `cursor/v2-portable-tracking-9bf5` (docs only — tip sync)
 
 ## Single authority
@@ -126,7 +126,7 @@ Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence
 | Learning adopt/rollback (held-out required) | **eng done** | `PursuitLessonStore`; never expands envelopes |
 | Deterministic tests (zero-spend) | **pass** | `tests/pursuit/test_v19_pursuit_loop.py` + Goal regressions |
 | HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
-| Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
+| Live model-backed pursuit | **not claimed** | Operational path uses `NativeMissionDispatchExecutor` (R20-01); RecordingExecutor fixture/mock only; no spend |
 | Goal schema | **uses Lane C on `dev`** | no fork |
 
 ## Lane E — V2.0 product UI/SDK

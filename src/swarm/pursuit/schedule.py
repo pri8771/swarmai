@@ -16,7 +16,8 @@ class PursuitScheduler:
     """Event/schedule/backoff gate — prevents endless polling."""
 
     def __init__(self, *, clock: Callable[[], float] | None = None) -> None:
-        # R20-04: a constant-zero clock is not an autonomous scheduler.
+        # R20-04: wall clock by default; tests inject deterministic clocks.
+        # A constant-zero clock is not an autonomous scheduler.
         self._clock = clock or time.time
         self._states: dict[str, ScheduleState] = {}
 

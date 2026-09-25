@@ -295,7 +295,12 @@ def test_pursuit_api_tick_and_lesson(tmp_path: Path) -> None:
     assert tick.status_code == 200, tick.text
     body = tick.json()
     assert body["cycle"]["decided_kind"] == "act"
-    assert body["goal"]["status"] == "achieved"
+    # R20-01: operational API must not achieve via RecordingExecutor.
+    assert body["goal"]["status"] != "achieved"
+    outcome = body["cycle"].get("outcome") or {}
+    assert outcome.get("success") is False
+    assert outcome.get("failure_class") == "submitted_pending"
+    assert outcome.get("runtime") == "native"
 
     status = client.get(f"/v1/goals/{goal_id}/pursuit", headers=HEADERS)
     assert status.status_code == 200

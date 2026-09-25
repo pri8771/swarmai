@@ -143,15 +143,30 @@ class ProductStore:
         return self._goal_store
 
     def pursuit_engine(self) -> Any:
-        """V1.9 autonomous pursuit loop with durable cycle/schedule state (R20-04)."""
+        """V1.9 autonomous pursuit loop.
+
+        Operational / non-fixture composition uses ``NativeMissionDispatchExecutor``
+        (R20-01) plus durable cycle/schedule state (R20-04). ``RecordingExecutor``
+        is reserved for explicit fixture/mock demos.
+        """
         if self._pursuit_engine is None:
+            import time
+
             from swarm.pursuit import PursuitEngine, RecordingExecutor
+            from swarm.pursuit.native_dispatch import NativeMissionDispatchExecutor
+            from swarm.pursuit.schedule import PursuitScheduler
             from swarm.pursuit.state_store import DurablePursuitStateStore
 
             root = (self.repo_root or Path.cwd()) / "var" / "pursuit"
+            if self.fixture_mode or self.execution_mode == "mock":
+                executor: Any = RecordingExecutor(default_success=True)
+            else:
+                executor = NativeMissionDispatchExecutor(self)
             self._pursuit_engine = PursuitEngine(
                 self.goal_store(),
-                executor=RecordingExecutor(default_success=True),
+                executor=executor,
+                scheduler=PursuitScheduler(clock=time.time),
+                clock=time.time,
                 state_store=DurablePursuitStateStore(root),
             )
         return self._pursuit_engine
@@ -774,12 +789,13 @@ class ProductStore:
             self.controller.missions[mission_id] = updated
             record.status = updated.status.value
             record.revision = updated.revision
-            record.result = {
+            accepted_result = {
                 **(record.result or {}),
                 "ok": True,
                 "accepted": True,
                 "acceptance_receipt_id": receipt_id,
             }
+            record.result = accepted_result
             self._persist_mission_record(updated, source="api")
             record = self.mission_store().load(mission_id)
             record.validation = {
@@ -789,6 +805,8 @@ class ProductStore:
                 "reviewed_at": utc_now().isoformat(),
                 "reviewed_by": actor,
             }
+            # _persist_mission_record preserves prior disk result; re-bind acceptance.
+            record.result = {**(record.result or {}), **accepted_result}
             self.mission_store().append_timeline(
                 record,
                 "mission.accepted",
@@ -821,12 +839,13 @@ class ProductStore:
         self.controller.missions[mission_id] = updated
         record.status = updated.status.value
         record.revision = updated.revision
-        record.result = {
+        rejected_result = {
             **(record.result or {}),
             "ok": False,
             "accepted": False,
             "rejected_reasons": list(decision.reasons),
         }
+        record.result = rejected_result
         self._persist_mission_record(updated, source="api")
         record = self.mission_store().load(mission_id)
         record.validation = {
@@ -835,6 +854,7 @@ class ProductStore:
             "reviewed_at": utc_now().isoformat(),
             "reviewed_by": actor,
         }
+        record.result = {**(record.result or {}), **rejected_result}
         self.mission_store().append_timeline(
             record,
             "mission.rejected",

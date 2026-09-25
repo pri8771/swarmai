@@ -34,6 +34,10 @@ class MissionExecutor(Protocol):
     def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome: ...
 
 
+class ReconcilingExecutor(Protocol):
+    def reconcile(self, mission_id: str) -> ExecutionOutcome | None: ...
+
+
 class RecordingExecutor:
     """Deterministic zero-spend executor for tests and dry runs.
 
@@ -131,6 +135,8 @@ class PursuitEngine:
         self._dedupe: dict[str, str] = {}  # dedupe_key -> proposal_id
         self._failed_approaches: dict[str, set[str]] = {}
         self._active_missions: dict[str, set[str]] = {}
+        # mission_id -> proposal draft while awaiting worker + protected verify
+        self._pending_missions: dict[str, MissionProposalDraft] = {}
         self._commitments: dict[str, list[str]] = {}  # goal_id -> commitment keys across missions
         self._ledgers: dict[str, GoalResourceLedger] = ledgers or {}
         self._hydrate_all()
@@ -233,6 +239,12 @@ class PursuitEngine:
             )
 
         satisfied = self._satisfied.setdefault(goal_id, set())
+
+        # Reconcile pending native missions before admitting new work.
+        pending_cycle = self._reconcile_pending(goal_id)
+        if pending_cycle is not None:
+            return pending_cycle
+
         gap = assess_gap(goal, satisfied=satisfied)
         if goal.blockers:
             gap = gap.model_copy(update={"blockers": list(goal.blockers)})
@@ -393,7 +405,34 @@ class PursuitEngine:
             )
 
         outcome = self.executor.execute(draft)
+        pending = self._is_pending_outcome(outcome)
+        if pending:
+            self._pending_missions[mission_id] = draft
+            # Keep active slot + hold until reconcile; do not invent failure/success.
+            if hold is not None:
+                accounting_notes.append("hold_open_pending_mission")
+            verification = self._verify(goal, outcome)
+            notes = "|".join(accounting_notes + ["submitted_pending"])
+            self.scheduler.defer(goal_id, reason="submitted_pending", kind=chosen.kind)
+            if goal.status == GoalStatus.ACTIVE:
+                self._safe_transition(
+                    goal_id, GoalStatus.WAITING, reason="submitted_pending"
+                )
+            return self._record(
+                goal_id,
+                CyclePhase.EXECUTE,
+                gap=gap,
+                frontier=frontier,
+                proposal=draft,
+                outcome=outcome,
+                verification=verification,
+                notes=notes,
+                decided=chosen.kind,
+                meta={"pending_mission_id": mission_id},
+            )
+
         self._active_missions.get(goal_id, set()).discard(mission_id)
+        self._pending_missions.pop(mission_id, None)
 
         if hold is not None:
             try:
@@ -529,6 +568,133 @@ class PursuitEngine:
             decided=chosen.kind,
             meta={"accounting": ledger.snapshot()} if hold is not None else {},
         )
+
+    def _is_pending_outcome(self, outcome: ExecutionOutcome) -> bool:
+        if outcome.success:
+            return False
+        return (outcome.failure_class or "") in {
+            "submitted_pending",
+            "pending",
+            "awaiting_worker",
+            "awaiting_verify",
+        }
+
+    def _reconcile_pending(self, goal_id: str) -> CycleRecord | None:
+        """If a native mission is pending, poll reconcile before admitting new work."""
+        active = list(self._active_missions.get(goal_id, set()))
+        if not active:
+            return None
+        reconcile = getattr(self.executor, "reconcile", None)
+        if not callable(reconcile):
+            return None
+
+        goal = self.goals.get(goal_id)
+        satisfied = self._satisfied.setdefault(goal_id, set())
+        for mission_id in active:
+            draft = self._pending_missions.get(mission_id)
+            outcome = reconcile(mission_id)
+            if outcome is None:
+                self.scheduler.defer(goal_id, reason="awaiting_pending_mission")
+                return self._record(
+                    goal_id,
+                    CyclePhase.EXECUTE,
+                    notes="awaiting_pending_mission",
+                    decided=ContributionKind.WAIT,
+                    meta={"pending_mission_id": mission_id},
+                    proposal=draft,
+                )
+
+            # Terminal — drop pending slot and apply verify/update path.
+            self._active_missions.get(goal_id, set()).discard(mission_id)
+            self._pending_missions.pop(mission_id, None)
+            ledger = self.resource_ledger(goal_id)
+            # Release any leftover hold for this mission (best-effort).
+            for hold in list(ledger.holds.values()):
+                if hold.mission_id != mission_id or hold.state != "held":
+                    continue
+                try:
+                    if outcome.success:
+                        ledger.settle(
+                            hold.hold_id,
+                            spend_usd=float(outcome.cost_usd),
+                            model_calls=int(outcome.model_calls),
+                            tool_calls=int(outcome.tool_calls),
+                            prompt_tokens=outcome.prompt_tokens,
+                            completion_tokens=outcome.completion_tokens,
+                            route_id=outcome.route_id,
+                            runtime=outcome.runtime,
+                            usage_unknown=outcome.usage_unknown,
+                        )
+                    else:
+                        ledger.release(hold.hold_id)
+                except AccountingError:
+                    pass
+
+            self.goals.record_mission_outcome(
+                goal_id,
+                mission_id=mission_id,
+                outcome="succeeded" if outcome.success else "failed",
+                actor="pursuit",
+                notes=(draft.title if draft else "reconcile"),
+                evidence_refs=list(outcome.evidence_refs),
+            )
+            verification = self._verify(goal, outcome)
+            for c in verification.newly_met:
+                satisfied.add(c)
+
+            kind = draft.kind if draft else ContributionKind.ACT
+            if outcome.success and verification.newly_met:
+                self.scheduler.note_success(goal_id, kind=kind)
+            else:
+                self.scheduler.note_failure(
+                    goal_id, kind=kind, no_progress=not verification.newly_met
+                )
+
+            self.goals.record_progress(
+                goal_id,
+                summary=f"pursuit:reconcile:{mission_id}",
+                actor="pursuit",
+                metrics={
+                    "mission_id": mission_id,
+                    "success": outcome.success,
+                    "newly_met": list(verification.newly_met),
+                    "still_unmet": list(verification.still_unmet),
+                    "verification_passed": verification.passed,
+                },
+            )
+
+            if goal.status == GoalStatus.WAITING:
+                self._safe_transition(goal_id, GoalStatus.ACTIVE, reason="mission_reconciled")
+
+            refreshed = self.goals.get(goal_id)
+            criteria = list(refreshed.verification_criteria)
+            if (
+                refreshed.kind == GoalKind.FINITE
+                and criteria
+                and all(c in satisfied for c in criteria)
+                and refreshed.status == GoalStatus.ACTIVE
+            ):
+                try:
+                    self.goals.transition(
+                        goal_id,
+                        GoalStatus.ACHIEVED,
+                        reason="all_verification_criteria_met",
+                        actor="pursuit",
+                    )
+                except GoalError:
+                    pass
+
+            return self._record(
+                goal_id,
+                CyclePhase.UPDATE,
+                proposal=draft,
+                outcome=outcome,
+                verification=verification,
+                notes="reconciled_pending_mission",
+                decided=kind,
+                meta={"reconciled_mission_id": mission_id},
+            )
+        return None
 
     def _verify(self, goal: Goal, outcome: ExecutionOutcome) -> VerificationResult:
         return verify_execution_outcome(
