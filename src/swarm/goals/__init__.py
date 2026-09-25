@@ -1,5 +1,19 @@
-"""Goal package — durable goals above missions."""
+"""Goal package — durable goals above missions (V1.8)."""
 
-from swarm.goals.models import Goal, GoalStatus, GoalStore
+from swarm.goals.models import (
+    Goal,
+    GoalError,
+    GoalKind,
+    GoalStatus,
+    GoalStore,
+    allowed_transitions,
+)
 
-__all__ = ["Goal", "GoalStatus", "GoalStore"]
+__all__ = [
+    "Goal",
+    "GoalError",
+    "GoalKind",
+    "GoalStatus",
+    "GoalStore",
+    "allowed_transitions",
+]

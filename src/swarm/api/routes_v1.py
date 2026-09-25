@@ -14,8 +14,12 @@ from swarm.api.schemas import (
     CancelRequest,
     EvaluationCreateRequest,
     GoalCreateRequest,
+    GoalLifecycleRequest,
     GoalLinkMissionRequest,
+    GoalMissionOutcomeRequest,
+    GoalProgressRequest,
     GoalTransitionRequest,
+    GoalTriggerRequest,
     MissionArtifactPublishRequest,
     MissionCreateRequest,
     MissionReviewRequest,
@@ -1143,7 +1147,7 @@ async def list_goals(
 ) -> dict[str, Any]:
     if project_id:
         auth.require_project(principal, project_id)
-    goals = store.goal_store().list(project_id=project_id)
+    goals = store.goal_store().list_goals(project_id=project_id)
     if "admin" not in principal.roles:
         goals = [g for g in goals if g.project_id in principal.project_ids]
     return {"goals": [g.model_dump(mode="json") for g in goals]}
@@ -1155,14 +1159,33 @@ async def create_goal(
     principal: Principal = Depends(get_principal),
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
-    auth.require_project(principal, body.project_id)
-    from swarm.goals.models import Goal
+    from swarm.goals.models import Goal, GoalError, GoalKind
 
+    auth.require_project(principal, body.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(
+        body.model_dump(mode="json", exclude={"idempotency_key"})
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="goals.create",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    try:
+        kind = GoalKind(body.kind)
+    except ValueError as exc:
+        raise ApiError("invalid_goal_kind", str(exc), status_code=400) from exc
     goal = Goal(
         project_id=body.project_id,
         desired_outcome=body.desired_outcome,
         verification_criteria=list(body.verification_criteria),
+        kind=kind,
         scope=dict(body.scope),
         constraints=dict(body.constraints),
         resource_envelope=dict(body.resource_envelope),
@@ -1171,9 +1194,25 @@ async def create_goal(
         permitted_agents=list(body.permitted_agents),
         strategy=body.strategy,
         stop_conditions=list(body.stop_conditions),
+        dependencies=list(body.dependencies),
+        open_questions=list(body.open_questions),
+        blockers=list(body.blockers),
+        review_cadence=body.review_cadence,
+        expires_at=body.expires_at,
     )
-    created = store.goal_store().create(goal)
-    return {"goal": created.model_dump(mode="json")}
+    try:
+        created = store.goal_store().create(goal)
+    except GoalError as exc:
+        raise ApiError("goal_create_error", str(exc), status_code=409) from exc
+    result = {"goal": created.model_dump(mode="json")}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=body.project_id,
+        operation="goals.create",
+        request_digest=digest,
+    )
 
 
 @router.get("/goals/{goal_id}")
@@ -1184,6 +1223,8 @@ async def get_goal(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     try:
+        goal = store.goal_store().get(goal_id)
+        store.goal_store().evaluate_expiry(goal_id)
         goal = store.goal_store().get(goal_id)
     except KeyError as exc:
         raise ApiError("not_found", "goal not found", status_code=404) from exc
@@ -1198,22 +1239,325 @@ async def transition_goal(
     principal: Principal = Depends(get_principal),
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ) -> dict[str, Any]:
-    from swarm.goals.models import GoalStatus
+    from swarm.goals.models import GoalError, GoalStatus
 
     try:
         goal = store.goal_store().get(goal_id)
     except KeyError as exc:
         raise ApiError("not_found", "goal not found", status_code=404) from exc
     auth.require_project(principal, goal.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(body.model_dump(mode="json", exclude={"idempotency_key"}))
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.transition:{goal_id}",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
     try:
         status = GoalStatus(body.status)
         updated = store.goal_store().transition(
             goal_id, status, reason=body.reason or "operator", actor=principal.subject
         )
-    except ValueError as exc:
+    except (ValueError, GoalError) as exc:
         raise ApiError("illegal_transition", str(exc), status_code=409) from exc
-    return {"goal": updated.model_dump(mode="json")}
+    result = {"goal": updated.model_dump(mode="json")}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.transition:{goal_id}",
+        request_digest=digest,
+    )
+
+
+def _goal_lifecycle(
+    *,
+    goal_id: str,
+    action: str,
+    body: GoalLifecycleRequest,
+    principal: Principal,
+    auth: AuthRegistry,
+    store: ProductStore,
+    idempotency_key: str | None,
+) -> dict[str, Any]:
+    from swarm.goals.models import GoalError
+
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(
+        {"action": action, **body.model_dump(mode="json", exclude={"idempotency_key"})}
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.{action}:{goal_id}",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    reason = body.reason or action
+    gs = store.goal_store()
+    try:
+        if action == "pause":
+            updated = gs.pause(goal_id, reason=reason, actor=principal.subject)
+        elif action == "resume":
+            updated = gs.resume(goal_id, reason=reason, actor=principal.subject)
+        elif action == "cancel":
+            updated = gs.cancel(goal_id, reason=reason, actor=principal.subject)
+        elif action == "restart":
+            updated = gs.restart(goal_id, reason=reason, actor=principal.subject)
+        else:
+            raise ApiError("invalid_action", f"unknown lifecycle action:{action}", status_code=400)
+    except GoalError as exc:
+        raise ApiError("illegal_transition", str(exc), status_code=409) from exc
+    result = {"goal": updated.model_dump(mode="json")}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.{action}:{goal_id}",
+        request_digest=digest,
+    )
+
+
+@router.post("/goals/{goal_id}/pause")
+async def pause_goal(
+    goal_id: str,
+    body: GoalLifecycleRequest | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    return _goal_lifecycle(
+        goal_id=goal_id,
+        action="pause",
+        body=body or GoalLifecycleRequest(),
+        principal=principal,
+        auth=auth,
+        store=store,
+        idempotency_key=idempotency_key,
+    )
+
+
+@router.post("/goals/{goal_id}/resume")
+async def resume_goal(
+    goal_id: str,
+    body: GoalLifecycleRequest | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    return _goal_lifecycle(
+        goal_id=goal_id,
+        action="resume",
+        body=body or GoalLifecycleRequest(),
+        principal=principal,
+        auth=auth,
+        store=store,
+        idempotency_key=idempotency_key,
+    )
+
+
+@router.post("/goals/{goal_id}/cancel")
+async def cancel_goal(
+    goal_id: str,
+    body: GoalLifecycleRequest | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    return _goal_lifecycle(
+        goal_id=goal_id,
+        action="cancel",
+        body=body or GoalLifecycleRequest(),
+        principal=principal,
+        auth=auth,
+        store=store,
+        idempotency_key=idempotency_key,
+    )
+
+
+@router.post("/goals/{goal_id}/restart")
+async def restart_goal(
+    goal_id: str,
+    body: GoalLifecycleRequest | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    return _goal_lifecycle(
+        goal_id=goal_id,
+        action="restart",
+        body=body or GoalLifecycleRequest(),
+        principal=principal,
+        auth=auth,
+        store=store,
+        idempotency_key=idempotency_key,
+    )
+
+
+@router.post("/goals/{goal_id}/triggers")
+async def trigger_goal(
+    goal_id: str,
+    body: GoalTriggerRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    from swarm.goals.models import GoalError
+
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(body.model_dump(mode="json", exclude={"idempotency_key"}))
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.trigger:{goal_id}",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    try:
+        updated, receipt = store.goal_store().accept_trigger(
+            goal_id,
+            dedupe_key=body.dedupe_key,
+            trigger_kind=body.trigger_kind,
+            actor=principal.subject,
+            payload=dict(body.payload),
+        )
+    except GoalError as exc:
+        raise ApiError("goal_trigger_error", str(exc), status_code=409) from exc
+    result = {"goal": updated.model_dump(mode="json"), "receipt": receipt}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.trigger:{goal_id}",
+        request_digest=digest,
+    )
+
+
+@router.post("/goals/{goal_id}/progress")
+async def record_goal_progress(
+    goal_id: str,
+    body: GoalProgressRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    from swarm.goals.models import GoalError
+
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(body.model_dump(mode="json", exclude={"idempotency_key"}))
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.progress:{goal_id}",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    try:
+        updated = store.goal_store().record_progress(
+            goal_id,
+            summary=body.summary,
+            actor=principal.subject,
+            metrics=dict(body.metrics),
+        )
+    except GoalError as exc:
+        raise ApiError("goal_progress_error", str(exc), status_code=409) from exc
+    result = {"goal": updated.model_dump(mode="json")}
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.progress:{goal_id}",
+        request_digest=digest,
+    )
+
+
+@router.post("/goals/{goal_id}/mission-outcomes")
+async def record_goal_mission_outcome(
+    goal_id: str,
+    body: GoalMissionOutcomeRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    from swarm.goals.models import GoalError
+
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(body.model_dump(mode="json", exclude={"idempotency_key"}))
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.mission_outcome:{goal_id}",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    try:
+        updated = store.goal_store().record_mission_outcome(
+            goal_id,
+            mission_id=body.mission_id,
+            outcome=body.outcome,
+            actor=principal.subject,
+            notes=body.notes,
+            evidence_refs=list(body.evidence_refs),
+        )
+    except GoalError as exc:
+        raise ApiError("goal_outcome_error", str(exc), status_code=409) from exc
+    result = {
+        "goal": updated.model_dump(mode="json"),
+        "mission_completion_implies_goal_achievement": False,
+    }
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=goal.project_id,
+        operation=f"goals.mission_outcome:{goal_id}",
+        request_digest=digest,
+    )
 
 
 @router.post("/goals/{goal_id}/missions")

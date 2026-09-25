@@ -36,6 +36,7 @@ jobs:
           tests/evals
           tests/extensions
           tests/foundation
+          tests/goals
           tests/knowledge
           tests/load
           tests/memory

@@ -1,11 +1,10 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:50Z  
-**Integration branch:** `dev` @ `e9ae85c4`  
-**Lane A branch:** `cursor/v17-connector-collab-e2e-b28d` (supersedes #45)  
+**Updated:** 2026-09-25T17:52Z  
+**Integration branch:** `dev`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Lane A rebased onto `e9ae85c4`; prefer #49 over #45.
+**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C) landing into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
 
 ## Single authority
 
@@ -48,17 +47,17 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 | PR | Lane | Tip | Disposition |
 |---|---|---|---|
-| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba` / docs `e9ae85c4`) |
-| #46 | C V1.8 Goals | `2ea1e655` | blocked — offline ruff fail; rebase onto `dev` |
-| #48 | D V1.9 Pursuit | `1f6c0ddd` | blocked — offline pytest fail (`artifact_required`); skip until newer tip green |
-| #45 | A connector | `e4212873` | **superseded by #49** — close when #49 green |
-| #49 | A connector+collab+E2E | rebasing onto `e9ae85c4` | preferred Lane A land |
-| #47 | F acceptance | `3d1b8358` | blocked — offline ruff |
-| #51 | E product UI | `3ae1e31f` | blocked — offline ruff; needs #46+#48 first |
+| #50 | B foundation CI | `4d512777` | **merged** (`5236fbba`) |
+| #49 | A connector+collab+E2E | `91250613` | **merged** (includes #45) |
+| #45 | A connector | — | **closed superseded** by #49 |
+| #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
+| #48 | D V1.9 Pursuit | `65383188` | hold — rebase onto updated `dev` |
+| #47 | F acceptance | `f8d10704` | merging after #49+#46 |
+| #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
 
 ## Next
 
-1. Land #49 (Lane A) onto `dev` after offline CI green.  
-2. Close #45 as superseded.  
-3. Other lanes rebase onto `dev` and re-run hosted CI.  
+1. Finish merge of #47 (Lane F) into `dev`.  
+2. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
+3. Hold #51 until #46+#48 landed; then rebase/CI.  
 4. Do **not** merge `main`.
