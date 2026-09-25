@@ -54,6 +54,7 @@ testpaths = ["tests"]
 pythonpath = ["src", "."]
 markers = [
     "integration: requires local PostgreSQL (SWARM_DATABASE_URL)",
+    "portable_docker: optional two-container Docker proof (SWARM_PORTABLE_DOCKER=1)",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
