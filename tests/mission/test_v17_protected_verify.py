@@ -118,7 +118,8 @@ def test_goal_store_transitions_and_link(tmp_path: Path) -> None:
     assert goal.status == GoalStatus.ACTIVE
     paused = store.transition(goal.id, GoalStatus.PAUSED, reason="operator pause", actor="op")
     assert paused.status == GoalStatus.PAUSED
-    assert len(paused.decision_history) == 1
+    # create + pause both append durable decision history
+    assert len(paused.decision_history) >= 2
     resumed = store.transition(goal.id, GoalStatus.ACTIVE, reason="resume", actor="op")
     assert resumed.status == GoalStatus.ACTIVE
     linked = store.link_mission(goal.id, "msn_1")
@@ -126,6 +127,7 @@ def test_goal_store_transitions_and_link(tmp_path: Path) -> None:
     # Cold reopen
     cold = GoalStore(tmp_path / "goals")
     assert cold.get(goal.id).mission_ids == ["msn_1"]
+    assert len(cold.get(goal.id).decision_history) >= 3
 
 
 def test_goal_api_create_transition(tmp_path: Path) -> None:

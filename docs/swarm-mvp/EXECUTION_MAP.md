@@ -57,7 +57,8 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 ## Next
 
-1. Lanes rebase onto `origin/dev` @ `5236fbba` and re-run hosted CI.  
+1. Lanes rebase onto `origin/dev` @ `e9ae85c4` and re-run hosted CI.  
 2. Merge next green non-conflicting drafts in order: #49 (or #45) → #46 → #48 (when green) → #47 → #51.  
 3. R2 continuous connector + V1.7 integrated mission with ≥1 authorized model-backed run.  
-4. Do **not** merge `main`.
+4. **V1.8 Goal entity (Lane C):** lifecycle campaign on `cursor/v18-goals-lifecycle-614f` — see `docs/evidence/v18/`.  
+5. Do **not** merge `main`.
