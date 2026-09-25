@@ -2,9 +2,11 @@
 
 from swarm.runtime.checkpoint import CheckpointStore, SessionCheckpoint
 from swarm.runtime.session import AgentSessionRuntime
+from swarm.runtime.succession import SuccessionService
 
 __all__ = [
     "AgentSessionRuntime",
     "CheckpointStore",
     "SessionCheckpoint",
+    "SuccessionService",
 ]

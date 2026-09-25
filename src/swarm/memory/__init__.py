@@ -1,5 +1,7 @@
-"""V0.4 memory package."""
+"""V0.4 memory package + PC-07 layered retrieval / lesson provenance."""
 
+from swarm.memory.layered import LayeredMemoryService, LayeredRetrievalReceipt
+from swarm.memory.lesson_provenance import LessonProvenanceLedger
 from swarm.memory.store import (
     MemoryStore,
     build_recovery_plan,
@@ -11,6 +13,9 @@ from swarm.memory.store import (
 )
 
 __all__ = [
+    "LayeredMemoryService",
+    "LayeredRetrievalReceipt",
+    "LessonProvenanceLedger",
     "MemoryStore",
     "build_recovery_plan",
     "interrupt_mission",
