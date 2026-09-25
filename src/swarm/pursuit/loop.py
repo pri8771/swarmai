@@ -117,7 +117,13 @@ class PursuitEngine:
         state_root: Path | None = None,
     ) -> None:
         self.goals = goals
-        self.executor = executor or RecordingExecutor()
+        if executor is None:
+            # R20-01 defense in depth: never default to successful RecordingExecutor.
+            from swarm.pursuit.native_dispatch import BlockedMissingImplementationExecutor
+
+            self.executor: MissionExecutor = BlockedMissingImplementationExecutor()
+        else:
+            self.executor = executor
         self.lessons = lessons or PursuitLessonStore()
         if scheduler is not None:
             self.scheduler = scheduler

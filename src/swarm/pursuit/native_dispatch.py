@@ -221,3 +221,27 @@ class NativeMissionDispatchExecutor:
             {"task_id": task.id, "required_capabilities": list(task.required_capabilities)},
         )
         self.store.mission_store().save(record)
+
+
+class BlockedMissingImplementationExecutor:
+    """Honest blocker when no native dispatch is wired (no synthetic success).
+
+    Used as ``PursuitEngine`` default when callers omit an executor. Operational
+    ProductStore must prefer ``NativeMissionDispatchExecutor`` instead.
+    """
+
+    def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome:
+        mission_id = proposal.mission_id or new_id("msn_")
+        return ExecutionOutcome(
+            mission_id=mission_id,
+            success=False,
+            failure_class="blocked_missing_implementation",
+            notes="operational_pursuit_requires_native_dispatch",
+            evidence_refs=[],
+            satisfied_criteria=[],
+            criterion_receipts=[],
+            cost_usd=0.0,
+            model_calls=0,
+            tool_calls=0,
+            runtime="blocked",
+        )

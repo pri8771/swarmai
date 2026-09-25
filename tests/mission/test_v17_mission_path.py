@@ -270,3 +270,27 @@ def test_claim_execute_artifact_protected_verify_path(tmp_path: Path) -> None:
     assert protected.get("content_hash") == digest
     assert protected.get("authority") == "server_protected_verifier"
     assert (record.get("result") or {}).get("acceptance_receipt_id")
+
+
+def test_pursuit_engine_default_is_not_recording_success(tmp_path: Path) -> None:
+    """Bare PursuitEngine must not default to successful RecordingExecutor (R20-01)."""
+    from swarm.goals.models import Goal, GoalStatus, GoalStore
+    from swarm.pursuit import BlockedMissingImplementationExecutor, PursuitEngine
+
+    goals = GoalStore(tmp_path / "goals")
+    goal = goals.create(
+        Goal(
+            project_id="proj_review",
+            desired_outcome="Must not false-achieve",
+            verification_criteria=["c1"],
+            resource_envelope={"spend_usd_ceiling": 0.0},
+            authority_envelope={"tools": ["workspace.read"], "providers": ["fake"]},
+        )
+    )
+    engine = PursuitEngine(goals)
+    assert isinstance(engine.executor, BlockedMissingImplementationExecutor)
+    cycle = engine.tick(goal.id, force=True)
+    assert cycle.outcome is not None
+    assert cycle.outcome.success is False
+    assert cycle.outcome.failure_class == "blocked_missing_implementation"
+    assert goals.get(goal.id).status != GoalStatus.ACHIEVED
