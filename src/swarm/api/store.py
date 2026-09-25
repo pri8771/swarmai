@@ -96,6 +96,23 @@ class ProductStore:
             self.idempotency.update(loaded)
         self._durable_bootstrapped = True
 
+    def require_durable_writes(self) -> None:
+        """Refuse simulated writable authority when operational DB is down (PC-02).
+
+        ``db_reachable is False`` means the database was probed and unavailable.
+        File-backed local durability remains allowed when no DB was configured
+        (``db_reachable is None``) or when fixture/mock mode is explicit.
+        """
+        if self.fixture_mode or self.execution_mode != "operational":
+            return
+        if self.db_reachable is False:
+            raise ApiError(
+                "durable_authority_unavailable",
+                "operational writes require a reachable durable database; "
+                "refusing writable fallback to simulated in-memory/file authority",
+                status_code=503,
+            )
+
     def _persist_durable_workers(self) -> None:
         if self.repo_root is None:
             return
@@ -125,13 +142,16 @@ class ProductStore:
         return self._goal_store
 
     def pursuit_engine(self) -> Any:
-        """V1.9 autonomous pursuit loop (deterministic RecordingExecutor by default)."""
+        """V1.9 autonomous pursuit loop with durable cycle/schedule state (R20-04)."""
         if self._pursuit_engine is None:
             from swarm.pursuit import PursuitEngine, RecordingExecutor
+            from swarm.pursuit.state_store import DurablePursuitStateStore
 
+            root = (self.repo_root or Path.cwd()) / "var" / "pursuit"
             self._pursuit_engine = PursuitEngine(
                 self.goal_store(),
                 executor=RecordingExecutor(default_success=True),
+                state_store=DurablePursuitStateStore(root),
             )
         return self._pursuit_engine
 
@@ -1171,6 +1191,13 @@ class ProductStore:
         else:
             db_status = "unprobed"
         ready = runtime_ok and self.db_reachable is not False
+        writable = True
+        if (
+            self.execution_mode == "operational"
+            and not self.fixture_mode
+            and self.db_reachable is False
+        ):
+            writable = False
         return {
             "status": "ready" if ready else "not_ready",
             "execution_mode": self.execution_mode,
@@ -1178,6 +1205,7 @@ class ProductStore:
             "providers_network": self.providers_network,
             "allow_paid": self.allow_paid,
             "database": db_status,
+            "durable_writes": "allowed" if writable else "blocked_db_down",
             "runtime": "ok" if runtime_ok else "down",
             "configured_accounts": len(self.accounts),
             "configured_routes": len(self.routes),

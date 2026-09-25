@@ -1177,6 +1177,7 @@ async def create_goal(
     from swarm.goals.models import Goal, GoalError, GoalKind
 
     auth.require_project(principal, body.project_id)
+    store.require_durable_writes()
     key = body.idempotency_key or idempotency_key
     digest = payload_hash(
         body.model_dump(mode="json", exclude={"idempotency_key"})
@@ -1601,6 +1602,7 @@ async def pursuit_tick(
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
     """Advance one V1.9 autonomous pursuit cycle (deterministic, zero-spend default)."""
+    store.require_durable_writes()
     try:
         goal = store.goal_store().get(goal_id)
     except KeyError as exc:

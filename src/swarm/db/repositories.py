@@ -18,9 +18,14 @@ from swarm.db.models import (
     AttemptReceiptRow,
     EventRow,
     FindingRow,
+    GoalCriterionVerdictRow,
+    GoalRow,
     GraphRevisionRow,
     MissionRow,
     OutboxRow,
+    PursuitCycleRow,
+    PursuitDedupeRow,
+    PursuitScheduleRow,
     ReservationRow,
     TaskRow,
 )
@@ -280,3 +285,180 @@ class OutboxRepository:
         row.status = "pending"
         row.attempts += 1
         row.last_error = error
+
+
+class GoalAuthorityRepository:
+    """PostgreSQL goal authority — optimistic revision, synthetic achievement flags."""
+
+    def __init__(self, session: Session) -> None:
+        self.session = session
+
+    def upsert_goal(
+        self,
+        *,
+        goal_id: str,
+        project_id: str,
+        status: str,
+        kind: str,
+        revision: int,
+        achievement_authority: str | None,
+        payload: dict[str, Any],
+    ) -> GoalRow:
+        existing = self.session.get(GoalRow, goal_id)
+        if existing is None:
+            row = GoalRow(
+                id=goal_id,
+                project_id=project_id,
+                status=status,
+                kind=kind,
+                revision=revision,
+                achievement_authority=achievement_authority,
+                payload=payload,
+            )
+            self.session.add(row)
+            return row
+        if existing.revision > revision:
+            raise GraphRevisionConflict(
+                f"goal {goal_id}: stale write revision {revision} < {existing.revision}"
+            )
+        existing.status = status
+        existing.kind = kind
+        existing.revision = revision
+        existing.achievement_authority = achievement_authority
+        existing.payload = payload
+        return existing
+
+    def get(self, goal_id: str) -> GoalRow | None:
+        return self.session.get(GoalRow, goal_id)
+
+    def record_criterion_verdict(
+        self,
+        *,
+        goal_id: str,
+        criterion_key: str,
+        goal_revision: int,
+        state: str,
+        authority: str,
+        evidence_digest: str | None = None,
+        verifier_receipt_id: str | None = None,
+        payload: dict[str, Any] | None = None,
+    ) -> GoalCriterionVerdictRow:
+        row = GoalCriterionVerdictRow(
+            verdict_id=new_id("gcv_"),
+            goal_id=goal_id,
+            criterion_key=criterion_key,
+            goal_revision=goal_revision,
+            state=state,
+            authority=authority,
+            evidence_digest=evidence_digest,
+            verifier_receipt_id=verifier_receipt_id,
+            payload=payload or {},
+        )
+        self.session.add(row)
+        try:
+            self.session.flush()
+        except IntegrityError:
+            raise
+        return row
+
+
+class PursuitStateRepository:
+    """Persist pursuit cycles, schedules and dedupe keys transactionally."""
+
+    def __init__(self, session: Session) -> None:
+        self.session = session
+
+    def append_cycle(
+        self,
+        *,
+        cycle_id: str,
+        goal_id: str,
+        phase: str,
+        decided_kind: str | None,
+        payload: dict[str, Any],
+    ) -> PursuitCycleRow:
+        row = PursuitCycleRow(
+            cycle_id=cycle_id,
+            goal_id=goal_id,
+            phase=phase,
+            decided_kind=decided_kind,
+            payload=payload,
+        )
+        self.session.add(row)
+        return row
+
+    def list_cycles(self, goal_id: str, *, limit: int = 200) -> list[PursuitCycleRow]:
+        stmt = (
+            select(PursuitCycleRow)
+            .where(PursuitCycleRow.goal_id == goal_id)
+            .order_by(PursuitCycleRow.created_at)
+            .limit(limit)
+        )
+        return list(self.session.scalars(stmt))
+
+    def upsert_schedule(
+        self,
+        *,
+        goal_id: str,
+        next_due_at: float,
+        backoff_seconds: float = 0.0,
+        consecutive_failures: int = 0,
+        consecutive_no_progress: int = 0,
+        last_cycle_at: float | None = None,
+        wait_reason: str | None = None,
+        payload: dict[str, Any] | None = None,
+    ) -> PursuitScheduleRow:
+        existing = self.session.get(PursuitScheduleRow, goal_id)
+        if existing is None:
+            row = PursuitScheduleRow(
+                goal_id=goal_id,
+                next_due_at=next_due_at,
+                backoff_seconds=backoff_seconds,
+                consecutive_failures=consecutive_failures,
+                consecutive_no_progress=consecutive_no_progress,
+                last_cycle_at=last_cycle_at,
+                wait_reason=wait_reason,
+                payload=payload or {},
+            )
+            self.session.add(row)
+            return row
+        existing.next_due_at = next_due_at
+        existing.backoff_seconds = backoff_seconds
+        existing.consecutive_failures = consecutive_failures
+        existing.consecutive_no_progress = consecutive_no_progress
+        existing.last_cycle_at = last_cycle_at
+        existing.wait_reason = wait_reason
+        existing.payload = payload or {}
+        return existing
+
+    def put_dedupe(
+        self,
+        *,
+        goal_id: str,
+        dedupe_key: str,
+        proposal_id: str,
+        payload: dict[str, Any] | None = None,
+    ) -> PursuitDedupeRow:
+        existing = self.session.scalar(
+            select(PursuitDedupeRow).where(PursuitDedupeRow.dedupe_key == dedupe_key)
+        )
+        if existing is not None:
+            if existing.proposal_id != proposal_id:
+                raise GraphRevisionConflict(
+                    f"pursuit_dedupe_conflict:{dedupe_key}"
+                )
+            return existing
+        row = PursuitDedupeRow(
+            dedupe_id=new_id("pdd_"),
+            goal_id=goal_id,
+            dedupe_key=dedupe_key,
+            proposal_id=proposal_id,
+            payload=payload or {},
+        )
+        self.session.add(row)
+        try:
+            self.session.flush()
+        except IntegrityError:
+            raise
+        return row
+

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable
 
 from swarm.pursuit.models import ContributionKind, ScheduleState
 
-# Backoff ladder (seconds). Deterministic; no wall-clock sleep required in tests.
+# Backoff ladder (seconds). Inject clocks in tests; operational default is wall time.
 _BACKOFF_STEPS = (0.0, 5.0, 15.0, 60.0, 300.0, 900.0)
 _MAX_BACKOFF = 3600.0
 
@@ -15,11 +16,19 @@ class PursuitScheduler:
     """Event/schedule/backoff gate — prevents endless polling."""
 
     def __init__(self, *, clock: Callable[[], float] | None = None) -> None:
-        self._clock = clock or (lambda: 0.0)
+        # R20-04: a constant-zero clock is not an autonomous scheduler.
+        self._clock = clock or time.time
         self._states: dict[str, ScheduleState] = {}
 
     def now(self) -> float:
         return float(self._clock())
+
+    def load_state(self, state: ScheduleState) -> None:
+        """Restore a persisted schedule for reopen / crash recovery."""
+        self._states[state.goal_id] = state
+
+    def dump_states(self) -> dict[str, ScheduleState]:
+        return dict(self._states)
 
     def get(self, goal_id: str) -> ScheduleState:
         state = self._states.get(goal_id)

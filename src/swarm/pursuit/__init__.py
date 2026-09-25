@@ -23,6 +23,7 @@ from swarm.pursuit.models import (
 from swarm.pursuit.policy import PursuitPolicyError, admit_proposal, dedupe_key_for
 from swarm.pursuit.schedule import PursuitScheduler
 from swarm.pursuit.stagnation import StagnationReport, detect_stagnation
+from swarm.pursuit.state_store import DurablePursuitStateStore
 from swarm.pursuit.verification import (
     CriterionEvidenceReceipt,
     issue_criterion_receipt,
@@ -35,6 +36,7 @@ __all__ = [
     "CriterionEvidenceReceipt",
     "CyclePhase",
     "CycleRecord",
+    "DurablePursuitStateStore",
     "ExecutionOutcome",
     "FrontierCandidate",
     "GapAssessment",

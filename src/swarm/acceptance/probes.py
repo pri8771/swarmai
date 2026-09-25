@@ -884,14 +884,6 @@ def probe_sdk_ui_parity(tmp: Path) -> ProbeResult:
                 request=request,
             )
 
-    root = tmp / "server"
-    app = create_app(
-        repo_root=root,
-        seed_loopback_token="parity-token",
-        install_project_id="proj_parity",
-        db_reachable=False,
-    )
-    http = TestClient(app)
     headers = {"Authorization": "Bearer parity-token"}
     ui_body = {
         "project_id": "proj_parity",
@@ -904,6 +896,52 @@ def probe_sdk_ui_parity(tmp: Path) -> ProbeResult:
         "strategy": "ui_then_sdk",
         "stop_conditions": [],
     }
+
+    # Honesty gate (PC-02): operational + DB-down must refuse writes — never echo success.
+    # LiveGrant is not invented here; durable authority refusal is the expected eng signal.
+    refuse_root = tmp / "server_refuse"
+    refuse_app = create_app(
+        repo_root=refuse_root,
+        seed_loopback_token="parity-token",
+        install_project_id="proj_parity",
+        db_reachable=False,
+    )
+    refuse_http = TestClient(refuse_app)
+    refused = refuse_http.post("/v1/goals", headers=headers, json=ui_body)
+    if refused.status_code == 200:
+        return ProbeResult(
+            False,
+            "fail_echo_success_when_db_down",
+            {"status": refused.status_code, "body": refused.text},
+        )
+    if refused.status_code != 503:
+        return ProbeResult(
+            False,
+            "fail_expected_durable_refuse",
+            {"status": refused.status_code, "body": refused.text},
+        )
+    refuse_code = ""
+    try:
+        refuse_code = str(refused.json().get("code") or "")
+    except Exception:
+        refuse_code = ""
+    if refuse_code != "durable_authority_unavailable":
+        return ProbeResult(
+            False,
+            "fail_unexpected_refuse_code",
+            {"code": refuse_code, "body": refused.text},
+        )
+
+    # Contract lifecycle on file-backed eng path (db_reachable=None → no DSN configured).
+    # Not LiveGrant, not operator acceptance — local durable files only.
+    root = tmp / "server"
+    app = create_app(
+        repo_root=root,
+        seed_loopback_token="parity-token",
+        install_project_id="proj_parity",
+        db_reachable=None,
+    )
+    http = TestClient(app)
     via_ui = http.post("/v1/goals", headers=headers, json=ui_body)
     if via_ui.status_code != 200:
         return ProbeResult(
@@ -968,9 +1006,15 @@ def probe_sdk_ui_parity(tmp: Path) -> ProbeResult:
             "sdk_goal_id": via_sdk.id,
             "shared_create_fields": sorted(ui_create_fields),
             "shared_lifecycle_actions": sorted(shared_lifecycle),
+            "db_down_refused_status": refused.status_code,
+            "db_down_refused_code": refuse_code or "durable_authority_unavailable",
             "fixture_only_certifies_acceptance": False,
+            "live_grant_invented": False,
             "spend_usd": 0.0,
-            "note": "Contract + HTTP parity only; not operator product acceptance",
+            "note": (
+                "Contract + HTTP parity on file-backed eng path; "
+                "DB-down create refused (no echo success); not LiveGrant / not operator accept"
+            ),
         },
     )
 

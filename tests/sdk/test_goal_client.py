@@ -53,7 +53,7 @@ def _client(path: Path) -> SwarmClient:
         repo_root=path,
         seed_loopback_token="sdk-token",
         install_project_id="proj_sdk",
-        db_reachable=False,
+        db_reachable=None,
     )
     return SwarmClient("http://test", token="sdk-token", transport=_StarletteTransport(app))
 
@@ -122,7 +122,7 @@ def test_sdk_matches_http_create_shape(tmp_path: Path) -> None:
         repo_root=root,
         seed_loopback_token="sdk-token",
         install_project_id="proj_sdk",
-        db_reachable=False,
+        db_reachable=None,
     )
     http = TestClient(app)
     body = {
