@@ -47,6 +47,16 @@ packets:
   acceptance: "Downstream workers do not guess whether to reuse existing code."
   deps: [A-0002, A-0003, A-0004]
 
+- id: A-0006
+  epic: E00
+  goal: Freeze exact repository path and focused-test conventions needed by downstream packets.
+  inputs: [docs/redesign/reuse/gap_register.yaml, apps/console, migrations, tests, pyproject.toml]
+  outputs: [docs/redesign/reuse/path_conventions.yaml]
+  steps: [Record exact migration naming convention, console source/component/test directories, focused test commands, package/module naming conventions, and any path that downstream packets currently describe symbolically.]
+  test: "YAML parses; every symbolic downstream path key has exactly one concrete repository convention or an explicit decision-needed marker."
+  acceptance: "Weak workers can resolve migration/UI/test target paths mechanically without browsing unrelated repository areas."
+  deps: [A-0005]
+
 - id: A-0101
   epic: E01
   goal: Define Mission and ResourceEnvelope contracts.
