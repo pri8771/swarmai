@@ -12,7 +12,7 @@
 | R4 | Deleted content still 200 | Fixed — resolve tombstone | `test_r4_*`; probes HTTP 404 |
 | R5 | Forged grader stdout; sandbox escape | Fixed — harness nonce; path gate | `test_r5_*`; probes correct=false; outside read false |
 | R6 | Native full mediation claimed | Fixed — proven=false; admission gated | `test_r6_*`; TH-06 tests updated |
-| R7 | Ruff/mypy/CI; PG skipped as notice | **Fixed (eng)** — lint clean; offline 367 pass; console lint/test/build pass; ephemeral Postgres CI job; integration 69 pass locally; `test_r7_ci_requires_ephemeral_postgres_integration_job` | See §R7 below |
+| R7 | Ruff/mypy/CI; PG skipped as notice | **Fixed** — lint clean; offline 367 pass; console pass; ephemeral Postgres CI job; integration 69 pass locally; hosted CI green (`36167607568`, `36167588681`); `test_r7_*` | See §R7 below |
 | R8 | Zero-$ rejected; hash unstable | Fixed — free-route zero grants + ceilings; frozen `generated_at` | `test_r8_*`; hash matches retained file |
 | R9 | Tracking/manifest/Linear | Partial — PLAN_MANIFEST file digests match (`test_r9_*`); Linear queue only; connector mount → Lane A | `docs/swarm-mvp/PLAN_MANIFEST.json`; `LINEAR_RECONCILIATION.md` |
 
@@ -33,6 +33,13 @@ cd apps/console && npm ci && npm run lint && npm run test && npm run build
 ```
 
 CI change: `.github/workflows/ci.yml` adds dedicated `integration` job with `postgres:16` service and always-on `SWARM_DATABASE_URL`. Offline job no longer treats a missing-DB notice as the integration path. Offline collection includes previously omitted `tests/foundation`, `knowledge`, `objectives`, `extensions`, `recovery`.
+
+Hosted Actions (branch `cursor/foundation-ci-c8a3`, PR #50):
+
+| Run | Conclusion | Jobs |
+|---|---|---|
+| `36167607568` (pull_request) | **success** | offline / integration / console / live-gated all pass |
+| `36167588681` (push) | **success** | same |
 
 ## Probe rerun (isolated)
 
