@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -74,6 +76,15 @@ async def test_wrong_output_review_rejects_and_blocks_receipt(tmp_path: Path) ->
         required_checks={"root_cause_identified": True},
     )
     assert created.status != MissionStatus.FAILED
+    # R1: review requires a published artifact binding before verdict.
+    store.publish_mission_artifact(
+        created.id,
+        kind="result",
+        content=b"triage notes",
+        media_type="text/plain",
+        owner_scope=created.project_id,
+        actor="tester",
+    )
     rejected = await store.review_mission_attempt(
         created.id,
         actor="tester",
@@ -92,17 +103,37 @@ async def test_correct_review_sets_acceptance_receipt(tmp_path: Path) -> None:
     mission = sample_mission().model_copy(
         update={"objective": "extract unfamiliar receipt line items"}
     )
+    emails = ["a@example.com", "b@example.com"]
+    payload = json.dumps({"emails": emails, "body": " ".join(emails)}).encode()
+    digest = hashlib.sha256(payload).hexdigest()
+    required = {
+        "email_count": 2,
+        "artifact_sha256": digest,
+        "placement": "server_verified",
+        "host_role": "protected_verifier",
+        "runtime": "swarm_kernel",
+    }
     created = await store.create_mission(
         mission,
         actor="tester",
         task_family="extract",
-        required_checks={"fields_extracted": True},
+        required_checks=required,
     )
+    store.publish_mission_artifact(
+        created.id,
+        kind="result",
+        content=payload,
+        media_type="application/json",
+        owner_scope=created.project_id,
+        expected_hash=digest,
+        actor="tester",
+    )
+    # Worker-produced checks are ignored; server recomputes from artifact.
     accepted = await store.review_mission_attempt(
         created.id,
         actor="tester",
         produced={"checks": {"fields_extracted": True}},
-        required_checks={"fields_extracted": True},
+        required_checks=required,
     )
     assert accepted["accepted"] is True
     assert accepted["acceptance_receipt_id"]
