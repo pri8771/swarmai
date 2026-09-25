@@ -1,0 +1,139 @@
+version: 1
+epics: [E00, E01]
+packets:
+- id: A-0001
+  epic: E00
+  goal: Inventory direct src/swarm modules without redesign judgments.
+  inputs: [src/swarm]
+  outputs: [docs/redesign/reuse/module_inventory.yaml]
+  steps: [List every direct child, classify file/directory, record one-line responsibility from code/docstrings, cite source path.]
+  test: "YAML parses; every direct src/swarm child appears exactly once."
+  acceptance: "Complete traceable inventory; no reuse decision."
+  deps: []
+- id: A-0002
+  epic: E00
+  goal: Inventory existing persistence and recovery components.
+  inputs: [src/swarm/db, src/swarm/recovery, migrations]
+  outputs: [docs/redesign/reuse/persistence_inventory.yaml]
+  steps: [List models/tables/migrations/checkpoints/recovery modules, record purpose and source path, mark unknowns.]
+  test: "YAML parses; every claim names repository path."
+  acceptance: "Persistence candidates are traceable."
+  deps: [A-0001]
+- id: A-0003
+  epic: E00
+  goal: Inventory existing inference, provider, broker and cost components.
+  inputs: [src/swarm/providers, src/swarm/broker, src/swarm/cost]
+  outputs: [docs/redesign/reuse/inference_inventory.yaml]
+  steps: [List adapters/routers/accounting/qualification code, record public interfaces and tests, do not redesign.]
+  test: "YAML parses; entries include path and interface/test reference where present."
+  acceptance: "Current inference surface is explicit."
+  deps: [A-0001]
+- id: A-0004
+  epic: E00
+  goal: Inventory tool, sandbox, memory, learning, mission, runtime and worker components.
+  inputs: [src/swarm/capabilities, src/swarm/extensions, src/swarm/memory, src/swarm/learning, src/swarm/mission, src/swarm/runtime, src/swarm/workers, sandbox]
+  outputs: [docs/redesign/reuse/runtime_inventory.yaml]
+  steps: [Inventory each listed area, record responsibility and tests, mark overlaps.]
+  test: "YAML parses; each listed input area has an entry or explicit missing marker."
+  acceptance: "Runtime candidates are traceable."
+  deps: [A-0001]
+- id: A-0005
+  epic: E00
+  goal: Decide reuse/adapt/deprecate/create status for redesign capabilities.
+  inputs: [docs/redesign/reuse/module_inventory.yaml, docs/redesign/reuse/persistence_inventory.yaml, docs/redesign/reuse/inference_inventory.yaml, docs/redesign/reuse/runtime_inventory.yaml]
+  outputs: [docs/redesign/reuse/gap_register.yaml]
+  steps: [Map each E01-E14 capability to existing module or gap, choose one status, state reason and migration risk.]
+  test: "Every E01-E14 capability has exactly one status in {reuse,adapt,deprecate,create}; YAML parses."
+  acceptance: "Downstream workers do not guess whether to reuse existing code."
+  deps: [A-0002, A-0003, A-0004]
+
+- id: A-0101
+  epic: E01
+  goal: Define Mission and ResourceEnvelope contracts.
+  inputs: [docs/redesign/reuse/gap_register.yaml]
+  outputs: [src/swarm/contracts/mission_v2.py, tests/contracts/test_mission_v2.py]
+  steps: [Define ids/status/goal/evidence/resource/capability/stop fields, add strict validation, add round-trip tests.]
+  test: "uv run pytest tests/contracts/test_mission_v2.py -q"
+  acceptance: "Valid contracts round-trip; invalid negative limits/status fail."
+  deps: [A-0005]
+- id: A-0102
+  epic: E01
+  goal: Define persistent AgentIdentity and BehavioralProfile contracts.
+  inputs: [docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md]
+  outputs: [src/swarm/contracts/agent_v2.py, tests/contracts/test_agent_v2.py]
+  steps: [Separate identity from model/assignment, define profile version/capabilities, test serialization.]
+  test: "uv run pytest tests/contracts/test_agent_v2.py -q"
+  acceptance: "Agent contract contains no mandatory model field."
+  deps: [A-0005]
+- id: A-0103
+  epic: E01
+  goal: Define Assignment and ExecutionAttempt contracts.
+  inputs: [src/swarm/contracts/agent_v2.py, src/swarm/contracts/mission_v2.py]
+  outputs: [src/swarm/contracts/execution_v2.py, tests/contracts/test_execution_v2.py]
+  steps: [Define assignment ownership/criteria, attempt model/provider/effort/tool/token/outcome fields, distinguish requested/applied settings.]
+  test: "uv run pytest tests/contracts/test_execution_v2.py -q"
+  acceptance: "Two attempts may share agent_id while using different inference profiles."
+  deps: [A-0101, A-0102]
+- id: A-0104
+  epic: E01
+  goal: Define Artifact and ArtifactDependency contracts.
+  inputs: [docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md]
+  outputs: [src/swarm/contracts/artifact_v2.py, tests/contracts/test_artifact_v2.py]
+  steps: [Define type/status/producer/consumer/dependencies/outputs/acceptance/evidence/parallel-safe fields.]
+  test: "uv run pytest tests/contracts/test_artifact_v2.py -q"
+  acceptance: "Artifact encodes exact inputs, outputs, verification and evidence."
+  deps: [A-0005]
+- id: A-0105
+  epic: E01
+  goal: Define CrewMembership and SwarmPopulation contracts.
+  inputs: [src/swarm/contracts/agent_v2.py]
+  outputs: [src/swarm/contracts/organization_v2.py, tests/contracts/test_organization_v2.py]
+  steps: [Model crew as optional relation, swarm as population, permit agents outside crews.]
+  test: "uv run pytest tests/contracts/test_organization_v2.py -q"
+  acceptance: "Swarm does not require crews."
+  deps: [A-0102]
+- id: A-0106
+  epic: E01
+  goal: Define layered MemoryPointer and MemoryNode contracts.
+  inputs: [docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md]
+  outputs: [src/swarm/contracts/memory_v2.py, tests/contracts/test_memory_v2.py]
+  steps: [Define raw/long/medium/task/archive classes, references/provenance/tags/relations, keep working context transient.]
+  test: "uv run pytest tests/contracts/test_memory_v2.py -q"
+  acceptance: "Medium pointer can reference long node that references raw evidence."
+  deps: [A-0005]
+- id: A-0107
+  epic: E01
+  goal: Define Experience, CandidateLesson and ValidatedLesson contracts.
+  inputs: [src/swarm/contracts/execution_v2.py, src/swarm/contracts/memory_v2.py]
+  outputs: [src/swarm/contracts/learning_v2.py, tests/contracts/test_learning_v2.py]
+  steps: [Separate observation/explanation/lesson states, require evidence references for promotion, record scope/counterevidence.]
+  test: "uv run pytest tests/contracts/test_learning_v2.py -q"
+  acceptance: "Candidate cannot become validated without evidence and scope."
+  deps: [A-0103, A-0106]
+- id: A-0108
+  epic: E01
+  goal: Define InferenceProfile and resolved InferenceReceipt contracts.
+  inputs: [src/swarm/contracts/execution_v2.py]
+  outputs: [src/swarm/contracts/inference_v2.py, tests/contracts/test_inference_v2.py]
+  steps: [Define capability request, endpoint/model constraints, effort/context/tool needs, resolved provider/model/usage receipt.]
+  test: "uv run pytest tests/contracts/test_inference_v2.py -q"
+  acceptance: "Portable profile has no required SplitSignal field."
+  deps: [A-0103]
+- id: A-0109
+  epic: E01
+  goal: Define ToolCapability and ToolReceipt contracts.
+  inputs: [docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md]
+  outputs: [src/swarm/contracts/tool_v2.py, tests/contracts/test_tool_v2.py]
+  steps: [Define schemas/side-effect class/scope/location/timeout/provenance and invocation receipt.]
+  test: "uv run pytest tests/contracts/test_tool_v2.py -q"
+  acceptance: "Native and MCP tools fit same contract."
+  deps: [A-0005]
+- id: A-0110
+  epic: E01
+  goal: Prove all E01 contracts compose.
+  inputs: [src/swarm/contracts]
+  outputs: [tests/contracts/test_redesign_contract_graph.py]
+  steps: [Build one minimal mission graph using every v2 contract, serialize, deserialize, assert ids/links.]
+  test: "uv run pytest tests/contracts/test_redesign_contract_graph.py -q"
+  acceptance: "All E01 contracts compose without circular import/runtime error."
+  deps: [A-0101, A-0102, A-0103, A-0104, A-0105, A-0106, A-0107, A-0108, A-0109]
