@@ -21,11 +21,13 @@ from swarm.pursuit.models import (
 from swarm.pursuit.policy import PursuitPolicyError, admit_proposal, dedupe_key_for
 from swarm.pursuit.schedule import PursuitScheduler
 from swarm.pursuit.stagnation import StagnationReport, detect_stagnation
+from swarm.pursuit.state_store import DurablePursuitStateStore
 
 __all__ = [
     "ContributionKind",
     "CyclePhase",
     "CycleRecord",
+    "DurablePursuitStateStore",
     "ExecutionOutcome",
     "FrontierCandidate",
     "GapAssessment",

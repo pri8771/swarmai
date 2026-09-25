@@ -30,7 +30,7 @@ def _client(path: Path) -> TestClient:
         repo_root=path,
         seed_loopback_token="review-only-token",
         install_project_id="proj_review",
-        db_reachable=False,
+        db_reachable=None,
     )
     return TestClient(app)
 

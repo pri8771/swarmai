@@ -212,3 +212,70 @@ def load_idempotency(repo_root: Path) -> dict[str, dict[str, Any]]:
         return {}
     entries = raw.get("entries") or {}
     return entries if isinstance(entries, dict) else {}
+
+
+def dry_run_import_goals_json(
+    source: Path,
+    *,
+    reject_synthetic_as_verified: bool = True,
+) -> dict[str, Any]:
+    """Validate a legacy ``goals.json`` without writing (PC-02 importer).
+
+    Returns a receipt summarizing accepted / rejected / synthetic-flagged rows.
+    Does not mutate destination state. Callers that perform a real import must
+    preserve ``achievement_authority`` and must not silently convert synthetic
+    achievements into verified ones.
+    """
+    receipt: dict[str, Any] = {
+        "dry_run": True,
+        "source": str(source),
+        "accepted": [],
+        "rejected": [],
+        "synthetic_achievements": [],
+        "schema_ok": False,
+    }
+    if not source.is_file():
+        receipt["rejected"].append({"error": "source_missing"})
+        return receipt
+    try:
+        raw = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError) as exc:
+        receipt["rejected"].append({"error": f"unreadable:{exc}"})
+        return receipt
+    if not isinstance(raw, dict) or "goals" not in raw:
+        receipt["rejected"].append({"error": "invalid_schema"})
+        return receipt
+    receipt["schema_ok"] = True
+    for row in raw.get("goals") or []:
+        if not isinstance(row, dict):
+            receipt["rejected"].append({"error": "row_not_object"})
+            continue
+        goal_id = str(row.get("id") or "")
+        if not goal_id:
+            receipt["rejected"].append({"error": "missing_id", "row": row})
+            continue
+        status = str(row.get("status") or "")
+        authority = row.get("achievement_authority")
+        if status == "achieved":
+            if authority is None or authority == "synthetic":
+                receipt["synthetic_achievements"].append(goal_id)
+                if reject_synthetic_as_verified and authority == "verified":
+                    receipt["rejected"].append(
+                        {"goal_id": goal_id, "error": "synthetic_cannot_be_verified"}
+                    )
+                    continue
+                # Flag for operator review — do not promote.
+                authority = authority or "synthetic"
+            elif authority not in {"synthetic", "verified"}:
+                receipt["rejected"].append(
+                    {"goal_id": goal_id, "error": f"bad_authority:{authority}"}
+                )
+                continue
+        receipt["accepted"].append(
+            {
+                "goal_id": goal_id,
+                "status": status,
+                "achievement_authority": authority,
+            }
+        )
+    return receipt

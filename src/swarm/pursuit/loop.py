@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any, Protocol
 
 from swarm.contracts.common import new_id
@@ -20,6 +21,7 @@ from swarm.pursuit.models import (
 from swarm.pursuit.policy import admit_proposal, dedupe_key_for
 from swarm.pursuit.schedule import PursuitScheduler
 from swarm.pursuit.stagnation import detect_stagnation
+from swarm.pursuit.state_store import DurablePursuitStateStore
 
 
 class MissionExecutor(Protocol):
@@ -72,22 +74,81 @@ class PursuitEngine:
         scheduler: PursuitScheduler | None = None,
         clock: Callable[[], float] | None = None,
         max_active_missions: int = 1,
+        state_store: DurablePursuitStateStore | None = None,
+        state_root: Path | None = None,
     ) -> None:
         self.goals = goals
         self.executor = executor or RecordingExecutor()
         self.lessons = lessons or PursuitLessonStore()
-        self.scheduler = scheduler or PursuitScheduler(clock=clock)
+        if scheduler is not None:
+            self.scheduler = scheduler
+        else:
+            self.scheduler = PursuitScheduler(clock=clock)
         self.max_active_missions = max_active_missions
+        if state_store is not None:
+            self.state_store = state_store
+        elif state_root is not None:
+            self.state_store = DurablePursuitStateStore(state_root)
+        else:
+            self.state_store = DurablePursuitStateStore(Path(goals.root) / "pursuit_state")
         self._satisfied: dict[str, set[str]] = {}
         self._history: dict[str, list[CycleRecord]] = {}
         self._dedupe: dict[str, str] = {}  # dedupe_key -> proposal_id
         self._failed_approaches: dict[str, set[str]] = {}
         self._active_missions: dict[str, set[str]] = {}
-        self._commitments: dict[str, list[str]] = {}  # goal_id -> commitment keys across missions
+        self._commitments: dict[str, list[str]] = {}  # goal_id -> commitment keys
+        self._hydrate_all()
+
+    def _hydrate_all(self) -> None:
+        """Load on-disk pursuit snapshots for goals already known to GoalStore."""
+        for goal in list(self.goals.goals.values()):
+            self._hydrate_goal(goal.id)
+
+    def _hydrate_goal(self, goal_id: str) -> None:
+        raw = self.state_store.load(goal_id)
+        if raw is None:
+            return
+        self._satisfied[goal_id] = set(raw.get("satisfied_criteria") or [])
+        self._history[goal_id] = self.state_store.parse_history(raw)
+        dedupe = raw.get("dedupe") or {}
+        if isinstance(dedupe, dict):
+            self._dedupe.update({str(k): str(v) for k, v in dedupe.items()})
+        self._failed_approaches[goal_id] = set(raw.get("failed_approaches") or [])
+        self._active_missions[goal_id] = set(raw.get("active_missions") or [])
+        self._commitments[goal_id] = list(raw.get("commitments") or [])
+        schedule = self.state_store.parse_schedule(raw)
+        if schedule is not None:
+            self.scheduler.load_state(schedule)
+
+    def _goal_dedupe(self, goal_id: str) -> dict[str, str]:
+        goal_dedupe: dict[str, str] = {}
+        for rec in self._history.get(goal_id, []):
+            if rec.proposal and rec.proposal.dedupe_key:
+                key = rec.proposal.dedupe_key
+                if key in self._dedupe:
+                    goal_dedupe[key] = self._dedupe[key]
+        for key, proposal_id in self._dedupe.items():
+            if goal_id in key:
+                goal_dedupe[key] = proposal_id
+        return goal_dedupe
+
+    def _persist_goal(self, goal_id: str) -> None:
+        schedule = self.scheduler.dump_states().get(goal_id)
+        self.state_store.save(
+            goal_id,
+            satisfied=self._satisfied.get(goal_id, set()),
+            history=self._history.get(goal_id, []),
+            dedupe=self._goal_dedupe(goal_id),
+            failed_approaches=self._failed_approaches.get(goal_id, set()),
+            active_missions=self._active_missions.get(goal_id, set()),
+            commitments=self._commitments.get(goal_id, []),
+            schedule=schedule,
+        )
 
     def observe(self, goal_id: str) -> Goal:
-        goal = self.goals.get(goal_id)
-        return goal
+        if goal_id not in self._history and self.state_store.load(goal_id) is not None:
+            self._hydrate_goal(goal_id)
+        return self.goals.get(goal_id)
 
     def tick(self, goal_id: str, *, force: bool = False) -> CycleRecord:
         goal = self.observe(goal_id)
@@ -132,13 +193,11 @@ class PursuitEngine:
         if goal.blockers:
             gap = gap.model_copy(update={"blockers": list(goal.blockers)})
 
-        # Authority/resource insufficiency for remaining work.
         if gap.unmet_criteria and not list(
             goal.authority_envelope.get("tools")
             or goal.authority_envelope.get("allowed_tools")
             or []
         ):
-            # Still allow act with zero tools if estimated cost is 0 and no tools required.
             pass
 
         frontier = build_frontier(
@@ -186,7 +245,6 @@ class PursuitEngine:
                 decided=chosen.kind,
             )
 
-        # Active missions cap.
         active = self._active_missions.get(goal_id, set())
         if len(active) >= self.max_active_missions:
             self.scheduler.defer(goal_id, reason="max_active_missions")
@@ -216,7 +274,6 @@ class PursuitEngine:
             requested_budget_usd=float(chosen.estimated_cost_usd),
         )
 
-        # Anti-duplicate.
         if draft.dedupe_key in self._dedupe:
             draft = draft.model_copy(
                 update={"state": "duplicate", "rejection_reason": "duplicate_mission"}
@@ -261,7 +318,6 @@ class PursuitEngine:
         outcome = self.executor.execute(draft)
         self._active_missions.get(goal_id, set()).discard(mission_id)
 
-        # Lane C: mission outcome never implies goal achievement.
         self.goals.record_mission_outcome(
             goal_id,
             mission_id=mission_id,
@@ -315,7 +371,6 @@ class PursuitEngine:
                 reason="pursuit_strategy_update",
             )
 
-        # Finite goals only: pursuit may achieve after verified criteria — not via mission alone.
         refreshed = self.goals.get(goal_id)
         criteria = list(refreshed.verification_criteria)
         if (
@@ -324,12 +379,19 @@ class PursuitEngine:
             and all(c in satisfied for c in criteria)
             and refreshed.status == GoalStatus.ACTIVE
         ):
+            # Storage truth: claim-only / RecordingExecutor achievement is synthetic.
+            # Protected verifier receipts (L5) may pass achievement_authority="verified".
+            authority = "synthetic"
+            protected = getattr(verification, "protected_receipt_id", None)
+            if verification.passed and protected:
+                authority = "verified"
             try:
                 self.goals.transition(
                     goal_id,
                     GoalStatus.ACHIEVED,
                     reason="all_verification_criteria_met",
                     actor="pursuit",
+                    achievement_authority=authority,
                 )
             except GoalError:
                 notes = (notes + "|achieve_blocked").strip("|")
@@ -351,15 +413,10 @@ class PursuitEngine:
         criteria = list(goal.verification_criteria)
         claimed = set(outcome.satisfied_criteria)
         newly = [c for c in criteria if c in claimed]
-        still = [
-            c for c in criteria if c not in claimed and c not in self._satisfied.get(goal.id, set())
-        ]
-        # Already satisfied stay met.
         already = self._satisfied.get(goal.id, set())
         still = [c for c in criteria if c not in already and c not in claimed]
         invalidated: list[str] = []
         if not outcome.success and goal.strategy:
-            # Evidence of failure can invalidate a named assumption token in strategy.
             for token in goal.strategy.split("|"):
                 token = token.strip()
                 if token.startswith("assume:") and outcome.failure_class:
@@ -385,10 +442,19 @@ class PursuitEngine:
             return
 
     def history(self, goal_id: str) -> list[CycleRecord]:
+        if goal_id not in self._history:
+            self._hydrate_goal(goal_id)
         return list(self._history.get(goal_id, []))
 
     def commitments(self, goal_id: str) -> list[str]:
+        if goal_id not in self._commitments:
+            self._hydrate_goal(goal_id)
         return list(self._commitments.get(goal_id, []))
+
+    def satisfied_criteria(self, goal_id: str) -> set[str]:
+        if goal_id not in self._satisfied:
+            self._hydrate_goal(goal_id)
+        return set(self._satisfied.get(goal_id, set()))
 
     def _record(
         self,
@@ -419,4 +485,5 @@ class PursuitEngine:
             meta=meta or {},
         )
         self._history.setdefault(goal_id, []).append(record)
+        self._persist_goal(goal_id)
         return record

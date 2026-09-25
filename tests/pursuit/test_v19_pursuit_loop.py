@@ -55,7 +55,8 @@ def _client(path: Path) -> TestClient:
         repo_root=path,
         seed_loopback_token="review-only-token",
         install_project_id="proj_pursuit",
-        db_reachable=False,
+        # None = no PG configured → file-backed pursuit durability allowed (PC-02).
+        db_reachable=None,
     )
     return TestClient(app)
 

@@ -790,3 +790,85 @@ class LearningProposalRow(Base):
     version: Mapped[int] = mapped_column(Integer, default=1)
     state: Mapped[str] = mapped_column(String(32), default="proposed")
     payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+
+
+# --- V2 pursuit / goal durable authority (PC-02 / R20-04) ---
+
+
+class GoalRow(Base):
+    """Authoritative goal record for operational PostgreSQL path."""
+
+    __tablename__ = "goals"
+    __table_args__ = (Index("ix_goals_project_status", "project_id", "status"),)
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    kind: Mapped[str] = mapped_column(String(16), default="finite")
+    revision: Mapped[int] = mapped_column(Integer, default=1)
+    # synthetic | verified | None — never silently promote synthetic to verified
+    achievement_authority: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class GoalCriterionVerdictRow(Base):
+    __tablename__ = "goal_criterion_verdicts"
+    __table_args__ = (
+        UniqueConstraint("goal_id", "criterion_key", "goal_revision", name="uq_goal_criterion_rev"),
+    )
+
+    verdict_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    goal_id: Mapped[str] = mapped_column(ForeignKey("goals.id"), index=True)
+    criterion_key: Mapped[str] = mapped_column(String(256))
+    goal_revision: Mapped[int] = mapped_column(Integer, default=1)
+    state: Mapped[str] = mapped_column(String(32), default="met")  # met|unmet|invalidated
+    authority: Mapped[str] = mapped_column(String(32), default="synthetic")  # synthetic|verified
+    evidence_digest: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    verifier_receipt_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PursuitCycleRow(Base):
+    __tablename__ = "pursuit_cycles"
+    __table_args__ = (Index("ix_pursuit_cycles_goal_at", "goal_id", "created_at"),)
+
+    cycle_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    goal_id: Mapped[str] = mapped_column(String(64), index=True)
+    phase: Mapped[str] = mapped_column(String(32))
+    decided_kind: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class PursuitScheduleRow(Base):
+    __tablename__ = "pursuit_schedules"
+
+    goal_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    next_due_at: Mapped[float] = mapped_column(Float)
+    backoff_seconds: Mapped[float] = mapped_column(Float, default=0.0)
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
+    consecutive_no_progress: Mapped[int] = mapped_column(Integer, default=0)
+    last_cycle_at: Mapped[float | None] = mapped_column(Float, nullable=True)
+    wait_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class PursuitDedupeRow(Base):
+    __tablename__ = "pursuit_dedupe"
+    __table_args__ = (UniqueConstraint("dedupe_key", name="uq_pursuit_dedupe_key"),)
+
+    dedupe_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    goal_id: Mapped[str] = mapped_column(String(64), index=True)
+    dedupe_key: Mapped[str] = mapped_column(String(64))
+    proposal_id: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+

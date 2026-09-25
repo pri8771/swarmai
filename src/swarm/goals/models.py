@@ -109,6 +109,10 @@ class Goal(StrictModel):
     review_cadence: str | None = None
     expires_at: str | None = None
     status: GoalStatus = GoalStatus.ACTIVE
+    # achievement_authority: None | "synthetic" | "verified"
+    # Synthetic marks simulation / RecordingExecutor / unverified paths so migration
+    # and operators never silently promote them to real achievements (PC-02 / PC-06).
+    achievement_authority: str | None = None
     progress: list[dict[str, Any]] = Field(default_factory=list)
     decision_history: list[dict[str, Any]] = Field(default_factory=list)
     trigger_receipts: list[dict[str, Any]] = Field(default_factory=list)
@@ -235,6 +239,7 @@ class GoalStore:
         reason: str,
         actor: str,
         action: str = "transition",
+        achievement_authority: str | None = None,
     ) -> Goal:
         self._reload()
         goal = self.get(goal_id)
@@ -244,6 +249,10 @@ class GoalStore:
         if new_status == GoalStatus.ACHIEVED and goal.kind == GoalKind.ONGOING:
             # Ongoing goals record milestones via progress; they do not terminate as achieved.
             raise GoalError("ongoing_goal_cannot_achieve")
+        if new_status == GoalStatus.ACHIEVED and achievement_authority is None:
+            # Default storage truth: unmarked achievement is synthetic until a
+            # protected verifier receipt binds it (L5). Never silently verified.
+            achievement_authority = "synthetic"
         history = self._append_decision(
             goal,
             actor=actor,
@@ -251,14 +260,20 @@ class GoalStore:
             reason=reason,
             from_status=goal.status,
             to_status=new_status,
+            extra=(
+                {"achievement_authority": achievement_authority}
+                if new_status == GoalStatus.ACHIEVED and achievement_authority
+                else None
+            ),
         )
-        updated = goal.model_copy(
-            update={
-                "status": new_status,
-                "decision_history": history,
-                "updated_at": utc_now().isoformat(),
-            }
-        )
+        updates: dict[str, Any] = {
+            "status": new_status,
+            "decision_history": history,
+            "updated_at": utc_now().isoformat(),
+        }
+        if new_status == GoalStatus.ACHIEVED and achievement_authority:
+            updates["achievement_authority"] = achievement_authority
+        updated = goal.model_copy(update=updates)
         return self._persist(updated)
 
     def pause(self, goal_id: str, *, reason: str, actor: str) -> Goal:
