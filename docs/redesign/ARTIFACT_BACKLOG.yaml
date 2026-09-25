@@ -2,9 +2,9 @@ version: 1
 status: planning
 protocol: docs/redesign/AI_NATIVE_ARTIFACT_PROTOCOL.md
 roadmap: docs/redesign/EPIC_ROADMAP.md
-total_atomic_packets: 96
+total_atomic_packets: 97
 files:
-  - {path: docs/redesign/backlog/E00_E01.yaml, packets: 15}
+  - {path: docs/redesign/backlog/E00_E01.yaml, packets: 16}
   - {path: docs/redesign/backlog/E02_E04.yaml, packets: 18}
   - {path: docs/redesign/backlog/E05_E07.yaml, packets: 18}
   - {path: docs/redesign/backlog/E08_E09.yaml, packets: 14}
