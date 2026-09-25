@@ -53,6 +53,12 @@ Execution map: `docs/swarm-mvp/EXECUTION_MAP.md`.
 | Version accept flipped | **no** — remain false |
 | False `supported` claims | **no** |
 
+## FAST_TRACK (2026-09-25)
+
+| Lane | Status | Notes |
+|---|---|---|
+| L4 comms/memory/succession | **eng_in_progress** | Durable authenticated mailbox, layered memory provenance, X/Y KT1/KT2 fencing on branch `cursor/v2-ft-comms-memory-4a67` — not version-accepted |
+
 ## Next action
 
-Keep live path honest (optional dispatcher only with authentic LiveGrant). Independent review + operator accept remain promotion gates. Do not merge `main`. Particular R730/CF/DNS evidence remains external.
+Keep live path honest (optional dispatcher only with authentic LiveGrant). Independent review + operator accept remain promotion gates. Do not merge `main`. Particular R730/CF/DNS evidence remains external. Coordinator integrates FAST_TRACK lane PRs → `dev`.

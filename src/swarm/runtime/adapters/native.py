@@ -75,12 +75,14 @@ class NativeRuntimeAdapter:
                 capability="context_occupancy_xy_succession",
                 status=CapabilityStatus.AVAILABLE,
                 reason=(
-                    "X→Y context handoff digests + generation bump; predecessor "
-                    "claim fenced after adopt on continuous connector path"
+                    "X/Y KT1/KT2 succession service + generation fencing; "
+                    "legacy peer handoff and continuous connector path retained"
                 ),
                 evidence_refs=(
                     "docs/evidence/v17/collab/SUMMARY.md",
                     "tests/mission/test_v17_collab_connector_campaign.py",
+                    "tests/runtime/test_succession.py",
+                    "tests/mission/test_collab_succession.py",
                 ),
             ),
             "nested_delegation_accounting": CapabilityQualification(

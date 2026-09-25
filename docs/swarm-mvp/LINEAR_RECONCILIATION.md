@@ -38,6 +38,7 @@
 | **PORT-03 portable install** | Fresh-install example; runbooks; R730/Mac/CF as reference only | **Done (eng)** (PR #56); particular-deploy evidence external | portable, PORT-03, P3, gate:product | 5 |
 | **PORT-04 portability tests** | Multi-config probes + two-container protocol proof | **Done (eng)** (PR #54); Mac Docker proof green | portable, PORT-04, P4, gate:product | 5 |
 | **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | **In Progress** → tip-sync on `cursor/v2-portable-tracking-9bf5` (refresh after verify) | portable, PORT-05, P5 | 2 |
+| **FAST_TRACK L4 / PC-07** | Durable authenticated mailbox, layered memory provenance, X/Y KT1/KT2 succession fencing | Eng in progress on `cursor/v2-ft-comms-memory-4a67` — not version-accepted | fast-track, L4, PC-07, gate:product | 8 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked — **live gate**, not product eng stop | TH-07, live, gate:live | 2 |
 | Live adapter dispatch (impl) | Optional dispatcher / qualification runner after approved grant | Todo / eng gap — label `blocked_missing_implementation` | portable, gate:product | 5 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked — **deployment gate** | infra, gate:deployment | 1 |
