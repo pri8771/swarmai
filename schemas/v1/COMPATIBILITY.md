@@ -7,4 +7,4 @@ Policy: **backward_compatible_additive_only**
 - Secret values must never appear in contracts or reports
 - Zero-spend remains the default unless explicitly overridden
 
-Frozen hash: `90b39972254c343a351c88af08dabffdaa38916c04aa24f969fb584c1c605de4`
+Frozen hash: `285bb12c750ab32948a2736092f9d9cacbbd1946408461124e3a77b50b68c3b9`

@@ -1,10 +1,10 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:45Z  
-**Integration branch:** `dev` @ `5236fbba`  
+**Updated:** 2026-09-25T17:50Z  
+**Integration branch:** `dev` @ `e9ae85c4`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Other lane drafts blocked on failing offline CI and/or rebase onto `5236fbba`.
+**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Lane C (#46) rebasing onto `e9ae85c4`.
 
 ## Single authority
 
@@ -47,8 +47,8 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 | PR | Lane | Tip | Disposition |
 |---|---|---|---|
-| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba`) |
-| #46 | C V1.8 Goals | `2ea1e655` | blocked — offline ruff fail; rebase onto `dev` |
+| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba` / tip `e9ae85c4`) |
+| #46 | C V1.8 Goals | rebasing | rebase onto `e9ae85c4`; offline CI re-run pending |
 | #48 | D V1.9 Pursuit | `1f6c0ddd` | blocked — offline pytest fail (`artifact_required`); skip until newer tip green |
 | #45 | A connector | `e4212873` | blocked — offline ruff; superseded content in #49 |
 | #49 | A connector+E2E | `330277b3` | blocked — offline ruff; prefer over #45 when green |

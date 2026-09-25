@@ -2,10 +2,10 @@
   "invocation_count": 1,
   "scheduler_checkins": 0,
   "manual_checkins": 1,
-  "last_run_at": "2026-09-20T20:20:05+00:00",
-  "cursor_agent_auth": "auth_required",
+  "last_run_at": "2026-09-25T17:47:21+00:00",
+  "cursor_agent_auth": "unavailable",
   "recurring_verified": false,
   "last_trigger": "manual",
   "host_alias": "test-host",
-  "repo": "/Users/pchordia/Downloads/swarm-ai-v14"
+  "repo": "/workspace"
 }
