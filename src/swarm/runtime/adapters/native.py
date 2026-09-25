@@ -91,7 +91,10 @@ class NativeRuntimeAdapter:
             live_inference_authorized=False,
             notes=[
                 "Native availability is partial: only narrowly proven capabilities may dispatch.",
-                "kernel_mediation_proven remains false until cancel/permissions/succession evidence exists.",
+                (
+                    "kernel_mediation_proven remains false until "
+                    "cancel/permissions/succession evidence exists."
+                ),
                 "CAS persistence is not knowledge-transfer qualification.",
                 "SwarmAI kernel owns admission; native code is not a third-party framework.",
             ],

@@ -294,7 +294,12 @@ def main() -> int:
     out.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
     latest = EVIDENCE_DIR / "latest.json"
     latest.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"ok": evidence["ok"], "evidence": str(out), "mission_id": mission_id}, indent=2))
+    print(
+        json.dumps(
+            {"ok": evidence["ok"], "evidence": str(out), "mission_id": mission_id},
+            indent=2,
+        )
+    )
     return 0 if evidence["ok"] else 1
 
 

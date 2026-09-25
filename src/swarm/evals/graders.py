@@ -128,20 +128,51 @@ work = Path(__file__).resolve().parent
 solution_path = work / "solution.py"
 spec = importlib.util.spec_from_file_location("swarm_solution", solution_path)
 if spec is None or spec.loader is None:
-    print(json.dumps({{"ok": False, "error": "load_failed", "harness_nonce": nonce, "results": []}}))
+    print(
+        json.dumps(
+            {{"ok": False, "error": "load_failed", "harness_nonce": nonce, "results": []}}
+        )
+    )
     raise SystemExit(2)
 mod = importlib.util.module_from_spec(spec)
 try:
     spec.loader.exec_module(mod)
 except SystemExit as exc:
-    print(json.dumps({{"ok": False, "error": "solution_systemexit", "harness_nonce": nonce, "results": []}}))
+    print(
+        json.dumps(
+            {{
+                "ok": False,
+                "error": "solution_systemexit",
+                "harness_nonce": nonce,
+                "results": [],
+            }}
+        )
+    )
     raise SystemExit(2) from exc
 except Exception as exc:
-    print(json.dumps({{"ok": False, "error": f"import_error:{{exc}}", "harness_nonce": nonce, "results": []}}))
+    print(
+        json.dumps(
+            {{
+                "ok": False,
+                "error": f"import_error:{{exc}}",
+                "harness_nonce": nonce,
+                "results": [],
+            }}
+        )
+    )
     raise SystemExit(2) from exc
 fn = getattr(mod, entry, None)
 if fn is None:
-    print(json.dumps({{"ok": False, "error": "missing_entrypoint", "harness_nonce": nonce, "results": []}}))
+    print(
+        json.dumps(
+            {{
+                "ok": False,
+                "error": "missing_entrypoint",
+                "harness_nonce": nonce,
+                "results": [],
+            }}
+        )
+    )
     raise SystemExit(2)
 tests = json.loads(sys.argv[1])
 results = []

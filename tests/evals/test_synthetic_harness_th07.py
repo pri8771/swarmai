@@ -9,6 +9,7 @@ import pytest
 
 from swarm.contracts.enums import RoutingState
 from swarm.contracts.workspace import EvalResult
+from swarm.evals.dataset import load_dataset
 from swarm.evals.profiles import ProfileStore
 from swarm.evals.synthetic_harness import (
     HARNESS_VERSION,
@@ -23,7 +24,6 @@ from swarm.evals.synthetic_harness import (
     seal_case_answers,
     select_suite_cases,
 )
-from swarm.evals.dataset import load_dataset
 
 ROOT = Path(__file__).resolve().parents[2]
 STARTER = ROOT / "benchmarks" / "starter.jsonl"

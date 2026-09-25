@@ -64,7 +64,7 @@ def main() -> int:
         evidence["project_id"] = project_id
         evidence["steps"].append({"step": "ensure_project", "ok": True, "project_id": project_id})
 
-        enrolled = connector.enroll(project_id=project_id, run_id=run_id)
+        connector.enroll(project_id=project_id, run_id=run_id)
         worker_id = connector.worker_id
         evidence["worker_id"] = worker_id
         evidence["steps"].append(
