@@ -278,8 +278,8 @@
     },
     {
       "path": "START_HERE.md",
-      "sha256": "d4604c4053c1b1d9c1add89ff471c283a733517e9605f9d073385b5b230b7f7c",
-      "words": 1067
+      "sha256": "78c96a8530d7d4936a969c1acef97f1c0d89d13f2aa3b63b8b4c2643d592738c",
+      "words": 1123
     },
     {
       "path": "SWARMAI_MVP_PLAN.md",
@@ -287,5 +287,5 @@
       "words": 8444
     }
   ],
-  "updated_note": "R9: START_HERE + plan doc digests verified 2026-09-25 (Lane B); Linear still needsAuth queue only; PORT-01–05 portable layer added 2026-09-25 (P5) — V1.7–V2.0 still unaccepted"
+  "updated_note": "R9: START_HERE + plan doc digests verified 2026-09-25 (Lane B); Linear still needsAuth queue only; PORT-01–05 portable layer added 2026-09-25 (P5); START_HERE portable-primary banner + digest refresh 2026-09-25 (P3) — V1.7–V2.0 still unaccepted"
 }
