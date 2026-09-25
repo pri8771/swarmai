@@ -1,10 +1,11 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:52Z  
-**Integration branch:** `dev`  
+**Updated:** 2026-09-25T18:00Z  
+**Integration branch:** `dev` @ `05c0bc4b`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C), #47 (Lane F) merged into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
+**Consolidate:** #50/#49/#46/#47 merged into `dev`. #51 stacks #48 pursuit until #48 lands; then rebase.  
+**Lane E base:** `05c0bc4b` + #48 pursuit stack (lineage through `65383188`).
 
 ## Single authority
 
@@ -31,7 +32,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | R4 | **fixed** | Content reads enforce tombstone via `resolve` |
 | R5 | **fixed** | Harness-owned nonce verdict; path-gated sandbox |
 | R6 | **fixed** | `kernel_mediation_proven=false`; admission requires mandatory caps |
-| R7 | **fixed** | Ruff/mypy/offline/console green; ephemeral Postgres `integration` job; hosted CI success `36167607568` / `36167588681`; protected `test_r7_*` |
+| R7 | **fixed** | Ruff/mypy/offline/console green on `dev` (#50); ephemeral Postgres `integration` job |
 | R8 | **fixed** | Zero-$ free-route grants with ceilings; frozen report hash |
 | R9 | **partial** | PLAN_MANIFEST file hashes verified (`test_r9_*`); Linear still needsAuth queue; connector mount hardening deferred (Lane A) |
 
@@ -62,11 +63,36 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
-| #48 | D V1.9 Pursuit | `65383188` | hold — rebase onto updated `dev` |
-| #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
+| #48 | D V1.9 Pursuit | stacked in #51 | eng on this tip — awaiting independent #48 land |
+| #51 | E product UI | this branch | onto `05c0bc4b` + #48 pursuit stack |
 
 ## Next
 
-1. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
-2. Hold #51 until #46+#48 landed; then rebase/CI.  
+1. Land #51 after offline CI green (includes #48 pursuit until #48 merges separately).  
+2. When #48 merges to `dev`, rebase #51 to drop duplicate pursuit commits.  
 3. Do **not** merge `main`.
+
+## Lane D — V1.9 pursuit (stacked in #51)
+
+| Packet | Status | Notes |
+|---|---|---|
+| Observe→assess→propose→admit→execute→verify→update | **eng done** | `src/swarm/pursuit/` + `PursuitEngine.tick` |
+| Justified frontier + act/ask/experiment/wait/request-human | **eng done** | `frontier.py` |
+| Schedules/backoff (no endless polling) | **eng done** | injectable clock; `PursuitScheduler` |
+| Anti-duplicate + stagnation | **eng done** | dedupe keys; waiting transition on stagnation |
+| Learning adopt/rollback (held-out required) | **eng done** | `PursuitLessonStore`; never expands envelopes |
+| Deterministic tests (zero-spend) | **pass** | `tests/pursuit/test_v19_pursuit_loop.py` + Goal regressions |
+| HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
+| Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
+| Goal schema | **uses Lane C on `dev`** | no fork |
+
+## Lane E — V2.0 product UI/SDK (this lane)
+
+| Packet | Status | Notes |
+|---|---|---|
+| P14 (SDK subset) | **in progress** | `src/swarm/sdk/client.py` — Lane C lifecycle + Lane D pursuit tick/status/why-next |
+| P15 (console Goals) | **in progress** | Goals tab: create, agents, resources, start pursuit (tick), progress, interrupt/resume, why-next; Mission UI retained |
+| Contract deps | #46 on `dev` + #48 stacked | Prefer those HTTP contracts; no parallel schemas |
+| Deferred | elaborate server-admin UI; V3 multi-goal |
+
+**Branch:** `cursor/v20-product-goal-ui-sdk-1418` → draft [PR #51](https://github.com/pri8771/swarmai/pull/51) to `dev`.

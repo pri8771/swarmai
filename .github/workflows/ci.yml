@@ -37,6 +37,8 @@ jobs:
           tests/extensions
           tests/foundation
           tests/goals
+          tests/pursuit
+          tests/sdk
           tests/knowledge
           tests/load
           tests/memory

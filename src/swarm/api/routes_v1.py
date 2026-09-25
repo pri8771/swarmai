@@ -27,6 +27,9 @@ from swarm.api.schemas import (
     ProbeRequest,
     ProjectCreateRequest,
     ProjectUpdateRequest,
+    PursuitLessonEvaluateRequest,
+    PursuitLessonProposeRequest,
+    PursuitTickRequest,
     WorkerCancelLeaseRequest,
     WorkerClaimRequest,
     WorkerEnqueueTaskRequest,
@@ -1577,6 +1580,170 @@ async def link_goal_mission(
     auth.require_project(principal, mission.project_id)
     updated = store.goal_store().link_mission(goal_id, body.mission_id)
     return {"goal": updated.model_dump(mode="json")}
+
+
+@router.post("/goals/{goal_id}/pursuit/tick")
+async def pursuit_tick(
+    goal_id: str,
+    body: PursuitTickRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    """Advance one V1.9 autonomous pursuit cycle (deterministic, zero-spend default)."""
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    engine = store.pursuit_engine()
+    cycle = engine.tick(goal_id, force=body.force)
+    refreshed = store.goal_store().get(goal_id)
+    return {
+        "cycle": cycle.model_dump(mode="json"),
+        "goal": refreshed.model_dump(mode="json"),
+    }
+
+
+@router.get("/goals/{goal_id}/pursuit")
+async def pursuit_status(
+    goal_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    engine = store.pursuit_engine()
+    schedule = engine.scheduler.get(goal_id)
+    return {
+        "goal_id": goal_id,
+        "schedule": schedule.model_dump(mode="json"),
+        "history": [c.model_dump(mode="json") for c in engine.history(goal_id)],
+        "commitments": engine.commitments(goal_id),
+        "adopted_lessons": [
+            lesson.model_dump(mode="json") for lesson in engine.lessons.adopted_for_goal(goal_id)
+        ],
+    }
+
+
+@router.post("/goals/{goal_id}/pursuit/lessons")
+async def propose_pursuit_lesson(
+    goal_id: str,
+    body: PursuitLessonProposeRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    from swarm.pursuit.models import PursuitLesson
+
+    engine = store.pursuit_engine()
+    lesson = engine.lessons.propose(
+        PursuitLesson(
+            goal_id=goal_id,
+            summary=body.summary,
+            scope=list(body.scope),
+            evidence_refs=list(body.evidence_refs),
+            strategy_delta=body.strategy_delta,
+        )
+    )
+    return {"lesson": lesson.model_dump(mode="json")}
+
+
+@router.post("/goals/{goal_id}/pursuit/lessons/{lesson_id}/evaluate")
+async def evaluate_pursuit_lesson(
+    goal_id: str,
+    lesson_id: str,
+    body: PursuitLessonEvaluateRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    from swarm.pursuit.learning import PursuitLearningError
+
+    engine = store.pursuit_engine()
+    try:
+        lesson = engine.lessons.evaluate(
+            lesson_id,
+            holdout_check_id=body.holdout_check_id,
+            holdout_passed=body.holdout_passed,
+        )
+    except PursuitLearningError as exc:
+        raise ApiError("lesson_error", str(exc), status_code=409) from exc
+    return {"lesson": lesson.model_dump(mode="json")}
+
+
+@router.post("/goals/{goal_id}/pursuit/lessons/{lesson_id}/adopt")
+async def adopt_pursuit_lesson(
+    goal_id: str,
+    lesson_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    from swarm.pursuit.learning import PursuitLearningError
+
+    engine = store.pursuit_engine()
+    try:
+        lesson = engine.lessons.adopt(lesson_id, current_strategy=goal.strategy)
+        new_strategy = engine.lessons.applied_strategy(goal_id, goal.strategy)
+        store.goal_store().apply_strategy(
+            goal_id,
+            strategy=new_strategy,
+            actor=principal.subject,
+            reason=f"lesson_adopted:{lesson_id}",
+        )
+    except PursuitLearningError as exc:
+        raise ApiError("lesson_error", str(exc), status_code=409) from exc
+    return {"lesson": lesson.model_dump(mode="json"), "strategy": new_strategy}
+
+
+@router.post("/goals/{goal_id}/pursuit/lessons/{lesson_id}/rollback")
+async def rollback_pursuit_lesson(
+    goal_id: str,
+    lesson_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    from swarm.pursuit.learning import PursuitLearningError
+
+    engine = store.pursuit_engine()
+    try:
+        lesson = engine.lessons.rollback(lesson_id)
+        restored = engine.lessons.applied_strategy(goal_id, lesson.prior_strategy or "")
+        store.goal_store().apply_strategy(
+            goal_id,
+            strategy=restored,
+            actor=principal.subject,
+            reason=f"lesson_rolled_back:{lesson_id}",
+        )
+    except PursuitLearningError as exc:
+        raise ApiError("lesson_error", str(exc), status_code=409) from exc
+    return {"lesson": lesson.model_dump(mode="json"), "strategy": restored}
 
 
 @router.post("/projects")

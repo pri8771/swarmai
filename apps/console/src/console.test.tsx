@@ -154,6 +154,9 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
+        if (url.endsWith('/v1/goals')) {
+          return new Response(JSON.stringify({ goals: [] }), { status: 200 })
+        }
         return new Response('missing', { status: 404 })
       }),
     )
@@ -168,10 +171,108 @@ describe('console fixtures', () => {
     expect(snap.artifacts[0]?.contentHash).toBe('abc123deadbeef')
     expect(snap.projects[0]?.projectId).toBe('proj_a')
     expect(snap.workers[0]?.workerId).toBe('wk_live_1')
+    expect(snap.goals).toEqual([])
     expect(snap.routes).toEqual([])
     expect(snap.profiles).toEqual([])
     expect(snap.mockVsLive).not.toContain('fixtures_only')
     expect(snap.mockVsLive).not.toContain('fixture-labeled')
+  })
+
+  it('live mode loads goals and prefers linked mission', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        const url = String(input)
+        if (url.endsWith('/health/ready')) {
+          return new Response(JSON.stringify({ status: 'ready' }), { status: 200 })
+        }
+        if (url.endsWith('/v1/capacity')) {
+          return new Response(JSON.stringify({ buckets: [] }), { status: 200 })
+        }
+        if (url.endsWith('/v1/goals')) {
+          return new Response(
+            JSON.stringify({
+              goals: [
+                {
+                  id: 'goal_live_1',
+                  project_id: 'proj_a',
+                  desired_outcome: 'Finish extract',
+                  status: 'active',
+                  mission_ids: ['msn_linked'],
+                  verification_criteria: [],
+                  permitted_agents: ['planner'],
+                  resource_envelope: {},
+                  authority_envelope: {},
+                  decision_history: [
+                    {
+                      at: '2026-09-25T00:00:00Z',
+                      actor: 'op',
+                      from: 'paused',
+                      to: 'active',
+                      reason: 'resume after blocker',
+                    },
+                  ],
+                  blockers: ['waiting on worker'],
+                  open_questions: [],
+                  evidence_refs: [],
+                  stop_conditions: [],
+                  scope: {},
+                  constraints: {},
+                  owner: 'op',
+                  strategy: 'extract then verify',
+                  created_at: '2026-09-25T00:00:00Z',
+                  updated_at: '2026-09-25T00:00:00Z',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.endsWith('/v1/missions')) {
+          return new Response(
+            JSON.stringify({
+              missions: [
+                { mission_id: 'msn_other', objective: 'other', status: 'draft' },
+                { mission_id: 'msn_linked', objective: 'linked work', status: 'running' },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/missions/msn_linked')) {
+          return new Response(
+            JSON.stringify({
+              mission: {
+                id: 'msn_linked',
+                objective: 'linked work',
+                status: 'running',
+                revision: 1,
+              },
+            }),
+            { status: 200 },
+          )
+        }
+        if (
+          url.includes('/graph') ||
+          url.includes('/artifacts') ||
+          url.includes('/events') ||
+          url.endsWith('/v1/routes') ||
+          url.endsWith('/v1/workers') ||
+          url.endsWith('/v1/projects')
+        ) {
+          return new Response(
+            JSON.stringify({ tasks: [], artifacts: [], items: [], routes: [], workers: [], projects: [] }),
+            { status: 200 },
+          )
+        }
+        return new Response('missing', { status: 404 })
+      }),
+    )
+    const snap = await loadSnapshot({ mode: 'live', baseUrl: 'http://127.0.0.1:9' })
+    expect(snap.goals[0]?.id).toBe('goal_live_1')
+    expect(snap.selectedGoalId).toBe('goal_live_1')
+    expect(snap.mission.missionId).toBe('msn_linked')
+    expect(snap.goals[0]?.decisionHistory[0]?.reason).toMatch(/resume/)
   })
 
   it('live mode respects missionId selection for artifacts', async () => {
@@ -215,8 +316,8 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
-        if (url.includes('/v1/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects')) {
-          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [] }), {
+        if (url.includes('/v1/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects') || url.endsWith('/v1/goals')) {
+          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [], goals: [] }), {
             status: 200,
           })
         }
@@ -265,6 +366,8 @@ describe('operator console UI (fixture mode)', () => {
     const user = userEvent.setup()
     render(<App />)
     expect(await screen.findByTestId('mode-banner')).toHaveTextContent('MOCK')
+    expect(await screen.findByTestId('goals-panel')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Mission' }))
     expect(screen.getByTestId('mission-panel')).toBeInTheDocument()
     expect(screen.getByText(/inference quota exhausted/i)).toBeInTheDocument()
     const before = screen.getAllByTestId(/task-row-/).length
@@ -273,10 +376,28 @@ describe('operator console UI (fixture mode)', () => {
     await user.click(screen.getByTestId('contract-mission'))
   })
 
+  it('goal pursuit panel supports interrupt resume redirect and why-next', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const panel = await screen.findByTestId('goals-panel')
+    expect(within(panel).getByTestId('goal-why-next')).toHaveTextContent(/linked|act|resume|quota/i)
+    expect(within(panel).getByTestId('goal-blockers')).toHaveTextContent(/quota exhausted/i)
+    await user.click(screen.getByTestId('goal-interrupt'))
+    expect(await screen.findByTestId('goal-action-note')).toHaveTextContent(/paused/i)
+    await user.click(screen.getByTestId('goal-resume'))
+    expect(screen.getByTestId('goal-action-note')).toHaveTextContent(/active/i)
+    await user.click(screen.getByTestId('goal-start-pursuit'))
+    expect(screen.getByTestId('goal-action-note')).toHaveTextContent(/pursuit tick|decided/i)
+    await user.type(screen.getByTestId('goal-redirect-reason'), 'try alternate path')
+    await user.click(screen.getByTestId('goal-redirect-btn'))
+    expect(screen.getByTestId('goal-action-note')).toHaveTextContent(/redirect/i)
+    expect(screen.getByTestId('goal-decision-history').textContent).toMatch(/redirect/)
+  })
+
   it('shows exhausted, unknown, retired, gated routes without inventing available', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Routes' }))
     const panel = await screen.findByTestId('routes-panel')
     expect(within(panel).getByTestId('badge-exhausted')).toBeInTheDocument()
@@ -288,7 +409,7 @@ describe('operator console UI (fixture mode)', () => {
   it('shows unknown capacity remaining honestly', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Capacity' }))
     expect(await screen.findByTestId('remaining-qb_tokens')).toHaveTextContent('unknown')
     expect(screen.getByTestId('remaining-qb_demo_requests')).toHaveTextContent('0')
@@ -297,7 +418,7 @@ describe('operator console UI (fixture mode)', () => {
   it('distinguishes qualified vs provisional profiles', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Profiles' }))
     const panel = await screen.findByTestId('profiles-panel')
     expect(within(panel).getByTestId('badge-qualified')).toBeInTheDocument()
@@ -307,7 +428,7 @@ describe('operator console UI (fixture mode)', () => {
   it('shows approval payload details', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Approvals' }))
     expect(await screen.findByTestId('approval-payload')).toHaveTextContent('tool.network')
   })
@@ -315,7 +436,7 @@ describe('operator console UI (fixture mode)', () => {
   it('handles interrupted event stream and stale workers', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Workers' }))
     expect(await screen.findByTestId('badge-stale')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Events' }))
@@ -327,7 +448,7 @@ describe('operator console UI (fixture mode)', () => {
   it('shows projects, history, and artifacts panels', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.click(screen.getByRole('button', { name: 'Projects' }))
     expect(await screen.findByTestId('projects-panel')).toBeInTheDocument()
     expect(screen.getByTestId('project-proj_demo')).toHaveTextContent('Demo workspace')
@@ -342,7 +463,7 @@ describe('operator console UI (fixture mode)', () => {
   it('supports keyboard tab navigation to sections', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await screen.findByTestId('mission-panel')
+    await screen.findByTestId('goals-panel')
     await user.tab()
     const routes = screen.getByRole('button', { name: 'Routes' })
     routes.focus()
@@ -354,9 +475,12 @@ describe('operator console UI (fixture mode)', () => {
 describe('operator console UI (live/operational default)', () => {
   it('defaults to live empty state without mock recover path', async () => {
     vi.stubGlobal('location', { ...window.location, search: '' })
+    const user = userEvent.setup()
     render(<App />)
     expect(await screen.findByTestId('mode-banner')).toHaveTextContent('LIVE')
     expect(screen.getByTestId('public-hostname')).toHaveTextContent('swarm.splitsignal.ai')
+    expect(await screen.findByTestId('goals-panel')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Mission' }))
     expect(screen.getByTestId('live-no-fixture-mutate')).toBeInTheDocument()
     expect(screen.queryByTestId('expand-mission')).not.toBeInTheDocument()
     expect(screen.queryByText(/Recover with mock fixtures/i)).not.toBeInTheDocument()
@@ -377,6 +501,9 @@ describe('operator console UI (live/operational default)', () => {
         }
         if (url.endsWith('/v1/capacity')) {
           return new Response(JSON.stringify({ buckets: [], mock_vs_live: 'live' }), { status: 200 })
+        }
+        if (url.endsWith('/v1/goals')) {
+          return new Response(JSON.stringify({ goals: [] }), { status: 200 })
         }
         if (url.endsWith('/v1/missions')) {
           return new Response(
@@ -434,6 +561,8 @@ describe('operator console UI (live/operational default)', () => {
     const user = userEvent.setup()
     render(<App />)
     expect(await screen.findByTestId('mode-banner')).toHaveTextContent('LIVE')
+    expect(await screen.findByTestId('goals-panel')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Mission' }))
     expect(screen.getByTestId('mission-panel')).toHaveTextContent('msn_live_shared')
     expect(screen.getByTestId('mission-picker')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Artifacts' }))

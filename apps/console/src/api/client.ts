@@ -1,6 +1,18 @@
 /** Browser API client — never embeds provider secrets. */
 
-import type { ConsoleSnapshot, HistoryRow, MissionGraph, MissionTask } from './types'
+import type {
+  ConsoleSnapshot,
+  GoalDecision,
+  GoalKind,
+  GoalMissionOutcome,
+  GoalProgressEntry,
+  GoalRow,
+  GoalStatus,
+  HistoryRow,
+  MissionGraph,
+  MissionTask,
+  PursuitStatus,
+} from './types'
 import { MOCK_SNAPSHOT } from '../data/fixtures'
 
 const SECRET_RE = /(sk-[a-zA-Z0-9]+|api_key\s*=\s*\S+)/i
@@ -41,6 +53,8 @@ export function emptyLiveSnapshot(opts?: {
   projects?: ConsoleSnapshot['projects']
   artifacts?: ConsoleSnapshot['artifacts']
   events?: ConsoleSnapshot['events']
+  goals?: GoalRow[]
+  selectedGoalId?: string | null
   errors?: string[]
   mockVsLive?: string
   serverReady?: boolean | null
@@ -53,6 +67,8 @@ export function emptyLiveSnapshot(opts?: {
     hostnamePublic: PUBLIC_HOSTNAME,
     serverReady: opts?.serverReady ?? null,
     mission: opts?.mission ?? emptyLiveMission(),
+    goals: opts?.goals ?? [],
+    selectedGoalId: opts?.selectedGoalId ?? null,
     routes: opts?.routes ?? [],
     capacity: opts?.capacity ?? [],
     capacityUnknown: !(opts?.capacity && opts.capacity.length),
@@ -66,6 +82,297 @@ export function emptyLiveSnapshot(opts?: {
     streamInterrupted: false,
     errors: opts?.errors ?? [],
   }
+}
+
+export function goalFromApi(raw: Record<string, unknown>): GoalRow {
+  const historyRaw = Array.isArray(raw.decision_history) ? raw.decision_history : []
+  const decisionHistory: GoalDecision[] = historyRaw
+    .filter((row): row is Record<string, unknown> => !!row && typeof row === 'object')
+    .map((row) => ({
+      at: String(row.at ?? ''),
+      actor: String(row.actor ?? ''),
+      from: row.from != null ? String(row.from) : undefined,
+      to: row.to != null ? String(row.to) : undefined,
+      action: row.action != null ? String(row.action) : undefined,
+      reason: row.reason != null ? String(row.reason) : undefined,
+      ...row,
+    }))
+  const progressRaw = Array.isArray(raw.progress) ? raw.progress : []
+  const progress: GoalProgressEntry[] = progressRaw
+    .filter((row): row is Record<string, unknown> => !!row && typeof row === 'object')
+    .map((row) => ({
+      at: String(row.at ?? ''),
+      actor: String(row.actor ?? ''),
+      summary: String(row.summary ?? ''),
+      metrics: (row.metrics as Record<string, unknown>) ?? {},
+    }))
+  const outcomesRaw = Array.isArray(raw.mission_outcomes) ? raw.mission_outcomes : []
+  const missionOutcomes: GoalMissionOutcome[] = outcomesRaw
+    .filter((row): row is Record<string, unknown> => !!row && typeof row === 'object')
+    .map((row) => ({
+      at: String(row.at ?? ''),
+      mission_id: String(row.mission_id ?? ''),
+      outcome: String(row.outcome ?? ''),
+      actor: String(row.actor ?? ''),
+      notes: row.notes != null ? String(row.notes) : undefined,
+      evidence_refs: Array.isArray(row.evidence_refs) ? (row.evidence_refs as string[]) : [],
+    }))
+  return {
+    id: String(raw.id ?? ''),
+    projectId: String(raw.project_id ?? ''),
+    desiredOutcome: String(raw.desired_outcome ?? ''),
+    verificationCriteria: Array.isArray(raw.verification_criteria)
+      ? (raw.verification_criteria as string[])
+      : [],
+    kind: (String(raw.kind ?? 'finite') as GoalKind) || 'finite',
+    scope: (raw.scope as Record<string, unknown>) ?? {},
+    constraints: (raw.constraints as Record<string, unknown>) ?? {},
+    resourceEnvelope: (raw.resource_envelope as Record<string, unknown>) ?? {},
+    authorityEnvelope: (raw.authority_envelope as Record<string, unknown>) ?? {},
+    owner: String(raw.owner ?? 'operator'),
+    permittedAgents: Array.isArray(raw.permitted_agents)
+      ? (raw.permitted_agents as string[])
+      : [],
+    strategy: String(raw.strategy ?? ''),
+    evidenceRefs: Array.isArray(raw.evidence_refs) ? (raw.evidence_refs as string[]) : [],
+    missionIds: Array.isArray(raw.mission_ids) ? (raw.mission_ids as string[]) : [],
+    dependencies: Array.isArray(raw.dependencies) ? (raw.dependencies as string[]) : [],
+    missionOutcomes,
+    openQuestions: Array.isArray(raw.open_questions) ? (raw.open_questions as string[]) : [],
+    blockers: Array.isArray(raw.blockers) ? (raw.blockers as string[]) : [],
+    stopConditions: Array.isArray(raw.stop_conditions) ? (raw.stop_conditions as string[]) : [],
+    reviewCadence: (raw.review_cadence as string | null) ?? null,
+    expiresAt: (raw.expires_at as string | null) ?? null,
+    status: String(raw.status ?? 'active') as GoalStatus,
+    progress,
+    decisionHistory,
+    triggerReceipts: Array.isArray(raw.trigger_receipts)
+      ? (raw.trigger_receipts as Array<Record<string, unknown>>)
+      : [],
+    restartCount: Number(raw.restart_count ?? 0),
+    createdAt: String(raw.created_at ?? ''),
+    updatedAt: String(raw.updated_at ?? ''),
+    pursuit: null,
+  }
+}
+
+async function mutateJson(
+  url: string,
+  headers: Record<string, string>,
+  method: 'POST' | 'PUT' | 'PATCH',
+  body: unknown,
+): Promise<Record<string, unknown>> {
+  const res = await fetch(url, {
+    method,
+    headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    throw new Error(`api_error_${res.status}`)
+  }
+  const payload = await res.json()
+  assertNoSecretsInBundle(payload)
+  return payload as Record<string, unknown>
+}
+
+export type GoalCreateInput = {
+  baseUrl: string
+  token?: string
+  projectId: string
+  desiredOutcome: string
+  verificationCriteria?: string[]
+  kind?: GoalKind | string
+  permittedAgents?: string[]
+  resourceEnvelope?: Record<string, unknown>
+  authorityEnvelope?: Record<string, unknown>
+  strategy?: string
+  stopConditions?: string[]
+}
+
+export async function createLiveGoal(opts: GoalCreateInput): Promise<GoalRow> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const payload = await mutateJson(`${opts.baseUrl.replace(/\/$/, '')}/v1/goals`, headers, 'POST', {
+    project_id: opts.projectId,
+    desired_outcome: opts.desiredOutcome,
+    verification_criteria: opts.verificationCriteria ?? [],
+    kind: opts.kind ?? 'finite',
+    permitted_agents: opts.permittedAgents ?? [],
+    resource_envelope: opts.resourceEnvelope ?? {},
+    authority_envelope: opts.authorityEnvelope ?? {},
+    strategy: opts.strategy ?? '',
+    stop_conditions: opts.stopConditions ?? [],
+  })
+  return goalFromApi((payload.goal ?? {}) as Record<string, unknown>)
+}
+
+async function lifecycleLiveGoal(opts: {
+  baseUrl: string
+  token?: string
+  goalId: string
+  action: 'pause' | 'resume' | 'cancel' | 'restart'
+  reason?: string
+}): Promise<GoalRow> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const payload = await mutateJson(
+    `${base}/v1/goals/${encodeURIComponent(opts.goalId)}/${opts.action}`,
+    headers,
+    'POST',
+    { reason: opts.reason ?? 'operator' },
+  )
+  return goalFromApi((payload.goal ?? {}) as Record<string, unknown>)
+}
+
+export async function transitionLiveGoal(opts: {
+  baseUrl: string
+  token?: string
+  goalId: string
+  status: GoalStatus | string
+  reason?: string
+}): Promise<GoalRow> {
+  // Prefer Lane C named lifecycle endpoints when status maps cleanly.
+  const map: Record<string, 'pause' | 'resume' | 'cancel' | 'restart'> = {
+    paused: 'pause',
+    active: 'resume',
+    cancelled: 'cancel',
+  }
+  const action = map[String(opts.status)]
+  if (action) {
+    try {
+      return await lifecycleLiveGoal({
+        baseUrl: opts.baseUrl,
+        token: opts.token,
+        goalId: opts.goalId,
+        action,
+        reason: opts.reason,
+      })
+    } catch {
+      // Fall through to generic transition (e.g. resume from waiting/blocked).
+    }
+  }
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const payload = await mutateJson(
+    `${base}/v1/goals/${encodeURIComponent(opts.goalId)}/transition`,
+    headers,
+    'POST',
+    { status: opts.status, reason: opts.reason ?? 'operator' },
+  )
+  return goalFromApi((payload.goal ?? {}) as Record<string, unknown>)
+}
+
+export async function linkLiveGoalMission(opts: {
+  baseUrl: string
+  token?: string
+  goalId: string
+  missionId: string
+}): Promise<GoalRow> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const payload = await mutateJson(
+    `${base}/v1/goals/${encodeURIComponent(opts.goalId)}/missions`,
+    headers,
+    'POST',
+    { mission_id: opts.missionId },
+  )
+  return goalFromApi((payload.goal ?? {}) as Record<string, unknown>)
+}
+
+/** Lane D: POST /v1/goals/{id}/pursuit/tick */
+export async function tickLivePursuit(opts: {
+  baseUrl: string
+  token?: string
+  goalId: string
+  force?: boolean
+}): Promise<{ goal: GoalRow; cycle: Record<string, unknown> | null }> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const payload = await mutateJson(
+    `${base}/v1/goals/${encodeURIComponent(opts.goalId)}/pursuit/tick`,
+    headers,
+    'POST',
+    { force: opts.force ?? true },
+  )
+  return {
+    goal: goalFromApi((payload.goal ?? {}) as Record<string, unknown>),
+    cycle: (payload.cycle as Record<string, unknown>) ?? null,
+  }
+}
+
+/** Lane D: GET /v1/goals/{id}/pursuit */
+export async function fetchLivePursuitStatus(opts: {
+  baseUrl: string
+  token?: string
+  goalId: string
+}): Promise<PursuitStatus> {
+  const headers: Record<string, string> = { Accept: 'application/json' }
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const res = await fetchJson(
+    `${base}/v1/goals/${encodeURIComponent(opts.goalId)}/pursuit`,
+    headers,
+  )
+  if (!res.ok) {
+    throw new Error(`api_error_${res.status}`)
+  }
+  const body = (res.body ?? {}) as Record<string, unknown>
+  return {
+    goal_id: String(body.goal_id ?? opts.goalId),
+    schedule: (body.schedule as Record<string, unknown>) ?? {},
+    history: Array.isArray(body.history) ? (body.history as PursuitStatus['history']) : [],
+    commitments: Array.isArray(body.commitments) ? (body.commitments as string[]) : [],
+    adopted_lessons: Array.isArray(body.adopted_lessons)
+      ? (body.adopted_lessons as Array<Record<string, unknown>>)
+      : [],
+  }
+}
+
+/** Start pursuit = Lane C resume if needed + Lane D tick (same as SDK). */
+export async function startLivePursuit(opts: {
+  baseUrl: string
+  token?: string
+  goal: GoalRow
+}): Promise<{ goal: GoalRow; cycle: Record<string, unknown> | null; pursuit: PursuitStatus | null }> {
+  let goal = opts.goal
+  if (goal.status === 'paused') {
+    goal = await lifecycleLiveGoal({
+      baseUrl: opts.baseUrl,
+      token: opts.token,
+      goalId: goal.id,
+      action: 'resume',
+      reason: 'start_pursuit',
+    })
+  } else if (goal.status === 'cancelled' || goal.status === 'expired') {
+    goal = await lifecycleLiveGoal({
+      baseUrl: opts.baseUrl,
+      token: opts.token,
+      goalId: goal.id,
+      action: 'restart',
+      reason: 'start_pursuit',
+    })
+  }
+  const ticked = await tickLivePursuit({
+    baseUrl: opts.baseUrl,
+    token: opts.token,
+    goalId: goal.id,
+    force: true,
+  })
+  let pursuit: PursuitStatus | null = null
+  try {
+    pursuit = await fetchLivePursuitStatus({
+      baseUrl: opts.baseUrl,
+      token: opts.token,
+      goalId: goal.id,
+    })
+  } catch {
+    pursuit = null
+  }
+  return { goal: { ...ticked.goal, pursuit }, cycle: ticked.cycle, pursuit }
 }
 
 function missionFromApi(raw: Record<string, unknown>, tasks: MissionTask[] = []): MissionGraph {
@@ -165,10 +472,14 @@ export async function loadSnapshot(opts: {
   baseUrl?: string
   token?: string
   missionId?: string
+  goalId?: string
 }): Promise<ConsoleSnapshot> {
   // Fixture UI is explicit mock mode only — never mixed into live/operational.
   if (opts.mode === 'mock') {
     const snap = structuredClone(MOCK_SNAPSHOT)
+    if (opts.goalId) {
+      snap.selectedGoalId = opts.goalId
+    }
     assertNoSecretsInBundle(snap)
     return snap
   }
@@ -189,7 +500,7 @@ export async function loadSnapshot(opts: {
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`
   const base = opts.baseUrl.replace(/\/$/, '')
 
-  const [readyRes, capacityRes, missionsRes, routesRes, workersRes, projectsRes] =
+  const [readyRes, capacityRes, missionsRes, routesRes, workersRes, projectsRes, goalsRes] =
     await Promise.all([
       fetchJson(`${base}/health/ready`, headers),
       fetchJson(`${base}/v1/capacity`, headers),
@@ -197,6 +508,7 @@ export async function loadSnapshot(opts: {
       fetchJson(`${base}/v1/routes`, headers),
       fetchJson(`${base}/v1/workers`, headers),
       fetchJson(`${base}/v1/projects`, headers),
+      fetchJson(`${base}/v1/goals`, headers),
     ])
 
   if (!capacityRes.ok) {
@@ -214,6 +526,47 @@ export async function loadSnapshot(opts: {
     readyRes.body !== null &&
     (readyRes.body as { status?: string }).status === 'ready'
 
+  const goals: GoalRow[] = []
+  if (goalsRes.ok) {
+    const goalsPayload = goalsRes.body as Record<string, unknown>
+    for (const row of (goalsPayload.goals ?? []) as Array<Record<string, unknown>>) {
+      goals.push(goalFromApi(row))
+    }
+  }
+
+  const preferredGoalId = (opts.goalId || '').trim()
+  const selectedGoalId =
+    (preferredGoalId && goals.some((g) => g.id === preferredGoalId) && preferredGoalId) ||
+    goals[0]?.id ||
+    null
+
+  if (selectedGoalId) {
+    const pursuitRes = await fetchJson(
+      `${base}/v1/goals/${encodeURIComponent(selectedGoalId)}/pursuit`,
+      headers,
+    )
+    if (pursuitRes.ok) {
+      const body = (pursuitRes.body ?? {}) as Record<string, unknown>
+      const idx = goals.findIndex((g) => g.id === selectedGoalId)
+      if (idx >= 0) {
+        goals[idx] = {
+          ...goals[idx],
+          pursuit: {
+            goal_id: String(body.goal_id ?? selectedGoalId),
+            schedule: (body.schedule as Record<string, unknown>) ?? {},
+            history: Array.isArray(body.history)
+              ? (body.history as NonNullable<GoalRow['pursuit']>['history'])
+              : [],
+            commitments: Array.isArray(body.commitments) ? (body.commitments as string[]) : [],
+            adopted_lessons: Array.isArray(body.adopted_lessons)
+              ? (body.adopted_lessons as Array<Record<string, unknown>>)
+              : [],
+          },
+        }
+      }
+    }
+  }
+
   const items = Array.isArray(missionsPayload.missions)
     ? (missionsPayload.missions as Array<Record<string, unknown>>)
     : Array.isArray(missionsPayload.items)
@@ -221,8 +574,14 @@ export async function loadSnapshot(opts: {
       : []
 
   const preferredId = (opts.missionId || '').trim()
+  const selectedGoal = goals.find((g) => g.id === selectedGoalId) ?? null
+  const linkedPreferred =
+    selectedGoal &&
+    selectedGoal.missionIds.length > 0 &&
+    items.find((row) => selectedGoal.missionIds.includes(String(row.mission_id ?? row.id ?? '')))
   const selectedRow =
     (preferredId && items.find((row) => String(row.mission_id ?? '') === preferredId)) ||
+    linkedPreferred ||
     items[0] ||
     null
 
@@ -231,7 +590,7 @@ export async function loadSnapshot(opts: {
   let events: ConsoleSnapshot['events'] = []
 
   if (selectedRow) {
-    const missionId = String(selectedRow.mission_id ?? '')
+    const missionId = String(selectedRow.mission_id ?? selectedRow.id ?? '')
     const [detailRes, graphRes, artsRes, eventsRes] = await Promise.all([
       fetchJson(`${base}/v1/missions/${missionId}`, headers),
       fetchJson(`${base}/v1/missions/${missionId}/graph`, headers),
@@ -352,6 +711,16 @@ export async function loadSnapshot(opts: {
     logicalAgents: workers.length,
   }
 
+  const liveErrors: string[] = []
+  if (!goalsRes.ok) {
+    liveErrors.push(`Goals API unavailable (HTTP ${goalsRes.status}) — mission UI still loads.`)
+  }
+  if (!items.length && !goals.length) {
+    liveErrors.push('No durable goals or missions yet (honest empty live state).')
+  } else if (!items.length) {
+    liveErrors.push('No durable missions in MissionStore yet (honest empty live state).')
+  }
+
   return emptyLiveSnapshot({
     mission,
     history,
@@ -360,6 +729,8 @@ export async function loadSnapshot(opts: {
     projects,
     artifacts,
     events,
+    goals,
+    selectedGoalId,
     serverReady,
     capacity: ((capacity.buckets ?? []) as Array<{
       bucket_id: string
@@ -372,12 +743,10 @@ export async function loadSnapshot(opts: {
       remaining: b.remaining,
       limit: b.limit,
     })),
-    errors: items.length
-      ? []
-      : ['No durable missions in MissionStore yet (honest empty live state).'],
+    errors: liveErrors,
     mockVsLive:
       String(capacity.mock_vs_live ?? '') ||
-      'live_missions_artifacts_workers_projects_from_api_not_fixtures',
+      'live_goals_missions_artifacts_workers_projects_from_api_not_fixtures',
   })
 }
 
@@ -390,6 +759,7 @@ export function resolveConsoleLoadOpts(): {
   baseUrl?: string
   token?: string
   missionId?: string
+  goalId?: string
 } {
   if (typeof window === 'undefined') {
     return { mode: 'live' }
@@ -399,5 +769,6 @@ export function resolveConsoleLoadOpts(): {
   const baseUrl = params.get('baseUrl') || undefined
   const token = params.get('token') || undefined
   const missionId = params.get('missionId') || undefined
-  return { mode, baseUrl, token, missionId }
+  const goalId = params.get('goalId') || undefined
+  return { mode, baseUrl, token, missionId, goalId }
 }

@@ -108,12 +108,103 @@ export interface ArtifactRow {
   byteLength?: number
 }
 
+/** Goal entity — aligned with /v1/goals (Lane C V1.8) + pursuit (Lane D V1.9). */
+export type GoalStatus =
+  | 'active'
+  | 'waiting'
+  | 'blocked'
+  | 'paused'
+  | 'achieved'
+  | 'cancelled'
+  | 'expired'
+
+export type GoalKind = 'finite' | 'ongoing'
+
+export interface GoalDecision {
+  at: string
+  actor: string
+  from?: string
+  to?: string
+  action?: string
+  reason?: string
+  [key: string]: unknown
+}
+
+export interface GoalProgressEntry {
+  at: string
+  actor: string
+  summary: string
+  metrics?: Record<string, unknown>
+}
+
+export interface GoalMissionOutcome {
+  at: string
+  mission_id: string
+  outcome: string
+  actor: string
+  notes?: string
+  evidence_refs?: string[]
+}
+
+export interface PursuitCycle {
+  cycle_id?: string
+  goal_id?: string
+  phase?: string
+  decided_kind?: string | null
+  notes?: string
+  strategy_after?: string | null
+  at?: string
+  [key: string]: unknown
+}
+
+export interface PursuitStatus {
+  goal_id: string
+  schedule?: Record<string, unknown>
+  history: PursuitCycle[]
+  commitments: string[]
+  adopted_lessons: Array<Record<string, unknown>>
+}
+
+export interface GoalRow {
+  id: string
+  projectId: string
+  desiredOutcome: string
+  verificationCriteria: string[]
+  kind: GoalKind
+  scope: Record<string, unknown>
+  constraints: Record<string, unknown>
+  resourceEnvelope: Record<string, unknown>
+  authorityEnvelope: Record<string, unknown>
+  owner: string
+  permittedAgents: string[]
+  strategy: string
+  evidenceRefs: string[]
+  missionIds: string[]
+  dependencies: string[]
+  missionOutcomes: GoalMissionOutcome[]
+  openQuestions: string[]
+  blockers: string[]
+  stopConditions: string[]
+  reviewCadence: string | null
+  expiresAt: string | null
+  status: GoalStatus
+  progress: GoalProgressEntry[]
+  decisionHistory: GoalDecision[]
+  triggerReceipts: Array<Record<string, unknown>>
+  restartCount: number
+  createdAt: string
+  updatedAt: string
+  pursuit?: PursuitStatus | null
+}
+
 export interface ConsoleSnapshot {
   mode: 'mock' | 'live'
   mockVsLive: string
   hostnamePublic: string
   serverReady: boolean | null
   mission: MissionGraph
+  goals: GoalRow[]
+  selectedGoalId: string | null
   routes: RouteRow[]
   capacity: CapacityBucket[]
   capacityUnknown: boolean
