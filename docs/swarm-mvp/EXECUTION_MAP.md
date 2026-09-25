@@ -1,11 +1,10 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T18:00Z  
-**Integration branch:** `dev` @ `05c0bc4b`  
+**Updated:** 2026-09-25T18:06Z  
+**Integration branch:** `dev` @ `4c9566b7`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50/#49/#46/#47 merged into `dev`. #51 stacks #48 pursuit until #48 lands; then rebase.  
-**Lane E base:** `05c0bc4b` + #48 pursuit stack (lineage through `65383188`).
+**Consolidate:** #50/#49/#46/#47/#51 merged into `dev` @ `4c9566b7`. #48 closed superseded (pursuit via #51). #45 closed superseded.
 
 ## Single authority
 
