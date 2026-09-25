@@ -219,3 +219,22 @@ class GoalTriggerRequest(StrictModel):
     trigger_kind: str = "manual"
     payload: dict[str, Any] = Field(default_factory=dict)
     idempotency_key: str | None = None
+
+
+class PursuitTickRequest(StrictModel):
+    force: bool = False
+    idempotency_key: str | None = None
+
+
+class PursuitLessonProposeRequest(StrictModel):
+    summary: str
+    scope: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    strategy_delta: str = ""
+    idempotency_key: str | None = None
+
+
+class PursuitLessonEvaluateRequest(StrictModel):
+    holdout_check_id: str
+    holdout_passed: bool
+    idempotency_key: str | None = None

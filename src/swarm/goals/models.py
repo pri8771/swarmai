@@ -404,6 +404,33 @@ class GoalStore:
         )
         return self._persist(updated)
 
+    def apply_strategy(
+        self,
+        goal_id: str,
+        *,
+        strategy: str,
+        actor: str,
+        reason: str,
+    ) -> Goal:
+        """Update strategy text only — used by V1.9 pursuit lesson adopt/rollback."""
+        self._reload()
+        goal = self.get(goal_id)
+        history = self._append_decision(
+            goal,
+            actor=actor,
+            action="strategy",
+            reason=reason,
+            extra={"strategy": strategy},
+        )
+        updated = goal.model_copy(
+            update={
+                "strategy": strategy,
+                "decision_history": history,
+                "updated_at": utc_now().isoformat(),
+            }
+        )
+        return self._persist(updated)
+
     def accept_trigger(
         self,
         goal_id: str,

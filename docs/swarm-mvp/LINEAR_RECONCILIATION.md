@@ -27,7 +27,7 @@
 | R7 CI / ephemeral Postgres | Lint, typing, offline suites, console, PG integration job green | Done (hosted CI green on PR #50) | foundation, R7, ci | 3 |
 | V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Planned | V1.7 | 8 |
 | V1.8 durable goals | Persistent Goal entity + pause/resume/cancel/restart/dedupe + protected tests | Eng complete (Lane C) — review pending | V1.8 | 5 |
-| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Planned | V1.9 | 8 |
+| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Eng complete (draft PR; rebased on Lane C) — not operator-accepted | V1.9 | 8 |
 | V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Planned | V2.0 | 13 |
 | V2.0 acceptance campaign freeze (Lane F) | Freeze §10 scenarios/pass criteria; harness + matrices; no version accept; no invented LiveGrant | Done (eng freeze/harness) — versions still not accepted | V2.0, acceptance | 5 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked | TH-07, live | 2 |

@@ -1,10 +1,10 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:52Z  
-**Integration branch:** `dev`  
+**Updated:** 2026-09-25T18:00Z  
+**Integration branch:** `dev` @ `05c0bc4b`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C), #47 (Lane F) merged into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
+**Consolidate:** #50/#49/#46/#47 merged into `dev`. #51 stacks #48 pursuit until #48 lands; then rebase.
 
 ## Single authority
 
@@ -62,11 +62,25 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
-| #48 | D V1.9 Pursuit | `65383188` | hold — rebase onto updated `dev` |
-| #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
+| #48 | D V1.9 Pursuit | stacked in #51 | eng on this tip — awaiting independent #48 land |
+| #51 | E product UI | rebasing | onto `05c0bc4b` + #48 pursuit stack |
 
 ## Next
 
-1. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
-2. Hold #51 until #46+#48 landed; then rebase/CI.  
+1. Land #51 after offline CI green (includes #48 pursuit until #48 merges separately).  
+2. When #48 merges to `dev`, rebase #51 to drop duplicate pursuit commits.  
 3. Do **not** merge `main`.
+
+## Lane D — V1.9 pursuit (stacked in #51)
+
+| Packet | Status | Notes |
+|---|---|---|
+| Observe→assess→propose→admit→execute→verify→update | **eng done** | `src/swarm/pursuit/` + `PursuitEngine.tick` |
+| Justified frontier + act/ask/experiment/wait/request-human | **eng done** | `frontier.py` |
+| Schedules/backoff (no endless polling) | **eng done** | injectable clock; `PursuitScheduler` |
+| Anti-duplicate + stagnation | **eng done** | dedupe keys; waiting transition on stagnation |
+| Learning adopt/rollback (held-out required) | **eng done** | `PursuitLessonStore`; never expands envelopes |
+| Deterministic tests (zero-spend) | **pass** | `tests/pursuit/test_v19_pursuit_loop.py` + Goal regressions |
+| HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
+| Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
+| Goal schema | **uses Lane C on `dev`** | no fork |
