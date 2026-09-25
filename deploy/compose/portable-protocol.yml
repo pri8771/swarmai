@@ -1,0 +1,105 @@
+# Portable two-container protocol proof (generic coordinator/worker names).
+# Coordinator + worker on one compose network. Offline pytest covers the same
+# protocol in-process; this file is the Docker twin for local/CI with Docker.
+#
+# Usage (from repo root, after building swarm-ai:local):
+#   docker compose -f deploy/compose/portable-protocol.yml up --build --abort-on-container-exit
+#
+# No named lab host required. Loopback publish only.
+name: swarm-portable-protocol
+
+services:
+  coordinator:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: swarm-ai:local
+    environment:
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:swarm@db:5432/swarm
+      SWARM_REPO_ROOT: "/app"
+      SWARM_BIND_HOST: "0.0.0.0"
+      SWARM_PORT: "8765"
+      SWARM_ALLOW_PAID: "false"
+      SWARM_ROLE: server
+      SWARM_PUBLIC_HOSTNAME: coordinator.example.test
+      SWARM_API_BASE_URL: http://coordinator:8765
+      SWARM_PUBLIC_BASE_URL: http://coordinator.example.test
+      SWARM_EXECUTION_MODE: standalone
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${SWARM_PORTABLE_HOST_PORT:-18767}:8765"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - portable_var:/app/var
+    networks:
+      - portable_net
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+
+  worker:
+    image: swarm-ai:local
+    user: "1000:1000"
+    depends_on:
+      coordinator:
+        condition: service_healthy
+    environment:
+      SWARM_ALLOW_PAID: "false"
+      SWARM_ROLE: worker
+      SWARM_PUBLIC_HOSTNAME: worker-a.example.test
+      SWARM_SERVER_URL: http://coordinator:8765
+      SWARM_API_BASE_URL: http://coordinator:8765
+      SWARM_REPO_ROOT: "/work"
+      SWARM_WORKSPACE_ROOT: "/work/workspace"
+      SWARM_CONNECTOR_MAX_ITERATIONS: ${SWARM_CONNECTOR_MAX_ITERATIONS:-3}
+      SWARM_CONNECTOR_POLL: ${SWARM_CONNECTOR_POLL:-1.0}
+      SWARM_PORTABLE_PROTOCOL: "1"
+    volumes:
+      - portable_worker_ws:/work/workspace
+    working_dir: /work
+    # Script ships in the image at /app/scripts (Dockerfile COPY scripts).
+    entrypoint: ["/app/.venv/bin/python"]
+    command: ["/app/scripts/portable_protocol_proof.py", "--mode", "worker-container"]
+    networks:
+      - portable_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    restart: "no"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: swarm
+      POSTGRES_PASSWORD: swarm
+      POSTGRES_DB: swarm
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swarm -d swarm"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - portable_pg:/var/lib/postgresql/data
+    networks:
+      - portable_net
+    # No host ports — DB stays private.
+
+networks:
+  portable_net:
+    driver: bridge
+
+volumes:
+  portable_var:
+  portable_worker_ws:
+  portable_pg:
