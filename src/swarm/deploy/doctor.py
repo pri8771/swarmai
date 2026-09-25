@@ -62,8 +62,26 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
             f"bind_host={prof.bind_host}",
         )
     )
-    # Wrong/missing secret refuses startup for non-mock profiles.
-    if profile != "mock":
+    # Wrong/missing secret refuses startup for non-mock / non-connector profiles.
+    if profile in {"mock", "mac_connector"}:
+        detail = (
+            "mock profile skips DB requirement"
+            if profile == "mock"
+            else "mac_connector uses server DB via SWARM_SERVER_URL"
+        )
+        checks.append(_check("database_url_configured", True, detail))
+        if profile == "mac_connector":
+            server_url = (os.environ.get("SWARM_SERVER_URL") or "").strip()
+            checks.append(
+                _check(
+                    "server_url_configured",
+                    bool(server_url),
+                    "SWARM_SERVER_URL present"
+                    if server_url
+                    else "SWARM_SERVER_URL missing — refuse connector start",
+                )
+            )
+    else:
         # Require SWARM_DATABASE_URL to be set OR explicitly allow missing for doctor dry-run.
         db_url = os.environ.get("SWARM_DATABASE_URL")
         if db_url and ("password=" in db_url.lower() or "@" in db_url):
@@ -83,10 +101,9 @@ def doctor(*, profile: str = "standalone", repo_root: Path | None = None) -> Doc
                     "SWARM_DATABASE_URL missing — refuse live start",
                 )
             )
-    else:
-        checks.append(_check("database_url_configured", True, "mock profile skips DB requirement"))
 
-    compose = root / "deploy" / "compose" / f"{profile}.yml"
+    compose_name = "mac-connector.yml" if profile == "mac_connector" else f"{profile}.yml"
+    compose = root / "deploy" / "compose" / compose_name
     checks.append(
         _check(
             "compose_artifact",

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_profiles_security_defaults() -> None:
-    for name in ("mock", "standalone", "hybrid", "recovery"):
+    for name in ("mock", "standalone", "hybrid", "recovery", "server", "mac_connector"):
         p = get_profile(name)
         assert p.non_root is True
         assert p.public_db_port is False
@@ -23,7 +23,7 @@ def test_profiles_security_defaults() -> None:
 
 
 def test_compose_no_public_db_ports() -> None:
-    for name in ("standalone", "hybrid", "recovery"):
+    for name in ("standalone", "hybrid", "recovery", "server"):
         text = (ROOT / "deploy" / "compose" / f"{name}.yml").read_text()
         db_idx = text.index("\n  db:")
         # Slice until next root-level key after services (networks/volumes).
@@ -47,6 +47,19 @@ def test_doctor_standalone(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.to_dict()["cloud_deployed"] is False
 
 
+def test_doctor_server_and_mac_connector(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("SWARM_DATABASE_URL", raising=False)
+    monkeypatch.delenv("SWARM_SERVER_URL", raising=False)
+    server = doctor(profile="server", repo_root=ROOT)
+    assert server.ok is True
+    assert (ROOT / "deploy" / "compose" / "server.yml").is_file()
+    mac = doctor(profile="mac_connector", repo_root=ROOT)
+    assert mac.ok is True
+    names = {c["name"]: c for c in mac.checks}
+    assert names["server_url_configured"]["ok"] is False
+    assert (ROOT / "deploy" / "compose" / "mac-connector.yml").is_file()
+
+
 def test_doctor_wrong_secret_refuses_non_mock(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("SWARM_DATABASE_URL", raising=False)
     result = doctor(profile="standalone", repo_root=ROOT)
@@ -67,3 +80,13 @@ def test_backup_manifest_has_hashes() -> None:
     )
     assert "sha256" in manifest["database"]
     assert manifest["artifacts"][0]["sha256"]
+
+
+def test_dockerfile_and_server_entrypoint_exist() -> None:
+    assert (ROOT / "Dockerfile").is_file()
+    entry = ROOT / "deploy" / "scripts" / "server-entrypoint.sh"
+    assert entry.is_file()
+    assert "alembic upgrade head" in entry.read_text()
+    assert "USER swarm" in (ROOT / "Dockerfile").read_text() or "useradd" in (
+        ROOT / "Dockerfile"
+    ).read_text()

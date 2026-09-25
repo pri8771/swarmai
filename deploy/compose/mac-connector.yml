@@ -1,0 +1,55 @@
+# Mac worker connector — outbound to SwarmAI server only.
+# No Postgres. No public inbound ports.
+# Completes TH-03 after server enrollment tokens and HTTP worker transport exist.
+name: swarm-mac-connector
+
+services:
+  connector:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: swarm-ai:local
+    user: "1000:1000"
+    env_file:
+      - ../env/mac-connector.env
+    environment:
+      SWARM_ALLOW_PAID: "false"
+      SWARM_ROLE: mac_connector
+      # Server URL is config — never hardcode LAN IPs in source.
+      SWARM_SERVER_URL: ${SWARM_SERVER_URL:-http://127.0.0.1:18765}
+    # Override entrypoint: connector loop (placeholder until TH-03 wires WorkerClient HTTP).
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        echo "mac-connector: waiting for server at $$SWARM_SERVER_URL"
+        i=0
+        while [ $$i -lt 60 ]; do
+          if curl -fsS "$$SWARM_SERVER_URL/health/live" >/dev/null 2>&1; then
+            echo "mac-connector: server live"
+            break
+          fi
+          i=$$((i+1))
+          sleep 2
+        done
+        if ! curl -fsS "$$SWARM_SERVER_URL/health/live" >/dev/null 2>&1; then
+          echo "mac-connector: server unreachable — exiting (Mac disconnect must not take server down)"
+          exit 1
+        fi
+        echo "mac-connector: TH-03 enrollment/lease loop not yet wired — idle health probe"
+        while true; do
+          curl -fsS "$$SWARM_SERVER_URL/health/ready" || true
+          sleep 30
+        done
+    networks:
+      - swarm_connector
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    stop_grace_period: 15s
+
+networks:
+  swarm_connector:
+    driver: bridge

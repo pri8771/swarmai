@@ -1,0 +1,17 @@
+# EXAMPLE Cloudflare Tunnel config — do not enable without origin cert + Access policy.
+# Copy to tunnel.runtime.yml only on the server host after credentials exist.
+# This file alone must never publish an unauthenticated service.
+
+tunnel: REPLACE_TUNNEL_ID
+credentials-file: /etc/cloudflared/credentials/tunnel.json
+
+ingress:
+  # Operator UI/API — protect with Cloudflare Access (configure in dashboard).
+  - hostname: swarm.splitsignal.ai
+    path: /health/*
+    service: http://api:8765
+  - hostname: swarm.splitsignal.ai
+    service: http://api:8765
+    originRequest:
+      noHappyEyeballs: true
+  - service: http_status:404

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-25T15:05:00Z",
+  "branch": "cursor/two-host-mvp-b28d",
+  "packets": [
+    {
+      "id": "P00",
+      "title": "Freeze source, ownership, and implementation baseline",
+      "status": "impl_complete",
+      "depends_on": [],
+      "owner": "cursor-project-two-host-worker"
+    },
+    {
+      "id": "TH-01",
+      "title": "Containerized server with durable PostgreSQL",
+      "status": "in_progress",
+      "depends_on": [
+        "P00"
+      ],
+      "acceptance": [
+        "Dockerfile builds swarm-ai:local",
+        "server compose starts API + Postgres on Mac loopback",
+        "migrations apply",
+        "/health/live and /health/ready report database up",
+        "volume persists across container recreate"
+      ],
+      "mac_verify": "passed",
+      "r730_verify": "blocked"
+    },
+    {
+      "id": "TH-02",
+      "title": "Native worker completes mission on authoritative path",
+      "status": "planned",
+      "depends_on": [
+        "TH-01"
+      ]
+    },
+    {
+      "id": "TH-03",
+      "title": "Mac connector scoped task via server",
+      "status": "planned",
+      "depends_on": [
+        "TH-01",
+        "TH-02"
+      ]
+    },
+    {
+      "id": "TH-04",
+      "title": "Durable artifacts and restart recovery",
+      "status": "planned",
+      "depends_on": [
+        "TH-02"
+      ]
+    },
+    {
+      "id": "TH-05",
+      "title": "Minimal mission UI on real execution state",
+      "status": "planned",
+      "depends_on": [
+        "TH-02"
+      ]
+    },
+    {
+      "id": "TH-06",
+      "title": "Optional OpenCode/Hermes runtime qualification",
+      "status": "planned",
+      "optional": true,
+      "depends_on": [
+        "TH-02"
+      ]
+    },
+    {
+      "id": "TH-07",
+      "title": "Synthetic evaluation harness and live qualification gate",
+      "status": "planned",
+      "depends_on": [
+        "TH-02"
+      ]
+    },
+    {
+      "id": "P01",
+      "title": "Contain acceptance and artifact defects",
+      "status": "planned",
+      "depends_on": [
+        "P00"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "Agent, communication, context, lesson contracts",
+      "status": "planned",
+      "depends_on": [
+        "P00"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "Authoritative PostgreSQL persistence",
+      "status": "planned",
+      "depends_on": [
+        "P01",
+        "P02"
+      ]
+    },
+    {
+      "id": "P09",
+      "title": "Native autonomous-agent vertical slice",
+      "status": "planned",
+      "depends_on": [
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08"
+      ],
+      "note": "Aligns with TH-02"
+    }
+  ],
+  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments from the adopted architecture update.",
+  "public_hostname": "swarm.splitsignal.ai"
+}

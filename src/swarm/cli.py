@@ -287,7 +287,7 @@ def main() -> None:
     doc.add_argument(
         "--profile",
         default="standalone",
-        choices=["mock", "standalone", "hybrid", "recovery"],
+        choices=["mock", "standalone", "hybrid", "recovery", "server", "mac_connector"],
     )
 
     recovery = sub.add_parser("recovery", help="Recovery drills (local)")

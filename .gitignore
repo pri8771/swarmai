@@ -15,6 +15,10 @@ build/
 .env
 .env.*
 !.env.example
+deploy/env/*.env
+!deploy/env/*.env.example
+deploy/cloudflare/credentials/
+deploy/cloudflare/tunnel.runtime.yml
 .DS_Store
 .dbos/
 tmp/

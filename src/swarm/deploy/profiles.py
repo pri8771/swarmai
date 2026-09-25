@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-PROFILES = ("mock", "standalone", "hybrid", "recovery")
+PROFILES = ("mock", "standalone", "hybrid", "recovery", "server", "mac_connector")
 
 
 @dataclass(frozen=True)
@@ -93,6 +93,32 @@ def get_profile(name: str) -> DeployProfile:
             secret_backend="env_refs_only",
             network_mode="loopback",
             resource_limits={"api_workers": 1, "pool_size": 5, "max_sessions": 16},
+        ),
+        "server": DeployProfile(
+            name="server",
+            description="Two-host always-on server (R730 target; Mac loopback verify)",
+            database="postgresql on compose network only",
+            bind_host="127.0.0.1",
+            public_db_port=False,
+            public_inference_admin=False,
+            non_root=True,
+            allow_paid_cloud=False,
+            secret_backend="env_or_file_refs",
+            network_mode="bridge_internal",
+            resource_limits={"api_workers": 2, "pool_size": 10, "max_sessions": 128},
+        ),
+        "mac_connector": DeployProfile(
+            name="mac_connector",
+            description="Mac worker connector; outbound to server; no local Postgres",
+            database="none_on_mac_authoritative_on_server",
+            bind_host="127.0.0.1",
+            public_db_port=False,
+            public_inference_admin=False,
+            non_root=True,
+            allow_paid_cloud=False,
+            secret_backend="env_refs_only",
+            network_mode="bridge_outbound",
+            resource_limits={"api_workers": 0, "pool_size": 0, "max_sessions": 8},
         ),
     }
     if name not in profiles:

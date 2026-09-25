@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-25T14:54:30Z",
+  "implementation_branch": "cursor/two-host-mvp-b28d",
+  "worktree": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp",
+  "remote": "https://github.com/pri8771/swarmai.git",
+  "sources": {
+    "swarmai_main": "08b910f981eff2ab66873a71055090f2c60f2a91",
+    "swarmai_v17_donor": "4d16fe85188861df6e123b4454c6bdc416e6c639",
+    "v17_lane_branch": "cursor/v17-single-session",
+    "v17_lane_local_sha": "f2b8d5f7dfd65530e73c63438c229b9fa428f922",
+    "v17_lane_status_reported_sha": "05fe7807db3509d68dd8a86a0616c9e8ffaa2307",
+    "coordination_tip_at_fetch": "fc873fe5",
+    "planning_bundle": "/Users/pchordia/Documents/Codex/2026-09-24/referenced-chatgpt-conversation-this-is-an/outputs/",
+    "planning_file_sha256": {
+      "EXECUTION_PACKETS.md": "302cddeb02d8399f29d112cd4d78fd44c75535fb6e1762b003f4ce655afcc428",
+      "SOURCE_AUDIT_AND_RESEARCH.md": "7cfba6dde65f0f6635fad368a2fefa10ea232caaf05e03117cbcef39951c03a3",
+      "START_HERE.md": "9bbf1be1dc788af6c6d72f8c79e67b6cd922b6c13d54fd43e7328e978ec66995",
+      "SWARMAI_MVP_PLAN.md": "3fe2e58fc74473bfee0c26520fd43676c8c9db9109fb8597c525118d96f83741",
+      "PLAN_MANIFEST.json": "c44f7bc3074a867465c0003707dadbbec8fb3bf918e694e29bf328cf8a329431"
+    },
+    "lockfile_sha256": {
+      "uv.lock": "9b017641c72d5dd8cae17388f51f86323ed06f43b48a7108936535f992bfc782",
+      "pyproject.toml": "6c4acf24d0e6970bf2bc531a8e96d5c7b0e79c4771a00753a8dd1b49e01f12fb"
+    }
+  },
+  "stack_selection": {
+    "api": "fastapi",
+    "console": "react_vite",
+    "agents": "pydantic_ai",
+    "db": "postgresql",
+    "durable_execution": "dbos_via_pydantic_ai_dbos_spike_pending",
+    "python": "3.12"
+  },
+  "deployment_topology": "two_host_r730_server_mac_connector",
+  "supersedes": "local_only_single_host_deploy_target",
+  "parallel_to": "v17_live_lane_cursor_v17_single_session",
+  "authorization_note": "No spend, main merge, destructive infra, or unauthenticated public publish from this baseline."
+}

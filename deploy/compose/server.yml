@@ -1,0 +1,94 @@
+# Always-on SwarmAI server stack (R730 target; Mac loopback verify allowed).
+# Does not publish Postgres. Does not start Cloudflare Tunnel by default.
+# Requires an operator-supplied auth token env file (see deploy/env/server.env.example).
+name: swarm-server
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: swarm-ai:local
+    user: "1000:1000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ../env/server.env
+    environment:
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:${SWARM_PG_PASSWORD:-swarm}@db:5432/swarm
+      SWARM_BIND_HOST: "0.0.0.0"
+      SWARM_PORT: "8765"
+      SWARM_ALLOW_PAID: "false"
+      SWARM_EXECUTION_MODE: ${SWARM_EXECUTION_MODE:-standalone}
+    ports:
+      # Host loopback only. Default 18765 avoids common local 8765 conflicts on Mac verify.
+      # R730 publish remains config/override — never public without auth.
+      - "127.0.0.1:${SWARM_HOST_PORT:-18765}:8765"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - swarm_artifacts:/app/var/artifacts
+    networks:
+      - swarm_internal
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
+    stop_grace_period: 20s
+
+  db:
+    image: postgres:16-alpine
+    # Official image runs as postgres (UID 70/999). Explicit user breaks named-volume
+    # init on Docker Desktop (chmod Operation not permitted). Do not publish ports.
+    environment:
+      POSTGRES_USER: swarm
+      POSTGRES_PASSWORD: ${SWARM_PG_PASSWORD:-swarm}
+      POSTGRES_DB: swarm
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swarm -d swarm"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - swarm_pg_data:/var/lib/postgresql/data
+      - swarm_pg_backup:/backup
+    networks:
+      - swarm_internal
+    # No host ports — DB stays private to the compose network.
+
+  # Optional tunnel sidecar — enable with: --profile tunnel
+  # Requires mounted origin cert + tunnel credentials; never starts unauthenticated.
+  tunnel:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:2026.6.1
+    user: "1000:1000"
+    depends_on:
+      api:
+        condition: service_healthy
+    command:
+      - tunnel
+      - --config
+      - /etc/cloudflared/config.yml
+      - run
+    volumes:
+      - ../cloudflare/tunnel.runtime.yml:/etc/cloudflared/config.yml:ro
+      - ${CLOUDFLARED_CREDENTIALS_DIR:-../cloudflare/credentials}:/etc/cloudflared/credentials:ro
+    networks:
+      - swarm_internal
+    restart: unless-stopped
+
+networks:
+  swarm_internal:
+    driver: bridge
+    # Not marked internal so optional tunnel egress works; Postgres still unpublished.
+
+volumes:
+  swarm_pg_data:
+  swarm_pg_backup:
+  swarm_artifacts:
