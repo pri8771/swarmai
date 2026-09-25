@@ -1,0 +1,327 @@
+{
+  "schema_version": "2.0.0",
+  "freeze_id": "v20-acceptance-campaign-20260925",
+  "freeze_hash": "7659fc74993a6d20c2276067bac9a91dd4b027fb40ec59e02d46f835553e8842",
+  "public_hostname": "swarm.splitsignal.ai",
+  "any_version_accepted": false,
+  "gates": {
+    "deterministic": "local mechanics / fake upstreams",
+    "live": "approved LiveGrant only \u2014 never invented",
+    "host": "R730/two-host/DNS \u2014 external",
+    "elapsed": "wall-clock windows \u2014 never simulated"
+  },
+  "versions": {
+    "V1.7": {
+      "title": "Complete the mission",
+      "accepted": false,
+      "readiness": "harness_ready_external_gates_blocked",
+      "required_scenarios": [
+        "V20-S05",
+        "V20-S06",
+        "V20-S07",
+        "V20-S08",
+        "V20-S12"
+      ],
+      "cells": [
+        {
+          "scenario_id": "V20-S05",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S06",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S07",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S08",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S12",
+          "status": "blocked_live_grant",
+          "ok": true,
+          "evidence_gate": "live",
+          "version_accepted_contribution": false,
+          "detail_status": "blocked_live_grant"
+        }
+      ],
+      "policy": "code_existing_neq_version_accepted"
+    },
+    "V1.8": {
+      "title": "Durable goals across missions",
+      "accepted": false,
+      "readiness": "harness_ready_scaffolds_pending_integration",
+      "required_scenarios": [
+        "V20-S01",
+        "V20-S03",
+        "V20-S04",
+        "V20-S08",
+        "V20-S09"
+      ],
+      "cells": [
+        {
+          "scenario_id": "V20-S01",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S03",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S04",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S08",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S09",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        }
+      ],
+      "policy": "code_existing_neq_version_accepted"
+    },
+    "V1.9": {
+      "title": "Autonomous pursuit",
+      "accepted": false,
+      "readiness": "harness_ready_scaffolds_pending_integration",
+      "required_scenarios": [
+        "V20-S01",
+        "V20-S02",
+        "V20-S03",
+        "V20-S04",
+        "V20-S05",
+        "V20-S08",
+        "V20-S09",
+        "V20-S10"
+      ],
+      "cells": [
+        {
+          "scenario_id": "V20-S01",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S02",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S03",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S04",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S05",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S08",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S09",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S10",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        }
+      ],
+      "policy": "code_existing_neq_version_accepted"
+    },
+    "V2.0": {
+      "title": "Integrated usable product",
+      "accepted": false,
+      "readiness": "harness_ready_external_gates_blocked",
+      "required_scenarios": [
+        "V20-S01",
+        "V20-S02",
+        "V20-S03",
+        "V20-S04",
+        "V20-S05",
+        "V20-S06",
+        "V20-S07",
+        "V20-S08",
+        "V20-S09",
+        "V20-S10",
+        "V20-S11",
+        "V20-S12"
+      ],
+      "cells": [
+        {
+          "scenario_id": "V20-S01",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S02",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S03",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S04",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S05",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S06",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S07",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S08",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S09",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S10",
+          "status": "pass_deterministic",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "pass_deterministic"
+        },
+        {
+          "scenario_id": "V20-S11",
+          "status": "scaffold_ready_not_integrated",
+          "ok": true,
+          "evidence_gate": "deterministic",
+          "version_accepted_contribution": false,
+          "detail_status": "scaffold_ready_not_integrated"
+        },
+        {
+          "scenario_id": "V20-S12",
+          "status": "blocked_live_grant",
+          "ok": true,
+          "evidence_gate": "live",
+          "version_accepted_contribution": false,
+          "detail_status": "blocked_live_grant"
+        }
+      ],
+      "policy": "code_existing_neq_version_accepted"
+    }
+  },
+  "campaign_run_id": "v20camp_c03463b9e9504af898b40c09177af66f",
+  "note": "Matrices report harness/evidence readiness only. Independent review + operator acceptance remain separate."
+}

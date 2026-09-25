@@ -1,0 +1,403 @@
+{
+  "run_id": "v20camp_c03463b9e9504af898b40c09177af66f",
+  "harness_version": "v20-acceptance-campaign-v1",
+  "freeze_id": "v20-acceptance-campaign-20260925",
+  "freeze_hash": "7659fc74993a6d20c2276067bac9a91dd4b027fb40ec59e02d46f835553e8842",
+  "public_hostname": "swarm.splitsignal.ai",
+  "mode": "campaign",
+  "generated_at": "2026-09-25T17:27:50.177175+00:00",
+  "results": [
+    {
+      "scenario_id": "V20-S01",
+      "title": "Finite multi-mission goal",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "goal_id": "goal_9f24302d98c34aaba975f5392381189c",
+          "mission_ids": [
+            "mission_a",
+            "mission_b"
+          ],
+          "status": "achieved",
+          "history_len": 1,
+          "note": "mission_link_does_not_auto_achieve"
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S02",
+      "title": "Failed approach \u2192 strategy change",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "goal_id": "goal_9e13713708f34762b5b1174d1e4523a7",
+          "strategy": "approach_v2_decompose",
+          "history_len": 3
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S03",
+      "title": "Ongoing goal across cycles",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "goal_id": "goal_b282711b202044b7834520f2a4065b1b",
+          "status": "active",
+          "cycles": 2,
+          "history_len": 4
+        },
+        "also_gates": {
+          "elapsed": {
+            "status": "blocked_elapsed_window",
+            "simulate_elapsed_time": false,
+            "window_started": false
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S04",
+      "title": "Blocked then available prerequisite",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "goal_id": "goal_355cf32f295e4d909dd203adae750e71",
+          "status": "active",
+          "illegal_transition": "illegal_goal_transition:blocked->achieved",
+          "history_len": 2
+        },
+        "also_gates": {}
+      }
+    },
+    {
+      "scenario_id": "V20-S05",
+      "title": "Collaboration + bounded delegation",
+      "primary_gate": "deterministic",
+      "status": "scaffold_ready_not_integrated",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "scaffold_ready_not_integrated",
+        "detail": {
+          "probe": "delegation_bounds_scaffold",
+          "note": "Freeze + gate wiring verified; full product integration awaits owning lanes (C/D/E/A). Not a version pass."
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S06",
+      "title": "Context succession",
+      "primary_gate": "deterministic",
+      "status": "scaffold_ready_not_integrated",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "scaffold_ready_not_integrated",
+        "detail": {
+          "probe": "succession_fence_scaffold",
+          "note": "Freeze + gate wiring verified; full product integration awaits owning lanes (C/D/E/A). Not a version pass."
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S07",
+      "title": "Server restart / worker disconnect / stale return",
+      "primary_gate": "deterministic",
+      "status": "scaffold_ready_not_integrated",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "scaffold_ready_not_integrated",
+        "detail": {
+          "probe": "restart_stale_return_scaffold",
+          "note": "Freeze + gate wiring verified; full product integration awaits owning lanes (C/D/E/A). Not a version pass."
+        },
+        "also_gates": {
+          "host": {
+            "status": "blocked_host_gate",
+            "host_qualified": false,
+            "policy": "two_local_processes_not_two_host"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S08",
+      "title": "Duplicate triggers / lost acks",
+      "primary_gate": "deterministic",
+      "status": "scaffold_ready_not_integrated",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "scaffold_ready_not_integrated",
+        "detail": {
+          "probe": "duplicate_trigger_idempotency_scaffold",
+          "note": "Freeze + gate wiring verified; full product integration awaits owning lanes (C/D/E/A). Not a version pass."
+        },
+        "also_gates": {}
+      }
+    },
+    {
+      "scenario_id": "V20-S09",
+      "title": "Pause / redirect / cancel / budget exhaustion",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "goal_id": "goal_42ef98f69f1c40b88d93c0417a51a027",
+          "status": "cancelled",
+          "strategy": "redirected_plan",
+          "terminal_guard": "illegal_goal_transition:cancelled->active",
+          "history_len": 5
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S10",
+      "title": "Memory correction / lesson rollback",
+      "primary_gate": "deterministic",
+      "status": "pass_deterministic",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "pass_deterministic",
+        "detail": {
+          "rolled_back_state": "rolled_back",
+          "self_approval_blocked": "independent_review_required",
+          "holdout_plaintext_blocked": "holdout_plaintext_forbidden"
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S11",
+      "title": "SDK / UI parity",
+      "primary_gate": "deterministic",
+      "status": "scaffold_ready_not_integrated",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "ok": true,
+        "status": "scaffold_ready_not_integrated",
+        "detail": {
+          "probe": "sdk_ui_parity_scaffold",
+          "note": "Freeze + gate wiring verified; full product integration awaits owning lanes (C/D/E/A). Not a version pass."
+        },
+        "also_gates": {
+          "live": {
+            "status": "blocked_live_grant",
+            "grant_present": false,
+            "grant_approved": false,
+            "invented": false,
+            "blocked": true,
+            "reason": "no_operator_live_grant"
+          }
+        }
+      }
+    },
+    {
+      "scenario_id": "V20-S12",
+      "title": "Authorized model/tool execution with artifacts",
+      "primary_gate": "live",
+      "status": "blocked_live_grant",
+      "ok": true,
+      "version_accepted": false,
+      "detail": {
+        "live_gate": {
+          "grant_present": false,
+          "grant_approved": false,
+          "invented": false,
+          "blocked": true,
+          "reason": "no_operator_live_grant"
+        },
+        "deterministic_side": {
+          "ok": true,
+          "status": "pass_deterministic_gate_only",
+          "detail": {
+            "no_grant": "live_qualification_blocked: missing approved LiveGrant (routes + budget); synthetic harness prepared independently",
+            "unapproved": "live_qualification_blocked: grant exists but is not approved",
+            "invented_grant": false,
+            "live_dispatch": "blocked_pending_operator_grant"
+          }
+        },
+        "also_gates": {
+          "deterministic": {
+            "status": "covered_by_primary_or_side_probe"
+          }
+        },
+        "note": "Live path not auto-dispatched; grant not invented"
+      }
+    }
+  ],
+  "gate_summary": {
+    "deterministic": {
+      "total": 11,
+      "ok": 11,
+      "fail": 0,
+      "blocked": 0
+    },
+    "live": {
+      "total": 1,
+      "ok": 0,
+      "fail": 0,
+      "blocked": 1
+    }
+  },
+  "version_claim": {
+    "any_version_accepted": false,
+    "policy": "never_mark_accepted_from_harness",
+    "versions": {
+      "V1.7": {
+        "accepted": false,
+        "required_scenarios": [
+          "V20-S05",
+          "V20-S06",
+          "V20-S07",
+          "V20-S08",
+          "V20-S12"
+        ]
+      },
+      "V1.8": {
+        "accepted": false,
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S03",
+          "V20-S04",
+          "V20-S08",
+          "V20-S09"
+        ]
+      },
+      "V1.9": {
+        "accepted": false,
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S02",
+          "V20-S03",
+          "V20-S04",
+          "V20-S05",
+          "V20-S08",
+          "V20-S09",
+          "V20-S10"
+        ]
+      },
+      "V2.0": {
+        "accepted": false,
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S02",
+          "V20-S03",
+          "V20-S04",
+          "V20-S05",
+          "V20-S06",
+          "V20-S07",
+          "V20-S08",
+          "V20-S09",
+          "V20-S10",
+          "V20-S11",
+          "V20-S12"
+        ]
+      }
+    }
+  },
+  "live_gate": {
+    "grant_present": false,
+    "grant_approved": false,
+    "invented": false,
+    "blocked": true,
+    "reason": "no_operator_live_grant"
+  },
+  "spend_usd": 0.0,
+  "allow_paid": false,
+  "report_hash": "8d0ec4a9eacbe4fa2ec69961af450bb6a09a41ffd74127839886b1b58164bbf4",
+  "note": "Acceptance campaign harness: scenarios frozen before run; deterministic \u2260 live \u2260 host \u2260 elapsed; versions not accepted by harness",
+  "any_version_accepted": false
+}

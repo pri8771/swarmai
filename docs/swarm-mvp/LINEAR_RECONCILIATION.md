@@ -29,6 +29,7 @@
 | V1.8 durable goals | Persistent Goal entity + pause/resume/cancel | Planned | V1.8 | 5 |
 | V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Planned | V1.9 | 8 |
 | V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Planned | V2.0 | 13 |
+| V2.0 acceptance campaign freeze (Lane F) | Freeze §10 scenarios/pass criteria; harness + matrices; no version accept; no invented LiveGrant | Done (eng freeze/harness) — versions still not accepted | V2.0, acceptance | 5 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked | TH-07, live | 2 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
 | Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |

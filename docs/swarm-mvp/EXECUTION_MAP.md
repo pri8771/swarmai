@@ -1,7 +1,13 @@
 # SwarmAI execution map (reconciled)
 
+<<<<<<< HEAD
 **Updated:** 2026-09-25T17:45Z  
 **Integration branch:** `dev` @ `5236fbba`  
+=======
+**Updated:** 2026-09-25T17:30Z  
+**Integration branch:** `dev`  
+**Lane F branch:** `cursor/v20-acceptance-freeze-92df`  
+>>>>>>> 3d1b8358 (feat(V2.0): freeze acceptance campaign scenarios and harness)
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
 **Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Other lane drafts blocked on failing offline CI and/or rebase onto `5236fbba`.
@@ -14,13 +20,14 @@
 | P00–P19 | Product MVP spine — remains active after foundation |
 | `plan/swarmai-v2-redesign-20260925` @ `8598e6ac` | **Planning donor only** — map requirements; do not run as competing backlog or replace contracts |
 | Independent review R1–R9 | Foundation gate — protected regressions under `tests/foundation/` |
+| V20 acceptance freeze | Lane F — `benchmarks/v20_acceptance/scenarios.freeze.json`; harness cannot accept versions |
 
 ## Version path (mandate)
 
 Foundation (R1–R9) → **V1.7** complete mission → **V1.8** durable goals → **V1.9** autonomous pursuit → **V2.0** integrated product.  
 Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
-## R1–R9 disposition (this branch)
+## R1–R9 disposition (integration tip)
 
 | ID | Status | Protected tests / notes |
 |---|---|---|
@@ -43,6 +50,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | Linear MCP | needsAuth — reconciliation queue only |
 | Live paid providers | blocked — fake upstreams first |
 
+<<<<<<< HEAD
 ## Dev consolidate status (2026-09-25)
 
 | PR | Lane | Tip | Disposition |
@@ -61,3 +69,20 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 2. Merge next green non-conflicting drafts in order: #49 (or #45) → #46 → #48 (when green) → #47 → #51.  
 3. R2 continuous connector + V1.7 integrated mission with ≥1 authorized model-backed run.  
 4. Do **not** merge `main`.
+=======
+## Lane F packet (this map owner)
+
+| Packet | Status | Notes |
+|---|---|---|
+| V20-ACCEPT-FREEZE | **done** | §10 scenarios + pass criteria sealed; gates separated |
+| V20-ACCEPT-HARNESS | **done** | `src/swarm/acceptance/`; CLI `swarm acceptance *`; scaffolds for product-owned scenarios |
+| V20-ACCEPT-MATRICES | **done** | V1.7–V2.0 matrices always `accepted: false` |
+| V20-ACCEPT-LIVE/HOST/ELAPSED | **blocked external** | No invented LiveGrant; host/elapsed not started |
+
+## Next
+
+1. Finish R7 CI (ephemeral Postgres job) + R2 continuous connector on HTTP path.  
+2. V1.7 integrated mission lifecycle with protected verification + ≥1 authorized model-backed run.  
+3. Lanes C/D/E integrate product hooks into freeze probes (replace scaffolds).  
+4. Operator LiveGrant + host qualification + elapsed windows — separate from harness green.
+>>>>>>> 3d1b8358 (feat(V2.0): freeze acceptance campaign scenarios and harness)
