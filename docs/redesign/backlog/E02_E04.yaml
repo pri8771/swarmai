@@ -5,11 +5,11 @@ packets:
   epic: E02
   goal: Add durable schema for agent identity and execution attempts using existing DB conventions.
   inputs: [docs/redesign/reuse/gap_register.yaml, src/swarm/contracts/agent_v2.py, src/swarm/contracts/execution_v2.py, src/swarm/db, migrations]
-  outputs: [migrations/versions/<next>_agent_execution_v2.py]
+  outputs: ["migration_path_key:agent_execution_v2 from docs/redesign/reuse/path_conventions.yaml"]
   steps: [Follow discovered migration pattern, add only required columns/indexes/FKs, include downgrade.]
   test: "Run repository migration upgrade/downgrade test identified by E00."
   acceptance: "Fresh DB and upgrade path create required structures."
-  deps: [A-0110]
+  deps: [A-0110, A-0006]
 - id: A-0202
   epic: E02
   goal: Persist and retrieve AgentIdentity.
