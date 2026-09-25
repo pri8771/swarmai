@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 SOURCE = (
     Path(sys.argv[1]).resolve()
     if len(sys.argv) > 1
-    else Path(__file__).parent / 'cursor-review-180eb73a'
+    else Path(__file__).parent / "cursor-review-180eb73a"
 )
 for key in list(os.environ):
     if key.startswith('SWARM_'):
@@ -42,12 +42,9 @@ with TemporaryDirectory(prefix='swarm-review-') as temp:
     created = client.post('/v1/missions', headers=headers, json=body)
     assert created.status_code == 200, created.text
     review = client.post(
-        '/v1/missions/msn_review/review',
+        "/v1/missions/msn_review/review",
         headers=headers,
-        json={
-            'produced': {'checks': {'count': 1}},
-            'required_checks': {'count': 1},
-        },
+        json={"produced": {"checks": {"count": 1}}, "required_checks": {"count": 1}},
     )
     results['acceptance_without_execution'] = {
         'http_status': review.status_code,
@@ -58,9 +55,9 @@ with TemporaryDirectory(prefix='swarm-review-') as temp:
         'produced_artifact': False,
     }
     enrollment = client.post(
-        '/v1/workers/enroll',
+        "/v1/workers/enroll",
         headers=headers,
-        json={'project_id': 'proj_review'},
+        json={"project_id": "proj_review"},
     )
     assert enrollment.status_code == 200, enrollment.text
     enrolled = enrollment.json()
@@ -68,7 +65,7 @@ with TemporaryDirectory(prefix='swarm-review-') as temp:
     replay_headers = {**headers, 'Idempotency-Key': 'artifact-review-replay'}
     payload = {'kind': 'result', 'content_text': 'review payload'}
     first_artifact = client.post(
-        '/v1/missions/msn_review/artifacts',
+        "/v1/missions/msn_review/artifacts",
         headers=replay_headers,
         json=payload,
     )
@@ -123,11 +120,11 @@ with TemporaryDirectory(prefix='swarm-review-') as temp:
     (sandbox / 'probe.py').write_text(
         'from pathlib import Path\nprint(Path(' + repr(str(marker)) + ').read_text())\n')
     sandbox_result = IsolatedCodeRunner(sandbox, network=False).run_python('probe.py')
-    results['sandbox_scope'] = {
-        'read_synthetic_file_outside_work_dir': (
-            sandbox_result.stdout.strip() == 'review-only-marker'
+    results["sandbox_scope"] = {
+        "read_synthetic_file_outside_work_dir": (
+            sandbox_result.stdout.strip() == "review-only-marker"
         ),
-        'real_user_files_accessed': False,
+        "real_user_files_accessed": False,
     }
     try:
         LiveGrant('review', ('verified_free_route',), 0.0, 'zero-spend-eval', True).assert_usable()
@@ -142,22 +139,22 @@ with TemporaryDirectory(prefix='swarm-review-') as temp:
     recomputed = hashlib.sha256(json.dumps(saved, sort_keys=True, default=str).encode()).hexdigest()
     results['report_hash_verification'] = {'matches_canonical_payload': recomputed == claimed_hash}
     qualification = NativeRuntimeAdapter().qualify()
-    results['native_admission'] = {
-        'availability': qualification.availability.value,
-        'kernel_mediation_proven': qualification.kernel_mediation_proven,
-        'unproven': [
+    results["native_admission"] = {
+        "availability": qualification.availability.value,
+        "kernel_mediation_proven": qualification.kernel_mediation_proven,
+        "unproven": [
             c.capability
             for c in qualification.capabilities
-            if c.status.value == 'unproven'
+            if c.status.value == "unproven"
         ],
     }
-    planroot = SOURCE / 'docs/swarm-mvp'
-    manifest = json.loads((planroot / 'PLAN_MANIFEST.json').read_text())
-    results['plan_manifest_hashes'] = {
-        entry['path']: (
-            hashlib.sha256((planroot / entry['path']).read_bytes()).hexdigest()
-            == entry['sha256']
+    planroot = SOURCE / "docs/swarm-mvp"
+    manifest = json.loads((planroot / "PLAN_MANIFEST.json").read_text())
+    results["plan_manifest_hashes"] = {
+        entry["path"]: (
+            hashlib.sha256((planroot / entry["path"]).read_bytes()).hexdigest()
+            == entry["sha256"]
         )
-        for entry in manifest['files']
+        for entry in manifest["files"]
     }
 print(json.dumps(results, indent=2))
