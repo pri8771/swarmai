@@ -1,0 +1,91 @@
+{
+  "packet": "TH-02",
+  "hostname_public": "swarm.splitsignal.ai",
+  "server_url": "http://127.0.0.1:18766",
+  "started_at": "2026-09-25T15:12:53.164104+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "steps": [
+    {
+      "step": "health_ready",
+      "ok": true
+    },
+    {
+      "step": "create_project",
+      "ok": true,
+      "project_id": "proj_install_dcfea95f02b94c8eab369121b806b999"
+    },
+    {
+      "step": "create_mission",
+      "ok": true,
+      "mission_id": "94d7deaac86148638db6f3f603240c0c",
+      "status": "planning",
+      "support": {
+        "supported": true,
+        "family": "extract",
+        "reason": "supported"
+      }
+    },
+    {
+      "step": "enroll_worker",
+      "ok": true,
+      "worker_id": "wk_863696af629d49e4adf74303ce306a1b",
+      "generation": 1,
+      "membership_token_prefix": "wt_21b"
+    },
+    {
+      "step": "worker_heartbeat",
+      "ok": true
+    },
+    {
+      "step": "list_workers",
+      "ok": true,
+      "count": 1
+    },
+    {
+      "step": "reject_forged_review",
+      "ok": true,
+      "accepted": false,
+      "reasons": [
+        "check_failed:email_count",
+        "check_failed:artifact_sha256",
+        "wrong_result_rejected"
+      ]
+    },
+    {
+      "step": "native_review_accepted",
+      "ok": true,
+      "acceptance_receipt_id": "acr_780f89e384cb4a60a1e6035b486c43fe"
+    },
+    {
+      "step": "get_mission_completed",
+      "ok": true,
+      "status": "completed",
+      "acceptance_receipt_id": "acr_780f89e384cb4a60a1e6035b486c43fe"
+    },
+    {
+      "step": "mission_report",
+      "ok": true,
+      "status_code": 200
+    }
+  ],
+  "health_ready": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "project_id": "proj_install_dcfea95f02b94c8eab369121b806b999",
+  "mission_id": "94d7deaac86148638db6f3f603240c0c",
+  "worker_id": "wk_863696af629d49e4adf74303ce306a1b",
+  "acceptance_receipt_id": "acr_780f89e384cb4a60a1e6035b486c43fe",
+  "final_mission_status": "completed",
+  "finished_at": "2026-09-25T15:12:53.247905+00:00",
+  "ok": true
+}

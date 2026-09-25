@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:05:00Z",
+  "updated_at": "2026-09-25T15:19:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -13,7 +13,7 @@
     {
       "id": "TH-01",
       "title": "Containerized server with durable PostgreSQL",
-      "status": "in_progress",
+      "status": "impl_complete",
       "depends_on": [
         "P00"
       ],
@@ -30,9 +30,16 @@
     {
       "id": "TH-02",
       "title": "Native worker completes mission on authoritative path",
-      "status": "planned",
+      "status": "impl_complete",
       "depends_on": [
         "TH-01"
+      ],
+      "evidence": "docs/evidence/two-host/TH-02/",
+      "acceptance_notes": [
+        "HTTP native extract mission completed via API review",
+        "forged review rejected",
+        "durable PG worker enroll/claim/submit/accept",
+        "mission hydrated after API recreate"
       ]
     },
     {
@@ -117,5 +124,6 @@
     }
   ],
   "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments from the adopted architecture update.",
-  "public_hostname": "swarm.splitsignal.ai"
+  "public_hostname": "swarm.splitsignal.ai",
+  "loopback_server_url": "http://127.0.0.1:18766"
 }

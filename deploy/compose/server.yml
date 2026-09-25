@@ -9,7 +9,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     image: swarm-ai:local
-    user: "1000:1000"
+    # Entrypoint chowns /app/var then drops to uid 1000 (swarm). Do not set user here.
     depends_on:
       db:
         condition: service_healthy
@@ -17,14 +17,15 @@ services:
       - ../env/server.env
     environment:
       SWARM_DATABASE_URL: postgresql+psycopg://swarm:${SWARM_PG_PASSWORD:-swarm}@db:5432/swarm
+      SWARM_REPO_ROOT: "/app"
       SWARM_BIND_HOST: "0.0.0.0"
       SWARM_PORT: "8765"
       SWARM_ALLOW_PAID: "false"
       SWARM_EXECUTION_MODE: ${SWARM_EXECUTION_MODE:-standalone}
     ports:
-      # Host loopback only. Default 18765 avoids common local 8765 conflicts on Mac verify.
+      # Host loopback only. Default 18766 avoids common local 8765 conflicts on Mac verify.
       # R730 publish remains config/override — never public without auth.
-      - "127.0.0.1:${SWARM_HOST_PORT:-18765}:8765"
+      - "127.0.0.1:${SWARM_HOST_PORT:-18766}:8765"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health/live"]
       interval: 10s
@@ -32,7 +33,8 @@ services:
       retries: 10
       start_period: 30s
     volumes:
-      - swarm_artifacts:/app/var/artifacts
+      # Persist missions, install identity, projects, and artifacts across recreate.
+      - swarm_var:/app/var
     networks:
       - swarm_internal
     deploy:
@@ -91,4 +93,4 @@ networks:
 volumes:
   swarm_pg_data:
   swarm_pg_backup:
-  swarm_artifacts:
+  swarm_var:

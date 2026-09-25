@@ -20,6 +20,7 @@ COPY migrations ./migrations
 COPY alembic.ini ./
 COPY config ./config
 COPY schemas ./schemas
+COPY scripts ./scripts
 
 RUN uv sync --frozen --no-dev --no-editable
 
@@ -33,16 +34,18 @@ RUN apt-get update \
 
 WORKDIR /app
 COPY --from=build --chown=swarm:swarm /app /app
-COPY --chown=swarm:swarm deploy/scripts/server-entrypoint.sh /app/deploy/scripts/server-entrypoint.sh
-RUN chmod +x /app/deploy/scripts/server-entrypoint.sh
+COPY --chown=root:root deploy/scripts/server-entrypoint.sh /app/deploy/scripts/server-entrypoint.sh
+RUN chmod 755 /app/deploy/scripts/server-entrypoint.sh
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     SWARM_ALLOW_PAID=false \
     SWARM_BIND_HOST=0.0.0.0 \
-    SWARM_PORT=8765
+    SWARM_PORT=8765 \
+    SWARM_REPO_ROOT=/app
 
-USER swarm
+# Entrypoint starts as root only to chown /app/var, then drops to swarm.
+USER root
 EXPOSE 8765
 HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=5 \
   CMD curl -fsS http://127.0.0.1:8765/health/live || exit 1

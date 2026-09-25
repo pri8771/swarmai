@@ -16,7 +16,7 @@ services:
       SWARM_ALLOW_PAID: "false"
       SWARM_ROLE: mac_connector
       # Server URL is config — never hardcode LAN IPs in source.
-      SWARM_SERVER_URL: ${SWARM_SERVER_URL:-http://127.0.0.1:18765}
+      SWARM_SERVER_URL: ${SWARM_SERVER_URL:-http://127.0.0.1:18766}
     # Override entrypoint: connector loop (placeholder until TH-03 wires WorkerClient HTTP).
     entrypoint: ["/bin/sh", "-c"]
     command:

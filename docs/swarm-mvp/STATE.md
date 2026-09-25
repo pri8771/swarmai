@@ -4,41 +4,30 @@
 **Branch:** `cursor/two-host-mvp-b28d`  
 **Worktree:** `/Users/pchordia/Downloads/swarm-ai-two-host-mvp`  
 **Base:** `origin/main` @ `08b910f981eff2ab66873a71055090f2c60f2a91`  
-**Updated:** 2026-09-25T15:05:00Z  
-**Public hostname:** `swarm.splitsignal.ai` (operator correction — never `.com`)
+**Updated:** 2026-09-25T15:19:00Z  
+**Public hostname:** `swarm.splitsignal.ai` (never `.com`)  
+**Loopback server:** `http://127.0.0.1:18766`
 
 ## Packet status
 
 | Packet | Status | Notes |
 |---|---|---|
-| P00 | done (engineering) | Docs + baseline frozen; independent review not claimed |
-| TH-01 | in progress | Mac compose verify **passed**; R730 placement **blocked** |
+| P00 | impl_complete | Docs + baseline frozen |
+| TH-01 | impl_complete (Mac) | Compose+Postgres durable; R730 still blocked |
+| TH-02 | impl_complete (Mac eng) | HTTP native mission + durable PG worker; restart hydrate OK |
+| TH-03–TH-07 | planned | Next: Mac connector scoped task (TH-03) |
 | P01–P19 | planned | Product queue unchanged |
-| TH-02–TH-07 | planned | Next: native worker mission on authoritative path |
 
-## Checks this session
+## Checks this session (TH-02)
 
 | Check | Result |
 |---|---|
-| Hostname correction `.ai` | applied across repo + Project plan doc |
-| Mac Docker/Compose server stack | pass — live/ready, DB up, volume durable, port 18765 |
-| R730 SSH | **blocked** — unresolved |
-| `swarm.splitsignal.ai` DNS | **blocked** — no A/AAAA |
-| Cloudflare tunnel cert | **blocked** |
-| Linear MCP | **blocked** — needsAuth |
-| Deployment unit tests | pass (8) |
-
-## Running locally (Mac verify)
-
-```sh
-docker compose -f deploy/compose/server.yml ps
-curl -fsS http://127.0.0.1:18765/health/ready
-# stop: docker compose -f deploy/compose/server.yml down   # keep volumes unless -v
-```
+| `pytest tests/deployment` (+ repo_root) | pass (9) |
+| HTTP native mission authoritative path | pass |
+| Durable worker claim/submit/accept on Postgres | pass |
+| Mission survives API recreate | pass |
+| R730 / DNS `.ai` / CF / Linear | blocked |
 
 ## Next action
 
-1. Operator: R730 SSH + Docker/VM facts.  
-2. Operator: DNS + Cloudflare Access for `swarm.splitsignal.ai`.  
-3. Linear auth for in-place issue updates.  
-4. Worker: TH-02 native mission through authoritative API/worker path (still free/fake inference).
+TH-03 Mac connector completing a scoped task through the server (still Mac loopback; no R730 wait). Linear auth still needed for in-place issue updates.

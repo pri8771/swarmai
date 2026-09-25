@@ -1,0 +1,48 @@
+{
+  "packet": "TH-02",
+  "path": "durable_worker_postgres",
+  "started_at": "2026-09-25T15:19:04.117226+00:00",
+  "spend_usd": 0,
+  "steps": [
+    {
+      "step": "seed_mission_task",
+      "ok": true
+    },
+    {
+      "step": "enroll",
+      "ok": true,
+      "generation": 1
+    },
+    {
+      "step": "heartbeat",
+      "ok": true
+    },
+    {
+      "step": "claim",
+      "ok": true,
+      "lease_id": "tls_ba3fea2d43024e90b63cad14e4a879cb"
+    },
+    {
+      "step": "renew",
+      "ok": true
+    },
+    {
+      "step": "submit_result",
+      "ok": true,
+      "result_id": "wres_59ad382923064cfb9e5f5c7912ae8004"
+    },
+    {
+      "step": "accept_result",
+      "ok": true,
+      "acceptance_state": "accepted",
+      "accepted": null
+    }
+  ],
+  "mission_id": "msn_9d927223b4b24957bf4e695145acb845",
+  "project_id": "proj_th02_8a07768eff334cef90f189f6d8a851b5",
+  "task_id": "tsk_8169bbc76ff548aeba9885ad58566167",
+  "worker_id": "wrk_9392605cd5f846148cec565e0461779e",
+  "result_id": "wres_59ad382923064cfb9e5f5c7912ae8004",
+  "finished_at": "2026-09-25T15:19:04.159947+00:00",
+  "ok": true
+}

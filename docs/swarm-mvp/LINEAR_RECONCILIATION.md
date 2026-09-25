@@ -16,7 +16,8 @@
 |---|---|---|---|---|
 | SwarmAI MVP / two-host epic | Adopt R730+Mac topology; supersede local-only deploy | In Progress | swarm-mvp, two-host | 8 |
 | P00 baseline | Freeze source/ownership/docs on `cursor/two-host-mvp-b28d` | In Progress | P00 | 2 |
-| TH-01 server compose | Containerized API+Postgres durable path | In Progress | TH-01, deploy | 3 |
+| TH-01 server compose | Containerized API+Postgres durable path | Done (Mac eng) | TH-01, deploy | 3 |
+| TH-02 native mission | Native worker completes mission on authoritative loopback path | Done (Mac eng) | TH-02, worker | 5 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
 | Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |
 

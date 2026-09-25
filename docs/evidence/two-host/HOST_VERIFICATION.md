@@ -12,7 +12,7 @@
 | Docker | 29.5.2 (linux/aarch64 engine) |
 | Compose | 5.5.1 |
 | cloudflared | 2026.6.1 installed; **no origin cert** |
-| Port conflict | Host `127.0.0.1:8765` occupied by unrelated `jobs-automation dashboard`; server compose publishes **18765** |
+| Port conflict | Host `127.0.0.1:8765` occupied by unrelated `jobs-automation dashboard`; server compose publishes **18766** |
 
 ## R730
 
@@ -36,8 +36,8 @@ Commands (repo root `swarm-ai-two-host-mvp`):
 ```sh
 docker compose -f deploy/compose/server.yml build
 docker compose -f deploy/compose/server.yml up -d
-curl -fsS http://127.0.0.1:18765/health/live
-curl -fsS http://127.0.0.1:18765/health/ready
+curl -fsS http://127.0.0.1:18766/health/live
+curl -fsS http://127.0.0.1:18766/health/ready
 ```
 
 Observed:
@@ -46,7 +46,7 @@ Observed:
 - `/health/live` → `{"status":"ok","service":"swarm","version":"1.0.0rc1"}`
 - `/health/ready` → `database":"up"`, `status":"ready"`, `allow_paid":false`
 - After `up -d --force-recreate api db`, probe row `th01-durable` still present in Postgres volume
-- Postgres **not** published to host; API bound to `127.0.0.1:18765` only
+- Postgres **not** published to host; API bound to `127.0.0.1:18766` only
 - Tunnel profile **not** enabled
 
 **Not claimed:** R730 production deploy, public ingress, authenticated Cloudflare Access, or completed product mission path (TH-02+).

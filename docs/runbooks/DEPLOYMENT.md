@@ -32,8 +32,8 @@ Server/standalone/hybrid/recovery refuse *live start* without `SWARM_DATABASE_UR
 cp deploy/env/server.env.example deploy/env/server.env   # set SWARM_SEED_LOOPBACK_TOKEN
 docker compose -f deploy/compose/server.yml build
 docker compose -f deploy/compose/server.yml up -d
-curl -fsS http://127.0.0.1:18765/health/live
-curl -fsS http://127.0.0.1:18765/health/ready
+curl -fsS http://127.0.0.1:18766/health/live
+curl -fsS http://127.0.0.1:18766/health/ready
 ```
 
 Tunnel (optional, blocked without credentials):
