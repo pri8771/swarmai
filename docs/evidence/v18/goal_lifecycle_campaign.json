@@ -1,0 +1,50 @@
+{
+  "campaign": "v1.8_goal_lifecycle",
+  "lane": "C",
+  "date_utc": "2026-09-25T17:27:00Z",
+  "base_sha": "748078f2fd253329c8cc53d28f0ec7ba11585ff0",
+  "tip_sha": "c8f93d42261e0790c380664a1f3730fb46fd9988",
+  "branch": "cursor/v18-goals-lifecycle-614f",
+  "schema_version": "1.8",
+  "tests": {
+    "command": "uv run pytest tests/goals/test_v18_goal_lifecycle.py tests/mission/test_v17_protected_verify.py -q",
+    "passed": 11,
+    "failed": 0,
+    "files": [
+      "tests/goals/test_v18_goal_lifecycle.py",
+      "tests/mission/test_v17_protected_verify.py"
+    ]
+  },
+  "checks": {
+    "ruff": "passed",
+    "mypy_goals": "passed"
+  },
+  "scenarios": {
+    "fields": "pass",
+    "transitions": "pass",
+    "finite_vs_ongoing": "pass",
+    "mission_not_achievement": "pass",
+    "pause_resume": "pass",
+    "cancel": "pass",
+    "restart_recovery": "pass",
+    "duplicate_trigger": "pass",
+    "expiry": "pass",
+    "cold_reopen_history": "pass"
+  },
+  "api_routes": [
+    "GET /v1/goals",
+    "POST /v1/goals",
+    "GET /v1/goals/{id}",
+    "POST /v1/goals/{id}/transition",
+    "POST /v1/goals/{id}/pause",
+    "POST /v1/goals/{id}/resume",
+    "POST /v1/goals/{id}/cancel",
+    "POST /v1/goals/{id}/restart",
+    "POST /v1/goals/{id}/triggers",
+    "POST /v1/goals/{id}/progress",
+    "POST /v1/goals/{id}/mission-outcomes",
+    "POST /v1/goals/{id}/missions"
+  ],
+  "operator_accepted": false,
+  "independent_review": "pending"
+}
