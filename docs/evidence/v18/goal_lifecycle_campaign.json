@@ -3,7 +3,8 @@
   "lane": "C",
   "date_utc": "2026-09-25T17:27:00Z",
   "base_sha": "748078f2fd253329c8cc53d28f0ec7ba11585ff0",
-  "tip_sha": "269d161fc9e3bef26a8bbac62aa00f8609c38e16",
+  "tip_sha": "2adc7feb717a1f47c7caf185d04451b8f9eb6e42",
+  "pr": "https://github.com/pri8771/swarmai/pull/46",
   "branch": "cursor/v18-goals-lifecycle-614f",
   "schema_version": "1.8",
   "tests": {
