@@ -113,3 +113,29 @@ class ProjectUpdateRequest(StrictModel):
     defaults: dict[str, Any] | None = None
     safety: dict[str, Any] | None = None
     idempotency_key: str | None = None
+
+
+class GoalCreateRequest(StrictModel):
+    project_id: str
+    desired_outcome: str
+    verification_criteria: list[str] = Field(default_factory=list)
+    scope: dict[str, Any] = Field(default_factory=dict)
+    constraints: dict[str, Any] = Field(default_factory=dict)
+    resource_envelope: dict[str, Any] = Field(default_factory=dict)
+    authority_envelope: dict[str, Any] = Field(default_factory=dict)
+    owner: str = "operator"
+    permitted_agents: list[str] = Field(default_factory=list)
+    strategy: str = ""
+    stop_conditions: list[str] = Field(default_factory=list)
+    idempotency_key: str | None = None
+
+
+class GoalTransitionRequest(StrictModel):
+    status: str
+    reason: str = ""
+    idempotency_key: str | None = None
+
+
+class GoalLinkMissionRequest(StrictModel):
+    mission_id: str
+    idempotency_key: str | None = None

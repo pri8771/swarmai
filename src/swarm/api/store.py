@@ -103,6 +103,12 @@ class ProductStore:
             self._project_store = ProjectStore(root)
         return self._project_store
 
+    def goal_store(self) -> Any:
+        from swarm.goals.models import GoalStore
+
+        root = (self.repo_root or Path.cwd()) / "var" / "goals"
+        return GoalStore(root)
+
     def mission_store(self) -> MissionStore:
         """Durable mission identity shared by API / CLI / console reopen paths."""
         if self._mission_store is None:
@@ -638,8 +644,6 @@ class ProductStore:
         required_checks: dict[str, Any] | None = None,
         force_wrong: bool = False,
     ) -> dict[str, Any]:
-        from swarm.mission.acceptance import review_attempt
-
         mission = self.get_mission(mission_id)
         record = self.mission_store().load(mission_id)
         plan_checks = (record.plan or {}).get("required_checks")
@@ -654,28 +658,56 @@ class ProductStore:
         checks = plan_checks if isinstance(plan_checks, dict) else None
         # R1: acceptance requires an actual mission artifact binding.
         arts = record.artifacts or {}
-        has_artifact = False
+        artifact_meta: dict[str, Any] | None = None
         if isinstance(arts, dict):
             for key, val in arts.items():
                 if key.endswith("__history"):
                     continue
                 if isinstance(val, dict) and val.get("content_hash"):
-                    has_artifact = True
+                    artifact_meta = dict(val)
+                    artifact_meta.setdefault("kind", key)
                     break
-        if not has_artifact:
+        if artifact_meta is None:
             raise ApiError(
                 "artifact_required",
                 "mission acceptance requires a published artifact under protected verification",
                 status_code=409,
             )
-        decision = review_attempt(
-            produced=produced,
-            required_checks=checks,
-            force_wrong=force_wrong,
-        )
+        task_family = str((record.plan or {}).get("task_family") or "")
+        art_id = str(artifact_meta.get("id") or "")
+        content_hash = str(artifact_meta.get("content_hash") or "")
+        try:
+            artifact_bytes, _meta = self.read_mission_artifact_bytes(mission_id, art_id)
+        except ApiError:
+            raise
+        from swarm.mission.acceptance import ReviewDecision
+        from swarm.mission.protected_verify import protected_review
+
+        if force_wrong or produced.get("intentionally_wrong") is True:
+            decision = ReviewDecision(
+                accepted=False,
+                reasons=["wrong_result_rejected"],
+                checks={"wrong_result": False},
+            )
+            protected = None
+        else:
+            protected = protected_review(
+                task_family=task_family,
+                required_checks=checks if isinstance(checks, dict) else None,
+                artifact_id=art_id,
+                artifact_bytes=artifact_bytes,
+                content_hash=content_hash,
+                worker_produced=produced,
+            )
+            decision = ReviewDecision(
+                accepted=protected.accepted,
+                reasons=list(protected.reasons),
+                checks=dict(protected.checks),
+            )
         record.validation = {
             **(record.validation or {}),
             "review": decision.to_dict(),
+            "protected_verify": protected.to_dict() if protected is not None else None,
             "reviewed_at": utc_now().isoformat(),
             "reviewed_by": actor,
         }
@@ -702,6 +734,7 @@ class ProductStore:
             record.validation = {
                 **(record.validation or {}),
                 "review": decision.to_dict(),
+                "protected_verify": protected.to_dict() if protected is not None else None,
                 "reviewed_at": utc_now().isoformat(),
                 "reviewed_by": actor,
             }

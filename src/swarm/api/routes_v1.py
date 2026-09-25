@@ -13,6 +13,9 @@ from swarm.api.schemas import (
     ApprovalResolveRequest,
     CancelRequest,
     EvaluationCreateRequest,
+    GoalCreateRequest,
+    GoalLinkMissionRequest,
+    GoalTransitionRequest,
     MissionArtifactPublishRequest,
     MissionCreateRequest,
     MissionReviewRequest,
@@ -827,6 +830,107 @@ async def list_projects(
     if "admin" not in principal.roles:
         rows = [r for r in rows if r.get("project_id") in principal.project_ids]
     return {"projects": rows}
+
+
+@router.get("/goals")
+async def list_goals(
+    project_id: str | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    if project_id:
+        auth.require_project(principal, project_id)
+    goals = store.goal_store().list(project_id=project_id)
+    if "admin" not in principal.roles:
+        goals = [g for g in goals if g.project_id in principal.project_ids]
+    return {"goals": [g.model_dump(mode="json") for g in goals]}
+
+
+@router.post("/goals")
+async def create_goal(
+    body: GoalCreateRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    auth.require_project(principal, body.project_id)
+    from swarm.goals.models import Goal
+
+    goal = Goal(
+        project_id=body.project_id,
+        desired_outcome=body.desired_outcome,
+        verification_criteria=list(body.verification_criteria),
+        scope=dict(body.scope),
+        constraints=dict(body.constraints),
+        resource_envelope=dict(body.resource_envelope),
+        authority_envelope=dict(body.authority_envelope),
+        owner=body.owner or principal.subject,
+        permitted_agents=list(body.permitted_agents),
+        strategy=body.strategy,
+        stop_conditions=list(body.stop_conditions),
+    )
+    created = store.goal_store().create(goal)
+    return {"goal": created.model_dump(mode="json")}
+
+
+@router.get("/goals/{goal_id}")
+async def get_goal(
+    goal_id: str,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    return {"goal": goal.model_dump(mode="json")}
+
+
+@router.post("/goals/{goal_id}/transition")
+async def transition_goal(
+    goal_id: str,
+    body: GoalTransitionRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    from swarm.goals.models import GoalStatus
+
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    try:
+        status = GoalStatus(body.status)
+        updated = store.goal_store().transition(
+            goal_id, status, reason=body.reason or "operator", actor=principal.subject
+        )
+    except ValueError as exc:
+        raise ApiError("illegal_transition", str(exc), status_code=409) from exc
+    return {"goal": updated.model_dump(mode="json")}
+
+
+@router.post("/goals/{goal_id}/missions")
+async def link_goal_mission(
+    goal_id: str,
+    body: GoalLinkMissionRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    try:
+        goal = store.goal_store().get(goal_id)
+    except KeyError as exc:
+        raise ApiError("not_found", "goal not found", status_code=404) from exc
+    auth.require_project(principal, goal.project_id)
+    mission = store.get_mission(body.mission_id)
+    auth.require_project(principal, mission.project_id)
+    updated = store.goal_store().link_mission(goal_id, body.mission_id)
+    return {"goal": updated.model_dump(mode="json")}
 
 
 @router.post("/projects")
