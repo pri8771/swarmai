@@ -1,10 +1,10 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:52Z  
+**Updated:** 2026-09-25T18:05Z  
 **Integration branch:** `dev`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C), #47 (Lane F) merged into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
+**Consolidate:** #50+#49+#46+#47 on `dev` @ `05c0bc4b`. #48 rebased onto that tip (push pending CI). Hold #51 until #46+#48 landed.
 
 ## Single authority
 
@@ -62,12 +62,12 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
-| #48 | D V1.9 Pursuit | `65383188` | hold — rebase onto updated `dev` |
+| #48 | D V1.9 Pursuit | (rebased tip — see tip SHA after push) | rebased onto `05c0bc4b`; await hosted CI |
 | #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
 
 ## Next
 
-1. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
+1. Await hosted CI green on rebased #48; then merge to `dev` (not `main`).  
 2. Hold #51 until #46+#48 landed; then rebase/CI.  
 3. Do **not** merge `main`.
 

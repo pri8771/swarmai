@@ -45,6 +45,7 @@ jobs:
           tests/onboarding
           tests/product
           tests/providers
+          tests/pursuit
           tests/recovery
           tests/regressions
           tests/release
