@@ -1,0 +1,250 @@
+{
+  "packet": "TH-07",
+  "hostname_public": "swarm.splitsignal.ai",
+  "started_at": "2026-09-25T15:59:00.847396+00:00",
+  "finished_at": "2026-09-25T15:59:01.395515+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "prepared_independently_of_live_grants": true,
+  "auto_production_routing_changes": false,
+  "r730_dns_cf_required": false,
+  "manifest": {
+    "packet": "TH-07",
+    "harness_version": "th07-synthetic-v1",
+    "dataset_version": "starter-v1",
+    "dataset_path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+    "public_hostname": "swarm.splitsignal.ai",
+    "prepared_independently_of_live_grants": true,
+    "live_gate_default": "blocked",
+    "auto_production_routing_changes": false,
+    "dataset_validation": {
+      "ok": true,
+      "case_count": 128,
+      "families": [
+        "classification",
+        "code_generation",
+        "code_repair",
+        "context_compaction",
+        "dependency_planning",
+        "evidence_qa",
+        "extraction",
+        "tool_selection"
+      ],
+      "sizes": [
+        "L",
+        "M",
+        "S",
+        "XL"
+      ],
+      "splits": [
+        "calibration",
+        "holdout"
+      ],
+      "grader_kinds": [
+        "json_exact",
+        "python_unit",
+        "topological_order"
+      ],
+      "duplicate_ids": [],
+      "path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+      "mock_vs_live": "dataset_fixtures_only"
+    },
+    "coverage": {
+      "case_count": 128,
+      "by_difficulty": {
+        "easy": 32,
+        "medium": 32,
+        "hard": 32,
+        "expert": 32
+      },
+      "by_family": {
+        "extraction": 16,
+        "classification": 16,
+        "evidence_qa": 16,
+        "code_generation": 16,
+        "code_repair": 16,
+        "dependency_planning": 16,
+        "tool_selection": 16,
+        "context_compaction": 16
+      },
+      "by_split": {
+        "calibration": 64,
+        "holdout": 64
+      },
+      "grader_kinds": [
+        "json_exact",
+        "python_unit",
+        "topological_order"
+      ]
+    },
+    "modes": {
+      "oracle": "privileged sealed answers \u2014 fixture path",
+      "fixture_pass": "alias of oracle",
+      "fixture_fail": "deterministic negative control",
+      "live": "blocked until approved LiveGrant; dispatch not in TH-07 first cut"
+    },
+    "mock_vs_live": "harness_manifest_only"
+  },
+  "oracle_report_id": "th07_54c93f51d94742bd806ba94c4815191f",
+  "oracle_report_hash": "e8ed9210b490b746ba3d4c18ca105cf492d3ac7317c65fcb2b2579552c2c5c95",
+  "budget": {
+    "expected_requests": 64,
+    "expected_completion_tokens": 8192,
+    "actual_requests": 128,
+    "actual_tokens_estimated": 85005,
+    "actual_cost_usd": 0.0,
+    "spend_usd": 0,
+    "allow_paid": false
+  },
+  "provenance": {
+    "runtime": "synthetic_fixture_oracle",
+    "runtime_version": "th07-synthetic-v1",
+    "provider": "none",
+    "route_id": "rt_synthetic_oracle",
+    "model_fingerprint": "fixture-oracle-v1",
+    "tool_grants": [],
+    "prompt_policy": "case.input_only_sealed_answers",
+    "grader_version": "1",
+    "repeats": 1,
+    "difficulties_covered": [
+      "easy",
+      "expert",
+      "hard",
+      "medium"
+    ],
+    "families_covered": [
+      "classification",
+      "code_generation",
+      "code_repair",
+      "context_compaction",
+      "dependency_planning",
+      "evidence_qa",
+      "extraction",
+      "tool_selection"
+    ]
+  },
+  "live_gate": {
+    "mode": "oracle",
+    "blocked": false,
+    "reason": "fixture_oracle_path_no_live_dispatch",
+    "grant_required": true,
+    "grant_present": false
+  },
+  "routing_mutation": {
+    "production_store_supplied": true,
+    "production_profiles_mutated": false,
+    "before_profile_count": 1,
+    "after_profile_count": 1,
+    "ephemeral_simulated_excluded": 32,
+    "ephemeral_live_profiles": 0,
+    "auto_production_routing_changes": false,
+    "policy": "no_auto_production_routing_from_few_examples"
+  },
+  "split_summaries": [
+    {
+      "split": "calibration",
+      "case_count": 64,
+      "passed": 64,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.9433739770288436
+    },
+    {
+      "split": "holdout",
+      "case_count": 64,
+      "passed": 64,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.9433739770288436
+    }
+  ],
+  "steps": [
+    {
+      "step": "prepare_manifest",
+      "ok": true,
+      "case_count": 128,
+      "live_gate_default": "blocked"
+    },
+    {
+      "step": "oracle_full_suite",
+      "ok": true,
+      "passed": 128,
+      "failed": 0,
+      "report_hash": "e8ed9210b490b746ba3d4c18ca105cf492d3ac7317c65fcb2b2579552c2c5c95",
+      "difficulties": [
+        "easy",
+        "expert",
+        "hard",
+        "medium"
+      ],
+      "families": [
+        "classification",
+        "code_generation",
+        "code_repair",
+        "context_compaction",
+        "dependency_planning",
+        "evidence_qa",
+        "extraction",
+        "tool_selection"
+      ]
+    },
+    {
+      "step": "holdout_vs_calibration",
+      "ok": true,
+      "summaries": [
+        {
+          "split": "calibration",
+          "case_count": 64,
+          "passed": 64,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "wilson_lower": 0.9433739770288436
+        },
+        {
+          "split": "holdout",
+          "case_count": 64,
+          "passed": 64,
+          "failed": 0,
+          "pass_rate": 1.0,
+          "wilson_lower": 0.9433739770288436
+        }
+      ]
+    },
+    {
+      "step": "no_production_routing_mutation",
+      "ok": true,
+      "routing_mutation": {
+        "production_store_supplied": true,
+        "production_profiles_mutated": false,
+        "before_profile_count": 1,
+        "after_profile_count": 1,
+        "ephemeral_simulated_excluded": 32,
+        "ephemeral_live_profiles": 0,
+        "auto_production_routing_changes": false,
+        "policy": "no_auto_production_routing_from_few_examples"
+      }
+    },
+    {
+      "step": "fixture_fail_negative_control",
+      "ok": true,
+      "passed": 0,
+      "failed": 8
+    },
+    {
+      "step": "live_gate_blocked_without_grant",
+      "ok": true,
+      "detail": "live_qualification_blocked: missing approved LiveGrant (routes + budget); synthetic harness prepared independently"
+    },
+    {
+      "step": "live_dispatch_not_enabled_even_with_grant",
+      "ok": true,
+      "detail": "live_qualification_blocked: grant accepted for gate check only; live provider dispatch is not enabled in TH-07 first cut"
+    },
+    {
+      "step": "hostname",
+      "ok": true,
+      "hostname": "swarm.splitsignal.ai"
+    }
+  ],
+  "ok": true
+}

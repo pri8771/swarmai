@@ -1,5 +1,25 @@
 # SwarmAI MVP decisions
 
+## DEC-TH-004 — Synthetic harness before live qualification; no auto routing
+
+| Field | Value |
+|---|---|
+| Decision ID | DEC-TH-004 |
+| Topic | Evaluation / qualification gate |
+| Decision Maker | Implementation worker per architecture §8 |
+| Decision | Prepare and run the graded synthetic harness independently of live route/budget grants. Live dispatch stays blocked until an approved `LiveGrant`. Fixture/oracle results never auto-change production routing; ProfileStore updates from synthetic runs are ephemeral and `simulated=True`. |
+| Context | TH-07; starter.jsonl 128 cases; R730/DNS/CF and provider grants unavailable |
+| Options Considered | (1) wait for live grants before harness, (2) prepare harness + block live, (3) promote provisional routes from oracle scores |
+| Why | Architecture §8: prepare harness independently; no universal best model; no auto production routing from few examples |
+| Date Recorded | 2026-09-25 |
+| Actual Start Date | 2026-09-25 |
+| Actual End Date | 2026-09-25 |
+| Status | accepted |
+| Consequences | TH-07 Mac eng complete; live qualification remains blocked pending grant + dispatch wiring |
+| Related Files | `src/swarm/evals/synthetic_harness.py`, `docs/evidence/two-host/TH-07/` |
+| Related Prompt | TH-07 authorized continuation |
+| Related Jira/Linear | pending — see `LINEAR_RECONCILIATION.md` |
+
 ## DEC-TH-001 — Two-host deployment topology
 
 | Field | Value |

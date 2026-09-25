@@ -3,7 +3,7 @@
 **Owner:** Cursor Project implementation worker (`bc-39c5759a-8fb4-514e-a825-98363e5fb28d`)  
 **Branch:** `cursor/two-host-mvp-b28d`  
 **Worktree:** `/Users/pchordia/Downloads/swarm-ai-two-host-mvp`  
-**Updated:** 2026-09-25T15:51:00Z  
+**Updated:** 2026-09-25T15:59:00Z  
 **Public hostname:** `swarm.splitsignal.ai` (never `.com`)  
 **Loopback server:** `http://127.0.0.1:18766`
 
@@ -18,28 +18,27 @@
 | TH-04 | impl_complete (Mac eng) | Durable CAS artifacts; identical sha256 after restart |
 | TH-05 | impl_complete (Mac eng) | Console live loader shows real missions/artifacts/workers |
 | TH-06 | impl_complete (Mac eng) | Runtime adapters qualified honestly; OpenCode/Hermes not mission-admissible |
-| TH-07 | planned | Next: synthetic eval harness + live qualification gate |
+| TH-07 | impl_complete (Mac eng) | Synthetic harness ready; live gate blocked pending grant |
 | P01–P19 | planned | Product queue unchanged |
 
-## Runtime qualification (TH-06)
+## Eval harness (TH-07)
 
-| Runtime | Status |
+| Item | Status |
 |---|---|
-| Native | available (partial) |
-| OpenCode | discovered_unqualified — **not** mission-admissible |
-| Hermes | unavailable — **not** mission-admissible |
+| Starter suite (128; easy→expert; 8 families) | prepared |
+| Sealed answers / holdout vs calibration | proven |
+| Oracle + fixture-fail paths | pass |
+| Live route/budget gate | **blocked** (no grant; dispatch not enabled) |
+| Production routing auto-change | **forbidden / verified none** |
 
-Framework config alone does **not** enforce SwarmAI contracts.
-
-## Checks this session (TH-06)
+## Checks this session (TH-07)
 
 | Check | Result |
 |---|---|
-| pytest runtime adapters | pass (6) |
-| `scripts/th06_runtime_qualification.py` | pass |
-| `GET /v1/runtimes` | pass |
+| pytest `test_synthetic_harness_th07` | pass (10) |
+| `scripts/th07_synthetic_eval_harness.py` | pass |
 | Linear MCP | blocked needsAuth (queue only) |
 
 ## Next action
 
-TH-07 synthetic evaluation harness and live qualification gate (still Mac loopback; R730/DNS/CF not required).
+Live qualification only when an approved route+budget grant exists (do not wait on R730/DNS/CF). Otherwise continue product packets (P01+) on Mac loopback. External infra still blocked.

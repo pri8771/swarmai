@@ -1,0 +1,77 @@
+{
+  "packet": "TH-07",
+  "harness_version": "th07-synthetic-v1",
+  "dataset_version": "starter-v1",
+  "dataset_path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+  "public_hostname": "swarm.splitsignal.ai",
+  "prepared_independently_of_live_grants": true,
+  "live_gate_default": "blocked",
+  "auto_production_routing_changes": false,
+  "dataset_validation": {
+    "ok": true,
+    "case_count": 128,
+    "families": [
+      "classification",
+      "code_generation",
+      "code_repair",
+      "context_compaction",
+      "dependency_planning",
+      "evidence_qa",
+      "extraction",
+      "tool_selection"
+    ],
+    "sizes": [
+      "L",
+      "M",
+      "S",
+      "XL"
+    ],
+    "splits": [
+      "calibration",
+      "holdout"
+    ],
+    "grader_kinds": [
+      "json_exact",
+      "python_unit",
+      "topological_order"
+    ],
+    "duplicate_ids": [],
+    "path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+    "mock_vs_live": "dataset_fixtures_only"
+  },
+  "coverage": {
+    "case_count": 128,
+    "by_difficulty": {
+      "easy": 32,
+      "medium": 32,
+      "hard": 32,
+      "expert": 32
+    },
+    "by_family": {
+      "extraction": 16,
+      "classification": 16,
+      "evidence_qa": 16,
+      "code_generation": 16,
+      "code_repair": 16,
+      "dependency_planning": 16,
+      "tool_selection": 16,
+      "context_compaction": 16
+    },
+    "by_split": {
+      "calibration": 64,
+      "holdout": 64
+    },
+    "grader_kinds": [
+      "json_exact",
+      "python_unit",
+      "topological_order"
+    ]
+  },
+  "modes": {
+    "oracle": "privileged sealed answers \u2014 fixture path",
+    "fixture_pass": "alias of oracle",
+    "fixture_fail": "deterministic negative control",
+    "live": "blocked until approved LiveGrant; dispatch not in TH-07 first cut"
+  },
+  "mock_vs_live": "harness_manifest_only"
+}

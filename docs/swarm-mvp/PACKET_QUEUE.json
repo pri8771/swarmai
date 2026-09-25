@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:51:00Z",
+  "updated_at": "2026-09-25T15:59:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -122,10 +122,22 @@
     {
       "id": "TH-07",
       "title": "Synthetic evaluation harness and live qualification gate",
-      "status": "planned",
+      "status": "impl_complete",
       "depends_on": [
         "TH-02"
-      ]
+      ],
+      "evidence": "docs/evidence/two-host/TH-07/",
+      "acceptance_notes": [
+        "Graded starter suite easy→expert across 8 families with sealed answers",
+        "Calibration vs holdout reported separately (64/64 each under oracle)",
+        "Fixture/oracle runs record budgets + provenance; spend $0",
+        "Live gate blocked without approved LiveGrant; dispatch not enabled in first cut",
+        "Production ProfileStore not mutated; no auto production routing changes",
+        "Prepared independently of R730/DNS/CF and live provider grants"
+      ],
+      "live_qualification": "blocked_pending_grant",
+      "mac_verify": "passed",
+      "r730_verify": "blocked"
     },
     {
       "id": "P01",

@@ -1,0 +1,3625 @@
+{
+  "run_id": "th07_54c93f51d94742bd806ba94c4815191f",
+  "packet": "TH-07",
+  "harness_version": "th07-synthetic-v1",
+  "dataset_version": "starter-v1",
+  "dataset_path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+  "mode": "oracle",
+  "public_hostname": "swarm.splitsignal.ai",
+  "generated_at": "2026-09-25T15:59:01.383992+00:00",
+  "trial_count": 128,
+  "passed": 128,
+  "failed": 0,
+  "cells": [
+    {
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1453
+    },
+    {
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1451
+    },
+    {
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 711
+    },
+    {
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 710
+    },
+    {
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 343
+    },
+    {
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 342
+    },
+    {
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2792
+    },
+    {
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2788
+    },
+    {
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1259
+    },
+    {
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1260
+    },
+    {
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 750
+    },
+    {
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 750
+    },
+    {
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 512
+    },
+    {
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 512
+    },
+    {
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2655
+    },
+    {
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2663
+    },
+    {
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1070
+    },
+    {
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1070
+    },
+    {
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 702
+    },
+    {
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 701
+    },
+    {
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 482
+    },
+    {
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 482
+    },
+    {
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1795
+    },
+    {
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1796
+    },
+    {
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1584
+    },
+    {
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1589
+    },
+    {
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 809
+    },
+    {
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 826
+    },
+    {
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 438
+    },
+    {
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 444
+    },
+    {
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2962
+    },
+    {
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2962
+    },
+    {
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 724
+    },
+    {
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 692
+    },
+    {
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 364
+    },
+    {
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 356
+    },
+    {
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 196
+    },
+    {
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 196
+    },
+    {
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1344
+    },
+    {
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1280
+    },
+    {
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2316
+    },
+    {
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2316
+    },
+    {
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1128
+    },
+    {
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1128
+    },
+    {
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 568
+    },
+    {
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 568
+    },
+    {
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 4466
+    },
+    {
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 4466
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1029
+    },
+    {
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1032
+    },
+    {
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 533
+    },
+    {
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 545
+    },
+    {
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 294
+    },
+    {
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 294
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1918
+    },
+    {
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1918
+    },
+    {
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 2028
+    },
+    {
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1970
+    },
+    {
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1038
+    },
+    {
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 1038
+    },
+    {
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 571
+    },
+    {
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 554
+    },
+    {
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 3735
+    },
+    {
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "sample_count": 2,
+      "pass_count": 2,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.3423719528896193,
+      "state": "fixture_oracle",
+      "cost_usd": 0.0,
+      "tokens_estimated": 3737
+    }
+  ],
+  "split_summaries": [
+    {
+      "split": "calibration",
+      "case_count": 64,
+      "passed": 64,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.9433739770288436
+    },
+    {
+      "split": "holdout",
+      "case_count": 64,
+      "passed": 64,
+      "failed": 0,
+      "pass_rate": 1.0,
+      "wilson_lower": 0.9433739770288436
+    }
+  ],
+  "plan": {
+    "suite": "starter",
+    "mode": "mock",
+    "mock_vs_live": "mock",
+    "cell_count": 32,
+    "case_count": 64,
+    "expected_requests": 64,
+    "expected_completion_tokens": 8192,
+    "cells": [
+      {
+        "family": "classification",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "classification",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "classification",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "classification",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "code_generation",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "code_generation",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "code_generation",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "code_generation",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "code_repair",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "code_repair",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "code_repair",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "code_repair",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "context_compaction",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "context_compaction",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "context_compaction",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "context_compaction",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "dependency_planning",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "dependency_planning",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "dependency_planning",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "dependency_planning",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "evidence_qa",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "evidence_qa",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "evidence_qa",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "evidence_qa",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "extraction",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "extraction",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "extraction",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "extraction",
+        "size": "XL",
+        "cases": 2
+      },
+      {
+        "family": "tool_selection",
+        "size": "L",
+        "cases": 2
+      },
+      {
+        "family": "tool_selection",
+        "size": "M",
+        "cases": 2
+      },
+      {
+        "family": "tool_selection",
+        "size": "S",
+        "cases": 2
+      },
+      {
+        "family": "tool_selection",
+        "size": "XL",
+        "cases": 2
+      }
+    ],
+    "case_ids": [
+      "classification_L_03",
+      "classification_L_04",
+      "classification_M_03",
+      "classification_M_04",
+      "classification_S_03",
+      "classification_S_04",
+      "classification_XL_03",
+      "classification_XL_04",
+      "code_generation_L_03",
+      "code_generation_L_04",
+      "code_generation_M_03",
+      "code_generation_M_04",
+      "code_generation_S_03",
+      "code_generation_S_04",
+      "code_generation_XL_03",
+      "code_generation_XL_04",
+      "code_repair_L_03",
+      "code_repair_L_04",
+      "code_repair_M_03",
+      "code_repair_M_04",
+      "code_repair_S_03",
+      "code_repair_S_04",
+      "code_repair_XL_03",
+      "code_repair_XL_04",
+      "context_compaction_L_03",
+      "context_compaction_L_04",
+      "context_compaction_M_03",
+      "context_compaction_M_04",
+      "context_compaction_S_03",
+      "context_compaction_S_04",
+      "context_compaction_XL_03",
+      "context_compaction_XL_04",
+      "dependency_planning_L_03",
+      "dependency_planning_L_04",
+      "dependency_planning_M_03",
+      "dependency_planning_M_04",
+      "dependency_planning_S_03",
+      "dependency_planning_S_04",
+      "dependency_planning_XL_03",
+      "dependency_planning_XL_04",
+      "evidence_qa_L_03",
+      "evidence_qa_L_04",
+      "evidence_qa_M_03",
+      "evidence_qa_M_04",
+      "evidence_qa_S_03",
+      "evidence_qa_S_04",
+      "evidence_qa_XL_03",
+      "evidence_qa_XL_04",
+      "extraction_L_03",
+      "extraction_L_04",
+      "extraction_M_03",
+      "extraction_M_04",
+      "extraction_S_03",
+      "extraction_S_04",
+      "extraction_XL_03",
+      "extraction_XL_04",
+      "tool_selection_L_03",
+      "tool_selection_L_04",
+      "tool_selection_M_03",
+      "tool_selection_M_04",
+      "tool_selection_S_03",
+      "tool_selection_S_04",
+      "tool_selection_XL_03",
+      "tool_selection_XL_04"
+    ],
+    "remaining_note": "mock plan only \u2014 no provider calls"
+  },
+  "budget": {
+    "expected_requests": 64,
+    "expected_completion_tokens": 8192,
+    "actual_requests": 128,
+    "actual_tokens_estimated": 85005,
+    "actual_cost_usd": 0.0,
+    "spend_usd": 0,
+    "allow_paid": false
+  },
+  "provenance": {
+    "runtime": "synthetic_fixture_oracle",
+    "runtime_version": "th07-synthetic-v1",
+    "provider": "none",
+    "route_id": "rt_synthetic_oracle",
+    "model_fingerprint": "fixture-oracle-v1",
+    "tool_grants": [],
+    "prompt_policy": "case.input_only_sealed_answers",
+    "grader_version": "1",
+    "repeats": 1,
+    "difficulties_covered": [
+      "easy",
+      "expert",
+      "hard",
+      "medium"
+    ],
+    "families_covered": [
+      "classification",
+      "code_generation",
+      "code_repair",
+      "context_compaction",
+      "dependency_planning",
+      "evidence_qa",
+      "extraction",
+      "tool_selection"
+    ]
+  },
+  "live_gate": {
+    "mode": "oracle",
+    "blocked": false,
+    "reason": "fixture_oracle_path_no_live_dispatch",
+    "grant_required": true,
+    "grant_present": false
+  },
+  "routing_mutation": {
+    "production_store_supplied": true,
+    "production_profiles_mutated": false,
+    "before_profile_count": 1,
+    "after_profile_count": 1,
+    "ephemeral_simulated_excluded": 32,
+    "ephemeral_live_profiles": 0,
+    "auto_production_routing_changes": false,
+    "policy": "no_auto_production_routing_from_few_examples"
+  },
+  "dataset_validation": {
+    "ok": true,
+    "case_count": 128,
+    "families": [
+      "classification",
+      "code_generation",
+      "code_repair",
+      "context_compaction",
+      "dependency_planning",
+      "evidence_qa",
+      "extraction",
+      "tool_selection"
+    ],
+    "sizes": [
+      "L",
+      "M",
+      "S",
+      "XL"
+    ],
+    "splits": [
+      "calibration",
+      "holdout"
+    ],
+    "grader_kinds": [
+      "json_exact",
+      "python_unit",
+      "topological_order"
+    ],
+    "duplicate_ids": [],
+    "path": "/Users/pchordia/Downloads/swarm-ai-two-host-mvp/benchmarks/starter.jsonl",
+    "mock_vs_live": "dataset_fixtures_only"
+  },
+  "mock_vs_live": "synthetic_fixture_oracle_not_live",
+  "report_hash": "e8ed9210b490b746ba3d4c18ca105cf492d3ac7317c65fcb2b2579552c2c5c95",
+  "trials": [
+    {
+      "case_id": "classification_S_03",
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.001,
+      "tokens_estimated": 171,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_S_04",
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.001,
+      "tokens_estimated": 171,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_M_03",
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 355,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_M_04",
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 355,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_L_03",
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 725,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_L_04",
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 726,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_XL_03",
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1394,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_XL_04",
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1394,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_S_03",
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.0,
+      "tokens_estimated": 256,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_S_04",
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 256,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_M_03",
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.003,
+      "tokens_estimated": 375,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_M_04",
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 375,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_L_03",
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 630,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_L_04",
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 630,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_XL_03",
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 1331,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_XL_04",
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 1332,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_S_03",
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 241,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_S_04",
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 241,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_M_03",
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.003,
+      "tokens_estimated": 350,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_M_04",
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 351,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_L_03",
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 535,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_L_04",
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 535,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_XL_03",
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.003,
+      "tokens_estimated": 898,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_XL_04",
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 898,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_S_03",
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.001,
+      "tokens_estimated": 225,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_S_04",
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 219,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_M_03",
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 424,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_M_04",
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 402,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_L_03",
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 797,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_L_04",
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 792,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_XL_03",
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1481,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_XL_04",
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1481,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_S_03",
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.002,
+      "tokens_estimated": 98,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_S_04",
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.001,
+      "tokens_estimated": 98,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_M_03",
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.001,
+      "tokens_estimated": 174,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_M_04",
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 182,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_L_03",
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 330,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_L_04",
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 362,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_XL_03",
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.001,
+      "tokens_estimated": 608,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_XL_04",
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 672,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_S_03",
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 284,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_S_04",
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 284,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_M_03",
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 564,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_M_04",
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 564,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_L_03",
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1158,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_L_04",
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1158,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_XL_03",
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 2233,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_XL_04",
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 2233,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_S_03",
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 147,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_S_04",
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 147,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_M_03",
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 273,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_M_04",
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 272,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_L_03",
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 516,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_L_04",
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 516,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_XL_03",
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.001,
+      "tokens_estimated": 959,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_XL_04",
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 959,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_S_03",
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 264,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_S_04",
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 290,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_M_03",
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 519,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_M_04",
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 519,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_L_03",
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 979,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_L_04",
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 991,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_XL_03",
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1869,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_XL_04",
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "holdout",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1868,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_S_01",
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 171,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_S_02",
+      "family": "classification",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 172,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_M_01",
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 355,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_M_02",
+      "family": "classification",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 356,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_L_01",
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 726,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_L_02",
+      "family": "classification",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 727,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_XL_01",
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1394,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "classification_XL_02",
+      "family": "classification",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1398,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_S_01",
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.0,
+      "tokens_estimated": 256,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_S_02",
+      "family": "code_generation",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 256,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_M_01",
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 375,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_M_02",
+      "family": "code_generation",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 375,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_L_01",
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 629,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_L_02",
+      "family": "code_generation",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 630,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_XL_01",
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 1327,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_generation_XL_02",
+      "family": "code_generation",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 1328,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_S_01",
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.003,
+      "tokens_estimated": 241,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_S_02",
+      "family": "code_repair",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 241,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_M_01",
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.002,
+      "tokens_estimated": 351,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_M_02",
+      "family": "code_repair",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 351,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_L_01",
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 535,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_L_02",
+      "family": "code_repair",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 535,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_XL_01",
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 897,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "code_repair_XL_02",
+      "family": "code_repair",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "unit_pass",
+      "latency_ms": 0.001,
+      "tokens_estimated": 898,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "unit": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_S_01",
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.001,
+      "tokens_estimated": 219,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_S_02",
+      "family": "context_compaction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 219,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_M_01",
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 402,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_M_02",
+      "family": "context_compaction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 407,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_L_01",
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 792,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_L_02",
+      "family": "context_compaction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 792,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_XL_01",
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1481,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "context_compaction_XL_02",
+      "family": "context_compaction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1481,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_S_01",
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.001,
+      "tokens_estimated": 98,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_S_02",
+      "family": "dependency_planning",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 98,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_M_01",
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 182,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_M_02",
+      "family": "dependency_planning",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 182,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_L_01",
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 362,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_L_02",
+      "family": "dependency_planning",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 362,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_XL_01",
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 672,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "dependency_planning_XL_02",
+      "family": "dependency_planning",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "valid_topo",
+      "latency_ms": 0.0,
+      "tokens_estimated": 672,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "topo": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_S_01",
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 284,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_S_02",
+      "family": "evidence_qa",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 284,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_M_01",
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 564,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_M_02",
+      "family": "evidence_qa",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 564,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_L_01",
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1158,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_L_02",
+      "family": "evidence_qa",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1158,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_XL_01",
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 2233,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "evidence_qa_XL_02",
+      "family": "evidence_qa",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 2233,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_S_01",
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 147,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_S_02",
+      "family": "extraction",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 147,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_M_01",
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 272,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_M_02",
+      "family": "extraction",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 261,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_L_01",
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 514,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_L_02",
+      "family": "extraction",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 515,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_XL_01",
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 959,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "extraction_XL_02",
+      "family": "extraction",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.002,
+      "tokens_estimated": 959,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_S_01",
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 293,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_S_02",
+      "family": "tool_selection",
+      "size": "S",
+      "difficulty": "easy",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 278,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_M_01",
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 519,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_M_02",
+      "family": "tool_selection",
+      "size": "M",
+      "difficulty": "medium",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 519,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_L_01",
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1020,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_L_02",
+      "family": "tool_selection",
+      "size": "L",
+      "difficulty": "hard",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1008,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_XL_01",
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1867,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    },
+    {
+      "case_id": "tool_selection_XL_02",
+      "family": "tool_selection",
+      "size": "XL",
+      "difficulty": "expert",
+      "split": "calibration",
+      "solver_mode": "oracle",
+      "correct": true,
+      "policy_violation": false,
+      "detail": "match",
+      "latency_ms": 0.0,
+      "tokens_estimated": 1868,
+      "cost_usd": 0.0,
+      "sealed": true,
+      "leakage_ok": true,
+      "score_components": {
+        "exact": 1.0
+      }
+    }
+  ],
+  "note": "Synthetic harness prepared independently of live route/budget grants; no production routing auto-changes"
+}
