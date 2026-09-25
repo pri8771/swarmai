@@ -29,8 +29,16 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [loadOpts, setLoadOpts] = useState(() => resolveConsoleLoadOpts())
 
-  const reload = () => {
+  const reload = (nextMissionId?: string) => {
     const opts = resolveConsoleLoadOpts()
+    if (nextMissionId) {
+      opts.missionId = nextMissionId
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        url.searchParams.set('missionId', nextMissionId)
+        window.history.replaceState({}, '', url.toString())
+      }
+    }
     setLoadOpts(opts)
     setLoading(true)
     setError(null)
@@ -81,7 +89,7 @@ export default function App() {
     return (
       <div className="shell" data-testid="error-state">
         <p>Console failed to load: {error ?? 'empty'}</p>
-        <button type="button" data-testid="retry-load" onClick={reload}>
+        <button type="button" data-testid="retry-load" onClick={() => reload()}>
           Retry
         </button>
         <p className="muted" data-testid="error-no-mock-recover">
@@ -116,12 +124,46 @@ export default function App() {
             Concurrent planners, real capacity units, and honest unknown states — not a vanity agent
             counter.
           </p>
+          <p className="muted" data-testid="public-hostname">
+            Public hostname: <code>{snap.hostnamePublic}</code>
+            {snap.serverReady === true ? ' · server ready' : null}
+            {snap.serverReady === false ? ' · server not ready' : null}
+            {loadOpts.baseUrl ? (
+              <>
+                {' '}
+                · API <code>{loadOpts.baseUrl}</code>
+              </>
+            ) : null}
+          </p>
         </div>
         <div className="mode-pill" data-testid="mode-banner">
           <strong>{snap.mode.toUpperCase()}</strong>
           <span>{scrubSecrets(snap.mockVsLive)}</span>
         </div>
       </header>
+
+      {snap.mode === 'live' && snap.history.length > 0 ? (
+        <div className="actions" data-testid="mission-picker">
+          <label htmlFor="mission-select">
+            Focus mission{' '}
+            <select
+              id="mission-select"
+              data-testid="mission-select"
+              value={snap.mission.missionId}
+              onChange={(e) => reload(e.target.value)}
+            >
+              {snap.history.map((h) => (
+                <option key={h.missionId} value={h.missionId}>
+                  {h.missionId.slice(0, 12)}… · {h.status} · {h.goal.slice(0, 48)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="button" data-testid="refresh-live" onClick={() => reload()}>
+            Refresh
+          </button>
+        </div>
+      ) : null}
 
       <nav className="tabs" aria-label="Console sections">
         {tabs.map((t) => (
@@ -319,6 +361,12 @@ export default function App() {
               <li key={a.artifactId} data-testid={`artifact-${a.artifactId}`}>
                 <code>{a.artifactId}</code> — {a.kind}
                 {a.summary ? <div className="muted">{a.summary}</div> : null}
+                {a.contentHash ? (
+                  <div className="muted" data-testid={`artifact-hash-${a.artifactId}`}>
+                    sha256: <code>{a.contentHash}</code>
+                    {typeof a.byteLength === 'number' ? ` · ${a.byteLength} bytes` : null}
+                  </div>
+                ) : null}
                 {a.uri ? (
                   <div className="muted">
                     <code>{a.uri}</code>
@@ -327,6 +375,9 @@ export default function App() {
               </li>
             ))}
           </ul>
+          {snap.artifacts.length === 0 ? (
+            <p data-testid="empty-artifacts">No artifacts for focused mission.</p>
+          ) : null}
         </Panel>
       ) : null}
 

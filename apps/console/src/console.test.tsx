@@ -48,6 +48,9 @@ describe('console fixtures', () => {
       'fetch',
       vi.fn(async (input: RequestInfo) => {
         const url = String(input)
+        if (url.endsWith('/health/ready')) {
+          return new Response(JSON.stringify({ status: 'ready', database: 'up' }), { status: 200 })
+        }
         if (url.endsWith('/v1/capacity')) {
           return new Response(
             JSON.stringify({
@@ -73,6 +76,34 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
+        if (url.includes('/v1/missions/msn_live_shared/artifacts')) {
+          return new Response(
+            JSON.stringify({
+              artifacts: [
+                {
+                  artifact_id: 'art_live_1',
+                  kind: 'result',
+                  content_hash: 'abc123deadbeef',
+                  byte_length: 12,
+                  summary: 'live artifact',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/missions/msn_live_shared/graph')) {
+          return new Response(
+            JSON.stringify({
+              mission_id: 'msn_live_shared',
+              tasks: [{ id: 'tsk_1', objective: 'extract', status: 'ready' }],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/events')) {
+          return new Response(JSON.stringify({ items: [] }), { status: 200 })
+        }
         if (url.includes('/v1/missions/msn_live_shared')) {
           return new Response(
             JSON.stringify({
@@ -87,22 +118,118 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
+        if (url.endsWith('/v1/projects')) {
+          return new Response(
+            JSON.stringify({
+              projects: [
+                {
+                  project_id: 'proj_a',
+                  name: 'Live proj',
+                  repo_path: '/app',
+                  allow_paid: false,
+                  allowed_tools: [],
+                  updated_at: '2026-09-25T00:00:00Z',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
         if (url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
-          return new Response(JSON.stringify({ routes: [], workers: [] }), { status: 200 })
+          return new Response(
+            JSON.stringify({
+              routes: [],
+              workers: [
+                {
+                  worker_id: 'wk_live_1',
+                  status: 'online',
+                  generation: 1,
+                  capacity: 1,
+                  privacy: ['local'],
+                  claimed: null,
+                  revoked: false,
+                },
+              ],
+            }),
+            { status: 200 },
+          )
         }
         return new Response('missing', { status: 404 })
       }),
     )
     const snap = await loadSnapshot({ mode: 'live', baseUrl: 'http://127.0.0.1:9' })
     expect(snap.mode).toBe('live')
+    expect(snap.hostnamePublic).toBe('swarm.splitsignal.ai')
+    expect(snap.serverReady).toBe(true)
     expect(snap.mission.missionId).toBe('msn_live_shared')
     expect(snap.mission.objective).toBe('unfamiliar live goal')
+    expect(snap.mission.tasks).toHaveLength(1)
     expect(snap.history[0]?.missionId).toBe('msn_live_shared')
+    expect(snap.artifacts[0]?.contentHash).toBe('abc123deadbeef')
+    expect(snap.projects[0]?.projectId).toBe('proj_a')
+    expect(snap.workers[0]?.workerId).toBe('wk_live_1')
     expect(snap.routes).toEqual([])
-    expect(snap.workers).toEqual([])
     expect(snap.profiles).toEqual([])
     expect(snap.mockVsLive).not.toContain('fixtures_only')
     expect(snap.mockVsLive).not.toContain('fixture-labeled')
+  })
+
+  it('live mode respects missionId selection for artifacts', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        const url = String(input)
+        if (url.endsWith('/health/ready')) {
+          return new Response(JSON.stringify({ status: 'ready' }), { status: 200 })
+        }
+        if (url.endsWith('/v1/capacity')) {
+          return new Response(JSON.stringify({ buckets: [] }), { status: 200 })
+        }
+        if (url.endsWith('/v1/missions')) {
+          return new Response(
+            JSON.stringify({
+              missions: [
+                { mission_id: 'msn_a', objective: 'A', status: 'planning' },
+                { mission_id: 'msn_b', objective: 'B', status: 'completed' },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/missions/msn_b/artifacts')) {
+          return new Response(
+            JSON.stringify({
+              artifacts: [{ artifact_id: 'art_b', kind: 'result', content_hash: 'hash_b' }],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/missions/msn_b/graph')) {
+          return new Response(JSON.stringify({ tasks: [] }), { status: 200 })
+        }
+        if (url.includes('/v1/missions/msn_b')) {
+          return new Response(
+            JSON.stringify({
+              mission: { id: 'msn_b', objective: 'B', status: 'completed', revision: 3 },
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/v1/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects')) {
+          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [] }), {
+            status: 200,
+          })
+        }
+        return new Response('missing', { status: 404 })
+      }),
+    )
+    const snap = await loadSnapshot({
+      mode: 'live',
+      baseUrl: 'http://127.0.0.1:9',
+      missionId: 'msn_b',
+    })
+    expect(snap.mission.missionId).toBe('msn_b')
+    expect(snap.artifacts[0]?.contentHash).toBe('hash_b')
   })
 
   it('live mode without baseUrl is honest empty not mock fixtures', async () => {
@@ -229,8 +356,87 @@ describe('operator console UI (live/operational default)', () => {
     vi.stubGlobal('location', { ...window.location, search: '' })
     render(<App />)
     expect(await screen.findByTestId('mode-banner')).toHaveTextContent('LIVE')
+    expect(screen.getByTestId('public-hostname')).toHaveTextContent('swarm.splitsignal.ai')
     expect(screen.getByTestId('live-no-fixture-mutate')).toBeInTheDocument()
     expect(screen.queryByTestId('expand-mission')).not.toBeInTheDocument()
     expect(screen.queryByText(/Recover with mock fixtures/i)).not.toBeInTheDocument()
+  })
+
+  it('renders live mission picker artifacts with content hash', async () => {
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '?mode=live&baseUrl=http://127.0.0.1:9&missionId=msn_live_shared',
+      href: 'http://127.0.0.1:43127/?mode=live&baseUrl=http://127.0.0.1:9&missionId=msn_live_shared',
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo) => {
+        const url = String(input)
+        if (url.endsWith('/health/ready')) {
+          return new Response(JSON.stringify({ status: 'ready' }), { status: 200 })
+        }
+        if (url.endsWith('/v1/capacity')) {
+          return new Response(JSON.stringify({ buckets: [], mock_vs_live: 'live' }), { status: 200 })
+        }
+        if (url.endsWith('/v1/missions')) {
+          return new Response(
+            JSON.stringify({
+              missions: [
+                {
+                  mission_id: 'msn_live_shared',
+                  objective: 'TH-05 live UI',
+                  status: 'planning',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/artifacts')) {
+          return new Response(
+            JSON.stringify({
+              artifacts: [
+                {
+                  artifact_id: 'art_ui',
+                  kind: 'result',
+                  content_hash: 'hash_ui_proof',
+                  summary: 'ui proof',
+                },
+              ],
+            }),
+            { status: 200 },
+          )
+        }
+        if (url.includes('/graph')) {
+          return new Response(JSON.stringify({ tasks: [] }), { status: 200 })
+        }
+        if (url.includes('/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects')) {
+          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [] }), {
+            status: 200,
+          })
+        }
+        if (url.includes('/v1/missions/msn_live_shared')) {
+          return new Response(
+            JSON.stringify({
+              mission: {
+                id: 'msn_live_shared',
+                objective: 'TH-05 live UI',
+                status: 'planning',
+                revision: 1,
+              },
+            }),
+            { status: 200 },
+          )
+        }
+        return new Response('missing', { status: 404 })
+      }),
+    )
+    const user = userEvent.setup()
+    render(<App />)
+    expect(await screen.findByTestId('mode-banner')).toHaveTextContent('LIVE')
+    expect(screen.getByTestId('mission-panel')).toHaveTextContent('msn_live_shared')
+    expect(screen.getByTestId('mission-picker')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Artifacts' }))
+    expect(await screen.findByTestId('artifact-hash-art_ui')).toHaveTextContent('hash_ui_proof')
   })
 })

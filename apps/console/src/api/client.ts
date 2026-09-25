@@ -1,9 +1,10 @@
 /** Browser API client — never embeds provider secrets. */
 
-import type { ConsoleSnapshot, HistoryRow, MissionGraph } from './types'
+import type { ConsoleSnapshot, HistoryRow, MissionGraph, MissionTask } from './types'
 import { MOCK_SNAPSHOT } from '../data/fixtures'
 
 const SECRET_RE = /(sk-[a-zA-Z0-9]+|api_key\s*=\s*\S+)/i
+export const PUBLIC_HOSTNAME = 'swarm.splitsignal.ai'
 
 export function scrubSecrets(value: string): string {
   return value.replace(SECRET_RE, '[redacted]')
@@ -37,14 +38,20 @@ export function emptyLiveSnapshot(opts?: {
   capacity?: ConsoleSnapshot['capacity']
   routes?: ConsoleSnapshot['routes']
   workers?: ConsoleSnapshot['workers']
+  projects?: ConsoleSnapshot['projects']
+  artifacts?: ConsoleSnapshot['artifacts']
+  events?: ConsoleSnapshot['events']
   errors?: string[]
   mockVsLive?: string
+  serverReady?: boolean | null
 }): ConsoleSnapshot {
   return {
     mode: 'live',
     mockVsLive:
       opts?.mockVsLive ??
       'operational_empty_or_observed_from_api_not_fixture_catalog',
+    hostnamePublic: PUBLIC_HOSTNAME,
+    serverReady: opts?.serverReady ?? null,
     mission: opts?.mission ?? emptyLiveMission(),
     routes: opts?.routes ?? [],
     capacity: opts?.capacity ?? [],
@@ -52,27 +59,41 @@ export function emptyLiveSnapshot(opts?: {
     workers: opts?.workers ?? [],
     profiles: [],
     approvals: [],
-    projects: [],
+    projects: opts?.projects ?? [],
     history: opts?.history ?? [],
-    artifacts: [],
-    events: [],
+    artifacts: opts?.artifacts ?? [],
+    events: opts?.events ?? [],
     streamInterrupted: false,
     errors: opts?.errors ?? [],
   }
 }
 
-function missionFromApi(raw: Record<string, unknown>): MissionGraph {
+function missionFromApi(raw: Record<string, unknown>, tasks: MissionTask[] = []): MissionGraph {
   return {
     missionId: String(raw.id ?? raw.mission_id ?? '(unknown)'),
     revision: Number(raw.revision ?? 1),
     status: String(raw.status ?? 'unknown'),
     objective: String(raw.objective ?? raw.goal ?? ''),
-    tasks: [],
+    tasks,
     planningRoles: [],
     logicalAgents: 0,
     busyWorkers: 0,
     inFlightInference: 0,
   }
+}
+
+function tasksFromGraph(graph: Record<string, unknown>): MissionTask[] {
+  const rows = Array.isArray(graph.tasks) ? (graph.tasks as Array<Record<string, unknown>>) : []
+  return rows.map((t) => ({
+    id: String(t.id ?? t.task_id ?? ''),
+    objective: String(t.objective ?? t.goal ?? ''),
+    status: String(t.status ?? 'unknown'),
+    roleHint: (t.role_hint as string | undefined) ?? (t.roleHint as string | undefined),
+    waitingReason:
+      (t.waiting_reason as string | undefined) ?? (t.waitingReason as string | undefined),
+    unblockEvent:
+      (t.unblock_event as string | undefined) ?? (t.unblockEvent as string | undefined),
+  }))
 }
 
 function historyFromList(items: Array<Record<string, unknown>>): HistoryRow[] {
@@ -81,11 +102,24 @@ function historyFromList(items: Array<Record<string, unknown>>): HistoryRow[] {
     projectId: (row.project_id as string | null) ?? null,
     goal: String(row.objective ?? row.goal ?? ''),
     status: String(row.status ?? 'unknown'),
-    costUsd: 0,
-    artifactCount: 0,
+    costUsd: Number(row.cost_usd ?? 0),
+    artifactCount: Number(row.artifact_count ?? 0),
     tags: [String(row.source ?? 'mission_store')],
     updatedAt: String(row.updated_at ?? ''),
   }))
+}
+
+async function fetchJson(
+  url: string,
+  headers: Record<string, string>,
+): Promise<{ ok: boolean; status: number; body: unknown }> {
+  const res = await fetch(url, { headers })
+  if (!res.ok) {
+    return { ok: false, status: res.status, body: null }
+  }
+  const body = await res.json()
+  assertNoSecretsInBundle(body)
+  return { ok: true, status: res.status, body }
 }
 
 export async function createLiveMission(opts: {
@@ -130,6 +164,7 @@ export async function loadSnapshot(opts: {
   mode: 'mock' | 'live'
   baseUrl?: string
   token?: string
+  missionId?: string
 }): Promise<ConsoleSnapshot> {
   // Fixture UI is explicit mock mode only — never mixed into live/operational.
   if (opts.mode === 'mock') {
@@ -139,12 +174,12 @@ export async function loadSnapshot(opts: {
   }
 
   if (!opts.baseUrl) {
-    // Live/operational without an API base: honest empty, not fixtures.
     const snap = emptyLiveSnapshot({
       errors: [
         'Live mode with no baseUrl — showing empty operational state (not mock fixtures).',
       ],
       mockVsLive: 'operational_empty_no_api_base_not_fixture_catalog',
+      serverReady: null,
     })
     assertNoSecretsInBundle(snap)
     return snap
@@ -152,54 +187,117 @@ export async function loadSnapshot(opts: {
 
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
 
-  const [capacityRes, missionsRes, routesRes, workersRes] = await Promise.all([
-    fetch(`${opts.baseUrl}/v1/capacity`, { headers }),
-    fetch(`${opts.baseUrl}/v1/missions`, { headers }),
-    fetch(`${opts.baseUrl}/v1/routes`, { headers }),
-    fetch(`${opts.baseUrl}/v1/workers`, { headers }),
-  ])
+  const [readyRes, capacityRes, missionsRes, routesRes, workersRes, projectsRes] =
+    await Promise.all([
+      fetchJson(`${base}/health/ready`, headers),
+      fetchJson(`${base}/v1/capacity`, headers),
+      fetchJson(`${base}/v1/missions`, headers),
+      fetchJson(`${base}/v1/routes`, headers),
+      fetchJson(`${base}/v1/workers`, headers),
+      fetchJson(`${base}/v1/projects`, headers),
+    ])
+
   if (!capacityRes.ok) {
     throw new Error(`api_error_${capacityRes.status}`)
   }
   if (!missionsRes.ok) {
     throw new Error(`api_error_${missionsRes.status}`)
   }
-  const capacity = await capacityRes.json()
-  const missionsPayload = await missionsRes.json()
-  assertNoSecretsInBundle(capacity)
-  assertNoSecretsInBundle(missionsPayload)
+
+  const capacity = capacityRes.body as Record<string, unknown>
+  const missionsPayload = missionsRes.body as Record<string, unknown>
+  const serverReady =
+    readyRes.ok &&
+    typeof readyRes.body === 'object' &&
+    readyRes.body !== null &&
+    (readyRes.body as { status?: string }).status === 'ready'
 
   const items = Array.isArray(missionsPayload.missions)
     ? (missionsPayload.missions as Array<Record<string, unknown>>)
     : Array.isArray(missionsPayload.items)
       ? (missionsPayload.items as Array<Record<string, unknown>>)
       : []
+
+  const preferredId = (opts.missionId || '').trim()
+  const selectedRow =
+    (preferredId && items.find((row) => String(row.mission_id ?? '') === preferredId)) ||
+    items[0] ||
+    null
+
   let mission = emptyLiveMission()
-  if (items.length > 0) {
-    const firstId = String(items[0].mission_id ?? '')
-    if (firstId) {
-      const detailRes = await fetch(`${opts.baseUrl}/v1/missions/${firstId}`, { headers })
-      if (detailRes.ok) {
-        const detail = await detailRes.json()
-        assertNoSecretsInBundle(detail)
-        mission = missionFromApi((detail.mission ?? items[0]) as Record<string, unknown>)
-      } else {
-        mission = missionFromApi(items[0])
-      }
+  let artifacts: ConsoleSnapshot['artifacts'] = []
+  let events: ConsoleSnapshot['events'] = []
+
+  if (selectedRow) {
+    const missionId = String(selectedRow.mission_id ?? '')
+    const [detailRes, graphRes, artsRes, eventsRes] = await Promise.all([
+      fetchJson(`${base}/v1/missions/${missionId}`, headers),
+      fetchJson(`${base}/v1/missions/${missionId}/graph`, headers),
+      fetchJson(`${base}/v1/missions/${missionId}/artifacts`, headers),
+      fetchJson(`${base}/v1/events?mission_id=${encodeURIComponent(missionId)}&limit=50`, headers),
+    ])
+
+    const tasks = graphRes.ok
+      ? tasksFromGraph((graphRes.body ?? {}) as Record<string, unknown>)
+      : []
+
+    if (detailRes.ok) {
+      const detail = detailRes.body as Record<string, unknown>
+      mission = missionFromApi((detail.mission ?? selectedRow) as Record<string, unknown>, tasks)
+    } else {
+      mission = missionFromApi(selectedRow, tasks)
+    }
+
+    if (artsRes.ok) {
+      const artsBody = artsRes.body as Record<string, unknown>
+      const rows = Array.isArray(artsBody.artifacts)
+        ? (artsBody.artifacts as Array<Record<string, unknown>>)
+        : []
+      artifacts = rows.map((a) => ({
+        artifactId: String(a.artifact_id ?? a.id ?? ''),
+        kind: String(a.kind ?? 'artifact'),
+        uri: (a.uri as string | undefined) ?? undefined,
+        summary: (a.summary as string | undefined) ?? undefined,
+        contentHash:
+          (a.content_hash as string | undefined) ?? (a.sha256 as string | undefined) ?? undefined,
+        mediaType: (a.media_type as string | undefined) ?? undefined,
+        byteLength:
+          typeof a.byte_length === 'number'
+            ? a.byte_length
+            : typeof a.byteLength === 'number'
+              ? a.byteLength
+              : undefined,
+      }))
+    }
+
+    if (eventsRes.ok) {
+      const evBody = eventsRes.body as Record<string, unknown>
+      const rows = Array.isArray(evBody.items)
+        ? (evBody.items as Array<Record<string, unknown>>)
+        : Array.isArray(evBody.events)
+          ? (evBody.events as Array<Record<string, unknown>>)
+          : []
+      events = rows.map((e, idx) => ({
+        id: String(e.id ?? e.event_id ?? `evt_${idx}`),
+        type: String(e.type ?? e.event_type ?? 'event'),
+        summary: String(e.summary ?? e.type ?? e.event_type ?? ''),
+      }))
     }
   }
 
   const routes: ConsoleSnapshot['routes'] = []
   if (routesRes.ok) {
-    const routesPayload = await routesRes.json()
-    assertNoSecretsInBundle(routesPayload)
+    const routesPayload = routesRes.body as Record<string, unknown>
     for (const row of (routesPayload.routes ?? []) as Array<Record<string, unknown>>) {
       routes.push({
         routeId: String(row.route_id ?? row.routeId ?? ''),
         provider: String(row.provider ?? row.provider_id ?? 'unknown'),
         modelId: (row.model_id as string | null) ?? null,
-        availability: String(row.availability_status ?? row.availability ?? 'unknown') as ConsoleSnapshot['routes'][0]['availability'],
+        availability: String(
+          row.availability_status ?? row.availability ?? 'unknown',
+        ) as ConsoleSnapshot['routes'][0]['availability'],
         status: String(row.status ?? 'unknown'),
         capabilityClaims: Array.isArray(row.observed_capabilities)
           ? (row.observed_capabilities as string[])
@@ -212,8 +310,7 @@ export async function loadSnapshot(opts: {
 
   const workers: ConsoleSnapshot['workers'] = []
   if (workersRes.ok) {
-    const workersPayload = await workersRes.json()
-    assertNoSecretsInBundle(workersPayload)
+    const workersPayload = workersRes.body as Record<string, unknown>
     for (const row of (workersPayload.workers ?? []) as Array<Record<string, unknown>>) {
       workers.push({
         workerId: String(row.worker_id ?? row.workerId ?? ''),
@@ -228,30 +325,59 @@ export async function loadSnapshot(opts: {
     }
   }
 
+  const projects: ConsoleSnapshot['projects'] = []
+  if (projectsRes.ok) {
+    const projectsPayload = projectsRes.body as Record<string, unknown>
+    for (const row of (projectsPayload.projects ?? []) as Array<Record<string, unknown>>) {
+      projects.push({
+        projectId: String(row.project_id ?? ''),
+        name: String(row.name ?? ''),
+        repoPath: String(row.repo_path ?? ''),
+        allowPaid: Boolean(row.allow_paid),
+        allowedTools: Array.isArray(row.allowed_tools) ? (row.allowed_tools as string[]) : [],
+        updatedAt: String(row.updated_at ?? ''),
+      })
+    }
+  }
+
+  const history = historyFromList(items).map((h) =>
+    h.missionId === mission.missionId
+      ? { ...h, artifactCount: Math.max(h.artifactCount, artifacts.length) }
+      : h,
+  )
+
+  mission = {
+    ...mission,
+    busyWorkers: workers.filter((w) => w.status === 'busy' || w.claimed).length,
+    logicalAgents: workers.length,
+  }
+
   return emptyLiveSnapshot({
     mission,
-    history: historyFromList(items),
+    history,
     routes,
     workers,
-    capacity: (capacity.buckets ?? []).map(
-      (b: {
-        bucket_id: string
-        dimension: string
-        remaining: number | null
-        limit: number | null
-      }) => ({
-        bucketId: b.bucket_id,
-        dimension: b.dimension,
-        remaining: b.remaining,
-        limit: b.limit,
-      }),
-    ),
+    projects,
+    artifacts,
+    events,
+    serverReady,
+    capacity: ((capacity.buckets ?? []) as Array<{
+      bucket_id: string
+      dimension: string
+      remaining: number | null
+      limit: number | null
+    }>).map((b) => ({
+      bucketId: b.bucket_id,
+      dimension: b.dimension,
+      remaining: b.remaining,
+      limit: b.limit,
+    })),
     errors: items.length
       ? []
       : ['No durable missions in MissionStore yet (honest empty live state).'],
     mockVsLive:
       String(capacity.mock_vs_live ?? '') ||
-      'live_missions_capacity_routes_workers_from_api_not_fixtures',
+      'live_missions_artifacts_workers_projects_from_api_not_fixtures',
   })
 }
 
@@ -263,6 +389,7 @@ export function resolveConsoleLoadOpts(): {
   mode: 'mock' | 'live'
   baseUrl?: string
   token?: string
+  missionId?: string
 } {
   if (typeof window === 'undefined') {
     return { mode: 'live' }
@@ -271,5 +398,6 @@ export function resolveConsoleLoadOpts(): {
   const mode = params.get('mode') === 'mock' ? 'mock' : 'live'
   const baseUrl = params.get('baseUrl') || undefined
   const token = params.get('token') || undefined
-  return { mode, baseUrl, token }
+  const missionId = params.get('missionId') || undefined
+  return { mode, baseUrl, token, missionId }
 }

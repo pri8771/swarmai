@@ -5,6 +5,8 @@ import type { ConsoleSnapshot } from '../api/types'
 export const MOCK_SNAPSHOT: ConsoleSnapshot = {
   mode: 'mock',
   mockVsLive: 'console_fixtures_only_not_live_providers',
+  hostnamePublic: 'swarm.splitsignal.ai',
+  serverReady: null,
   mission: {
     missionId: 'mission_demo_001',
     revision: 3,

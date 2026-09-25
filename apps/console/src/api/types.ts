@@ -103,11 +103,16 @@ export interface ArtifactRow {
   kind: string
   uri?: string
   summary?: string
+  contentHash?: string
+  mediaType?: string
+  byteLength?: number
 }
 
 export interface ConsoleSnapshot {
   mode: 'mock' | 'live'
   mockVsLive: string
+  hostnamePublic: string
+  serverReady: boolean | null
   mission: MissionGraph
   routes: RouteRow[]
   capacity: CapacityBucket[]

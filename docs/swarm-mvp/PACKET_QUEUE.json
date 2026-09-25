@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:40:00Z",
+  "updated_at": "2026-09-25T15:45:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -80,10 +80,20 @@
     {
       "id": "TH-05",
       "title": "Minimal mission UI on real execution state",
-      "status": "planned",
+      "status": "impl_complete",
       "depends_on": [
         "TH-02"
-      ]
+      ],
+      "evidence": "docs/evidence/two-host/TH-05/",
+      "acceptance_notes": [
+        "Console live mode loads missions/projects/workers/artifacts from loopback API",
+        "Mission picker focuses durable mission; artifacts show content_hash",
+        "Hostname swarm.splitsignal.ai in UI bundle",
+        "vitest + production build pass; no secrets in dist",
+        "Node live snapshot parity with console fetch set"
+      ],
+      "mac_verify": "passed",
+      "r730_verify": "blocked"
     },
     {
       "id": "TH-06",

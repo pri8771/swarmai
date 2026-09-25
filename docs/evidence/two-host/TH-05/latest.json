@@ -1,0 +1,102 @@
+{
+  "packet": "TH-05",
+  "hostname_public": "swarm.splitsignal.ai",
+  "server_url": "http://127.0.0.1:18766",
+  "console_port": 43127,
+  "started_at": "2026-09-25T15:45:01.440065+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "steps": [
+    {
+      "step": "health_ready",
+      "ok": true
+    },
+    {
+      "step": "select_real_mission_with_artifact",
+      "ok": true,
+      "mission_id": "9cf531a7e66e4454b931f69ced6a0e13",
+      "artifact_id": "art_914acd848a00479293fe5aedd5029ec5",
+      "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+      "mission_count": 6
+    },
+    {
+      "step": "console_live_endpoints",
+      "ok": true,
+      "mission_status": "planning",
+      "objective": "TH-04 durable artifact recovery 9640e6eebda1",
+      "graph_task_count": 0,
+      "worker_count": 1,
+      "project_count": 1
+    },
+    {
+      "step": "console_url_template",
+      "ok": true,
+      "url": "http://127.0.0.1:43127/?mode=live&baseUrl=http://127.0.0.1:18766&missionId=9cf531a7e66e4454b931f69ced6a0e13",
+      "note": "append &token=<loopback> for browser; never commit tokens"
+    },
+    {
+      "step": "npm_install",
+      "ok": true,
+      "skipped": true
+    },
+    {
+      "step": "console_vitest",
+      "ok": true,
+      "returncode": 0,
+      "stdout_tail": "\n> console@0.1.0 test\n> vitest run\n\n\n RUN  v5.0.1 /Users/pchordia/Downloads/swarm-ai-two-host-mvp/apps/console\n\n\n Test Files  1 passed (1)\n      Tests  18 passed (18)\n   Start at  11:45:01\n   Duration  804ms (environment 46%, tests 35%, setup 7%, transform 7%, import 5%)\n\n",
+      "stderr_tail": ""
+    },
+    {
+      "step": "console_build",
+      "ok": true,
+      "returncode": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "dist_no_secrets_has_hostname",
+      "ok": true,
+      "secret_free": true,
+      "hostname_in_bundle": true
+    },
+    {
+      "step": "node_live_snapshot_parity",
+      "ok": true,
+      "returncode": 0,
+      "parity": {
+        "ok": true,
+        "mission_id": "9cf531a7e66e4454b931f69ced6a0e13",
+        "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+        "worker_count": 1,
+        "project_count": 1,
+        "hostname_public": "swarm.splitsignal.ai"
+      },
+      "stderr_tail": ""
+    }
+  ],
+  "health_ready": {
+    "status": "ready",
+    "execution_mode": "operational",
+    "fixture_mode": false,
+    "providers_network": false,
+    "allow_paid": false,
+    "database": "up",
+    "runtime": "ok",
+    "configured_accounts": 0,
+    "configured_routes": 0,
+    "mock_vs_live": "operational_empty_or_observed_not_mock_broker"
+  },
+  "mission_id": "9cf531a7e66e4454b931f69ced6a0e13",
+  "artifact_id": "art_914acd848a00479293fe5aedd5029ec5",
+  "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+  "console_url_template": "http://127.0.0.1:43127/?mode=live&baseUrl=http://127.0.0.1:18766&missionId=9cf531a7e66e4454b931f69ced6a0e13",
+  "live_snapshot_parity": {
+    "ok": true,
+    "mission_id": "9cf531a7e66e4454b931f69ced6a0e13",
+    "content_hash": "a21e29cc4efeb126f2e9192c375e73f7bb25b9c54c6c3850c2df9778b8c8ee99",
+    "worker_count": 1,
+    "project_count": 1,
+    "hostname_public": "swarm.splitsignal.ai"
+  },
+  "ok": true,
+  "finished_at": "2026-09-25T15:45:03.992237+00:00"
+}
