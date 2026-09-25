@@ -212,23 +212,23 @@ class LayeredMemoryService:
         if resolve_sources:
             by_id = {r.memory_id: r for r in self.store.list_all()}
             for sid in selected_source_ids:
-                rec = by_id.get(sid)
-                if rec is None:
+                source = by_id.get(sid)
+                if source is None:
                     omitted["source_unresolved"] += 1
                     continue
-                if rec.project_id != project_id:
+                if source.project_id != project_id:
                     omitted["wrong_project"] += 1
                     continue
-                content = rec.content
+                content = source.content
                 content, was_trunc, prov = self.truncate_tool_output(
-                    content, provenance=rec.provenance
+                    content, provenance=source.provenance
                 )
                 truncated = truncated or was_trunc
-                cost = max(1, min(rec.tokens_estimate, len(content.split())))
+                cost = max(1, min(source.tokens_estimate, len(content.split())))
                 if used + cost > token_budget:
                     omitted["budget_truncated"] += 1
                     continue
-                payload = rec.to_dict()
+                payload = source.to_dict()
                 payload["content"] = content
                 payload["provenance"] = prov
                 source_out.append(payload)
