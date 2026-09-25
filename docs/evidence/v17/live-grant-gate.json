@@ -1,0 +1,25 @@
+{
+  "packet": "V1.7-live-grant-gate",
+  "hostname_public": "swarm.splitsignal.ai",
+  "mode": "live",
+  "blocked": true,
+  "blocked_missing_grant": true,
+  "blocked_unapproved_draft": true,
+  "reason": "grant_prepared_but_not_approved",
+  "grant": {
+    "grant_id": "lg_prepared_v17_not_approved",
+    "routes": [
+      "rt_free_qualified_only"
+    ],
+    "budget_usd": 0.0,
+    "approved": false,
+    "free_routes_only": true,
+    "max_calls": 3,
+    "max_tokens": 4000,
+    "max_wall_seconds": 120,
+    "purpose": "v17_native_model_mission"
+  },
+  "spend_usd": 0,
+  "invented_approval": false,
+  "note": "Operator must approve before live dispatch; fake upstream E2E covers mechanics."
+}

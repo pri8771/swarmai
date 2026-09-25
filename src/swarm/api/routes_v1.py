@@ -23,8 +23,14 @@ from swarm.api.schemas import (
     ProbeRequest,
     ProjectCreateRequest,
     ProjectUpdateRequest,
+    WorkerCancelLeaseRequest,
+    WorkerClaimRequest,
+    WorkerEnqueueTaskRequest,
     WorkerEnrollRequest,
     WorkerHeartbeatRequest,
+    WorkerReconnectRequest,
+    WorkerRenewRequest,
+    WorkerSubmitResultRequest,
 )
 from swarm.api.store import ProductStore
 from swarm.contracts.common import new_id, payload_hash
@@ -36,6 +42,7 @@ router = APIRouter(prefix="/v1")
 
 def get_store(request: Request) -> ProductStore:
     return request.app.state.store  # type: ignore[no-any-return]
+
 
 def _history_project_id(store: ProductStore, mission_id: str) -> str | None:
     try:
@@ -50,8 +57,6 @@ def _history_project_id(store: ProductStore, mission_id: str) -> str | None:
         if row.get("mission_id") == mission_id and row.get("project_id"):
             return str(row["project_id"])
     return None
-
-
 
 
 def _page(items: list[Any], *, limit: int, cursor: str | None) -> dict[str, Any]:
@@ -268,7 +273,7 @@ async def stream_events(
             events = [e for e in events if e.project_id in allowed or is_admin]
         for ev in events:
             yield f"id: {ev.id}\nevent: {ev.type}\ndata: {ev.model_dump_json()}\n\n"
-        yield f"event: cursor\ndata: {{\"cursor\": \"{cursor or ''}\"}}\n\n"
+        yield f'event: cursor\ndata: {{"cursor": "{cursor or ""}"}}\n\n'
 
     return StreamingResponse(gen(), media_type="text/event-stream")
 
@@ -284,9 +289,7 @@ async def providers(
         "providers": list_providers(mode=mode),
         "accounts": store.public_accounts(),
         "mock_vs_live": (
-            "fixture_catalog"
-            if store.fixture_mode
-            else "catalog_status_not_live_eligibility"
+            "fixture_catalog" if store.fixture_mode else "catalog_status_not_live_eligibility"
         ),
     }
 
@@ -558,8 +561,307 @@ async def worker_heartbeat(
         and "admin" not in principal.roles
     ):
         raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
-    lease = await store.workers.heartbeat(body.worker_id, body.generation, token=body.token)
-    return {"worker": lease.model_dump(mode="json"), "project_id": rec.project_id}
+    try:
+        lease = await store.workers.heartbeat(body.worker_id, body.generation, token=body.token)
+    except Exception as exc:  # noqa: BLE001 — map auth/fence errors
+        from swarm.workers.registry import StaleGenerationError, WorkerAuthError
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    return {
+        "worker": lease.model_dump(mode="json"),
+        "project_id": rec.project_id,
+        "cancel_notices": store.workers.cancel_notices_for(body.worker_id),
+        "active_lease_ids": list(rec.active_lease_ids),
+    }
+
+
+@router.post("/workers/claim")
+async def worker_claim(
+    body: WorkerClaimRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    if body.generation != rec.lease.lease_generation:
+        raise ApiError("stale_generation", "worker generation mismatch", status_code=409)
+    try:
+        claimed = await store.workers.claim_work(body.worker_id, token=body.token)
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import StaleGenerationError, WorkerAuthError
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    if not claimed.claimed or claimed.lease is None:
+        return {
+            "claimed": False,
+            "cancel_notices": claimed.cancel_notices,
+            "agent_profile_id": body.agent_profile_id,
+        }
+    lease = claimed.lease
+    return {
+        "claimed": True,
+        "lease_id": lease.lease_id,
+        "task_id": lease.task.id,
+        "mission_id": lease.task.mission_id,
+        "project_id": rec.project_id,
+        "worker_generation": lease.worker_generation,
+        "expires_at": lease.expires_at.isoformat(),
+        "state": lease.state,
+        "task": lease.task.model_dump(mode="json"),
+        "cancel_notices": claimed.cancel_notices,
+        "agent_profile_id": body.agent_profile_id,
+    }
+
+
+@router.post("/workers/renew")
+async def worker_renew(
+    body: WorkerRenewRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    try:
+        lease = store.workers.renew_lease(
+            lease_id=body.lease_id,
+            worker_id=body.worker_id,
+            generation=body.generation,
+            token=body.token,
+            extend_seconds=body.extend_seconds,
+        )
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import (
+            LeaseStateError,
+            StaleGenerationError,
+            WorkerAuthError,
+        )
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        if isinstance(exc, LeaseStateError):
+            raise ApiError("lease_state", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    return {
+        "lease_id": lease.lease_id,
+        "state": lease.state,
+        "expires_at": lease.expires_at.isoformat(),
+        "progress_class": body.progress_class,
+        "cancel_notices": store.workers.cancel_notices_for(body.worker_id),
+    }
+
+
+@router.post("/workers/submit-result")
+async def worker_submit_result(
+    body: WorkerSubmitResultRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(
+        {
+            "lease_id": body.lease_id,
+            "worker_id": body.worker_id,
+            "status": body.status,
+            "checks": body.checks,
+            "artifact_manifest": body.artifact_manifest,
+            "result_id": body.result_id,
+            "operation": "workers.submit_result",
+        }
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=rec.project_id or "",
+        operation="workers.submit_result",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    try:
+        payload = store.workers.submit_result(
+            lease_id=body.lease_id,
+            worker_id=body.worker_id,
+            generation=body.generation,
+            token=body.token,
+            status=body.status,
+            checks=body.checks,
+            artifact_manifest=body.artifact_manifest,
+            usage=body.usage,
+            summary=body.summary,
+            result_id=body.result_id,
+        )
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import (
+            LeaseStateError,
+            StaleGenerationError,
+            WorkerAuthError,
+        )
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        if isinstance(exc, LeaseStateError):
+            raise ApiError("lease_state", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    # Explicit: worker submit never self-accepts.
+    result = {
+        **payload,
+        "self_accepted": False,
+        "acceptance_requires": "control_plane",
+    }
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=rec.project_id or "",
+        operation="workers.submit_result",
+        request_digest=digest,
+    )
+
+
+@router.post("/workers/cancel-lease")
+async def worker_cancel_lease(
+    body: WorkerCancelLeaseRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    lease = store.workers._leases.get(body.lease_id)
+    if lease is None:
+        raise ApiError("not_found", "lease not found", status_code=404)
+    rec = store.workers._workers.get(lease.worker_id)
+    if rec is not None and rec.project_id:
+        if rec.project_id not in principal.project_ids and "admin" not in principal.roles:
+            raise ApiError("forbidden_project", "lease not in project scope", status_code=403)
+    try:
+        cancelled = store.workers.cancel_lease(lease_id=body.lease_id, reason=body.reason)
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import LeaseStateError
+
+        if isinstance(exc, LeaseStateError):
+            raise ApiError("lease_state", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    return {
+        "lease_id": cancelled.lease_id,
+        "state": cancelled.state,
+        "reason": cancelled.cancel_reason,
+    }
+
+
+@router.post("/workers/reconnect")
+async def worker_reconnect(
+    body: WorkerReconnectRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    try:
+        payload = store.workers.reconnect(
+            body.worker_id, generation=body.generation, token=body.token
+        )
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import StaleGenerationError, WorkerAuthError
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    return payload
+
+
+@router.post("/workers/enqueue")
+async def worker_enqueue_task(
+    body: WorkerEnqueueTaskRequest,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, Any]:
+    from swarm.contracts.mission import TaskSpec
+
+    try:
+        task = TaskSpec.model_validate(body.task)
+    except Exception as exc:  # noqa: BLE001
+        raise ApiError("invalid_request", f"invalid task: {exc}", status_code=400) from exc
+    auth.require_project(principal, task.project_id)
+    key = body.idempotency_key or idempotency_key
+    digest = payload_hash(
+        {"task_id": task.id, "mission_id": task.mission_id, "operation": "enqueue"}
+    )
+    cached = store.recall_idempotent(
+        key,
+        actor=principal.subject,
+        project_id=task.project_id,
+        operation="workers.enqueue",
+        request_digest=digest,
+    )
+    if cached is not None:
+        return cached
+    store.workers.enqueue(task)
+    store._persist_durable_workers()
+    result = {
+        "enqueued": True,
+        "task_id": task.id,
+        "mission_id": task.mission_id,
+        "queue_depth": len(store.workers._dispatch_queue),
+    }
+    return store.store_idempotent(
+        key,
+        result,
+        actor=principal.subject,
+        project_id=task.project_id,
+        operation="workers.enqueue",
+        request_digest=digest,
+    )
 
 
 @router.get("/approvals")
@@ -958,11 +1260,7 @@ async def create_project(
     if project_id:
         auth.require_project(principal, project_id)
     else:
-        project_id = (
-            sorted(principal.project_ids)[0]
-            if principal.project_ids
-            else new_id("proj_")
-        )
+        project_id = sorted(principal.project_ids)[0] if principal.project_ids else new_id("proj_")
     digest = payload_hash(
         {
             "name": body.name,
@@ -1238,6 +1536,8 @@ async def freeze_candidate(
 
     root = Path(__file__).resolve().parents[3]
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
-    return CandidateFreezer(root).freeze(
-        source_sha=sha, schema_revision="a18tov30schema0001"
-    ).to_dict()
+    return (
+        CandidateFreezer(root)
+        .freeze(source_sha=sha, schema_revision="a18tov30schema0001")
+        .to_dict()
+    )

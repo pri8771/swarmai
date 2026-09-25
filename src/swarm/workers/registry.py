@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from swarm.contracts.common import new_id, utc_now
@@ -20,6 +20,35 @@ class StaleGenerationError(PermissionError):
     pass
 
 
+class LeaseStateError(RuntimeError):
+    pass
+
+
+@dataclass
+class DispatchLease:
+    """Server-owned work lease — workers submit results; they never self-accept."""
+
+    lease_id: str
+    task: TaskSpec
+    worker_id: str
+    worker_generation: int
+    expires_at: datetime
+    state: str = "claimed"  # claimed | renewed | cancelled | submitted | expired
+    cancel_requested: bool = False
+    cancel_reason: str | None = None
+    result_id: str | None = None
+    result_payload: dict[str, Any] | None = None
+    submitted_at: datetime | None = None
+    acceptance_state: str = "pending"  # pending | accepted | rejected — control-plane only
+
+
+@dataclass
+class ClaimedDispatch:
+    claimed: bool
+    lease: DispatchLease | None = None
+    cancel_notices: list[str] = field(default_factory=list)
+
+
 @dataclass
 class WorkerRecord:
     lease: WorkerLease
@@ -30,18 +59,27 @@ class WorkerRecord:
     named_inference_urls: list[str] = field(default_factory=list)
     measured_capacity: float = 1.0
     claimed_task_id: str | None = None
+    active_lease_ids: list[str] = field(default_factory=list)
     last_heartbeat: Any = field(default_factory=utc_now)
 
 
 class WorkerRegistryService:
     """Trusted control-plane registry — no raw provider secrets on workers."""
 
-    def __init__(self, *, heartbeat_ttl_seconds: int = 30) -> None:
+    def __init__(
+        self,
+        *,
+        heartbeat_ttl_seconds: int = 30,
+        lease_ttl_seconds: int = 60,
+    ) -> None:
         self.heartbeat_ttl = timedelta(seconds=heartbeat_ttl_seconds)
+        self.lease_ttl = timedelta(seconds=lease_ttl_seconds)
         self._workers: dict[str, WorkerRecord] = {}
         self._tokens: dict[str, str] = {}
         self._quarantine: set[str] = set()
         self._dispatch_queue: list[TaskSpec] = []
+        self._leases: dict[str, DispatchLease] = {}
+        self._results: dict[str, dict[str, Any]] = {}
 
     async def register(
         self,
@@ -82,35 +120,221 @@ class WorkerRegistryService:
         rec.lease = rec.lease.model_copy(update={"heartbeat_at": rec.last_heartbeat})
         return rec.lease
 
+    def cancel_notices_for(self, worker_id: str) -> list[str]:
+        notices: list[str] = []
+        now = utc_now()
+        for lease in self._leases.values():
+            if lease.worker_id != worker_id:
+                continue
+            if lease.cancel_requested and lease.state not in {"cancelled", "submitted"}:
+                notices.append(lease.lease_id)
+            elif lease.state in {"claimed", "renewed"} and lease.expires_at <= now:
+                lease.state = "expired"
+                notices.append(lease.lease_id)
+        return notices
+
     def enqueue(self, task: TaskSpec) -> None:
         self._dispatch_queue.append(task)
 
+    def _task_matches_worker(self, task: TaskSpec, rec: WorkerRecord) -> bool:
+        needed = set(task.required_capabilities)
+        have = set(rec.lease.capabilities)
+        if needed and not needed.issubset(have):
+            return False
+        if "local_only" in task.scopes and "local" not in rec.privacy_classes:
+            return False
+        if "mac_local" in task.scopes and "mac_local" not in rec.privacy_classes:
+            return False
+        return True
+
     async def claim_dispatch(self, worker_id: str, *, token: str) -> TaskSpec | None:
+        """Backward-compatible claim — returns TaskSpec or None."""
+        claimed = await self.claim_work(worker_id, token=token)
+        return claimed.lease.task if claimed.claimed and claimed.lease else None
+
+    async def claim_work(self, worker_id: str, *, token: str) -> ClaimedDispatch:
         rec = self._require(worker_id, token)
+        notices = self.cancel_notices_for(worker_id)
         if rec.lease.status == WorkerStatus.DRAINING:
-            return None
+            return ClaimedDispatch(claimed=False, cancel_notices=notices)
         if worker_id in self._quarantine:
-            return None
-        # Capability / runtime mismatch check.
+            return ClaimedDispatch(claimed=False, cancel_notices=notices)
+        if rec.claimed_task_id is not None:
+            # One active claim per worker for this registry path.
+            return ClaimedDispatch(claimed=False, cancel_notices=notices)
+
+        pending: list[TaskSpec] = []
+        matched: TaskSpec | None = None
         while self._dispatch_queue:
             task = self._dispatch_queue.pop(0)
-            needed = set(task.required_capabilities)
-            have = set(rec.lease.capabilities)
-            if needed and not needed.issubset(have):
-                # Put back and skip — mismatch prevents dispatch.
-                self._dispatch_queue.insert(0, task)
-                return None
-            # Local-only privacy never migrates to unauthorized cloud.
-            if "local_only" in task.scopes and "local" not in rec.privacy_classes:
-                self._dispatch_queue.insert(0, task)
-                return None
-            # Mac-local tasks require an enrolled Mac connector privacy class.
-            if "mac_local" in task.scopes and "mac_local" not in rec.privacy_classes:
-                self._dispatch_queue.insert(0, task)
-                return None
-            rec.claimed_task_id = task.id
-            return task
-        return None
+            if self._task_matches_worker(task, rec):
+                matched = task
+                break
+            pending.append(task)
+        # Restore unmatched tasks in original relative order.
+        self._dispatch_queue = pending + self._dispatch_queue
+        if matched is None:
+            return ClaimedDispatch(claimed=False, cancel_notices=notices)
+
+        lease = DispatchLease(
+            lease_id=new_id("lease_"),
+            task=matched,
+            worker_id=worker_id,
+            worker_generation=rec.lease.lease_generation,
+            expires_at=utc_now() + self.lease_ttl,
+            state="claimed",
+        )
+        self._leases[lease.lease_id] = lease
+        rec.claimed_task_id = matched.id
+        rec.active_lease_ids.append(lease.lease_id)
+        return ClaimedDispatch(claimed=True, lease=lease, cancel_notices=notices)
+
+    def renew_lease(
+        self,
+        *,
+        lease_id: str,
+        worker_id: str,
+        generation: int,
+        token: str,
+        extend_seconds: int | None = None,
+    ) -> DispatchLease:
+        rec = self._require(worker_id, token)
+        if generation != rec.lease.lease_generation:
+            raise StaleGenerationError("renew_generation_mismatch")
+        lease = self._leases.get(lease_id)
+        if lease is None:
+            raise LeaseStateError("lease_not_found")
+        if lease.worker_id != worker_id:
+            raise LeaseStateError("lease_worker_mismatch")
+        if lease.cancel_requested or lease.state == "cancelled":
+            raise LeaseStateError("lease_cancelled")
+        if lease.state == "submitted":
+            raise LeaseStateError("lease_already_submitted")
+        if lease.expires_at <= utc_now():
+            lease.state = "expired"
+            raise LeaseStateError("lease_expired")
+        ttl = timedelta(seconds=extend_seconds) if extend_seconds else self.lease_ttl
+        lease.expires_at = utc_now() + ttl
+        lease.state = "renewed"
+        return lease
+
+    def submit_result(
+        self,
+        *,
+        lease_id: str,
+        worker_id: str,
+        generation: int,
+        token: str,
+        status: str,
+        checks: dict[str, Any] | None = None,
+        artifact_manifest: dict[str, Any] | None = None,
+        usage: dict[str, Any] | None = None,
+        summary: str | None = None,
+        result_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Durable submit only — never accepts. Control plane accepts separately."""
+        rec = self._require(worker_id, token)
+        if generation != rec.lease.lease_generation:
+            raise StaleGenerationError("submit_generation_mismatch")
+        lease = self._leases.get(lease_id)
+        if lease is None:
+            raise LeaseStateError("lease_not_found")
+        if lease.worker_id != worker_id:
+            raise LeaseStateError("lease_worker_mismatch")
+        if lease.cancel_requested or lease.state == "cancelled":
+            raise LeaseStateError("lease_cancelled")
+        if lease.state == "expired" or lease.expires_at <= utc_now():
+            lease.state = "expired"
+            raise LeaseStateError("lease_expired")
+        if lease.state == "submitted" and lease.result_id:
+            # Idempotent replay of same result_id.
+            existing = self._results.get(lease.result_id)
+            if existing is not None:
+                return existing
+
+        rid = result_id or new_id("res_")
+        payload = {
+            "result_id": rid,
+            "lease_id": lease_id,
+            "attempt_id": new_id("att_"),
+            "task_id": lease.task.id,
+            "mission_id": lease.task.mission_id,
+            "worker_id": worker_id,
+            "status": status,
+            "checks": dict(checks or {}),
+            "artifact_manifest": dict(artifact_manifest or {}),
+            "usage": dict(usage or {}),
+            "summary": (summary or "")[:400],
+            "acceptance_state": "pending",
+            "submitted_at": utc_now().isoformat(),
+        }
+        self._results[rid] = payload
+        lease.state = "submitted"
+        lease.result_id = rid
+        lease.result_payload = payload
+        lease.submitted_at = utc_now()
+        lease.acceptance_state = "pending"
+        rec.claimed_task_id = None
+        if lease_id in rec.active_lease_ids:
+            rec.active_lease_ids = [x for x in rec.active_lease_ids if x != lease_id]
+        return payload
+
+    def control_plane_accept_result(self, result_id: str, *, accepted: bool) -> dict[str, Any]:
+        """Control-plane only — workers must not call this."""
+        row = self._results.get(result_id)
+        if row is None:
+            raise LeaseStateError("result_not_found")
+        row = dict(row)
+        row["acceptance_state"] = "accepted" if accepted else "rejected"
+        row["accepted_at"] = utc_now().isoformat()
+        self._results[result_id] = row
+        lease = self._leases.get(str(row.get("lease_id") or ""))
+        if lease is not None:
+            lease.acceptance_state = row["acceptance_state"]
+        return row
+
+    def cancel_lease(self, *, lease_id: str, reason: str = "cancelled") -> DispatchLease:
+        lease = self._leases.get(lease_id)
+        if lease is None:
+            raise LeaseStateError("lease_not_found")
+        if lease.state == "submitted":
+            raise LeaseStateError("cannot_cancel_submitted")
+        lease.cancel_requested = True
+        lease.cancel_reason = reason
+        lease.state = "cancelled"
+        rec = self._workers.get(lease.worker_id)
+        if rec is not None:
+            if rec.claimed_task_id == lease.task.id:
+                rec.claimed_task_id = None
+            if lease_id in rec.active_lease_ids:
+                rec.active_lease_ids = [x for x in rec.active_lease_ids if x != lease_id]
+        return lease
+
+    def reconnect(self, worker_id: str, *, generation: int, token: str) -> dict[str, Any]:
+        rec = self._require(worker_id, token)
+        if generation != rec.lease.lease_generation:
+            raise StaleGenerationError("reconnect_generation_mismatch")
+        rec.last_heartbeat = utc_now()
+        active = [
+            {
+                "lease_id": lease.lease_id,
+                "task_id": lease.task.id,
+                "mission_id": lease.task.mission_id,
+                "state": lease.state,
+                "expires_at": lease.expires_at.isoformat(),
+                "cancel_requested": lease.cancel_requested,
+                "worker_generation": lease.worker_generation,
+            }
+            for lease in self._leases.values()
+            if lease.worker_id == worker_id and lease.state in {"claimed", "renewed"}
+        ]
+        return {
+            "worker_id": worker_id,
+            "generation": generation,
+            "status": rec.lease.status.value,
+            "active_leases": active,
+            "cancel_notices": self.cancel_notices_for(worker_id),
+        }
 
     async def drain(self, worker_id: str, *, token: str) -> WorkerLease:
         rec = self._require(worker_id, token)
@@ -185,6 +409,7 @@ class WorkerRegistryService:
                     "capacity": float(r.measured_capacity),
                     "privacy": sorted(r.privacy_classes),
                     "claimed": r.claimed_task_id,
+                    "active_leases": list(r.active_lease_ids),
                     "revoked": r.revoked,
                 }
             )
@@ -201,6 +426,10 @@ class WorkerRegistryService:
                 for wid in self._quarantine
                 if project_id is None
                 or (self._workers.get(wid) and self._workers[wid].project_id == project_id)
+            ),
+            "dispatch_queue_depth": len(self._dispatch_queue),
+            "active_lease_count": sum(
+                1 for lease in self._leases.values() if lease.state in {"claimed", "renewed"}
             ),
         }
 

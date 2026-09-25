@@ -1,10 +1,11 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:45Z  
-**Integration branch:** `dev` @ `5236fbba`  
+**Updated:** 2026-09-25T17:50Z  
+**Integration branch:** `dev` @ `e9ae85c4`  
+**Lane A branch:** `cursor/v17-connector-collab-e2e-b28d` (supersedes #45)  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Other lane drafts blocked on failing offline CI and/or rebase onto `5236fbba`.
+**Consolidate:** PR #50 (Lane B / R7) merged into `dev`. Lane A rebased onto `e9ae85c4`; prefer #49 over #45.
 
 ## Single authority
 
@@ -25,7 +26,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | ID | Status | Protected tests / notes |
 |---|---|---|
 | R1 | **fixed** | Reject caller `required_checks` override; require artifact before accept |
-| R2 | **mitigated** | Durable worker + idempotency mirror under `var/`; continuous lease connector still V1.7 |
+| R2 | **mitigated→connector landed** | Continuous claim/renew/submit/cancel/reconnect + durable registry; PG still preferred when configured (`cursor/v17-connector-collab-e2e-b28d`) |
 | R3 | **fixed** | Locked merge-safe artifact index; durable idempotent artifact IDs |
 | R4 | **fixed** | Content reads enforce tombstone via `resolve` |
 | R5 | **fixed** | Harness-owned nonce verdict; path-gated sandbox |
@@ -47,17 +48,17 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 | PR | Lane | Tip | Disposition |
 |---|---|---|---|
-| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba`) |
+| #50 | B foundation CI | `4d512777` | **merged** into `dev` (`5236fbba` / docs `e9ae85c4`) |
 | #46 | C V1.8 Goals | `2ea1e655` | blocked — offline ruff fail; rebase onto `dev` |
 | #48 | D V1.9 Pursuit | `1f6c0ddd` | blocked — offline pytest fail (`artifact_required`); skip until newer tip green |
-| #45 | A connector | `e4212873` | blocked — offline ruff; superseded content in #49 |
-| #49 | A connector+E2E | `330277b3` | blocked — offline ruff; prefer over #45 when green |
+| #45 | A connector | `e4212873` | **superseded by #49** — close when #49 green |
+| #49 | A connector+collab+E2E | rebasing onto `e9ae85c4` | preferred Lane A land |
 | #47 | F acceptance | `3d1b8358` | blocked — offline ruff |
 | #51 | E product UI | `3ae1e31f` | blocked — offline ruff; needs #46+#48 first |
 
 ## Next
 
-1. Lanes rebase onto `origin/dev` @ `5236fbba` and re-run hosted CI.  
-2. Merge next green non-conflicting drafts in order: #49 (or #45) → #46 → #48 (when green) → #47 → #51.  
-3. R2 continuous connector + V1.7 integrated mission with ≥1 authorized model-backed run.  
+1. Land #49 (Lane A) onto `dev` after offline CI green.  
+2. Close #45 as superseded.  
+3. Other lanes rebase onto `dev` and re-run hosted CI.  
 4. Do **not** merge `main`.

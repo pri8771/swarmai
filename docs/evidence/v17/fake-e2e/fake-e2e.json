@@ -1,0 +1,14 @@
+{
+  "packet": "V1.7-fake-upstream-e2e",
+  "hostname_public": "swarm.splitsignal.ai",
+  "solver": "fake_inference_broker",
+  "runtime": "native",
+  "route_id": "rt_fake_alpha",
+  "model_calls": 1,
+  "spend_usd": 0.0,
+  "artifact_id": "art_20c5d612c5604c4a812a6cfda46191bc",
+  "protected_accepted": true,
+  "live_grant": null,
+  "live_mode": false,
+  "invented_approval": false
+}

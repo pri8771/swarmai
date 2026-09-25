@@ -66,6 +66,54 @@ class WorkerHeartbeatRequest(StrictModel):
     token: str
 
 
+class WorkerClaimRequest(StrictModel):
+    worker_id: str
+    generation: int
+    token: str
+    agent_profile_id: str = "ap_default"
+
+
+class WorkerRenewRequest(StrictModel):
+    lease_id: str
+    worker_id: str
+    generation: int
+    token: str
+    progress_class: str = "running"
+    extend_seconds: int | None = None
+
+
+class WorkerSubmitResultRequest(StrictModel):
+    lease_id: str
+    worker_id: str
+    generation: int
+    token: str
+    status: str = "completed"
+    checks: dict[str, Any] = Field(default_factory=dict)
+    artifact_manifest: dict[str, Any] = Field(default_factory=dict)
+    usage: dict[str, Any] = Field(default_factory=dict)
+    summary: str | None = None
+    result_id: str | None = None
+    idempotency_key: str | None = None
+
+
+class WorkerCancelLeaseRequest(StrictModel):
+    lease_id: str
+    reason: str = "cancelled"
+
+
+class WorkerReconnectRequest(StrictModel):
+    worker_id: str
+    generation: int
+    token: str
+
+
+class WorkerEnqueueTaskRequest(StrictModel):
+    """Control-plane enqueue of a TaskSpec for outbound connector claim."""
+
+    task: dict[str, Any]
+    idempotency_key: str | None = None
+
+
 class ApprovalResolveRequest(StrictModel):
     accept: bool
     payload: dict[str, Any] | None = None

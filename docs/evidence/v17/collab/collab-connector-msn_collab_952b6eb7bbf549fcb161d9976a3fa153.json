@@ -1,0 +1,119 @@
+{
+  "packet": "V1.7-collab-continuous-connector",
+  "hostname_public": "swarm.splitsignal.ai",
+  "ok": true,
+  "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+  "collab": {
+    "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+    "agents": [
+      "agent_x",
+      "agent_y"
+    ],
+    "message_count": 2,
+    "messages": [
+      {
+        "message_id": "msg_70a4a547852c4ec283a80cd78c9bc194",
+        "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+        "from_agent": "agent_x",
+        "to_agent": "agent_y",
+        "kind": "request_help",
+        "body": "Please continue mac_local extract; I will hand off context.",
+        "evidence_refs": [
+          "art_partial_1"
+        ],
+        "created_at": "2026-09-25T17:29:44.950362+00:00"
+      },
+      {
+        "message_id": "msg_9309142a7a4a47968874b7ef4b6f1a1d",
+        "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+        "from_agent": "agent_y",
+        "to_agent": "agent_x",
+        "kind": "evidence",
+        "body": "Ready to assume lease after KT handoff.",
+        "evidence_refs": [],
+        "created_at": "2026-09-25T17:29:44.950502+00:00"
+      }
+    ],
+    "handoffs": [
+      {
+        "handoff_id": "ho_396005a2a6b442d483a6c5819fbf5dd7",
+        "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+        "from_agent": "agent_x",
+        "to_agent": "agent_y",
+        "context_digest": "9049e178e08606106c7839fe1eb6b376d7e418a98214203928b30184fd81a18f",
+        "event_watermark": "wm_msn_collab_952b6eb7bbf549fcb161d9976a3fa153",
+        "inbox_cursor": 2,
+        "retained_facts": [
+          "placement=mac_local",
+          "email_count_pending"
+        ],
+        "open_commitments": [
+          "claim_lease",
+          "submit_result_pending_accept"
+        ],
+        "created_at": "2026-09-25T17:29:44.950535+00:00",
+        "adopted": true,
+        "authority_expanded": false
+      }
+    ],
+    "active_generation": {
+      "agent_x": 1,
+      "agent_y": 2
+    },
+    "spend_usd": 0
+  },
+  "connector_steps": [
+    {
+      "step": "enroll",
+      "agent": "agent_x",
+      "worker_id": "wk_77adfd9b64b347f0bbc494fa8a698010",
+      "generation": 1
+    },
+    {
+      "step": "enroll",
+      "agent": "agent_y",
+      "worker_id": "wk_b3c4fad5931d4d06a07d20b5776ffc35",
+      "generation": 1
+    },
+    {
+      "step": "enqueue",
+      "task_id": "tsk_fd8e65acb0dc468e9e104b5fc78f3260",
+      "mission_id": "msn_collab_952b6eb7bbf549fcb161d9976a3fa153"
+    },
+    {
+      "step": "predecessor_claim_blocked",
+      "agent": "agent_x",
+      "ok": true
+    },
+    {
+      "step": "claim",
+      "agent": "agent_y",
+      "claimed": true,
+      "lease_id": "lease_40f5f4f7f4c44310b46652b4a80a6a3f"
+    },
+    {
+      "step": "renew",
+      "lease_id": "lease_40f5f4f7f4c44310b46652b4a80a6a3f",
+      "state": "renewed",
+      "expires_at": "2026-09-25T17:30:44.950635+00:00"
+    },
+    {
+      "step": "submit_result",
+      "result_id": "res_e3391288d00f45379828a1640c04705b",
+      "acceptance_state": "pending",
+      "self_accepted": false
+    },
+    {
+      "step": "predecessor_post_handoff_claim",
+      "claimed": false,
+      "blocked_by_board": true
+    }
+  ],
+  "predecessor_blocked_after_handoff": true,
+  "successor_submitted": true,
+  "self_accepted": false,
+  "one_shot": false,
+  "continuous_lease_path": true,
+  "spend_usd": 0.0,
+  "finished_at": "2026-09-25T17:29:44.951025+00:00"
+}
