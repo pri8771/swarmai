@@ -332,6 +332,23 @@ def test_pursuit_api_tick_and_lesson(tmp_path: Path) -> None:
     assert rolled.json()["lesson"]["state"] == "rolled_back"
 
 
+def test_ongoing_goal_never_auto_achieved(tmp_path: Path) -> None:
+    from swarm.goals.models import GoalKind
+
+    goals, goal = _goal(
+        tmp_path,
+        kind=GoalKind.ONGOING,
+        verification_criteria=["c1"],
+    )
+    engine = PursuitEngine(goals, executor=RecordingExecutor(default_success=True))
+    cycle = engine.tick(goal.id, force=True)
+    assert cycle.outcome is not None and cycle.outcome.success
+    refreshed = goals.get(goal.id)
+    assert refreshed.status == GoalStatus.ACTIVE
+    assert refreshed.mission_outcomes
+    assert refreshed.mission_outcomes[0]["outcome"] == "succeeded"
+
+
 def test_negative_budget_raises() -> None:
     goal = Goal(
         project_id="p",
