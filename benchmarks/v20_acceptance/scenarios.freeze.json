@@ -1,0 +1,302 @@
+{
+  "schema_version": "2.0.0",
+  "freeze_id": "v20-acceptance-campaign-20260925",
+  "frozen_at": "2026-09-25T17:00:00+00:00",
+  "mandate_section": 10,
+  "public_hostname": "swarm.splitsignal.ai",
+  "version_claim_policy": "never_mark_accepted_from_harness",
+  "spend_policy": "zero_no_invented_live_grant",
+  "observation_windows": {
+    "elapsed_reliability": {
+      "predeclared": true,
+      "simulate_elapsed_time": false,
+      "default_window_hours": 24,
+      "status": "not_started"
+    }
+  },
+  "gates": {
+    "deterministic": {
+      "id": "deterministic",
+      "description": "Local mechanics with fake upstreams; no credentials; no wall-clock claim",
+      "requires_live_grant": false,
+      "requires_host": false,
+      "requires_elapsed_window": false
+    },
+    "live": {
+      "id": "live",
+      "description": "Authorized model/tool routes only; approved LiveGrant required; never invent grants",
+      "requires_live_grant": true,
+      "requires_host": false,
+      "requires_elapsed_window": false
+    },
+    "host": {
+      "id": "host",
+      "description": "Two-host / R730 / DNS-CF qualification; two local processes do not satisfy",
+      "requires_live_grant": false,
+      "requires_host": true,
+      "requires_elapsed_window": false
+    },
+    "elapsed": {
+      "id": "elapsed",
+      "description": "Wall-clock reliability observation; do not simulate elapsed time",
+      "requires_live_grant": false,
+      "requires_host": false,
+      "requires_elapsed_window": true
+    }
+  },
+  "scenarios": [
+    {
+      "id": "V20-S01",
+      "title": "Finite multi-mission goal",
+      "mandate_ref": "§10 finite multi-mission goal",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.8", "V1.9", "V2.0"],
+      "setup": "Create a finite Goal with verification criteria; link ≥2 successive missions toward the outcome.",
+      "pass_criteria": [
+        "Goal persists desired_outcome, verification_criteria, and linked mission_ids",
+        "Mission completion does not auto-mark Goal achieved",
+        "Goal reaches achieved only when verification criteria are independently satisfied"
+      ],
+      "fail_criteria": [
+        "Mission accept forges Goal achievement",
+        "Missing verification criteria still yields achieved"
+      ],
+      "deterministic_probe": "goal_multi_mission_link"
+    },
+    {
+      "id": "V20-S02",
+      "title": "Failed approach → strategy change",
+      "mandate_ref": "§10 failed approach → strategy change",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.9", "V2.0"],
+      "setup": "Record a failed mission approach; require strategy update before admitting a duplicate-shaped mission.",
+      "pass_criteria": [
+        "Decision history records failure reason and new strategy",
+        "Duplicate approach without strategy change is refused or marked stagnation",
+        "Next admitted mission references updated strategy"
+      ],
+      "fail_criteria": [
+        "Endless retry of identical failed approach",
+        "Strategy mutated by generated text expanding authority"
+      ],
+      "deterministic_probe": "goal_strategy_change_after_failure"
+    },
+    {
+      "id": "V20-S03",
+      "title": "Ongoing goal across cycles",
+      "mandate_ref": "§10 ongoing goal across cycles",
+      "primary_gate": "deterministic",
+      "also_gates": ["elapsed"],
+      "versions": ["V1.8", "V1.9", "V2.0"],
+      "setup": "Ongoing Goal without terminal achieved; run ≥2 pursuit cycles with progress retained.",
+      "pass_criteria": [
+        "Goal remains active/waiting after cycle completion",
+        "Progress and decision history retained across cycles",
+        "Stop conditions / review cadence honored when triggered"
+      ],
+      "fail_criteria": [
+        "Ongoing Goal auto-achieved on any mission success",
+        "Cycle state lost on restart of pursuit loop"
+      ],
+      "deterministic_probe": "goal_ongoing_cycles"
+    },
+    {
+      "id": "V20-S04",
+      "title": "Blocked then available prerequisite",
+      "mandate_ref": "§10 blocked then available prerequisite",
+      "primary_gate": "deterministic",
+      "also_gates": [],
+      "versions": ["V1.8", "V1.9", "V2.0"],
+      "setup": "Goal enters blocked with explicit prerequisite; clear prerequisite and resume.",
+      "pass_criteria": [
+        "Illegal transitions rejected",
+        "blocked → active/waiting only with recorded reason",
+        "Blockers list and decision_history reflect the prerequisite lifecycle"
+      ],
+      "fail_criteria": [
+        "Silent unblock without history",
+        "achieved reachable directly from blocked without verification"
+      ],
+      "deterministic_probe": "goal_blocked_then_available"
+    },
+    {
+      "id": "V20-S05",
+      "title": "Collaboration + bounded delegation",
+      "mandate_ref": "§10 collaboration + bounded delegation",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.7", "V1.9", "V2.0"],
+      "setup": "Mission with ≥2 agents; optional peer help; child spawn under depth/budget/scope caps.",
+      "pass_criteria": [
+        "Delegation cannot widen scope, budget, or depth beyond parent envelope",
+        "Idempotent spawn keys admit one child",
+        "Collective mission constraints retained by children"
+      ],
+      "fail_criteria": [
+        "Caller-supplied checks certify completion",
+        "Delegation expands authority via generated text"
+      ],
+      "deterministic_probe": "delegation_bounds_scaffold"
+    },
+    {
+      "id": "V20-S06",
+      "title": "Context succession",
+      "mandate_ref": "§10 context succession",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.7", "V1.9", "V2.0"],
+      "setup": "X→Y succession with fenced takeover; late parent commits refused.",
+      "pass_criteria": [
+        "One active generation after cutover",
+        "Logical identity and inbox preserved",
+        "Stale generation commits refused"
+      ],
+      "fail_criteria": [
+        "Dual active generations",
+        "Trainee writes consequential effects before cutover"
+      ],
+      "deterministic_probe": "succession_fence_scaffold"
+    },
+    {
+      "id": "V20-S07",
+      "title": "Server restart / worker disconnect / stale return",
+      "mandate_ref": "§10 server restart / worker disconnect / stale return",
+      "primary_gate": "deterministic",
+      "also_gates": ["host"],
+      "versions": ["V1.7", "V2.0"],
+      "setup": "Coordinator restart; worker disconnect; stale lease return after reconnect.",
+      "pass_criteria": [
+        "Durable state recovers without duplicate effects",
+        "Stale generation/lease results refused",
+        "Host gate evidence required for two-host claims"
+      ],
+      "fail_criteria": [
+        "Two local processes claimed as two-host proof",
+        "Stale return accepted as fresh completion"
+      ],
+      "deterministic_probe": "restart_stale_return_scaffold"
+    },
+    {
+      "id": "V20-S08",
+      "title": "Duplicate triggers / lost acks",
+      "mandate_ref": "§10 duplicate triggers / lost acks",
+      "primary_gate": "deterministic",
+      "also_gates": [],
+      "versions": ["V1.7", "V1.8", "V1.9", "V2.0"],
+      "setup": "Replay identical trigger/ack paths for goal pursuit and mission admit.",
+      "pass_criteria": [
+        "Idempotency keys yield one admission",
+        "Lost ack replay does not double-spend budget or spawn",
+        "Duplicate pursuit triggers do not open parallel identical missions"
+      ],
+      "fail_criteria": [
+        "Double admission on replay",
+        "Budget consumed twice for one logical action"
+      ],
+      "deterministic_probe": "duplicate_trigger_idempotency_scaffold"
+    },
+    {
+      "id": "V20-S09",
+      "title": "Pause / redirect / cancel / budget exhaustion",
+      "mandate_ref": "§10 pause/redirect/cancel/budget exhaustion",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.8", "V1.9", "V2.0"],
+      "setup": "Operator pause, redirect (strategy update), cancel, and budget-exhaustion stop.",
+      "pass_criteria": [
+        "pause→active resume retains decision history",
+        "cancel is terminal; no further admissions",
+        "Budget exhaustion stops new spend and records blocker"
+      ],
+      "fail_criteria": [
+        "Work continues after cancel",
+        "Budget ceiling expanded by agent text"
+      ],
+      "deterministic_probe": "goal_pause_cancel_budget"
+    },
+    {
+      "id": "V20-S10",
+      "title": "Memory correction / lesson rollback",
+      "mandate_ref": "§10 memory correction / lesson rollback",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V1.9", "V2.0"],
+      "setup": "Adopt a lesson; correct/tombstone memory; roll back harmful lesson.",
+      "pass_criteria": [
+        "Illegal learning transitions rejected",
+        "Rollback from canary/accepted leaves rolled_back",
+        "Independent review required before canary; no self-approval"
+      ],
+      "fail_criteria": [
+        "Self-approved canary without review_ref",
+        "Holdout plaintext stored on proposal"
+      ],
+      "deterministic_probe": "lesson_rollback"
+    },
+    {
+      "id": "V20-S11",
+      "title": "SDK / UI parity",
+      "mandate_ref": "§10 SDK/UI parity",
+      "primary_gate": "deterministic",
+      "also_gates": ["live"],
+      "versions": ["V2.0"],
+      "setup": "Create goal via SDK then observe in UI and reverse; same contracts.",
+      "pass_criteria": [
+        "Same Goal/Mission definition IDs across UI and SDK",
+        "Start/interrupt/resume operations share API contracts",
+        "Fixture-only UI paths cannot certify product acceptance"
+      ],
+      "fail_criteria": [
+        "UI-only demo state diverges from API",
+        "Parity claimed from screenshots alone"
+      ],
+      "deterministic_probe": "sdk_ui_parity_scaffold"
+    },
+    {
+      "id": "V20-S12",
+      "title": "Authorized model/tool execution with artifacts",
+      "mandate_ref": "§10 authorized model/tool execution with artifacts",
+      "primary_gate": "live",
+      "also_gates": ["deterministic"],
+      "versions": ["V1.7", "V2.0"],
+      "setup": "Authorized free/eligible route executes tools; artifacts retained; verifier-owned checks.",
+      "pass_criteria": [
+        "Live path blocked without approved LiveGrant",
+        "Zero-dollar grants require free_routes_only + call/token/time ceilings",
+        "Completion requires actual artifacts + independently executed checks"
+      ],
+      "fail_criteria": [
+        "Invented LiveGrant or silent paid fallback",
+        "Worker-supplied required_checks forge acceptance"
+      ],
+      "deterministic_probe": "live_grant_gate"
+    }
+  ],
+  "version_matrices": {
+    "V1.7": {
+      "title": "Complete the mission",
+      "required_scenarios": ["V20-S05", "V20-S06", "V20-S07", "V20-S08", "V20-S12"],
+      "accepted": false
+    },
+    "V1.8": {
+      "title": "Durable goals across missions",
+      "required_scenarios": ["V20-S01", "V20-S03", "V20-S04", "V20-S08", "V20-S09"],
+      "accepted": false
+    },
+    "V1.9": {
+      "title": "Autonomous pursuit",
+      "required_scenarios": ["V20-S01", "V20-S02", "V20-S03", "V20-S04", "V20-S05", "V20-S08", "V20-S09", "V20-S10"],
+      "accepted": false
+    },
+    "V2.0": {
+      "title": "Integrated usable product",
+      "required_scenarios": [
+        "V20-S01", "V20-S02", "V20-S03", "V20-S04", "V20-S05", "V20-S06",
+        "V20-S07", "V20-S08", "V20-S09", "V20-S10", "V20-S11", "V20-S12"
+      ],
+      "accepted": false
+    }
+  }
+}

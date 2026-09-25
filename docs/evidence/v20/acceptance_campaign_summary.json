@@ -1,0 +1,47 @@
+{
+  "packet": "V20-ACCEPTANCE-CAMPAIGN",
+  "started_at": "2026-09-25T17:27:50.171135+00:00",
+  "finished_at": "2026-09-25T17:27:50.177889+00:00",
+  "freeze_id": "v20-acceptance-campaign-20260925",
+  "freeze_hash": "7659fc74993a6d20c2276067bac9a91dd4b027fb40ec59e02d46f835553e8842",
+  "run_id": "v20camp_c03463b9e9504af898b40c09177af66f",
+  "report_hash": "8d0ec4a9eacbe4fa2ec69961af450bb6a09a41ffd74127839886b1b58164bbf4",
+  "spend_usd": 0.0,
+  "any_version_accepted": false,
+  "gate_summary": {
+    "deterministic": {
+      "total": 11,
+      "ok": 11,
+      "fail": 0,
+      "blocked": 0
+    },
+    "live": {
+      "total": 1,
+      "ok": 0,
+      "fail": 0,
+      "blocked": 1
+    }
+  },
+  "scenario_statuses": {
+    "V20-S01": "pass_deterministic",
+    "V20-S02": "pass_deterministic",
+    "V20-S03": "pass_deterministic",
+    "V20-S04": "pass_deterministic",
+    "V20-S05": "scaffold_ready_not_integrated",
+    "V20-S06": "scaffold_ready_not_integrated",
+    "V20-S07": "scaffold_ready_not_integrated",
+    "V20-S08": "scaffold_ready_not_integrated",
+    "V20-S09": "pass_deterministic",
+    "V20-S10": "pass_deterministic",
+    "V20-S11": "scaffold_ready_not_integrated",
+    "V20-S12": "blocked_live_grant"
+  },
+  "version_readiness": {
+    "V1.7": "harness_ready_external_gates_blocked",
+    "V1.8": "harness_ready_scaffolds_pending_integration",
+    "V1.9": "harness_ready_scaffolds_pending_integration",
+    "V2.0": "harness_ready_external_gates_blocked"
+  },
+  "public_hostname": "swarm.splitsignal.ai",
+  "note": "Acceptance campaign harness: scenarios frozen before run; deterministic \u2260 live \u2260 host \u2260 elapsed; versions not accepted by harness"
+}

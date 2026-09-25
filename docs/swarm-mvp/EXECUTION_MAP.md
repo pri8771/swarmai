@@ -4,7 +4,7 @@
 **Integration branch:** `dev`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C) landing into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
+**Consolidate:** #50 (R7), #49 (Lane A), #46 (Lane C), #47 (Lane F) merged into `dev`. Hold #48 until rebased; hold #51 until #46+#48.
 
 ## Single authority
 
@@ -14,13 +14,14 @@
 | P00–P19 | Product MVP spine — remains active after foundation |
 | `plan/swarmai-v2-redesign-20260925` @ `8598e6ac` | **Planning donor only** — map requirements; do not run as competing backlog or replace contracts |
 | Independent review R1–R9 | Foundation gate — protected regressions under `tests/foundation/` |
+| V20 acceptance freeze | Lane F — `benchmarks/v20_acceptance/scenarios.freeze.json`; harness cannot accept versions |
 
 ## Version path (mandate)
 
 Foundation (R1–R9) → **V1.7** complete mission → **V1.8** durable goals → **V1.9** autonomous pursuit → **V2.0** integrated product.  
 Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
-## R1–R9 disposition (this branch)
+## R1–R9 disposition (integration tip)
 
 | ID | Status | Protected tests / notes |
 |---|---|---|
@@ -43,6 +44,15 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | Linear MCP | needsAuth — reconciliation queue only |
 | Live paid providers | blocked — fake upstreams first |
 
+## Lane F packet (this map owner)
+
+| Packet | Status | Notes |
+|---|---|---|
+| V20-ACCEPT-FREEZE | **done** | §10 scenarios + pass criteria sealed; gates separated |
+| V20-ACCEPT-HARNESS | **done** | `src/swarm/acceptance/`; CLI `swarm acceptance *`; scaffolds for product-owned scenarios |
+| V20-ACCEPT-MATRICES | **done** | V1.7–V2.0 matrices always `accepted: false` |
+| V20-ACCEPT-LIVE/HOST/ELAPSED | **blocked external** | No invented LiveGrant; host/elapsed not started |
+
 ## Dev consolidate status (2026-09-25)
 
 | PR | Lane | Tip | Disposition |
@@ -51,13 +61,12 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #49 | A connector+collab+E2E | `91250613` | **merged** (includes #45) |
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
+| #47 | F acceptance | `f8d10704` | **merged** |
 | #48 | D V1.9 Pursuit | `65383188` | hold — rebase onto updated `dev` |
-| #47 | F acceptance | `f8d10704` | merging after #49+#46 |
 | #51 | E product UI | `3ae1e31f` | hold until #46+#48 landed |
 
 ## Next
 
-1. Finish merge of #47 (Lane F) into `dev`.  
-2. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
-3. Hold #51 until #46+#48 landed; then rebase/CI.  
-4. Do **not** merge `main`.
+1. Hold #48 until Lane D rebases onto updated `dev` and CI is green.  
+2. Hold #51 until #46+#48 landed; then rebase/CI.  
+3. Do **not** merge `main`.

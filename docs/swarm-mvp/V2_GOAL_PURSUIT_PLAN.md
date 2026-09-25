@@ -72,6 +72,29 @@ Note: the independent review’s cumulative 0.1 roadmap (V1.0–V2.0 packaging l
 Separate: implementation · eng verification · live qualification · independent review · operator acceptance.  
 Code existing ≠ version accepted. No self-approval where independent review is required.
 
+### V2.0 acceptance campaign freeze (Lane F)
+
+**Freeze ID:** `v20-acceptance-campaign-20260925`  
+**Catalog:** `benchmarks/v20_acceptance/scenarios.freeze.json`  
+**Doc:** `docs/v2.0/ACCEPTANCE_CAMPAIGN.md`  
+**Harness:** `src/swarm/acceptance/` · `uv run swarm acceptance run`
+
+| Gate | Meaning | Campaign default |
+|---|---|---|
+| deterministic | Local mechanics / fake upstreams | Executable probes + scaffolds |
+| live | Approved LiveGrant only | Blocked — never invented |
+| host | R730 / two-host / DNS | Blocked — two local processes ≠ proof |
+| elapsed | Wall-clock reliability | Not started — never simulated |
+
+| Version | Required §10 scenarios | Accepted by harness |
+|---|---|---|
+| V1.7 | V20-S05, S06, S07, S08, S12 | **false** |
+| V1.8 | V20-S01, S03, S04, S08, S09 | **false** |
+| V1.9 | V20-S01–S05, S08–S10 | **false** |
+| V2.0 | V20-S01–S12 | **false** |
+
+Scenarios frozen before campaign reliance: finite multi-mission goal; failed approach→strategy change; ongoing goal across cycles; blocked then available prerequisite; collaboration+bounded delegation; context succession; server restart/worker disconnect/stale return; duplicate triggers/lost acks; pause/redirect/cancel/budget exhaustion; memory correction/lesson rollback; SDK/UI parity; authorized model/tool execution with artifacts.
+
 ## Checkpoints to publish
 
 After each major gate: branch SHA, R-matrix or version matrix, evidence paths, CI results, remaining blockers, Linear queue status.

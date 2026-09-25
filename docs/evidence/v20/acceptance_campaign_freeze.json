@@ -1,0 +1,101 @@
+{
+  "packet": "V20-ACCEPTANCE-FREEZE",
+  "started_at": "2026-09-25T17:27:50.171135+00:00",
+  "freeze": {
+    "schema_version": "2.0.0",
+    "freeze_id": "v20-acceptance-campaign-20260925",
+    "frozen_at": "2026-09-25T17:00:00+00:00",
+    "public_hostname": "swarm.splitsignal.ai",
+    "version_claim_policy": "never_mark_accepted_from_harness",
+    "spend_policy": "zero_no_invented_live_grant",
+    "content_hash": "7659fc74993a6d20c2276067bac9a91dd4b027fb40ec59e02d46f835553e8842",
+    "scenario_count": 12,
+    "scenario_ids": [
+      "V20-S01",
+      "V20-S02",
+      "V20-S03",
+      "V20-S04",
+      "V20-S05",
+      "V20-S06",
+      "V20-S07",
+      "V20-S08",
+      "V20-S09",
+      "V20-S10",
+      "V20-S11",
+      "V20-S12"
+    ],
+    "gates": [
+      "deterministic",
+      "elapsed",
+      "host",
+      "live"
+    ],
+    "version_matrices": {
+      "V1.7": {
+        "title": "Complete the mission",
+        "required_scenarios": [
+          "V20-S05",
+          "V20-S06",
+          "V20-S07",
+          "V20-S08",
+          "V20-S12"
+        ],
+        "accepted": false
+      },
+      "V1.8": {
+        "title": "Durable goals across missions",
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S03",
+          "V20-S04",
+          "V20-S08",
+          "V20-S09"
+        ],
+        "accepted": false
+      },
+      "V1.9": {
+        "title": "Autonomous pursuit",
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S02",
+          "V20-S03",
+          "V20-S04",
+          "V20-S05",
+          "V20-S08",
+          "V20-S09",
+          "V20-S10"
+        ],
+        "accepted": false
+      },
+      "V2.0": {
+        "title": "Integrated usable product",
+        "required_scenarios": [
+          "V20-S01",
+          "V20-S02",
+          "V20-S03",
+          "V20-S04",
+          "V20-S05",
+          "V20-S06",
+          "V20-S07",
+          "V20-S08",
+          "V20-S09",
+          "V20-S10",
+          "V20-S11",
+          "V20-S12"
+        ],
+        "accepted": false
+      }
+    },
+    "observation_windows": {
+      "elapsed_reliability": {
+        "predeclared": true,
+        "simulate_elapsed_time": false,
+        "default_window_hours": 24,
+        "status": "not_started"
+      }
+    }
+  },
+  "version_claim_policy": "never_mark_accepted_from_harness",
+  "spend_policy": "zero_no_invented_live_grant",
+  "any_version_accepted": false
+}
