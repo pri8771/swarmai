@@ -1,0 +1,82 @@
+---
+doc: agents_resume
+audience: ai_agent
+pause: true
+base: origin/dev
+tip_floor: dd7726eb8c22986ef72847994c8e435a81a869b6
+accepted: false
+---
+
+# RESUME
+
+## preflight
+
+```text
+git fetch origin dev main
+git rev-parse origin/dev
+# must be >= dd7726eb8c22986ef72847994c8e435a81a869b6
+git rev-parse origin/main
+# must remain 08b910f981eff2ab66873a71055090f2c60f2a91 unless operator moves it
+```
+
+Read order: `CURRENT.md` → `V17_DONE.md` → `V20_TODO.md` → this file → `context.json`.
+
+## pause_now
+
+| key | value |
+|---|---|
+| v20_eng_lanes | STOPPED — do not start E03–E11 code work this pause |
+| this_pr_scope | `docs/agents/` only |
+| tip_sync_owner | PR #66 (do not duplicate STATE/PACKET_QUEUE/EXECUTION_MAP tip-sync) |
+| manifest_wip | PR #68 (CandidateManifest rebind; overlaps E01) |
+| fast_track_docs | PR #67 (+ plan #59) |
+
+## first_actions_when_resume_eng
+
+| step | action | status_hint |
+|---|---|---|
+| 1 | Confirm tip ≥ `dd7726eb`; ignore stale `f39e0032` tracking until #66 lands | required |
+| 2 | Merge/close E01: prefer #66 (all-green MERGEABLE); reconcile/supersede #68 | P0 — not this agents PR |
+| 3 | E02: merge #67 or fix #59 offline CI | P0 parallel |
+| 4 | Next depth eng only after pause lifted: **V20-E03** or **V20-E05** | P1 — blocked until resume |
+| 5 | Keep `accepted: false` / `versions_accepted: false` | mandatory |
+
+## branch_policy
+
+| rule | value |
+|---|---|
+| branch_from | `origin/dev` |
+| pr_base | `dev` |
+| pr_base_forbid | `main` |
+| force_push | forbid |
+| small_prs | required |
+
+## verify_minimal
+
+```text
+uv run pytest tests/mission/test_v17_mission_path.py \
+  tests/pursuit/test_protected_verification.py \
+  tests/mission/test_v17_protected_verify.py \
+  tests/pursuit/test_pursuit_durability.py -q
+# expect 17 passed on tip floor
+
+# after eng changes: targeted suite for touched packages + required CI
+```
+
+## stop_conditions
+
+| if | then |
+|---|---|
+| tip moved past `dd7726eb` | re-verify; update `CURRENT.md` + `context.json` SHAs |
+| LiveGrant requested | refuse invent; wait operator-approved grant |
+| urge to merge main | refuse |
+| urge to flip accepted | refuse |
+
+## pointers
+
+| what | where |
+|---|---|
+| this SoT | `docs/agents/` |
+| stale tracking | `docs/swarm-mvp/STATE.md` (fix via E01) |
+| acceptance status | `docs/v2.0/STATUS.md` |
+| open FT plan | PR #59 |
