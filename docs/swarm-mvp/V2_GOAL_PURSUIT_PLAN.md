@@ -1,11 +1,12 @@
 # SwarmAI V2.0 goal-pursuit plan
 
 **Date:** 2026-09-25  
-**Status:** active — operator mandate supersedes stop-after-foundation  
+**Status:** active — operator mandate supersedes stop-after-foundation; **portable product mandate** now active for independent eng (see Project Context `docs/v2-portable-product-plan.md`)  
 **Repo:** `pri8771/swarmai`  
-**Integration branch:** `dev`  
-**Hostname:** `swarm.splitsignal.ai` (operator-clarified; not `.com`)  
-**Do not:** implement V3/V4; merge to `main`; spend money; publish without auth
+**Integration branch:** `dev` @ `58f72fa5`  
+**Hostname:** deploy may use `swarm.splitsignal.ai` (operator-clarified; not `.com`); freeze must not hardcode (PORT-01)  
+**Do not:** implement V3/V4; merge to `main`; spend money; publish without auth; claim V1.7–V2.0 accepted  
+**Portable packets:** PORT-01–05 in `docs/swarm-mvp/PACKET_QUEUE.json` / `EXECUTION_MAP.md`
 
 ## Mandate summary
 
@@ -69,8 +70,17 @@ Note: the independent review’s cumulative 0.1 roadmap (V1.0–V2.0 packaging l
 
 ## Acceptance discipline
 
-Separate: implementation · eng verification · live qualification · independent review · operator acceptance.  
-Code existing ≠ version accepted. No self-approval where independent review is required.
+Separate explicitly:
+
+1. **Product correctness** (portable eng — PORT-*)  
+2. **Supported-platform qualification**  
+3. **Particular deployment** (R730/CF — does not block generic eng)  
+4. **Live inference** (LiveGrant only)  
+5. **Independent review**  
+6. **Operator acceptance**
+
+Code existing ≠ version accepted. No self-approval where independent review is required.  
+Portable plan: Project Context `docs/v2-portable-product-plan.md`.
 
 ### V2.0 acceptance campaign freeze (Lane F)
 

@@ -1,46 +1,107 @@
 {
   "artifact": "ART-V20-SUPPORT_MATRIX",
-  "status": "evidence_grounded_local",
-  "generated_at": "2026-09-23T16:40:19.617217+00:00",
+  "status": "evidence_grounded_local_plus_portable_draft",
+  "generated_at": "2026-09-25T18:29:00+00:00",
+  "integration_tip": "58f72fa59691a3fd2af53c501598ffa225fdd9cc",
   "spend": "zero",
   "public_launch": false,
+  "versions_accepted": {
+    "V1.7": false,
+    "V1.8": false,
+    "V1.9": false,
+    "V2.0": false
+  },
+  "gate_classes": {
+    "product_correctness": "Generic behavior on supported configs",
+    "supported_platform_qualification": "Explicit OS/arch/runtime evidence",
+    "particular_deployment": "Operator R730/Mac/DNS/CF — does not block generic eng",
+    "live_inference": "Approved LiveGrant only",
+    "independent_review": "Required for promotion",
+    "operator_acceptance": "Required for release claim"
+  },
   "surfaces": {
     "api": {
       "status": "implemented",
+      "gate_class": "product_correctness",
       "evidence": "tests/api/test_api.py"
     },
     "cli": {
       "status": "implemented",
+      "gate_class": "product_correctness",
       "evidence": "src/swarm/cli.py install/recovery/objectives"
     },
     "console": {
       "status": "packaging_present",
+      "gate_class": "product_correctness",
       "evidence": "apps/console"
     },
     "workers": {
       "status": "implemented_local",
+      "gate_class": "product_correctness",
       "evidence": "tests/workers (DB-gated skips without Postgres)"
     },
     "postgres": {
       "status": "schema_present",
-      "evidence": "migrations a15\u2013a18tov30; live DSN optional"
+      "gate_class": "product_correctness",
+      "evidence": "migrations a15–a18tov30; live DSN optional"
     },
     "ollama_local": {
       "status": "supported_local_loopback",
+      "gate_class": "live_inference",
       "evidence": "docs/evidence/launch/ollama_live_canary.json"
     },
     "paid_cloud": {
       "status": "blocked",
+      "gate_class": "live_inference",
       "evidence": "SWARM_ALLOW_PAID=false"
     },
     "recovery_drill_local": {
       "status": "supported_local",
+      "gate_class": "product_correctness",
       "evidence": "docs/evidence/launch/recovery_drill_local.json"
+    },
+    "linux_container_baseline": {
+      "status": "in_progress",
+      "gate_class": "supported_platform_qualification",
+      "evidence": "PORT-02/PORT-04 pending; preferred portable baseline"
+    },
+    "generic_worker_enrollment": {
+      "status": "in_progress",
+      "gate_class": "product_correctness",
+      "evidence": "PORT-02; caps must be authorized not self-granted"
+    },
+    "macos_native_adapter": {
+      "status": "local_only",
+      "gate_class": "supported_platform_qualification",
+      "evidence": "optional adapter; fixture/echo must not imply operational success (PORT-01)"
+    },
+    "hardcoded_public_hostname_freeze": {
+      "status": "unsupported_defect",
+      "gate_class": "product_correctness",
+      "evidence": "src/swarm/acceptance/freeze.py still requires swarm.splitsignal.ai — PORT-01a"
+    },
+    "r730_mac_cf_deploy": {
+      "status": "external_prerequisite_blocked",
+      "gate_class": "particular_deployment",
+      "evidence": "reference guides only; does not block portable eng"
+    },
+    "two_container_protocol_proof": {
+      "status": "in_progress",
+      "gate_class": "product_correctness",
+      "evidence": "PORT-04; two local containers ≠ two-host"
+    },
+    "cross_host_proof": {
+      "status": "external_prerequisite_blocked",
+      "gate_class": "particular_deployment",
+      "evidence": "separate from PORT-04 protocol proof"
     }
   },
+  "portable_doc": "docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md",
   "notes": [
-    "Matrix cells claim only what local deterministic tests, packaging, or this-session live loopback prove.",
+    "Matrix cells claim only what local deterministic tests, packaging, or explicit PORT evidence prove.",
     "No remote dual, multi-host, wall-clock reliability, or paid provider cells marked qualified.",
-    "Lead accept remains USER_ACTION \u2014 not claimed."
+    "V1.7–V2.0 remain unaccepted.",
+    "Lead accept remains USER_ACTION — not claimed.",
+    "Missing R730/CF/LiveGrant blocks particular deployment or live cells, not generic portable eng."
   ]
 }

@@ -1,20 +1,35 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T18:06Z  
-**Integration branch:** `dev` @ `4c9566b7`  
-**Hostname:** `swarm.splitsignal.ai`  
-**Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50/#49/#46/#47/#51 merged into `dev` @ `4c9566b7`. #48 closed superseded (pursuit via #51). #45 closed superseded.
+**Updated:** 2026-09-25T18:29Z  
+**Integration branch:** `dev` @ `58f72fa5`  
+**Hostname:** configurable (operator deploy may use `swarm.splitsignal.ai`; not product hardcoded truth)  
+**Mandate:** portable product (Project Context `docs/v2-portable-product-plan.md`) + prior goal-pursuit plan  
+**Consolidate:** #50/#49/#46/#47/#51/#52 merged into `dev` @ `58f72fa5`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
+**Portable tracking branch:** `cursor/v2-portable-tracking-3ac7` (docs only)
 
 ## Single authority
 
 | Source | Role after reconciliation |
 |---|---|
-| TH-01–07 | Two-host eng increments — evidence retained; disputed acceptance → **review-required** until R1–R4 closed |
+| TH-01–07 | Two-host eng increments — evidence retained; disputed acceptance → **review-required** until R1–R4 closed; **particular deployment**, not generic product correctness |
 | P00–P19 | Product MVP spine — remains active after foundation |
+| PORT-01–05 | **Portable product** layer — defects, generic roles, install, portability tests, tracking (see below) |
 | `plan/swarmai-v2-redesign-20260925` @ `8598e6ac` | **Planning donor only** — map requirements; do not run as competing backlog or replace contracts |
 | Independent review R1–R9 | Foundation gate — protected regressions under `tests/foundation/` |
 | V20 acceptance freeze | Lane F — `benchmarks/v20_acceptance/scenarios.freeze.json`; harness cannot accept versions |
+
+## Gate taxonomy (do not collapse)
+
+| Gate class | Blocks version accept? | Examples |
+|---|---|---|
+| Product correctness | Yes | Configurable freeze hostname; real connector execution; harness auth vs impl |
+| Supported-platform qualification | Yes for “supported” claims | Linux container baseline; proven native adapters only |
+| Particular deployment | No for generic eng | R730, CF tunnel, personal paths |
+| Live inference | Yes for live cells | Approved LiveGrant only — never invent |
+| Independent review | Yes for promotion | No self-approval |
+| Operator acceptance | Yes for release claim | Separate from eng green |
+
+**V1.7 / V1.8 / V1.9 / V2.0 remain unaccepted.**
 
 ## Version path (mandate)
 
@@ -65,11 +80,24 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #48 | D V1.9 Pursuit | stacked in #51 | eng on this tip — awaiting independent #48 land |
 | #51 | E product UI | this branch | onto `05c0bc4b` + #48 pursuit stack |
 
+## Portable product packets (PORT-*)
+
+| Packet | Lane | Status | Notes |
+|---|---|---|---|
+| PORT-01 | P1 defects | **open** | freeze hostname config; connector no fixture/echo success; harness grant vs impl |
+| PORT-02 | P2 roles | **open** | server/worker/combined; enrollment contracts; support matrix; generic connector |
+| PORT-03 | P3 install | **open** | portable install + fresh-install example; R730/Mac/CF = reference only |
+| PORT-04 | P4 tests | **open** | multi hostname/path/platform probes; two-container protocol proof |
+| PORT-05 | P5 tracking | **in progress** | this map + packet queue + support matrix + Linear queue |
+
+Plan SoT (user-facing): Project Context `docs/v2-portable-product-plan.md`.  
+Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence/v20/support_matrix.json`.
+
 ## Next
 
-1. Land #51 after offline CI green (includes #48 pursuit until #48 merges separately).  
-2. When #48 merges to `dev`, rebase #51 to drop duplicate pursuit commits.  
-3. Do **not** merge `main`.
+1. Land PORT-01–04 draft PRs → `dev` when green; consolidate lane merges.  
+2. Keep V1.7–V2.0 `accepted: false` until product + live + review + operator gates pass.  
+3. Do **not** merge `main`. Missing R730/LiveGrant does **not** stop portable eng.
 
 ## Lane D — V1.9 pursuit (stacked in #51)
 
