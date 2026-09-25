@@ -3,9 +3,10 @@
 **Owner:** Cursor Project implementation worker (`bc-39c5759a-8fb4-514e-a825-98363e5fb28d`)  
 **Branch:** `cursor/two-host-mvp-b28d`  
 **Worktree:** `/Users/pchordia/Downloads/swarm-ai-two-host-mvp`  
-**Updated:** 2026-09-25T15:59:00Z  
+**Updated:** 2026-09-25T16:10:00Z  
 **Public hostname:** `swarm.splitsignal.ai` (never `.com`)  
-**Loopback server:** `http://127.0.0.1:18766`
+**Loopback server:** `http://127.0.0.1:18766`  
+**Integration branch:** `origin/dev` @ `14c62a77` (TH-01–07; created 2026-09-25 per operator; `main` untouched)
 
 ## Packet status
 
