@@ -4,9 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
+
+from pydantic import ValidationError
+
+from swarm.product.portable_config import PortableConfigError, PublicEndpointConfig
 
 GateId = Literal["deterministic", "live", "host", "elapsed"]
 
@@ -17,6 +23,17 @@ FREEZE_PATH = (
     / "v20_acceptance"
     / "scenarios.freeze.json"
 )
+
+# Sibling manifest: hostname/scope policy without mutating freeze content_hash.
+VERSION_ACCEPTANCE_MANIFEST_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "benchmarks"
+    / "v20_acceptance"
+    / "version_acceptance_manifest.json"
+)
+
+# Hostname is validated via PublicEndpointConfig — never a product-literal default.
+HOSTNAME_VALIDATION_POLICY = "match_deployment_config"
 
 REQUIRED_SCENARIO_IDS: tuple[str, ...] = (
     "V20-S01",
@@ -111,6 +128,130 @@ class AcceptanceFreeze:
         }
 
 
+def endpoint_for_hostname(
+    hostname: str, *, api_base_url: str | None = None
+) -> PublicEndpointConfig:
+    """Build a PublicEndpointConfig for hostname validation (P4 contract)."""
+    host = hostname.strip()
+    api = (api_base_url or "").strip() or f"https://{host}"
+    return PublicEndpointConfig(public_hostname=host, api_base_url=api)
+
+
+def resolve_deployment_endpoint(
+    *,
+    endpoint: PublicEndpointConfig | None = None,
+    deployment_hostname: str | None = None,
+    env: Mapping[str, str] | None = None,
+) -> PublicEndpointConfig | None:
+    """Resolve deployment endpoint from explicit config / env via PublicEndpointConfig.
+
+    Never invents a product-literal hostname default.
+    """
+    if endpoint is not None:
+        return endpoint
+    if deployment_hostname is not None:
+        value = deployment_hostname.strip()
+        if not value:
+            return None
+        try:
+            return endpoint_for_hostname(value)
+        except ValidationError as exc:
+            raise FreezeIntegrityError(f"deployment_hostname_invalid:{value}") from exc
+
+    environ = dict(env) if env is not None else dict(os.environ)
+    try:
+        return PublicEndpointConfig.from_env(environ)
+    except PortableConfigError:
+        host = (environ.get("SWARM_PUBLIC_HOSTNAME") or environ.get("SWARM_HOSTNAME") or "").strip()
+        if not host:
+            return None
+        try:
+            return endpoint_for_hostname(host)
+        except ValidationError as exc:
+            raise FreezeIntegrityError(f"deployment_hostname_invalid:{host}") from exc
+
+
+def resolve_deployment_public_hostname(
+    *,
+    explicit: str | None = None,
+    env: Mapping[str, str] | None = None,
+    endpoint: PublicEndpointConfig | None = None,
+) -> str | None:
+    """Resolve public hostname from PublicEndpointConfig / env (no literal default)."""
+    resolved = resolve_deployment_endpoint(
+        endpoint=endpoint,
+        deployment_hostname=explicit,
+        env=env,
+    )
+    return resolved.public_hostname if resolved is not None else None
+
+
+def is_valid_public_hostname(hostname: str) -> bool:
+    """Delegate hostname syntax checks to PublicEndpointConfig."""
+    try:
+        endpoint_for_hostname(hostname)
+    except ValidationError:
+        return False
+    return True
+
+
+def load_version_acceptance_manifest(
+    path: Path | None = None,
+) -> dict[str, Any]:
+    """Load sibling version-acceptance manifest (scope / hostname policy)."""
+    target = path or VERSION_ACCEPTANCE_MANIFEST_PATH
+    if not target.is_file():
+        raise FreezeIntegrityError(f"version_acceptance_manifest_missing:{target}")
+    try:
+        raw = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise FreezeIntegrityError(
+            f"version_acceptance_manifest_unreadable:{target}:{exc}"
+        ) from exc
+    if not isinstance(raw, dict):
+        raise FreezeIntegrityError("version_acceptance_manifest_not_object")
+    return raw
+
+
+def verify_version_acceptance_manifest(
+    freeze: AcceptanceFreeze,
+    *,
+    manifest: dict[str, Any] | None = None,
+    manifest_path: Path | None = None,
+) -> dict[str, Any]:
+    """Ensure version-acceptance scope matches freeze; never marks accepted."""
+    doc = manifest if manifest is not None else load_version_acceptance_manifest(manifest_path)
+    if doc.get("hostname_validation") != HOSTNAME_VALIDATION_POLICY:
+        raise FreezeIntegrityError(
+            f"hostname_policy_mismatch:expected={HOSTNAME_VALIDATION_POLICY} "
+            f"got={doc.get('hostname_validation')}"
+        )
+    if doc.get("literal_hostname_forbidden") is not True:
+        raise FreezeIntegrityError("literal_hostname_must_be_forbidden_in_manifest")
+    if doc.get("any_version_accepted") is True:
+        raise FreezeIntegrityError("manifest_must_not_preclaim_accepted")
+    if str(doc.get("freeze_id") or "") != freeze.freeze_id:
+        raise FreezeIntegrityError(
+            f"manifest_freeze_id_mismatch:expected={freeze.freeze_id} "
+            f"got={doc.get('freeze_id')}"
+        )
+    matrices = doc.get("version_matrices") or {}
+    if not isinstance(matrices, dict) or not matrices:
+        raise FreezeIntegrityError("manifest_missing_version_matrices")
+    for ver, meta in freeze.version_matrices.items():
+        if ver not in matrices:
+            raise FreezeIntegrityError(f"manifest_missing_version:{ver}")
+        required = list(meta.get("required_scenarios") or [])
+        declared = list((matrices[ver] or {}).get("required_scenarios") or [])
+        if declared != required:
+            raise FreezeIntegrityError(
+                f"manifest_scope_mismatch:{ver}:freeze={required} manifest={declared}"
+            )
+        if (matrices[ver] or {}).get("accepted") is True:
+            raise FreezeIntegrityError(f"manifest_must_not_preclaim_accepted:{ver}")
+    return doc
+
+
 def _parse_scenario(row: dict[str, Any]) -> ScenarioSpec:
     primary = str(row["primary_gate"])
     if primary not in {"deterministic", "live", "host", "elapsed"}:
@@ -147,7 +288,15 @@ def content_hash_for(raw: dict[str, Any]) -> str:
     return hashlib.sha256(blob.encode()).hexdigest()
 
 
-def load_freeze(path: Path | None = None) -> AcceptanceFreeze:
+def load_freeze(
+    path: Path | None = None,
+    *,
+    deployment_hostname: str | None = None,
+    endpoint: PublicEndpointConfig | None = None,
+    env: Mapping[str, str] | None = None,
+    require_deployment_match: bool | None = None,
+    verify_manifest: bool = True,
+) -> AcceptanceFreeze:
     target = path or FREEZE_PATH
     if not target.is_file():
         raise FreezeIntegrityError(f"freeze_missing:{target}")
@@ -172,19 +321,58 @@ def load_freeze(path: Path | None = None) -> AcceptanceFreeze:
         raw=raw,
         content_hash=content_hash_for(raw),
     )
-    verify_freeze_integrity(freeze)
+    verify_freeze_integrity(
+        freeze,
+        deployment_hostname=deployment_hostname,
+        endpoint=endpoint,
+        env=env,
+        require_deployment_match=require_deployment_match,
+    )
+    if verify_manifest and path is None:
+        # Only enforce sibling manifest against the canonical in-repo freeze.
+        verify_version_acceptance_manifest(freeze)
     return freeze
 
 
-def verify_freeze_integrity(freeze: AcceptanceFreeze) -> None:
+def verify_freeze_integrity(
+    freeze: AcceptanceFreeze,
+    *,
+    deployment_hostname: str | None = None,
+    endpoint: PublicEndpointConfig | None = None,
+    env: Mapping[str, str] | None = None,
+    require_deployment_match: bool | None = None,
+) -> None:
     if freeze.schema_version != "2.0.0":
         raise FreezeIntegrityError(f"unexpected_schema:{freeze.schema_version}")
     if freeze.version_claim_policy != "never_mark_accepted_from_harness":
         raise FreezeIntegrityError("version_claim_policy_must_forbid_harness_accept")
     if freeze.spend_policy != "zero_no_invented_live_grant":
         raise FreezeIntegrityError("spend_policy_must_forbid_invented_grants")
-    if freeze.public_hostname != "swarm.splitsignal.ai":
-        raise FreezeIntegrityError(f"hostname_mismatch:{freeze.public_hostname}")
+
+    hostname = freeze.public_hostname.strip()
+    try:
+        freeze_endpoint = endpoint_for_hostname(hostname)
+    except ValidationError as exc:
+        raise FreezeIntegrityError(f"hostname_invalid:{freeze.public_hostname}") from exc
+
+    deployment = resolve_deployment_endpoint(
+        endpoint=endpoint,
+        deployment_hostname=deployment_hostname,
+        env=env,
+    )
+    # Match when deployment endpoint config is present, or when explicitly required.
+    must_match = (
+        require_deployment_match if require_deployment_match is not None else deployment is not None
+    )
+    if must_match:
+        if deployment is None:
+            raise FreezeIntegrityError("deployment_hostname_unconfigured")
+        if not deployment.matches_configured_hostname(freeze_endpoint.public_hostname):
+            raise FreezeIntegrityError(
+                f"hostname_mismatch:freeze={freeze_endpoint.public_hostname} "
+                f"deployment={deployment.public_hostname}"
+            )
+
     ids = [s.id for s in freeze.scenarios]
     if tuple(ids) != REQUIRED_SCENARIO_IDS:
         raise FreezeIntegrityError(
