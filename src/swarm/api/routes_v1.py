@@ -1737,7 +1737,12 @@ async def pursuit_tick(
     auth: AuthRegistry = Depends(get_auth),
     store: ProductStore = Depends(get_store),
 ) -> dict[str, Any]:
-    """Advance one V1.9 autonomous pursuit cycle (deterministic, zero-spend default)."""
+    """Advance one V1.9 autonomous pursuit cycle.
+
+    Operational mode dispatches a durable native mission and returns pending
+    until worker execution + protected verification succeed (R20-01). Fixture/mock
+    mode may still use RecordingExecutor for explicit demos.
+    """
     store.require_durable_writes()
     try:
         goal = store.goal_store().get(goal_id)

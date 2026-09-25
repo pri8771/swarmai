@@ -20,6 +20,10 @@ from swarm.pursuit.models import (
     ScheduleState,
     VerificationResult,
 )
+from swarm.pursuit.native_dispatch import (
+    BlockedMissingImplementationExecutor,
+    NativeMissionDispatchExecutor,
+)
 from swarm.pursuit.policy import PursuitPolicyError, admit_proposal, dedupe_key_for
 from swarm.pursuit.schedule import PursuitScheduler
 from swarm.pursuit.stagnation import StagnationReport, detect_stagnation
@@ -32,6 +36,7 @@ from swarm.pursuit.verification import (
 
 __all__ = [
     "AccountingError",
+    "BlockedMissingImplementationExecutor",
     "ContributionKind",
     "CriterionEvidenceReceipt",
     "CyclePhase",
@@ -44,6 +49,7 @@ __all__ = [
     "LessonState",
     "LiveGrantPreflight",
     "MissionProposalDraft",
+    "NativeMissionDispatchExecutor",
     "PursuitEngine",
     "PursuitLearningError",
     "PursuitLesson",
