@@ -405,7 +405,9 @@ class WorkerRegistryService:
                 pass
         return new_gen
 
-    def rotate_membership_token(self, worker_id: str, *, current_token: str) -> tuple[WorkerLease, str]:
+    def rotate_membership_token(
+        self, worker_id: str, *, current_token: str
+    ) -> tuple[WorkerLease, str]:
         """Rotate membership credential and bump generation; prior token invalid."""
         rec = self._require(worker_id, current_token)
         new_token = new_id("wt_")

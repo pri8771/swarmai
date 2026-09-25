@@ -871,7 +871,11 @@ async def worker_drain(
     try:
         if body.token:
             if body.generation is None:
-                raise ApiError("invalid_request", "generation required for self-drain", status_code=400)
+                raise ApiError(
+                    "invalid_request",
+                    "generation required for self-drain",
+                    status_code=400,
+                )
             if int(body.generation) != int(rec.lease.lease_generation):
                 raise ApiError("stale_generation", "worker generation mismatch", status_code=409)
             lease = await store.workers.drain(body.worker_id, token=body.token)
