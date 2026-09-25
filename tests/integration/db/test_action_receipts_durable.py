@@ -24,7 +24,8 @@ DATABASE_URL = os.environ.get(
     "SWARM_DATABASE_URL", "postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm"
 )
 PREVIOUS_HEAD = "a17effect004a0001"
-NEW_HEAD = "a17effect004b0001"
+# Tip after ART-V18–V30 schema (must stay a single head).
+NEW_HEAD = "a18tov30schema0001"
 
 
 def _alembic_config(url: str) -> Config:

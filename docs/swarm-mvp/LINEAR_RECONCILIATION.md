@@ -23,7 +23,8 @@
 | TH-05 mission UI | Console live mode shows real missions/artifacts/workers on loopback | Done (Mac eng) | TH-05, console | 3 |
 | TH-06 runtime adapters | Qualify OpenCode/Hermes honestly; mark unqualified caps unavailable | Done (Mac eng) | TH-06, runtime | 3 |
 | TH-07 synthetic eval harness | Graded starter suite + sealed answers; live gate blocked pending grant; no auto routing | Done (Mac eng) / review-required | TH-07, evals | 5 |
-| R1–R9 foundation repairs | Close review blockers with protected regressions on `dev` lane | In Progress | foundation, R1-R9 | 8 |
+| R1–R9 foundation repairs | Close review blockers with protected regressions on `dev` lane | In Progress (R7 eng closed on `cursor/foundation-ci-c8a3`; R9 Linear + connector remain) | foundation, R1-R9 | 8 |
+| R7 CI / ephemeral Postgres | Lint, typing, offline suites, console, PG integration job green | Done (hosted CI green on PR #50) | foundation, R7, ci | 3 |
 | V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Planned | V1.7 | 8 |
 | V1.8 durable goals | Persistent Goal entity + pause/resume/cancel | Planned | V1.8 | 5 |
 | V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Planned | V1.9 | 8 |

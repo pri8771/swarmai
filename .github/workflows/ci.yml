@@ -21,6 +21,8 @@ jobs:
         run: uv run alembic heads
       # Offline-safe unit/contract suites. Live-gated suites are a separate job
       # that reports blocked/skipped honestly rather than implying pass.
+      # Integration DB suites run in the dedicated `integration` job with
+      # ephemeral PostgreSQL — a missing DB notice is not counted as a pass (R7).
       - name: Offline pytest (non-live)
         run: >
           uv run pytest
@@ -32,12 +34,17 @@ jobs:
           tests/chaos
           tests/deployment
           tests/evals
+          tests/extensions
+          tests/foundation
+          tests/knowledge
           tests/load
           tests/memory
           tests/mission
+          tests/objectives
           tests/onboarding
           tests/product
           tests/providers
+          tests/recovery
           tests/regressions
           tests/release
           tests/runtime
@@ -49,14 +56,33 @@ jobs:
           tests/e2e
           -q
           --ignore=tests/integration
-      - name: Integration pytest (requires SWARM_DATABASE_URL)
-        if: ${{ env.SWARM_DATABASE_URL != '' }}
-        run: uv run pytest tests/integration -q
-      - name: Integration skipped notice
-        if: ${{ env.SWARM_DATABASE_URL == '' }}
-        run: >
-          echo "::notice title=integration-tests-blocked::tests/integration skipped —
-          SWARM_DATABASE_URL not configured in this CI environment (honest skip, not a pass)."
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: swarm
+          POSTGRES_PASSWORD: swarm
+          POSTGRES_DB: swarm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U swarm -d swarm"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      - name: PostgreSQL integration pytest
+        run: uv run pytest tests/integration -q -m integration
 
   console:
     runs-on: ubuntu-latest

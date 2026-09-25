@@ -8,8 +8,9 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from swarm.contracts.common import StrictModel, new_id, utc_now
 from pydantic import Field
+
+from swarm.contracts.common import StrictModel, new_id, utc_now
 
 
 class GoalStatus(StrEnum):

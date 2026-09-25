@@ -232,3 +232,36 @@ def test_r8_zero_dollar_grant_and_reproducible_hash(tmp_path: Path) -> None:
     ).hexdigest()
     assert recomputed == claimed
     assert report.report_hash == claimed
+
+
+def test_r7_ci_requires_ephemeral_postgres_integration_job() -> None:
+    """R7: lint/type/backend/console pass; integration must not be a skip-notice pass."""
+    ci = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "ruff check" in ci
+    assert "mypy src/swarm" in ci
+    assert "tests/foundation" in ci
+    assert "npm run lint" in ci
+    assert "npm run test" in ci
+    assert "npm run build" in ci
+    # Dedicated ephemeral PostgreSQL job (not an offline skip counted as green).
+    assert "postgres:16" in ci or "image: postgres" in ci
+    assert "tests/integration" in ci
+    assert "SWARM_DATABASE_URL" in ci
+    assert "job:" in ci.replace(" ", "") or "integration:" in ci
+    # Offline job must not treat missing DB as the only integration path.
+    assert "PostgreSQL integration pytest" in ci or "pytest tests/integration" in ci
+    # Live notice job must remain explicitly non-pass for live claims.
+    assert "blocked_not_skipped_green" in ci
+
+
+def test_r9_plan_manifest_file_hashes_match() -> None:
+    """R9 evidence hygiene: START_HERE and plan docs stay digest-aligned."""
+    planroot = ROOT / "docs" / "swarm-mvp"
+    manifest = json.loads((planroot / "PLAN_MANIFEST.json").read_text(encoding="utf-8"))
+    mismatches: list[str] = []
+    for entry in manifest["files"]:
+        path = planroot / entry["path"]
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != entry["sha256"]:
+            mismatches.append(f"{entry['path']}: expected {entry['sha256']} got {digest}")
+    assert not mismatches, "PLAN_MANIFEST hashes drifted:\n" + "\n".join(mismatches)
