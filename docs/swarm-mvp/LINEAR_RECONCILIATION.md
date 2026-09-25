@@ -1,11 +1,11 @@
 # Linear reconciliation queue
 
 **Date Recorded:** 2026-09-25  
-**Updated:** 2026-09-25T18:55Z (PORT-01–04 eng landed; tip `f39e0032`; post-merge verify PASS)  
+**Updated:** 2026-09-25T21:10Z (FAST_TRACK L1–L6 eng_landed; tip `dd7726eb`; CandidateManifest rebound)  
 **Status:** blocked — Linear MCP unavailable (`needsAuth`)  
 **Action:** update existing SwarmAI project/issues in place; do **not** create a duplicate project when access returns.  
 **Versions:** V1.7–V2.0 remain **unaccepted** in repo tracking regardless of Linear status.  
-**Repo tip SoT:** `origin/dev` @ `f39e003249b73849a699bb554dddcdfbfffa502c`
+**Repo tip SoT:** `origin/dev` @ `dd7726eb8c22986ef72847994c8e435a81a869b6`
 
 ## Access problem
 
@@ -37,8 +37,9 @@
 | **PORT-02 generic roles** | Server/worker/combined roles; enrollment contracts; support matrix; generic connector | **Done (eng)** (PR #57); matrix cells stay experimental — not `supported` | portable, PORT-02, P2, gate:product | 8 |
 | **PORT-03 portable install** | Fresh-install example; runbooks; R730/Mac/CF as reference only | **Done (eng)** (PR #56); particular-deploy evidence external | portable, PORT-03, P3, gate:product | 5 |
 | **PORT-04 portability tests** | Multi-config probes + two-container protocol proof | **Done (eng)** (PR #54); Mac Docker proof green | portable, PORT-04, P4, gate:product | 5 |
-| **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | **In Progress** → tip-sync on `cursor/v2-portable-tracking-9bf5` (refresh after verify) | portable, PORT-05, P5 | 2 |
-| **FAST_TRACK L4 / PC-07** | Durable authenticated mailbox, layered memory provenance, X/Y KT1/KT2 succession fencing | Eng in progress on `cursor/v2-ft-comms-memory-4a67` — not version-accepted | fast-track, L4, PC-07, gate:product | 8 |
+| **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | **Done (eng)** tip-sync @ `dd7726eb` (V20-E01); continuous | portable, PORT-05, P5 | 2 |
+| **FAST_TRACK L1–L6** | Durable storage, pursuit, workers, memory, verify, UI/SDK | **Eng landed** on tip (#61/#63/#62/#64/#65/#60) — not version-accepted | fast-track, L1-L6, gate:product | 13 |
+| **V2.0 eng depth E03–E06** | PG write-through, ledger durability, native model/tool loop, coordinator | Todo / eng gap | V2.0, gate:product | 13 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked — **live gate**, not product eng stop | TH-07, live, gate:live | 2 |
 | Live adapter dispatch (impl) | Optional dispatcher / qualification runner after approved grant | Todo / eng gap — label `blocked_missing_implementation` | portable, gate:product | 5 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked — **deployment gate** | infra, gate:deployment | 1 |

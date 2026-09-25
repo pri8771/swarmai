@@ -2,11 +2,12 @@
 
 **Date Recorded:** 2026-09-25  
 **Status:** evidence-grounded honesty — eng landed; no false `supported` claims  
-**Integration tip:** `origin/dev` @ `f39e003249b73849a699bb554dddcdfbfffa502c`  
-**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed with `SWARM_PORTABLE_DOCKER=1`)  
-**Related:** `docs/evidence/v20/support_matrix.json`, `docs/install/`, Project Context `docs/v2-portable-product-plan.md`  
+**Integration tip:** `origin/dev` @ `dd7726eb8c22986ef72847994c8e435a81a869b6`  
+**Post-merge verify (portable):** PASS (Mac 2026-09-25T18:49Z; 78 passed with `SWARM_PORTABLE_DOCKER=1` @ `f39e0032`)  
+**FAST_TRACK:** L1–L6 **eng_landed** on tip (#61/#63/#62/#64/#65/#60)  
+**Related:** `docs/evidence/v20/support_matrix.json`, `docs/install/`, Project Context `docs/v2-fast-track-plan.md`  
 **Versions accepted:** V1.7–V2.0 = **false**  
-**PRs landed:** #53 (tracking) · #54 (PORT-04) · #55 (PORT-01) · #56 (PORT-03) · #57 (PORT-02)
+**PRs landed:** #53–#58 (portable) · #61 L5 · #63 L1 · #62 L3 · #64 L4 · #65 L2 · #60 L6
 
 Use only these status classes:
 
@@ -101,4 +102,4 @@ A row is never `supported` because code exists.
 - Mark `supported` without operator-grade qualification + review  
 - Treat R730/CF absence as blocking portable eng (already landed)  
 - Mark any of V1.7–V2.0 accepted from this matrix alone  
-- Re-open closed PORT-01 defects as present on tip `f39e0032`
+- Re-open closed PORT-01 defects as present on tip `dd7726eb`

@@ -1,14 +1,24 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T18:55:00Z",
-  "branch": "cursor/v2-portable-tracking-9bf5",
-  "integration_tip": "f39e003249b73849a699bb554dddcdfbfffa502c",
+  "updated_at": "2026-09-25T21:10:00Z",
+  "branch": "cursor/v20-tracking-tipsync-4635",
+  "integration_tip": "dd7726eb8c22986ef72847994c8e435a81a869b6",
   "post_merge_verify": {
     "status": "PASS",
     "host": "Mac",
     "at": "2026-09-25T18:49Z",
     "suite": "78 passed (SWARM_PORTABLE_DOCKER=1)",
-    "handoff": "Project Context internal/v2-portable-post-merge-verify-handoff.md"
+    "tip_at_verify": "f39e003249b73849a699bb554dddcdfbfffa502c",
+    "handoff": "Project Context internal/v2-portable-post-merge-verify-handoff.md",
+    "note": "Portable verify retained; FAST_TRACK L1-L6 subsequently landed on tip dd7726eb"
+  },
+  "fast_track": {
+    "L1": {"pr": 63, "status": "eng_landed"},
+    "L2": {"pr": 65, "status": "eng_landed"},
+    "L3": {"pr": 62, "status": "eng_landed"},
+    "L4": {"pr": 64, "status": "eng_landed"},
+    "L5": {"pr": 61, "status": "eng_landed"},
+    "L6": {"pr": 60, "status": "eng_landed"}
   },
   "versions_accepted": {
     "V1.7": false,
@@ -296,11 +306,11 @@
     {
       "id": "PORT-05",
       "title": "Portable tracking: plan, packet graph, support matrix, Linear queue",
-      "status": "in_progress",
+      "status": "eng_done",
       "lane": "P5",
       "gate_class": "product_correctness",
       "depends_on": [],
-      "notes": "Tip-sync refresh on f39e0032 after post-merge verify PASS; continuous for future lands",
+      "notes": "Tip-sync @ dd7726eb (V20-E01); continuous refresh on future lands; versions_accepted remain false",
       "acceptance": [
         "user-facing portable plan current",
         "packet graph includes PORT-* without replacing P00-P19/TH-*",
@@ -308,10 +318,10 @@
         "Linear reconciliation queue updated while MCP needsAuth",
         "V1.7-V2.0 remain unaccepted"
       ],
-      "branch_prefix": "cursor/v2-portable-tracking-*"
+      "branch_prefix": "cursor/v20-tracking-tipsync-*"
     }
   ],
-  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments. PORT-* packets encode portable product work from the 2026-09-25 portable mandate; they do not replace P/TH packets. P1\u2013P5 eng (#53\u2013#57) landed; post-merge verify PASS @ f39e0032.",
+  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments. PORT-* packets encode portable product work from the 2026-09-25 portable mandate; they do not replace P/TH packets. PORT + FAST_TRACK L1\u2013L6 eng_landed on tip dd7726eb; V1.7\u2013V2.0 remain unaccepted.",
   "public_hostname_note": "Operator deploy may use swarm.splitsignal.ai; product freeze is config-driven (PORT-01 closed).",
   "loopback_server_url": "http://127.0.0.1:18766"
 }

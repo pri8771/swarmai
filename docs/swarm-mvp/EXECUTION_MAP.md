@@ -1,12 +1,12 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T20:35Z  
-**Integration branch:** `dev` @ `c294d8ca` (+ L2 pursuit PR pending)  
+**Updated:** 2026-09-25T21:10Z  
+**Integration branch:** `dev` @ `dd7726eb8c22986ef72847994c8e435a81a869b6`  
 **Hostname:** configurable (operator deploy may use `swarm.splitsignal.ai`; freeze is config-driven — PORT-01 **closed**)  
-**Mandate:** portable product (Project Context `docs/v2-portable-product-plan.md`) + prior goal-pursuit plan + FAST_TRACK  
-**Consolidate:** #50/#49/#46/#47/#51/#52 + portable #53/#54/#55/#56/#57 + L5 #61 merged into `dev` @ `c294d8ca`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
-**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed with Docker) — recheck after L2 pursuit merge  
-**Portable tracking branch:** `cursor/v2-portable-tracking-9bf5` (docs only — tip sync)
+**Mandate:** portable product + FAST_TRACK (Project Context `docs/v2-fast-track-plan.md` / `docs/v2-portable-product-plan.md`)  
+**Consolidate:** portable #53–#58 + Lane F #47/#52 + L5 #61 + L1 #63 + L3 #62 + L4 #64 + L2 #65 + L6 #60 on tip. #48/#45 closed superseded.  
+**Post-merge verify (portable):** PASS (Mac 2026-09-25T18:49Z; 78 passed @ `f39e0032`) — FT tip CI green on #65/#60 merges  
+**Tracking branch:** `cursor/v20-tracking-tipsync-4635` (docs only — tip sync)
 
 ## Single authority
 
@@ -86,6 +86,24 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #55 | P1 portable defects | `82d34b8c` | **merged** (`6211a567`) |
 | #56 | P3 portable install | `2bff8d79` | **merged** (`f39e0032`) |
 | #57 | P2 portable roles | `761d5859` | **merged** (`3fca9d29`) |
+| #58 | PORT-05 tip-sync | — | **merged** (prior @ `f39e0032`) |
+| #61 | L5 verify/acct | — | **merged** (`c294d8ca`) |
+| #63 | L1 durable storage | — | **merged** (on tip before L4) |
+| #62 | L3 workers/perms | — | **merged** (`53401981`) |
+| #64 | L4 comms/memory | — | **merged** (`45efb242`) |
+| #65 | L2 R20-01 pursuit | — | **merged** (`ad0ed567`) |
+| #60 | L6 UI/SDK/Docker | — | **merged** (`dd7726eb` = tip) |
+
+## FAST_TRACK lanes (L1–L6)
+
+| Lane | PR | Status | Remaining depth |
+|---|---|---|---|
+| L1 storage | #63 | **eng_landed** | PG write-through (V20-E03); ledger/lesson persist (V20-E04) |
+| L2 pursuit | #65 | **eng_landed** | Native model/tool loop fake HTTP (V20-E05); coordinator singleton (V20-E06) |
+| L3 workers | #62 | **eng_landed** | Cancel kill-bound (V20-E08) |
+| L4 memory | #64 | **eng_landed** | Optional mailbox PG (V20-E11) |
+| L5 verify | #61 | **eng_landed** | Live adapter behind grant (V20-E07) |
+| L6 product | #60 | **eng_landed** | Drain/revoke UI (V20-E09); compose smoke (V20-E10) |
 
 ## Portable product packets (PORT-*)
 
@@ -95,23 +113,25 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | PORT-02 | P2 roles | **eng done** | #57 — server/worker/combined; enrollment contracts; matrix draft; cells stay experimental |
 | PORT-03 | P3 install | **eng done** | #56 — portable install + fresh-install example; R730/Mac/CF = reference only |
 | PORT-04 | P4 tests | **eng done** | #54 — multi hostname/path/platform probes; two-container protocol proof (Mac Docker green) |
-| PORT-05 | P5 tracking | **in progress** | tip-sync refresh this branch after verify PASS @ `f39e0032` |
+| PORT-05 | P5 tracking | **eng done** (continuous) | Tip-sync @ `dd7726eb`; keep refreshing on future lands |
 
-Plan SoT (user-facing): Project Context `docs/v2-portable-product-plan.md`.  
-Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence/v20/support_matrix.json`.
+Plan SoT (user-facing): Project Context `docs/v2-fast-track-plan.md` + `docs/v2-portable-product-plan.md`.  
+Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence/v20/support_matrix.json`.  
+Gap audit: Project Context `internal/v20-gap-audit.md`.
 
 ## Remaining gaps (honest)
 
 | Gap | Class |
 |---|---|
-| Live adapter dispatch → `blocked_missing_implementation` | implementation |
+| PG write-through / ledger durability / native model-tool loop / coordinator loop | V2.0 eng depth (V20-E03–E06) |
+| Live adapter dispatch → `blocked_missing_implementation` | implementation (V20-E07) |
 | Linux/enrollment claimed `supported` | platform qualification (keep experimental) |
 | Real non-container cross-host proof | particular deployment / platform |
 | LiveGrant / R730 / DNS/CF / Linear MCP / independent review / operator accept | genuinely external |
 
 ## Next
 
-1. Merge this PORT-05 tip-sync PR → `dev` when green.  
+1. Continue V2.0 eng depth PRs (E03→E06) → `dev` when green.  
 2. Keep V1.7–V2.0 `accepted: false` until product + live + review + operator gates pass.  
 3. Do **not** merge `main`. Optional live dispatcher only with authentic LiveGrant — no invent, no spend.
 

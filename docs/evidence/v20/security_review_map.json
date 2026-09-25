@@ -3,7 +3,9 @@
   "status": "mapped_to_candidate",
   "generated_at": "2026-09-23T16:40:19.617217+00:00",
   "source_doc": "docs/artifacts/future/ART-V20-SECURITY_THREAT_MODEL.md",
-  "candidate_schema_revision": "a18tov30schema0001",
+  "candidate_schema_revision": "a20pursuitpersist0001",
+  "candidate_source_sha": "dd7726eb8c22986ef72847994c8e435a81a869b6",
+  "rebinding_note": "Rebound 2026-09-25 with V20-E01 tip-sync; prior a18tov30schema0001 @ 405da911 superseded for tip binding only",
   "controls_mapped": [
     {
       "threat": "secret_exfiltration_in_backup",
