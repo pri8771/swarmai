@@ -53,6 +53,7 @@ export function emptyLiveSnapshot(opts?: {
   projects?: ConsoleSnapshot['projects']
   artifacts?: ConsoleSnapshot['artifacts']
   events?: ConsoleSnapshot['events']
+  approvals?: ConsoleSnapshot['approvals']
   goals?: GoalRow[]
   selectedGoalId?: string | null
   errors?: string[]
@@ -74,7 +75,7 @@ export function emptyLiveSnapshot(opts?: {
     capacityUnknown: !(opts?.capacity && opts.capacity.length),
     workers: opts?.workers ?? [],
     profiles: [],
-    approvals: [],
+    approvals: opts?.approvals ?? [],
     projects: opts?.projects ?? [],
     history: opts?.history ?? [],
     artifacts: opts?.artifacts ?? [],
@@ -500,16 +501,25 @@ export async function loadSnapshot(opts: {
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`
   const base = opts.baseUrl.replace(/\/$/, '')
 
-  const [readyRes, capacityRes, missionsRes, routesRes, workersRes, projectsRes, goalsRes] =
-    await Promise.all([
-      fetchJson(`${base}/health/ready`, headers),
-      fetchJson(`${base}/v1/capacity`, headers),
-      fetchJson(`${base}/v1/missions`, headers),
-      fetchJson(`${base}/v1/routes`, headers),
-      fetchJson(`${base}/v1/workers`, headers),
-      fetchJson(`${base}/v1/projects`, headers),
-      fetchJson(`${base}/v1/goals`, headers),
-    ])
+  const [
+    readyRes,
+    capacityRes,
+    missionsRes,
+    routesRes,
+    workersRes,
+    projectsRes,
+    goalsRes,
+    approvalsRes,
+  ] = await Promise.all([
+    fetchJson(`${base}/health/ready`, headers),
+    fetchJson(`${base}/v1/capacity`, headers),
+    fetchJson(`${base}/v1/missions`, headers),
+    fetchJson(`${base}/v1/routes`, headers),
+    fetchJson(`${base}/v1/workers`, headers),
+    fetchJson(`${base}/v1/projects`, headers),
+    fetchJson(`${base}/v1/goals`, headers),
+    fetchJson(`${base}/v1/approvals`, headers),
+  ])
 
   if (!capacityRes.ok) {
     throw new Error(`api_error_${capacityRes.status}`)
@@ -671,6 +681,7 @@ export async function loadSnapshot(opts: {
   if (workersRes.ok) {
     const workersPayload = workersRes.body as Record<string, unknown>
     for (const row of (workersPayload.workers ?? []) as Array<Record<string, unknown>>) {
+      const leasesRaw = row.active_leases ?? row.activeLeases
       workers.push({
         workerId: String(row.worker_id ?? row.workerId ?? ''),
         status: String(row.status ?? 'unknown'),
@@ -678,6 +689,7 @@ export async function loadSnapshot(opts: {
         capacity: Number(row.capacity ?? 0),
         privacy: Array.isArray(row.privacy) ? (row.privacy as string[]) : [],
         claimed: (row.claimed as string | null) ?? null,
+        activeLeases: Array.isArray(leasesRaw) ? leasesRaw.map((x) => String(x)) : [],
         revoked: Boolean(row.revoked),
         stale: Boolean(row.stale),
       })
@@ -695,6 +707,25 @@ export async function loadSnapshot(opts: {
         allowPaid: Boolean(row.allow_paid),
         allowedTools: Array.isArray(row.allowed_tools) ? (row.allowed_tools as string[]) : [],
         updatedAt: String(row.updated_at ?? ''),
+      })
+    }
+  }
+
+  const approvals: ConsoleSnapshot['approvals'] = []
+  if (approvalsRes.ok) {
+    const approvalsPayload = approvalsRes.body as Record<string, unknown>
+    for (const row of (approvalsPayload.approvals ?? []) as Array<Record<string, unknown>>) {
+      approvals.push({
+        id: String(row.id ?? row.approval_id ?? ''),
+        operation: String(row.operation ?? row.op ?? 'unknown'),
+        destination: String(row.destination ?? row.target ?? ''),
+        payloadHash: String(row.payload_hash ?? row.payloadHash ?? ''),
+        payloadPreview:
+          (row.payload_preview as Record<string, unknown>) ??
+          (row.payload as Record<string, unknown>) ??
+          {},
+        expiresAt: String(row.expires_at ?? row.expiresAt ?? ''),
+        revokedAt: (row.revoked_at as string | null) ?? (row.revokedAt as string | null) ?? null,
       })
     }
   }
@@ -729,6 +760,7 @@ export async function loadSnapshot(opts: {
     projects,
     artifacts,
     events,
+    approvals,
     goals,
     selectedGoalId,
     serverReady,
@@ -750,9 +782,23 @@ export async function loadSnapshot(opts: {
   })
 }
 
+export type ConsoleRuntimeConfig = {
+  mode?: 'mock' | 'live'
+  baseUrl?: string
+  token?: string
+  sameOrigin?: boolean
+}
+
+declare global {
+  interface Window {
+    __SWARM_CONSOLE__?: ConsoleRuntimeConfig
+  }
+}
+
 /**
- * Resolve console mode from query string.
+ * Resolve console mode from query string + optional product-compose runtime-config.js.
  * Default is live/operational empty — mock fixtures require explicit ?mode=mock.
+ * Product compose sets sameOrigin so baseUrl defaults to window.location.origin (nginx proxy).
  */
 export function resolveConsoleLoadOpts(): {
   mode: 'mock' | 'live'
@@ -764,11 +810,64 @@ export function resolveConsoleLoadOpts(): {
   if (typeof window === 'undefined') {
     return { mode: 'live' }
   }
+  const cfg = window.__SWARM_CONSOLE__ ?? {}
   const params = new URLSearchParams(window.location.search)
-  const mode = params.get('mode') === 'mock' ? 'mock' : 'live'
-  const baseUrl = params.get('baseUrl') || undefined
-  const token = params.get('token') || undefined
+  const mode: 'mock' | 'live' =
+    params.get('mode') === 'mock'
+      ? 'mock'
+      : params.get('mode') === 'live'
+        ? 'live'
+        : cfg.mode === 'mock'
+          ? 'mock'
+          : 'live'
+  const sameOrigin = cfg.sameOrigin === true
+  const baseUrl =
+    params.get('baseUrl') ||
+    cfg.baseUrl ||
+    (sameOrigin ? window.location.origin : undefined) ||
+    undefined
+  const token = params.get('token') || cfg.token || undefined
   const missionId = params.get('missionId') || undefined
   const goalId = params.get('goalId') || undefined
   return { mode, baseUrl, token, missionId, goalId }
+}
+
+/** Live: POST /v1/workers/cancel-lease */
+export async function cancelLiveWorkerLease(opts: {
+  baseUrl: string
+  token?: string
+  leaseId: string
+  reason?: string
+}): Promise<{ lease_id: string; state: string; reason?: string | null }> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  const payload = await mutateJson(`${base}/v1/workers/cancel-lease`, headers, 'POST', {
+    lease_id: opts.leaseId,
+    reason: opts.reason ?? 'operator_cancel',
+  })
+  return {
+    lease_id: String(payload.lease_id ?? opts.leaseId),
+    state: String(payload.state ?? 'cancelled'),
+    reason: (payload.reason as string | null | undefined) ?? null,
+  }
+}
+
+/** Live: POST /v1/approvals/{id}/resolve */
+export async function resolveLiveApproval(opts: {
+  baseUrl: string
+  token?: string
+  approvalId: string
+  accept: boolean
+  payload?: Record<string, unknown>
+}): Promise<Record<string, unknown>> {
+  const headers: Record<string, string> = {}
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`
+  const base = opts.baseUrl.replace(/\/$/, '')
+  return mutateJson(
+    `${base}/v1/approvals/${encodeURIComponent(opts.approvalId)}/resolve`,
+    headers,
+    'POST',
+    { accept: opts.accept, payload: opts.payload ?? null },
+  )
 }

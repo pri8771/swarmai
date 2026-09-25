@@ -55,6 +55,8 @@ export interface WorkerRow {
   capacity: number
   privacy: string[]
   claimed: string | null
+  /** Active dispatch lease IDs (for operator cancel-lease). */
+  activeLeases: string[]
   revoked: boolean
   stale?: boolean
 }

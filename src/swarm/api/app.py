@@ -86,6 +86,10 @@ def create_app(
             "http://localhost:43127",
             "http://127.0.0.1:4177",
             "http://localhost:4177",
+            # Product-compose console publishes host 43127 → container 8080;
+            # Vite preview / alternate local binds may use 8080 directly.
+            "http://127.0.0.1:8080",
+            "http://localhost:8080",
         ],
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],

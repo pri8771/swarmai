@@ -135,7 +135,7 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
-        if (url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
+        if url.endsWith('/v1/routes') || url.endsWith('/v1/workers')) {
           return new Response(
             JSON.stringify({
               routes: [],
@@ -147,12 +147,16 @@ describe('console fixtures', () => {
                   capacity: 1,
                   privacy: ['local'],
                   claimed: null,
+                  active_leases: [],
                   revoked: false,
                 },
               ],
             }),
             { status: 200 },
           )
+        }
+        if (url.endsWith('/v1/approvals')) {
+          return new Response(JSON.stringify({ approvals: [] }), { status: 200 })
         }
         if (url.endsWith('/v1/goals')) {
           return new Response(JSON.stringify({ goals: [] }), { status: 200 })
@@ -258,10 +262,19 @@ describe('console fixtures', () => {
           url.includes('/events') ||
           url.endsWith('/v1/routes') ||
           url.endsWith('/v1/workers') ||
-          url.endsWith('/v1/projects')
+          url.endsWith('/v1/projects') ||
+          url.endsWith('/v1/approvals')
         ) {
           return new Response(
-            JSON.stringify({ tasks: [], artifacts: [], items: [], routes: [], workers: [], projects: [] }),
+            JSON.stringify({
+              tasks: [],
+              artifacts: [],
+              items: [],
+              routes: [],
+              workers: [],
+              projects: [],
+              approvals: [],
+            }),
             { status: 200 },
           )
         }
@@ -316,10 +329,27 @@ describe('console fixtures', () => {
             { status: 200 },
           )
         }
-        if (url.includes('/v1/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects') || url.endsWith('/v1/goals')) {
-          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [], goals: [] }), {
-            status: 200,
-          })
+        if (
+          url.includes('/v1/events') ||
+          url.endsWith('/v1/routes') ||
+          url.endsWith('/v1/workers') ||
+          url.endsWith('/v1/projects') ||
+          url.endsWith('/v1/goals') ||
+          url.endsWith('/v1/approvals')
+        ) {
+          return new Response(
+            JSON.stringify({
+              items: [],
+              routes: [],
+              workers: [],
+              projects: [],
+              goals: [],
+              approvals: [],
+            }),
+            {
+              status: 200,
+            },
+          )
         }
         return new Response('missing', { status: 404 })
       }),
@@ -347,6 +377,20 @@ describe('console fixtures', () => {
     expect(resolveConsoleLoadOpts().mode).toBe('live')
     vi.stubGlobal('location', { ...window.location, search: '?mode=mock' })
     expect(resolveConsoleLoadOpts().mode).toBe('mock')
+  })
+
+  it('product runtime-config sameOrigin defaults baseUrl to origin', () => {
+    window.__SWARM_CONSOLE__ = { mode: 'live', sameOrigin: true, token: 'seed' }
+    vi.stubGlobal('location', {
+      ...window.location,
+      search: '',
+      origin: 'http://127.0.0.1:43127',
+    })
+    const opts = resolveConsoleLoadOpts()
+    expect(opts.mode).toBe('live')
+    expect(opts.baseUrl).toBe('http://127.0.0.1:43127')
+    expect(opts.token).toBe('seed')
+    delete window.__SWARM_CONSOLE__
   })
 
   it('emptyLiveSnapshot never embeds MOCK_SNAPSHOT routes', () => {
@@ -537,10 +581,19 @@ describe('operator console UI (live/operational default)', () => {
         if (url.includes('/graph')) {
           return new Response(JSON.stringify({ tasks: [] }), { status: 200 })
         }
-        if (url.includes('/events') || url.endsWith('/v1/routes') || url.endsWith('/v1/workers') || url.endsWith('/v1/projects')) {
-          return new Response(JSON.stringify({ items: [], routes: [], workers: [], projects: [] }), {
-            status: 200,
-          })
+        if (
+          url.includes('/events') ||
+          url.endsWith('/v1/routes') ||
+          url.endsWith('/v1/workers') ||
+          url.endsWith('/v1/projects') ||
+          url.endsWith('/v1/approvals')
+        ) {
+          return new Response(
+            JSON.stringify({ items: [], routes: [], workers: [], projects: [], approvals: [] }),
+            {
+              status: 200,
+            },
+          )
         }
         if (url.includes('/v1/missions/msn_live_shared')) {
           return new Response(

@@ -53,6 +53,29 @@ npm --prefix apps/console install
 npm --prefix apps/console run dev -- --host 127.0.0.1 --port 5173
 ```
 
+## Steps (product — Docker: console + API + worker)
+
+Preferred real-product packaging (PC-10 / L6):
+
+```sh
+cp deploy/env/product.env.example deploy/env/product.env
+# Set SWARM_PG_PASSWORD and SWARM_SEED_LOOPBACK_TOKEN to local random values only.
+
+docker compose -f deploy/compose/product.yml --env-file deploy/env/product.env up --build -d
+
+# API / SDK / CLI (loopback)
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/live"
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/ready"
+
+# Console (same-origin /v1 proxy; pass token query or rely on injected seed)
+# http://127.0.0.1:${SWARM_CONSOLE_HOST_PORT:-43127}/?mode=live
+# http://127.0.0.1:43127/?mode=live&token=$SWARM_SEED_LOOPBACK_TOKEN
+```
+
+Services: `api` (coordinator/server), `console` (static UI + nginx proxy), `worker` (outbound connector), `db` (private Postgres). Volumes persist `var/`, worker workspaces, and Postgres. No public ingress; `SWARM_ALLOW_PAID=false`.
+
+Server-only or worker-only stacks remain available (`server.yml`, `worker.yml`).
+
 ## Steps (standalone — Docker, empty DB volume)
 
 ```sh

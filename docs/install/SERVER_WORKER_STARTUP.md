@@ -22,6 +22,20 @@ uv run swarm deploy doctor --profile mock
 uv run swarm serve --host 127.0.0.1 --port "${SWARM_PORT:-8765}"
 ```
 
+## Product stack (console + API + worker)
+
+```sh
+cp deploy/env/product.env.example deploy/env/product.env
+# Fill SWARM_PG_PASSWORD + SWARM_SEED_LOOPBACK_TOKEN only.
+
+docker compose -f deploy/compose/product.yml --env-file deploy/env/product.env up --build -d
+
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/ready"
+# Console: http://127.0.0.1:${SWARM_CONSOLE_HOST_PORT:-43127}/?mode=live
+```
+
+Same seed token authenticates SDK/CLI against the published API port and the console (query `token=` or compose-injected runtime config). Worker reaches `http://api:8765` on the compose network with a bounded workspace volume.
+
 ## Server (Compose, portable)
 
 ```sh

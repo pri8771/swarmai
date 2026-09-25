@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { emptyLiveSnapshot, loadSnapshot, resolveConsoleLoadOpts, scrubSecrets } from './api/client'
+import {
+  cancelLiveWorkerLease,
+  emptyLiveSnapshot,
+  loadSnapshot,
+  resolveConsoleLoadOpts,
+  resolveLiveApproval,
+  scrubSecrets,
+} from './api/client'
 import type { ConsoleSnapshot, GoalRow } from './api/types'
 import { GoalsPanel } from './components/GoalsPanel'
 import { Panel } from './components/Panel'
@@ -30,6 +37,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadOpts, setLoadOpts] = useState(() => resolveConsoleLoadOpts())
+  const [controlBusy, setControlBusy] = useState<string | null>(null)
+  const [controlNote, setControlNote] = useState<string | null>(null)
 
   const reload = (next?: { missionId?: string; goalId?: string }) => {
     const opts = resolveConsoleLoadOpts()
@@ -495,7 +504,12 @@ export default function App() {
       ) : null}
 
       {tab === 'workers' ? (
-        <Panel title="Workers" subtitle="Stale heartbeats called out explicitly" testId="workers-panel">
+        <Panel
+          title="Workers"
+          subtitle="Stale heartbeats called out; cancel active leases via API"
+          testId="workers-panel"
+        >
+          {controlNote ? <p data-testid="worker-control-note">{controlNote}</p> : null}
           <table className="grid">
             <thead>
               <tr>
@@ -505,6 +519,7 @@ export default function App() {
                 <th>Capacity</th>
                 <th>Privacy</th>
                 <th>Claimed</th>
+                <th>Control</th>
               </tr>
             </thead>
             <tbody>
@@ -522,6 +537,43 @@ export default function App() {
                   <td>{w.capacity}</td>
                   <td>{w.privacy.join(', ')}</td>
                   <td>{w.claimed ?? '—'}</td>
+                  <td>
+                    {(w.activeLeases ?? []).length === 0 ? (
+                      <span className="muted">—</span>
+                    ) : (
+                      (w.activeLeases ?? []).map((leaseId) => (
+                        <button
+                          key={leaseId}
+                          type="button"
+                          data-testid={`cancel-lease-${leaseId}`}
+                          disabled={!!controlBusy || snap.mode !== 'live' || !loadOpts.baseUrl}
+                          onClick={() => {
+                            if (!loadOpts.baseUrl) return
+                            setControlBusy(leaseId)
+                            setControlNote(null)
+                            void cancelLiveWorkerLease({
+                              baseUrl: loadOpts.baseUrl,
+                              token: loadOpts.token,
+                              leaseId,
+                              reason: 'console_operator_cancel',
+                            })
+                              .then((res) => {
+                                setControlNote(`Cancelled lease ${res.lease_id} → ${res.state}`)
+                                reload()
+                              })
+                              .catch((e: unknown) => {
+                                setControlNote(
+                                  e instanceof Error ? e.message : 'cancel_lease_failed',
+                                )
+                              })
+                              .finally(() => setControlBusy(null))
+                          }}
+                        >
+                          {controlBusy === leaseId ? 'Cancelling…' : `Cancel ${leaseId.slice(0, 10)}…`}
+                        </button>
+                      ))
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -569,7 +621,14 @@ export default function App() {
       ) : null}
 
       {tab === 'approvals' ? (
-        <Panel title="Approvals" subtitle="Payload details for verification" testId="approvals-panel">
+        <Panel
+          title="Approvals"
+          subtitle="Resolve via POST /v1/approvals/{id}/resolve (same as SDK)"
+          testId="approvals-panel"
+        >
+          {controlNote && tab === 'approvals' ? (
+            <p data-testid="approval-control-note">{controlNote}</p>
+          ) : null}
           {snap.approvals.map((a) => (
             <article key={a.id} className="approval" data-testid={`approval-${a.id}`}>
               <h3>
@@ -582,6 +641,70 @@ export default function App() {
                 Payload hash: <code>{a.payloadHash}</code>
               </p>
               <pre data-testid="approval-payload">{JSON.stringify(a.payloadPreview, null, 2)}</pre>
+              <div className="actions">
+                <button
+                  type="button"
+                  data-testid={`approval-accept-${a.id}`}
+                  disabled={
+                    !!controlBusy ||
+                    !!a.revokedAt ||
+                    snap.mode !== 'live' ||
+                    !loadOpts.baseUrl
+                  }
+                  onClick={() => {
+                    if (!loadOpts.baseUrl) return
+                    setControlBusy(a.id)
+                    setControlNote(null)
+                    void resolveLiveApproval({
+                      baseUrl: loadOpts.baseUrl,
+                      token: loadOpts.token,
+                      approvalId: a.id,
+                      accept: true,
+                    })
+                      .then(() => {
+                        setControlNote(`Accepted ${a.id}`)
+                        reload()
+                      })
+                      .catch((e: unknown) => {
+                        setControlNote(e instanceof Error ? e.message : 'resolve_failed')
+                      })
+                      .finally(() => setControlBusy(null))
+                  }}
+                >
+                  Accept
+                </button>
+                <button
+                  type="button"
+                  data-testid={`approval-reject-${a.id}`}
+                  disabled={
+                    !!controlBusy ||
+                    !!a.revokedAt ||
+                    snap.mode !== 'live' ||
+                    !loadOpts.baseUrl
+                  }
+                  onClick={() => {
+                    if (!loadOpts.baseUrl) return
+                    setControlBusy(a.id)
+                    setControlNote(null)
+                    void resolveLiveApproval({
+                      baseUrl: loadOpts.baseUrl,
+                      token: loadOpts.token,
+                      approvalId: a.id,
+                      accept: false,
+                    })
+                      .then(() => {
+                        setControlNote(`Rejected ${a.id}`)
+                        reload()
+                      })
+                      .catch((e: unknown) => {
+                        setControlNote(e instanceof Error ? e.message : 'resolve_failed')
+                      })
+                      .finally(() => setControlBusy(null))
+                  }}
+                >
+                  Reject
+                </button>
+              </div>
             </article>
           ))}
           {snap.approvals.length === 0 ? (

@@ -1,0 +1,145 @@
+# Product stack — console + API/coordinator + Postgres + outbound worker.
+# Real installable path for goal UI/SDK/CLI against one compose network.
+# Loopback publish only. No public ingress. No paid inference.
+#
+# Usage (from repo root):
+#   cp deploy/env/product.env.example deploy/env/product.env
+#   # fill SWARM_PG_PASSWORD + SWARM_SEED_LOOPBACK_TOKEN with local random values
+#   docker compose -f deploy/compose/product.yml --env-file deploy/env/product.env up --build -d
+#
+# Console: http://127.0.0.1:${SWARM_CONSOLE_HOST_PORT:-43127}/?mode=live
+#   (same-origin /v1 and /health proxy to api — pass ?token=… for seeded auth)
+# API/SDK:  http://127.0.0.1:${SWARM_HOST_PORT:-8765}
+name: swarm-product
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: swarm-ai:local
+    # Entrypoint chowns /app/var then drops to uid 1000. Do not set user here.
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ../env/product.env
+    environment:
+      SWARM_DATABASE_URL: postgresql+psycopg://swarm:${SWARM_PG_PASSWORD:-swarm}@db:5432/swarm
+      SWARM_REPO_ROOT: "/app"
+      SWARM_BIND_HOST: "0.0.0.0"
+      SWARM_PORT: "8765"
+      SWARM_ALLOW_PAID: "false"
+      SWARM_ROLE: server
+      SWARM_PROCESS_ROLE: server
+      SWARM_EXECUTION_MODE: ${SWARM_EXECUTION_MODE:-standalone}
+      SWARM_PUBLIC_HOSTNAME: ${SWARM_PUBLIC_HOSTNAME:-coordinator.example.test}
+      SWARM_API_BASE_URL: http://api:8765
+    ports:
+      - "127.0.0.1:${SWARM_HOST_PORT:-8765}:8765"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - product_var:/app/var
+    networks:
+      - product_net
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2048M
+    stop_grace_period: 20s
+
+  console:
+    build:
+      context: ../..
+      dockerfile: deploy/console/Dockerfile
+    image: swarm-ai-console:local
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      SWARM_CONSOLE_API_UPSTREAM: http://api:8765
+      # Optional loopback seed token injected into runtime-config.js (never commit filled env).
+      SWARM_CONSOLE_TOKEN: ${SWARM_SEED_LOOPBACK_TOKEN:-}
+      SWARM_CONSOLE_MODE: live
+    ports:
+      - "127.0.0.1:${SWARM_CONSOLE_HOST_PORT:-43127}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - product_net
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+  worker:
+    image: swarm-ai:local
+    user: "1000:1000"
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - ../env/product.env
+    environment:
+      SWARM_ALLOW_PAID: "false"
+      SWARM_PROCESS_ROLE: worker
+      SWARM_ROLE: worker
+      SWARM_SERVER_URL: http://api:8765
+      SWARM_API_BASE_URL: http://api:8765
+      SWARM_PUBLIC_HOSTNAME: ${SWARM_WORKER_HOSTNAME:-worker.example.local}
+      SWARM_WORKER_WORKSPACE: /var/swarm/workspaces
+      SWARM_ENABLE_MACOS_ADAPTER: "false"
+      SWARM_CONNECTOR_MAX_ITERATIONS: ${SWARM_CONNECTOR_MAX_ITERATIONS:-}
+      SWARM_CONNECTOR_POLL: ${SWARM_CONNECTOR_POLL:-1.0}
+    volumes:
+      - product_worker_ws:/var/swarm/workspaces
+    working_dir: /app
+    entrypoint: ["/app/.venv/bin/python"]
+    command: ["-m", "swarm.workers.connector"]
+    networks:
+      - product_net
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: swarm
+      POSTGRES_PASSWORD: ${SWARM_PG_PASSWORD:-swarm}
+      POSTGRES_DB: swarm
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U swarm -d swarm"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - product_pg:/var/lib/postgresql/data
+    networks:
+      - product_net
+    # No host ports — DB stays private to the compose network.
+
+networks:
+  product_net:
+    driver: bridge
+
+volumes:
+  product_var:
+  product_worker_ws:
+  product_pg:

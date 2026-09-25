@@ -1,8 +1,11 @@
 """Python SDK client for SwarmAI goal-pursuit and mission APIs.
 
 Mirrors product HTTP contracts under ``/v1``:
-- Lane C Goals lifecycle (PR #46): create/transition/pause/resume/cancel/restart/…
-- Lane D Pursuit (PR #48): ``/v1/goals/{id}/pursuit/*``
+- Goals lifecycle: create/transition/pause/resume/cancel/restart/…
+- Pursuit: ``/v1/goals/{id}/pursuit/*``
+- Missions, artifacts, events
+- Workers inspect + cancel-lease (operator control)
+- Approvals list + resolve
 Does not launch a separate engine.
 """
 
@@ -367,3 +370,61 @@ class SwarmClient:
         if not isinstance(mission, dict):
             return data
         return mission
+
+    def list_mission_artifacts(self, mission_id: str) -> list[dict[str, Any]]:
+        data = self._json(self._client.get(f"/v1/missions/{mission_id}/artifacts"))
+        rows = data.get("artifacts") or []
+        return [r for r in rows if isinstance(r, dict)]
+
+    def list_events(
+        self,
+        *,
+        mission_id: str | None = None,
+        limit: int = 50,
+    ) -> list[dict[str, Any]]:
+        params: dict[str, Any] = {"limit": limit}
+        if mission_id:
+            params["mission_id"] = mission_id
+        data = self._json(self._client.get("/v1/events", params=params))
+        rows = data.get("items") or data.get("events") or []
+        return [r for r in rows if isinstance(r, dict)]
+
+    def list_workers(self, *, project_id: str | None = None) -> list[dict[str, Any]]:
+        params = {"project_id": project_id} if project_id else None
+        data = self._json(self._client.get("/v1/workers", params=params))
+        rows = data.get("workers") or []
+        return [r for r in rows if isinstance(r, dict)]
+
+    def cancel_worker_lease(
+        self,
+        lease_id: str,
+        *,
+        reason: str = "sdk_operator_cancel",
+    ) -> dict[str, Any]:
+        return self._json(
+            self._client.post(
+                "/v1/workers/cancel-lease",
+                json={"lease_id": lease_id, "reason": reason},
+            )
+        )
+
+    def list_approvals(self, *, project_id: str | None = None) -> list[dict[str, Any]]:
+        params = {"project_id": project_id} if project_id else None
+        data = self._json(self._client.get("/v1/approvals", params=params))
+        rows = data.get("approvals") or []
+        return [r for r in rows if isinstance(r, dict)]
+
+    def resolve_approval(
+        self,
+        approval_id: str,
+        *,
+        accept: bool,
+        payload: dict[str, Any] | None = None,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {"accept": accept, "payload": payload}
+        if idempotency_key:
+            body["idempotency_key"] = idempotency_key
+        return self._json(
+            self._client.post(f"/v1/approvals/{approval_id}/resolve", json=body)
+        )
