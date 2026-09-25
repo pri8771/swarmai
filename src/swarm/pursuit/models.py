@@ -87,10 +87,20 @@ class ExecutionOutcome(StrictModel):
     mission_id: str
     success: bool
     evidence_refs: list[str] = Field(default_factory=list)
+    # Worker/model claims — never authoritative for criterion progress.
     satisfied_criteria: list[str] = Field(default_factory=list)
+    # Protected verifier receipts — only validated receipts advance criteria.
+    criterion_receipts: list[dict[str, Any]] = Field(default_factory=list)
     failure_class: str | None = None
     notes: str = ""
     cost_usd: float = 0.0
+    model_calls: int = 0
+    tool_calls: int = 0
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    route_id: str | None = None
+    runtime: str | None = None
+    usage_unknown: bool = False
 
 
 class VerificationResult(StrictModel):
@@ -99,6 +109,8 @@ class VerificationResult(StrictModel):
     newly_met: list[str] = Field(default_factory=list)
     still_unmet: list[str] = Field(default_factory=list)
     invalidated_assumptions: list[str] = Field(default_factory=list)
+    rejection_reasons: list[str] = Field(default_factory=list)
+    accepted_receipts: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class PursuitLesson(StrictModel):
