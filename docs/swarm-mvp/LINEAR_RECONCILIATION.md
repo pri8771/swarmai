@@ -1,13 +1,15 @@
 # Linear reconciliation queue
 
 **Date Recorded:** 2026-09-25  
+**Updated:** 2026-09-25T18:29Z (portable product PORT-* added)  
 **Status:** blocked — Linear MCP unavailable  
-**Action:** update existing SwarmAI project/issues in place; do **not** create a duplicate project when access returns.
+**Action:** update existing SwarmAI project/issues in place; do **not** create a duplicate project when access returns.  
+**Versions:** V1.7–V2.0 remain **unaccepted** in repo tracking regardless of Linear status.
 
 ## Access problem
 
 - Linear MCP namespace status: `needsAuth`
-- `mcp_auth` call: authentication timed out
+- `mcp_auth` call: authentication timed out / not invoked this pass (queue-only policy)
 - No Linear issue IDs mutated this session
 
 ## Intended updates (when auth works)
@@ -25,23 +27,44 @@
 | TH-07 synthetic eval harness | Graded starter suite + sealed answers; live gate blocked pending grant; no auto routing | Done (Mac eng) / review-required | TH-07, evals | 5 |
 | R1–R9 foundation repairs | Close review blockers with protected regressions on `dev` lane | In Progress (R7 eng closed on `cursor/foundation-ci-c8a3`; R9 Linear + connector remain) | foundation, R1-R9 | 8 |
 | R7 CI / ephemeral Postgres | Lint, typing, offline suites, console, PG integration job green | Done (hosted CI green on PR #50) | foundation, R7, ci | 3 |
-| V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Planned | V1.7 | 8 |
-| V1.8 durable goals | Persistent Goal entity + pause/resume/cancel/restart/dedupe + protected tests | Eng complete (Lane C) — review pending | V1.8 | 5 |
-| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Eng complete (draft PR; rebased on Lane C) — not operator-accepted | V1.9 | 8 |
-| V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Planned | V2.0 | 13 |
+| V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Eng present — **not accepted** | V1.7 | 8 |
+| V1.8 durable goals | Persistent Goal entity + pause/resume/cancel/restart/dedupe + protected tests | Eng complete — **not accepted** | V1.8 | 5 |
+| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Eng complete — **not accepted** | V1.9 | 8 |
+| V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Eng present — **not accepted** | V2.0 | 13 |
 | V2.0 acceptance campaign freeze (Lane F) | Freeze §10 scenarios/pass criteria; harness + matrices; no version accept; no invented LiveGrant | Done (eng freeze/harness) — versions still not accepted | V2.0, acceptance | 5 |
-| Live qualification grant | Approve route+budget before live provider dispatch | Blocked | TH-07, live | 2 |
-| R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
-| Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |
+| **PORT-01 portable defects** | Configurable freeze hostname; connector executes assigned work; harness auth vs impl | Todo / In Progress | portable, PORT-01, P1 | 5 |
+| **PORT-02 generic roles** | Server/worker/combined roles; enrollment contracts; support matrix; generic connector | Todo | portable, PORT-02, P2 | 8 |
+| **PORT-03 portable install** | Fresh-install example; runbooks; R730/Mac/CF as reference only | Todo | portable, PORT-03, P3 | 5 |
+| **PORT-04 portability tests** | Multi-config probes + two-container protocol proof | Todo | portable, PORT-04, P4 | 5 |
+| **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | In Progress (docs on `cursor/v2-portable-tracking-3ac7`) | portable, PORT-05, P5 | 2 |
+| Live qualification grant | Approve route+budget before live provider dispatch | Blocked — **live gate**, not product eng stop | TH-07, live | 2 |
+| R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked — **deployment gate** | infra | 1 |
+| Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked — **deployment gate** | infra | 2 |
+
+## Gate labels (apply when creating/updating)
+
+| Label | Meaning |
+|---|---|
+| `gate:product` | Product correctness — eng must close |
+| `gate:platform` | Supported-platform qualification |
+| `gate:deployment` | Particular deployment (R730/CF) — does not block generic eng |
+| `gate:live` | Live inference / LiveGrant |
+| `gate:review` | Independent review |
+| `gate:operator` | Operator acceptance |
 
 ## Repo SoT while blocked
 
 - `docs/swarm-mvp/STATE.md`
 - `docs/swarm-mvp/PACKET_QUEUE.json`
-- Project Context: `docs/two-host-implementation-plan.md`
+- `docs/swarm-mvp/EXECUTION_MAP.md`
+- `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md`
+- `docs/evidence/v20/support_matrix.json`
+- Project Context: `docs/v2-portable-product-plan.md` (+ prior `docs/v2-goal-pursuit-plan.md`)
 
 ## Do not
 
 - Create a second Linear project named SwarmAI
 - Invent issue keys
 - Mark live qualification or operator acceptance complete without independent review
+- Mark V1.7–V2.0 accepted from eng green alone
+- Treat missing R730/CF/LiveGrant as blocking PORT-01–04 eng

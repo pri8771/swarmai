@@ -1,7 +1,22 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:59:00Z",
-  "branch": "cursor/two-host-mvp-b28d",
+  "updated_at": "2026-09-25T18:29:00Z",
+  "branch": "cursor/v2-portable-tracking-3ac7",
+  "integration_tip": "58f72fa59691a3fd2af53c501598ffa225fdd9cc",
+  "versions_accepted": {
+    "V1.7": false,
+    "V1.8": false,
+    "V1.9": false,
+    "V2.0": false
+  },
+  "gate_classes": [
+    "product_correctness",
+    "supported_platform_qualification",
+    "particular_deployment",
+    "live_inference",
+    "independent_review",
+    "operator_acceptance"
+  ],
   "packets": [
     {
       "id": "P00",
@@ -176,9 +191,100 @@
         "P08"
       ],
       "note": "Aligns with TH-02"
+    },
+    {
+      "id": "PORT-01",
+      "title": "Fix portable product defects (hostname, connector, grant status)",
+      "status": "open",
+      "lane": "P1",
+      "gate_class": "product_correctness",
+      "depends_on": [],
+      "acceptance": [
+        "freeze validates deployment-configured hostname (not hardcoded swarm.splitsignal.ai)",
+        "historical freeze hashes preserved when scope versions",
+        "operational connector executes assigned task via registered permitted executor",
+        "fixture/echo only in explicit test/demo modes; unsupported yields blocked not success",
+        "harness distinguishes missing authorization vs missing implementation"
+      ],
+      "branch_prefix": "cursor/v2-portable-defects-*"
+    },
+    {
+      "id": "PORT-02",
+      "title": "Generic server/worker roles, enrollment contracts, support matrix",
+      "status": "open",
+      "lane": "P2",
+      "gate_class": "product_correctness",
+      "depends_on": [
+        "PORT-01"
+      ],
+      "acceptance": [
+        "configurable server, worker, combined roles",
+        "worker identity includes enrolled id, platform/arch, runtimes, verified caps, limits, workspace grants, locality",
+        "scheduling uses contracts not personal machine names",
+        "self-reported labels cannot grant access",
+        "explicit support matrix; no unqualified OS/arch claim"
+      ],
+      "branch_prefix": "cursor/v2-portable-roles-*"
+    },
+    {
+      "id": "PORT-03",
+      "title": "Portable install docs and fresh-install example",
+      "status": "open",
+      "lane": "P3",
+      "gate_class": "product_correctness",
+      "depends_on": [
+        "PORT-02"
+      ],
+      "acceptance": [
+        "documented startup without editing application code",
+        "validated config and secret refs",
+        "enrollment/revocation, storage/migrations/backup-restore",
+        "health/readiness with useful config errors",
+        "fresh-install example with no personal credentials/paths",
+        "R730/Mac/CF documented as reference guides only"
+      ],
+      "branch_prefix": "cursor/v2-portable-install-*"
+    },
+    {
+      "id": "PORT-04",
+      "title": "Portability acceptance tests and two-container protocol proof",
+      "status": "open",
+      "lane": "P4",
+      "gate_class": "product_correctness",
+      "depends_on": [
+        "PORT-01"
+      ],
+      "prefers": [
+        "PORT-02",
+        "PORT-03"
+      ],
+      "acceptance": [
+        "probes vary hostnames/URLs, worker names/ids, install/workspace paths, platforms/archs, capability grants",
+        "fresh startup outside original checkout",
+        "reject unsupported configs",
+        "persistent recovery, revocation, isolation",
+        "two local containers prove protocol; real cross-host is separate evidence"
+      ],
+      "branch_prefix": "cursor/v2-portable-tests-*"
+    },
+    {
+      "id": "PORT-05",
+      "title": "Portable tracking: plan, packet graph, support matrix, Linear queue",
+      "status": "in_progress",
+      "lane": "P5",
+      "gate_class": "product_correctness",
+      "depends_on": [],
+      "acceptance": [
+        "user-facing portable plan current",
+        "packet graph includes PORT-* without replacing P00-P19/TH-*",
+        "support matrix separates product vs deployment vs live vs review",
+        "Linear reconciliation queue updated while MCP needsAuth",
+        "V1.7-V2.0 remain unaccepted"
+      ],
+      "branch_prefix": "cursor/v2-portable-tracking-*"
     }
   ],
-  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments from the adopted architecture update.",
-  "public_hostname": "swarm.splitsignal.ai",
+  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments. PORT-* packets encode portable product work from the 2026-09-25 portable mandate; they do not replace P/TH packets.",
+  "public_hostname_note": "Operator deploy may use swarm.splitsignal.ai; product freeze must not hardcode it (PORT-01).",
   "loopback_server_url": "http://127.0.0.1:18766"
 }
