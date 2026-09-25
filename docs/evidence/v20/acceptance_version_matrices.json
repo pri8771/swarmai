@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0.0",
   "freeze_id": "v20-acceptance-campaign-20260925",
-  "freeze_hash": "7659fc74993a6d20c2276067bac9a91dd4b027fb40ec59e02d46f835553e8842",
+  "freeze_hash": "b3e1e524949f866144bc71ad44a3660c85f02a4cd723d4df8eac09c92e749819",
   "public_hostname": "swarm.splitsignal.ai",
   "any_version_accepted": false,
   "gates": {
@@ -25,35 +25,35 @@
       "cells": [
         {
           "scenario_id": "V20-S05",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S06",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S07",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S08",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S12",
@@ -69,7 +69,7 @@
     "V1.8": {
       "title": "Durable goals across missions",
       "accepted": false,
-      "readiness": "harness_ready_scaffolds_pending_integration",
+      "readiness": "harness_deterministic_portion_green",
       "required_scenarios": [
         "V20-S01",
         "V20-S03",
@@ -104,11 +104,11 @@
         },
         {
           "scenario_id": "V20-S08",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S09",
@@ -124,7 +124,7 @@
     "V1.9": {
       "title": "Autonomous pursuit",
       "accepted": false,
-      "readiness": "harness_ready_scaffolds_pending_integration",
+      "readiness": "harness_deterministic_portion_green",
       "required_scenarios": [
         "V20-S01",
         "V20-S02",
@@ -170,19 +170,19 @@
         },
         {
           "scenario_id": "V20-S05",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S08",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S09",
@@ -256,35 +256,35 @@
         },
         {
           "scenario_id": "V20-S05",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S06",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S07",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S08",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S09",
@@ -304,11 +304,11 @@
         },
         {
           "scenario_id": "V20-S11",
-          "status": "scaffold_ready_not_integrated",
+          "status": "pass_deterministic",
           "ok": true,
           "evidence_gate": "deterministic",
           "version_accepted_contribution": false,
-          "detail_status": "scaffold_ready_not_integrated"
+          "detail_status": "pass_deterministic"
         },
         {
           "scenario_id": "V20-S12",
@@ -322,6 +322,6 @@
       "policy": "code_existing_neq_version_accepted"
     }
   },
-  "campaign_run_id": "v20camp_c03463b9e9504af898b40c09177af66f",
+  "campaign_run_id": "v20camp_7a22dc575da9417c9c3247fc31f779b0",
   "note": "Matrices report harness/evidence readiness only. Independent review + operator acceptance remain separate."
 }

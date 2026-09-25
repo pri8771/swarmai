@@ -319,10 +319,12 @@ def run_acceptance_campaign(
         work = Path(work_dir) if work_dir else Path(tmp)
         work.mkdir(parents=True, exist_ok=True)
         for spec in catalog.scenarios:
+            scenario_work = work / spec.id
+            scenario_work.mkdir(parents=True, exist_ok=True)
             results.append(
                 _evaluate_scenario(
                     spec,
-                    work=work / spec.id,
+                    work=scenario_work,
                     live_grant=live_grant,
                     host_qualified=host_qualified,
                     elapsed_window_started=elapsed_window_started,

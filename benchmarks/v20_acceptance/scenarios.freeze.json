@@ -138,7 +138,7 @@
         "Caller-supplied checks certify completion",
         "Delegation expands authority via generated text"
       ],
-      "deterministic_probe": "delegation_bounds_scaffold"
+      "deterministic_probe": "delegation_bounds"
     },
     {
       "id": "V20-S06",
@@ -157,7 +157,7 @@
         "Dual active generations",
         "Trainee writes consequential effects before cutover"
       ],
-      "deterministic_probe": "succession_fence_scaffold"
+      "deterministic_probe": "succession_fence"
     },
     {
       "id": "V20-S07",
@@ -176,7 +176,7 @@
         "Two local processes claimed as two-host proof",
         "Stale return accepted as fresh completion"
       ],
-      "deterministic_probe": "restart_stale_return_scaffold"
+      "deterministic_probe": "restart_stale_return"
     },
     {
       "id": "V20-S08",
@@ -195,7 +195,7 @@
         "Double admission on replay",
         "Budget consumed twice for one logical action"
       ],
-      "deterministic_probe": "duplicate_trigger_idempotency_scaffold"
+      "deterministic_probe": "duplicate_trigger_idempotency"
     },
     {
       "id": "V20-S09",
@@ -252,7 +252,7 @@
         "UI-only demo state diverges from API",
         "Parity claimed from screenshots alone"
       ],
-      "deterministic_probe": "sdk_ui_parity_scaffold"
+      "deterministic_probe": "sdk_ui_parity"
     },
     {
       "id": "V20-S12",

@@ -63,6 +63,19 @@ Readiness strings from the harness (`harness_*`, `blocked_*`) are **not** accept
 - `docs/evidence/v20/acceptance_campaign_summary.json`
 - `docs/evidence/v20/acceptance_campaign_runs/latest.json`
 
+## Deterministic probe map (post scaffold wire)
+
+| ID | Probe | Product surface |
+|---|---|---|
+| V20-S01–S04, S09 | Goal store lifecycle | `swarm.goals` |
+| V20-S05 | `delegation_bounds` | collab board + graph spawn + pursuit admit |
+| V20-S06 | `succession_fence` | `CollaborativeMissionBoard` X→Y fence |
+| V20-S07 | `restart_stale_return` | Goal restart + worker generation fence (host also-gate still blocked) |
+| V20-S08 | `duplicate_trigger_idempotency` | Goal triggers + API idempotency + pursuit dedupe |
+| V20-S10 | `lesson_rollback` | learning repository |
+| V20-S11 | `sdk_ui_parity` | SDK client ↔ `/v1/goals` UI contract |
+| V20-S12 | `live_grant_gate` | live blocked without operator LiveGrant |
+
 ## External gates (continue eng)
 
 | Gate | Policy |
