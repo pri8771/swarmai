@@ -96,7 +96,7 @@ def get_profile(name: str) -> DeployProfile:
         ),
         "server": DeployProfile(
             name="server",
-            description="Two-host always-on server (R730 target; Mac loopback verify)",
+            description="Always-on server role (API + Postgres; optional ingress sidecar)",
             database="postgresql on compose network only",
             bind_host="127.0.0.1",
             public_db_port=False,
@@ -109,8 +109,11 @@ def get_profile(name: str) -> DeployProfile:
         ),
         "mac_connector": DeployProfile(
             name="mac_connector",
-            description="Mac worker connector; outbound to server; no local Postgres",
-            database="none_on_mac_authoritative_on_server",
+            description=(
+                "Outbound worker connector; no local Postgres "
+                "(historical profile name; see docs/reference/MAC-CONNECTOR.md)"
+            ),
+            database="none_local_authoritative_on_server",
             bind_host="127.0.0.1",
             public_db_port=False,
             public_inference_admin=False,

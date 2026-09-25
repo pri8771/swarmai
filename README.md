@@ -23,6 +23,9 @@ uv sync
 cp .env.example .env   # optional; mock demos work without keys
 ```
 
+**Portable install (primary):** [`docs/install/FRESH_INSTALL.md`](docs/install/FRESH_INSTALL.md)  
+**Reference hosts only:** [`docs/reference/`](docs/reference/README.md)
+
 ## Fresh-install / RC verify
 
 ```sh
@@ -33,11 +36,12 @@ uv run swarm release demo-suite
 uv run pytest tests/contracts tests/selfdev tests/regressions tests/release tests/product -q
 ```
 
-Or: `bash examples/v0_9/run_rc_demo.sh`
+Or: `bash examples/v0_9/run_rc_demo.sh`  
+Portable mock example: [`examples/fresh-install/`](examples/fresh-install/README.md)
 
 ## Operator start
 
-See [`docs/operator/START.md`](docs/operator/START.md) and [`docs/user/GUIDE.md`](docs/user/GUIDE.md).
+See [`docs/operator/START.md`](docs/operator/START.md), [`docs/install/`](docs/install/README.md), and [`docs/user/GUIDE.md`](docs/user/GUIDE.md).
 
 ## Useful commands
 
@@ -49,6 +53,7 @@ uv run swarm providers onboarding-report
 uv run swarm demo self-development --mode mock
 uv run swarm reliability proof
 uv run swarm deploy doctor --profile standalone
+uv run swarm deploy doctor --profile mock --require-start
 ```
 
 ## Status vocabulary

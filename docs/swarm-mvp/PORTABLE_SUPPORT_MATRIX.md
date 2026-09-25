@@ -2,8 +2,8 @@
 
 **Date Recorded:** 2026-09-25  
 **Status:** drafting / evidence-grounded honesty only  
-**Integration tip:** `origin/dev` @ `58f72fa5`  
-**Related:** `docs/evidence/v20/support_matrix.json`, Project Context `docs/v2-portable-product-plan.md`  
+**Integration tip:** `origin/dev` @ `d8537386`  
+**Related:** `docs/evidence/v20/support_matrix.json`, `docs/install/`, Project Context `docs/v2-portable-product-plan.md`  
 **Versions accepted:** V1.7–V2.0 = **false**
 
 Use only these status classes:
@@ -74,10 +74,11 @@ A row is never `supported` because code exists.
 
 | Row | Status | Gate class | Notes |
 |---|---|---|---|
-| Fresh install without editing app code | `in_progress` | product_correctness | PORT-03 |
-| Fresh install without personal paths/creds | `in_progress` | product_correctness | PORT-03 example |
-| Health/readiness + useful config errors | `in_progress` | product_correctness | PORT-03 |
-| Backup/restore / migrations | `local_only` / schema present | product_correctness | Qualify under portable paths |
+| Fresh install without editing app code | `in_progress` | product_correctness | PORT-03 — `docs/install/` + `examples/fresh-install/` on P3 branch |
+| Fresh install without personal paths/creds | `in_progress` | product_correctness | PORT-03 — placeholder `coordinator.example.test`; tests guard personal paths |
+| Health/readiness + useful config errors | `in_progress` | product_correctness | PORT-03 — doctor `ready_to_start` + `config_errors`; `/health/*` docs |
+| Backup/restore / migrations | `local_only` / schema present | product_correctness | `docs/install/STORAGE_BACKUP_RESTORE.md`; qualify under portable paths |
+| R730 / Mac / Cloudflare docs | `external_prerequisite_blocked` (guides only) | particular_deployment | `docs/reference/*` labelled REFERENCE ONLY |
 | Two-container protocol proof | `in_progress` | product_correctness | PORT-04; ≠ two-host |
 | Real cross-host proof | `external_prerequisite_blocked` | particular_deployment | Separate from PORT-04 |
 

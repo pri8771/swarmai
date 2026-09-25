@@ -1,5 +1,9 @@
 # Deployment and recovery runbooks
 
+**Primary install:** [`docs/install/`](../install/README.md) (portable; no personal paths).
+
+**Reference only (named hosts / ingress):** [`docs/reference/`](../reference/README.md) — R730, Mac connector, Cloudflare Tunnel.
+
 ## Profiles
 
 | Profile | Use |
@@ -8,54 +12,38 @@
 | standalone | Single-node compose; DB internal-only |
 | hybrid | Local control + private model endpoint |
 | recovery | Restore drill with side-effect freeze |
-| server | Two-host always-on server (R730 target; Mac loopback verify) |
-| mac_connector | Mac worker connector (outbound only; no local Postgres) |
+| server | Always-on server role (API + Postgres; optional tunnel profile) |
+| mac_connector | Outbound worker connector (no local Postgres; historical name) |
 
-**Adopted topology (2026-09-25):** R730 server + Mac connector + authenticated `swarm.splitsignal.ai`. Local-only single-host is superseded as the target; existing profiles remain for engineering drills.
+Portable product target is **configurable server/worker/combined roles** with placeholder hostnames. Named hardware and DNS are deployment qualification — see reference guides.
 
-**No production/public deploy from this kit without auth.** No paid cloud auto-path. Cloudflare Tunnel profile stays off until origin cert + Access are verified.
+**No production/public deploy from this kit without auth.** No paid cloud auto-path. Optional tunnel profile stays off until origin cert + Access are verified.
 
 ## Doctor
 
 ```sh
-uv run swarm deploy doctor --profile server
-uv run swarm deploy doctor --profile mac_connector
-uv run swarm deploy doctor --profile standalone
+uv run swarm deploy doctor --profile mock
+uv run swarm deploy doctor --profile standalone --require-start
+uv run swarm deploy doctor --profile server --require-start
+uv run swarm deploy doctor --profile mac_connector --require-start
 uv run swarm recovery verify --profile recovery
 ```
 
-Server/standalone/hybrid/recovery refuse *live start* without `SWARM_DATABASE_URL` (doctor reports the gap; values never printed). `mac_connector` requires `SWARM_SERVER_URL` instead.
+`ok` = security posture. `ready_to_start` = required env refs present. `--require-start` exits non-zero when start refs are missing (values never printed).
 
-## Startup (TH-01 Mac verify / R730 when access exists)
-
-```sh
-cp deploy/env/server.env.example deploy/env/server.env   # set SWARM_SEED_LOOPBACK_TOKEN
-docker compose -f deploy/compose/server.yml build
-docker compose -f deploy/compose/server.yml up -d
-curl -fsS http://127.0.0.1:18766/health/live
-curl -fsS http://127.0.0.1:18766/health/ready
-```
-
-Tunnel (optional, blocked without credentials):
+## Portable startup (loopback)
 
 ```sh
-# After origin cert + tunnel.json exist — never enable unauthenticated
-docker compose -f deploy/compose/server.yml --profile tunnel up -d
+cp deploy/env/portable.env.example deploy/env/portable.env
+# Set SWARM_SEED_LOOPBACK_TOKEN and SWARM_PG_PASSWORD to local random values only.
+
+docker compose -f deploy/compose/server.yml --env-file deploy/env/portable.env build
+docker compose -f deploy/compose/server.yml --env-file deploy/env/portable.env up -d
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/live"
+curl -fsS "http://127.0.0.1:${SWARM_HOST_PORT:-8765}/health/ready"
 ```
 
-Mac connector (TH-03; after server is up):
-
-```sh
-# Preferred Mac-host one-shot (authoritative evidence path)
-cp deploy/env/mac-connector.env.example deploy/env/mac-connector.env
-# copy SWARM_SEED_LOOPBACK_TOKEN from server.env into mac-connector.env for loopback verify
-uv run python scripts/th03_mac_connector.py
-
-# Optional compose one-shot (uses host.docker.internal → published server port)
-docker compose -f deploy/compose/mac-connector.yml up --abort-on-container-exit
-# Server must still answer:
-curl -fsS http://127.0.0.1:18766/health/ready
-```
+Fresh-install walkthrough: [`docs/install/FRESH_INSTALL.md`](../install/FRESH_INSTALL.md).
 
 ## Restore (local)
 
@@ -66,12 +54,18 @@ curl -fsS http://127.0.0.1:18766/health/ready
 5. Confirm unresolved reservations/action receipts from manifest.
 6. Promote only after checks pass — do not claim seamless failover.
 
+Details: [`docs/install/STORAGE_BACKUP_RESTORE.md`](../install/STORAGE_BACKUP_RESTORE.md).
+
 ## Rollback
 
 Revert compose image tag to previous known digest; restore prior dump; keep side effects frozen until ledger reconciliation completes.
 
-## Host gates
+## Reference topologies
 
-- Do not write R730-specific IP/DNS into source.
-- Do not overwrite Cloudflare DNS or publish without Access.
-- Record blockers in `docs/swarm-mvp/STATE.md` and `docs/evidence/two-host/`.
+| Topic | Doc |
+|---|---|
+| Always-on named server host | [`docs/reference/R730-SERVER.md`](../reference/R730-SERVER.md) |
+| macOS connector evidence | [`docs/reference/MAC-CONNECTOR.md`](../reference/MAC-CONNECTOR.md) |
+| Authenticated tunnel ingress | [`docs/reference/CLOUDFLARE-TUNNEL.md`](../reference/CLOUDFLARE-TUNNEL.md) |
+
+Do not write host-specific IP/DNS into source. Do not publish without Access.

@@ -289,6 +289,11 @@ def main() -> None:
         default="standalone",
         choices=["mock", "standalone", "hybrid", "recovery", "server", "mac_connector"],
     )
+    doc.add_argument(
+        "--require-start",
+        action="store_true",
+        help="Exit non-zero unless ready_to_start (required config/secret refs present)",
+    )
 
     recovery = sub.add_parser("recovery", help="Recovery drills (local)")
     recovery_sub = recovery.add_subparsers(dest="recovery_command", required=True)
@@ -526,12 +531,10 @@ def main() -> None:
     elif args.command == "deploy" and args.deploy_command == "doctor":
         from swarm.deploy.doctor import doctor
 
-        print(
-            json.dumps(
-                doctor(profile=args.profile, repo_root=_repo_root()).to_dict(),
-                indent=2,
-            )
-        )
+        result = doctor(profile=args.profile, repo_root=_repo_root()).to_dict()
+        print(json.dumps(result, indent=2))
+        if getattr(args, "require_start", False) and not result.get("ready_to_start"):
+            raise SystemExit(1)
     elif args.command == "recovery" and args.recovery_command == "verify":
         from swarm.deploy.doctor import recovery_verify
 
