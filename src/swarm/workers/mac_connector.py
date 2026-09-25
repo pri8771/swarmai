@@ -210,6 +210,136 @@ class MacConnectorClient:
             raise RuntimeError(f"heartbeat:{response.status_code}:{response.text}")
         return cast(dict[str, Any], response.json())
 
+    def claim(self, *, agent_profile_id: str = "ap_default") -> dict[str, Any]:
+        if not self.worker_id or self.generation is None or not self.membership_token:
+            raise RuntimeError("connector_not_enrolled")
+        response = self._client.post(
+            "/v1/workers/claim",
+            json={
+                "worker_id": self.worker_id,
+                "generation": self.generation,
+                "token": self.membership_token,
+                "agent_profile_id": agent_profile_id,
+            },
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(f"claim:{response.status_code}:{response.text}")
+        return cast(dict[str, Any], response.json())
+
+    def renew(
+        self,
+        *,
+        lease_id: str,
+        progress_class: str = "running",
+        extend_seconds: int | None = None,
+    ) -> dict[str, Any]:
+        if not self.worker_id or self.generation is None or not self.membership_token:
+            raise RuntimeError("connector_not_enrolled")
+        payload: dict[str, Any] = {
+            "lease_id": lease_id,
+            "worker_id": self.worker_id,
+            "generation": self.generation,
+            "token": self.membership_token,
+            "progress_class": progress_class,
+        }
+        if extend_seconds is not None:
+            payload["extend_seconds"] = extend_seconds
+        response = self._client.post("/v1/workers/renew", json=payload)
+        if response.status_code >= 400:
+            raise RuntimeError(f"renew:{response.status_code}:{response.text}")
+        return cast(dict[str, Any], response.json())
+
+    def submit_result(
+        self,
+        *,
+        lease_id: str,
+        status: str,
+        checks: dict[str, Any] | None = None,
+        artifact_manifest: dict[str, Any] | None = None,
+        usage: dict[str, Any] | None = None,
+        summary: str | None = None,
+        result_id: str | None = None,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
+        """Submit evidence only — never self-accepts."""
+        if not self.worker_id or self.generation is None or not self.membership_token:
+            raise RuntimeError("connector_not_enrolled")
+        headers = dict(self._headers)
+        if idempotency_key:
+            headers["Idempotency-Key"] = idempotency_key
+        response = self._client.post(
+            "/v1/workers/submit-result",
+            headers=headers,
+            json={
+                "lease_id": lease_id,
+                "worker_id": self.worker_id,
+                "generation": self.generation,
+                "token": self.membership_token,
+                "status": status,
+                "checks": dict(checks or {}),
+                "artifact_manifest": dict(artifact_manifest or {}),
+                "usage": dict(usage or {}),
+                "summary": summary,
+                "result_id": result_id,
+            },
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(f"submit_result:{response.status_code}:{response.text}")
+        body = cast(dict[str, Any], response.json())
+        if body.get("self_accepted") is True or body.get("acceptance_state") == "accepted":
+            raise RuntimeError("connector_must_not_self_accept")
+        return body
+
+    def reconnect(self) -> dict[str, Any]:
+        if not self.worker_id or self.generation is None or not self.membership_token:
+            raise RuntimeError("connector_not_enrolled")
+        response = self._client.post(
+            "/v1/workers/reconnect",
+            json={
+                "worker_id": self.worker_id,
+                "generation": self.generation,
+                "token": self.membership_token,
+            },
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(f"reconnect:{response.status_code}:{response.text}")
+        return cast(dict[str, Any], response.json())
+
+    def reconcile(self) -> dict[str, Any]:
+        """Recover ownership from server after disconnect — drop cancelled leases."""
+        recon = self.reconnect()
+        active = []
+        cancelled = list(recon.get("cancel_notices") or [])
+        for row in recon.get("active_leases") or []:
+            lease_id = str(row.get("lease_id") or "")
+            if not lease_id:
+                continue
+            if lease_id in cancelled or row.get("cancel_requested") or row.get("state") == "cancelled":
+                cancelled.append(lease_id)
+                continue
+            active.append(row)
+        return {
+            "worker_id": recon.get("worker_id"),
+            "generation": recon.get("generation"),
+            "status": recon.get("status"),
+            "active_leases": active,
+            "cancelled_leases": sorted(set(cancelled)),
+            "reconciled": True,
+        }
+
+    def enqueue_task(self, task: dict[str, Any], *, idempotency_key: str | None = None) -> dict[str, Any]:
+        headers = dict(self._headers)
+        if idempotency_key:
+            headers["Idempotency-Key"] = idempotency_key
+        response = self._client.post(
+            "/v1/workers/enqueue",
+            headers=headers,
+            json={"task": task},
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(f"enqueue:{response.status_code}:{response.text}")
+        return cast(dict[str, Any], response.json())
+
     def create_mac_scoped_mission(
         self,
         *,

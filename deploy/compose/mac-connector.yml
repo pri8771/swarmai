@@ -1,7 +1,7 @@
 # Mac worker connector — outbound to SwarmAI server only.
 # No Postgres. No public inbound ports.
-# One-shot TH-03: enroll, complete mac_local scoped mission, exit.
-# Server must remain up after this container stops.
+# Continuous claim/lease/submit loop (V1.7) — not one-shot self-approve.
+# Server must remain up after this container stops or drains.
 name: swarm-mac-connector
 
 services:
@@ -10,7 +10,7 @@ services:
       context: ../..
       dockerfile: Dockerfile
     image: swarm-ai:local
-    # Run as swarm; entrypoint overridden for one-shot connector.
+    # Run as swarm; entrypoint overridden for continuous connector.
     user: "1000:1000"
     env_file:
       - ../env/mac-connector.env
@@ -20,6 +20,9 @@ services:
       # From container → host-published server port (Docker Desktop).
       SWARM_SERVER_URL: ${SWARM_SERVER_URL:-http://host.docker.internal:18766}
       SWARM_REPO_ROOT: "/work"
+      # Bound continuous loops for smoke; omit for forever-running workers.
+      SWARM_CONNECTOR_MAX_ITERATIONS: ${SWARM_CONNECTOR_MAX_ITERATIONS:-}
+      SWARM_CONNECTOR_POLL: ${SWARM_CONNECTOR_POLL:-1.0}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -27,7 +30,7 @@ services:
       - ../..:/work:rw
     working_dir: /work
     entrypoint: ["/app/.venv/bin/python"]
-    command: ["scripts/th03_mac_connector.py"]
+    command: ["scripts/v17_continuous_mac_connector.py"]
     networks:
       - swarm_connector
     deploy:
@@ -35,8 +38,8 @@ services:
         limits:
           cpus: "1.0"
           memory: 1024M
-    stop_grace_period: 15s
-    restart: "no"
+    stop_grace_period: 30s
+    restart: "unless-stopped"
 
 networks:
   swarm_connector:

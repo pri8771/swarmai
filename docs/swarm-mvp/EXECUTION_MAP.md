@@ -1,8 +1,8 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T17:00Z  
+**Updated:** 2026-09-25T17:25Z  
 **Integration branch:** `dev`  
-**Implementation branch:** `cursor/v2-foundation-r1r9-b28d`  
+**Lane A branch:** `cursor/v17-connector-continuous-b28d`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`
 
@@ -25,7 +25,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | ID | Status | Protected tests / notes |
 |---|---|---|
 | R1 | **fixed** | Reject caller `required_checks` override; require artifact before accept |
-| R2 | **mitigated** | Durable worker + idempotency mirror under `var/`; continuous lease connector still V1.7 |
+| R2 | **mitigated→connector landed** | Durable workers/idempotency + continuous claim/renew/submit/cancel/reconnect on HTTP (`cursor/v17-connector-continuous-b28d`); PG transactional authority still preferred when configured |
 | R3 | **fixed** | Locked merge-safe artifact index; durable idempotent artifact IDs |
 | R4 | **fixed** | Content reads enforce tombstone via `resolve` |
 | R5 | **fixed** | Harness-owned nonce verdict; path-gated sandbox |
@@ -45,6 +45,6 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 
 ## Next
 
-1. Finish R7 CI (ephemeral Postgres job) + R2 continuous connector on HTTP path.  
-2. V1.7 integrated mission lifecycle with protected verification + ≥1 authorized model-backed run.  
-3. V1.8 Goal entity → V1.9 pursuit loop → V2.0 product UI/SDK + acceptance campaign freeze.
+1. Lane A continuous connector HTTP path landed on `cursor/v17-connector-continuous-b28d` (merge to `dev`).  
+2. Finish R7 CI (ephemeral Postgres job) — Lane B.  
+3. V1.7 collab/model E2E + V1.8→V2.0 — other lanes.
