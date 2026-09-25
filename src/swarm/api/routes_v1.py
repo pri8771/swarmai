@@ -43,6 +43,7 @@ router = APIRouter(prefix="/v1")
 def get_store(request: Request) -> ProductStore:
     return request.app.state.store  # type: ignore[no-any-return]
 
+
 def _history_project_id(store: ProductStore, mission_id: str) -> str | None:
     try:
         opened = store.history_index().reopen(mission_id)
@@ -56,8 +57,6 @@ def _history_project_id(store: ProductStore, mission_id: str) -> str | None:
         if row.get("mission_id") == mission_id and row.get("project_id"):
             return str(row["project_id"])
     return None
-
-
 
 
 def _page(items: list[Any], *, limit: int, cursor: str | None) -> dict[str, Any]:
@@ -274,7 +273,7 @@ async def stream_events(
             events = [e for e in events if e.project_id in allowed or is_admin]
         for ev in events:
             yield f"id: {ev.id}\nevent: {ev.type}\ndata: {ev.model_dump_json()}\n\n"
-        yield f"event: cursor\ndata: {{\"cursor\": \"{cursor or ''}\"}}\n\n"
+        yield f'event: cursor\ndata: {{"cursor": "{cursor or ""}"}}\n\n'
 
     return StreamingResponse(gen(), media_type="text/event-stream")
 
@@ -290,9 +289,7 @@ async def providers(
         "providers": list_providers(mode=mode),
         "accounts": store.public_accounts(),
         "mock_vs_live": (
-            "fixture_catalog"
-            if store.fixture_mode
-            else "catalog_status_not_live_eligibility"
+            "fixture_catalog" if store.fixture_mode else "catalog_status_not_live_eligibility"
         ),
     }
 
@@ -837,7 +834,9 @@ async def worker_enqueue_task(
         raise ApiError("invalid_request", f"invalid task: {exc}", status_code=400) from exc
     auth.require_project(principal, task.project_id)
     key = body.idempotency_key or idempotency_key
-    digest = payload_hash({"task_id": task.id, "mission_id": task.mission_id, "operation": "enqueue"})
+    digest = payload_hash(
+        {"task_id": task.id, "mission_id": task.mission_id, "operation": "enqueue"}
+    )
     cached = store.recall_idempotent(
         key,
         actor=principal.subject,
@@ -1261,11 +1260,7 @@ async def create_project(
     if project_id:
         auth.require_project(principal, project_id)
     else:
-        project_id = (
-            sorted(principal.project_ids)[0]
-            if principal.project_ids
-            else new_id("proj_")
-        )
+        project_id = sorted(principal.project_ids)[0] if principal.project_ids else new_id("proj_")
     digest = payload_hash(
         {
             "name": body.name,
@@ -1541,6 +1536,8 @@ async def freeze_candidate(
 
     root = Path(__file__).resolve().parents[3]
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
-    return CandidateFreezer(root).freeze(
-        source_sha=sha, schema_revision="a18tov30schema0001"
-    ).to_dict()
+    return (
+        CandidateFreezer(root)
+        .freeze(source_sha=sha, schema_revision="a18tov30schema0001")
+        .to_dict()
+    )

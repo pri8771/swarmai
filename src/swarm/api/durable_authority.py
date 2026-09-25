@@ -165,7 +165,7 @@ def load_worker_registry(repo_root: Path, registry: WorkerRegistryService) -> No
             expires = _parse_dt(lease_row.get("expires_at"))
             if expires is None:
                 continue
-            lease = DispatchLease(
+            dispatch_lease = DispatchLease(
                 lease_id=str(lease_row["lease_id"]),
                 task=TaskSpec.model_validate(lease_row.get("task") or {}),
                 worker_id=str(lease_row["worker_id"]),
@@ -179,7 +179,7 @@ def load_worker_registry(repo_root: Path, registry: WorkerRegistryService) -> No
                 submitted_at=_parse_dt(lease_row.get("submitted_at")),
                 acceptance_state=str(lease_row.get("acceptance_state") or "pending"),
             )
-            registry._leases[lease.lease_id] = lease
+            registry._leases[dispatch_lease.lease_id] = dispatch_lease
         except (TypeError, ValueError, KeyError):
             continue
     results = raw.get("results") or {}

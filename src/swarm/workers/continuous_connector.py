@@ -13,10 +13,11 @@ import os
 import threading
 import time
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from swarm.workers.mac_connector import (
     DEFAULT_SERVER_URL,
@@ -27,7 +28,6 @@ from swarm.workers.mac_connector import (
     write_mac_local_fixture,
 )
 
-
 Executor = Callable[[dict[str, Any], Path], dict[str, Any]]
 
 
@@ -36,9 +36,7 @@ def default_mac_executor(claim: dict[str, Any], fixture_dir: Path) -> dict[str, 
     task = claim.get("task") or {}
     scopes = set(task.get("scopes") or [])
     run_id = str(task.get("id") or uuid.uuid4().hex[:12])
-    if "mac_local" in scopes or "mac.local.extract" in set(
-        task.get("required_capabilities") or []
-    ):
+    if "mac_local" in scopes or "mac.local.extract" in set(task.get("required_capabilities") or []):
         path = write_mac_local_fixture(fixture_dir, run_id=run_id)
         work = perform_mac_local_extract(path)
         return {
@@ -71,9 +69,7 @@ class ContinuousMacConnector:
     project_id: str | None = None
     poll_interval_seconds: float = 1.0
     renew_every_seconds: float = 15.0
-    fixture_dir: Path = field(
-        default_factory=lambda: Path("var") / "mac-connector" / "fixtures"
-    )
+    fixture_dir: Path = field(default_factory=lambda: Path("var") / "mac-connector" / "fixtures")
     evidence_dir: Path = field(
         default_factory=lambda: Path("docs") / "evidence" / "v17" / "continuous-connector"
     )
@@ -166,9 +162,7 @@ class ContinuousMacConnector:
                                 lease_id=active_lease,
                                 status=str(produced.get("status") or "completed"),
                                 checks=dict(produced.get("checks") or {}),
-                                artifact_manifest=dict(
-                                    produced.get("artifact_manifest") or {}
-                                ),
+                                artifact_manifest=dict(produced.get("artifact_manifest") or {}),
                                 usage=dict(produced.get("usage") or {}),
                                 summary=str(produced.get("summary") or ""),
                                 idempotency_key=f"cont-submit-{active_lease}",
@@ -187,9 +181,7 @@ class ContinuousMacConnector:
                     else:
                         # Keep renewing an in-flight lease (long executor / pause).
                         if time.monotonic() - last_renew >= self.renew_every_seconds:
-                            renew = client.renew(
-                                lease_id=active_lease, progress_class="running"
-                            )
+                            renew = client.renew(lease_id=active_lease, progress_class="running")
                             last_renew = time.monotonic()
                             self._record("renew_keepalive", lease_id=active_lease)
                             if active_lease in (renew.get("cancel_notices") or []):
@@ -262,7 +254,15 @@ def run_from_env(*, max_iterations: int | None = None) -> dict[str, Any]:
 
 def main() -> int:
     evidence = run_from_env()
-    print(json.dumps({"ok": True, "submitted": evidence.get("submitted"), "path": evidence.get("evidence_path")}))
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "submitted": evidence.get("submitted"),
+                "path": evidence.get("evidence_path"),
+            }
+        )
+    )
     return 0
 
 

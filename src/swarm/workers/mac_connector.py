@@ -314,7 +314,11 @@ class MacConnectorClient:
             lease_id = str(row.get("lease_id") or "")
             if not lease_id:
                 continue
-            if lease_id in cancelled or row.get("cancel_requested") or row.get("state") == "cancelled":
+            if (
+                lease_id in cancelled
+                or row.get("cancel_requested")
+                or row.get("state") == "cancelled"
+            ):
                 cancelled.append(lease_id)
                 continue
             active.append(row)
@@ -327,7 +331,9 @@ class MacConnectorClient:
             "reconciled": True,
         }
 
-    def enqueue_task(self, task: dict[str, Any], *, idempotency_key: str | None = None) -> dict[str, Any]:
+    def enqueue_task(
+        self, task: dict[str, Any], *, idempotency_key: str | None = None
+    ) -> dict[str, Any]:
         headers = dict(self._headers)
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
