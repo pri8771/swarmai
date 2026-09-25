@@ -11,7 +11,7 @@ This package does **not** invent lead acceptance.
 
 | Artifact | Path / proof | Worker status |
 |---|---|---|
-| ART-V20-INTEGRATED-CANDIDATE | `docs/evidence/v20/candidate_manifest.json` + Alembic `a18tov30schema0001` | implementation-complete |
+| ART-V20-INTEGRATED-CANDIDATE | `docs/evidence/v20/candidate_manifest.json` + Alembic `a20pursuitpersist0001` (tip `dd7726eb`) | implementation-complete candidate; **not** lead-accepted |
 | ART-V20-SUPPORT-MATRIX | `docs/evidence/v20/support_matrix.json` | evidence-grounded local + loopback |
 | ART-V20-INSTALL-JOURNEY | `uv run swarm release install-check` / `first-run` (session receipts) | executable local |
 | ART-V20-UPGRADE-ROLLBACK | `swarm install upgrade-plan` / `rollback-plan` CLI | executable local |

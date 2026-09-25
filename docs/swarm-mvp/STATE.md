@@ -1,20 +1,22 @@
 # SwarmAI MVP / two-host + V2 + portable state
 
-**Owner:** Cursor Project P5 tracking (`bc-e1ed8584-abe5-5d33-94cb-2ea10d429bf5`)  
-**Integration:** `origin/dev` @ `f39e003249b73849a699bb554dddcdfbfffa502c`  
-**Active tracking branch:** `cursor/v2-portable-tracking-9bf5`  
-**Updated:** 2026-09-25T18:55:00Z  
-**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed)  
+**Owner:** Cursor Project V2.0 eng (`bc-5513fdae-823c-5454-8e5f-91feccf64635`)  
+**Integration:** `origin/dev` @ `dd7726eb8c22986ef72847994c8e435a81a869b6`  
+**Active tracking branch:** `cursor/v20-tracking-tipsync-4635`  
+**Updated:** 2026-09-25T21:10:00Z  
+**Post-merge verify (portable):** PASS (Mac 2026-09-25T18:49Z; 78 passed @ older tip `f39e0032`)  
+**FAST_TRACK tip CI:** green on merges #65 / #60 (2026-09-25T20:39Z)  
 **Public hostname (deploy config):** `swarm.splitsignal.ai` (operator; freeze is **config-driven** — PORT-01 closed)  
 **Loopback server:** `http://127.0.0.1:18766`  
 **Versions accepted:** V1.7–V2.0 = **false**
 
 ## Mandate
 
-Portable product mandate supersedes “wait on LiveGrant / eng exhausted” for independent eng.  
-User plan: Project Context `docs/v2-portable-product-plan.md`.  
+Portable product + FAST_TRACK continue independent eng.  
+User plan: Project Context `docs/v2-fast-track-plan.md` / `docs/v2-portable-product-plan.md`.  
 Prior goal-pursuit plan remains for version meanings: `docs/v2-goal-pursuit-plan.md`.  
-Execution map: `docs/swarm-mvp/EXECUTION_MAP.md`.
+Execution map: `docs/swarm-mvp/EXECUTION_MAP.md`.  
+Gap audit: Project Context `internal/v20-gap-audit.md`.
 
 ## Packet status
 
@@ -23,42 +25,49 @@ Execution map: `docs/swarm-mvp/EXECUTION_MAP.md`.
 | P00 | impl_complete | Docs + baseline frozen |
 | TH-01–07 | eng_complete / **review-required** | Particular deployment evidence; R730 still blocked |
 | R1–R9 foundation | eng landed on tip | R9 Linear residual |
-| V1.7–V2.0 | eng present | **not accepted** |
+| V1.7 | eng_landed | Mission path + R20-01 closed @ tip; **not accepted** |
+| V1.8–V1.9 | eng_landed | Goals + pursuit; **not accepted** |
+| V2.0 | eng_in_progress | L1–L6 on tip; remaining depth E03–E06+; **not accepted** |
 | P01–P19 | planned / partial eng | Product spine |
 | PORT-01 | **done** | PR #55; Mac verify PASS — defects closed |
 | PORT-02 | **eng_done** | PR #57; matrix cells experimental (not `supported`) |
 | PORT-03 | **eng_done** | PR #56; particular-deploy evidence external |
 | PORT-04 | **eng_done** | PR #54; Docker two-container proven on Mac |
-| PORT-05 | **in_progress** | Tip-sync refresh this branch after verify PASS |
+| PORT-05 | **eng_done** (continuous) | Tip-sync @ `dd7726eb`; keep refreshing |
 
 ## Gate snapshot
 
 | Gate class | Status |
 |---|---|
-| Product correctness | PORT-01 defects **closed**; live adapter dispatch still missing (`blocked_missing_implementation`) |
+| Product correctness | PORT-01 closed; FT L1–L6 eng_landed; live adapter dispatch still missing (`blocked_missing_implementation`) |
 | Supported-platform qualification | Linux container / enrollment **experimental** — do not claim `supported` |
 | Particular deployment (R730/CF) | blocked — does not stop portable eng |
-| Live inference | LiveGrant blocked; fake-upstream wiring proven (spend 0) |
+| Live inference | LiveGrant blocked; fake-upstream / preflight only (spend 0) |
 | Independent review | required for version accept |
 | Operator acceptance | not done |
 
-## Checks this session (P5 tip sync)
+## Checks this session (V20-E01 tip sync)
 
 | Check | Result |
 |---|---|
-| Tip SHA recorded | `f39e0032` (≥ verify tip) |
-| Post-merge verify handoff | PASS — Context `internal/v2-portable-post-merge-verify-handoff.md` |
-| Packet queue / matrix / Linear / STATE / EXECUTION_MAP | refreshed to eng-landed honesty |
+| Tip SHA recorded | `dd7726eb` (FAST_TRACK L1–L6 absorbed) |
+| Prior portable verify | PASS @ `f39e0032` (retained; not re-run this pass) |
+| Packet queue / matrix / Linear / STATE / EXECUTION_MAP | refreshed to tip honesty |
 | Linear MCP | needsAuth (queue only) |
 | Version accept flipped | **no** — remain false |
 | False `supported` claims | **no** |
 
-## FAST_TRACK (2026-09-25)
+## FAST_TRACK (2026-09-25) — eng landed on tip
 
-| Lane | Status | Notes |
-|---|---|---|
-| L4 comms/memory/succession | **eng_in_progress** | Durable authenticated mailbox, layered memory provenance, X/Y KT1/KT2 fencing on branch `cursor/v2-ft-comms-memory-4a67` — not version-accepted |
+| Lane | PR | Status | Notes |
+|---|---|---|---|
+| L1 durable storage | #63 | **eng_landed** | File pursuit durability + DB-down fence; PG write-through still open (V20-E03) |
+| L2 real pursuit / R20-01 | #65 | **eng_landed** | Ops `NativeMissionDispatchExecutor`; extract path proven; native model/tool loop open (V20-E05) |
+| L3 workers / perms / cancel | #62 | **eng_landed** | Capability conjunction, enrollment fences, drain/revoke/rotate |
+| L4 comms / memory / succession | #64 | **eng_landed** | Mailbox, layered memory, X/Y KT1/KT2 |
+| L5 verify / accounting | #61 | **eng_landed** | Protected receipts; usage ledger process-local (V20-E04); LiveGrant preflight |
+| L6 UI / SDK / Docker | #60 | **eng_landed** | Product compose + console/SDK control parity |
 
 ## Next action
 
-Keep live path honest (optional dispatcher only with authentic LiveGrant). Independent review + operator accept remain promotion gates. Do not merge `main`. Particular R730/CF/DNS evidence remains external. Coordinator integrates FAST_TRACK lane PRs → `dev`.
+Continue V2.0 eng depth from gap audit: E03 PG write-through → E04 ledger/lesson durability → E05 native model/tool loop (fake HTTP) → E06 coordinator singleton. Keep LiveGrant/operator/version-accept out of eng claims. Do not merge `main`.

@@ -1,14 +1,25 @@
 {
   "artifact": "ART-V20-SUPPORT_MATRIX",
   "status": "evidence_grounded_local_plus_portable_eng_landed",
-  "generated_at": "2026-09-25T18:55:00+00:00",
-  "integration_tip": "f39e003249b73849a699bb554dddcdfbfffa502c",
+  "generated_at": "2026-09-25T21:10:00+00:00",
+  "integration_tip": "dd7726eb8c22986ef72847994c8e435a81a869b6",
+  "schema_revision": "a20pursuitpersist0001",
   "post_merge_verify": {
     "status": "PASS",
     "at": "2026-09-25T18:49Z",
     "host": "Mac",
     "suite_passed": 78,
-    "docker_flag": "SWARM_PORTABLE_DOCKER=1"
+    "docker_flag": "SWARM_PORTABLE_DOCKER=1",
+    "tip_at_verify": "f39e003249b73849a699bb554dddcdfbfffa502c",
+    "note": "Portable verify retained; tip advanced with FAST_TRACK L1-L6"
+  },
+  "fast_track_lanes": {
+    "L1": 63,
+    "L2": 65,
+    "L3": 62,
+    "L4": 64,
+    "L5": 61,
+    "L6": 60
   },
   "portable_prs": {
     "PORT-01": 55,
@@ -133,7 +144,7 @@
   "portable_doc": "docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md",
   "notes": [
     "Matrix cells claim only what local deterministic tests, packaging, or explicit PORT evidence prove.",
-    "PORT-01–04 eng landed (#54–#57); post-merge verify PASS @ f39e0032.",
+    "PORT-01–04 eng landed (#54–#57); post-merge verify PASS @ f39e0032; tip now dd7726eb with FAST_TRACK L1–L6 eng_landed.",
     "No remote dual, multi-host, wall-clock reliability, or paid provider cells marked qualified.",
     "Do not mark linux_container_baseline or enrollment as supported without operator qualification + review.",
     "V1.7–V2.0 remain unaccepted.",
