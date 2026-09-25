@@ -24,7 +24,7 @@ def test_campaign_runs_all_frozen_scenarios(tmp_path: Path) -> None:
     assert (tmp_path / "latest.json").is_file()
 
 
-def test_deterministic_probes_pass_or_scaffold() -> None:
+def test_deterministic_probes_pass() -> None:
     report = run_acceptance_campaign(gates=["deterministic"])
     det = [r for r in report.results if r.primary_gate == "deterministic"]
     assert det
@@ -32,9 +32,13 @@ def test_deterministic_probes_pass_or_scaffold() -> None:
         assert r.ok, (r.scenario_id, r.status, r.detail)
         assert r.status in {
             "pass_deterministic",
-            "scaffold_ready_not_integrated",
             "pass_deterministic_gate_only",
-        }
+        }, (r.scenario_id, r.status)
+    # S05–S08/S11 must be real product probes, not scaffolds.
+    for sid in ("V20-S05", "V20-S06", "V20-S07", "V20-S08", "V20-S11"):
+        row = next(r for r in report.results if r.scenario_id == sid)
+        assert row.status == "pass_deterministic", (sid, row.status, row.detail)
+        assert "scaffold" not in str(row.detail.get("status", "")).lower()
 
 
 def test_live_primary_blocked_without_grant() -> None:

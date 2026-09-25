@@ -81,7 +81,7 @@ Code existing ≠ version accepted. No self-approval where independent review is
 
 | Gate | Meaning | Campaign default |
 |---|---|---|
-| deterministic | Local mechanics / fake upstreams | Executable probes + scaffolds |
+| deterministic | Local mechanics / fake upstreams | Executable product probes (S01–S11; scaffolds retired) |
 | live | Approved LiveGrant only | Blocked — never invented |
 | host | R730 / two-host / DNS | Blocked — two local processes ≠ proof |
 | elapsed | Wall-clock reliability | Not started — never simulated |
