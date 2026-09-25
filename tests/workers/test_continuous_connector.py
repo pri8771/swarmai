@@ -15,6 +15,7 @@ from swarm.workers.continuous_connector import (
     ContinuousMacConnector,
     default_mac_executor,
     execute_assigned_work,
+    execute_mac_local_extract_operational,
     fixture_demo_executor,
     resolve_connector_mode,
 )
@@ -351,7 +352,9 @@ def test_operational_default_rejects_fixture_echo_success(tmp_path: Path) -> Non
 
 def test_operational_executes_assigned_input_via_permitted_runtime(tmp_path: Path) -> None:
     """Protected regression: operational path executes real assigned input path."""
-    src = tmp_path / "assigned.txt"
+    work = tmp_path / "work"
+    work.mkdir()
+    src = work / "assigned.txt"
     src.write_text(
         "Assigned mac-local extract input.\n"
         "Contact worker@example.com and ops@example.org.\n",
@@ -365,11 +368,186 @@ def test_operational_executes_assigned_input_via_permitted_runtime(tmp_path: Pat
             "input_path": str(src),
         }
     }
-    produced = default_mac_executor(claim, tmp_path / "work")
+    produced = default_mac_executor(claim, work)
     assert produced["status"] == "completed"
     assert produced["checks"]["email_count"] == 2
     assert produced["artifact_manifest"]["runtime"] == "mac_local_extract"
     assert produced["usage"]["spend_usd"] == 0.0
+
+
+def test_runtime_requires_all_capabilities_and_scopes() -> None:
+    from swarm.workers.continuous_connector import PermittedRuntime
+
+    runtime = PermittedRuntime(
+        "extract",
+        frozenset({"extract"}),
+        frozenset({"workspace.read"}),
+        lambda c, p: {},
+    )
+    assert runtime.matches(
+        {"required_capabilities": ["extract"], "scopes": ["workspace.read"]}
+    )
+    assert not runtime.matches(
+        {"required_capabilities": ["extract", "admin"], "scopes": ["workspace.read"]}
+    )
+    assert not runtime.matches(
+        {"required_capabilities": ["extract"], "scopes": ["secrets.read"]}
+    )
+
+
+def test_outside_workspace_input_blocked(tmp_path: Path) -> None:
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("Generated probe: test@example.test\n")
+    work = execute_mac_local_extract_operational(
+        {"task": {"id": "generated-probe", "input_path": str(outside)}}, workspace
+    )
+    assert work["status"] == "blocked"
+    assert work["checks"]["reason"] == "path_escapes_workspace"
+
+
+@pytest.mark.asyncio
+async def test_enrollment_unverified_without_project_policy_and_unsupported_host(
+    tmp_path: Path,
+) -> None:
+    from swarm.api.store import ProductStore
+
+    store = ProductStore(repo_root=tmp_path)
+    # Default allowlist: authorized but not project-verified.
+    granted, _ = await store.enroll_worker(
+        capabilities=["code.write"],
+        capacity_units=1,
+        privacy_classes=["local"],
+        project_id="proj_review",
+        actor="review",
+        platform="linux",
+        architecture="amd64",
+    )
+    assert granted.capabilities_verified is False
+    assert "code.write" in granted.capabilities
+
+    bad, _ = await store.enroll_worker(
+        capabilities=["code.write"],
+        capacity_units=1,
+        privacy_classes=["local"],
+        project_id="proj_review",
+        actor="review",
+        platform="unsupported_os",
+        architecture="unsupported_arch",
+    )
+    assert bad.capabilities_verified is False
+    assert bad.capabilities == []
+
+
+def test_revoke_cancels_leases_and_rejects_stale_submit(tmp_path: Path) -> None:
+    client = _app(tmp_path)
+    enroll = client.post(
+        "/v1/workers/enroll",
+        headers=HEADERS,
+        json={
+            "project_id": "proj_review",
+            "capabilities": ["extract"],
+            "privacy_classes": ["mac_local", "local"],
+            "platform": "linux",
+            "architecture": "amd64",
+        },
+    ).json()
+    worker_id = enroll["worker"]["worker_id"]
+    generation = enroll["worker"]["lease_generation"]
+    token = enroll["membership_token"]
+    task = sample_task().model_copy(
+        update={
+            "id": new_id("tsk_"),
+            "project_id": "proj_review",
+            "required_capabilities": ["extract"],
+            "scopes": ["mac_local"],
+        }
+    )
+    client.post(
+        "/v1/workers/enqueue",
+        headers={**HEADERS, "Idempotency-Key": "enq-rev"},
+        json={"task": task.model_dump(mode="json")},
+    )
+    lease_id = client.post(
+        "/v1/workers/claim",
+        headers=HEADERS,
+        json={"worker_id": worker_id, "generation": generation, "token": token},
+    ).json()["lease_id"]
+    revoked = client.post(
+        "/v1/workers/revoke",
+        headers=HEADERS,
+        json={"worker_id": worker_id, "reason": "test_revoke"},
+    )
+    assert revoked.status_code == 200, revoked.text
+    assert revoked.json()["revoked"] is True
+    submit = client.post(
+        "/v1/workers/submit-result",
+        headers=HEADERS,
+        json={
+            "lease_id": lease_id,
+            "worker_id": worker_id,
+            "generation": generation,
+            "token": token,
+            "status": "completed",
+        },
+    )
+    assert submit.status_code in {403, 409}
+    drain = client.post(
+        "/v1/workers/drain",
+        headers=HEADERS,
+        json={"worker_id": worker_id},
+    )
+    # Already revoked — operator drain should fail closed.
+    assert drain.status_code == 403
+
+
+def test_reconnect_reports_cancelled_leases(tmp_path: Path) -> None:
+    client = _app(tmp_path)
+    enroll = client.post(
+        "/v1/workers/enroll",
+        headers=HEADERS,
+        json={
+            "project_id": "proj_review",
+            "capabilities": ["extract"],
+            "privacy_classes": ["mac_local", "local"],
+        },
+    ).json()
+    worker_id = enroll["worker"]["worker_id"]
+    generation = enroll["worker"]["lease_generation"]
+    token = enroll["membership_token"]
+    task = sample_task().model_copy(
+        update={
+            "id": new_id("tsk_"),
+            "project_id": "proj_review",
+            "required_capabilities": ["extract"],
+            "scopes": ["mac_local"],
+        }
+    )
+    client.post(
+        "/v1/workers/enqueue",
+        headers={**HEADERS, "Idempotency-Key": "enq-rec"},
+        json={"task": task.model_dump(mode="json")},
+    )
+    lease_id = client.post(
+        "/v1/workers/claim",
+        headers=HEADERS,
+        json={"worker_id": worker_id, "generation": generation, "token": token},
+    ).json()["lease_id"]
+    client.post(
+        "/v1/workers/cancel-lease",
+        headers=HEADERS,
+        json={"lease_id": lease_id, "reason": "operator_cancel"},
+    )
+    recon = client.post(
+        "/v1/workers/reconnect",
+        headers=HEADERS,
+        json={"worker_id": worker_id, "generation": generation, "token": token},
+    )
+    assert recon.status_code == 200, recon.text
+    body = recon.json()
+    assert lease_id in body["cancelled_leases"]
+    assert body["active_leases"] == []
 
 
 def test_connector_reuses_p4_identity_and_support_matrix() -> None:

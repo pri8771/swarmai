@@ -118,6 +118,24 @@ class WorkerReconnectRequest(StrictModel):
     token: str
 
 
+class WorkerDrainRequest(StrictModel):
+    worker_id: str
+    generation: int | None = None
+    token: str | None = None
+    """When token is set, worker self-drain; otherwise operator drain by worker_id."""
+
+
+class WorkerRevokeRequest(StrictModel):
+    worker_id: str
+    reason: str = "operator_revoke"
+
+
+class WorkerRotateTokenRequest(StrictModel):
+    worker_id: str
+    generation: int
+    token: str
+
+
 class WorkerEnqueueTaskRequest(StrictModel):
     """Control-plane enqueue of a TaskSpec for outbound connector claim."""
 

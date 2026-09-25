@@ -32,11 +32,14 @@ from swarm.api.schemas import (
     PursuitTickRequest,
     WorkerCancelLeaseRequest,
     WorkerClaimRequest,
+    WorkerDrainRequest,
     WorkerEnqueueTaskRequest,
     WorkerEnrollRequest,
     WorkerHeartbeatRequest,
     WorkerReconnectRequest,
     WorkerRenewRequest,
+    WorkerRevokeRequest,
+    WorkerRotateTokenRequest,
     WorkerSubmitResultRequest,
 )
 from swarm.api.store import ProductStore
@@ -833,6 +836,139 @@ async def worker_reconnect(
         raise
     store._persist_durable_workers()
     return payload
+
+
+@router.get("/workers")
+async def workers_inspect(
+    project_id: str | None = None,
+    principal: Principal = Depends(get_principal),
+    auth: AuthRegistry = Depends(get_auth),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    if project_id:
+        auth.require_project(principal, project_id)
+    elif "admin" not in principal.roles:
+        # Non-admin must scope to a project they own.
+        raise ApiError("project_required", "project_id required", status_code=400)
+    return store.workers.inspect(project_id=project_id)
+
+
+@router.post("/workers/drain")
+async def worker_drain(
+    body: WorkerDrainRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    try:
+        if body.token:
+            if body.generation is None:
+                raise ApiError(
+                    "invalid_request",
+                    "generation required for self-drain",
+                    status_code=400,
+                )
+            if int(body.generation) != int(rec.lease.lease_generation):
+                raise ApiError("stale_generation", "worker generation mismatch", status_code=409)
+            lease = await store.workers.drain(body.worker_id, token=body.token)
+        else:
+            lease = store.workers.operator_drain(body.worker_id)
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import StaleGenerationError, WorkerAuthError
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        if isinstance(exc, StaleGenerationError):
+            raise ApiError("stale_generation", str(exc), status_code=409) from exc
+        raise
+    store._persist_durable_workers()
+    return {
+        "worker_id": lease.worker_id,
+        "status": lease.status.value,
+        "active_lease_ids": list(rec.active_lease_ids),
+        "generation": lease.lease_generation,
+    }
+
+
+@router.post("/workers/revoke")
+async def worker_revoke(
+    body: WorkerRevokeRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    new_gen = await store.workers.revoke_generation(body.worker_id)
+    store._persist_durable_workers()
+    store.publish(
+        project_id=rec.project_id or "",
+        type="worker.revoked",
+        actor=principal.subject,
+        payload={
+            "worker_id": body.worker_id,
+            "generation": new_gen,
+            "reason": body.reason,
+        },
+        dedupe_key=f"worker.revoked:{body.worker_id}:{new_gen}",
+    )
+    return {
+        "worker_id": body.worker_id,
+        "generation": new_gen,
+        "status": "quarantined",
+        "revoked": True,
+        "reason": body.reason,
+    }
+
+
+@router.post("/workers/rotate-token")
+async def worker_rotate_token(
+    body: WorkerRotateTokenRequest,
+    principal: Principal = Depends(get_principal),
+    store: ProductStore = Depends(get_store),
+) -> dict[str, Any]:
+    rec = store.workers._workers.get(body.worker_id)
+    if rec is None:
+        raise ApiError("not_found", "worker not found", status_code=404)
+    if (
+        rec.project_id
+        and rec.project_id not in principal.project_ids
+        and "admin" not in principal.roles
+    ):
+        raise ApiError("forbidden_project", "worker not in project scope", status_code=403)
+    if int(body.generation) != int(rec.lease.lease_generation):
+        raise ApiError("stale_generation", "worker generation mismatch", status_code=409)
+    try:
+        lease, new_token = store.workers.rotate_membership_token(
+            body.worker_id, current_token=body.token
+        )
+    except Exception as exc:  # noqa: BLE001
+        from swarm.workers.registry import WorkerAuthError
+
+        if isinstance(exc, WorkerAuthError):
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        raise
+    store._persist_durable_workers()
+    return {
+        "worker_id": lease.worker_id,
+        "generation": lease.lease_generation,
+        "membership_token": new_token,
+        "status": lease.status.value,
+    }
 
 
 @router.post("/workers/enqueue")

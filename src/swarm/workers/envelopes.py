@@ -229,3 +229,5 @@ class ReconnectResponse(StrictModel):
     generation: int
     status: str
     active_leases: list[dict[str, Any]] = Field(default_factory=list)
+    cancel_notices: list[str] = Field(default_factory=list)
+    cancelled_leases: list[str] = Field(default_factory=list)
