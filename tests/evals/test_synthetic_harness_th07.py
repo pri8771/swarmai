@@ -105,7 +105,7 @@ def test_live_gate_with_grant_still_blocks_dispatch() -> None:
     # Gate check alone may pass; first-cut harness still refuses live dispatch.
     meta = assert_live_gate(mode="live", grant=grant)
     assert meta["grant_present"] is True
-    with pytest.raises(LiveGateBlocked, match="not enabled in TH-07"):
+    with pytest.raises(LiveGateBlocked, match="not enabled|fake|dispatch"):
         run_synthetic_harness(
             dataset_path=STARTER, mode="live", live_grant=grant, max_cases=1
         )

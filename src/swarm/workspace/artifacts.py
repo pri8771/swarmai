@@ -4,9 +4,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import tempfile
+import time
 from pathlib import Path
+from typing import Any
 
 from swarm.contracts.workspace import ArtifactRef
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover — non-POSIX
+    fcntl = None  # type: ignore[assignment]
 
 
 class ChecksumMismatchError(ValueError):
@@ -27,6 +36,7 @@ class ArtifactStore:
         self._meta: dict[str, ArtifactRef] = {}
         self._deleted: set[str] = set()
         self._index_path = self.root / "index.json"
+        self._lock_path = self.root / "index.lock"
         self._load_index()
 
     @staticmethod
@@ -53,11 +63,20 @@ class ArtifactStore:
         path = self.blob_path(digest)
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
-            # Write temp then rename so a crash mid-write cannot leave a partial
-            # blob that later verifies as the content-addressed path.
-            tmp = path.with_suffix(".partial")
-            tmp.write_bytes(content)
-            tmp.replace(path)
+            # Unique temp name avoids shared ``.partial`` races across writers (R3).
+            fd, tmp_name = tempfile.mkstemp(
+                prefix=f"{digest}.", suffix=".partial", dir=str(path.parent)
+            )
+            try:
+                with os.fdopen(fd, "wb") as handle:
+                    handle.write(content)
+                os.replace(tmp_name, path)
+            except Exception:
+                try:
+                    os.unlink(tmp_name)
+                except OSError:
+                    pass
+                raise
         else:
             # Verify existing blob still matches.
             if self.content_hash(path.read_bytes()) != digest:
@@ -70,9 +89,11 @@ class ArtifactStore:
             owner_scope=owner_scope,
             retention_class=retention_class,
         )
-        self._meta[ref.id] = ref
-        self._deleted.discard(ref.id)
-        self._persist_index()
+        with self._index_lock():
+            self._load_index()
+            self._meta[ref.id] = ref
+            self._deleted.discard(ref.id)
+            self._persist_index_unlocked()
         return ref
 
     def get_bytes(self, artifact_id: str, *, allowed_scopes: set[str]) -> bytes:
@@ -90,32 +111,66 @@ class ArtifactStore:
         return data
 
     def resolve(self, artifact_id: str, *, allowed_scopes: set[str]) -> ArtifactRef:
-        if artifact_id in self._deleted:
-            raise FileNotFoundError(f"artifact_deleted:{artifact_id}")
-        ref = self._meta.get(artifact_id)
-        if ref is None:
-            # Cold start: index may still list the id after reload race.
+        with self._index_lock():
             self._load_index()
+            if artifact_id in self._deleted:
+                raise FileNotFoundError(f"artifact_deleted:{artifact_id}")
             ref = self._meta.get(artifact_id)
-        if ref is None:
-            raise KeyError(artifact_id)
-        if ref.owner_scope not in allowed_scopes and "*" not in allowed_scopes:
-            raise PermissionError(f"artifact_scope_denied:{ref.owner_scope}")
-        return ref
+            if ref is None:
+                raise KeyError(artifact_id)
+            if ref.owner_scope not in allowed_scopes and "*" not in allowed_scopes:
+                raise PermissionError(f"artifact_scope_denied:{ref.owner_scope}")
+            return ref
 
     def put_ref(self, ref: ArtifactRef) -> None:
-        self._meta[ref.id] = ref
-        self._deleted.discard(ref.id)
-        self._persist_index()
+        with self._index_lock():
+            self._load_index()
+            self._meta[ref.id] = ref
+            self._deleted.discard(ref.id)
+            self._persist_index_unlocked()
 
     def delete(self, artifact_id: str, *, retention_ok: bool = False) -> None:
-        ref = self._meta.get(artifact_id)
-        if ref is None:
-            return
-        if ref.retention_class == "legal_hold" and not retention_ok:
-            raise PermissionError("retention_blocks_delete")
-        self._deleted.add(artifact_id)
-        self._persist_index()
+        with self._index_lock():
+            self._load_index()
+            ref = self._meta.get(artifact_id)
+            if ref is None:
+                return
+            if ref.retention_class == "legal_hold" and not retention_ok:
+                raise PermissionError("retention_blocks_delete")
+            self._deleted.add(artifact_id)
+            self._persist_index_unlocked()
+
+    def _index_lock(self) -> Any:
+        from collections.abc import Iterator
+        from contextlib import contextmanager
+        from typing import IO
+
+        @contextmanager
+        def _cm() -> Iterator[None]:
+            self._lock_path.parent.mkdir(parents=True, exist_ok=True)
+            fh: IO[str] = open(self._lock_path, "a+", encoding="utf-8")
+            try:
+                if fcntl is not None:
+                    deadline = time.time() + 5.0
+                    while True:
+                        try:
+                            fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                            break
+                        except BlockingIOError:
+                            if time.time() > deadline:
+                                fcntl.flock(fh.fileno(), fcntl.LOCK_EX)
+                                break
+                            time.sleep(0.01)
+                yield
+            finally:
+                if fcntl is not None:
+                    try:
+                        fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
+                    except OSError:
+                        pass
+                fh.close()
+
+        return _cm()
 
     def _load_index(self) -> None:
         if not self._index_path.is_file():
@@ -135,10 +190,16 @@ class ArtifactStore:
                     loaded[str(key)] = ArtifactRef.model_validate(val)
                 except (TypeError, ValueError, KeyError):
                     continue
-        self._meta = loaded
-        self._deleted = {str(x) for x in deleted}
+        # Merge disk into memory so concurrent writers do not clobber peers (R3).
+        self._meta.update(loaded)
+        self._deleted |= {str(x) for x in deleted}
 
     def _persist_index(self) -> None:
+        with self._index_lock():
+            self._load_index()
+            self._persist_index_unlocked()
+
+    def _persist_index_unlocked(self) -> None:
         payload = {
             "schema_version": "1.0",
             "artifacts": {
@@ -146,6 +207,16 @@ class ArtifactStore:
             },
             "deleted": sorted(self._deleted),
         }
-        tmp = self._index_path.with_suffix(".partial")
-        tmp.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
-        tmp.replace(self._index_path)
+        fd, tmp_name = tempfile.mkstemp(
+            prefix="index.", suffix=".partial", dir=str(self.root)
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(json.dumps(payload, indent=2, default=str) + "\n")
+            os.replace(tmp_name, self._index_path)
+        except Exception:
+            try:
+                os.unlink(tmp_name)
+            except OSError:
+                pass
+            raise

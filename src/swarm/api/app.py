@@ -111,6 +111,7 @@ def create_app(
             db_reachable = False
 
     store = ProductStore(db_reachable=db_reachable, repo_root=root)
+    store.bootstrap_durable()
     if seed_fixtures:
         store.seed_catalog()
         store.fixture_mode = True

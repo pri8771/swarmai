@@ -60,8 +60,12 @@ def main() -> int:
     policy = report["policy"]
     evidence["steps"].append(
         {
-            "step": "native_mission_admissible",
-            "ok": "native" in policy["mission_admissible_runtimes"],
+            "step": "native_available_partial_not_fully_admitted",
+            "ok": (
+                "native" in summary["available"]
+                and "native" not in policy["mission_admissible_runtimes"]
+            ),
+            "available": summary["available"],
             "admissible": policy["mission_admissible_runtimes"],
         }
     )
@@ -146,7 +150,11 @@ def main() -> int:
                     "step": "api_runtimes_endpoint",
                     "ok": body.get("config_alone_enforces_swarm_contracts") is False
                     and "native"
-                    in ((body.get("policy") or {}).get("mission_admissible_runtimes") or []),
+                    in ((body.get("summary") or {}).get("available") or [])
+                    and "native"
+                    not in (
+                        (body.get("policy") or {}).get("mission_admissible_runtimes") or []
+                    ),
                     "status_code": rt.status_code,
                 }
             )

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 from pathlib import Path
@@ -98,7 +99,11 @@ def grade_topological_order(case: BenchmarkCase, output: Any) -> GradeResult:
 
 
 def grade_python_unit(case: BenchmarkCase, output: Any) -> GradeResult:
-    """Run model code against grader tests in IsolatedCodeRunner (network off)."""
+    """Run model code against grader tests in IsolatedCodeRunner (network off).
+
+    Submitted code is loaded as a module file. The harness alone emits the
+    verdict JSON with a nonce — forged stdout from the submission cannot pass (R5).
+    """
     entry = str(case.grader.get("entrypoint") or "solve")
     tests = list(case.grader.get("tests") or [])
     if isinstance(output, dict) and "code" in output:
@@ -106,22 +111,41 @@ def grade_python_unit(case: BenchmarkCase, output: Any) -> GradeResult:
     else:
         code = str(output)
     if "import os" in code or "socket" in code or "subprocess" in code:
-        # Soft policy flag — still run under sandbox limits.
         policy = True
     else:
         policy = False
 
+    nonce = hashlib.sha256(f"{case.id}:{entry}:{len(tests)}".encode()).hexdigest()[:16]
     harness = f'''
-import json, copy, sys
-NS = {{}}
-CODE = {code!r}
-exec(CODE, NS, NS)
-fn = NS.get({entry!r})
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+nonce = {nonce!r}
+entry = {entry!r}
+work = Path(__file__).resolve().parent
+solution_path = work / "solution.py"
+spec = importlib.util.spec_from_file_location("swarm_solution", solution_path)
+if spec is None or spec.loader is None:
+    print(json.dumps({{"ok": False, "error": "load_failed", "harness_nonce": nonce, "results": []}}))
+    raise SystemExit(2)
+mod = importlib.util.module_from_spec(spec)
+try:
+    spec.loader.exec_module(mod)
+except SystemExit as exc:
+    print(json.dumps({{"ok": False, "error": "solution_systemexit", "harness_nonce": nonce, "results": []}}))
+    raise SystemExit(2) from exc
+except Exception as exc:
+    print(json.dumps({{"ok": False, "error": f"import_error:{{exc}}", "harness_nonce": nonce, "results": []}}))
+    raise SystemExit(2) from exc
+fn = getattr(mod, entry, None)
 if fn is None:
-    print(json.dumps({{"ok": False, "error": "missing_entrypoint"}}))
+    print(json.dumps({{"ok": False, "error": "missing_entrypoint", "harness_nonce": nonce, "results": []}}))
     raise SystemExit(2)
 tests = json.loads(sys.argv[1])
 results = []
+import copy
 for t in tests:
     args = t.get("args") or []
     expected = t.get("expected")
@@ -138,25 +162,53 @@ for t in tests:
         ok = False
         err = str(exc)
         got = None
-    results.append({{"ok": ok, "error": err, "got": got}})
-print(json.dumps({{"ok": all(r["ok"] for r in results), "results": results}}))
+    results.append({{"ok": ok, "error": err}})
+payload = {{
+    "ok": all(r["ok"] for r in results) and len(results) == len(tests),
+    "results": results,
+    "harness_nonce": nonce,
+    "test_count": len(tests),
+}}
+print(json.dumps(payload))
 '''
     with tempfile.TemporaryDirectory(prefix="swarm-eval-") as tmp:
         work = Path(tmp)
+        (work / "solution.py").write_text(code, encoding="utf-8")
         script = work / "harness.py"
         script.write_text(harness, encoding="utf-8")
         runner = IsolatedCodeRunner(work, network=False, timeout_seconds=5.0, memory_mb=256)
         result = runner.run_python("harness.py", [json.dumps(tests)])
-        if result.timed_out or result.exit_code != 0:
+        if result.timed_out:
             return GradeResult(
                 correct=False,
                 policy_violation=policy,
-                detail=f"sandbox_fail:exit={result.exit_code}:stderr={result.stderr[:200]}",
+                detail="sandbox_timeout",
             )
         try:
-            payload = json.loads(result.stdout.strip().splitlines()[-1])
+            lines = [ln for ln in result.stdout.strip().splitlines() if ln.strip()]
+            payload = json.loads(lines[-1]) if lines else {}
         except Exception as exc:
-            return GradeResult(correct=False, policy_violation=policy, detail=f"bad_harness:{exc}")
+            return GradeResult(
+                correct=False,
+                policy_violation=policy,
+                detail=f"bad_harness:{exc}",
+            )
+        if payload.get("harness_nonce") != nonce:
+            return GradeResult(
+                correct=False,
+                policy_violation=True,
+                detail="forged_or_missing_harness_nonce",
+            )
+        if not isinstance(payload.get("results"), list):
+            return GradeResult(correct=False, detail="missing_results")
+        if len(payload["results"]) != len(tests):
+            return GradeResult(correct=False, detail="test_count_mismatch")
+        if result.exit_code != 0 and not payload.get("ok"):
+            return GradeResult(
+                correct=False,
+                policy_violation=policy,
+                detail=f"sandbox_fail:exit={result.exit_code}:{payload.get('error')}",
+            )
         ok = bool(payload.get("ok"))
         return GradeResult(
             correct=ok,

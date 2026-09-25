@@ -12,7 +12,7 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 
@@ -150,7 +150,7 @@ class MacConnectorClient:
         body = response.json()
         if body.get("database") != "up":
             raise RuntimeError(f"server_database_not_up:{body.get('database')}")
-        return body
+        return cast(dict[str, Any], body)
 
     def ensure_project(self, *, run_id: str) -> str:
         response = self._client.post(
@@ -172,7 +172,7 @@ class MacConnectorClient:
             raise RuntimeError(f"create_project:{response.status_code}:{response.text}")
         project_id = response.json()["project"]["project_id"]
         self.project_id = project_id
-        return project_id
+        return cast(str, project_id)
 
     def enroll(self, *, project_id: str, run_id: str) -> dict[str, Any]:
         response = self._client.post(
@@ -193,7 +193,7 @@ class MacConnectorClient:
         self.generation = int(worker.get("lease_generation") or worker.get("generation") or 1)
         self.membership_token = body["membership_token"]
         self.project_id = project_id
-        return body
+        return cast(dict[str, Any], body)
 
     def heartbeat(self) -> dict[str, Any]:
         if not self.worker_id or self.generation is None or not self.membership_token:
@@ -208,7 +208,7 @@ class MacConnectorClient:
         )
         if response.status_code >= 400:
             raise RuntimeError(f"heartbeat:{response.status_code}:{response.text}")
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
     def create_mac_scoped_mission(
         self,
@@ -243,7 +243,7 @@ class MacConnectorClient:
         )
         if response.status_code >= 400:
             raise RuntimeError(f"create_mission:{response.status_code}:{response.text}")
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
     def review(
         self,
@@ -263,17 +263,17 @@ class MacConnectorClient:
         )
         if response.status_code >= 400:
             raise RuntimeError(f"review:{response.status_code}:{response.text}")
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
     def get_mission(self, mission_id: str) -> dict[str, Any]:
         response = self._client.get(f"/v1/missions/{mission_id}")
         response.raise_for_status()
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
     def list_workers(self, project_id: str) -> dict[str, Any]:
         response = self._client.get("/v1/workers", params={"project_id": project_id})
         response.raise_for_status()
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
 
 def dump_evidence(path: Path, payload: dict[str, Any]) -> None:

@@ -1,0 +1,62 @@
+{
+  "source_sha": "180eb73a4b67103b3e38f4aaa550ac444307d60a",
+  "acceptance_without_execution": {
+    "http_status": 200,
+    "accepted": true,
+    "mission_status": "completed",
+    "original_required_count": 99,
+    "submitted_count": 1,
+    "workers_enrolled": 0,
+    "produced_artifact": false
+  },
+  "worker_restart": {
+    "workers_before": 1,
+    "workers_after": 0,
+    "heartbeat_after_restart_status": 404
+  },
+  "artifact_idempotency_after_restart": {
+    "http_status": 200,
+    "same_id": false,
+    "original_artifact_read_status": 404
+  },
+  "deleted_artifact_read": {
+    "http_status": 200
+  },
+  "artifact_multiple_writers": {
+    "metadata_ids_written": 2,
+    "metadata_ids_after_reload": 1,
+    "first_reference_preserved": false,
+    "second_reference_preserved": true
+  },
+  "grader_forged_stdout": {
+    "case_id": "code_generation_S_01",
+    "correct": true,
+    "detail": "unit_pass",
+    "solution_function_defined": false
+  },
+  "sandbox_scope": {
+    "read_synthetic_file_outside_work_dir": true,
+    "real_user_files_accessed": false
+  },
+  "zero_spend_grant": "live_qualification_blocked: grant budget_usd must be > 0",
+  "report_hash_verification": {
+    "matches_canonical_payload": false
+  },
+  "native_admission": {
+    "availability": "available",
+    "kernel_mediation_proven": true,
+    "unproven": [
+      "cancel_termination",
+      "permission_tool_observability",
+      "model_routing_usage",
+      "context_occupancy_xy_succession",
+      "nested_delegation_accounting"
+    ]
+  },
+  "plan_manifest_hashes": {
+    "EXECUTION_PACKETS.md": true,
+    "SOURCE_AUDIT_AND_RESEARCH.md": true,
+    "START_HERE.md": false,
+    "SWARMAI_MVP_PLAN.md": true
+  }
+}

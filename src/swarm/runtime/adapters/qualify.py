@@ -43,8 +43,27 @@ def qualification_report(
     unavailable = [
         r.runtime_id for r in rows if r.availability == RuntimeAvailability.UNAVAILABLE
     ]
-    # Admission rule: only AVAILABLE runtimes may be offered for mission work.
-    mission_admissible = list(available)
+    # R6: admission requires available + kernel mediation proven for mandatory caps.
+    # Partial native fixture capability is not full mission admission.
+    mandatory = {
+        "cancel_termination",
+        "permission_tool_observability",
+        "model_routing_usage",
+        "context_occupancy_xy_succession",
+    }
+    mission_admissible: list[str] = []
+    for row in rows:
+        if row.availability != RuntimeAvailability.AVAILABLE:
+            continue
+        if not row.kernel_mediation_proven:
+            continue
+        proven = {
+            c.capability
+            for c in row.capabilities
+            if c.status.value == "available"
+        }
+        if mandatory.issubset(proven):
+            mission_admissible.append(row.runtime_id)
     return {
         "schema_version": "1.0",
         "packet": "TH-06",
@@ -54,7 +73,8 @@ def qualification_report(
             "mission_admissible_runtimes": mission_admissible,
             "note": (
                 "Framework configuration alone never admits a runtime. "
-                "Only availability=available with SwarmAI kernel mediation may run missions."
+                "Mission admission requires available status, proven kernel mediation, "
+                "and mandatory capability evidence (cancel/permissions/routing/succession)."
             ),
         },
         "summary": {
@@ -62,6 +82,18 @@ def qualification_report(
             "discovered_unqualified": discovered,
             "unavailable": unavailable,
         },
-        "runtimes": [r.to_dict() for r in rows],
+        "runtimes": [
+            {
+                **r.to_dict(),
+                "mission_admission": (
+                    "admitted"
+                    if r.runtime_id in mission_admissible
+                    else "partial"
+                    if r.availability == RuntimeAvailability.AVAILABLE
+                    else "not_admitted"
+                ),
+            }
+            for r in rows
+        ],
         "mock_vs_live": "qualification_probe_not_live_inference",
     }

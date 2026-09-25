@@ -14,9 +14,10 @@ from __future__ import annotations
 import hashlib
 import json
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 from swarm.contracts.common import new_id, utc_now
 from swarm.contracts.mission import SizeFeatures
@@ -68,6 +69,10 @@ class LiveGrant:
     budget_usd: float
     purpose: str
     approved: bool = False
+    free_routes_only: bool = False
+    max_calls: int | None = None
+    max_tokens: int | None = None
+    max_wall_seconds: int | None = None
 
     def assert_usable(self) -> None:
         if not self.approved:
@@ -78,10 +83,23 @@ class LiveGrant:
             raise LiveGateBlocked(
                 "live_qualification_blocked: grant has no eligible routes"
             )
-        if self.budget_usd <= 0:
+        # R8: zero-dollar grants allowed only for explicitly free-only routes
+        # with independent call/token/time ceilings — never silent paid fallback.
+        if self.budget_usd < 0:
             raise LiveGateBlocked(
-                "live_qualification_blocked: grant budget_usd must be > 0"
+                "live_qualification_blocked: grant budget_usd must be >= 0"
             )
+        if self.budget_usd == 0:
+            if not self.free_routes_only:
+                raise LiveGateBlocked(
+                    "live_qualification_blocked: zero-dollar grant requires "
+                    "free_routes_only=true with verified free routes"
+                )
+            if not (self.max_calls and self.max_tokens and self.max_wall_seconds):
+                raise LiveGateBlocked(
+                    "live_qualification_blocked: zero-dollar grant requires "
+                    "max_calls, max_tokens, and max_wall_seconds ceilings"
+                )
 
 
 @dataclass
@@ -161,6 +179,7 @@ class SyntheticHarnessReport:
     dataset_validation: dict[str, Any] = field(default_factory=dict)
     mock_vs_live: str = "synthetic_fixture_oracle_not_live"
     report_hash: str | None = None
+    generated_at: str = field(default_factory=lambda: utc_now().isoformat())
     note: str = (
         "Synthetic harness prepared independently of live route/budget grants; "
         "no production routing auto-changes"
@@ -183,7 +202,7 @@ class SyntheticHarnessReport:
             "dataset_path": self.dataset_path,
             "mode": self.mode,
             "public_hostname": self.public_hostname,
-            "generated_at": utc_now().isoformat(),
+            "generated_at": self.generated_at,
             "trial_count": len(self.trials),
             "passed": self.passed,
             "failed": self.failed,
@@ -404,12 +423,10 @@ def run_synthetic_harness(
 
     live_gate = assert_live_gate(mode=mode, grant=live_grant)
     if mode == "live":
-        # Harness is prepared; live solver wiring is intentionally not shipped
-        # until a grant exists. Reaching here means grant passed — still refuse
-        # silent paid dispatch in this packet.
+        # Live adapter dispatch remains unimplemented — grant alone is not enough (R8).
         raise LiveGateBlocked(
-            "live_qualification_blocked: grant accepted for gate check only; "
-            "live provider dispatch is not enabled in TH-07 first cut"
+            "live_qualification_blocked: live adapter dispatch not enabled; "
+            "fake-upstream integration required before live authorization"
         )
 
     solver = _solver_for_mode(mode)
@@ -560,21 +577,22 @@ def run_synthetic_harness(
         routing_mutation=routing_mutation,
         dataset_validation=validation,
         mock_vs_live="synthetic_fixture_oracle_not_live",
+        generated_at=utc_now().isoformat(),
     )
-    raw = json.dumps(report.to_dict(), sort_keys=True, default=str)
-    report.report_hash = hashlib.sha256(raw.encode()).hexdigest()
+    # Freeze payload once: hash must match retained file (R8).
+    payload = report.to_dict()
+    payload["report_hash"] = None
+    report.report_hash = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, default=str).encode()
+    ).hexdigest()
+    payload["report_hash"] = report.report_hash
 
     if out_dir is not None:
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-        (out_dir / f"{report.run_id}.json").write_text(
-            json.dumps(report.to_dict(), indent=2, default=str) + "\n",
-            encoding="utf-8",
-        )
-        (out_dir / "latest.json").write_text(
-            json.dumps(report.to_dict(), indent=2, default=str) + "\n",
-            encoding="utf-8",
-        )
+        serialized = json.dumps(payload, indent=2, default=str) + "\n"
+        (out_dir / f"{report.run_id}.json").write_text(serialized, encoding="utf-8")
+        (out_dir / "latest.json").write_text(serialized, encoding="utf-8")
     return report
 
 

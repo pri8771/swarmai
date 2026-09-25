@@ -24,7 +24,8 @@ def test_required_capability_set_complete() -> None:
 def test_native_available_with_partial_capability_proof() -> None:
     q = NativeRuntimeAdapter().qualify()
     assert q.availability == RuntimeAvailability.AVAILABLE
-    assert q.kernel_mediation_proven is True
+    # R6: partial proofs do not claim full kernel mediation.
+    assert q.kernel_mediation_proven is False
     assert q.config_alone_enforces_swarm_contracts is False
     by_cap = {c.capability: c for c in q.capabilities}
     assert by_cap["dispatch_events"].status == CapabilityStatus.AVAILABLE
@@ -82,7 +83,10 @@ def test_qualification_report_admission_policy() -> None:
     )
     assert report["config_alone_enforces_swarm_contracts"] is False
     assert report["hostname_public"] == "swarm.splitsignal.ai"
-    assert "native" in report["policy"]["mission_admissible_runtimes"]
+    # Native is available/partial but not fully mission-admissible until mandatory caps proven.
+    assert "native" not in report["policy"]["mission_admissible_runtimes"]
     assert "opencode" not in report["policy"]["mission_admissible_runtimes"]
     assert "hermes" not in report["policy"]["mission_admissible_runtimes"]
     assert "hermes" in report["summary"]["unavailable"]
+    native = next(r for r in report["runtimes"] if r["runtime_id"] == "native")
+    assert native["mission_admission"] == "partial"

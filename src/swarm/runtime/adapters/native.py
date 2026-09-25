@@ -87,10 +87,12 @@ class NativeRuntimeAdapter:
             ),
             blockers=[],
             config_alone_enforces_swarm_contracts=False,
-            kernel_mediation_proven=True,
+            kernel_mediation_proven=False,
             live_inference_authorized=False,
             notes=[
-                "Native availability does not imply paid/live model qualification.",
+                "Native availability is partial: only narrowly proven capabilities may dispatch.",
+                "kernel_mediation_proven remains false until cancel/permissions/succession evidence exists.",
+                "CAS persistence is not knowledge-transfer qualification.",
                 "SwarmAI kernel owns admission; native code is not a third-party framework.",
             ],
         )

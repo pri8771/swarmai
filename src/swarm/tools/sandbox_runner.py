@@ -1,8 +1,8 @@
 """Isolated code/test runner — operator-controlled trust boundary.
 
-This sandbox is for operator-controlled development workloads. It is NOT a
-hardened hostile multi-tenant execution environment. Network is off by default;
-Docker socket and host secrets are never mounted.
+Network is off by default. Paths outside the work directory are denied via an
+injected sitecustomize gate (R5). This is still not a hardened multi-tenant
+hypervisor; Docker socket and host secrets are never mounted.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ import resource
 import subprocess
 import sys
 import tempfile
+import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -29,6 +30,67 @@ class SandboxPolicyError(PermissionError):
     pass
 
 
+_SITECUSTOMIZE = textwrap.dedent(
+    """
+    import builtins
+    import sys
+    from pathlib import Path
+
+    _WORK = Path(__file__).resolve().parent
+    _ALLOWED_PREFIXES = (
+        str(_WORK),
+        sys.base_prefix,
+        sys.prefix,
+        "/usr",
+        "/Library/Frameworks",
+        "/System/Library",
+    )
+
+    def _allowed(path: Path) -> bool:
+        try:
+            resolved = path.resolve()
+        except OSError:
+            return False
+        text = str(resolved)
+        return any(text.startswith(prefix) for prefix in _ALLOWED_PREFIXES)
+
+    _real_open = builtins.open
+
+    def _open(file, *args, **kwargs):
+        try:
+            candidate = Path(file)
+        except TypeError:
+            return _real_open(file, *args, **kwargs)
+        if not _allowed(candidate):
+            raise PermissionError(f"sandbox_path_denied:{file}")
+        return _real_open(file, *args, **kwargs)
+
+    builtins.open = _open
+
+    try:
+        import pathlib
+
+        _real_read_text = pathlib.Path.read_text
+        _real_read_bytes = pathlib.Path.read_bytes
+
+        def _read_text(self, *args, **kwargs):
+            if not _allowed(self):
+                raise PermissionError(f"sandbox_path_denied:{self}")
+            return _real_read_text(self, *args, **kwargs)
+
+        def _read_bytes(self, *args, **kwargs):
+            if not _allowed(self):
+                raise PermissionError(f"sandbox_path_denied:{self}")
+            return _real_read_bytes(self, *args, **kwargs)
+
+        pathlib.Path.read_text = _read_text  # type: ignore[method-assign]
+        pathlib.Path.read_bytes = _read_bytes  # type: ignore[method-assign]
+    except Exception:
+        pass
+    """
+)
+
+
 class IsolatedCodeRunner:
     def __init__(
         self,
@@ -44,6 +106,9 @@ class IsolatedCodeRunner:
         self.memory_mb = memory_mb
         if not self.work_dir.exists():
             raise FileNotFoundError(self.work_dir)
+        gate = self.work_dir / "sitecustomize.py"
+        if not gate.exists():
+            gate.write_text(_SITECUSTOMIZE, encoding="utf-8")
 
     def _assert_path_allowed(self, path: Path) -> Path:
         resolved = path.resolve()
@@ -65,15 +130,14 @@ class IsolatedCodeRunner:
             raise SandboxPolicyError("network is disabled by default; refuse enabling in self-test")
 
         def _limit() -> None:
-            # Soft memory ceiling (best-effort; platform dependent).
             bytes_limit = self.memory_mb * 1024 * 1024
             resource.setrlimit(resource.RLIMIT_AS, (bytes_limit, bytes_limit))
 
         env = {
             "PATH": os.environ.get("PATH", ""),
-            "PYTHONPATH": "",
+            "PYTHONPATH": str(self.work_dir),
             "HOME": str(self.work_dir),
-            # Never pass host secrets.
+            "PYTHONNOUSERSITE": "1",
         }
         cmd = [sys.executable, str(script), *(args or [])]
         try:
@@ -122,5 +186,5 @@ def self_test(*, network: str = "off") -> dict[str, object]:
             "network": "off",
             "docker_socket_mounted": False,
             "host_secrets_mounted": False,
-            "trust_boundary": "operator-controlled-dev-not-hostile-multi-tenant",
+            "trust_boundary": "operator-controlled-dev-path-gated-not-hostile-multi-tenant",
         }

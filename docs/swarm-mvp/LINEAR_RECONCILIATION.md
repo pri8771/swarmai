@@ -22,7 +22,12 @@
 | TH-04 durable artifacts | Content-addressed artifacts reopen identical sha256 after API restart | Done (Mac eng) | TH-04, artifacts | 3 |
 | TH-05 mission UI | Console live mode shows real missions/artifacts/workers on loopback | Done (Mac eng) | TH-05, console | 3 |
 | TH-06 runtime adapters | Qualify OpenCode/Hermes honestly; mark unqualified caps unavailable | Done (Mac eng) | TH-06, runtime | 3 |
-| TH-07 synthetic eval harness | Graded starter suite + sealed answers; live gate blocked pending grant; no auto routing | Done (Mac eng) | TH-07, evals | 5 |
+| TH-07 synthetic eval harness | Graded starter suite + sealed answers; live gate blocked pending grant; no auto routing | Done (Mac eng) / review-required | TH-07, evals | 5 |
+| R1–R9 foundation repairs | Close review blockers with protected regressions on `dev` lane | In Progress | foundation, R1-R9 | 8 |
+| V1.7 complete the mission | Integrated lifecycle + protected verify + model-backed mission | Planned | V1.7 | 8 |
+| V1.8 durable goals | Persistent Goal entity + pause/resume/cancel | Planned | V1.8 | 5 |
+| V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Planned | V1.9 | 8 |
+| V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Planned | V2.0 | 13 |
 | Live qualification grant | Approve route+budget before live provider dispatch | Blocked | TH-07, live | 2 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
 | Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |

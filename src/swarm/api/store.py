@@ -69,6 +69,33 @@ class ProductStore:
     repo_root: Path | None = None
     _project_store: ProjectStore | None = field(default=None, repr=False)
     _mission_store: MissionStore | None = field(default=None, repr=False)
+    _durable_bootstrapped: bool = field(default=False, repr=False)
+
+    def bootstrap_durable(self) -> None:
+        """Load durable worker + idempotency mirrors from repo_root (R2/R3)."""
+        if self._durable_bootstrapped or self.repo_root is None:
+            return
+        from swarm.api.durable_authority import load_idempotency, load_worker_registry
+
+        load_worker_registry(self.repo_root, self.workers)
+        loaded = load_idempotency(self.repo_root)
+        if loaded:
+            self.idempotency.update(loaded)
+        self._durable_bootstrapped = True
+
+    def _persist_durable_workers(self) -> None:
+        if self.repo_root is None:
+            return
+        from swarm.api.durable_authority import save_worker_registry
+
+        save_worker_registry(self.repo_root, self.workers)
+
+    def _persist_durable_idempotency(self) -> None:
+        if self.repo_root is None:
+            return
+        from swarm.api.durable_authority import save_idempotency
+
+        save_idempotency(self.repo_root, self.idempotency)
 
     def project_store(self) -> ProjectStore:
         if self._project_store is None:
@@ -254,7 +281,7 @@ class ProductStore:
         except (OSError, FileNotFoundError, TypeError, KeyError):
             return []
 
-    def artifact_store(self):
+    def artifact_store(self) -> Any:
         """Content-addressed blob store under durable ``var/artifacts/cas``."""
         from swarm.workspace.artifacts import ArtifactStore
 
@@ -286,7 +313,9 @@ class ProductStore:
         )
         record = self.mission_store().load(mission_id)
         arts = dict(record.artifacts or {})
-        arts[kind] = {
+        # Preserve history: kind may have many revisions; keep list under kind_history.
+        history = list(arts.get(f"{kind}__history") or [])
+        entry = {
             "id": ref.id,
             "kind": kind,
             "uri": ref.uri,
@@ -297,6 +326,11 @@ class ProductStore:
             "retention_class": ref.retention_class,
             "summary": summary or f"{kind} artifact",
         }
+        if isinstance(arts.get(kind), dict) and arts[kind].get("id"):
+            history.append(arts[kind])
+        history.append(entry)
+        arts[f"{kind}__history"] = history
+        arts[kind] = entry
         record.artifacts = arts
         self.mission_store().append_timeline(
             record,
@@ -340,13 +374,23 @@ class ProductStore:
     def read_mission_artifact_bytes(
         self, mission_id: str, artifact_id: str
     ) -> tuple[bytes, dict[str, Any]]:
-        """Reopen artifact bytes by mission ref; verify sha256 against durable CAS."""
-        _ = self.get_mission(mission_id)
+        """Reopen artifact bytes; enforce tombstone/scope via ArtifactStore.resolve (R4)."""
+        mission = self.get_mission(mission_id)
         record = self.mission_store().load(mission_id)
         arts = record.artifacts or {}
         meta: dict[str, Any] | None = None
         if isinstance(arts, dict):
             for key, val in arts.items():
+                if key.endswith("__history"):
+                    if isinstance(val, list):
+                        for item in val:
+                            if isinstance(item, dict) and str(item.get("id") or "") == artifact_id:
+                                meta = dict(item)
+                                meta.setdefault("kind", key.replace("__history", ""))
+                                break
+                    if meta is not None:
+                        break
+                    continue
                 if not isinstance(val, dict):
                     continue
                 if str(val.get("id") or key) == artifact_id:
@@ -355,14 +399,26 @@ class ProductStore:
                     break
         if meta is None:
             raise ApiError("not_found", "artifact not found on mission", status_code=404)
-        content_hash = str(meta.get("content_hash") or meta.get("sha256") or "")
-        if not content_hash:
-            raise ApiError(
-                "artifact_incomplete",
-                "mission artifact missing content_hash",
-                status_code=409,
+        store = self.artifact_store()
+        try:
+            # Authoritative deletion/scope check — never bypass via bare hash read.
+            ref = store.resolve(
+                artifact_id,
+                allowed_scopes={str(meta.get("owner_scope") or mission.project_id), "*", mission.project_id},
             )
-        data = self.artifact_store().get_bytes_by_hash(content_hash)
+        except FileNotFoundError as exc:
+            raise ApiError("not_found", str(exc), status_code=404) from exc
+        except KeyError as exc:
+            raise ApiError("not_found", "artifact metadata missing", status_code=404) from exc
+        except PermissionError as exc:
+            raise ApiError("forbidden", str(exc), status_code=403) from exc
+        data = store.get_bytes_by_hash(ref.content_hash)
+        meta = {
+            **meta,
+            "content_hash": ref.content_hash,
+            "byte_length": ref.byte_length,
+            "media_type": ref.media_type,
+        }
         return data, meta
 
     def _persist_artifact_metadata(self, ref: Any) -> None:
@@ -503,6 +559,7 @@ class ProductStore:
             return body
         if actor is None or project_id is None or operation is None:
             self.idempotency[key] = body
+            self._persist_durable_idempotency()
             return body
         scoped = self._idem_key(
             actor=actor, project_id=project_id, operation=operation, key=key
@@ -511,6 +568,7 @@ class ProductStore:
             "request_digest": request_digest,
             "body": body,
         }
+        self._persist_durable_idempotency()
         return body
 
     async def create_mission(
@@ -585,10 +643,34 @@ class ProductStore:
         mission = self.get_mission(mission_id)
         record = self.mission_store().load(mission_id)
         plan_checks = (record.plan or {}).get("required_checks")
-        checks = required_checks if required_checks is not None else plan_checks
+        # R1: worker/caller cannot replace frozen verifier specs.
+        if required_checks is not None:
+            if plan_checks is None or dict(required_checks) != dict(plan_checks):
+                raise ApiError(
+                    "verifier_override_forbidden",
+                    "caller-supplied required_checks cannot override frozen plan checks",
+                    status_code=403,
+                )
+        checks = plan_checks if isinstance(plan_checks, dict) else None
+        # R1: acceptance requires an actual mission artifact binding.
+        arts = record.artifacts or {}
+        has_artifact = False
+        if isinstance(arts, dict):
+            for key, val in arts.items():
+                if key.endswith("__history"):
+                    continue
+                if isinstance(val, dict) and val.get("content_hash"):
+                    has_artifact = True
+                    break
+        if not has_artifact:
+            raise ApiError(
+                "artifact_required",
+                "mission acceptance requires a published artifact under protected verification",
+                status_code=409,
+            )
         decision = review_attempt(
             produced=produced,
-            required_checks=checks if isinstance(checks, dict) else None,
+            required_checks=checks,
             force_wrong=force_wrong,
         )
         record.validation = {
@@ -902,6 +984,7 @@ class ProductStore:
         rec = self.workers._workers[registered.worker_id]
         rec.privacy_classes = set(privacy_classes)
         rec.named_inference_urls = list(named_inference_urls or [])
+        self._persist_durable_workers()
         self.publish(
             project_id=project_id,
             type="worker.joined",

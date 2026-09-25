@@ -278,7 +278,7 @@
     },
     {
       "path": "START_HERE.md",
-      "sha256": "9bbf1be1dc788af6c6d72f8c79e67b6cd922b6c13d54fd43e7328e978ec66995",
+      "sha256": "d4604c4053c1b1d9c1add89ff471c283a733517e9605f9d073385b5b230b7f7c",
       "words": 1067
     },
     {
@@ -286,5 +286,6 @@
       "sha256": "3fe2e58fc74473bfee0c26520fd43676c8c9db9109fb8597c525118d96f83741",
       "words": 8444
     }
-  ]
+  ],
+  "updated_note": "refreshed START_HERE hash after two-host adoption edits (R9)"
 }
