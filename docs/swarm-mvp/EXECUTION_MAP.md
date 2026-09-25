@@ -4,7 +4,8 @@
 **Integration branch:** `dev` @ `05c0bc4b`  
 **Hostname:** `swarm.splitsignal.ai`  
 **Mandate:** `docs/v2-goal-pursuit-plan.md` (Project Context) + `internal/v2-operator-mandate.md`  
-**Consolidate:** #50/#49/#46/#47 merged into `dev`. #51 stacks #48 pursuit until #48 lands; then rebase.
+**Consolidate:** #50/#49/#46/#47 merged into `dev`. #51 stacks #48 pursuit until #48 lands; then rebase.  
+**Lane E base:** `05c0bc4b` + #48 pursuit stack (lineage through `65383188`).
 
 ## Single authority
 
@@ -31,7 +32,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | R4 | **fixed** | Content reads enforce tombstone via `resolve` |
 | R5 | **fixed** | Harness-owned nonce verdict; path-gated sandbox |
 | R6 | **fixed** | `kernel_mediation_proven=false`; admission requires mandatory caps |
-| R7 | **fixed** | Ruff/mypy/offline/console green; ephemeral Postgres `integration` job; hosted CI success `36167607568` / `36167588681`; protected `test_r7_*` |
+| R7 | **fixed** | Ruff/mypy/offline/console green on `dev` (#50); ephemeral Postgres `integration` job |
 | R8 | **fixed** | Zero-$ free-route grants with ceilings; frozen report hash |
 | R9 | **partial** | PLAN_MANIFEST file hashes verified (`test_r9_*`); Linear still needsAuth queue; connector mount hardening deferred (Lane A) |
 
@@ -63,7 +64,7 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
 | #48 | D V1.9 Pursuit | stacked in #51 | eng on this tip — awaiting independent #48 land |
-| #51 | E product UI | rebasing | onto `05c0bc4b` + #48 pursuit stack |
+| #51 | E product UI | this branch | onto `05c0bc4b` + #48 pursuit stack |
 
 ## Next
 
@@ -84,3 +85,14 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | HTTP surface | **eng done** | `/v1/goals/{id}/pursuit/*` |
 | Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
 | Goal schema | **uses Lane C on `dev`** | no fork |
+
+## Lane E — V2.0 product UI/SDK (this lane)
+
+| Packet | Status | Notes |
+|---|---|---|
+| P14 (SDK subset) | **in progress** | `src/swarm/sdk/client.py` — Lane C lifecycle + Lane D pursuit tick/status/why-next |
+| P15 (console Goals) | **in progress** | Goals tab: create, agents, resources, start pursuit (tick), progress, interrupt/resume, why-next; Mission UI retained |
+| Contract deps | #46 on `dev` + #48 stacked | Prefer those HTTP contracts; no parallel schemas |
+| Deferred | elaborate server-admin UI; V3 multi-goal |
+
+**Branch:** `cursor/v20-product-goal-ui-sdk-1418` → draft [PR #51](https://github.com/pri8771/swarmai/pull/51) to `dev`.

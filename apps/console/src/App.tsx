@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { emptyLiveSnapshot, loadSnapshot, resolveConsoleLoadOpts, scrubSecrets } from './api/client'
-import type { ConsoleSnapshot } from './api/types'
+import type { ConsoleSnapshot, GoalRow } from './api/types'
+import { GoalsPanel } from './components/GoalsPanel'
 import { Panel } from './components/Panel'
 import { StatusBadge } from './components/StatusBadge'
 import {
@@ -11,6 +12,7 @@ import {
 import './App.css'
 
 type Tab =
+  | 'goals'
   | 'mission'
   | 'projects'
   | 'history'
@@ -24,18 +26,26 @@ type Tab =
 
 export default function App() {
   const [snap, setSnap] = useState<ConsoleSnapshot | null>(null)
-  const [tab, setTab] = useState<Tab>('mission')
+  const [tab, setTab] = useState<Tab>('goals')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadOpts, setLoadOpts] = useState(() => resolveConsoleLoadOpts())
 
-  const reload = (nextMissionId?: string) => {
+  const reload = (next?: { missionId?: string; goalId?: string }) => {
     const opts = resolveConsoleLoadOpts()
-    if (nextMissionId) {
-      opts.missionId = nextMissionId
+    if (next?.missionId) {
+      opts.missionId = next.missionId
       if (typeof window !== 'undefined') {
         const url = new URL(window.location.href)
-        url.searchParams.set('missionId', nextMissionId)
+        url.searchParams.set('missionId', next.missionId)
+        window.history.replaceState({}, '', url.toString())
+      }
+    }
+    if (next?.goalId) {
+      opts.goalId = next.goalId
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        url.searchParams.set('goalId', next.goalId)
         window.history.replaceState({}, '', url.toString())
       }
     }
@@ -102,6 +112,7 @@ export default function App() {
 
   const fixtureControls = snap.mode === 'mock'
   const tabs: { id: Tab; label: string }[] = [
+    { id: 'goals', label: 'Goals' },
     { id: 'mission', label: 'Mission' },
     { id: 'projects', label: 'Projects' },
     { id: 'history', label: 'History' },
@@ -119,10 +130,10 @@ export default function App() {
       <header className="top">
         <div>
           <p className="brand">SwarmAI Console</p>
-          <h1>Operator diagnostics</h1>
+          <h1>Goal pursuit</h1>
           <p className="lede">
-            Concurrent planners, real capacity units, and honest unknown states — not a vanity agent
-            counter.
+            Create durable goals, set agents and envelopes, pursue through missions, interrupt or
+            redirect, and inspect why the next action was chosen — same contracts as the API/SDK.
           </p>
           <p className="muted" data-testid="public-hostname">
             Public hostname: <code>{snap.hostnamePublic}</code>
@@ -142,23 +153,25 @@ export default function App() {
         </div>
       </header>
 
-      {snap.mode === 'live' && snap.history.length > 0 ? (
+      {snap.mode === 'live' && (snap.history.length > 0 || snap.goals.length > 0) ? (
         <div className="actions" data-testid="mission-picker">
-          <label htmlFor="mission-select">
-            Focus mission{' '}
-            <select
-              id="mission-select"
-              data-testid="mission-select"
-              value={snap.mission.missionId}
-              onChange={(e) => reload(e.target.value)}
-            >
-              {snap.history.map((h) => (
-                <option key={h.missionId} value={h.missionId}>
-                  {h.missionId.slice(0, 12)}… · {h.status} · {h.goal.slice(0, 48)}
-                </option>
-              ))}
-            </select>
-          </label>
+          {snap.history.length > 0 ? (
+            <label htmlFor="mission-select">
+              Focus mission{' '}
+              <select
+                id="mission-select"
+                data-testid="mission-select"
+                value={snap.mission.missionId}
+                onChange={(e) => reload({ missionId: e.target.value })}
+              >
+                {snap.history.map((h) => (
+                  <option key={h.missionId} value={h.missionId}>
+                    {h.missionId.slice(0, 12)}… · {h.status} · {h.goal.slice(0, 48)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           <button type="button" data-testid="refresh-live" onClick={() => reload()}>
             Refresh
           </button>
@@ -185,6 +198,33 @@ export default function App() {
             <p key={e}>{e}</p>
           ))}
         </div>
+      ) : null}
+
+      {tab === 'goals' ? (
+        <GoalsPanel
+          snap={snap}
+          loadOpts={loadOpts}
+          onSelectGoal={(goalId) => {
+            setSnap({ ...snap, selectedGoalId: goalId })
+            if (snap.mode === 'live') {
+              reload({ goalId })
+            }
+          }}
+          onGoalsChanged={(goals: GoalRow[], selectedGoalId) => {
+            setSnap({ ...snap, goals, selectedGoalId })
+          }}
+          onPursuitStarted={(goal, missionId) => {
+            setSnap({
+              ...snap,
+              goals: [goal, ...snap.goals.filter((g) => g.id !== goal.id)],
+              selectedGoalId: goal.id,
+            })
+            if (snap.mode === 'live') {
+              reload({ missionId, goalId: goal.id })
+              if (missionId) setTab('mission')
+            }
+          }}
+        />
       ) : null}
 
       {tab === 'mission' ? (
