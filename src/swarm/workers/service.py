@@ -128,6 +128,16 @@ class DurableWorkerService:
                 )
             )
         arch = normalize_architecture(request.architecture)
+        if plat == "unknown" or arch == "unknown":
+            from swarm.workers.identity import detect_platform_arch
+
+            detected_plat, detected_arch = detect_platform_arch()
+            if plat == "unknown":
+                plat = detected_plat
+            if arch == "unknown":
+                arch = detected_arch
+        matrix = default_support_matrix()
+        platform_supported = matrix.is_supported(plat, arch)
         runtime_names = []
         for item in request.runtimes or []:
             if isinstance(item, dict):
@@ -157,10 +167,15 @@ class DurableWorkerService:
                 else None
             ),
             role="worker",
-            support_matrix=default_support_matrix(),
+            support_matrix=matrix,
         )
-        effective = sorted(identity.effective_capabilities())
-        scheduling_caps = effective if effective else granted_caps
+        if platform_supported:
+            scheduling_caps = sorted(set(granted_caps))
+        else:
+            scheduling_caps = []
+        capabilities_verified = bool(
+            authz.verified and platform_supported and identity.verified_capabilities
+        )
         resource_payload = {
             "resources": request.resources.model_dump(mode="json"),
             "artifact_transport": request.artifact_transport.model_dump(mode="json"),
@@ -175,6 +190,8 @@ class DurableWorkerService:
             "workspace_grant_ids": list(identity.workspace_grants),
             "claimed_capabilities": list(identity.capabilities),
             "verified_capabilities": list(identity.verified_capabilities),
+            "capabilities_verified": capabilities_verified,
+            "platform_supported": platform_supported,
             "identity": identity.model_dump(mode="json"),
         }
         row, token_id = self.workers.upsert_registration(
@@ -185,7 +202,7 @@ class DurableWorkerService:
             runtime_version=identity.runtime_version,
             capacity_units=float(request.capacity_units),
             membership_token=membership_token,
-            status="online",
+            status="online" if platform_supported else "quarantined",
             generation=generation,
             trust_class=trust,
             labels=list(request.labels),
@@ -204,7 +221,7 @@ class DurableWorkerService:
             scopes_granted=scopes,
             capabilities_granted=scheduling_caps,
             capabilities_claimed=list(identity.capabilities),
-            capabilities_verified=bool(identity.verified_capabilities),
+            capabilities_verified=capabilities_verified,
             trust_class=trust,
             heartbeat_interval_seconds=self.heartbeat_interval_seconds,
             policy_version=request.policy_version,
@@ -413,6 +430,11 @@ class DurableWorkerService:
             worker_state="active" if row.status == "online" else row.status,
         )
         active = self.lifecycle.list_active_leases_for_worker(request.worker_id)
+        cancel_notices = [
+            lease.lease_id
+            for lease in active
+            if self._lease_cancellation_stale(lease)
+        ]
         return ReconnectResponse(
             worker_id=row.worker_id,
             generation=int(row.lease_generation),
@@ -428,9 +450,13 @@ class DurableWorkerService:
                     "worker_generation": lease.worker_generation,
                     "task_revision": lease.task_revision,
                     "cancellation_generation": lease.cancellation_generation,
+                    "cancel_requested": lease.lease_id in cancel_notices,
                 }
                 for lease in active
+                if lease.lease_id not in cancel_notices
             ],
+            cancel_notices=cancel_notices,
+            cancelled_leases=list(cancel_notices),
         )
 
     def get_result(self, result_id: str) -> WorkerResultRow | None:

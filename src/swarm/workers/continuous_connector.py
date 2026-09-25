@@ -19,6 +19,8 @@ import threading
 import time
 import uuid
 from collections.abc import Callable, Mapping
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -72,18 +74,21 @@ class PermittedRuntime:
     execute: Executor
 
     def matches(self, task: Mapping[str, Any]) -> bool:
-        required = {str(c) for c in (task.get("required_capabilities") or [])}
-        scopes = {str(s) for s in (task.get("scopes") or [])}
-        if required and required.isdisjoint(self.capabilities):
-            return False
-        if scopes and scopes.isdisjoint(self.scopes) and required.isdisjoint(self.capabilities):
-            return False
+        """Admit only when *all* required capabilities and scopes are granted.
+
+        Overlap matching is forbidden: a runtime with ``extract`` must not admit
+        a task requiring ``extract`` + ``admin``, and ``workspace.read`` must not
+        admit ``secrets.read``.
+        """
+        required = {str(c) for c in (task.get("required_capabilities") or []) if str(c)}
+        scopes = {str(s) for s in (task.get("scopes") or []) if str(s)}
         if not required and not scopes:
             return False
-        # Capability match preferred; scope overlap also admits when capability set empty on task.
-        if required and not required.isdisjoint(self.capabilities):
-            return True
-        return bool(scopes and not scopes.isdisjoint(self.scopes))
+        if required and not required.issubset(self.capabilities):
+            return False
+        if scopes and not scopes.issubset(self.scopes):
+            return False
+        return True
 
 
 class RuntimeExecutorRegistry:
@@ -114,18 +119,35 @@ def _task_input_path(task: Mapping[str, Any]) -> Path | None:
             raw = inputs.get("path") or inputs.get("input_path")
     if not raw:
         return None
-    path = Path(str(raw))
-    return path if path.is_file() else path
+    return Path(str(raw))
+
+
+def resolve_workspace_input_path(raw: Path, work_dir: Path) -> Path | None:
+    """Resolve a task input under the authorized workspace root only.
+
+    Absolute paths outside ``work_dir``, parent traversal, and symlink escapes
+    are rejected at effect time — even if an upstream caller also validates.
+    """
+    root = work_dir.resolve()
+    try:
+        candidate = raw if raw.is_absolute() else (root / raw)
+        # Resolve after joining so symlink targets outside the root fail relative_to.
+        resolved = candidate.resolve(strict=False)
+        resolved.relative_to(root)
+    except (OSError, ValueError):
+        return None
+    if not resolved.is_file():
+        return None
+    return resolved
 
 
 def execute_mac_local_extract_operational(
     claim: dict[str, Any], work_dir: Path
 ) -> dict[str, Any]:
-    """Operational mac-local extract: requires assigned input path (no fixture invent)."""
-    del work_dir  # workspace grant is caller-owned; input path comes from the task
+    """Operational mac-local extract: input must resolve inside the workspace grant."""
     task = claim.get("task") or {}
-    path = _task_input_path(task)
-    if path is None or not path.is_file():
+    raw = _task_input_path(task)
+    if raw is None:
         return {
             "status": "blocked",
             "checks": {
@@ -135,6 +157,20 @@ def execute_mac_local_extract_operational(
             "artifact_manifest": {"kind": "blocked", "task_id": task.get("id")},
             "usage": {"spend_usd": 0.0, "model_calls": 0},
             "summary": "blocked_missing_input_path",
+        }
+    path = resolve_workspace_input_path(raw, work_dir)
+    if path is None:
+        return {
+            "status": "blocked",
+            "checks": {
+                "blocked": True,
+                "reason": "path_escapes_workspace",
+                "input_path": str(raw),
+                "work_dir": str(work_dir),
+            },
+            "artifact_manifest": {"kind": "blocked", "task_id": task.get("id")},
+            "usage": {"spend_usd": 0.0, "model_calls": 0},
+            "summary": "blocked_path_escapes_workspace",
         }
     work = perform_mac_local_extract(path)
     return {
@@ -388,7 +424,57 @@ class ContinuousMacConnector:
                                 active_lease = None
                                 cancelled_honored += 1
                                 continue
-                            produced = executor(claim, self.fixture_dir)
+                            # Keep heartbeat/renew alive during slow execution so
+                            # cancel notices are observed before stale submit.
+                            produced: dict[str, Any] | None = None
+                            cancelled_midflight = False
+                            with ThreadPoolExecutor(max_workers=1) as pool:
+                                future = pool.submit(executor, claim, self.fixture_dir)
+                                while True:
+                                    try:
+                                        produced = future.result(timeout=0.25)
+                                        break
+                                    except FuturesTimeout:
+                                        if self._stopped():
+                                            cancelled_midflight = True
+                                            break
+                                        try:
+                                            renew = client.renew(
+                                                lease_id=active_lease,
+                                                progress_class="running",
+                                            )
+                                            last_renew = time.monotonic()
+                                            self._record(
+                                                "renew_during_exec",
+                                                lease_id=active_lease,
+                                            )
+                                            if active_lease in (
+                                                renew.get("cancel_notices") or []
+                                            ):
+                                                cancelled_midflight = True
+                                                self._record(
+                                                    "cancel_during_exec",
+                                                    lease_id=active_lease,
+                                                )
+                                                break
+                                        except Exception as renew_exc:  # noqa: BLE001
+                                            self._record(
+                                                "renew_during_exec_failed",
+                                                error=str(renew_exc),
+                                            )
+                                            cancelled_midflight = True
+                                            break
+                            if cancelled_midflight or produced is None:
+                                active_lease = None
+                                cancelled_honored += 1
+                                continue
+                            # Final fence before submit — reject stale result locally.
+                            hb = client.heartbeat()
+                            if active_lease in (hb.get("cancel_notices") or []):
+                                self._record("cancel_before_submit", lease_id=active_lease)
+                                active_lease = None
+                                cancelled_honored += 1
+                                continue
                             submitted_body = client.submit_result(
                                 lease_id=active_lease,
                                 status=str(produced.get("status") or "unsupported"),

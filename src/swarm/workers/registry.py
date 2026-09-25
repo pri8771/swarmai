@@ -170,6 +170,9 @@ class WorkerRegistryService:
             return ClaimedDispatch(claimed=False, cancel_notices=notices)
         if worker_id in self._quarantine:
             return ClaimedDispatch(claimed=False, cancel_notices=notices)
+        # Unqualified / empty grant set cannot receive operational work.
+        if not rec.lease.capabilities:
+            return ClaimedDispatch(claimed=False, cancel_notices=notices)
         if rec.claimed_task_id is not None:
             # One active claim per worker for this registry path.
             return ClaimedDispatch(claimed=False, cancel_notices=notices)
@@ -326,25 +329,34 @@ class WorkerRegistryService:
         if generation != rec.lease.lease_generation:
             raise StaleGenerationError("reconnect_generation_mismatch")
         rec.last_heartbeat = utc_now()
-        active = [
-            {
-                "lease_id": lease.lease_id,
-                "task_id": lease.task.id,
-                "mission_id": lease.task.mission_id,
-                "state": lease.state,
-                "expires_at": lease.expires_at.isoformat(),
-                "cancel_requested": lease.cancel_requested,
-                "worker_generation": lease.worker_generation,
-            }
-            for lease in self._leases.values()
-            if lease.worker_id == worker_id and lease.state in {"claimed", "renewed"}
-        ]
+        active = []
+        cancelled_leases: list[str] = []
+        for lease in self._leases.values():
+            if lease.worker_id != worker_id:
+                continue
+            if lease.state in {"claimed", "renewed"} and not lease.cancel_requested:
+                active.append(
+                    {
+                        "lease_id": lease.lease_id,
+                        "task_id": lease.task.id,
+                        "mission_id": lease.task.mission_id,
+                        "state": lease.state,
+                        "expires_at": lease.expires_at.isoformat(),
+                        "cancel_requested": lease.cancel_requested,
+                        "worker_generation": lease.worker_generation,
+                    }
+                )
+            elif lease.state == "cancelled" or lease.cancel_requested:
+                cancelled_leases.append(lease.lease_id)
+        notices = self.cancel_notices_for(worker_id)
+        cancelled_leases = sorted(set(cancelled_leases) | set(notices))
         return {
             "worker_id": worker_id,
             "generation": generation,
             "status": rec.lease.status.value,
             "active_leases": active,
-            "cancel_notices": self.cancel_notices_for(worker_id),
+            "cancelled_leases": cancelled_leases,
+            "cancel_notices": notices,
         }
 
     async def drain(self, worker_id: str, *, token: str) -> WorkerLease:
@@ -352,6 +364,18 @@ class WorkerRegistryService:
         rec.lease = rec.lease.model_copy(update={"status": WorkerStatus.DRAINING})
         # Complete current claim then exit — clear claim when done.
         if rec.claimed_task_id is None:
+            rec.lease = rec.lease.model_copy(update={"status": WorkerStatus.OFFLINE})
+        return rec.lease
+
+    def operator_drain(self, worker_id: str) -> WorkerLease:
+        """Control-plane drain — does not require the worker membership token."""
+        rec = self._workers.get(worker_id)
+        if rec is None:
+            raise WorkerAuthError("worker_not_found")
+        if rec.revoked:
+            raise WorkerAuthError("revoked")
+        rec.lease = rec.lease.model_copy(update={"status": WorkerStatus.DRAINING})
+        if rec.claimed_task_id is None and not rec.active_lease_ids:
             rec.lease = rec.lease.model_copy(update={"status": WorkerStatus.OFFLINE})
         return rec.lease
 
@@ -373,7 +397,29 @@ class WorkerRegistryService:
         for tok, wid in list(self._tokens.items()):
             if wid == worker_id:
                 del self._tokens[tok]
+        # Cancel in-flight leases so reconnect/stale-submit see durable cancel.
+        for lease_id in list(rec.active_lease_ids):
+            try:
+                self.cancel_lease(lease_id=lease_id, reason="worker_revoked")
+            except LeaseStateError:
+                pass
         return new_gen
+
+    def rotate_membership_token(self, worker_id: str, *, current_token: str) -> tuple[WorkerLease, str]:
+        """Rotate membership credential and bump generation; prior token invalid."""
+        rec = self._require(worker_id, current_token)
+        new_token = new_id("wt_")
+        if any(k in new_token.lower() for k in ("sk-", "api_key", "secret=")):
+            raise WorkerAuthError("provider_secret_forbidden_on_worker_token")
+        # Drop old token mapping.
+        for tok, wid in list(self._tokens.items()):
+            if wid == worker_id:
+                del self._tokens[tok]
+        new_gen = rec.lease.lease_generation + 1
+        rec.token = new_token
+        rec.lease = rec.lease.model_copy(update={"lease_generation": new_gen})
+        self._tokens[new_token] = worker_id
+        return rec.lease, new_token
 
     def accept_result(
         self,

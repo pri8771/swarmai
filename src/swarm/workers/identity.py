@@ -109,19 +109,22 @@ def identity_from_authorization(
     role: str = "worker",
     support_matrix: SupportMatrix | None = None,
 ) -> WorkerIdentitySpec:
-    """Build identity; scheduling uses ``effective_capabilities()`` only."""
+    """Build identity; scheduling uses ``effective_capabilities()`` only when verified.
+
+    Unsupported platforms remain inventoriable but must not receive verified
+    (scheduling-eligible) capabilities. Default-allowlist grants without an
+    explicit project policy stay ``authz.verified=False`` and are not written
+    into ``verified_capabilities``.
+    """
     matrix = support_matrix or default_support_matrix()
     plat = normalize_platform(platform_name)
     arch = normalize_architecture(architecture)
-    # Reject unqualified platforms at enrollment when matrix is strict — callers
-    # may catch PortableConfigError. Soft path: still build but mark unverified.
-    try:
-        matrix.require(plat, arch)
-    except Exception:
-        # Keep identity; support matrix enforcement is explicit at qualify time.
-        pass
-    # Authority-granted caps become verified; labels never appear here.
-    verified = list(authz.granted)
+    platform_supported = matrix.is_supported(plat, arch)
+    # Authority-granted caps become verified only with project policy + supported host.
+    if platform_supported and authz.verified:
+        verified = list(authz.granted)
+    else:
+        verified = []
     return build_worker_identity_spec(
         worker_id=worker_id,
         node_identity=node_identity,

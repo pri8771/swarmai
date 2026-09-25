@@ -26,6 +26,7 @@ from swarm.product.projects import ProjectConfig, ProjectStore, scrub_config
 from swarm.providers.catalog import list_providers
 from swarm.workers.capability_authority import CapabilityAuthority
 from swarm.workers.identity import (
+    detect_platform_arch,
     identity_from_authorization,
     normalize_architecture,
     normalize_platform,
@@ -1063,6 +1064,15 @@ class ProductStore:
             str(architecture or arch_from_plat or "unknown")
         )
         plat_name = normalize_platform(plat_name)
+        # Omitted platform/arch → detect host; explicit unsupported stays unqualified.
+        if plat_name == "unknown" or arch == "unknown":
+            detected_plat, detected_arch = detect_platform_arch()
+            if plat_name == "unknown":
+                plat_name = detected_plat
+            if arch == "unknown":
+                arch = detected_arch
+        matrix = default_support_matrix()
+        platform_supported = matrix.is_supported(plat_name, arch)
         runtime_names: list[str] = []
         for item in runtimes or []:
             if isinstance(item, str):
@@ -1103,20 +1113,27 @@ class ProductStore:
             privacy_classes=loc_classes,
             data_locality=locality_str,
             role=role,
-            support_matrix=default_support_matrix(),
+            support_matrix=matrix,
         )
-        # Scheduling-eligible set — never labels, never unverified claims.
-        granted = sorted(identity.effective_capabilities())
+        # Scheduling: supported host may use authorized grants; unsupported → empty.
+        # Verified flag tracks explicit project policy only (never nonempty-list coercion).
+        if platform_supported:
+            scheduling = sorted(set(authz.granted))
+        else:
+            scheduling = []
+        capabilities_verified = bool(
+            authz.verified and platform_supported and identity.verified_capabilities
+        )
         lease = WorkerLease(
             worker_id=identity.worker_id,
             node_identity=identity.node_identity,
             architecture=identity.architecture,
             runtime_version=identity.runtime_version,
             capacity_units=capacity_units,
-            capabilities=granted,
+            capabilities=scheduling,
             labels=list(labels or []),
             claimed_capabilities=list(identity.capabilities),
-            capabilities_verified=bool(identity.verified_capabilities),
+            capabilities_verified=capabilities_verified,
             platform={
                 "platform": identity.platform,
                 "architecture": identity.architecture,
@@ -1136,7 +1153,7 @@ class ProductStore:
         rec.privacy_classes = set(loc_classes)
         rec.named_inference_urls = list(named_inference_urls or [])
         rec.claimed_capabilities = set(identity.capabilities)
-        rec.capabilities_verified = bool(identity.verified_capabilities)
+        rec.capabilities_verified = capabilities_verified
         rec.host_alias = node
         rec.workspace_grant_ids = list(identity.workspace_grants)
         self._persist_durable_workers()
@@ -1148,9 +1165,10 @@ class ProductStore:
                 "worker_id": registered.worker_id,
                 "capacity": capacity_units,
                 "privacy": loc_classes,
-                "capabilities_granted": granted,
+                "capabilities_granted": scheduling,
                 "capabilities_claimed": list(identity.capabilities),
-                "capabilities_verified": bool(identity.verified_capabilities),
+                "capabilities_verified": capabilities_verified,
+                "platform_supported": platform_supported,
                 "architecture": identity.architecture,
                 "platform": identity.platform,
                 "role": identity.role,

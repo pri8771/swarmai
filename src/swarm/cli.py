@@ -275,6 +275,21 @@ def main() -> None:
     worker_sub = worker.add_subparsers(dest="worker_command", required=True)
     wst = worker_sub.add_parser("self-test", help="Worker membership self-test")
     wst.add_argument("--mode", default="mock", choices=["mock"])
+    winspect = worker_sub.add_parser("inspect", help="Inspect enrolled workers (local store)")
+    winspect.add_argument("--project-id", default=None)
+    winspect.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help="Repo root with var/ durable worker state (default: cwd)",
+    )
+    wdrain = worker_sub.add_parser("drain", help="Operator drain a worker by id (local store)")
+    wdrain.add_argument("--worker-id", required=True)
+    wdrain.add_argument("--repo-root", type=Path, default=None)
+    wrevoke = worker_sub.add_parser("revoke", help="Operator revoke a worker by id (local store)")
+    wrevoke.add_argument("--worker-id", required=True)
+    wrevoke.add_argument("--repo-root", type=Path, default=None)
+    wrevoke.add_argument("--reason", default="operator_revoke")
 
     api = sub.add_parser("api", help="API utilities")
     api_sub = api.add_subparsers(dest="api_command", required=True)
@@ -918,6 +933,45 @@ def main() -> None:
         from swarm.workers.registry import worker_self_test
 
         print(json.dumps(worker_self_test(mode=args.mode), indent=2))
+    elif args.command == "worker" and args.worker_command in {"inspect", "drain", "revoke"}:
+        import asyncio
+
+        from swarm.api.durable_authority import load_worker_registry, save_worker_registry
+        from swarm.workers.registry import WorkerRegistryService
+
+        root = Path(args.repo_root) if args.repo_root else _repo_root()
+        reg = WorkerRegistryService()
+        load_worker_registry(root, reg)
+        if args.worker_command == "inspect":
+            print(json.dumps(reg.inspect(project_id=args.project_id), indent=2, default=str))
+        elif args.worker_command == "drain":
+            lease = reg.operator_drain(args.worker_id)
+            save_worker_registry(root, reg)
+            print(
+                json.dumps(
+                    {
+                        "worker_id": lease.worker_id,
+                        "status": lease.status.value,
+                        "generation": lease.lease_generation,
+                    },
+                    indent=2,
+                )
+            )
+        else:
+            new_gen = asyncio.run(reg.revoke_generation(args.worker_id))
+            save_worker_registry(root, reg)
+            print(
+                json.dumps(
+                    {
+                        "worker_id": args.worker_id,
+                        "generation": new_gen,
+                        "status": "quarantined",
+                        "revoked": True,
+                        "reason": args.reason,
+                    },
+                    indent=2,
+                )
+            )
     elif args.command == "load" and args.load_command == "run":
         import asyncio
 
