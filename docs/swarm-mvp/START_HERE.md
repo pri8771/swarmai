@@ -1,3 +1,7 @@
+> **Latest user direction: move faster with six parallel lanes. Start with [CURSOR_FAST_TRACK.md](CURSOR_FAST_TRACK.md).** It overrides new dataset/benchmark and exhaustive campaign requirements in the detailed completion plan.
+
+> **Next execution round (2026-09-25):** Follow [V2 product completion](V2_PRODUCT_COMPLETION_PLAN.md), [independent review](V2_PRODUCT_COMPLETION_REVIEW.md), and `V2_PRODUCT_COMPLETION_PACKETS.json`. Start from current **dev**, reconcile newer commits, and execute PC-00–PC-13. This supersedes historical main-based startup and V1.0-only stopping instructions below. This is a planning handoff; no new product implementation or version acceptance is claimed.
+
 > **Portable product install (2026-09-25+):** primary path is [`docs/install/`](../install/README.md) — configurable server/worker roles, placeholder hostnames, no personal credentials/paths.  
 > **REFERENCE ONLY** named topology (R730 / Mac connector / Cloudflare / operator DNS): [`docs/reference/`](../reference/README.md) and `ADR-002-two-host-architecture.md`. Missing named-host access blocks that deployment’s qualification, not portable eng.  
 > Product packets P00–P19 remain. Historical two-host implementation notes: Project `docs/two-host-implementation-plan.md`.

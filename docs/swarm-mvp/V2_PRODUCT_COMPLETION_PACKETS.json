@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "program": "V2 product completion",
+  "status": "plan_ready_not_started",
+  "reviewed_source_sha": "4444a565cbe71dbf5f013e9bd6510c68c257e4b3",
+  "integration_branch": "dev",
+  "main_changes_authorized": false,
+  "plan": "V2_PRODUCT_COMPLETION_PLAN.md",
+  "review": "V2_PRODUCT_COMPLETION_REVIEW.md",
+  "canonical_execution_status": "Import into existing PACKET_QUEUE.json at PC-00; this file is the immutable planning graph, not a competing progress ledger.",
+  "versions_accepted": {
+    "1.7": false,
+    "1.8": false,
+    "1.9": false,
+    "2.0": false
+  },
+  "packets": [
+    {
+      "id": "PC-00",
+      "title": "Freeze, inventory and assign ownership",
+      "depends_on": [],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "all"
+      ],
+      "required_artifacts": [
+        "baseline_receipt",
+        "interface_and_schema_map"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-01",
+      "title": "Contain false success and repair authorization",
+      "depends_on": [
+        "PC-00"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-01",
+        "R20-02",
+        "R20-03",
+        "R20-05"
+      ],
+      "required_artifacts": [
+        "negative_regressions"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-02",
+      "title": "Durable operational repositories and migrations",
+      "depends_on": [
+        "PC-00",
+        "PC-01"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-04"
+      ],
+      "required_artifacts": [
+        "migration_and_restart_evidence"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-03",
+      "title": "Real mission dispatch and native execution",
+      "depends_on": [
+        "PC-01",
+        "PC-02"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-01"
+      ],
+      "required_artifacts": [
+        "real_worker_artifact_receipt"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-04",
+      "title": "Persistent bounded pursuit service",
+      "depends_on": [
+        "PC-02",
+        "PC-03"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-04"
+      ],
+      "required_artifacts": [
+        "autonomous_two_mission_receipt"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-05",
+      "title": "Worker lifecycle cancellation and isolation",
+      "depends_on": [
+        "PC-01",
+        "PC-02",
+        "PC-03"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-03",
+        "R20-05",
+        "R20-07"
+      ],
+      "required_artifacts": [
+        "revocation_cancel_and_confinement_evidence"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-06",
+      "title": "Protected acceptance and evidence accounting",
+      "depends_on": [
+        "PC-02",
+        "PC-03"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-02"
+      ],
+      "required_artifacts": [
+        "protected_verifier_and_accounting_receipts"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-07",
+      "title": "Agent communication memory and succession",
+      "depends_on": [
+        "PC-02",
+        "PC-03",
+        "PC-05"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [],
+      "required_artifacts": [
+        "kt1_kt2_fencing_and_memory_evidence"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-08",
+      "title": "Evidence-backed lessons and model evaluation",
+      "depends_on": [
+        "PC-04",
+        "PC-06",
+        "PC-07"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [],
+      "required_artifacts": [
+        "lesson_adoption_rollback",
+        "nine_task_benchmark"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-09",
+      "title": "SDK CLI and UI parity",
+      "depends_on": [
+        "PC-04",
+        "PC-05",
+        "PC-06",
+        "PC-07",
+        "PC-08"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [],
+      "required_artifacts": [
+        "real_api_browser_e2e"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-10",
+      "title": "Fresh install packaging and recovery",
+      "depends_on": [
+        "PC-02",
+        "PC-04",
+        "PC-05",
+        "PC-09"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-07"
+      ],
+      "required_artifacts": [
+        "empty_volume_install_and_restore"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-11",
+      "title": "Integrated acceptance and fault campaign",
+      "depends_on": [
+        "PC-06",
+        "PC-08",
+        "PC-09",
+        "PC-10"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [
+        "R20-06"
+      ],
+      "required_artifacts": [
+        "A01_A18_evidence",
+        "fault_injection_receipts"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    },
+    {
+      "id": "PC-12",
+      "title": "Live qualification runner and conditional execution",
+      "depends_on": [
+        "PC-03",
+        "PC-05",
+        "PC-06",
+        "PC-11"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [],
+      "required_artifacts": [
+        "grant_preflight_tests",
+        "live_receipt_or_scoped_blocker"
+      ],
+      "live_grant_required": true,
+      "gate_note": "Only actual live execution is grant-gated; implementation, tests and handoff proceed without it."
+    },
+    {
+      "id": "PC-13",
+      "title": "Integrate independently review and hand off",
+      "depends_on": [
+        "PC-11",
+        "PC-12"
+      ],
+      "status": "planned",
+      "owner": null,
+      "findings": [],
+      "required_artifacts": [
+        "merged_candidate_review",
+        "tracking_readback",
+        "operator_handoff"
+      ],
+      "live_grant_required": false,
+      "gate_note": null
+    }
+  ],
+  "execution_entrypoint": "CURSOR_FAST_TRACK.md",
+  "priority_override": "User requests six parallel implementation lanes, no new mock datasets/benchmarks/exhaustive campaign; see FAST_TRACK. Detailed dependencies describe integration requirements, not a barrier to independent lane work."
+}
