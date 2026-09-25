@@ -2,7 +2,8 @@
 
 **Date:** 2026-09-25  
 **Lane:** C — durable Goal entity  
-**Branch:** `cursor/v18-goals-lifecycle-614f` @ `269d161f`  
+**Branch:** `cursor/v18-goals-lifecycle-614f` @ `2adc7feb`  
+**PR:** https://github.com/pri8771/swarmai/pull/46 (draft → `dev`)  
 **Base:** `origin/dev` @ `748078f2` (extended; not rewritten)  
 **Status:** eng_verified (deterministic) — **not** operator-accepted
 
