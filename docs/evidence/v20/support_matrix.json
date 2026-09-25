@@ -1,8 +1,22 @@
 {
   "artifact": "ART-V20-SUPPORT_MATRIX",
-  "status": "evidence_grounded_local_plus_portable_draft",
-  "generated_at": "2026-09-25T18:29:00+00:00",
-  "integration_tip": "58f72fa59691a3fd2af53c501598ffa225fdd9cc",
+  "status": "evidence_grounded_local_plus_portable_eng_landed",
+  "generated_at": "2026-09-25T18:55:00+00:00",
+  "integration_tip": "f39e003249b73849a699bb554dddcdfbfffa502c",
+  "post_merge_verify": {
+    "status": "PASS",
+    "at": "2026-09-25T18:49Z",
+    "host": "Mac",
+    "suite_passed": 78,
+    "docker_flag": "SWARM_PORTABLE_DOCKER=1"
+  },
+  "portable_prs": {
+    "PORT-01": 55,
+    "PORT-02": 57,
+    "PORT-03": 56,
+    "PORT-04": 54,
+    "PORT-05_initial": 53
+  },
   "spend": "zero",
   "public_launch": false,
   "versions_accepted": {
@@ -61,34 +75,54 @@
       "evidence": "docs/evidence/launch/recovery_drill_local.json"
     },
     "linux_container_baseline": {
-      "status": "in_progress",
+      "status": "experimental",
       "gate_class": "supported_platform_qualification",
-      "evidence": "PORT-02/PORT-04 pending; preferred portable baseline"
+      "evidence": "PR #57 roles + PR #54 Docker two-container proof; not operator-supported"
     },
     "generic_worker_enrollment": {
-      "status": "in_progress",
+      "status": "experimental",
       "gate_class": "product_correctness",
-      "evidence": "PORT-02; caps must be authorized not self-granted"
+      "evidence": "PR #57; caps authorized not self-granted"
     },
     "macos_native_adapter": {
       "status": "local_only",
       "gate_class": "supported_platform_qualification",
-      "evidence": "optional adapter; fixture/echo must not imply operational success (PORT-01)"
+      "evidence": "optional adapter; operational mode rejects fixture/echo success (PR #55)"
     },
     "hardcoded_public_hostname_freeze": {
-      "status": "unsupported_defect",
+      "status": "closed",
       "gate_class": "product_correctness",
-      "evidence": "src/swarm/acceptance/freeze.py still requires swarm.splitsignal.ai — PORT-01a"
+      "evidence": "PR #55 — freeze config-driven; no splitsignal literal required; hash b3e1e524…e749819 preserved"
+    },
+    "connector_fixture_echo_default": {
+      "status": "closed",
+      "gate_class": "product_correctness",
+      "evidence": "PR #55 — operational → unsupported; fixture/echo only test/demo"
+    },
+    "harness_grant_vs_impl_mislabel": {
+      "status": "closed",
+      "gate_class": "product_correctness",
+      "evidence": "PR #55 — approved grant → blocked_missing_implementation"
+    },
+    "live_adapter_dispatch": {
+      "status": "in_progress",
+      "gate_class": "product_correctness",
+      "evidence": "honest blocked_missing_implementation after approved grant; fake-upstream wiring spend 0"
     },
     "r730_mac_cf_deploy": {
       "status": "external_prerequisite_blocked",
       "gate_class": "particular_deployment",
-      "evidence": "reference guides only; does not block portable eng"
+      "evidence": "reference guides only (PR #56); does not block portable eng"
     },
     "two_container_protocol_proof": {
-      "status": "in_progress",
+      "status": "experimental",
       "gate_class": "product_correctness",
-      "evidence": "PORT-04; two local containers ≠ two-host"
+      "evidence": "PR #54; Mac verify Docker 5/5 under SWARM_PORTABLE_DOCKER=1; ≠ two-host"
+    },
+    "portable_install_docs": {
+      "status": "experimental",
+      "gate_class": "product_correctness",
+      "evidence": "PR #56 docs/install + examples/fresh-install + doctor tests"
     },
     "cross_host_proof": {
       "status": "external_prerequisite_blocked",
@@ -99,7 +133,9 @@
   "portable_doc": "docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md",
   "notes": [
     "Matrix cells claim only what local deterministic tests, packaging, or explicit PORT evidence prove.",
+    "PORT-01–04 eng landed (#54–#57); post-merge verify PASS @ f39e0032.",
     "No remote dual, multi-host, wall-clock reliability, or paid provider cells marked qualified.",
+    "Do not mark linux_container_baseline or enrollment as supported without operator qualification + review.",
     "V1.7–V2.0 remain unaccepted.",
     "Lead accept remains USER_ACTION — not claimed.",
     "Missing R730/CF/LiveGrant blocks particular deployment or live cells, not generic portable eng."

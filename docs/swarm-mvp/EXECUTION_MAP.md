@@ -1,11 +1,12 @@
 # SwarmAI execution map (reconciled)
 
-**Updated:** 2026-09-25T18:29Z  
-**Integration branch:** `dev` @ `58f72fa5`  
-**Hostname:** configurable (operator deploy may use `swarm.splitsignal.ai`; not product hardcoded truth)  
+**Updated:** 2026-09-25T18:55Z  
+**Integration branch:** `dev` @ `f39e0032`  
+**Hostname:** configurable (operator deploy may use `swarm.splitsignal.ai`; freeze is config-driven — PORT-01 **closed**)  
 **Mandate:** portable product (Project Context `docs/v2-portable-product-plan.md`) + prior goal-pursuit plan  
-**Consolidate:** #50/#49/#46/#47/#51/#52 merged into `dev` @ `58f72fa5`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
-**Portable tracking branch:** `cursor/v2-portable-tracking-3ac7` (docs only)
+**Consolidate:** #50/#49/#46/#47/#51/#52 + portable #53/#54/#55/#56/#57 merged into `dev` @ `f39e0032`. #48 closed superseded (pursuit via #51). #45 closed superseded.  
+**Post-merge verify:** PASS (Mac 2026-09-25T18:49Z; 78 passed with Docker)  
+**Portable tracking branch:** `cursor/v2-portable-tracking-9bf5` (docs only — tip sync)
 
 ## Single authority
 
@@ -13,7 +14,7 @@
 |---|---|
 | TH-01–07 | Two-host eng increments — evidence retained; disputed acceptance → **review-required** until R1–R4 closed; **particular deployment**, not generic product correctness |
 | P00–P19 | Product MVP spine — remains active after foundation |
-| PORT-01–05 | **Portable product** layer — defects, generic roles, install, portability tests, tracking (see below) |
+| PORT-01–05 | **Portable product** layer — defects closed; roles/install/tests eng done; tracking continuous (see below) |
 | `plan/swarmai-v2-redesign-20260925` @ `8598e6ac` | **Planning donor only** — map requirements; do not run as competing backlog or replace contracts |
 | Independent review R1–R9 | Foundation gate — protected regressions under `tests/foundation/` |
 | V20 acceptance freeze | Lane F — `benchmarks/v20_acceptance/scenarios.freeze.json`; harness cannot accept versions |
@@ -77,27 +78,42 @@ Do **not** implement V3/V4. Do **not** merge `main` without auth.
 | #45 | A connector | — | **closed superseded** by #49 |
 | #46 | C V1.8 Goals | `bd6e44bf` | **merged** |
 | #47 | F acceptance | `f8d10704` | **merged** |
-| #48 | D V1.9 Pursuit | stacked in #51 | eng on this tip — awaiting independent #48 land |
-| #51 | E product UI | this branch | onto `05c0bc4b` + #48 pursuit stack |
+| #48 | D V1.9 Pursuit | stacked in #51 | **closed superseded** (pursuit via #51) |
+| #51 | E product UI | — | **merged** |
+| #52 | F acceptance probes | — | **merged** (`58f72fa5`) |
+| #53 | P5 portable tracking | `13955489` | **merged** (`d8537386`) |
+| #54 | P4 portability tests | `70c1a7cb` | **merged** (`fab9186c`) |
+| #55 | P1 portable defects | `82d34b8c` | **merged** (`6211a567`) |
+| #56 | P3 portable install | `2bff8d79` | **merged** (`f39e0032`) |
+| #57 | P2 portable roles | `761d5859` | **merged** (`3fca9d29`) |
 
 ## Portable product packets (PORT-*)
 
 | Packet | Lane | Status | Notes |
 |---|---|---|---|
-| PORT-01 | P1 defects | **open** | freeze hostname config; connector no fixture/echo success; harness grant vs impl |
-| PORT-02 | P2 roles | **open** | server/worker/combined; enrollment contracts; support matrix; generic connector |
-| PORT-03 | P3 install | **open** | portable install + fresh-install example; R730/Mac/CF = reference only |
-| PORT-04 | P4 tests | **open** | multi hostname/path/platform probes; two-container protocol proof |
-| PORT-05 | P5 tracking | **in progress** | this map + packet queue + support matrix + Linear queue |
+| PORT-01 | P1 defects | **done** | #55 — freeze hostname config; connector no fixture/echo success; harness grant vs impl; Mac verify PASS |
+| PORT-02 | P2 roles | **eng done** | #57 — server/worker/combined; enrollment contracts; matrix draft; cells stay experimental |
+| PORT-03 | P3 install | **eng done** | #56 — portable install + fresh-install example; R730/Mac/CF = reference only |
+| PORT-04 | P4 tests | **eng done** | #54 — multi hostname/path/platform probes; two-container protocol proof (Mac Docker green) |
+| PORT-05 | P5 tracking | **in progress** | tip-sync refresh this branch after verify PASS @ `f39e0032` |
 
 Plan SoT (user-facing): Project Context `docs/v2-portable-product-plan.md`.  
 Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence/v20/support_matrix.json`.
 
+## Remaining gaps (honest)
+
+| Gap | Class |
+|---|---|
+| Live adapter dispatch → `blocked_missing_implementation` | implementation |
+| Linux/enrollment claimed `supported` | platform qualification (keep experimental) |
+| Real non-container cross-host proof | particular deployment / platform |
+| LiveGrant / R730 / DNS/CF / Linear MCP / independent review / operator accept | genuinely external |
+
 ## Next
 
-1. Land PORT-01–04 draft PRs → `dev` when green; consolidate lane merges.  
+1. Merge this PORT-05 tip-sync PR → `dev` when green.  
 2. Keep V1.7–V2.0 `accepted: false` until product + live + review + operator gates pass.  
-3. Do **not** merge `main`. Missing R730/LiveGrant does **not** stop portable eng.
+3. Do **not** merge `main`. Optional live dispatcher only with authentic LiveGrant — no invent, no spend.
 
 ## Lane D — V1.9 pursuit (stacked in #51)
 
@@ -113,13 +129,12 @@ Repo support truth: `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md` + `docs/evidence
 | Live model-backed pursuit | **not claimed** | RecordingExecutor default; no spend |
 | Goal schema | **uses Lane C on `dev`** | no fork |
 
-## Lane E — V2.0 product UI/SDK (this lane)
+## Lane E — V2.0 product UI/SDK
 
 | Packet | Status | Notes |
 |---|---|---|
-| P14 (SDK subset) | **in progress** | `src/swarm/sdk/client.py` — Lane C lifecycle + Lane D pursuit tick/status/why-next |
-| P15 (console Goals) | **in progress** | Goals tab: create, agents, resources, start pursuit (tick), progress, interrupt/resume, why-next; Mission UI retained |
-| Contract deps | #46 on `dev` + #48 stacked | Prefer those HTTP contracts; no parallel schemas |
+| P14 (SDK subset) | **eng landed** (#51) | `src/swarm/sdk/client.py` — lifecycle + pursuit tick/status/why-next |
+| P15 (console Goals) | **eng landed** (#51) | Goals tab retained Mission UI |
+| Contract deps | #46 + #51 on `dev` | Prefer those HTTP contracts; no parallel schemas |
 | Deferred | elaborate server-admin UI; V3 multi-goal |
-
-**Branch:** `cursor/v20-product-goal-ui-sdk-1418` → draft [PR #51](https://github.com/pri8771/swarmai/pull/51) to `dev`.
+| Version accept | **false** | independent review + operator required |

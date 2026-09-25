@@ -3,10 +3,10 @@
 **Date:** 2026-09-25  
 **Status:** active — operator mandate supersedes stop-after-foundation; **portable product mandate** now active for independent eng (see Project Context `docs/v2-portable-product-plan.md`)  
 **Repo:** `pri8771/swarmai`  
-**Integration branch:** `dev` @ `58f72fa5`  
-**Hostname:** deploy may use `swarm.splitsignal.ai` (operator-clarified; not `.com`); freeze must not hardcode (PORT-01)  
+**Integration branch:** `dev` @ `f39e0032` (portable eng #53–#57 landed; post-merge verify PASS)  
+**Hostname:** deploy may use `swarm.splitsignal.ai` (operator-clarified; not `.com`); freeze is **config-driven** (PORT-01 **closed**)  
 **Do not:** implement V3/V4; merge to `main`; spend money; publish without auth; claim V1.7–V2.0 accepted  
-**Portable packets:** PORT-01–05 in `docs/swarm-mvp/PACKET_QUEUE.json` / `EXECUTION_MAP.md`
+**Portable packets:** PORT-01 **done**; PORT-02–04 **eng done**; PORT-05 tip-sync — see `PACKET_QUEUE.json` / `EXECUTION_MAP.md`
 
 ## Mandate summary
 

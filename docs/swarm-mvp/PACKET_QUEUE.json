@@ -1,8 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T18:29:00Z",
-  "branch": "cursor/v2-portable-tracking-3ac7",
-  "integration_tip": "58f72fa59691a3fd2af53c501598ffa225fdd9cc",
+  "updated_at": "2026-09-25T18:55:00Z",
+  "branch": "cursor/v2-portable-tracking-9bf5",
+  "integration_tip": "f39e003249b73849a699bb554dddcdfbfffa502c",
+  "post_merge_verify": {
+    "status": "PASS",
+    "host": "Mac",
+    "at": "2026-09-25T18:49Z",
+    "suite": "78 passed (SWARM_PORTABLE_DOCKER=1)",
+    "handoff": "Project Context internal/v2-portable-post-merge-verify-handoff.md"
+  },
   "versions_accepted": {
     "V1.7": false,
     "V1.8": false,
@@ -195,10 +202,14 @@
     {
       "id": "PORT-01",
       "title": "Fix portable product defects (hostname, connector, grant status)",
-      "status": "open",
+      "status": "done",
       "lane": "P1",
       "gate_class": "product_correctness",
       "depends_on": [],
+      "pr": 55,
+      "merge_commit": "6211a567",
+      "eng_commit": "82d34b8c",
+      "post_merge_verify": "PASS",
       "acceptance": [
         "freeze validates deployment-configured hostname (not hardcoded swarm.splitsignal.ai)",
         "historical freeze hashes preserved when scope versions",
@@ -211,12 +222,17 @@
     {
       "id": "PORT-02",
       "title": "Generic server/worker roles, enrollment contracts, support matrix",
-      "status": "open",
+      "status": "eng_done",
       "lane": "P2",
       "gate_class": "product_correctness",
       "depends_on": [
         "PORT-01"
       ],
+      "pr": 57,
+      "merge_commit": "3fca9d29",
+      "eng_commit": "761d5859",
+      "post_merge_verify": "PASS",
+      "notes": "Do not claim matrix cells supported; qualification remains experimental/in_progress",
       "acceptance": [
         "configurable server, worker, combined roles",
         "worker identity includes enrolled id, platform/arch, runtimes, verified caps, limits, workspace grants, locality",
@@ -229,12 +245,17 @@
     {
       "id": "PORT-03",
       "title": "Portable install docs and fresh-install example",
-      "status": "open",
+      "status": "eng_done",
       "lane": "P3",
       "gate_class": "product_correctness",
       "depends_on": [
         "PORT-02"
       ],
+      "pr": 56,
+      "merge_commit": "f39e0032",
+      "eng_commit": "2bff8d79",
+      "post_merge_verify": "PASS",
+      "notes": "Particular-deploy evidence still external; reference guides only",
       "acceptance": [
         "documented startup without editing application code",
         "validated config and secret refs",
@@ -248,7 +269,7 @@
     {
       "id": "PORT-04",
       "title": "Portability acceptance tests and two-container protocol proof",
-      "status": "open",
+      "status": "eng_done",
       "lane": "P4",
       "gate_class": "product_correctness",
       "depends_on": [
@@ -258,6 +279,11 @@
         "PORT-02",
         "PORT-03"
       ],
+      "pr": 54,
+      "merge_commit": "fab9186c",
+      "eng_commit": "70c1a7cb",
+      "post_merge_verify": "PASS",
+      "notes": "Mac verify 78 passed incl. Docker two-container; real cross-host separate",
       "acceptance": [
         "probes vary hostnames/URLs, worker names/ids, install/workspace paths, platforms/archs, capability grants",
         "fresh startup outside original checkout",
@@ -274,6 +300,7 @@
       "lane": "P5",
       "gate_class": "product_correctness",
       "depends_on": [],
+      "notes": "Tip-sync refresh on f39e0032 after post-merge verify PASS; continuous for future lands",
       "acceptance": [
         "user-facing portable plan current",
         "packet graph includes PORT-* without replacing P00-P19/TH-*",
@@ -284,7 +311,7 @@
       "branch_prefix": "cursor/v2-portable-tracking-*"
     }
   ],
-  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments. PORT-* packets encode portable product work from the 2026-09-25 portable mandate; they do not replace P/TH packets.",
-  "public_hostname_note": "Operator deploy may use swarm.splitsignal.ai; product freeze must not hardcode it (PORT-01).",
+  "notes": "Full P00\u2013P19 definitions live in EXECUTION_PACKETS.md. TH-* packets encode two-host deployment increments. PORT-* packets encode portable product work from the 2026-09-25 portable mandate; they do not replace P/TH packets. P1\u2013P5 eng (#53\u2013#57) landed; post-merge verify PASS @ f39e0032.",
+  "public_hostname_note": "Operator deploy may use swarm.splitsignal.ai; product freeze is config-driven (PORT-01 closed).",
   "loopback_server_url": "http://127.0.0.1:18766"
 }

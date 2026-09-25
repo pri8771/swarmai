@@ -1,15 +1,16 @@
 # Linear reconciliation queue
 
 **Date Recorded:** 2026-09-25  
-**Updated:** 2026-09-25T18:29Z (portable product PORT-* added)  
-**Status:** blocked — Linear MCP unavailable  
+**Updated:** 2026-09-25T18:55Z (PORT-01–04 eng landed; tip `f39e0032`; post-merge verify PASS)  
+**Status:** blocked — Linear MCP unavailable (`needsAuth`)  
 **Action:** update existing SwarmAI project/issues in place; do **not** create a duplicate project when access returns.  
-**Versions:** V1.7–V2.0 remain **unaccepted** in repo tracking regardless of Linear status.
+**Versions:** V1.7–V2.0 remain **unaccepted** in repo tracking regardless of Linear status.  
+**Repo tip SoT:** `origin/dev` @ `f39e003249b73849a699bb554dddcdfbfffa502c`
 
 ## Access problem
 
 - Linear MCP namespace status: `needsAuth`
-- `mcp_auth` call: authentication timed out / not invoked this pass (queue-only policy)
+- `mcp_auth` not invoked this pass (queue-only policy while needsAuth)
 - No Linear issue IDs mutated this session
 
 ## Intended updates (when auth works)
@@ -32,14 +33,15 @@
 | V1.9 autonomous pursuit | Bounded pursuit loop + evaluated lessons | Eng complete — **not accepted** | V1.9 | 8 |
 | V2.0 integrated product | UI/SDK goal pursuit + acceptance campaign | Eng present — **not accepted** | V2.0 | 13 |
 | V2.0 acceptance campaign freeze (Lane F) | Freeze §10 scenarios/pass criteria; harness + matrices; no version accept; no invented LiveGrant | Done (eng freeze/harness) — versions still not accepted | V2.0, acceptance | 5 |
-| **PORT-01 portable defects** | Configurable freeze hostname; connector executes assigned work; harness auth vs impl | Todo / In Progress | portable, PORT-01, P1 | 5 |
-| **PORT-02 generic roles** | Server/worker/combined roles; enrollment contracts; support matrix; generic connector | Todo | portable, PORT-02, P2 | 8 |
-| **PORT-03 portable install** | Fresh-install example; runbooks; R730/Mac/CF as reference only | Todo | portable, PORT-03, P3 | 5 |
-| **PORT-04 portability tests** | Multi-config probes + two-container protocol proof | Todo | portable, PORT-04, P4 | 5 |
-| **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | In Progress (docs on `cursor/v2-portable-tracking-3ac7`) | portable, PORT-05, P5 | 2 |
-| Live qualification grant | Approve route+budget before live provider dispatch | Blocked — **live gate**, not product eng stop | TH-07, live | 2 |
-| R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked — **deployment gate** | infra | 1 |
-| Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked — **deployment gate** | infra | 2 |
+| **PORT-01 portable defects** | Configurable freeze hostname; connector executes assigned work; harness auth vs impl | **Done** (PR #55 merged; Mac verify PASS) | portable, PORT-01, P1, gate:product | 5 |
+| **PORT-02 generic roles** | Server/worker/combined roles; enrollment contracts; support matrix; generic connector | **Done (eng)** (PR #57); matrix cells stay experimental — not `supported` | portable, PORT-02, P2, gate:product | 8 |
+| **PORT-03 portable install** | Fresh-install example; runbooks; R730/Mac/CF as reference only | **Done (eng)** (PR #56); particular-deploy evidence external | portable, PORT-03, P3, gate:product | 5 |
+| **PORT-04 portability tests** | Multi-config probes + two-container protocol proof | **Done (eng)** (PR #54); Mac Docker proof green | portable, PORT-04, P4, gate:product | 5 |
+| **PORT-05 portable tracking** | Plan / packet graph / support matrix / this Linear queue | **In Progress** → tip-sync on `cursor/v2-portable-tracking-9bf5` (refresh after verify) | portable, PORT-05, P5 | 2 |
+| Live qualification grant | Approve route+budget before live provider dispatch | Blocked — **live gate**, not product eng stop | TH-07, live, gate:live | 2 |
+| Live adapter dispatch (impl) | Optional dispatcher / qualification runner after approved grant | Todo / eng gap — label `blocked_missing_implementation` | portable, gate:product | 5 |
+| R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked — **deployment gate** | infra, gate:deployment | 1 |
+| Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked — **deployment gate** | infra, gate:deployment | 2 |
 
 ## Gate labels (apply when creating/updating)
 
@@ -60,6 +62,7 @@
 - `docs/swarm-mvp/PORTABLE_SUPPORT_MATRIX.md`
 - `docs/evidence/v20/support_matrix.json`
 - Project Context: `docs/v2-portable-product-plan.md` (+ prior `docs/v2-goal-pursuit-plan.md`)
+- Post-merge verify: Project Context `internal/v2-portable-post-merge-verify-handoff.md`
 
 ## Do not
 
@@ -67,4 +70,5 @@
 - Invent issue keys
 - Mark live qualification or operator acceptance complete without independent review
 - Mark V1.7–V2.0 accepted from eng green alone
-- Treat missing R730/CF/LiveGrant as blocking PORT-01–04 eng
+- Treat missing R730/CF/LiveGrant as blocking portable eng (PORT-01–04 already landed)
+- Claim Linux container / enrollment cells `supported` without qualification + review
