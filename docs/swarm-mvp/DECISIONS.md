@@ -19,6 +19,26 @@
 | Related Prompt | two-host-architecture-update |
 | Related Jira/Linear | pending — see `LINEAR_RECONCILIATION.md` |
 
+## DEC-TH-003 — Runtime adapters require mediated qualification
+
+| Field | Value |
+|---|---|
+| Decision ID | DEC-TH-003 |
+| Topic | Optional OpenCode / Hermes runtimes |
+| Decision Maker | Implementation worker per architecture mandate |
+| Decision | Framework configuration alone does **not** enforce SwarmAI contracts. OpenCode/Hermes stay non-admissible until capability-by-capability SwarmAI kernel mediation is proven. Missing/unqualified capabilities are marked unavailable. Native remains default. |
+| Context | TH-06 optional adapters; OpenCode binary present on Mac; Hermes not installed |
+| Options Considered | (1) claim qualified from vendor config, (2) honest discovery + unavailable caps, (3) block all optional runtimes including native |
+| Why | Architecture §6 and P16 stop conditions forbid false badges and contract weakening |
+| Date Recorded | 2026-09-25 |
+| Actual Start Date | 2026-09-25 |
+| Actual End Date | 2026-09-25 |
+| Status | accepted |
+| Consequences | `GET /v1/runtimes` admits only `native` today; OpenCode=`discovered_unqualified`; Hermes=`unavailable` |
+| Related Files | `src/swarm/runtime/adapters/`, `docs/evidence/two-host/TH-06/` |
+| Related Prompt | TH-06 authorized continuation |
+| Related Jira/Linear | pending — see `LINEAR_RECONCILIATION.md` |
+
 ## DEC-TH-002 — Parallel lane vs V1.7
 
 | Field | Value |

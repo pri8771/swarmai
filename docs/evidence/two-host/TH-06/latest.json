@@ -1,0 +1,331 @@
+{
+  "packet": "TH-06",
+  "hostname_public": "swarm.splitsignal.ai",
+  "server_url": "http://127.0.0.1:18766",
+  "started_at": "2026-09-25T15:51:04.713734+00:00",
+  "spend_usd": 0,
+  "allow_paid": false,
+  "config_alone_enforces_swarm_contracts": false,
+  "steps": [
+    {
+      "step": "native_mission_admissible",
+      "ok": true,
+      "admissible": [
+        "native"
+      ]
+    },
+    {
+      "step": "opencode_not_mission_admissible",
+      "ok": true,
+      "availability": "discovered_unqualified"
+    },
+    {
+      "step": "hermes_unavailable",
+      "ok": true,
+      "summary": {
+        "available": [
+          "native"
+        ],
+        "discovered_unqualified": [
+          "opencode"
+        ],
+        "unavailable": [
+          "hermes"
+        ]
+      }
+    },
+    {
+      "step": "config_alone_never_enforces",
+      "ok": true
+    },
+    {
+      "step": "optional_runtimes_kernel_mediation_unproven",
+      "ok": true
+    },
+    {
+      "step": "health_ready",
+      "ok": true
+    },
+    {
+      "step": "api_runtimes_endpoint",
+      "ok": true,
+      "status_code": 200
+    }
+  ],
+  "qualification": {
+    "schema_version": "1.0",
+    "packet": "TH-06",
+    "hostname_public": "swarm.splitsignal.ai",
+    "config_alone_enforces_swarm_contracts": false,
+    "policy": {
+      "mission_admissible_runtimes": [
+        "native"
+      ],
+      "note": "Framework configuration alone never admits a runtime. Only availability=available with SwarmAI kernel mediation may run missions."
+    },
+    "summary": {
+      "available": [
+        "native"
+      ],
+      "discovered_unqualified": [
+        "opencode"
+      ],
+      "unavailable": [
+        "hermes"
+      ]
+    },
+    "runtimes": [
+      {
+        "runtime_id": "native",
+        "display_name": "Native SwarmAI runtime",
+        "availability": "available",
+        "pinned_version": "swarm-native",
+        "discovered_version": "swarm-native",
+        "install_path": "src/swarm",
+        "summary": "Native runtime remains the default mission path. TH-02/TH-04 prove dispatch and durable artifacts on Mac loopback; other controls stay unproven rather than silently claimed.",
+        "capabilities": [
+          {
+            "capability": "dispatch_events",
+            "status": "available",
+            "reason": "TH-02 native worker enroll/claim/submit/accept on loopback API",
+            "evidence_refs": [
+              "docs/evidence/two-host/TH-02/"
+            ]
+          },
+          {
+            "capability": "cancel_termination",
+            "status": "unproven",
+            "reason": "Cancel routes exist; dedicated cancel-during-tool proof not in TH-06 scope",
+            "evidence_refs": []
+          },
+          {
+            "capability": "permission_tool_observability",
+            "status": "unproven",
+            "reason": "Gateway exists; full native permission matrix not re-proven in TH-06",
+            "evidence_refs": []
+          },
+          {
+            "capability": "model_routing_usage",
+            "status": "unproven",
+            "reason": "Free-only default; live route qualification not authorized this packet",
+            "evidence_refs": []
+          },
+          {
+            "capability": "context_occupancy_xy_succession",
+            "status": "unproven",
+            "reason": "X/Y succession not exercised in two-host TH packets yet",
+            "evidence_refs": []
+          },
+          {
+            "capability": "knowledge_transfer_artifacts",
+            "status": "available",
+            "reason": "TH-04 durable CAS publish/reopen with identical sha256 after restart",
+            "evidence_refs": [
+              "docs/evidence/two-host/TH-04/"
+            ]
+          },
+          {
+            "capability": "restart_recovery_cleanup",
+            "status": "available",
+            "reason": "TH-02 mission hydrate + TH-04 artifact reopen after API restart",
+            "evidence_refs": [
+              "docs/evidence/two-host/TH-02/",
+              "docs/evidence/two-host/TH-04/"
+            ]
+          },
+          {
+            "capability": "nested_delegation_accounting",
+            "status": "unproven",
+            "reason": "Nested delegation accounting not proven on Mac loopback TH path",
+            "evidence_refs": []
+          }
+        ],
+        "blockers": [],
+        "config_alone_enforces_swarm_contracts": false,
+        "kernel_mediation_proven": true,
+        "live_inference_authorized": false,
+        "hostname_public": "swarm.splitsignal.ai",
+        "qualified_at": "2026-09-25T15:51:04.674667+00:00",
+        "notes": [
+          "Native availability does not imply paid/live model qualification.",
+          "SwarmAI kernel owns admission; native code is not a third-party framework."
+        ]
+      },
+      {
+        "runtime_id": "opencode",
+        "display_name": "OpenCode",
+        "availability": "discovered_unqualified",
+        "pinned_version": "v2.0.15",
+        "discovered_version": "v2.0.15",
+        "install_path": "/Users/pchordia/.opencode/bin/opencode",
+        "summary": "OpenCode binary discovered for optional worker use, but mission capabilities are NOT qualified. Vendor configuration is not SwarmAI policy enforcement.",
+        "capabilities": [
+          {
+            "capability": "dispatch_events",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "cancel_termination",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "permission_tool_observability",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "model_routing_usage",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "context_occupancy_xy_succession",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "knowledge_transfer_artifacts",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "restart_recovery_cleanup",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          },
+          {
+            "capability": "nested_delegation_accounting",
+            "status": "unavailable",
+            "reason": "unqualified: OpenCode config/settings do not enforce SwarmAI contracts; kernel-mediated proof missing",
+            "evidence_refs": []
+          }
+        ],
+        "blockers": [
+          "OpenCode settings/config alone do not enforce SwarmAI contracts",
+          "SwarmAI kernel mediation (gateway/leases/budgets/succession) not proven for OpenCode",
+          "No authorized live inference / spend for OpenCode mission qualification this packet",
+          "Required capability matrix remains unavailable without mediated evidence"
+        ],
+        "config_alone_enforces_swarm_contracts": false,
+        "kernel_mediation_proven": false,
+        "live_inference_authorized": false,
+        "hostname_public": "swarm.splitsignal.ai",
+        "qualified_at": "2026-09-25T15:51:04.713373+00:00",
+        "notes": [
+          "Discovery \u2260 qualification.",
+          "Disable nested OpenCode subagent trees until admission/budget mapping exists.",
+          "Do not start OpenCode service or paid models from this qualification probe."
+        ]
+      },
+      {
+        "runtime_id": "hermes",
+        "display_name": "Hermes (optional planning agent)",
+        "availability": "unavailable",
+        "pinned_version": "v2026.9.24",
+        "discovered_version": null,
+        "install_path": null,
+        "summary": "Hermes not installed in this environment. Native missions remain usable without Hermes. Pinned research ref 59004a62356f3a4697ab0fe8ad5086d2b405e2a6 was not fetched or executed.",
+        "capabilities": [
+          {
+            "capability": "dispatch_events",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "cancel_termination",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "permission_tool_observability",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "model_routing_usage",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "context_occupancy_xy_succession",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "knowledge_transfer_artifacts",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "restart_recovery_cleanup",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          },
+          {
+            "capability": "nested_delegation_accounting",
+            "status": "unavailable",
+            "reason": "hermes missing \u2014 capability cannot be qualified",
+            "evidence_refs": []
+          }
+        ],
+        "blockers": [
+          "Hermes CLI/package not discovered",
+          "Hermes packaging prefers isolated process/container (Py>=3.14 constraints)",
+          "No SwarmAI-mediated Hermes planning-seed evidence",
+          "Hermes config/prompts alone do not enforce SwarmAI tool or budget limits",
+          "Live Hermes qualification not authorized (no install / no spend)"
+        ],
+        "config_alone_enforces_swarm_contracts": false,
+        "kernel_mediation_proven": false,
+        "live_inference_authorized": false,
+        "hostname_public": "swarm.splitsignal.ai",
+        "qualified_at": "2026-09-25T15:51:04.713692+00:00",
+        "notes": [
+          "Absence of Hermes must not fail native acceptance.",
+          "Adapter stop condition: do not weaken core contracts for a Hermes badge.",
+          "Research pin: 59004a62356f3a4697ab0fe8ad5086d2b405e2a6 (v2026.9.24)."
+        ]
+      }
+    ],
+    "mock_vs_live": "qualification_probe_not_live_inference"
+  },
+  "api_runtimes": {
+    "summary": {
+      "available": [
+        "native"
+      ],
+      "discovered_unqualified": [],
+      "unavailable": [
+        "opencode",
+        "hermes"
+      ]
+    },
+    "mission_admissible": [
+      "native"
+    ],
+    "config_alone_enforces_swarm_contracts": false
+  },
+  "ok": true,
+  "finished_at": "2026-09-25T15:51:04.794310+00:00",
+  "qualification_status": {
+    "native": "available (partial capability proof; Mac loopback)",
+    "opencode": "discovered_unqualified",
+    "hermes": "unavailable"
+  }
+}

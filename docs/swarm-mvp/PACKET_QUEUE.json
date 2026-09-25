@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-25T15:45:00Z",
+  "updated_at": "2026-09-25T15:51:00Z",
   "branch": "cursor/two-host-mvp-b28d",
   "packets": [
     {
@@ -98,11 +98,26 @@
     {
       "id": "TH-06",
       "title": "Optional OpenCode/Hermes runtime qualification",
-      "status": "planned",
+      "status": "impl_complete",
       "optional": true,
       "depends_on": [
         "TH-02"
-      ]
+      ],
+      "evidence": "docs/evidence/two-host/TH-06/",
+      "acceptance_notes": [
+        "GET /v1/runtimes reports native/opencode/hermes availability",
+        "native mission-admissible with partial capability proof",
+        "opencode discovered_unqualified — config does not enforce SwarmAI contracts",
+        "hermes unavailable when not installed — native path unaffected",
+        "no live inference / no Hermes install / no false qualification claim"
+      ],
+      "qualification_status": {
+        "native": "available",
+        "opencode": "discovered_unqualified",
+        "hermes": "unavailable"
+      },
+      "mac_verify": "passed",
+      "r730_verify": "blocked"
     },
     {
       "id": "TH-07",

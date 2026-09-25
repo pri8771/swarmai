@@ -21,6 +21,7 @@
 | TH-03 Mac connector | Mac connector completes mac_local scoped task through server | Done (Mac eng) | TH-03, connector | 3 |
 | TH-04 durable artifacts | Content-addressed artifacts reopen identical sha256 after API restart | Done (Mac eng) | TH-04, artifacts | 3 |
 | TH-05 mission UI | Console live mode shows real missions/artifacts/workers on loopback | Done (Mac eng) | TH-05, console | 3 |
+| TH-06 runtime adapters | Qualify OpenCode/Hermes honestly; mark unqualified caps unavailable | Done (Mac eng) | TH-06, runtime | 3 |
 | R730 access gate | Verify SSH/OS/Docker/VM before host config | Blocked | infra | 1 |
 | Cloudflare tunnel gate | Origin cert + authenticated routes for swarm.splitsignal.ai | Blocked | infra | 2 |
 

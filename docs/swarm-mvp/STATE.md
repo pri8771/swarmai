@@ -3,10 +3,9 @@
 **Owner:** Cursor Project implementation worker (`bc-39c5759a-8fb4-514e-a825-98363e5fb28d`)  
 **Branch:** `cursor/two-host-mvp-b28d`  
 **Worktree:** `/Users/pchordia/Downloads/swarm-ai-two-host-mvp`  
-**Updated:** 2026-09-25T15:45:00Z  
+**Updated:** 2026-09-25T15:51:00Z  
 **Public hostname:** `swarm.splitsignal.ai` (never `.com`)  
-**Loopback server:** `http://127.0.0.1:18766`  
-**Console:** `http://127.0.0.1:43127` (live `?mode=live&baseUrl=…`)
+**Loopback server:** `http://127.0.0.1:18766`
 
 ## Packet status
 
@@ -18,18 +17,29 @@
 | TH-03 | impl_complete (Mac eng) | Mac connector host + compose one-shot |
 | TH-04 | impl_complete (Mac eng) | Durable CAS artifacts; identical sha256 after restart |
 | TH-05 | impl_complete (Mac eng) | Console live loader shows real missions/artifacts/workers |
-| TH-06–TH-07 | planned | Next: optional OpenCode/Hermes qualification (TH-06) or eval harness (TH-07) |
+| TH-06 | impl_complete (Mac eng) | Runtime adapters qualified honestly; OpenCode/Hermes not mission-admissible |
+| TH-07 | planned | Next: synthetic eval harness + live qualification gate |
 | P01–P19 | planned | Product queue unchanged |
 
-## Checks this session (TH-05)
+## Runtime qualification (TH-06)
+
+| Runtime | Status |
+|---|---|
+| Native | available (partial) |
+| OpenCode | discovered_unqualified — **not** mission-admissible |
+| Hermes | unavailable — **not** mission-admissible |
+
+Framework config alone does **not** enforce SwarmAI contracts.
+
+## Checks this session (TH-06)
 
 | Check | Result |
 |---|---|
-| Console vitest | pass (18) |
-| Console build + secret scan | pass |
-| Live snapshot parity vs API | pass |
+| pytest runtime adapters | pass (6) |
+| `scripts/th06_runtime_qualification.py` | pass |
+| `GET /v1/runtimes` | pass |
 | Linear MCP | blocked needsAuth (queue only) |
 
 ## Next action
 
-TH-06 optional OpenCode/Hermes runtime qualification, or TH-07 synthetic eval harness — still Mac loopback; R730/DNS/CF not required.
+TH-07 synthetic evaluation harness and live qualification gate (still Mac loopback; R730/DNS/CF not required).

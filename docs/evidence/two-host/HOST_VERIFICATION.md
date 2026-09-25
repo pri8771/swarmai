@@ -59,5 +59,5 @@ Observed:
 | `swarm deploy doctor --profile server` | **ok** (DB URL missing in host env expected for doctor dry-run) |
 | `swarm deploy doctor --profile mac_connector` | **ok** with `SWARM_SERVER_URL` |
 | Linear MCP update | **blocked** (`needsAuth` / auth timeout) — see `docs/swarm-mvp/LINEAR_RECONCILIATION.md` |
-| Runtime OpenCode/Hermes | **not started** |
+| Runtime OpenCode/Hermes | **TH-06 done (honest)** — native available; OpenCode discovered_unqualified; Hermes unavailable |
 | Live providers | **not run** (free-only / no spend) |

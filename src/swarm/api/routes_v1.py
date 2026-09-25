@@ -384,6 +384,22 @@ async def qualifications(
     return {"profiles": profiles, "policy_version": store.profiles.policy.policy_version}
 
 
+@router.get("/runtimes")
+async def list_runtimes(
+    principal: Principal = Depends(get_principal),
+) -> dict[str, Any]:
+    """Optional runtime adapter qualification status (Native / OpenCode / Hermes).
+
+    Framework configuration alone does not enforce SwarmAI contracts. Only
+    ``availability=available`` runtimes are mission-admissible.
+    """
+    _ = principal
+    from swarm.runtime.adapters.qualify import qualification_report
+
+    report = qualification_report()
+    return report
+
+
 @router.post("/evaluations")
 async def create_evaluation(
     body: EvaluationCreateRequest,
