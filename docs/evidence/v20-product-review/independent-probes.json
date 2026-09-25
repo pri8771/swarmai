@@ -1,0 +1,46 @@
+{
+  "source_sha": "4444a565cbe71dbf5f013e9bd6510c68c257e4b3",
+  "probes": {
+    "operational_api_simulates_achievement": {
+      "http_status": 200,
+      "execution_mode": "operational",
+      "fixture_mode": false,
+      "executor": "RecordingExecutor",
+      "goal_status": "achieved",
+      "evidence_refs": [
+        "ev:msn_15de612b24374f99991c66d5a913b2f7"
+      ],
+      "mission_record_count": 0
+    },
+    "pursuit_restart": {
+      "before_history": 1,
+      "after_history": 0,
+      "scheduler_now": 0.0,
+      "next_due_at": 1.0
+    },
+    "runtime_authorization_match": {
+      "missing_required_capability_admitted": true,
+      "forbidden_scope_admitted": true
+    },
+    "outside_workspace_input": {
+      "input_is_outside_supplied_workspace": true,
+      "status": "completed",
+      "artifact_created": true
+    },
+    "unenforced_enrollment_qualification": {
+      "platform": {
+        "platform": "unsupported_os",
+        "architecture": "unsupported_arch"
+      },
+      "capabilities": [
+        "code.write"
+      ],
+      "capabilities_verified": true,
+      "explicit_project_policy": false
+    },
+    "failed_claim_achieves": {
+      "verification_passed": false,
+      "goal_status": "achieved"
+    }
+  }
+}
