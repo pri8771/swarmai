@@ -1,0 +1,101 @@
+{
+  "schema": "swarmai.agents.context.v1",
+  "verified_at": "2026-09-25T21:07Z",
+  "repo": "pri8771/swarmai",
+  "pause": true,
+  "v20_work": "STOPPED",
+  "refs": {
+    "origin_dev": "dd7726eb8c22986ef72847994c8e435a81a869b6",
+    "origin_dev_subject": "Merge PR #60: feat(L6) product Compose console + SDK/UI control parity",
+    "origin_main": "08b910f981eff2ab66873a71055090f2c60f2a91",
+    "origin_main_status": "UNTOUCHED",
+    "alembic_head": "a20pursuitpersist0001"
+  },
+  "version_flags": {
+    "v17_eng": "done",
+    "v17_accepted": false,
+    "v20_eng_complete": false,
+    "v20_harness": "harness_ready_external_gates_blocked",
+    "v20_accepted": false,
+    "versions_accepted": {
+      "V1.7": false,
+      "V1.8": false,
+      "V1.9": false,
+      "V2.0": false
+    },
+    "any_version_accepted": false
+  },
+  "hard_limits": [
+    "no_main_merge",
+    "no_paid_public",
+    "livegrant_fail_closed_no_invent",
+    "job_bot_out_of_scope",
+    "livegrant_r730_cf_linear_deploy_live_only",
+    "harness_star_ne_accepted",
+    "pr_base_dev_only"
+  ],
+  "fast_track_merged_order": [
+    {"order": 1, "pr": 61, "lane": "L5", "merge_sha": "c294d8ca"},
+    {"order": 2, "pr": 63, "lane": "L1", "merge_sha": "3357d944"},
+    {"order": 3, "pr": 62, "lane": "L3", "merge_sha": "53401981"},
+    {"order": 4, "pr": 64, "lane": "L4", "merge_sha": "45efb242"},
+    {"order": 5, "pr": 65, "lane": "L2_R20-01", "merge_sha": "ad0ed567"},
+    {"order": 6, "pr": 60, "lane": "L6", "merge_sha": "dd7726eb"}
+  ],
+  "r20": {
+    "R20-01": {"status": "done", "ops_executor": "NativeMissionDispatchExecutor", "recording_executor": "fixture_mock_only"},
+    "R20-02": {"status": "done", "pr": 61},
+    "R20-03": {"status": "done", "pr": 62},
+    "R20-04": {"status": "done", "pg_writethrough": "open_V20-E03"},
+    "R20-05": {"status": "done", "pr": 62}
+  },
+  "mission_path": {
+    "status": "tip_proven",
+    "tip": "dd7726eb8c22986ef72847994c8e435a81a869b6",
+    "path": ["claim", "execute", "CAS", "protected_verify"],
+    "pytest_passed": 17
+  },
+  "acceptance": {
+    "S01_S11": "pass_deterministic",
+    "S12": "blocked_live_grant",
+    "spend_usd": 0.0,
+    "invent_live_grant": "refused"
+  },
+  "remaining_eng": [
+    {"id": "V20-E01", "pri": "P0", "status": "in_progress", "open_prs": [66, 68]},
+    {"id": "V20-E02", "pri": "P0", "status": "in_progress", "open_prs": [59, 67]},
+    {"id": "V20-E03", "pri": "P1", "status": "open"},
+    {"id": "V20-E04", "pri": "P1", "status": "open", "deps": ["V20-E03"]},
+    {"id": "V20-E05", "pri": "P1", "status": "open"},
+    {"id": "V20-E06", "pri": "P1", "status": "open", "deps_preferred": ["V20-E03", "V20-E04"]},
+    {"id": "V20-E07", "pri": "P1", "status": "open", "deps_preferred": ["V20-E05"]},
+    {"id": "V20-E08", "pri": "P2", "status": "open"},
+    {"id": "V20-E09", "pri": "P2", "status": "open"},
+    {"id": "V20-E10", "pri": "P2", "status": "open"},
+    {"id": "V20-E11", "pri": "P2", "status": "deferred"}
+  ],
+  "open_prs_session": [
+    {"pr": 59, "draft": true, "topic": "plan_fast_track", "url": "https://github.com/pri8771/swarmai/pull/59"},
+    {"pr": 66, "draft": true, "topic": "V20-E01_tipsync", "mergeable": true, "ci": "all_green", "url": "https://github.com/pri8771/swarmai/pull/66", "owns": "STATE_PACKET_QUEUE_tipsync"},
+    {"pr": 67, "draft": true, "topic": "V20-E02_fast_track_docs", "url": "https://github.com/pri8771/swarmai/pull/67"},
+    {"pr": 68, "draft": true, "topic": "V20-E01_manifest_wip", "url": "https://github.com/pri8771/swarmai/pull/68"}
+  ],
+  "sot": {
+    "primary": "docs/agents/",
+    "read_order": ["CURRENT.md", "V17_DONE.md", "V20_TODO.md", "RESUME.md", "context.json"],
+    "stale_tracking": ["docs/swarm-mvp/STATE.md", "docs/swarm-mvp/PACKET_QUEUE.json"]
+  },
+  "pause_now": {
+    "v20_eng_lanes": "STOPPED",
+    "tip_sync_owner_pr": 66,
+    "do_not_duplicate_state_tipsync": true,
+    "related_open_prs": [59, 66, 67, 68]
+  },
+  "resume_first_when_eng_allowed": [
+    "fetch_confirm_tip_ge_dd7726eb",
+    "merge_V20-E01_prefer_pr66_reconcile_68",
+    "V20-E02_pr67_or_pr59",
+    "pick_V20-E03_or_V20-E05",
+    "keep_accepted_false"
+  ]
+}
