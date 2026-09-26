@@ -25,7 +25,7 @@ All notable changes to SwarmAI are documented here.
 
 ### Notes
 - Not accepted. Multi-process gate pending owner approval. Zero spend (no provider calls; cost unknown ≠ $0).
-- SplitSignal adapter (SW-X1-S1) awaiting inference_server SP1; not merged.
+- SplitSignal adapter (SW-X1-S1) merged after inference_server SP1/SP2 (IS `9ca12671`); live use pending SP4 and a LiveGrant.
 
 ## Unreleased (V2.3 tracking reset)
 

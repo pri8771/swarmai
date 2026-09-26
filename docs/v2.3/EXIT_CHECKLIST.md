@@ -39,7 +39,7 @@ Legend: **done**, meaning implemented with a deterministic test and, where it sa
 | V20-E03 pursuit PostgreSQL write-through | done (PG), behind `SWARM_V23_DURABLE=1` | `tests/integration/db/test_v20_pursuit_writethrough_sql.py`, `test_v20_durable_wiring_sql.py` |
 | V20-E04 durable holds/lessons (+ F-13 unknown ≠ zero) | done (PG) | `tests/pursuit/test_v20_durable_holds.py`, `test_v20_unknown_usage_budget.py`, `test_v20_holds_sql.py` |
 | V20-E05 inference_server router client | done (fake router) | `tests/providers/test_router_client.py` |
-| SplitSignal consumer adapter (contract `swarmai-consumer 1.x`, sync point SP1/SP2) | pending: SW-X1-S1 not merged (gate SP1) — implemented on draft branch `cursor/sw-x1-s1-460c`, awaiting SP1 | `tests/providers/test_splitsignal_client.py` |
+| SplitSignal consumer adapter (contract `swarmai-consumer 1.x`, sync point SP1/SP2) | done (fake SplitSignal + real IS mock); live pending SW-X2-S1 (SP4) — SW-X1-S1 merged at `2b27bc20` after SP1/SP2 were reached (IS integration `9ca12671`; contract blob `1a4a31c9` unchanged); SP3–SP6 pending | `tests/providers/test_splitsignal_client.py`, `tests/pursuit/test_v20_native_loop_splitsignal.py`, `docs/v2.3/sessions/SW-X1-S1.md` (real-mock run) |
 | V20-E06 singleton pursuit ticker | done | `tests/product/test_v20_durable_wiring.py::test_only_one_ticker_runs_per_site` |
 | V20-E07 native model/tool loop | implemented; **live run blocked** (`blocked:router_not_configured`) | `tests/pursuit/test_v20_native_loop.py` |
 | V20-E08 sandbox cancel kill-bound | done | `tests/tools/test_v20_cancel_killbound.py` |
@@ -62,3 +62,4 @@ Each merged into `cursor/sw-v23-integration-460c` with `--no-ff` after ruff, myp
 | SW-FIX-COMPOSE | `e5fd04c0` | compose `worker` has a connector process healthcheck; V20-E10 smoke `pass` (17/17) on the dev VM |
 | SW-FIX-ALEMBIC | `604f7ace` | V20-S11 probe restores `SWARM_*`; Alembic tests pinned to their DB; whole-repo `uv run pytest -q` → `778 passed, 1 skipped` (was 4 failed) |
 | SW-FIX-FLAKE | `1b3f48ad` | V20-E08 kill-bound tests deterministic (reaped-zombie race in the helper; cancel after the grandchild exists) |
+| SW-X1-S1 | `2b27bc20` | SplitSignal consumer adapter merged after SP1/SP2 (Codex review pending) |
