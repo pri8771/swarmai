@@ -250,12 +250,18 @@ class GoalResourceLedger:
         max_spend = hold.reserved.spend_usd + rem.spend_usd
         if spend > max_spend + 1e-9:
             raise AccountingError("settle_exceeds_envelope")
+        models = max(0, int(model_calls))
+        tools = max(0, int(tool_calls))
+        if models > hold.reserved.model_calls + rem.model_calls:
+            raise AccountingError("settle_exceeds_model_call_envelope")
+        if tools > hold.reserved.tool_calls + rem.tool_calls:
+            raise AccountingError("settle_exceeds_tool_call_envelope")
 
         hold.state = "settled"
         hold.settled = UsageAmounts(
             spend_usd=spend,
-            model_calls=max(0, int(model_calls)),
-            tool_calls=max(0, int(tool_calls)),
+            model_calls=models,
+            tool_calls=tools,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             route_id=route_id or hold.reserved.route_id,

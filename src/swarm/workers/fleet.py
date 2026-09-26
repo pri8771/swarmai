@@ -138,6 +138,28 @@ class FleetPlacementService:
         self._worker_trust[worker_id] = normalize_trust(trust_class)
         self._worker_drain.setdefault(worker_id, WorkerDrainState.ACTIVE)
 
+    def sync_project_workers(self, project_id: str, tenant_id: str) -> None:
+        """Bind trusted registry facts into placement without worker self-assertion.
+
+        The product API already authorizes worker enrollment to a project. This
+        adapter uses that server-owned project binding and the normalized
+        locality on the registered lease. Trust defaults to sandbox compute;
+        higher trust still requires an explicit control-plane annotation.
+        """
+        self.bind_project_tenant(project_id, tenant_id)
+        for worker_id, rec in self.registry._workers.items():  # noqa: SLF001
+            if rec.project_id != project_id or worker_id in self._worker_tenant:
+                continue
+            locality = "local"
+            if isinstance(rec.lease.data_locality, dict):
+                locality = str(rec.lease.data_locality.get("primary") or locality)
+            self.annotate_worker(
+                worker_id,
+                tenant_id=tenant_id,
+                locality=locality,
+                trust_class=TrustClass.SANDBOX_COMPUTE.value,
+            )
+
     def drain_state(self, worker_id: str) -> WorkerDrainState:
         return self._worker_drain.get(worker_id, WorkerDrainState.ACTIVE)
 

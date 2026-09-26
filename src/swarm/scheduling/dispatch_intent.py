@@ -106,16 +106,29 @@ class DispatchIntentService:
             ),
             expected_version=None,
         )
-        reserved: list[DispatchIntentComponent] = []
-        for comp in intent.components:
-            try:
-                reservation_id = self._reserve(intent, comp)
-            except Exception as exc:  # noqa: BLE001 — any failure compensates
-                return self._compensate(intent, reserved, f"reserve_failed:{comp.kind}:{exc}")
-            reserved.append(
-                comp.model_copy(update={"reserved": True, "reservation_id": reservation_id})
+        for index, comp in enumerate(intent.components):
+            # Persist the attempted reservation before crossing the external
+            # boundary. A process death after reserve() succeeds can then be
+            # compensated by recover_expired(); release callbacks are required
+            # to be idempotent for an attempt that did not acquire capacity.
+            attempted = comp.model_copy(update={"reserved": True})
+            components = list(intent.components)
+            components[index] = attempted
+            intent = self.store.put_intent(
+                intent.model_copy(update={"components": components}),
+                expected_version=intent.version,
             )
-            components = reserved + intent.components[len(reserved) :]
+            try:
+                reservation_id = self._reserve(intent, attempted)
+            except Exception as exc:  # noqa: BLE001 — any failure compensates
+                attempted_components = [c for c in intent.components if c.reserved]
+                return self._compensate(
+                    intent,
+                    attempted_components,
+                    f"reserve_failed:{comp.kind}:{exc}",
+                )
+            components = list(intent.components)
+            components[index] = attempted.model_copy(update={"reservation_id": reservation_id})
             intent = self.store.put_intent(
                 intent.model_copy(update={"components": components}),
                 expected_version=intent.version,

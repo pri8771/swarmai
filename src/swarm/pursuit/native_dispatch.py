@@ -163,6 +163,7 @@ class NativeMissionDispatchExecutor:
         validation = dict(record.validation or {})
         protected = validation.get("protected_verify") or {}
         result = dict(record.result or {})
+        usage = self._recorded_loop_usage(record.plan)
         receipt_id = result.get("acceptance_receipt_id")
         if not receipt_id:
             mission = self.store.controller.missions.get(mission_id)
@@ -176,6 +177,7 @@ class NativeMissionDispatchExecutor:
                 failure_class=f"mission_{status}",
                 notes=str((record.result or {}).get("summary") or status),
                 runtime="native",
+                **usage,
             )
 
         if (
@@ -213,13 +215,24 @@ class NativeMissionDispatchExecutor:
                 criterion_receipts=receipts,
                 notes=f"protected_verify_accepted:{receipt_id}",
                 cost_usd=0.0,
-                model_calls=0,
-                tool_calls=0,
                 runtime="native",
+                **usage,
             )
 
         # Still awaiting worker execution / protected verify.
         return None
+
+    @staticmethod
+    def _recorded_loop_usage(plan: dict[str, Any] | None) -> dict[str, Any]:
+        summary = dict((plan or {}).get("native_loop") or {})
+        model_calls = max(0, int(summary.get("model_calls") or 0))
+        return {
+            "model_calls": model_calls,
+            "tool_calls": max(0, int(summary.get("tool_calls") or 0)),
+            "prompt_tokens": summary.get("prompt_tokens"),
+            "completion_tokens": summary.get("completion_tokens"),
+            "usage_unknown": model_calls > 0 and summary.get("usage_known") is not True,
+        }
 
     def _project_id(self, goal_id: str) -> str:
         try:

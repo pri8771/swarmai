@@ -176,7 +176,10 @@ async def scheduler_register_project(
 ) -> dict[str, Any]:
     auth.require_project(principal, project_id)
     state = rt.scheduler.register_project(
-        project_id, weight=body.weight, max_concurrency=body.max_concurrency
+        project_id,
+        tenant_id=f"project:{project_id}",
+        weight=body.weight,
+        max_concurrency=body.max_concurrency,
     )
     _audit(request, principal, "scheduler.register", project_id)
     return state.model_dump(mode="json")
@@ -418,6 +421,14 @@ async def fleet_place(
     rt: V23Runtime = Depends(get_v23),
 ) -> dict[str, Any]:
     auth.require_project(principal, body.project_id)
+    project = rt.scheduler.store.get_project(body.project_id)
+    if project is None:
+        raise ApiError(
+            "placement_rejected",
+            "project_not_registered",
+            status_code=409,
+        )
+    rt.fleet.sync_project_workers(body.project_id, project.tenant_id)
     try:
         decision = rt.fleet.place(
             project_id=body.project_id,

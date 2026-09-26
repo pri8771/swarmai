@@ -45,6 +45,13 @@ class LoopResult:
     def usage_known(self) -> bool:
         return bool(self.receipts) and all(r.usage_known for r in self.receipts)
 
+    @staticmethod
+    def _token_total(receipts: list[RouterCallReceipt], field_name: str) -> int | None:
+        values = [getattr(receipt, field_name) for receipt in receipts]
+        if not values or any(value is None for value in values):
+            return None
+        return sum(int(value) for value in values)
+
     def summary(self) -> dict[str, Any]:
         return {
             "status": self.status,
@@ -52,6 +59,8 @@ class LoopResult:
             "model_calls": self.model_calls,
             "tool_calls": self.tool_calls,
             "usage_known": self.usage_known,
+            "prompt_tokens": self._token_total(self.receipts, "prompt_tokens"),
+            "completion_tokens": self._token_total(self.receipts, "completion_tokens"),
             "error_class": self.error_class,
             "error_code": self.error_code,
             "transcript_digest": self.transcript_digest,
@@ -110,8 +119,13 @@ class BoundedNativeLoop:
             return result
 
         for _ in range(self.max_turns):
-            if deadline is not None and time.monotonic() >= deadline:
-                return done("budget_exhausted", error_code="max_wall_seconds")
+            if deadline is not None:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return done("budget_exhausted", error_code="max_wall_seconds")
+                set_timeout = getattr(self.router, "set_timeout", None)
+                if callable(set_timeout):
+                    set_timeout(remaining)
             if result.model_calls >= self.max_model_calls:
                 return done("budget_exhausted", error_code="max_model_calls")
             result.turns += 1

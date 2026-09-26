@@ -485,37 +485,16 @@ class PursuitEngine:
 
         if hold is not None:
             try:
-                if outcome.usage_unknown:
-                    ledger.settle(
-                        hold.hold_id,
-                        spend_usd=float(outcome.cost_usd),
-                        model_calls=int(outcome.model_calls),
-                        tool_calls=int(outcome.tool_calls),
-                        prompt_tokens=outcome.prompt_tokens,
-                        completion_tokens=outcome.completion_tokens,
-                        route_id=outcome.route_id,
-                        runtime=outcome.runtime,
-                        usage_unknown=True,
-                    )
+                preserved_unknown = self._settle_outcome(ledger, hold.hold_id, outcome)
+                if outcome.usage_unknown or preserved_unknown:
                     accounting_notes.append("usage_unknown_preserved")
-                else:
-                    ledger.settle(
-                        hold.hold_id,
-                        spend_usd=float(outcome.cost_usd),
-                        model_calls=int(outcome.model_calls),
-                        tool_calls=int(outcome.tool_calls),
-                        prompt_tokens=outcome.prompt_tokens,
-                        completion_tokens=outcome.completion_tokens,
-                        route_id=outcome.route_id,
-                        runtime=outcome.runtime,
-                        usage_unknown=False,
-                    )
             except AccountingError as exc:
                 accounting_notes.append(f"settle:{exc}")
-                try:
-                    ledger.release(hold.hold_id)
-                except AccountingError as inner:
-                    accounting_notes.append(f"reconcile:{inner}")
+                if not self._outcome_has_usage(outcome):
+                    try:
+                        ledger.release(hold.hold_id)
+                    except AccountingError as inner:
+                        accounting_notes.append(f"reconcile:{inner}")
 
         # Lane C: mission outcome never implies goal achievement.
         self.goals.record_mission_outcome(
@@ -628,6 +607,46 @@ class PursuitEngine:
             "awaiting_verify",
         }
 
+    @staticmethod
+    def _outcome_has_usage(outcome: ExecutionOutcome) -> bool:
+        return bool(
+            outcome.usage_unknown
+            or float(outcome.cost_usd) > 0
+            or int(outcome.model_calls) > 0
+            or int(outcome.tool_calls) > 0
+        )
+
+    def _settle_outcome(
+        self,
+        ledger: GoalResourceLedger,
+        hold_id: str,
+        outcome: ExecutionOutcome,
+    ) -> bool:
+        """Settle known usage, preserving over-envelope facts as unknown.
+
+        A post-call accounting violation cannot undo consumed work. If known
+        usage exceeds the reserved envelope, keep it committed for explicit
+        reconciliation rather than releasing the hold as if usage were zero.
+        Returns true when that fallback was required.
+        """
+        values: dict[str, Any] = {
+            "spend_usd": float(outcome.cost_usd),
+            "model_calls": int(outcome.model_calls),
+            "tool_calls": int(outcome.tool_calls),
+            "prompt_tokens": outcome.prompt_tokens,
+            "completion_tokens": outcome.completion_tokens,
+            "route_id": outcome.route_id,
+            "runtime": outcome.runtime,
+        }
+        try:
+            ledger.settle(hold_id, **values, usage_unknown=outcome.usage_unknown)
+            return False
+        except AccountingError:
+            if outcome.usage_unknown or not self._outcome_has_usage(outcome):
+                raise
+            ledger.settle(hold_id, **values, usage_unknown=True)
+            return True
+
     def _reconcile_pending(self, goal_id: str) -> CycleRecord | None:
         """If a native mission is pending, poll reconcile before admitting new work."""
         active = list(self._active_missions.get(goal_id, set()))
@@ -662,18 +681,8 @@ class PursuitEngine:
                 if hold.mission_id != mission_id or hold.state != "held":
                     continue
                 try:
-                    if outcome.success:
-                        ledger.settle(
-                            hold.hold_id,
-                            spend_usd=float(outcome.cost_usd),
-                            model_calls=int(outcome.model_calls),
-                            tool_calls=int(outcome.tool_calls),
-                            prompt_tokens=outcome.prompt_tokens,
-                            completion_tokens=outcome.completion_tokens,
-                            route_id=outcome.route_id,
-                            runtime=outcome.runtime,
-                            usage_unknown=outcome.usage_unknown,
-                        )
+                    if outcome.success or self._outcome_has_usage(outcome):
+                        self._settle_outcome(ledger, hold.hold_id, outcome)
                     else:
                         ledger.release(hold.hold_id)
                 except AccountingError:

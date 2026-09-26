@@ -6,6 +6,7 @@ Events are redacted recursively before they reach any sink. Sinks are pluggable:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Protocol
@@ -18,6 +19,16 @@ from swarm.contracts.common import new_id, utc_now
 SECRET_FRAGMENTS = ("secret", "api_key", "token", "password", "authorization", "credential")
 REDACTED = "[redacted]"
 MAX_LIST_LIMIT = 1000
+SECRET_VALUE_PATTERNS = (
+    re.compile(r"sk-[A-Za-z0-9_-]{8,}"),
+    re.compile(r"ss_live_[0-9a-f]{32}_[A-Za-z0-9_-]{16,}"),
+    re.compile(r"AIza[A-Za-z0-9_-]{20,}"),
+    re.compile(r"AKIA[0-9A-Z]{16}"),
+    re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}"),
+    re.compile(r"xox[abpr]-[A-Za-z0-9-]{8,}"),
+    re.compile(r"(?i)bearer\s+[A-Za-z0-9._-]{12,}"),
+    re.compile(r"(?i)postgres(?:ql)?(?:\+\w+)?://[^/\s:@]+:[^@\s/]+@"),
+)
 
 
 @dataclass
@@ -62,6 +73,8 @@ def _redact_value(value: Any) -> Any:
         return _redact(value)
     if isinstance(value, list | tuple):
         return [_redact_value(v) for v in value]
+    if isinstance(value, str) and any(p.search(value) for p in SECRET_VALUE_PATTERNS):
+        return REDACTED
     return value
 
 

@@ -103,6 +103,10 @@ class RouterClient:
     def close(self) -> None:
         self._http.close()
 
+    def set_timeout(self, timeout_s: float) -> None:
+        """Bound subsequent HTTP operations by the caller's remaining wall budget."""
+        self._http.timeout = httpx.Timeout(max(float(timeout_s), 0.001))
+
     def _headers(self) -> dict[str, str]:
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
         key = os.environ.get(self._api_key_env, "")
