@@ -13,6 +13,8 @@ from swarm import __version__
 from swarm.api.auth import AuthRegistry
 from swarm.api.errors import ApiError, api_error_handler
 from swarm.api.routes_v1 import router as v1_router
+from swarm.api.routes_v23 import build_v23_runtime, v23_session_factory
+from swarm.api.routes_v23 import router as v23_router
 from swarm.api.store import ProductStore
 from swarm.contracts.common import new_id
 
@@ -178,11 +180,15 @@ def create_app(
     app.state.repo_root = root
     from swarm.learning import LearningRepository
     from swarm.objectives import ObjectiveRepository
-    from swarm.observability import OpsEventLog
+    from swarm.observability import OpsEventLog, SqlOpsSink
 
     app.state.objective_repo = ObjectiveRepository()
     app.state.learning_repo = LearningRepository()
-    app.state.ops_events = OpsEventLog()
+    v23_factory = v23_session_factory(bool(db_reachable))
+    app.state.ops_events = OpsEventLog(sink=SqlOpsSink(v23_factory) if v23_factory else None)
+    app.state.v23 = build_v23_runtime(
+        workers=store.workers, ops=app.state.ops_events, session_factory=v23_factory
+    )
     if not hasattr(app.state, "install_project_id"):
         app.state.install_project_id = None
 
@@ -195,6 +201,7 @@ def create_app(
         return store.health_ready()
 
     app.include_router(v1_router)
+    app.include_router(v23_router)
     return app
 
 
