@@ -48,3 +48,5 @@ Nothing else changes (attempt counting stays as is).
 - [ ] `tests/api/test_v23_ops_events_scope.py` 3 passed; `tests/broker/test_retry_after_cap.py` 7 passed.
 - [ ] `git diff src/swarm/api/routes_v1.py` touches only `list_ops_events`.
 - [ ] Existing `tests/api` and `tests/broker` pass unchanged.
+
+> Later change (EXECUTED): SW-FIX-RETRY (`b3162712`) replaced the F-06 clamp with a give-up (`retry_after_exceeds_cap`) when `Retry-After` exceeds the cap; `tests/broker/test_retry_after_cap.py` was rewritten accordingly. On a tree containing that fix, this session's F-06 test expectations no longer apply.

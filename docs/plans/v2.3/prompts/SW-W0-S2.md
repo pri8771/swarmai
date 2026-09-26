@@ -1211,6 +1211,8 @@ What to do on STOP, in this order:
 5. End the session with a final message: the condition id, the reason, the branch and the head SHA.
 Never work around a STOP by editing other files, weakening tests, or adding `skip`/`xfail`.
 
+If `tests/tools/test_v20_cancel_killbound.py` fails once in the full run and you did not touch `sandbox_runner.py` or that test, re-run the full list once. If it passes, record both result lines in the handoff under Verification and continue; if it fails twice, STOP (S3). (The known race was fixed by SW-FIX-FLAKE; a new failure is worth reporting.)
+
 ## 11. Codex review packet (put this in the PR description and in the handoff)
 ```markdown
 ### Codex review packet — SW-W0-S2

@@ -1,7 +1,7 @@
 # V2.3 implementation-complete — exit checklist
 
 Source checklist: `docs/coordination/FUTURE_VERSION_EXIT_CHECKLISTS_20260921.md` §"V2.3 implementation-complete".
-Contracts: `docs/architecture/ART-V23-SCHEDULER-CONTRACTS.md`, policy `config/v23/scheduler_policy.v1.json` (`v23-wdrr-1`).
+Contracts: `src/swarm/contracts/v23.py` (artifact `docs/artifacts/future/ART-V23-MULTIMISSION_SCHEDULER.md`), policy `config/v23/scheduler_policy.v1.json` (`v23-wdrr-1`).
 
 | Field | Value |
 |---|---|

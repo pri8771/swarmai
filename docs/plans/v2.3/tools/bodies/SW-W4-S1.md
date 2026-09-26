@@ -5,7 +5,7 @@
 4. Rewrites the status and agent docs to state **exactly** what is true: implementation-complete candidate, **not accepted**, with the external gates listed as pending or blocked.
 
 The code below was compiled and run on the fully integrated scratch tree (`dev @ 8e1c0fde` plus all 23 other sessions):
-- The full `uv run pytest` gives 763 passed, 1 skipped.
+- The full `uv run pytest` gives 763 passed, 1 skipped on the scratch tree. On the executed integration branch (after SW-FIX-ALEMBIC, `604f7ace`) it gives `778 passed, 1 skipped` with a private database; before that fix it had 4 Alembic failures (see Step 6).
 - The campaign gives `deterministic: pass` (10/10). On a VM without router, Docker or LiveGrant it reports `live_router_free_route: blocked:router_not_configured` and `compose_smoke_v20_e10: blocked_env_no_docker`.
 - ruff and mypy: clean.
 
@@ -80,6 +80,7 @@ grep -rn "a18tov30schema0001" src/swarm/cli.py src/swarm/api/routes_v1.py   # mu
 ```bash
 git clean -fdX -- var/
 uv run ruff check . && uv run mypy src/swarm
+export SWARM_DATABASE_URL=postgresql+psycopg://swarm:swarm@127.0.0.1:5432/swarm_sw_w4_s1   # private DB (section 6 creates it)
 uv run pytest -q                                     # whole suite; record passed/skipped counts
 (cd apps/console && npx vitest run && npx oxlint src) # console
 uv run python scripts/v23_acceptance_campaign.py; echo "exit=$?"
@@ -87,10 +88,11 @@ git checkout -- schemas/v1 docs/evidence/fix-004 var 2>/dev/null || true   # und
 git status --short                                   # only your owned files may appear
 ```
 - Do **not** set `SWARM_ROUTER_BASE_URL`, `SWARM_ROUTER_MODEL`, `SPLITSIGNAL_BASE_URL` or `SPLITSIGNAL_MODEL`, and do not create a LiveGrant, to "make the gate green". If the environment already injects `SPLITSIGNAL_*` secrets, leave them; the gate then honestly reads `blocked:<LiveGrant reason>`. The campaign must report the environment as it really is.
+- The whole-repo `uv run pytest -q` must pass on a tree that contains SW-FIX-ALEMBIC. If the Alembic schema tests (`test_single_alembic_head_after_upgrade`, `test_alembic_upgrade_empty_db`, `test_alembic_upgrade_preserves_populated_legacy_rows`, `test_upgrade_downgrade_upgrade`) fail with empty table sets, something in the run removed `SWARM_DATABASE_URL` from the process environment (historically the V20-S11 probe) and Alembic migrated the default `swarm` database. Record the failing tests; the authoritative checks remain the section 6 offline list and `pytest tests/integration -m integration` run separately. Do not STOP for this alone.
 - If the campaign exits 1, a probe failed. Do not edit probes. Record the failing `results[].status` and STOP (S3, section 10).
 
 ### Step 7 — `docs/v2.3/EXIT_CHECKLIST.md` (create)
-Start from the template below. Fill in every `<…>` placeholder from `docs/evidence/v23/acceptance_campaign.json` and `git rev-parse HEAD`. If an item's evidence test is missing or failing on your tree, change its status to `not done` and say why. **Never** mark item 16 done. For `<splitsignal adapter status>`: run `git cat-file -e origin/cursor/sw-v23-integration-460c:src/swarm/providers/splitsignal_client.py && echo MERGED || echo NOT_MERGED`; write `done (fake SplitSignal); live pending SW-X2-S1 (SP4)` if MERGED, else `pending: SW-X1-S1 not merged (gate SP1)`.
+Start from the template below. Fill in every `<…>` placeholder from `docs/evidence/v23/acceptance_campaign.json` and `git rev-parse HEAD`. If an item's evidence test is missing or failing on your tree, change its status to `not done` and say why. **Never** mark item 16 done. If the V20-E10 gate is `fail`, write `not done — gate fail` with the failing step and the follow-up owner; if it is `pass`, say where it ran (dev VM or operator host). For `<splitsignal adapter status>`: run `git cat-file -e origin/cursor/sw-v23-integration-460c:src/swarm/providers/splitsignal_client.py && echo MERGED || echo NOT_MERGED`; write `done (fake SplitSignal); live pending SW-X2-S1 (SP4)` if MERGED, else `pending: SW-X1-S1 not merged (gate SP1)`.
 ```markdown
 {{FILE:docs/v2.3/EXIT_CHECKLIST.md}}
 ```

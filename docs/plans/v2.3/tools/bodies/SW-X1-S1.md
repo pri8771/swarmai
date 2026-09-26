@@ -15,9 +15,9 @@ gh api "repos/pri8771/inference_server/contents/docs/api/v1/consumers/swarmai.md
   && echo "SP1 OK" || echo "SP1 MISSING"
 ```
 - `SP1 OK`: read that file (`gh api ... --jq .content | base64 -d`). Compare it with the facts in this prompt: env var names `SPLITSIGNAL_BASE_URL` / `SPLITSIGNAL_API_KEY` / `SPLITSIGNAL_MODEL`, route ids like `mock/ok`, error codes, and the `/v1/models` shape. If the doc's `/v1/models` example is a `ModelPage` (`items`) instead of `{"object":"list","data":[...]}`, that is fine: the adapter accepts both. Write the difference in the handoff under "Decisions". If the doc changes something else this prompt relies on (env var names, auth header, error envelope field names), STOP (S7) and name the difference.
-- `SP1 MISSING`: STOP (S7, section 10) with reason `external gate SP1 not reached`. Do not guess the contract.
+- `SP1 MISSING`: STOP (S7, section 10) with reason `external gate SP1 not reached`. Do not guess the contract. Exception: if the coordinator explicitly asks for the adapter before SP1, implement it against the offline fake, title the PR `[AWAITING SP1]`, write `awaiting SP1` in the handoff Status, and do not merge it.
 - These contract facts are expected and are **not** differences (joint consistency check, `docs/plans/v2.3/JOINT_PLAN.md`): the version line `Consumer contract version: swarmai-consumer 1.0.0` (any `1.x` is compatible); the six `x-ratelimit-*` headers are optional and informational (the real server sends none; the mock and the fake send demo values; the adapter ignores them); a client may strip the trailing `/v1` from `SPLITSIGNAL_BASE_URL` and append `/v1/...` itself; the usage chunk arrives only with `stream_options.include_usage` (the base client sends it).
-- Retry rule in the contract: never retry before `Retry-After` has elapsed; a client whose maximum wait is shorter gives up instead. SwarmAI's `RetryOwner` clamps waits to `max_retry_after_seconds` (30 s, SW-W0-S3). Read `src/swarm/broker/retry.py` and record in the handoff under "Decisions" whether a `Retry-After` above 30 s leads to an early retry. If it does, add under "Needs other owner": `src/swarm/broker/retry.py: when retry_after exceeds max_retry_after_seconds, give up instead of retrying at the cap (SplitSignal contract)`. Do not edit that file in this session.
+- Retry rule in the contract: never retry before `Retry-After` has elapsed; a client whose maximum wait is shorter gives up instead. Since SW-FIX-RETRY (`b3162712`), `RetryOwner.decide` returns a give-up with reason `retry_after_exceeds_cap` when `Retry-After` exceeds `max_retry_after_seconds` (30 s) or is not finite. Confirm with `grep -n retry_after_exceeds_cap src/swarm/broker/retry.py` and record the result under "Decisions". If the grep prints nothing, add under "Needs other owner": `src/swarm/broker/retry.py: when retry_after exceeds max_retry_after_seconds, give up instead of retrying at the cap (SplitSignal contract)`. Do not edit that file in this session.
 - If `gh api repos/pri8771/inference_server --jq .full_name` does not print `pri8771/inference_server`, this session cannot read the private repo: STOP (S7) with reason `inference_server not readable from this environment`.
 
 ### Step 1 — `src/swarm/providers/splitsignal_client.py` (create, exactly)
@@ -77,10 +77,10 @@ Reason: Cloud Agent environments may inject `SPLITSIGNAL_BASE_URL` as a secret. 
 Fill `<DATE>` and the blob SHA from Step 0.
 
 ### Step 8 — optional: run against the real mock (only if SP2 is reached)
-SP2 means `scripts/mock_splitsignal.py` is on `cursor/is-v23-integration-460c`. This step is optional. Its result goes into the handoff only; do not commit the mock.
+SP2 means `scripts/mock_splitsignal.py` is on `cursor/is-v23-integration-460c`. This step is optional. Its result goes into the handoff only; do not commit the mock. The mock loads `docs/api/v1/consumers/fixtures` relative to its repo root, so export that tree read-only and run the mock from there (a lone `/tmp/mock_splitsignal.py` dies with `FileNotFoundError` and the client then reports `transient:connect_error`, which is not a contract mismatch). Without a clone, fetch `scripts/mock_splitsignal.py` **and** every file under `docs/api/v1/consumers/fixtures/` with `gh api`, keeping the same relative paths under `/tmp/is-mock`.
 ```bash
-gh api "repos/pri8771/inference_server/contents/scripts/mock_splitsignal.py?ref=cursor/is-v23-integration-460c" --jq .content | base64 -d > /tmp/mock_splitsignal.py \
-  && (python3 /tmp/mock_splitsignal.py --port 8089 & echo $! > /tmp/mock.pid; sleep 1) \
+mkdir -p /tmp/is-mock && git -C <inference_server clone> archive origin/cursor/is-v23-integration-460c scripts docs/api/v1 | tar -x -C /tmp/is-mock \
+  && (cd /tmp/is-mock && python3 scripts/mock_splitsignal.py --port 8089 & echo $! > /tmp/mock.pid; sleep 2) \
   && SPLITSIGNAL_API_KEY="ss_live_00000000000000000000000000000000_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" uv run python -c "
 from swarm.providers.splitsignal_client import SplitSignalClient
 c = SplitSignalClient('http://127.0.0.1:8089/v1')
@@ -89,7 +89,7 @@ r = c.chat({'model': 'mock/ok', 'messages': [{'role': 'user', 'content': 'hi'}]}
 print(r.receipt.route_id, r.receipt.billing, r.receipt.usage_known)
 "; kill "$(cat /tmp/mock.pid)" 2>/dev/null; true
 ```
-Expected output: a list containing `mock/ok`, then `mock/ok free <True or False>` (`False` is correct when the mock's fixture reports no cost). If it differs, record the exact output under "Needs other owner" (a contract/mock mismatch for the inference_server coordinator). Do **not** change the adapter to fit the mock.
+Expected output (observed with the IS-W1-S10 mock: `['mock/ok', 'mock/quota', 'mock/unavailable']` then `mock/ok free False`): a list containing `mock/ok`, then `mock/ok free <True or False>` (`False` is correct when the mock's fixture reports no cost). If it differs, record the exact output under "Needs other owner" (a contract/mock mismatch for the inference_server coordinator). Do **not** change the adapter to fit the mock.
 
 ### Acceptance (this session)
 - [ ] Step 0 printed `SP1 OK`, and the contract facts match (or the differences are recorded).

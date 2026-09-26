@@ -340,9 +340,13 @@ def _alive(pid: int) -> bool:
         return True
     try:
         with open(f"/proc/{pid}/stat", encoding="utf-8") as fh:
-            return fh.read().split()[2] != "Z"
+            state = fh.read().rsplit(")", 1)[1].split()[0]
+    except (FileNotFoundError, ProcessLookupError):
+        # Reaped between kill(0) and the read: a zombie PID 1 just collected.
+        return False
     except OSError:
         return True
+    return state not in ("Z", "X")
 
 
 def _wait_pid(root: Path) -> int:
@@ -356,18 +360,22 @@ def _wait_pid(root: Path) -> int:
 
 def _assert_dead(pid: int) -> None:
     deadline = time.monotonic() + KILL_BOUND_SECONDS
-    while time.monotonic() < deadline and _alive(pid):
+    alive = _alive(pid)
+    while alive and time.monotonic() < deadline:
         time.sleep(0.05)
-    assert not _alive(pid), "grandchild survived the kill bound"
+        alive = _alive(pid)
+    assert not alive, "grandchild survived the kill bound"
 
 
 def test_timeout_kills_grandchildren(tmp_path: Path) -> None:
     (tmp_path / "spawn.py").write_text(SPAWNER, encoding="utf-8")
-    runner = IsolatedCodeRunner(tmp_path, timeout_seconds=1.5, memory_mb=512)
+    # Long enough that the grandchild is always spawned before the timeout fires.
+    timeout = 4.0
+    runner = IsolatedCodeRunner(tmp_path, timeout_seconds=timeout, memory_mb=512)
     started = time.monotonic()
     result = runner.run_python("spawn.py")
     assert result.timed_out and result.killed_group and not result.ok
-    assert time.monotonic() - started < 1.5 + KILL_BOUND_SECONDS
+    assert time.monotonic() - started < timeout + KILL_BOUND_SECONDS
     _assert_dead(_wait_pid(tmp_path))
 
 
@@ -375,12 +383,22 @@ def test_cancel_kills_group_before_timeout(tmp_path: Path) -> None:
     (tmp_path / "spawn.py").write_text(SPAWNER, encoding="utf-8")
     runner = IsolatedCodeRunner(tmp_path, timeout_seconds=60, memory_mb=512)
     cancel = threading.Event()
-    threading.Timer(1.0, cancel.set).start()
-    started = time.monotonic()
+    seen: dict[str, float] = {}
+
+    def _cancel_once_grandchild_exists() -> None:
+        seen["pid"] = _wait_pid(tmp_path)
+        seen["cancel_at"] = time.monotonic()
+        cancel.set()
+
+    trigger = threading.Thread(target=_cancel_once_grandchild_exists, daemon=True)
+    trigger.start()
     result = runner.run_python("spawn.py", cancel=cancel)
+    returned_at = time.monotonic()
+    trigger.join(timeout=1)
+    assert "cancel_at" in seen, "cancel was never triggered"
     assert result.cancelled and not result.timed_out and result.killed_group
-    assert time.monotonic() - started < 1.0 + KILL_BOUND_SECONDS
-    _assert_dead(_wait_pid(tmp_path))
+    assert returned_at - seen["cancel_at"] < KILL_BOUND_SECONDS
+    _assert_dead(int(seen["pid"]))
 
 
 def test_normal_run_unchanged(tmp_path: Path) -> None:
@@ -388,11 +406,27 @@ def test_normal_run_unchanged(tmp_path: Path) -> None:
     result = IsolatedCodeRunner(tmp_path).run_python("ok.py")
     assert result.ok and result.stdout.strip() == "ok"
     assert not result.cancelled and not result.killed_group
+
+
+def test_alive_treats_reaped_zombie_as_dead(monkeypatch: pytest.MonkeyPatch) -> None:
+    """kill(0) can succeed on a zombie that PID 1 reaps before /proc is read."""
+    import builtins
+
+    monkeypatch.setattr(os, "kill", lambda pid, sig: None)
+    real_open = builtins.open
+
+    def _gone(path, *a, **kw):  # type: ignore[no-untyped-def]
+        if str(path).startswith("/proc/"):
+            raise FileNotFoundError(path)
+        return real_open(path, *a, **kw)
+
+    monkeypatch.setattr(builtins, "open", _gone)
+    assert _alive(4_000_000) is False
 ```
 
 ### Step 3 — run
 ```bash
-uv run pytest tests/tools/test_v20_cancel_killbound.py -q     # 3 passed (about 3 s)
+uv run pytest tests/tools/test_v20_cancel_killbound.py -q     # 4 passed (about 5 s)
 uv run pytest tests/tools tests/foundation tests/selfdev tests/evals -q
 ```
 If the kill-bound tests fail only on macOS, record it in the handoff; CI is Linux. Do not add skips beyond the existing `win32` skip.
@@ -496,6 +530,8 @@ What to do on STOP, in this order:
 4. Open the draft PR against `cursor/sw-v23-integration-460c` with the title prefix `[BLOCKED]`, or record the compare URL `https://github.com/pri8771/swarmai/compare/cursor/sw-v23-integration-460c...cursor/v20-w1-s13-sandbox-killbound?expand=1` in the handoff.
 5. End the session with a final message: the condition id, the reason, the branch and the head SHA.
 Never work around a STOP by editing other files, weakening tests, or adding `skip`/`xfail`.
+
+If `tests/tools/test_v20_cancel_killbound.py` fails once in the full run and you did not touch `sandbox_runner.py` or that test, re-run the full list once. If it passes, record both result lines in the handoff under Verification and continue; if it fails twice, STOP (S3). (The known race was fixed by SW-FIX-FLAKE; a new failure is worth reporting.)
 
 ## 11. Codex review packet (put this in the PR description and in the handoff)
 ```markdown

@@ -494,6 +494,69 @@ sess(
 )
 
 
+# Follow-up fixes after SW-W4-S1, executed by the integrator on 2026-09-26 (EXECUTED markers in PLAN.md).
+sess(
+    "SW-FIX-RETRY",
+    title="RetryOwner gives up when upstream Retry-After exceeds the cap (SplitSignal rule)",
+    branch="cursor/sw-fix-retry-after",
+    wave="FIX",
+    deps=["SW-W4-S1"],
+    dep_paths=["src/swarm/broker/retry.py"],
+    owned=[
+        "M src/swarm/broker/retry.py",
+        "M tests/broker/test_retry_after_cap.py",
+        "M CHANGELOG.md (the F-06 line only)",
+    ],
+    tests=["tests/broker", "tests/providers"],
+    commit="fix(broker): give up when upstream Retry-After exceeds max_retry_after_seconds (SW-FIX-RETRY)",
+)
+sess(
+    "SW-FIX-COMPOSE",
+    title="Compose worker gets its own connector process healthcheck; re-run V20-E10 smoke",
+    branch="cursor/sw-fix-compose-healthcheck",
+    wave="FIX",
+    deps=["SW-W3-S5"],
+    dep_paths=["deploy/compose/product.yml", "scripts/v20_compose_smoke.sh"],
+    owned=[
+        "M deploy/compose/product.yml (service worker only)",
+        "M tests/deployment/test_product_compose.py",
+        "M docs/evidence/v20/compose-smoke/latest.json",
+        "M docs/evidence/v20/compose-smoke/README.md",
+        "M docs/v2.3/EXIT_CHECKLIST.md (V20-E10 row only)",
+        "M docs/agents/V20_TODO.md (V20-E10 row only)",
+        "M docs/agents/context.json (V20-E10 entry only)",
+    ],
+    tests=["tests/deployment"],
+    commit="fix(deploy): compose worker uses a connector process healthcheck (SW-FIX-COMPOSE)",
+)
+sess(
+    "SW-FIX-ALEMBIC",
+    title="Whole-repo pytest isolation: V20-S11 probe restores SWARM_*; Alembic tests pinned to their DB",
+    branch="cursor/sw-fix-alembic-isolation",
+    wave="FIX",
+    deps=["SW-W4-S1"],
+    dep_paths=["src/swarm/acceptance/probes.py", "tests/integration/db/test_v23_schema.py"],
+    owned=[
+        "M src/swarm/acceptance/probes.py (probe_sdk_ui_parity only)",
+        "C tests/integration/db/conftest.py",
+        "M tests/acceptance/test_campaign_harness.py (append one test)",
+    ],
+    tests=["tests/acceptance"],
+    commit="fix(tests): whole-repo pytest isolation for Alembic schema tests (SW-FIX-ALEMBIC)",
+)
+sess(
+    "SW-FIX-FLAKE",
+    title="Deterministic V20-E08 kill-bound tests",
+    branch="cursor/sw-fix-killbound-flake",
+    wave="FIX",
+    deps=["SW-W1-S13"],
+    dep_paths=["tests/tools/test_v20_cancel_killbound.py"],
+    owned=["M tests/tools/test_v20_cancel_killbound.py"],
+    tests=["tests/tools/test_v20_cancel_killbound.py"],
+    commit="test(sandbox): make the V20-E08 kill-bound tests deterministic (SW-FIX-FLAKE)",
+)
+
+
 INTEG = "cursor/sw-v23-integration-460c"
 PLAN_BRANCH = "cursor/v23-plan-460c"
 IS_INTEG = "cursor/is-v23-integration-460c"
@@ -525,6 +588,10 @@ FOCUS: dict[str, str] = {
     "SW-W3-S2": "singleton ticker per site; durable flag off by default; restore after restart",
     "SW-W4-S1": "candidate-freeze admin gate (F-16); evidence and status make no acceptance claim",
     "SW-X1-S1": "D-SS1 free admission; known non-zero cost refused; unknown cost recorded as null and never settles as zero (C3/F-13); error classes; no retry after a 200 header; key never logged",
+    "SW-FIX-RETRY": "over-cap or non-finite Retry-After is a terminal give-up (`retry_after_exceeds_cap`), never a retry at the cap; terminal classes and max_attempts keep precedence",
+    "SW-FIX-COMPOSE": "worker healthcheck never probes the API port; `disable: true` is incompatible with `compose up --wait`; evidence has no secrets; VM-local changes recorded and reverted",
+    "SW-FIX-ALEMBIC": "probe restores the caller's SWARM_* environment; Alembic migrates the database the test inspects; no assertion weakened",
+    "SW-FIX-FLAKE": "test-only; the kill bound is measured from cancel; the grandchild exists before the kill; no assertion weakened",
     "SW-X2-S1": "at most 2 live calls, approval line checked before any network call, evidence has no prompt/response text and no key",
 }
 
@@ -659,6 +726,8 @@ def _stop_section(sid: str, meta: dict) -> list[str]:
         f"4. Open the draft PR against `{INTEG}` with the title prefix `[BLOCKED]`, or record the compare URL `https://github.com/pri8771/swarmai/compare/{INTEG}...{meta['branch']}?expand=1` in the handoff.",
         "5. End the session with a final message: the condition id, the reason, the branch and the head SHA.",
         "Never work around a STOP by editing other files, weakening tests, or adding `skip`/`xfail`.",
+        "",
+        "If `tests/tools/test_v20_cancel_killbound.py` fails once in the full run and you did not touch `sandbox_runner.py` or that test, re-run the full list once. If it passes, record both result lines in the handoff under Verification and continue; if it fails twice, STOP (S3). (The known race was fixed by SW-FIX-FLAKE; a new failure is worth reporting.)",
         "",
     ]
 

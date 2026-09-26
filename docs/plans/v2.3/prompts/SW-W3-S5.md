@@ -142,7 +142,7 @@ fi
 ENV_DIR="$(mktemp -d)"
 ENV_FILE="$ENV_DIR/product.env"
 TOKEN="$(python3 -c 'import secrets; print("atk_smoke_" + secrets.token_hex(24))')"
-PG_PASSWORD="$(python3 -c 'import secrets; print(secrets.token_hex(24))')"
+PG_PASSWORD="$(python3 -c 'import secrets; print(secrets.token_hex(24))')"  # value hidden: generated per run, never echoed
 umask 077
 sed -e "s|^SWARM_SEED_LOOPBACK_TOKEN=.*|SWARM_SEED_LOOPBACK_TOKEN=$TOKEN|" \
     -e "s|^SWARM_API_AUTH_TOKEN=.*|SWARM_API_AUTH_TOKEN=$TOKEN|" \
@@ -261,19 +261,23 @@ A `blocked_*` result is honest evidence that the smoke did **not** run. It does 
 ```
 
 ### Step 3 — run it and keep whatever it produces
+If the api container stays `health: starting` and its log stops at `running alembic upgrade head`, test `docker compose … exec -T api python -c "import socket;socket.create_connection(('db',5432),3)"`. A timeout means host bridge filtering: check `sudo iptables-legacy -S FORWARD`; on a disposable VM you may run `sudo sysctl -w net.bridge.bridge-nf-call-iptables=0` and re-run. Record this environment change in the handoff and restore the value afterwards. Never change `deploy/` to work around it.
+
 ```bash
 ./scripts/v20_compose_smoke.sh; echo "exit=$?"
 cat docs/evidence/v20/compose-smoke/latest.json
 git status --short deploy/      # MUST print nothing (no product.env left behind)
 ```
 - **Exit 0 (`pass`):** commit `latest.json`. In the PR body write "V20-E10 compose smoke: pass on <OS>, docker <version>".
-- **Exit 1 (`fail`):** commit `latest.json` anyway, since it is honest evidence. List the failing `steps[].name` in the PR body. Do **not** change application code in this session; write the follow-up under "Needs other owner" in the handoff.
+- **Exit 1 (`fail`):** commit `latest.json` anyway, since it is honest evidence. List the failing `steps[].name` in the PR body. Do **not** change application code in this session; write the follow-up under "Needs other owner" in the handoff. Known historical cause (fixed by SW-FIX-COMPOSE, `e5fd04c0`): the `worker` service inherited the API image HTTP HEALTHCHECK and was always unhealthy. If `compose ps` shows `worker` unhealthy again, check that `deploy/compose/product.yml` still gives `worker:` its own process healthcheck; `healthcheck: {disable: true}` does **not** work with `compose up --wait` ("has no healthcheck configured"). Do not edit `deploy/` in this session.
 - **Exit 3 (`blocked_*`):** commit `latest.json`. In the PR body write "V20-E10 blocked_env_no_docker — needs an operator run". This does **not** mark E10 done.
 
 Before committing, confirm that `latest.json` contains no token or password value:
 ```bash
 grep -E "atk_smoke_|[0-9a-f]{48}" docs/evidence/v20/compose-smoke/latest.json && echo "LEAK — do not commit" || echo CLEAN
 ```
+
+Run the section 6 offline list **after** `git add` of your new files: `tests/release/test_release_verify.py::test_security_harden_ok` scans only tracked files, so a pre-`git add` run looks green even when the script trips a secret pattern.
 
 ## 6. Verify (run exactly; all must pass)
 ```bash
@@ -367,6 +371,8 @@ What to do on STOP, in this order:
 4. Open the draft PR against `cursor/sw-v23-integration-460c` with the title prefix `[BLOCKED]`, or record the compare URL `https://github.com/pri8771/swarmai/compare/cursor/sw-v23-integration-460c...cursor/v20-w3-s5-compose-smoke?expand=1` in the handoff.
 5. End the session with a final message: the condition id, the reason, the branch and the head SHA.
 Never work around a STOP by editing other files, weakening tests, or adding `skip`/`xfail`.
+
+If `tests/tools/test_v20_cancel_killbound.py` fails once in the full run and you did not touch `sandbox_runner.py` or that test, re-run the full list once. If it passes, record both result lines in the handoff under Verification and continue; if it fails twice, STOP (S3). (The known race was fixed by SW-FIX-FLAKE; a new failure is worth reporting.)
 
 ## 11. Codex review packet (put this in the PR description and in the handoff)
 ```markdown

@@ -23,7 +23,7 @@ The code below was compiled and run against `dev @ 8e1c0fde`. `tests/tools tests
 
 ### Step 3 — run
 ```bash
-uv run pytest tests/tools/test_v20_cancel_killbound.py -q     # 3 passed (about 3 s)
+uv run pytest tests/tools/test_v20_cancel_killbound.py -q     # 4 passed (about 5 s)
 uv run pytest tests/tools tests/foundation tests/selfdev tests/evals -q
 ```
 If the kill-bound tests fail only on macOS, record it in the handoff; CI is Linux. Do not add skips beyond the existing `win32` skip.

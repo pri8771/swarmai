@@ -61,7 +61,7 @@ fi
 ENV_DIR="$(mktemp -d)"
 ENV_FILE="$ENV_DIR/product.env"
 TOKEN="$(python3 -c 'import secrets; print("atk_smoke_" + secrets.token_hex(24))')"
-PG_PASSWORD="$(python3 -c 'import secrets; print(secrets.token_hex(24))')"
+PG_PASSWORD="$(python3 -c 'import secrets; print(secrets.token_hex(24))')"  # value hidden: generated per run, never echoed
 umask 077
 sed -e "s|^SWARM_SEED_LOOPBACK_TOKEN=.*|SWARM_SEED_LOOPBACK_TOKEN=$TOKEN|" \
     -e "s|^SWARM_API_AUTH_TOKEN=.*|SWARM_API_AUTH_TOKEN=$TOKEN|" \
