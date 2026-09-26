@@ -80,7 +80,24 @@ def test_worker_does_not_inherit_api_http_healthcheck() -> None:
     text = PRODUCT.read_text(encoding="utf-8")
     worker = _service_block(text, "worker")
     assert "swarm.workers.connector" in worker
-    assert "healthcheck:\n      disable: true" in worker
+    assert "    healthcheck:\n      test:" in worker
+    assert "/proc/1/cmdline" in worker
+    assert "disable: true" not in worker
     assert "8765/health" not in worker
     api = _service_block(text, "api")
     assert "http://127.0.0.1:8765/health/live" in api
+
+
+def test_worker_healthcheck_command_is_valid_python() -> None:
+    import subprocess
+    import sys
+
+    worker = _service_block(PRODUCT.read_text(encoding="utf-8"), "worker")
+    code_line = next(ln for ln in worker.splitlines() if "/proc/1/cmdline" in ln)
+    code = code_line.strip().removeprefix("- ").strip('"')
+    result = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, check=False
+    )
+    # PID 1 of the test host is not the connector: a clean "unhealthy" exit, no traceback.
+    assert result.returncode == 1
+    assert result.stderr == ""
