@@ -42,10 +42,10 @@ tree: ebe199b404c718912a893afef76ebbd2d4dfee3e dirty=0
 - [x] The Codex review packet (section 11) is in the PR description and the handoff.
 ## Decisions
 - D-SS1 (coordinator-accepted 2026-09-26, C3; the owner may override): a route listed by SplitSignal's `/v1/models` under SwarmAI's key is admitted as `billing: free`; a response whose `splitsignal.cost.amount` is a known non-zero decimal is refused after the fact with `policy_denied / paid_route_forbidden` (receipt keeps `billing: paid`); an unknown cost (`amount: null`) is recorded as unknown (`cost_amount = None`, `cost_source = "unknown"`, never 0) and the receipt has `usage_known = False`, so accounting keeps the hold committed (F-13); a `ModelPage` body's `cost_class` is authoritative (adapter accepts both shapes, C4).
-- Retry-After: `RetryOwner.decide` (SW-W0-S3) clamps waits to `max_retry_after_seconds` (30 s), so a `Retry-After` above 30 s **does** lead to an early retry at the cap, contrary to the SplitSignal rule "never retry before Retry-After has elapsed".
+- Retry-After: `RetryOwner.decide` (SW-W0-S3) clamps waits to `max_retry_after_seconds` (30 s), so a `Retry-After` above 30 s **does** lead to an early retry at the cap, contrary to the SplitSignal rule "never retry before Retry-After has elapsed". (Follow-up: fixed on the integration branch by SW-FIX-RETRY; see Needs other owner.)
 - Tests ran against the private Postgres DB `swarm_sw460c`.
 ## Needs other owner
-- `src/swarm/broker/retry.py`: when retry_after exceeds max_retry_after_seconds, give up instead of retrying at the cap (SplitSignal contract).
+- ~~`src/swarm/broker/retry.py`: when retry_after exceeds max_retry_after_seconds, give up instead of retrying at the cap (SplitSignal contract).~~ Resolved by SW-FIX-RETRY (`cursor/sw-fix-retry-after-460c` head `a42a94bd`, merged into `cursor/sw-v23-integration-460c` at `b3162712`): over-cap or non-finite `Retry-After` → give-up `retry_after_exceeds_cap`. This adapter does not call `decide` itself (it only records `retry_after_s` on the receipt), so no code change here; trial merge of this branch with the fix is clean and `tests/providers tests/pursuit tests/broker` → `162 passed`.
 - Coordinator: merge only after SP1 (IS-W1-S10 merged into `cursor/is-v23-integration-460c`) and a re-read of the merged `swarmai.md`.
 ## Status
 implemented / offline-tested only — awaiting SP1 (IS-W1-S10 not merged into cursor/is-v23-integration-460c); NOT merged into the integration branch
