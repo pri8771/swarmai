@@ -83,6 +83,24 @@ def test_partial_failure_compensates_everything() -> None:
     assert intent.failure_reason is not None and "worker" in intent.failure_reason
 
 
+def test_reservation_exception_text_is_not_persisted() -> None:
+    def fail_with_secret(
+        _intent: DispatchIntent, _comp: DispatchIntentComponent
+    ) -> str:
+        raise RuntimeError("api_key=should-never-reach-a-receipt")
+
+    store = InMemorySchedulingStore()
+    service = DispatchIntentService(
+        store,
+        reserve=fail_with_secret,
+        release=lambda _intent, _comp: None,
+        clock=Clock(),
+    )
+    intent = _prepare(service)
+    assert intent.state == DispatchIntentState.COMPENSATED
+    assert intent.failure_reason == "reserve_failed:provider:RuntimeError"
+
+
 def test_crash_after_external_reserve_is_recovered() -> None:
     cap = FakeCapacity()
     clock = Clock()
