@@ -25,4 +25,4 @@
 - Elapsed reliability campaign results
 - Invented lead accept or LiveGrant
 - Two-host proof from local processes
-- V2.0 eng depth complete: E03–E06 and E08–E09 are now implemented and offline-tested with evidence on the V2.3 integration branch (`docs/v2.3/EXIT_CHECKLIST.md`); E10 compose smoke ran and **failed** (worker healthcheck; follow-up); E07's live run and E11 stay open
+- V2.0 eng depth complete: E03–E06 and E08–E09 are now implemented and offline-tested with evidence on the V2.3 integration branch (`docs/v2.3/EXIT_CHECKLIST.md`); E10 compose smoke `pass` on a dev VM after the worker healthcheck fix (SW-FIX-COMPOSE; not an operator host); E07's live run and E11 stay open

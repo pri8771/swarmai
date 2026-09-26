@@ -15,15 +15,17 @@ All notable changes to SwarmAI are documented here.
 - F-13: unknown-usage holds never free budget; release requires reconciliation evidence.
 - F-14: single `CURRENT_SCHEMA_REVISION` pinned to the Alembic head.
 - F-16: `POST /v1/release/candidate-freeze` is admin-only.
+- V20-E10: compose `worker` no longer inherits the API HTTP healthcheck (connector process check) (SW-FIX-COMPOSE).
+- Tests: acceptance probe V20-S11 no longer clears `SWARM_*` for the rest of the process, which had sent Alembic schema tests to the default database in whole-repo runs (SW-FIX-ALEMBIC); V20-E08 kill-bound tests made deterministic (SW-FIX-FLAKE).
 - F-06: upstream `Retry-After` bounded; a value above `max_retry_after_seconds` (or non-finite) is now a terminal give-up (`retry_after_exceeds_cap`), never a retry at the cap (SW-FIX-RETRY).
 
 ### Evidence
-- `docs/evidence/v23/acceptance_campaign.json`: deterministic 10/10 pass; live router `blocked:router_not_configured`; compose smoke `fail`; multi-process `pending_owner_approval`.
+- `docs/evidence/v23/acceptance_campaign.json`: deterministic 10/10 pass; live router `blocked:router_not_configured`; compose smoke `pass` (re-run on `1b3f48ad` after SW-FIX-*; dev VM); multi-process `pending_owner_approval`.
 - `docs/v2.3/EXIT_CHECKLIST.md`.
 
 ### Notes
 - Not accepted. Multi-process gate pending owner approval. Zero spend (no provider calls; cost unknown ≠ $0).
-- SplitSignal adapter (SW-X1-S1) awaiting inference_server SP1; not merged. V20-E10 compose smoke fails on the worker healthcheck (follow-up).
+- SplitSignal adapter (SW-X1-S1) awaiting inference_server SP1; not merged.
 
 ## Unreleased (V2.3 tracking reset)
 

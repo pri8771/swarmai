@@ -15,8 +15,8 @@ v20_work: "V23_ENGINEERING_ACTIVE"
 |---|---|
 | origin/dev | `8e1c0fdec24c131e7612d88076220945230f4c3b` |
 | origin/dev_subject | Merge pull request #69 from pri8771/cursor/v20-agents-context-6612 |
-| origin/cursor/sw-v23-integration-460c | `10fd924efd866fbaa8ce7348b24aad3019a13ecc` |
-| origin/cursor/sw-v23-integration-460c_subject | Merge cursor/sw-w3-s5-460c into cursor/sw-v23-integration-460c (SW-W3-S5) |
+| origin/cursor/sw-v23-integration-460c | `1b3f48ad2a1d27cb4d485416502cdd3ba2d12796` |
+| origin/cursor/sw-v23-integration-460c_subject | Merge cursor/sw-fix-killbound-flake-460c into cursor/sw-v23-integration-460c (SW-FIX-FLAKE) |
 | origin/main | `08b910f981eff2ab66873a71055090f2c60f2a91` |
 | origin/main_status | UNTOUCHED |
 | alembic_head | `a23opsplatform0001` |
