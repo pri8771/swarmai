@@ -107,8 +107,8 @@ Coordinator decisions (owner may override):
 Pre-approvals (exact lines; SW-X2-S1 reads the A3 line):
 - SW-PREAPPROVAL-A1: APPROVED 2026-09-26 (pause lift, B-01)
 - SW-PREAPPROVAL-A2: APPROVED 2026-09-26 (Codex reviewer, D2)
-- SW-PREAPPROVAL-A3: PENDING (SplitSignal live smoke; wording in OWNER_PREFLIGHT Part 3)
-- SW-PREAPPROVAL-A5: PENDING (multi-process/private evidence run; wording in OWNER_PREFLIGHT Part 3)
+- SW-PREAPPROVAL-A3: APPROVED 2026-09-26 (owner, chat) (SplitSignal live smoke; wording in OWNER_PREFLIGHT Part 3)
+- SW-PREAPPROVAL-A5: APPROVED 2026-09-26 (owner, chat) (multi-process/private evidence run; wording in OWNER_PREFLIGHT Part 3)
 
 ## DEC-V23-002: Cross-reference — owner decisions D7 and D8 (2026-09-26)
 
