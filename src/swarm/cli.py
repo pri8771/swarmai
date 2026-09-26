@@ -10,6 +10,7 @@ from pathlib import Path
 
 import uvicorn
 
+from swarm import cli_v23
 from swarm.broker.explain import explain_capacity
 from swarm.contracts.fixtures import sample_mission, sample_task
 from swarm.controller.mission import MissionController, spawn_proposal
@@ -115,6 +116,7 @@ def cmd_providers_canary(
 def main() -> None:
     parser = argparse.ArgumentParser(prog="swarm", description="SwarmAI local CLI")
     sub = parser.add_subparsers(dest="command", required=True)
+    cli_v23.register(sub)
 
     serve = sub.add_parser("serve", help="Run the local API")
     serve.add_argument("--host", default="127.0.0.1")
@@ -539,6 +541,8 @@ def main() -> None:
     part.add_argument("mission_id")
 
     args = parser.parse_args()
+    if cli_v23.dispatch(args):
+        return
     if args.command == "serve":
         cmd_serve(args.host, args.port)
     elif args.command == "api" and args.api_command == "export-openapi":
