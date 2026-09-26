@@ -22,4 +22,8 @@ Secrets are handled like this:
 
 There is no spend: `SWARM_ALLOW_PAID=false` and there is no provider network.
 
+The `worker` service has its own process healthcheck (PID 1 is `swarm.workers.connector` and not a zombie); it must not inherit the image's API HTTP HEALTHCHECK, and `healthcheck: {disable: true}` is not an option because `docker compose up --wait` rejects containers without a healthcheck.
+
+If the api stays `health: starting` with its log stopped at `alembic upgrade head`, container-to-container traffic is being filtered by the host (seen on a VM with leftover `iptables-legacy` `FORWARD DROP`); fix the host, not `deploy/`.
+
 A `blocked_*` result is honest evidence that the smoke did **not** run. It does not satisfy V20-E10. Only a `pass` run by an operator with Docker does.

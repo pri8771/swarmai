@@ -61,3 +61,43 @@ def test_product_env_example_has_no_real_secrets() -> None:
     assert "SWARM_SEED_LOOPBACK_TOKEN" in text
     assert "SWARM_PG_PASSWORD" in text
     assert "SWARM_CONSOLE_HOST_PORT" in text
+
+
+def _service_block(text: str, name: str) -> str:
+    start = text.index(f"\n  {name}:\n")
+    rest = text[start + 1 :]
+    lines = rest.splitlines()
+    block = [lines[0]]
+    for line in lines[1:]:
+        if line and not line.startswith("    ") and line.strip():
+            break
+        block.append(line)
+    return "\n".join(block)
+
+
+def test_worker_does_not_inherit_api_http_healthcheck() -> None:
+    """V20-E10: the image HEALTHCHECK curls :8765, which the connector never serves."""
+    text = PRODUCT.read_text(encoding="utf-8")
+    worker = _service_block(text, "worker")
+    assert "swarm.workers.connector" in worker
+    assert "    healthcheck:\n      test:" in worker
+    assert "/proc/1/cmdline" in worker
+    assert "\n      disable: true" not in worker
+    assert "8765/health" not in worker
+    api = _service_block(text, "api")
+    assert "http://127.0.0.1:8765/health/live" in api
+
+
+def test_worker_healthcheck_command_is_valid_python() -> None:
+    import subprocess
+    import sys
+
+    worker = _service_block(PRODUCT.read_text(encoding="utf-8"), "worker")
+    code_line = next(ln for ln in worker.splitlines() if "/proc/1/cmdline" in ln)
+    code = code_line.strip().removeprefix("- ").strip('"')
+    result = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, check=False
+    )
+    # PID 1 of the test host is not the connector: a clean "unhealthy" exit, no traceback.
+    assert result.returncode == 1
+    assert result.stderr == ""

@@ -44,7 +44,7 @@ Legend: **done**, meaning implemented with a deterministic test and, where it sa
 | V20-E07 native model/tool loop | implemented; **live run blocked** (`blocked:router_not_configured`) | `tests/pursuit/test_v20_native_loop.py` |
 | V20-E08 sandbox cancel kill-bound | done | `tests/tools/test_v20_cancel_killbound.py` |
 | V20-E09 console ops surface | done | `apps/console/src/ops.test.tsx` |
-| V20-E10 compose full-path smoke | **not done** — gate `fail`: first real Docker run; `worker` service inherits the API image HEALTHCHECK and is always unhealthy (follow-up on `deploy/compose/product.yml`) | `docs/evidence/v20/compose-smoke/latest.json` |
+| V20-E10 compose full-path smoke | implemented; smoke `pass` (17/17 steps, incl. after api restart) on the dev VM (Docker 29.1.3, compose v2.40.3) at `6f85edc7` after SW-FIX-COMPOSE gave `worker` a connector process healthcheck (it inherited the API HTTP HEALTHCHECK and was always unhealthy). VM-local env change for the run: `net.bridge.bridge-nf-call-iptables=0` (leftover `iptables-legacy` FORWARD DROP), reverted after; not an operator/production host; not independently reviewed | `docs/evidence/v20/compose-smoke/latest.json`, `tests/deployment/test_product_compose.py` |
 | V20-E11 | deferred (out of scope) | — |
 
 ## Not claimed

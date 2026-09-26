@@ -108,6 +108,21 @@ services:
     working_dir: /app
     entrypoint: ["/app/.venv/bin/python"]
     command: ["-m", "swarm.workers.connector"]
+    # The image HEALTHCHECK probes the API's HTTP port, which the connector never
+    # serves. The connector keeps no local heartbeat (it heartbeats to the API,
+    # where lease TTLs track progress), so this is a process check: PID 1 is the
+    # connector and not a zombie. `disable: true` is not usable here because
+    # `docker compose up --wait` rejects containers without a healthcheck.
+    healthcheck:
+      test:
+        - "CMD"
+        - "/app/.venv/bin/python"
+        - "-c"
+        - "import sys; c = open('/proc/1/cmdline', 'rb').read(); st = open('/proc/1/stat').read().rsplit(')', 1)[1].split()[0]; sys.exit(0 if b'swarm.workers.connector' in c and st not in ('Z', 'X') else 1)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     networks:
       - product_net
     deploy:

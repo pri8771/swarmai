@@ -83,7 +83,7 @@
     {"id": "V20-E07", "pri": "P1", "status": "implemented_live_blocked", "gate": "blocked:router_not_configured", "next": "SW-X1-S1 (awaiting SP1), SW-X2-S1"},
     {"id": "V20-E08", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S13"]},
     {"id": "V20-E09", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S12"]},
-    {"id": "V20-E10", "pri": "P2", "status": "open", "gate": "fail", "evidence": "docs/evidence/v20/compose-smoke/latest.json", "follow_up": "deploy/compose/product.yml worker healthcheck"},
+    {"id": "V20-E10", "pri": "P2", "status": "implemented", "gate": "pass", "evidence": "docs/evidence/v20/compose-smoke/latest.json", "note": "dev VM Docker run after SW-FIX-COMPOSE worker healthcheck; not independently reviewed"},
     {"id": "V20-E11", "pri": "P2", "status": "deferred"}
   ],
   "open_prs_session": [
