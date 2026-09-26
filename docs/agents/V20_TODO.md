@@ -30,7 +30,7 @@ verified_at: 2026-09-26T02:03Z
 | V20-E04 | P1 | implemented | E03 helpful | SW-W1-S10 `cursor/sw-w1-s10-460c` + SW-W3-S2 `cursor/sw-w3-s2-460c` | persist usage ledger holds + pursuit lessons across restart |
 | V20-E05 | P1 | implemented | L3 fences present | SW-W1-S11 `cursor/sw-w1-s11-460c` + SW-W2-S2 `cursor/sw-w2-s2-460c` | bounded native model/tool loop behind fake HTTP (not extract-only) |
 | V20-E06 | P1 | implemented | E03/E04 preferred | SW-W1-S4 `cursor/sw-w1-s4-460c` + SW-W3-S2 `cursor/sw-w3-s2-460c` | singleton coordinator pursuit service (HTTP tick ≠ scheduler) |
-| V20-E07 | P1 | implemented; live run via SplitSignal is SW-X2-S1 (blocked:router_not_configured) | E05 preferred | SW-W2-S2 `cursor/sw-w2-s2-460c`; SW-X1-S1 `cursor/sw-x1-s1-460c` awaiting SP1 | live adapter after approved grant OR honest blocked_missing_implementation; fake/free first; no invent grant |
+| V20-E07 | P1 | implemented; live run via SplitSignal is SW-X2-S1 (blocked:router_not_configured) | E05 preferred | SW-W2-S2 `cursor/sw-w2-s2-460c`; SW-X1-S1 `cursor/sw-x1-s1-460c` merged (SP1/SP2 reached) | live adapter after approved grant OR honest blocked_missing_implementation; fake/free first; no invent grant |
 | V20-E08 | P2 | implemented | — | SW-W1-S13 `cursor/sw-w1-s13-460c` | cancel child-process kill-bound ≤10s non-Python |
 | V20-E09 | P2 | implemented | L3 APIs | SW-W1-S12 `cursor/sw-w1-s12-460c` | console/SDK drain+revoke parity |
 | V20-E10 | P2 | implemented — smoke `pass` on dev VM after worker healthcheck fix (not independently reviewed) | tip as-is | SW-W3-S5 `cursor/sw-w3-s5-460c` + SW-FIX-COMPOSE `cursor/sw-fix-compose-healthcheck-460c` | product compose full-path smoke (Docker); packaging-only ≠ smoke |

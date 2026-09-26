@@ -15,7 +15,7 @@
   "refs": {
     "origin_dev": "8e1c0fdec24c131e7612d88076220945230f4c3b",
     "origin_dev_subject": "Merge pull request #69 from pri8771/cursor/v20-agents-context-6612",
-    "origin_cursor_sw_v23_integration_460c": "1b3f48ad2a1d27cb4d485416502cdd3ba2d12796",
+    "origin_cursor_sw_v23_integration_460c": "2b27bc200ec5938715b853eec7156d30c62d3d5c",
     "origin_cursor_sw_v23_integration_460c_subject": "Merge cursor/sw-w3-s5-460c into cursor/sw-v23-integration-460c (SW-W3-S5)",
     "origin_main": "08b910f981eff2ab66873a71055090f2c60f2a91",
     "origin_main_status": "UNTOUCHED",
@@ -80,7 +80,7 @@
     {"id": "V20-E04", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S10", "SW-W3-S2"]},
     {"id": "V20-E05", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S11", "SW-W2-S2"]},
     {"id": "V20-E06", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S4", "SW-W3-S2"]},
-    {"id": "V20-E07", "pri": "P1", "status": "implemented_live_blocked", "gate": "blocked:router_not_configured", "next": "SW-X1-S1 (awaiting SP1), SW-X2-S1"},
+    {"id": "V20-E07", "pri": "P1", "status": "implemented_live_blocked", "gate": "blocked:router_not_configured", "next": "SW-X2-S1 (SW-X1-S1 merged; SP1/SP2 reached, SP3-SP6 pending)"},
     {"id": "V20-E08", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S13"]},
     {"id": "V20-E09", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S12"]},
     {"id": "V20-E10", "pri": "P2", "status": "implemented", "gate": "pass", "evidence": "docs/evidence/v20/compose-smoke/latest.json", "note": "dev VM Docker run after SW-FIX-COMPOSE worker healthcheck; not independently reviewed"},
