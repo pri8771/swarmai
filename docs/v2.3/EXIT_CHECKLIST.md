@@ -5,7 +5,7 @@ Contracts: `src/swarm/contracts/v23.py` (artifact `docs/artifacts/future/ART-V23
 
 | Field | Value |
 |---|---|
-| Tree | `origin/cursor/sw-v23-integration-460c` @ `723f6e55da6ac4293d385a197a7a1bd78603a640` (campaign `source_sha`; session branch `cursor/sw-w4-s1-460c`, based on integration tip `10fd924efd866fbaa8ce7348b24aad3019a13ecc` |
+| Tree | `origin/cursor/sw-v23-integration-460c` @ `1b3f48ad2a1d27cb4d485416502cdd3ba2d12796` (campaign `source_sha`, re-run after the follow-up fixes SW-FIX-RETRY (`b3162712`), SW-FIX-COMPOSE (`e5fd04c0`), SW-FIX-ALEMBIC (`604f7ace`), SW-FIX-FLAKE (`1b3f48ad`); first run was on `723f6e55`, SW-W4-S1) |
 | Schema head | `a23opsplatform0001` (`CURRENT_SCHEMA_REVISION`) |
 | Campaign | `docs/evidence/v23/acceptance_campaign.json` (`freeze_id` `v23-acceptance-deterministic-20260926`) |
 | Deterministic probes | `10/10` pass |
@@ -53,3 +53,12 @@ Legend: **done**, meaning implemented with a deterministic test and, where it sa
 - Multi-process / private-infrastructure evidence (V23-A11).
 - A live model call through inference_server, unless the owner granted a LiveGrant **and** it is recorded in the campaign.
 - Any spend. `spend_usd` is 0.0 because no provider was called, not because costs were measured as zero.
+
+## Follow-up fixes (after SW-W4-S1)
+Each merged into `cursor/sw-v23-integration-460c` with `--no-ff` after ruff, mypy, one Alembic head, the offline CI list and the Postgres integration run passed on the tip. Status: implemented / offline-tested; not independently reviewed.
+| Fix | Merge | What changed |
+|---|---|---|
+| SW-FIX-RETRY | `b3162712` | `RetryOwner.decide`: `Retry-After` above `max_retry_after_seconds` (or non-finite) → give-up `retry_after_exceeds_cap`, never a retry at the cap (SplitSignal rule) |
+| SW-FIX-COMPOSE | `e5fd04c0` | compose `worker` has a connector process healthcheck; V20-E10 smoke `pass` (17/17) on the dev VM |
+| SW-FIX-ALEMBIC | `604f7ace` | V20-S11 probe restores `SWARM_*`; Alembic tests pinned to their DB; whole-repo `uv run pytest -q` → `778 passed, 1 skipped` (was 4 failed) |
+| SW-FIX-FLAKE | `1b3f48ad` | V20-E08 kill-bound tests deterministic (reaped-zombie race in the helper; cancel after the grandchild exists) |

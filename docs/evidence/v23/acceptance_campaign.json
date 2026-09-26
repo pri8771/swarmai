@@ -1,8 +1,8 @@
 {
   "packet": "V23-ACCEPTANCE-CAMPAIGN",
-  "started_at": "2026-09-26T02:01:23.825762+00:00",
-  "finished_at": "2026-09-26T02:01:24.377676+00:00",
-  "source_sha": "723f6e55da6ac4293d385a197a7a1bd78603a640",
+  "started_at": "2026-09-26T02:52:45.403779+00:00",
+  "finished_at": "2026-09-26T02:52:46.007090+00:00",
+  "source_sha": "1b3f48ad2a1d27cb4d485416502cdd3ba2d12796",
   "schema_revision": "a23opsplatform0001",
   "freeze_id": "v23-acceptance-deterministic-20260926",
   "policy_version": "v23-wdrr-1",
@@ -10,7 +10,7 @@
     "deterministic": "pass",
     "multi_process_private": "pending_owner_approval",
     "live_router_free_route": "blocked:router_not_configured",
-    "compose_smoke_v20_e10": "fail",
+    "compose_smoke_v20_e10": "pass",
     "durable_postgres_flag": false
   },
   "deterministic_passed": 10,

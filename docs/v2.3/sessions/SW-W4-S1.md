@@ -42,3 +42,6 @@ tree: e652c397df6ede051f6de965df9e9d20b1f58d83 dirty=0
 - Test isolation: offline tests in `tests/workers/` and `tests/knowledge/` should not `drop_all` the database the Alembic integration tests use (pre-existing whole-repo run failures).
 ## Status
 implemented / offline-tested only (NOT accepted; needs independent Codex review)
+
+## Follow-up (after merge)
+The three "Needs other owner" items and the SW-W1-S13 flake were fixed by SW-FIX-RETRY (`b3162712`), SW-FIX-COMPOSE (`e5fd04c0`), SW-FIX-ALEMBIC (`604f7ace`), SW-FIX-FLAKE (`1b3f48ad`) (handoffs in this directory). Campaign re-run on `1b3f48ad`: deterministic `pass` 10/10, `compose_smoke_v20_e10: pass`, other gates unchanged. Whole-repo `uv run pytest -q` (private DB): `778 passed, 1 skipped` — the 4 Alembic failures above were caused by the V20-S11 probe clearing `SWARM_DATABASE_URL`, not by `drop_all` in offline tests. Status: implemented / offline-tested.
