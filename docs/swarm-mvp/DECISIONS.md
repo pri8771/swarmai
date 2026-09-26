@@ -73,3 +73,12 @@
 | Date Recorded | 2026-09-25 |
 | Status | accepted |
 | Related Files | `STATE.md`, `SOURCE_BASELINE.json` |
+
+## DEC-V23-001: Owner pre-approvals for V2.3 (2026-09-26)
+
+The owner approved these grants in chat on 2026-09-26. The full scope and
+wording are recorded in `docs/plans/v2.3/OWNER_PREFLIGHT.md` on
+`cursor/v23-plan-460c`.
+
+- SW-PREAPPROVAL-A3: APPROVED 2026-09-26 (owner, chat) (SplitSignal live smoke; at most 2 chat calls, `max_tokens` 16, free route, $0, gated on SP4/SP5, joint live-call maximum 7)
+- SW-PREAPPROVAL-A5: APPROVED 2026-09-26 (owner, chat) (multi-process/private-infrastructure evidence run; no provider/model calls, no deploy)

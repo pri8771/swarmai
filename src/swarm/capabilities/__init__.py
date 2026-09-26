@@ -1,11 +1,23 @@
-"""V2.3 capability packs — extend extension trust model, no new permission engine."""
+"""V2.3 capability packs — extend extension trust model, no new permission engine.
+
+Two signature modes:
+
+* **keyed** (production): ``CapabilityPackRegistry(trusted_keys=...)``. Signatures
+  must be ``hmac-sha256-v1:`` from a trusted publisher (see ``signing.py``);
+  unkeyed digests are refused.
+* **legacy** (fixtures only, ``trusted_keys=None``): the historical unkeyed
+  sha256 digest. It proves integrity, not authorship (F-02) and must not be used
+  on operational paths.
+"""
 
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Mapping
 
 from pydantic import Field
 
+from swarm.capabilities.signing import is_keyed_signature, verify_manifest
 from swarm.contracts.common import StrictModel, new_id
 from swarm.extensions.registry import ExtensionAuthzError
 
@@ -48,21 +60,38 @@ def _expected_signature(manifest: CapabilityPackManifest) -> str:
 
 
 class CapabilityPackRegistry:
-    def __init__(self, *, require_signature: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        require_signature: bool = False,
+        trusted_keys: Mapping[str, bytes] | None = None,
+    ) -> None:
         self.require_signature = require_signature
+        self.trusted_keys = dict(trusted_keys) if trusted_keys is not None else None
         self._packs: dict[tuple[str, str], CapabilityPackManifest] = {}
         self._grants: dict[tuple[str, str, str], ProjectPackGrant] = {}
+
+    @property
+    def keyed(self) -> bool:
+        return self.trusted_keys is not None
+
+    def _check_signature(self, manifest: CapabilityPackManifest) -> None:
+        if not manifest.signature:
+            if self.require_signature:
+                raise ExtensionAuthzError("pack_signature_required")
+            return
+        if self.trusted_keys is not None:
+            verify_manifest(manifest, trusted_keys=self.trusted_keys)
+            return
+        if is_keyed_signature(manifest.signature):
+            raise ExtensionAuthzError("pack_keyed_signature_needs_trusted_keys")
+        if manifest.signature != _expected_signature(manifest):
+            raise ExtensionAuthzError("pack_signature_invalid")
 
     def register(self, manifest: CapabilityPackManifest) -> None:
         if manifest.revoked:
             raise ExtensionAuthzError("pack_revoked")
-        if self.require_signature:
-            if not manifest.signature:
-                raise ExtensionAuthzError("pack_signature_required")
-            if manifest.signature != _expected_signature(manifest):
-                raise ExtensionAuthzError("pack_signature_invalid")
-        elif manifest.signature and manifest.signature != _expected_signature(manifest):
-            raise ExtensionAuthzError("pack_signature_invalid")
+        self._check_signature(manifest)
         self._packs[(manifest.pack_id, manifest.version)] = manifest
 
     def revoke(self, pack_id: str, version: str) -> None:
@@ -77,8 +106,7 @@ class CapabilityPackRegistry:
             raise ExtensionAuthzError("pack_missing")
         if pack.revoked:
             raise ExtensionAuthzError("pack_revoked")
-        if pack.signature and pack.signature != _expected_signature(pack):
-            raise ExtensionAuthzError("pack_signature_invalid")
+        self._check_signature(pack)
         return pack
 
     def grant(self, grant: ProjectPackGrant) -> ProjectPackGrant:
@@ -99,4 +127,5 @@ class CapabilityPackRegistry:
 
     @staticmethod
     def sign(manifest: CapabilityPackManifest) -> CapabilityPackManifest:
+        """Legacy unkeyed digest (fixtures only). Use signing.sign_manifest for real packs."""
         return manifest.model_copy(update={"signature": _expected_signature(manifest)})

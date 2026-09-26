@@ -1,0 +1,99 @@
+{
+  "schema_version": "1",
+  "scenario": "V20-E10-compose-full-path-smoke",
+  "status": "pass",
+  "reason": "all probes returned the expected status",
+  "compose_file": "deploy/compose/product.yml",
+  "git_sha": "6f85edc7c540a8748f1559ec9715777de28ecc39",
+  "started_at": "2026-09-26T02:22:25Z",
+  "finished_at": "2026-09-26T02:22:53Z",
+  "steps": [
+    {
+      "name": "compose_up",
+      "ok": true,
+      "http_status": "000"
+    },
+    {
+      "name": "first_boot.health_live",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "first_boot.health_ready",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "first_boot.unauthenticated_rejected",
+      "ok": true,
+      "http_status": "401"
+    },
+    {
+      "name": "first_boot.scheduler_queues",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "first_boot.ops_events",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "first_boot.foreign_project_forbidden",
+      "ok": true,
+      "http_status": "403"
+    },
+    {
+      "name": "first_boot.console_healthz",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "first_boot.console_proxies_api",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.health_live",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.health_ready",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.unauthenticated_rejected",
+      "ok": true,
+      "http_status": "401"
+    },
+    {
+      "name": "after_api_restart.scheduler_queues",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.ops_events",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.foreign_project_forbidden",
+      "ok": true,
+      "http_status": "403"
+    },
+    {
+      "name": "after_api_restart.console_healthz",
+      "ok": true,
+      "http_status": "200"
+    },
+    {
+      "name": "after_api_restart.console_proxies_api",
+      "ok": true,
+      "http_status": "200"
+    }
+  ],
+  "secrets": "generated per run in a temp file outside the repo; never recorded",
+  "spend": "none (SWARM_ALLOW_PAID=false, no provider network)"
+}

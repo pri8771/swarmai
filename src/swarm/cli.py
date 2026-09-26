@@ -10,6 +10,7 @@ from pathlib import Path
 
 import uvicorn
 
+from swarm import cli_v23
 from swarm.broker.explain import explain_capacity
 from swarm.contracts.fixtures import sample_mission, sample_task
 from swarm.controller.mission import MissionController, spawn_proposal
@@ -115,6 +116,7 @@ def cmd_providers_canary(
 def main() -> None:
     parser = argparse.ArgumentParser(prog="swarm", description="SwarmAI local CLI")
     sub = parser.add_subparsers(dest="command", required=True)
+    cli_v23.register(sub)
 
     serve = sub.add_parser("serve", help="Run the local API")
     serve.add_argument("--host", default="127.0.0.1")
@@ -539,6 +541,8 @@ def main() -> None:
     part.add_argument("mission_id")
 
     args = parser.parse_args()
+    if cli_v23.dispatch(args):
+        return
     if args.command == "serve":
         cmd_serve(args.host, args.port)
     elif args.command == "api" and args.api_command == "export-openapi":
@@ -568,6 +572,7 @@ def main() -> None:
         print(json.dumps(OutageDrillHarness().run_local(commit_sha=sha).to_dict(), indent=2))
     elif args.command == "recovery" and args.recovery_command == "backup":
         from swarm.recovery import BackupService
+        from swarm.release.candidate import CURRENT_SCHEMA_REVISION
 
         out = args.out or (_repo_root() / "var" / "recovery" / "backups")
         sha = subprocess.check_output(
@@ -577,7 +582,7 @@ def main() -> None:
             site_id=args.site_id,
             epoch=args.epoch,
             commit_sha=sha,
-            schema_revision="a18tov30schema0001",
+            schema_revision=CURRENT_SCHEMA_REVISION,
             secret_ref_names=["SWARM_DATABASE_URL"],
         )
         print(json.dumps(backup_manifest.to_dict(), indent=2))
@@ -1069,13 +1074,13 @@ def main() -> None:
     elif args.command == "release" and args.release_command == "candidate-freeze":
         import subprocess as _sp
 
-        from swarm.release.candidate import CandidateFreezer
+        from swarm.release.candidate import CURRENT_SCHEMA_REVISION, CandidateFreezer
 
         sha = _sp.check_output(
             ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
         ).strip()
         candidate_manifest = CandidateFreezer(_repo_root()).freeze(
-            source_sha=sha, schema_revision="a18tov30schema0001"
+            source_sha=sha, schema_revision=CURRENT_SCHEMA_REVISION
         )
         print(json.dumps(candidate_manifest.to_dict(), indent=2))
     elif args.command == "acceptance" and args.acceptance_command == "freeze":

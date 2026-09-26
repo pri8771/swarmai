@@ -25,7 +25,7 @@ DATABASE_URL = os.environ.get(
 )
 PREVIOUS_HEAD = "a17effect004a0001"
 # Tip after ART-V20 pursuit persistence (must stay a single head).
-NEW_HEAD = "a20pursuitpersist0001"
+NEW_HEAD = "a23opsplatform0001"
 
 
 def _alembic_config(url: str) -> Config:

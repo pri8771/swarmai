@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from swarm.contracts.common import new_id
 from swarm.goals.models import Goal, GoalError, GoalKind, GoalStatus, GoalStore
 from swarm.pursuit.accounting import AccountingError, GoalResourceLedger
+from swarm.pursuit.durable_accounting import HoldStore, bind_durable_ledger
 from swarm.pursuit.frontier import assess_gap, build_frontier, choose_contribution
 from swarm.pursuit.learning import PursuitLessonStore
 from swarm.pursuit.models import (
@@ -28,6 +29,9 @@ from swarm.pursuit.verification import (
     issue_criterion_receipt,
     verify_execution_outcome,
 )
+
+if TYPE_CHECKING:
+    from swarm.scheduling.singleton import SingletonTicker, TickResult
 
 
 class MissionExecutor(Protocol):
@@ -115,8 +119,10 @@ class PursuitEngine:
         ledgers: dict[str, GoalResourceLedger] | None = None,
         state_store: DurablePursuitStateStore | None = None,
         state_root: Path | None = None,
+        hold_store: HoldStore | None = None,
     ) -> None:
         self.goals = goals
+        self.hold_store = hold_store
         if executor is None:
             # R20-01 defense in depth: never default to successful RecordingExecutor.
             from swarm.pursuit.native_dispatch import BlockedMissingImplementationExecutor
@@ -152,8 +158,27 @@ class PursuitEngine:
         ledger = self._ledgers.get(goal_id)
         if ledger is None:
             ledger = GoalResourceLedger.from_envelope(goal_id, goal.resource_envelope)
+            if self.hold_store is not None:
+                bind_durable_ledger(ledger, self.hold_store)
             self._ledgers[goal_id] = ledger
         return ledger
+
+    def tick_all_due(self) -> list[CycleRecord]:
+        """Tick every active/waiting goal whose schedule is due, in goal-id order."""
+        records: list[CycleRecord] = []
+        for goal_id in sorted(self.goals.goals):
+            goal = self.goals.goals[goal_id]
+            if goal.status not in {GoalStatus.ACTIVE, GoalStatus.WAITING}:
+                continue
+            if goal_id not in self._history:
+                self.observe(goal_id)
+            if self.scheduler.is_due(goal_id):
+                records.append(self.tick(goal_id))
+        return records
+
+    def singleton_tick(self, ticker: SingletonTicker) -> TickResult:
+        """Run ``tick_all_due`` only while holding the site-wide pursuit epoch."""
+        return ticker.run_once(lambda _lease: self.tick_all_due())
 
     def _hydrate_all(self) -> None:
         """Load on-disk pursuit snapshots for goals already known to GoalStore."""

@@ -808,7 +808,24 @@ def probe_duplicate_trigger_idempotency(tmp: Path) -> ProbeResult:
 
 
 def probe_sdk_ui_parity(tmp: Path) -> ProbeResult:
-    """V20-S11: SDK and UI share Goal create/lifecycle contracts (fixture API, no spend)."""
+    """V20-S11: SDK and UI share Goal create/lifecycle contracts (fixture API, no spend).
+
+    The probe clears ``SWARM_*`` for its fixture app; the caller's environment is
+    restored afterwards so the probe cannot redirect later work (e.g. Alembic's
+    ``database_url()``) to the default database.
+    """
+    import os
+
+    saved = {k: v for k, v in os.environ.items() if k.startswith("SWARM_")}
+    try:
+        return _probe_sdk_ui_parity(tmp)
+    finally:
+        for key in [k for k in os.environ if k.startswith("SWARM_")]:
+            os.environ.pop(key, None)
+        os.environ.update(saved)
+
+
+def _probe_sdk_ui_parity(tmp: Path) -> ProbeResult:
     import os
 
     import httpx

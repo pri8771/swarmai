@@ -9,6 +9,7 @@ import {
 } from './api/client'
 import type { ConsoleSnapshot, GoalRow } from './api/types'
 import { GoalsPanel } from './components/GoalsPanel'
+import { OpsPanel } from './components/OpsPanel'
 import { Panel } from './components/Panel'
 import { StatusBadge } from './components/StatusBadge'
 import {
@@ -30,6 +31,7 @@ type Tab =
   | 'profiles'
   | 'approvals'
   | 'events'
+  | 'ops'
 
 export default function App() {
   const [snap, setSnap] = useState<ConsoleSnapshot | null>(null)
@@ -132,6 +134,7 @@ export default function App() {
     { id: 'profiles', label: 'Profiles' },
     { id: 'approvals', label: 'Approvals' },
     { id: 'events', label: 'Events' },
+    { id: 'ops', label: 'Ops' },
   ]
 
   return (
@@ -737,6 +740,15 @@ export default function App() {
             ))}
           </ol>
         </Panel>
+      ) : null}
+
+      {tab === 'ops' ? (
+        <OpsPanel
+          mode={snap.mode}
+          baseUrl={loadOpts.baseUrl}
+          token={loadOpts.token}
+          workers={snap.workers}
+        />
       ) : null}
     </div>
   )

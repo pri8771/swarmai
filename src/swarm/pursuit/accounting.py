@@ -7,6 +7,8 @@ denied under a zero ceiling.
 
 from __future__ import annotations
 
+import copy
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -78,6 +80,23 @@ class GoalResourceLedger:
     max_tool_calls: int = 400
     allow_paid: bool = False
     holds: dict[str, ResourceHold] = field(default_factory=dict)
+    on_change: Callable[[ResourceHold], None] | None = field(
+        default=None, repr=False, compare=False
+    )
+
+    def _commit(self, hold: ResourceHold, prior: ResourceHold | None) -> ResourceHold:
+        """Persist first (when durable); on failure restore the prior in-memory state."""
+        if self.on_change is not None:
+            try:
+                self.on_change(hold)
+            except Exception:
+                if prior is None:
+                    self.holds.pop(hold.hold_id, None)
+                else:
+                    self.holds[hold.hold_id] = prior
+                raise
+        self.holds[hold.hold_id] = hold
+        return hold
 
     @classmethod
     def from_envelope(cls, goal_id: str, envelope: dict[str, Any] | None) -> GoalResourceLedger:
@@ -94,15 +113,24 @@ class GoalResourceLedger:
         )
 
     def _held_totals(self) -> UsageAmounts:
+        """Budget still committed: open holds plus unknown-outcome holds.
+
+        An ``unknown`` hold keeps the larger of its reservation and its reported
+        usage committed until reconciled; unknown usage is never treated as zero.
+        """
         spend = 0.0
         models = 0
         tools = 0
         for hold in self.holds.values():
-            if hold.state != "held":
-                continue
-            spend += hold.reserved.spend_usd
-            models += hold.reserved.model_calls
-            tools += hold.reserved.tool_calls
+            if hold.state == "held":
+                spend += hold.reserved.spend_usd
+                models += hold.reserved.model_calls
+                tools += hold.reserved.tool_calls
+            elif hold.state == "unknown":
+                reported = hold.settled or UsageAmounts()
+                spend += max(hold.reserved.spend_usd, reported.spend_usd)
+                models += max(hold.reserved.model_calls, reported.model_calls)
+                tools += max(hold.reserved.tool_calls, reported.tool_calls)
         return UsageAmounts(spend_usd=spend, model_calls=models, tool_calls=tools)
 
     def _settled_totals(self) -> UsageAmounts:
@@ -170,8 +198,7 @@ class GoalResourceLedger:
                 runtime=runtime,
             ),
         )
-        self.holds[hold.hold_id] = hold
-        return hold
+        return self._commit(hold, None)
 
     def settle(
         self,
@@ -197,6 +224,7 @@ class GoalResourceLedger:
             # Preserve unknown — do not invent a refund or clearance.
             raise AccountingError(f"unknown_hold_requires_reconciliation:{hold_id}")
 
+        prior = copy.deepcopy(hold)
         spend = max(0.0, float(spend_usd))
         # Unknown usage is recorded without authorizing payment or inventing a refund.
         if usage_unknown:
@@ -212,7 +240,7 @@ class GoalResourceLedger:
                 usage_unknown=True,
             )
             hold.updated_at = utc_now().isoformat()
-            return hold
+            return self._commit(hold, prior)
 
         if spend > 0 and not self.allow_paid and self.spend_usd_ceiling <= 0:
             raise AccountingError("paid_cost_denied_under_zero_spend_budget")
@@ -235,7 +263,7 @@ class GoalResourceLedger:
             usage_unknown=False,
         )
         hold.updated_at = utc_now().isoformat()
-        return hold
+        return self._commit(hold, prior)
 
     def release(self, hold_id: str) -> ResourceHold:
         hold = self.holds.get(hold_id)
@@ -243,11 +271,47 @@ class GoalResourceLedger:
             raise AccountingError(f"unknown_hold:{hold_id}")
         if hold.state == "settled":
             raise AccountingError(f"release_after_settle:{hold_id}")
+        if hold.state == "unknown":
+            raise AccountingError(f"unknown_hold_requires_reconciliation:{hold_id}")
         if hold.state == "released":
             return hold
+        prior = copy.deepcopy(hold)
         hold.state = "released"
         hold.updated_at = utc_now().isoformat()
-        return hold
+        return self._commit(hold, prior)
+
+    def reconcile_unknown(
+        self,
+        hold_id: str,
+        *,
+        spend_usd: float,
+        model_calls: int,
+        tool_calls: int,
+        evidence_ref: str,
+    ) -> ResourceHold:
+        """Operator/provider reconciliation of an unknown hold to known usage."""
+        hold = self.holds.get(hold_id)
+        if hold is None:
+            raise AccountingError(f"unknown_hold:{hold_id}")
+        if hold.state != "unknown":
+            raise AccountingError(f"reconcile_requires_unknown:{hold_id}")
+        if not evidence_ref:
+            raise AccountingError("reconcile_requires_evidence_ref")
+        before = copy.deepcopy(hold)
+        prior = hold.settled or UsageAmounts()
+        hold.state = "settled"
+        hold.settled = UsageAmounts(
+            spend_usd=max(0.0, float(spend_usd)),
+            model_calls=max(0, int(model_calls)),
+            tool_calls=max(0, int(tool_calls)),
+            prompt_tokens=prior.prompt_tokens,
+            completion_tokens=prior.completion_tokens,
+            route_id=prior.route_id or hold.reserved.route_id,
+            runtime=prior.runtime or hold.reserved.runtime,
+            usage_unknown=False,
+        )
+        hold.updated_at = utc_now().isoformat()
+        return self._commit(hold, before)
 
     def snapshot(self) -> dict[str, Any]:
         return {

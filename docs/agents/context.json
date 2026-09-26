@@ -1,15 +1,25 @@
 {
   "schema": "swarmai.agents.context.v1",
-  "verified_at": "2026-09-25T21:07Z",
+  "verified_at": "2026-09-26T02:03Z",
   "repo": "pri8771/swarmai",
-  "pause": true,
-  "v20_work": "STOPPED",
+  "pause": false,
+  "v20_work": "V23_ENGINEERING_ACTIVE",
+  "v23": {
+    "status": "implementation_complete_candidate_not_accepted",
+    "plan": "docs/v2.3/PLAN.md",
+    "policy": "config/v23/scheduler_policy.v1.json",
+    "acceptance_freeze": "benchmarks/v23_acceptance/scenarios.freeze.json",
+    "accepted": false,
+    "pause_lift": "owner V2.3 request; engineering only; HL-01..HL-07 unchanged"
+  },
   "refs": {
-    "origin_dev": "dd7726eb8c22986ef72847994c8e435a81a869b6",
-    "origin_dev_subject": "Merge PR #60: feat(L6) product Compose console + SDK/UI control parity",
+    "origin_dev": "8e1c0fdec24c131e7612d88076220945230f4c3b",
+    "origin_dev_subject": "Merge pull request #69 from pri8771/cursor/v20-agents-context-6612",
+    "origin_cursor_sw_v23_integration_460c": "2b27bc200ec5938715b853eec7156d30c62d3d5c",
+    "origin_cursor_sw_v23_integration_460c_subject": "Merge cursor/sw-w3-s5-460c into cursor/sw-v23-integration-460c (SW-W3-S5)",
     "origin_main": "08b910f981eff2ab66873a71055090f2c60f2a91",
     "origin_main_status": "UNTOUCHED",
-    "alembic_head": "a20pursuitpersist0001"
+    "alembic_head": "a23opsplatform0001"
   },
   "version_flags": {
     "v17_eng": "done",
@@ -23,7 +33,9 @@
       "V1.9": false,
       "V2.0": false
     },
-    "any_version_accepted": false
+    "any_version_accepted": false,
+    "v23_impl_complete_candidate": true,
+    "v23_accepted": false
   },
   "hard_limits": [
     "no_main_merge",
@@ -51,7 +63,7 @@
   },
   "mission_path": {
     "status": "tip_proven",
-    "tip": "dd7726eb8c22986ef72847994c8e435a81a869b6",
+    "tip": "8e1c0fdec24c131e7612d88076220945230f4c3b",
     "path": ["claim", "execute", "CAS", "protected_verify"],
     "pytest_passed": 17
   },
@@ -64,14 +76,14 @@
   "remaining_eng": [
     {"id": "V20-E01", "pri": "P0", "status": "in_progress", "open_prs": [66, 68]},
     {"id": "V20-E02", "pri": "P0", "status": "in_progress", "open_prs": [59, 67]},
-    {"id": "V20-E03", "pri": "P1", "status": "open"},
-    {"id": "V20-E04", "pri": "P1", "status": "open", "deps": ["V20-E03"]},
-    {"id": "V20-E05", "pri": "P1", "status": "open"},
-    {"id": "V20-E06", "pri": "P1", "status": "open", "deps_preferred": ["V20-E03", "V20-E04"]},
-    {"id": "V20-E07", "pri": "P1", "status": "open", "deps_preferred": ["V20-E05"]},
-    {"id": "V20-E08", "pri": "P2", "status": "open"},
-    {"id": "V20-E09", "pri": "P2", "status": "open"},
-    {"id": "V20-E10", "pri": "P2", "status": "open"},
+    {"id": "V20-E03", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S9", "SW-W3-S2"]},
+    {"id": "V20-E04", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S10", "SW-W3-S2"]},
+    {"id": "V20-E05", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S11", "SW-W2-S2"]},
+    {"id": "V20-E06", "pri": "P1", "status": "implemented", "sessions": ["SW-W1-S4", "SW-W3-S2"]},
+    {"id": "V20-E07", "pri": "P1", "status": "implemented_live_blocked", "gate": "blocked:router_not_configured", "next": "SW-X2-S1 (SW-X1-S1 merged; SP1/SP2 reached, SP3-SP6 pending)"},
+    {"id": "V20-E08", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S13"]},
+    {"id": "V20-E09", "pri": "P2", "status": "implemented", "sessions": ["SW-W1-S12"]},
+    {"id": "V20-E10", "pri": "P2", "status": "implemented", "gate": "pass", "evidence": "docs/evidence/v20/compose-smoke/latest.json", "note": "dev VM Docker run after SW-FIX-COMPOSE worker healthcheck; not independently reviewed"},
     {"id": "V20-E11", "pri": "P2", "status": "deferred"}
   ],
   "open_prs_session": [

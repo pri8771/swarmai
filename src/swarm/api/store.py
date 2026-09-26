@@ -83,6 +83,8 @@ class ProductStore:
     _mission_store: MissionStore | None = field(default=None, repr=False)
     _goal_store: Any = field(default=None, repr=False)
     _pursuit_engine: Any = field(default=None, repr=False)
+    _pg_factory: Any = field(default=None, repr=False)
+    _pursuit_ticker: Any = field(default=None, repr=False)
     _durable_bootstrapped: bool = field(default=False, repr=False)
 
     def bootstrap_durable(self) -> None:
@@ -162,14 +164,66 @@ class ProductStore:
                 executor: Any = RecordingExecutor(default_success=True)
             else:
                 executor = NativeMissionDispatchExecutor(self)
+            factory = self.pg_session_factory()
+            mirror: Any = None
+            lessons: Any = None
+            hold_store: Any = None
+            if factory is not None:
+                from swarm.pursuit.durable_accounting import SqlHoldStore, SqlLessonPersistence
+                from swarm.pursuit.learning import PursuitLessonStore
+                from swarm.pursuit.pg_mirror import PursuitPgMirror
+
+                mirror = PursuitPgMirror(factory)
+                lessons = PursuitLessonStore(persistence=SqlLessonPersistence(factory))
+                hold_store = SqlHoldStore(factory)
             self._pursuit_engine = PursuitEngine(
                 self.goal_store(),
                 executor=executor,
+                lessons=lessons,
                 scheduler=PursuitScheduler(clock=time.time),
                 clock=time.time,
-                state_store=DurablePursuitStateStore(root),
+                state_store=DurablePursuitStateStore(root, mirror=mirror),
+                hold_store=hold_store,
             )
         return self._pursuit_engine
+
+    def pg_session_factory(self) -> Any:
+        """PostgreSQL session factory for durable pursuit state, or ``None``.
+
+        Only when ``SWARM_V23_DURABLE=1`` and the database was probed reachable;
+        otherwise file-backed state under ``var/`` stays authoritative, as before.
+        """
+        if self._pg_factory is None and self.db_reachable is True:
+            import os
+
+            if os.environ.get("SWARM_V23_DURABLE", "") == "1":
+                from swarm.db.engine import create_db_engine, make_session_factory
+
+                self._pg_factory = make_session_factory(create_db_engine())
+        return self._pg_factory
+
+    def pursuit_ticker(self) -> Any:
+        """Site-wide singleton ticker; the epoch row ``pursuit-ticker`` fences other processes."""
+        if self._pursuit_ticker is None:
+            from swarm.contracts.common import new_id
+            from swarm.scheduling.epoch import (
+                InMemorySchedulerEpochService,
+                SqlSchedulerEpochService,
+            )
+            from swarm.scheduling.singleton import SingletonTicker
+
+            factory = self.pg_session_factory()
+            epochs: Any = (
+                SqlSchedulerEpochService(factory, site_id="pursuit-ticker")
+                if factory is not None
+                else InMemorySchedulerEpochService(site_id="pursuit-ticker")
+            )
+            self._pursuit_ticker = SingletonTicker(epochs, holder_id=new_id("pursuit_"))
+        return self._pursuit_ticker
+
+    def run_pursuit_tick(self) -> Any:
+        """Tick all due goals once, only if this process holds the pursuit epoch."""
+        return self.pursuit_engine().singleton_tick(self.pursuit_ticker())
 
     def mission_store(self) -> MissionStore:
         """Durable mission identity shared by API / CLI / console reopen paths."""

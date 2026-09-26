@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "policy_version": "v23-wdrr-1",
+  "status": "frozen_for_v23_implementation",
+  "source": "docs/artifacts/future/ART-V23-MULTIMISSION_SCHEDULER.md",
+  "wdrr": {
+    "base_quantum": 1.0,
+    "max_credit_cap_multiplier": 10.0,
+    "urgent_borrow_cap": 2.0,
+    "aging_floor_ms": 60000,
+    "aging_bonus": 0.5,
+    "deadline_bonus_cap": 1.0,
+    "deadline_slack_ms": 300000,
+    "restart_credit_cap_multiplier": 10.0
+  },
+  "defaults": {
+    "project_max_concurrency": 4,
+    "mission_max_parallelism": 2,
+    "max_queue_depth_per_project": 1000,
+    "max_fanout_per_mission": 50
+  },
+  "intents": {
+    "ttl_seconds": 30
+  },
+  "scheduler_epoch": {
+    "ttl_seconds": 15
+  },
+  "fairness_tolerance": {
+    "relative_share_error": 0.15,
+    "min_decisions": 200
+  },
+  "spend": {
+    "mode": "zero_spend",
+    "allowed_billing": ["free"]
+  }
+}

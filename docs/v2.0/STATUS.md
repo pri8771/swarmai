@@ -1,8 +1,8 @@
 # SwarmAI V2.0 Status — Implementation-complete candidate (lead accept USER_ACTION)
 
 **Date:** 2026-09-25  
-**Tip:** `origin/dev` @ `dd7726eb8c22986ef72847994c8e435a81a869b6`  
-**Schema head:** `a20pursuitpersist0001`  
+**Tip:** `cursor/sw-v23-integration-460c` @ `10fd924efd866fbaa8ce7348b24aad3019a13ecc` (V2.3 integration; `origin/dev` unchanged at `8e1c0fde`)  
+**Schema head:** `a23opsplatform0001` (`CURRENT_SCHEMA_REVISION`)  
 **CandidateManifest:** rebound to tip (V20-E01) — **not** lead-accepted  
 **Public launch:** **NO** (track authorized; not claimed complete)  
 **Spend:** zero (`SWARM_ALLOW_PAID=false`)  
@@ -25,4 +25,4 @@
 - Elapsed reliability campaign results
 - Invented lead accept or LiveGrant
 - Two-host proof from local processes
-- V2.0 eng depth complete (see Project Context `internal/v20-gap-audit.md` E03–E06)
+- V2.0 eng depth complete: E03–E06 and E08–E09 are now implemented and offline-tested with evidence on the V2.3 integration branch (`docs/v2.3/EXIT_CHECKLIST.md`); E10 compose smoke `pass` on a dev VM after the worker healthcheck fix (SW-FIX-COMPOSE; not an operator host); E07's live run and E11 stay open

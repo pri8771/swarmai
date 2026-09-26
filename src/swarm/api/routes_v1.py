@@ -2185,23 +2185,32 @@ async def list_ops_events(
         request.app.state.ops_events = log
     if project_id:
         auth.require_project(principal, project_id)
-    return {"events": log.list_events(project_id=project_id)}
+        return {"events": log.list_events(project_id=project_id)}
+    if "admin" in principal.roles:
+        return {"events": log.list_events()}
+    # Non-admin without project_id: only the principal's projects; never unscoped events.
+    events: list[dict[str, Any]] = []
+    for pid in sorted(principal.project_ids):
+        events.extend(log.list_events(project_id=pid))
+    events.sort(key=lambda e: (str(e.get("at")), str(e.get("event_id"))))
+    return {"events": events[-100:]}
 
 
 @router.post("/release/candidate-freeze")
 async def freeze_candidate(
     principal: Principal = Depends(get_principal),
 ) -> dict[str, Any]:
-    _ = principal
+    if "admin" not in principal.roles:
+        raise ApiError("forbidden_admin", "admin role required", status_code=403)
     import subprocess
     from pathlib import Path
 
-    from swarm.release.candidate import CandidateFreezer
+    from swarm.release.candidate import CURRENT_SCHEMA_REVISION, CandidateFreezer
 
     root = Path(__file__).resolve().parents[3]
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     return (
         CandidateFreezer(root)
-        .freeze(source_sha=sha, schema_revision="a18tov30schema0001")
+        .freeze(source_sha=sha, schema_revision=CURRENT_SCHEMA_REVISION)
         .to_dict()
     )

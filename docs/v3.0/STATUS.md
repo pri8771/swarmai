@@ -1,4 +1,6 @@
-# SwarmAI V3.0 Status — Persistent governed ops implementation-complete (local)
+# SwarmAI V3.0 Status — Persistent governed ops (scaffold)
+
+V3.0 work is blocked on V2.3; existing V3 modules are scaffolds and are not claimed complete.
 
 **Date:** 2026-09-23  
 **Lead accept:** **false** — `docs/evidence/v30/LEAD_ACCEPT_PACKAGE.md`  

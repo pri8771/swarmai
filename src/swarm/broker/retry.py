@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from swarm.contracts.common import utc_now
 from swarm.contracts.enums import ErrorClass
 
 Clock = Callable[[], datetime]
+
+RETRY_AFTER_EXCEEDS_CAP = "retry_after_exceeds_cap"
 
 
 @dataclass
@@ -27,6 +30,7 @@ class RetryConfig:
     base_delay_seconds: float = 0.05
     max_delay_seconds: float = 2.0
     jitter_ratio: float = 0.25
+    max_retry_after_seconds: float = 30.0
 
 
 class RetryOwner:
@@ -73,6 +77,11 @@ class RetryOwner:
 
         if retry_after is not None:
             wait = float(retry_after)
+            # Never retry before the upstream Retry-After has elapsed: a value
+            # above the cap (or not a number) is a give-up, not a clamped retry.
+            if not math.isfinite(wait) or wait > self.config.max_retry_after_seconds:
+                return RetryDecision(False, 0.0, RETRY_AFTER_EXCEEDS_CAP)
+            wait = max(wait, 0.0)
         else:
             exp = self.config.base_delay_seconds * (2 ** max(0, attempt - 1))
             wait = min(self.config.max_delay_seconds, exp)

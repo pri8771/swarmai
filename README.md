@@ -7,7 +7,10 @@ and preserve durable state. Small models are used where measured fitness support
 This repository is the product source. Planning/handoff files live separately in the
 Cursor execution kit and must not be overwritten by this tree.
 
-**Current label:** offline-verified release candidate (V0.9 hardening) — **not** a public launch.
+**Current label:** V2.3 implementation-complete candidate (not accepted) — **not** a public launch.
+
+**V2.3 operator commands:** `swarm v23 --help` (offline scheduler/pack/portability tools).
+Deterministic acceptance campaign: `uv run python scripts/v23_acceptance_campaign.py`.
 
 ## Requirements
 

@@ -2,7 +2,37 @@
 
 All notable changes to SwarmAI are documented here.
 
-## [Unreleased] — V1.4→V3.0 implementation-complete + accept/launch track (2026-09-23)
+## [Unreleased] — V2.3 implementation-complete candidate (2026-09-26)
+
+### Added
+- V2.3 scheduler: shared contracts + migration `a23opsplatform0001`, WDRR fairness, durable `SchedulingStore` (PostgreSQL), DispatchIntent reservations, scheduler epoch lease + singleton ticker, `SchedulerService` with the 11 pathological cases.
+- Capability-pack lifecycle with keyed HMAC signatures (F-02); portability bundle v2 with value-based secret scan and tombstones (F-03); fleet trust classes, drain state machine and deterministic placement; durable ops events + trace graph.
+- `routes_v23.py` API surface, `swarm v23` offline CLI, console Ops tab + worker drain/revoke, router client + bounded native loop (fake router), pursuit PostgreSQL write-through, durable holds/lessons, sandbox kill-bound, compose smoke script.
+- `scripts/v23_acceptance_campaign.py` and deterministic probes V23-A01…A10.
+
+### Fixed
+- F-01: `GET /v1/ops/events` scoped to the principal's projects.
+- F-13: unknown-usage holds never free budget; release requires reconciliation evidence.
+- F-14: single `CURRENT_SCHEMA_REVISION` pinned to the Alembic head.
+- F-16: `POST /v1/release/candidate-freeze` is admin-only.
+- V20-E10: compose `worker` no longer inherits the API HTTP healthcheck (connector process check) (SW-FIX-COMPOSE).
+- Tests: acceptance probe V20-S11 no longer clears `SWARM_*` for the rest of the process, which had sent Alembic schema tests to the default database in whole-repo runs (SW-FIX-ALEMBIC); V20-E08 kill-bound tests made deterministic (SW-FIX-FLAKE).
+- F-06: upstream `Retry-After` bounded; a value above `max_retry_after_seconds` (or non-finite) is now a terminal give-up (`retry_after_exceeds_cap`), never a retry at the cap (SW-FIX-RETRY).
+
+### Evidence
+- `docs/evidence/v23/acceptance_campaign.json`: deterministic 10/10 pass; live router `blocked:router_not_configured`; compose smoke `pass` (re-run on `1b3f48ad` after SW-FIX-*; dev VM); multi-process `pending_owner_approval`.
+- `docs/v2.3/EXIT_CHECKLIST.md`.
+
+### Notes
+- Not accepted. Multi-process gate pending owner approval. Zero spend (no provider calls; cost unknown ≠ $0).
+- SplitSignal adapter (SW-X1-S1) merged after inference_server SP1/SP2 (IS `9ca12671`); live use pending SP4 and a LiveGrant.
+
+## Unreleased (V2.3 tracking reset)
+
+- docs: corrected V2.3/V3.0 status claims (scaffold, not implementation-complete).
+- config: froze scheduler policy `v23-wdrr-1` and V2.3 deterministic acceptance manifest.
+
+## [2026-09-23] — V1.4→V2.0 track + accept/launch track; V2.3/V3.0: scaffolds only — see docs/v2.3/STATUS.md
 
 ### Added
 - V1.5–V3.0 implementation packages: leases/workers, knowledge, V17 gateway, SiteEpoch recovery,

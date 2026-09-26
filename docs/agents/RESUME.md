@@ -1,20 +1,24 @@
 ---
 doc: agents_resume
 audience: ai_agent
-pause: true
+pause: false
 base: origin/dev
-tip_floor: dd7726eb8c22986ef72847994c8e435a81a869b6
+tip_floor: 8e1c0fdec24c131e7612d88076220945230f4c3b
 accepted: false
 ---
 
 # RESUME
+
+Active work: V2.3 per docs/v2.3/PLAN.md; each session writes docs/v2.3/sessions/<ID>.md.
+
+Next step: Codex review of the V2.3 candidate range on `cursor/sw-v23-integration-460c`; SW-X2-S1 (SplitSignal live smoke, SP4–SP6); owner merges `cursor/sw-v23-integration-460c` into `dev`; owner decision on the V23-A11 multi-process gate (SW-PREAPPROVAL-A5). SW-X1-S1 (SplitSignal adapter) is merged (`2b27bc20`) after SP1/SP2; SP3–SP6 pending. Follow-up fixes SW-FIX-RETRY/COMPOSE/ALEMBIC/FLAKE are merged into the integration branch (tip `1b3f48ad`) and need Codex review.
 
 ## preflight
 
 ```text
 git fetch origin dev main
 git rev-parse origin/dev
-# must be >= dd7726eb8c22986ef72847994c8e435a81a869b6
+# must be >= 8e1c0fdec24c131e7612d88076220945230f4c3b
 git rev-parse origin/main
 # must remain 08b910f981eff2ab66873a71055090f2c60f2a91 unless operator moves it
 ```

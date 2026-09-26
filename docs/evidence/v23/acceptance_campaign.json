@@ -1,0 +1,100 @@
+{
+  "packet": "V23-ACCEPTANCE-CAMPAIGN",
+  "started_at": "2026-09-26T02:52:45.403779+00:00",
+  "finished_at": "2026-09-26T02:52:46.007090+00:00",
+  "source_sha": "1b3f48ad2a1d27cb4d485416502cdd3ba2d12796",
+  "schema_revision": "a23opsplatform0001",
+  "freeze_id": "v23-acceptance-deterministic-20260926",
+  "policy_version": "v23-wdrr-1",
+  "gates": {
+    "deterministic": "pass",
+    "multi_process_private": "pending_owner_approval",
+    "live_router_free_route": "blocked:router_not_configured",
+    "compose_smoke_v20_e10": "pass",
+    "durable_postgres_flag": false
+  },
+  "deterministic_passed": 10,
+  "deterministic_total": 10,
+  "results": [
+    {
+      "id": "V23-A01",
+      "probe": "fairness_three_projects",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A02",
+      "probe": "anti_amplification",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A03",
+      "probe": "isolation_negatives",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A04",
+      "probe": "restart_recovery",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A05",
+      "probe": "drain_active",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A06",
+      "probe": "pack_lifecycle",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A07",
+      "probe": "portability_roundtrip",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A08",
+      "probe": "trace_chain",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A09",
+      "probe": "failure_truth",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    },
+    {
+      "id": "V23-A10",
+      "probe": "zero_spend",
+      "gate": "deterministic",
+      "ok": true,
+      "status": "pass"
+    }
+  ],
+  "pending": [
+    {
+      "id": "V23-A11",
+      "status": "pending_owner_approval"
+    }
+  ],
+  "version_claim": "not_accepted_by_harness",
+  "any_version_accepted": false,
+  "spend_usd": 0.0,
+  "spend_basis": "no provider calls; probes are in-process fakes"
+}

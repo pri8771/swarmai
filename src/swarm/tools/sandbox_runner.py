@@ -9,12 +9,18 @@ from __future__ import annotations
 
 import os
 import resource
+import signal
 import subprocess
 import sys
 import tempfile
 import textwrap
+import threading
+import time
 from dataclasses import dataclass
 from pathlib import Path
+
+KILL_BOUND_SECONDS = 10.0
+_POLL_SECONDS = 0.05
 
 
 @dataclass
@@ -24,6 +30,8 @@ class SandboxResult:
     stdout: str
     stderr: str
     timed_out: bool = False
+    cancelled: bool = False
+    killed_group: bool = False
 
 
 class SandboxPolicyError(PermissionError):
@@ -124,7 +132,13 @@ class IsolatedCodeRunner:
                 raise SandboxPolicyError("symlink escape blocked") from exc
         return resolved
 
-    def run_python(self, relative_script: str, args: list[str] | None = None) -> SandboxResult:
+    def run_python(
+        self,
+        relative_script: str,
+        args: list[str] | None = None,
+        *,
+        cancel: threading.Event | None = None,
+    ) -> SandboxResult:
         script = self._assert_path_allowed(self.work_dir / relative_script)
         if self.network:
             raise SandboxPolicyError("network is disabled by default; refuse enabling in self-test")
@@ -140,35 +154,59 @@ class IsolatedCodeRunner:
             "PYTHONNOUSERSITE": "1",
         }
         cmd = [sys.executable, str(script), *(args or [])]
-        try:
-            proc = subprocess.run(
-                cmd,
-                cwd=str(self.work_dir),
-                env=env,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout_seconds,
-                preexec_fn=_limit if sys.platform != "darwin" else None,
-            )
+        # Own session => own process group, so timeout/cancel kills every descendant.
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(self.work_dir),
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            start_new_session=True,
+            preexec_fn=_limit if sys.platform != "darwin" else None,
+        )
+        deadline = time.monotonic() + self.timeout_seconds
+        while True:
+            if cancel is not None and cancel.is_set():
+                return self._kill_group(proc, timed_out=False, cancelled=True)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return self._kill_group(proc, timed_out=True, cancelled=False)
+            try:
+                stdout, stderr = proc.communicate(timeout=min(_POLL_SECONDS, remaining))
+            except subprocess.TimeoutExpired:
+                continue
             return SandboxResult(
                 ok=proc.returncode == 0,
                 exit_code=proc.returncode,
-                stdout=proc.stdout,
-                stderr=proc.stderr,
-            )
-        except subprocess.TimeoutExpired as exc:
-            stdout = exc.stdout.decode() if isinstance(exc.stdout, bytes) else (exc.stdout or "")
-            if isinstance(exc.stderr, bytes):
-                stderr = exc.stderr.decode()
-            else:
-                stderr = exc.stderr or "timeout"
-            return SandboxResult(
-                ok=False,
-                exit_code=-1,
                 stdout=stdout,
                 stderr=stderr,
-                timed_out=True,
             )
+
+    def _kill_group(
+        self, proc: subprocess.Popen[str], *, timed_out: bool, cancelled: bool
+    ) -> SandboxResult:
+        killed = False
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+            killed = True
+        except ProcessLookupError:
+            pass
+        try:
+            stdout, stderr = proc.communicate(timeout=KILL_BOUND_SECONDS)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            stdout, stderr = "", ""
+        reason = "timeout" if timed_out else "cancelled"
+        return SandboxResult(
+            ok=False,
+            exit_code=-1,
+            stdout=stdout or "",
+            stderr=stderr or reason,
+            timed_out=timed_out,
+            cancelled=cancelled,
+            killed_group=killed,
+        )
 
 
 def self_test(*, network: str = "off") -> dict[str, object]:
