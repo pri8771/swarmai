@@ -321,8 +321,8 @@ V2.0 depth prerequisites: E03 → W1-S9 + W3-S2; E04 → W1-S10 + W3-S2; E05 →
 | `prompts/SW-W3-S4.md` | **EXECUTED** | `fd92d239909b71a72685a7ff3cab2af51d9bc838` |
 | `prompts/SW-W3-S5.md` | **EXECUTED** | `10fd924efd866fbaa8ce7348b24aad3019a13ecc` |
 | `prompts/SW-W4-S1.md` | **EXECUTED** | `ed388b7bf61066d49082a81b675a57ef945b6272` |
-| `prompts/SW-X1-S1.md` | implemented on `cursor/sw-x1-s1-460c` (head `f9bb9645`), awaiting SP1; **not merged** | — |
-| `prompts/SW-X2-S1.md` | not run (needs SW-X1-S1, SP4, SW-PREAPPROVAL-A3) | — |
+| `prompts/SW-X1-S1.md` | **EXECUTED** (SP1/SP2 reached at IS `9ca12671`; contract blob `1a4a31c9` unchanged; real-mock run in the handoff) | `2b27bc200ec5938715b853eec7156d30c62d3d5c` |
+| `prompts/SW-X2-S1.md` | not run (needs SP4 and SW-PREAPPROVAL-A3; SW-X1-S1 is merged) | — |
 | `prompts/SW-FIX-RETRY.md` | **EXECUTED** | `b31627121d9d56836374f5dbfad32e579821937c` |
 | `prompts/SW-FIX-COMPOSE.md` | **EXECUTED** | `e5fd04c00028b7e89ae749da7d2966ef742bea74` |
 | `prompts/SW-FIX-ALEMBIC.md` | **EXECUTED** | `604f7acec2c560cffa39bafd87ab9284e4b9a565` |
