@@ -2,7 +2,7 @@
 doc: agents_current
 audience: ai_agent
 repo: pri8771/swarmai
-verified_at: 2026-09-26T00:47Z
+verified_at: 2026-09-26T02:03Z
 pause: false
 v20_work: "V23_ENGINEERING_ACTIVE"
 ---
@@ -15,9 +15,11 @@ v20_work: "V23_ENGINEERING_ACTIVE"
 |---|---|
 | origin/dev | `8e1c0fdec24c131e7612d88076220945230f4c3b` |
 | origin/dev_subject | Merge pull request #69 from pri8771/cursor/v20-agents-context-6612 |
+| origin/cursor/sw-v23-integration-460c | `10fd924efd866fbaa8ce7348b24aad3019a13ecc` |
+| origin/cursor/sw-v23-integration-460c_subject | Merge cursor/sw-w3-s5-460c into cursor/sw-v23-integration-460c (SW-W3-S5) |
 | origin/main | `08b910f981eff2ab66873a71055090f2c60f2a91` |
 | origin/main_status | UNTOUCHED |
-| alembic_head | `a20pursuitpersist0001` |
+| alembic_head | `a23opsplatform0001` |
 
 ## version_flags
 
@@ -33,12 +35,14 @@ v20_work: "V23_ENGINEERING_ACTIVE"
 | versions_accepted.V1.9 | false | |
 | versions_accepted.V2.0 | false | |
 | any_version_accepted | false | |
+| v23_impl_complete_candidate | true | `docs/v2.3/EXIT_CHECKLIST.md`; implemented + offline-tested; not reviewed |
+| v23_accepted | false | explicit |
 
 ## v23
 
 | key | value |
 |---|---|
-| status | scaffold_implementation_in_progress |
+| status | implementation_complete_candidate_not_accepted |
 | plan | `docs/v2.3/PLAN.md` |
 | policy | `config/v23/scheduler_policy.v1.json` |
 | acceptance_freeze | `benchmarks/v23_acceptance/scenarios.freeze.json` |
