@@ -2,7 +2,7 @@
   "schema": "swarmai.agents.context.v1",
   "verified_at": "2026-09-25T21:07Z",
   "repo": "pri8771/swarmai",
-  "pause": true,
+  "pause": false,
   "v20_work": "STOPPED",
   "refs": {
     "origin_dev": "dd7726eb8c22986ef72847994c8e435a81a869b6",
@@ -97,5 +97,14 @@
     "V20-E02_pr67_or_pr59",
     "pick_V20-E03_or_V20-E05",
     "keep_accepted_false"
-  ]
+  ],
+  "owner_decisions_20260926": {
+    "pause_lift": "B-01 owner: get to V2.3 for both projects",
+    "supersedes": ["pause_now", "resume_first_when_eng_allowed", "HL-07 for V2.3 (C1)"],
+    "decisions": "docs/swarm-mvp/DECISIONS.md#dec-v23-001",
+    "plan": "docs/plans/v2.3/PLAN.md",
+    "integration_branch": "cursor/sw-v23-integration-460c",
+    "reviewer": "codex",
+    "accepted": false
+  }
 }

@@ -1,0 +1,2 @@
+# Reference copies of session code; each session lints them at their real repo paths.
+exclude = ["*"]

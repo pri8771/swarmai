@@ -148,3 +148,7 @@ ChatGPT:
 - artifact verification and dependency graph
 - V2.3/V3.0 design work ahead of implementation
 
+
+## V2.3 execution plan (2026-09-26)
+
+The V2.3 rows above are executed by `docs/plans/v2.3/PLAN.md` (26 sessions in waves W0–W4 and X, plus 6 merge prompts) on `cursor/sw-v23-integration-460c`. It is gated with inference_server through sync points SP1–SP6 (PLAN §5.2). The target is "V2.3 implementation-complete" with multi-process/private evidence complete or honestly pending. Acceptance still needs Codex review and the owner's merge.

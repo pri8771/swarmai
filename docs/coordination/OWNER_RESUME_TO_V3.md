@@ -28,3 +28,5 @@ Time-bound evidence remains wall-clock truth. The V2.0 implementation candidate 
 
 Canonical execution plan: docs/coordination/V2_EXECUTION_PLAN.md
 Team split: docs/coordination/TWO_CURSOR_TEAM.md
+
+Update 2026-09-26: the owner's instruction "get to V2.3 for both projects" lifts the recorded pause (B-01). Execution plan for V2.3: `docs/plans/v2.3/PLAN.md`; decisions: `docs/swarm-mvp/DECISIONS.md` DEC-V23-001. The independent reviewer is Codex (D2); main merge, tag, deploy and spend stay separately gated.

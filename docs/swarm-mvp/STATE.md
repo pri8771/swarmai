@@ -71,3 +71,15 @@ Gap audit: Project Context `internal/v20-gap-audit.md`.
 ## Next action
 
 Continue V2.0 eng depth from gap audit: E03 PG write-through → E04 ledger/lesson durability → E05 native model/tool loop (fake HTTP) → E06 coordinator singleton. Keep LiveGrant/operator/version-accept out of eng claims. Do not merge `main`.
+
+## V2.3 plan and owner decisions (2026-09-26)
+
+- Pause lifted by the owner (B-01). Decisions D1–D6 and C1–C5 are in `DECISIONS.md` DEC-V23-001.
+- Plan: `docs/plans/v2.3/PLAN.md`; audit: `docs/plans/v2.3/AUDIT.md`. The truth table for V2.3 is `docs/v2.3/STATUS.md`, owned by SW-W0-S1/SW-W4-S1 on the integration branch.
+- Integration: `cursor/sw-v23-integration-460c` (from `origin/dev` @ `8e1c0fde`). Session PRs target it; the owner merges it into `dev` (C1). `main` untouched.
+- Only inference dependency: SplitSignal (D3), sync points SP1–SP6 (PLAN §5.2). Live use only in SW-X2-S1 under SW-PREAPPROVAL-A3.
+- Versions accepted: none. Reviewer: Codex (D2).
+
+## Next action (2026-09-26, supersedes the "Next action" above)
+
+Owner: complete `docs/plans/v2.3/OWNER_PREFLIGHT.md`. Agents: run the remaining V2.3 waves from `docs/plans/v2.3/prompts/` on the integration branch, each wave followed by its `SW-MERGE-<wave>` prompt. V20-E03..E10 are covered by those sessions.

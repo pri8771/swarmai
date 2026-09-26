@@ -3,7 +3,7 @@ doc: agents_current
 audience: ai_agent
 repo: pri8771/swarmai
 verified_at: 2026-09-25T21:07Z
-pause: true
+pause: false
 v20_work: STOPPED
 ---
 
@@ -44,7 +44,7 @@ v20_work: STOPPED
 | HL-04 | job-bot out of scope |
 | HL-05 | LiveGrant / R730 / CF / Linear mutations = deploy/live-only gates; eng may proceed without them |
 | HL-06 | do not claim version-accepted from harness_* |
-| HL-07 | PRs target `dev` only |
+| HL-07 | PRs target `dev` only (superseded for V2.3 by C1, 2026-09-26: session PRs target `cursor/sw-v23-integration-460c`; the owner merges it into `dev`) |
 
 ## fast_track_merged_order
 
@@ -80,9 +80,23 @@ v20_work: STOPPED
 
 | field | value |
 |---|---|
+| superseded | 2026-09-26 by B-01 (owner): pause lifted; see `owner_decisions_20260926` below |
 | operator | STOP V2.0 eng; push session state |
 | eng_lanes | do_not_restart |
 | resume | see `RESUME.md` |
 | sot | `docs/agents/` (this tree) |
 | tip_sync_pr | #66 |
 | related_open | #59 #66 #67 #68 |
+
+## owner_decisions_20260926
+
+| key | value |
+|---|---|
+| pause | lifted by the owner (B-01): "get to V2.3 for both projects" |
+| decisions | D1–D6, B-01, C1–C5 in `docs/swarm-mvp/DECISIONS.md` DEC-V23-001 |
+| plan | `docs/plans/v2.3/PLAN.md` (26 session + 6 merge prompts in `docs/plans/v2.3/prompts/`) |
+| integration_branch | `cursor/sw-v23-integration-460c` (from `origin/dev` @ `8e1c0fde`) |
+| reviewer | Codex (D2) |
+| inference_dependency | SplitSignal only (D3): `SPLITSIGNAL_BASE_URL`, `SPLITSIGNAL_API_KEY`, `SPLITSIGNAL_MODEL` |
+| accepted | false |
+| next_action | owner: `docs/plans/v2.3/OWNER_PREFLIGHT.md` (A3, A5, R-1..R-3); agents: continue the waves on the integration branch (W1 → W2 → W3 → W4, X1 after SP1, X2 last), each followed by its `SW-MERGE-<wave>` prompt |
