@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -27,6 +28,7 @@ class RetryConfig:
     base_delay_seconds: float = 0.05
     max_delay_seconds: float = 2.0
     jitter_ratio: float = 0.25
+    max_retry_after_seconds: float = 30.0
 
 
 class RetryOwner:
@@ -73,6 +75,9 @@ class RetryOwner:
 
         if retry_after is not None:
             wait = float(retry_after)
+            if not math.isfinite(wait):
+                wait = self.config.max_retry_after_seconds
+            wait = min(max(wait, 0.0), self.config.max_retry_after_seconds)
         else:
             exp = self.config.base_delay_seconds * (2 ** max(0, attempt - 1))
             wait = min(self.config.max_delay_seconds, exp)
