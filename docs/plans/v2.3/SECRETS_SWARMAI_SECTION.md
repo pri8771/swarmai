@@ -1,5 +1,7 @@
 # SECRETS_SWARMAI_SECTION: the swarmai additions to the inference_server SECRETS_SETUP
 
+**Status: MERGED (2026-09-26).** Edits 1–6 below are applied in inference_server `docs/plans/v2.3/SECRETS_SETUP.md` on branch `cursor/v23-plan-460c` (§5 SEC-15, §8, §9 STEP E1/G/G-PUBLIC/H/I and the final report, §10). Use that file's §9 as the ONE computer-use prompt for both repos. This file is kept as the record of what swarmai asked for.
+
 Target file: `pri8771/inference_server` → `docs/plans/v2.3/SECRETS_SETUP.md` on branch `cursor/v23-plan-460c` (read at `28232556`). Apply the edits below to it. They are written for the inference_server coordinator, or for the owner pasting the §9 computer-use prompt by hand. swarmai adds exactly **one** name, `SPLITSIGNAL_MODEL` (coordinator decision C5). Its value is not secret. It is kept in the Desktop file so that one file holds every SwarmAI setting.
 
 `SPLITSIGNAL_API_KEY` (SEC-13, group `shared`) and `SPLITSIGNAL_BASE_URL` (SEC-14, group `swarmai`) are already in that file. Keep them unchanged.
