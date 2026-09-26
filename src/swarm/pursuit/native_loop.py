@@ -192,7 +192,11 @@ def native_loop_from_env(
     )
     if ss_url:
         model = e.get("SPLITSIGNAL_MODEL", "").strip() or DEFAULT_SPLITSIGNAL_MODEL
-        router = SplitSignalClient(ss_url, **({"timeout_s": timeout_s} if timeout_s else {}))
+        router = (
+            SplitSignalClient(ss_url, timeout_s=timeout_s)
+            if timeout_s is not None
+            else SplitSignalClient(ss_url)
+        )
     else:
         base_url = e.get("SWARM_ROUTER_BASE_URL", "").strip()
         if not base_url:
@@ -200,7 +204,11 @@ def native_loop_from_env(
         model = e.get("SWARM_ROUTER_MODEL", "").strip()
         if not model:
             return None, "router_model_not_configured"
-        router = RouterClient(base_url, **({"timeout_s": timeout_s} if timeout_s else {}))
+        router = (
+            RouterClient(base_url, timeout_s=timeout_s)
+            if timeout_s is not None
+            else RouterClient(base_url)
+        )
     pre = preflight_live_grant(grant, purpose="pursuit_native_loop", required_route=model)
     if not pre.ready:
         router.close()

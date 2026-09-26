@@ -22,9 +22,9 @@ from swarm.pursuit import (
     admit_proposal,
     detect_stagnation,
 )
+from swarm.pursuit.durable_accounting import InMemoryHoldStore
 from swarm.pursuit.models import MissionProposalDraft
 from swarm.pursuit.policy import PursuitPolicyError
-from swarm.pursuit.durable_accounting import InMemoryHoldStore
 
 HEADERS = {"Authorization": "Bearer review-only-token"}
 

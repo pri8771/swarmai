@@ -294,4 +294,7 @@ class PackLifecycleService:
         return rec
 
     def history(self, pack_id: str, version: str) -> list[dict[str, Any]]:
-        return self._install_record(pack_id, version).history
+        rec = self.store.get(pack_id, version, INSTALL_SCOPE)
+        if rec is None:
+            raise PackLifecycleError("pack_not_installed")
+        return rec.history

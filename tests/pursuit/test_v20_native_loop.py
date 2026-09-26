@@ -8,9 +8,9 @@ from swarm.api.store import ProductStore
 from swarm.contracts.enums import ErrorClass
 from swarm.contracts.router_capabilities import RouteBilling, RouterCallReceipt
 from swarm.providers.router_client import ChatResult, RouterClient, RouterClientError
+from swarm.pursuit import native_loop
 from swarm.pursuit.models import ContributionKind, MissionProposalDraft
 from swarm.pursuit.native_dispatch import NativeMissionDispatchExecutor
-from swarm.pursuit import native_loop
 from swarm.pursuit.native_loop import BoundedNativeLoop, native_loop_from_env
 from tests.fixtures.router_http.fake_router import FakeRouter
 
