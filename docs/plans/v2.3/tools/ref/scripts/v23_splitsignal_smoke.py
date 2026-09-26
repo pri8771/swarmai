@@ -21,6 +21,7 @@ import argparse
 import json
 import os
 import re
+import signal
 import sys
 import time
 from collections.abc import Callable, Mapping
@@ -42,6 +43,8 @@ DECISIONS = ROOT / "docs" / "swarm-mvp" / "DECISIONS.md"
 OUT = ROOT / "docs" / "evidence" / "v23" / "splitsignal_live.json"
 APPROVAL_LINE = re.compile(r"^- SW-PREAPPROVAL-A3: APPROVED\b", re.MULTILINE)
 PROMPT = "Reply with the single word: ok"
+MAX_TOKENS = 16
+MAX_WALL_SECONDS = 60
 
 
 def _receipt(r: Any) -> dict[str, Any]:
@@ -100,15 +103,22 @@ def run(
         approved=True,
         free_routes_only=True,
         max_calls=2,
-        max_tokens=16,
-        max_wall_seconds=60,
+        max_tokens=MAX_TOKENS,
+        max_wall_seconds=MAX_WALL_SECONDS,
     )
     pre = preflight_live_grant(grant, purpose="splitsignal_live_smoke", required_route=model)
     if not pre.ready:
         return blocked(pre.blocked_reason or "live_grant_not_ready")
 
     client = client_factory(base)
-    deadline = time.monotonic() + 60
+    deadline = time.monotonic() + MAX_WALL_SECONDS
+    previous_alarm = signal.getsignal(signal.SIGALRM)
+
+    def wall_timeout(_signum: int, _frame: Any) -> None:
+        raise TimeoutError("smoke_wall_clock_exceeded")
+
+    signal.signal(signal.SIGALRM, wall_timeout)
+    signal.setitimer(signal.ITIMER_REAL, MAX_WALL_SECONDS)
     try:
         try:
             models = {m.model_id: m for m in client.list_models()}
@@ -126,7 +136,7 @@ def run(
         body = {
             "model": model,
             "messages": [{"role": "user", "content": PROMPT}],
-            "max_tokens": 16,
+            "max_tokens": MAX_TOKENS,
         }
         calls: list[dict[str, Any]] = report["calls"]
         modes = ["text", "stream"] if stream else ["text"]
@@ -152,7 +162,12 @@ def run(
             if not text.strip():
                 report["status"] = f"fail:{mode}:empty_answer"
                 return 1, report
+    except TimeoutError:
+        report["status"] = "fail:wall_clock_exceeded"
+        return 1, report
     finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_alarm)
         client.close()
     report["status"] = "pass"
     return 0, report
