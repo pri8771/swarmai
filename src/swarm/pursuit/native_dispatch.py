@@ -2,6 +2,8 @@
 
 Never synthesizes achievement. Admits a RUNNING mission under ``var/missions/``
 and returns a pending outcome until protected verification accepts an artifact.
+An optional bounded native loop (V20-E05) may run model/tool turns; its result is
+recorded on the mission but never turns the outcome into success.
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ from swarm.contracts.enums import MissionStatus
 from swarm.contracts.fixtures import sample_task
 from swarm.contracts.mission import Mission
 from swarm.pursuit.models import ExecutionOutcome, MissionProposalDraft
+from swarm.pursuit.native_loop import BoundedNativeLoop, LoopResult, native_loop_from_env
 from swarm.pursuit.verification import (
     artifact_digest_for_refs,
     issue_criterion_receipt,
@@ -31,9 +34,20 @@ class NativeMissionDispatchExecutor:
     ``RecordingExecutor`` remains available only for explicit fixture/mock demos.
     """
 
-    def __init__(self, store: ProductStore, *, enqueue_worker_task: bool = True) -> None:
+    def __init__(
+        self,
+        store: ProductStore,
+        *,
+        enqueue_worker_task: bool = True,
+        native_loop: BoundedNativeLoop | None = None,
+    ) -> None:
         self.store = store
         self.enqueue_worker_task = enqueue_worker_task
+        self.native_loop = native_loop
+        self.loop_blocker: str | None = None
+        if native_loop is None:
+            # No LiveGrant is ever invented here, so this reports the honest blocker.
+            _, self.loop_blocker = native_loop_from_env({}, grant=None)
 
     def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome:
         mission_id = proposal.mission_id or new_id("msn_")
@@ -88,6 +102,8 @@ class NativeMissionDispatchExecutor:
         if self.enqueue_worker_task:
             self._enqueue_task(mission_id=mission.id, project_id=project_id, proposal=proposal)
 
+        loop_result = self._run_native_loop(mission.id, proposal)
+
         self.store.publish(
             project_id=project_id,
             type="mission.created",
@@ -97,16 +113,40 @@ class NativeMissionDispatchExecutor:
             dedupe_key=f"mission.created:{mission.id}",
         )
 
+        routes = [r.route_id for r in loop_result.receipts if r.route_id] if loop_result else []
         return ExecutionOutcome(
             mission_id=mission.id,
             success=False,
             failure_class="submitted_pending",
             notes="native_mission_dispatched_awaiting_worker_and_protected_verify",
             cost_usd=0.0,
-            model_calls=0,
-            tool_calls=0,
+            model_calls=loop_result.model_calls if loop_result else 0,
+            tool_calls=loop_result.tool_calls if loop_result else 0,
+            route_id=routes[0] if routes else None,
             runtime="native",
+            usage_unknown=loop_result is not None
+            and loop_result.model_calls > 0
+            and not loop_result.usage_known,
         )
+
+    def _run_native_loop(
+        self, mission_id: str, proposal: MissionProposalDraft
+    ) -> LoopResult | None:
+        result: LoopResult | None = None
+        if self.native_loop is None:
+            summary: dict[str, Any] = {"status": "blocked", "reason": self.loop_blocker}
+        else:
+            result = self.native_loop.run(proposal.objective)
+            summary = result.summary()
+        record = self.store.mission_store().load(mission_id)
+        plan = dict(record.plan or {})
+        plan["native_loop"] = summary
+        record.plan = plan
+        self.store.mission_store().append_timeline(
+            record, f"native_loop.{summary['status']}", dict(summary)
+        )
+        self.store.mission_store().save(record)
+        return result
 
     def reconcile(self, mission_id: str) -> ExecutionOutcome | None:
         """Return terminal outcome when mission completed/failed; else None (still pending)."""
