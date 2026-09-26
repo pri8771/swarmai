@@ -2,7 +2,7 @@
 
 Identical copy in both repos at `docs/plans/v2.3/JOINT_PLAN.md` on branch `cursor/v23-plan-460c` (inference_server [PR #32](https://github.com/pri8771/inference_server/pull/32), swarmai [PR #70](https://github.com/pri8771/swarmai/pull/70)). Written 2026-09-26 01:32 UTC by the joint planning agent. It sits on top of each repo's own `PLAN.md`, `OWNER_PREFLIGHT.md` and `prompts/`; where they differ, this file gives the joint order and the repo files give the detail.
 
-Owner decisions in force: D1 (Google sign-in as `priyansh.chordia@gmail.com` everywhere; every account exists), D2 (Codex reviews), D3 (the only cross-repo dependency is the SwarmAI API key plus the OpenAI-compatible API), D4 (finish together), D5 (one preflight), D6 (secrets in `~/Desktop/splitsignal-swarmai-secrets.env`). Coordinator decisions: C1/C6 (session merges go into the integration branches only, labelled `Codex review pending`; the owner merges to `main`/`dev` later), IS C8 (deploy/live steps are skipped while secrets are missing).
+Owner decisions in force: D1 (Google sign-in as `priyansh.chordia@gmail.com` everywhere; every account exists), D2 (Codex reviews), D3 (the only cross-repo dependency is the SwarmAI API key plus the OpenAI-compatible API), D4 (finish together), D5 (one preflight), D6 (secrets in `~/Desktop/splitsignal-swarmai-secrets.env`), D7 (2026-09-26: SSO deferred, outside V2.3 acceptance, no IdP/vendor), D8 (2026-09-26: the Desktop file is testing-only; rotate every SEC-* key before any non-owner traffic, then delete the file). Coordinator decisions: C1/C6 (session merges go into the integration branches only, labelled `Codex review pending`; the owner merges to `main`/`dev` later), IS C8 (deploy/live steps are skipped while secrets are missing).
 
 **Approval IDs are namespaced in this file.** `IS-An` = the line `PREAPPROVAL-An` in inference_server `docs/DECISIONS.md`. `SW-An` = the line `SW-PREAPPROVAL-An` in swarmai `docs/swarm-mvp/DECISIONS.md`. Both repos have an `A3` and an `A5`, and they are different approvals (§8).
 
@@ -240,6 +240,8 @@ Both repos must pass their own list and the joint list before the owner merges.
 - [ ] Joint live calls ≤ 7 (IS-A6 5 + SW-A3 2), spend $0, no paid service, no new account.
 - [ ] Neither repo contains a secret: `git grep -nE 'ss_live_[0-9a-f]{32}_|AIza|rnd_|postgresql://[^@ ]*:[^@ ]*@'` prints only the synthetic test key and placeholders.
 - [ ] The Desktop secrets file stays on the Desktop only (D6); no value appears in any PR, handoff or chat.
+- SSO is **not** an acceptance item (owner D7, 2026-09-26): IS B19 and the IS readiness "SSO refusal code" gap are deferred, not open. SSO stays off unless `SSO_ENABLED=true`.
+- [ ] **Pre-launch, after acceptance (owner D8):** rotate every SEC-* key before any non-owner traffic; then delete the Desktop file (IS `OWNER_PREFLIGHT.md` Part 8). Required before launch; does not block V2.3 acceptance.
 - [ ] Then the owner merges inference_server integration → `main` and swarmai integration → `dev`.
 
 ---

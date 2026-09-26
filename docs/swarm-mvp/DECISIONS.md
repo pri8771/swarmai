@@ -109,3 +109,17 @@ Pre-approvals (exact lines; SW-X2-S1 reads the A3 line):
 - SW-PREAPPROVAL-A2: APPROVED 2026-09-26 (Codex reviewer, D2)
 - SW-PREAPPROVAL-A3: PENDING (SplitSignal live smoke; wording in OWNER_PREFLIGHT Part 3)
 - SW-PREAPPROVAL-A5: PENDING (multi-process/private evidence run; wording in OWNER_PREFLIGHT Part 3)
+
+## DEC-V23-002: Cross-reference — owner decisions D7 and D8 (2026-09-26)
+
+| Field | Value |
+|---|---|
+| Topic | SSO scope and the plaintext secrets file (recorded in inference_server) |
+| Decision Maker | Owner |
+| Date Recorded | 2026-09-26 |
+| Status | accepted |
+| Supersedes | D6's open vault question, for both repos (by D8). Nothing in swarmai is deleted. |
+| Related Files | `docs/plans/v2.3/JOINT_PLAN.md` (byte-identical with inference_server); inference_server `docs/DECISIONS.md` D7/D8, `docs/DEFERRED_FEATURES.md`, `docs/plans/v2.3/OWNER_PREFLIGHT.md` Part 8 (branch `cursor/v23-plan-460c`) |
+
+- D7: SplitSignal's v2.1 SSO is deferred and not part of V2.3 acceptance. SwarmAI does not use SSO; there is no swarmai change.
+- D8: the Desktop file `~/Desktop/splitsignal-swarmai-secrets.env` (including the `# --- swarmai ---` group and `SPLITSIGNAL_API_KEY`) is a testing-only measure. Pre-launch: rotate every SEC-* key, including the SwarmAI key, before any non-owner traffic; then delete the Desktop file. The risk is closed as "accepted by owner, rotation required before launch".
