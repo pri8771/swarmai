@@ -1,0 +1,19 @@
+{
+  "schema_version": "1",
+  "scenario": "V20-E10-compose-full-path-smoke",
+  "status": "fail",
+  "reason": "compose up did not become healthy",
+  "compose_file": "deploy/compose/product.yml",
+  "git_sha": "fd92d239909b71a72685a7ff3cab2af51d9bc838",
+  "started_at": "2026-09-26T01:46:02Z",
+  "finished_at": "2026-09-26T01:47:15Z",
+  "steps": [
+    {
+      "name": "compose_up",
+      "ok": false,
+      "http_status": "000"
+    }
+  ],
+  "secrets": "generated per run in a temp file outside the repo; never recorded",
+  "spend": "none (SWARM_ALLOW_PAID=false, no provider network)"
+}
