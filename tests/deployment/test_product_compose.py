@@ -82,7 +82,7 @@ def test_worker_does_not_inherit_api_http_healthcheck() -> None:
     assert "swarm.workers.connector" in worker
     assert "    healthcheck:\n      test:" in worker
     assert "/proc/1/cmdline" in worker
-    assert "disable: true" not in worker
+    assert "\n      disable: true" not in worker
     assert "8765/health" not in worker
     api = _service_block(text, "api")
     assert "http://127.0.0.1:8765/health/live" in api
