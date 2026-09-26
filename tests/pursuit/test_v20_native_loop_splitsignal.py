@@ -52,7 +52,18 @@ def test_splitsignal_preferred_over_legacy_router(monkeypatch) -> None:  # type:
         "SWARM_ROUTER_BASE_URL": "http://legacy.test",
         "SWARM_ROUTER_MODEL": "legacy-free",
     }
-    loop, reason = native_loop_from_env({}, grant=None, env=env)
+    grant = LiveGrant(
+        grant_id="grant-routing",
+        routes=("mock/ok",),
+        budget_usd=0.0,
+        purpose="pursuit_native_loop",
+        approved=True,
+        free_routes_only=True,
+        max_calls=1,
+        max_tokens=8,
+        max_wall_seconds=1,
+    )
+    loop, reason = native_loop_from_env({}, grant=grant, env=env)
     assert reason == "ready" and loop is not None
     assert isinstance(loop.router, SplitSignalClient)
     assert seen["route"] == "mock/ok"

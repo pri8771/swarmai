@@ -286,8 +286,8 @@ class PackLifecycleService:
         )
 
     def revoke(self, pack_id: str, version: str) -> PackInstall:
-        self.registry.revoke(pack_id, version)
         rec = self._install_record(pack_id, version)
+        self.registry.revoke(pack_id, version)
         if rec.state in {PackLifecycleState.INSTALLED, PackLifecycleState.DRAINING}:
             rec = self._move(rec, PackLifecycleState.DISABLED, "revoke")
         self._set_projects(pack_id, version, PackLifecycleState.DISABLED)
