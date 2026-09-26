@@ -83,6 +83,41 @@ def test_partial_failure_compensates_everything() -> None:
     assert intent.failure_reason is not None and "worker" in intent.failure_reason
 
 
+def test_crash_after_external_reserve_is_recovered() -> None:
+    cap = FakeCapacity()
+    clock = Clock()
+    store = InMemorySchedulingStore()
+
+    def crash_after_reserve(
+        intent: DispatchIntent, comp: DispatchIntentComponent
+    ) -> str:
+        reservation_id = cap.reserve(intent, comp)
+        raise SystemExit(reservation_id)
+
+    crashed = DispatchIntentService(
+        store,
+        reserve=crash_after_reserve,
+        release=cap.release,
+        clock=clock,
+        ttl_seconds=30,
+    )
+    with pytest.raises(SystemExit):
+        _prepare(crashed)
+    assert cap.held == {"res_provider_att_1": "provider"}
+
+    clock.now += timedelta(seconds=31)
+    recovered = DispatchIntentService(
+        store,
+        reserve=cap.reserve,
+        release=cap.release,
+        clock=clock,
+        ttl_seconds=30,
+    ).recover_expired()
+    assert len(recovered) == 1
+    assert recovered[0].state == DispatchIntentState.EXPIRED
+    assert cap.held == {}
+
+
 def test_prepare_is_idempotent_per_attempt() -> None:
     cap = FakeCapacity()
     svc = _service(cap)

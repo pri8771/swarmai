@@ -5,9 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from swarm.api.store import ProductStore
-from swarm.providers.router_client import RouterClient
+from swarm.contracts.enums import ErrorClass
+from swarm.contracts.router_capabilities import RouteBilling, RouterCallReceipt
+from swarm.providers.router_client import ChatResult, RouterClient, RouterClientError
 from swarm.pursuit.models import ContributionKind, MissionProposalDraft
 from swarm.pursuit.native_dispatch import NativeMissionDispatchExecutor
+from swarm.pursuit import native_loop
 from swarm.pursuit.native_loop import BoundedNativeLoop, native_loop_from_env
 from tests.fixtures.router_http.fake_router import FakeRouter
 
@@ -47,6 +50,59 @@ def test_model_call_budget_is_hard() -> None:
     loop, _ = _loop("tools", max_model_calls=1)
     res = loop.run("x")
     assert res.status == "budget_exhausted" and res.model_calls == 1
+
+
+def test_wall_budget_limits_each_remaining_router_call(monkeypatch) -> None:
+    clock = {"now": 0.0}
+
+    class TimedRouter:
+        def __init__(self) -> None:
+            self.calls = 0
+            self.timeout = 99.0
+
+        def set_timeout(self, timeout_s: float) -> None:
+            self.timeout = timeout_s
+
+        def chat(self, _body: dict) -> ChatResult:
+            duration = 0.6
+            if duration > self.timeout:
+                clock["now"] += self.timeout
+                raise RouterClientError(ErrorClass.UNKNOWN_OUTCOME, "timeout")
+            clock["now"] += duration
+            self.calls += 1
+            message: dict = {"role": "assistant", "content": "done"}
+            if self.calls == 1:
+                message = {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": "call_1",
+                            "function": {"name": "workspace.read", "arguments": "{}"},
+                        }
+                    ],
+                }
+            return ChatResult(
+                body={"choices": [{"message": message}]},
+                receipt=RouterCallReceipt(
+                    billing=RouteBilling.FREE,
+                    usage_known=True,
+                    prompt_tokens=1,
+                    completion_tokens=1,
+                ),
+            )
+
+    monkeypatch.setattr(native_loop.time, "monotonic", lambda: clock["now"])
+    loop = BoundedNativeLoop(
+        TimedRouter(),  # type: ignore[arg-type]
+        {"workspace.read": lambda _args: "ok"},
+        model="fake-free",
+        max_wall_seconds=1.0,
+    )
+    result = loop.run("x")
+    assert result.status == "router_error"
+    assert result.error_code == "timeout"
+    assert clock["now"] <= 1.0
 
 
 def test_router_errors_stop_the_loop() -> None:
@@ -92,6 +148,22 @@ def test_executor_records_loop_but_never_invents_success(tmp_path: Path) -> None
     plan = store.mission_store().load(out.mission_id).plan
     assert plan["native_loop"]["status"] == "completed"
     assert "readme contents" not in str(plan)
+
+
+def test_executor_reconciliation_preserves_loop_usage(tmp_path: Path) -> None:
+    store = ProductStore(repo_root=tmp_path, db_reachable=None)
+    loop, _ = _loop("tools")
+    executor = NativeMissionDispatchExecutor(store, enqueue_worker_task=False, native_loop=loop)
+    pending = executor.execute(_proposal())
+    record = store.mission_store().load(pending.mission_id)
+    record.status = "failed"
+    store.mission_store().save(record)
+
+    terminal = executor.reconcile(pending.mission_id)
+    assert terminal is not None
+    assert (terminal.model_calls, terminal.tool_calls) == (2, 1)
+    assert (terminal.prompt_tokens, terminal.completion_tokens) == (22, 14)
+    assert terminal.usage_unknown is False
 
 
 def test_executor_without_loop_records_honest_blocker(tmp_path: Path, monkeypatch) -> None:

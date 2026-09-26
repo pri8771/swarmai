@@ -315,6 +315,56 @@ def test_pending_unknown_usage_hold_survives_terminal_reconciliation(tmp_path: P
     assert engine.resource_ledger(goal.id).holds[hold.hold_id].state == "unknown"
 
 
+def test_pending_known_usage_is_never_released_after_terminal_failure(tmp_path: Path) -> None:
+    goals, goal = _goal(
+        tmp_path,
+        verification_criteria=["c1"],
+        resource_envelope={"spend_usd_ceiling": 0.0, "max_model_calls": 1},
+    )
+
+    class PendingKnownExecutor:
+        def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome:
+            assert proposal.mission_id is not None
+            return ExecutionOutcome(
+                mission_id=proposal.mission_id,
+                success=False,
+                failure_class="submitted_pending",
+                model_calls=2,
+                prompt_tokens=5,
+                completion_tokens=2,
+                runtime="native",
+                usage_unknown=False,
+            )
+
+        def reconcile(self, mission_id: str) -> ExecutionOutcome:
+            return ExecutionOutcome(
+                mission_id=mission_id,
+                success=False,
+                failure_class="mission_failed",
+                model_calls=2,
+                prompt_tokens=5,
+                completion_tokens=2,
+                runtime="native",
+                usage_unknown=False,
+            )
+
+    engine = PursuitEngine(
+        goals,
+        executor=PendingKnownExecutor(),
+        scheduler=PursuitScheduler(clock=lambda: 0.0),
+        hold_store=InMemoryHoldStore(),
+    )
+    engine.tick(goal.id, force=True)
+    [hold] = engine.resource_ledger(goal.id).holds.values()
+    assert hold.state == "held"
+
+    engine.tick(goal.id, force=True)
+    preserved = engine.resource_ledger(goal.id).holds[hold.hold_id]
+    assert preserved.state == "unknown"
+    assert preserved.settled is not None and preserved.settled.model_calls == 2
+    assert engine.resource_ledger(goal.id).remaining().model_calls == 0
+
+
 def test_pursuit_api_tick_and_lesson(tmp_path: Path) -> None:
     client = _client(tmp_path / "server")
     created = client.post(

@@ -61,6 +61,18 @@ def test_child_cannot_exceed_remaining_model_calls() -> None:
         ledger.reserve(mission_id="msn_b", model_calls=1)
 
 
+def test_settlement_cannot_silently_exceed_call_envelope() -> None:
+    ledger = GoalResourceLedger.from_envelope(
+        "goal_x", {"spend_usd_ceiling": 0.0, "max_model_calls": 1, "max_tool_calls": 1}
+    )
+    hold = ledger.reserve(mission_id="msn_a", model_calls=1, tool_calls=1)
+    with pytest.raises(AccountingError, match="settle_exceeds_model_call_envelope"):
+        ledger.settle(hold.hold_id, model_calls=2, tool_calls=1)
+    with pytest.raises(AccountingError, match="settle_exceeds_tool_call_envelope"):
+        ledger.settle(hold.hold_id, model_calls=1, tool_calls=2)
+    assert ledger.holds[hold.hold_id].state == "held"
+
+
 def test_pursuit_tick_settles_usage(tmp_path: Path) -> None:
     store = GoalStore(tmp_path / "goals")
     goal = store.create(

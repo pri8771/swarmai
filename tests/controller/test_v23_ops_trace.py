@@ -29,6 +29,26 @@ def test_nested_secrets_are_redacted() -> None:
     assert d["items"][0] == {"password": "[redacted]", "ok": 1}
 
 
+def test_secret_shaped_values_are_redacted_under_generic_keys() -> None:
+    log = OpsEventLog()
+    log.emit(
+        "operator.action",
+        "api",
+        project_id="p",
+        detail={
+            "reason": "investigate ss_live_0123456789abcdef0123456789abcdef_abcdefghijklmnop",
+            "destination": "postgresql://user:password@db.internal/private",
+            "safe": "maintenance",
+        },
+    )
+    detail = log.list_events(project_id="p")[0]["detail"]
+    assert detail == {
+        "reason": "[redacted]",
+        "destination": "[redacted]",
+        "safe": "maintenance",
+    }
+
+
 def test_custom_sink_receives_events_and_filters() -> None:
     sink = InMemoryOpsSink()
     log = OpsEventLog(sink)

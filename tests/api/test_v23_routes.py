@@ -131,6 +131,40 @@ def test_fleet_audit_is_admin_only(client: TestClient) -> None:
     assert client.get("/v1/fleet/audit", headers=_h(ADMIN)).status_code == 200
 
 
+def test_fleet_place_uses_enrolled_project_worker(client: TestClient) -> None:
+    registered = client.post(
+        "/v1/scheduler/projects/proj_demo", json={}, headers=_h(DEMO)
+    )
+    assert registered.status_code == 200
+    enrolled = client.post(
+        "/v1/workers/enroll",
+        json={
+            "project_id": "proj_demo",
+            "capabilities": ["extract"],
+            "data_locality": {"primary": "local", "classes": ["local"]},
+        },
+        headers=_h(DEMO),
+    )
+    assert enrolled.status_code == 200
+    worker_id = enrolled.json()["worker"]["worker_id"]
+
+    placed = client.post(
+        "/v1/fleet/place",
+        json={"project_id": "proj_demo", "preferred_locality": "local"},
+        headers=_h(DEMO),
+    )
+    assert placed.status_code == 200
+    assert placed.json()["worker_id"] == worker_id
+    assert placed.json()["project_id"] == "proj_demo"
+
+    foreign = client.post(
+        "/v1/fleet/place",
+        json={"project_id": "proj_demo"},
+        headers=_h(OTHER),
+    )
+    assert foreign.status_code == 403
+
+
 def test_each_api_runtime_has_a_distinct_scheduler_holder(tmp_path: Path) -> None:
     first = create_app(require_auth=True, db_reachable=False, repo_root=tmp_path / "first")
     second = create_app(require_auth=True, db_reachable=False, repo_root=tmp_path / "second")
