@@ -9,7 +9,7 @@ makes no network call:
   defaults to ``DEFAULT_SPLITSIGNAL_MODEL``);
 * the decisions log has a line starting ``- SW-PREAPPROVAL-A3: APPROVED``;
 * a zero-dollar, free-routes-only LiveGrant (built here from that approval, at
-  most 2 calls, 64 output tokens, 60 s) passes ``preflight_live_grant``;
+  most 2 calls, 16 output tokens per call, 60 s) passes ``preflight_live_grant``;
 * the model is listed by ``GET /v1/models`` and admissible.
 
 Evidence keeps only sanitized metadata: no prompt or response text, no key.
@@ -100,7 +100,7 @@ def run(
         approved=True,
         free_routes_only=True,
         max_calls=2,
-        max_tokens=64,
+        max_tokens=16,
         max_wall_seconds=60,
     )
     pre = preflight_live_grant(grant, purpose="splitsignal_live_smoke", required_route=model)
