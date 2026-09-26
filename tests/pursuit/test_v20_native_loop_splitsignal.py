@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import copy
+
 from swarm.contracts.router_capabilities import RouteBilling, RouterCallReceipt
 from swarm.evals.synthetic_harness import LiveGrant
 from swarm.providers.router_client import ChatResult
@@ -83,7 +85,7 @@ def test_live_grant_ceilings_are_applied_to_native_loop(monkeypatch) -> None:  #
             pass
 
         def chat(self, body: dict[str, object]) -> ChatResult:
-            requests.append(body)
+            requests.append(copy.deepcopy(body))
             return ChatResult(
                 body={
                     "choices": [
