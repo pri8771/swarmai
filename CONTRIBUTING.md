@@ -17,6 +17,12 @@ uv run pytest -q
 - Prefer small, reviewable commits (packet / coherent sub-slice)
 - Secret-scan before push; never commit `.env` or keys
 
+### V2.3 work (2026-09-26)
+
+- Branch from `cursor/sw-v23-integration-460c` and open a **draft** PR to it, never to `dev` or `main` (decision C1 in `docs/swarm-mvp/DECISIONS.md`).
+- Each session follows its prompt in `docs/plans/v2.3/prompts/` and ends its handoff with a Codex review packet.
+- The independent reviewer is Codex (D2). Authors never accept their own work.
+
 ## Tests
 
 ```sh

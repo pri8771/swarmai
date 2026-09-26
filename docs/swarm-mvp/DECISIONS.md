@@ -73,3 +73,39 @@
 | Date Recorded | 2026-09-25 |
 | Status | accepted |
 | Related Files | `STATE.md`, `SOURCE_BASELINE.json` |
+
+## DEC-V23-001: Owner and coordinator decisions for V2.3 (2026-09-25/26)
+
+| Field | Value |
+|---|---|
+| Decision ID | DEC-V23-001 |
+| Topic | V2.3 execution: pause lift, review, branching, SplitSignal, secrets |
+| Decision Maker | Owner (D1–D6, B-01); coordinator (C1–C5; the owner may override) |
+| Date Recorded | 2026-09-26 |
+| Status | accepted (C1–C5: coordinator-accepted) |
+| Supersedes | `docs/agents/CURRENT.md` `pause: true` / `pause_state` (by B-01); HL-07 "PRs target `dev` only" for V2.3 work (by C1); open "name a reviewer" / independent-review blockers (by D2). The earlier entries are kept and marked. |
+| Related Files | `docs/plans/v2.3/PLAN.md` §0 and §5.2, `docs/plans/v2.3/OWNER_PREFLIGHT.md`, `docs/plans/v2.3/AUDIT.md` |
+| Related Prompt | V2.3 planning prompt, 2026-09-26 (`docs/PROMPT_LOG.md`) |
+| Related Jira/Linear | pending (see `docs/JIRA_SYNC_PENDING.md`) |
+
+Owner decisions:
+- D1: Every third-party account uses Sign in with Google with the owner's Google account. All accounts exist and are signed in; Codex has read access.
+- D2: The independent reviewer is Codex. Every session that needs review ends with a "Codex review packet" (PR URL placeholder, head SHA command, files to review, review focus per the AGENTS.md Code Review Rules). A session is accepted only by Codex `RECOMMEND_ACCEPT <sha>` on its exact head SHA.
+- D3: The only cross-repo dependency: SplitSignal (inference_server) issues SwarmAI an API key, and SwarmAI calls SplitSignal as a standard OpenAI-compatible API. Nothing else crosses repos.
+- D4: Both projects finish V2.3 together, coordinated through sync points SP1–SP6 (`docs/plans/v2.3/PLAN.md` §5.2).
+- D5: All owner blockers go into one preflight (`docs/plans/v2.3/OWNER_PREFLIGHT.md`), done before sessions start. Nothing may block partway: a missing gate makes a session STOP, record and push; it never waits.
+- D6: Secrets live in a plain-text file on the owner's Mac (`~/Desktop/splitsignal-swarmai-secrets.env`, section `# --- swarmai ---`), then in Cursor Dashboard → Cloud Agents → Secrets. swarmai is public, so Cursor may withhold secret injection unless the owner allows it.
+- B-01: The owner's instruction "get to V2.3 for both projects" lifts `pause: true` (2026-09-26).
+
+Coordinator decisions (owner may override):
+- C1: Agents may not merge into `dev` or `main`. Integration branch `cursor/sw-v23-integration-460c` (created from `origin/dev`). Every session branches from it and opens a draft PR to it. `SW-MERGE-<wave>` prompts merge session PRs after checks pass, labelled `Codex review pending`. The owner merges integration into `dev`. For V2.3, "merged to dev" means "merged into `cursor/sw-v23-integration-460c`".
+- C2: inference_server's integration branch is `cursor/is-v23-integration-460c`.
+- C3: D-SS1. A route listed by SplitSignal's key-scoped `/v1/models` is treated as free. A response is refused only when it reports a known non-zero cost. An unknown cost is recorded as unknown (`null`), never zero, and never releases budget (F-13 semantics).
+- C4: inference_server `/v1/models` returns `{"object":"list","data":[...]}`. SwarmAI stays tolerant of both that and `ModelPage` (`items`).
+- C5: SwarmAI env var names are exactly `SPLITSIGNAL_BASE_URL` (public URL + `/v1`), `SPLITSIGNAL_API_KEY` and `SPLITSIGNAL_MODEL` (recommended default `gemini/gemini-3.5-flash-lite`, used when unset).
+
+Pre-approvals (exact lines; SW-X2-S1 reads the A3 line):
+- SW-PREAPPROVAL-A1: APPROVED 2026-09-26 (pause lift, B-01)
+- SW-PREAPPROVAL-A2: APPROVED 2026-09-26 (Codex reviewer, D2)
+- SW-PREAPPROVAL-A3: PENDING (SplitSignal live smoke; wording in OWNER_PREFLIGHT Part 3)
+- SW-PREAPPROVAL-A5: PENDING (multi-process/private evidence run; wording in OWNER_PREFLIGHT Part 3)

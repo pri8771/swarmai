@@ -27,3 +27,14 @@
 - Paid spend (forbidden unless later explicit message)
 
 See `docs/evidence/ACCEPTANCE_LAUNCH_TRACK.md`.
+
+---
+
+# Handoff: V2.3 planning (2026-09-26, supersedes the "Still USER_ACTION" routing above for V2.3)
+
+- **Branch:** `cursor/v23-plan-460c` (from `origin/dev` @ `8e1c0fde`); docs only.
+- **Plan:** `docs/plans/v2.3/PLAN.md`, `AUDIT.md`, `OWNER_PREFLIGHT.md`, `prompts/`.
+- **Integration:** `cursor/sw-v23-integration-460c`. Session PRs target it; `SW-MERGE-<wave>` merges them; the owner merges it into `dev`.
+- **Reviewer:** Codex (D2). Every session handoff ends with a "Codex review packet": PR URL, head SHA (`git rev-parse HEAD` = `git ls-remote origin refs/heads/<branch>`), files, focus per AGENTS.md Code Review Rules, requested verdict `RECOMMEND_ACCEPT <sha>` or `REQUEST_CHANGES`.
+- **Spend:** $0. Live calls only in SW-X2-S1, once SW-PREAPPROVAL-A3 is approved.
+- **Owner actions:** `OWNER_PREFLIGHT.md` Part 3 (A3, A5) and Part 4 (R-1 public-repo secrets, R-2 stale PRs, R-3 integration → `dev` merge).
