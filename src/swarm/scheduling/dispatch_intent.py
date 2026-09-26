@@ -125,7 +125,7 @@ class DispatchIntentService:
                 return self._compensate(
                     intent,
                     attempted_components,
-                    f"reserve_failed:{comp.kind}:{exc}",
+                    f"reserve_failed:{comp.kind}:{type(exc).__name__}",
                 )
             components = list(intent.components)
             components[index] = attempted.model_copy(update={"reservation_id": reservation_id})
