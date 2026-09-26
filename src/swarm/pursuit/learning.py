@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from swarm.contracts.common import utc_now
 from swarm.pursuit.models import LessonState, PursuitLesson
+
+if TYPE_CHECKING:
+    from swarm.pursuit.durable_accounting import LessonPersistence
 
 
 class PursuitLearningError(RuntimeError):
@@ -20,12 +25,24 @@ _TRANSITIONS: dict[LessonState, set[LessonState]] = {
 
 
 class PursuitLessonStore:
-    def __init__(self) -> None:
+    def __init__(self, persistence: LessonPersistence | None = None) -> None:
         self._lessons: dict[str, PursuitLesson] = {}
         self._by_goal: dict[str, list[str]] = {}
+        self._persistence = persistence
+        if persistence is not None:
+            for lesson in persistence.load_all():
+                self._lessons[lesson.lesson_id] = lesson
+                self._by_goal.setdefault(lesson.goal_id, []).append(lesson.lesson_id)
+
+    def _store(self, lesson: PursuitLesson) -> PursuitLesson:
+        """Durable first: a persistence failure leaves memory unchanged."""
+        if self._persistence is not None:
+            self._persistence.put(lesson)
+        self._lessons[lesson.lesson_id] = lesson
+        return lesson
 
     def propose(self, lesson: PursuitLesson) -> PursuitLesson:
-        self._lessons[lesson.lesson_id] = lesson
+        self._store(lesson)
         self._by_goal.setdefault(lesson.goal_id, []).append(lesson.lesson_id)
         return lesson
 
@@ -64,8 +81,7 @@ class PursuitLessonStore:
                 "updated_at": utc_now().isoformat(),
             }
         )
-        self._lessons[lesson_id] = updated
-        return updated
+        return self._store(updated)
 
     def adopt(self, lesson_id: str, *, current_strategy: str) -> PursuitLesson:
         lesson = self.get(lesson_id)
@@ -80,8 +96,7 @@ class PursuitLessonStore:
                 "updated_at": utc_now().isoformat(),
             }
         )
-        self._lessons[lesson_id] = updated
-        return updated
+        return self._store(updated)
 
     def rollback(self, lesson_id: str) -> PursuitLesson:
         lesson = self.get(lesson_id)
@@ -90,8 +105,7 @@ class PursuitLessonStore:
         updated = lesson.model_copy(
             update={"state": LessonState.ROLLED_BACK, "updated_at": utc_now().isoformat()}
         )
-        self._lessons[lesson_id] = updated
-        return updated
+        return self._store(updated)
 
     def applied_strategy(self, goal_id: str, base_strategy: str) -> str:
         adopted = self.adopted_for_goal(goal_id)
