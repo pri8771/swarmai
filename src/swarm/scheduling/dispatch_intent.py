@@ -121,6 +121,16 @@ class DispatchIntentService:
             try:
                 reservation_id = self._reserve(intent, attempted)
             except Exception as exc:  # noqa: BLE001 — any failure compensates
+                # ReserveFn's contract is atomic for ordinary exceptions: a
+                # raised Exception means this component was not acquired.
+                # Abrupt process death never reaches this block, so the durable
+                # attempted bit remains set for restart compensation.
+                components = list(intent.components)
+                components[index] = attempted.model_copy(update={"reserved": False})
+                intent = self.store.put_intent(
+                    intent.model_copy(update={"components": components}),
+                    expected_version=intent.version,
+                )
                 attempted_components = [c for c in intent.components if c.reserved]
                 return self._compensate(
                     intent,

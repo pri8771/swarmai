@@ -183,11 +183,12 @@ class PackLifecycleService:
         try:
             self.registry.verify_trust(pack_id, version)
         except ExtensionAuthzError as exc:
-            if str(exc) != "pack_missing":
-                raise
-            if rec.manifest is None:
-                raise PackLifecycleError("pack_manifest_not_persisted") from exc
-            self.registry.register(rec.manifest)
+            if str(exc) == "pack_missing":
+                if rec.manifest is None:
+                    raise PackLifecycleError("pack_manifest_not_persisted") from exc
+                self.registry.register(rec.manifest)
+            else:
+                raise PackLifecycleError(str(exc)) from exc
         return rec
 
     def _move(self, rec: PackInstall, to: PackLifecycleState, action: str) -> PackInstall:
