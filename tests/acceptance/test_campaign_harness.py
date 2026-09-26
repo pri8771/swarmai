@@ -173,3 +173,20 @@ def test_live_dispatcher_consumes_scoped_grant_without_invent() -> None:
     assert live.status == "pass_fake_upstream_wiring"
     assert live.detail["live_dispatch"]["receipt"] == "authentic_receipt"
     assert live.status != "blocked_live_grant"
+
+
+def test_sdk_ui_parity_probe_restores_swarm_env(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The probe clears SWARM_* for its fixture app; it must not leak that to the caller."""
+    import os
+
+    from swarm.acceptance.probes import probe_sdk_ui_parity
+
+    monkeypatch.setenv("SWARM_DATABASE_URL", "postgresql+psycopg://u:p@127.0.0.1:5432/probe_leak")
+    monkeypatch.setenv("SWARM_PROBE_SENTINEL", "keep")
+    before = {k: v for k, v in os.environ.items() if k.startswith("SWARM_")}
+    result = probe_sdk_ui_parity(tmp_path)
+    assert result.ok, (result.status, result.detail)
+    after = {k: v for k, v in os.environ.items() if k.startswith("SWARM_")}
+    assert after == before
