@@ -1,0 +1,156 @@
+{
+  "schema_version": "2.3.0",
+  "freeze_id": "v23-acceptance-deterministic-20260926",
+  "frozen_at": "REPLACE_WITH_UTC_TIMESTAMP_AT_COMMIT",
+  "source": "docs/artifacts/future/ART-V23-OPS_PLATFORM.md#acceptance-protocol-for-v23-operational-platform",
+  "policy_ref": "config/v23/scheduler_policy.v1.json",
+  "policy_version": "v23-wdrr-1",
+  "version_claim_policy": "never_mark_accepted_from_harness",
+  "spend_policy": "zero_no_invented_live_grant",
+  "tolerance": {
+    "relative_share_error": 0.15,
+    "min_decisions": 200
+  },
+  "gates": {
+    "deterministic": {
+      "id": "deterministic",
+      "description": "Single-process mechanics with fake upstreams and injected clocks; no credentials",
+      "requires_live_grant": false,
+      "requires_multi_process": false
+    },
+    "multi_process_private": {
+      "id": "multi_process_private",
+      "description": "Separate scheduler/control-plane/worker processes on private infrastructure; owner approval required",
+      "requires_live_grant": false,
+      "requires_multi_process": true
+    }
+  },
+  "scenarios": [
+    {
+      "id": "V23-A01",
+      "title": "Fairness across three weighted projects",
+      "art_item": 1,
+      "primary_gate": "deterministic",
+      "workload": {"projects": {"proj_w1": 1, "proj_w2": 2, "proj_w3": 3}, "decisions": 600},
+      "pass_criteria": [
+        "each project's admitted share within relative_share_error of weight/sum(weights)",
+        "every eligible project admitted at least once"
+      ],
+      "deterministic_probe": "fairness_three_projects"
+    },
+    {
+      "id": "V23-A02",
+      "title": "Anti-amplification under 50+ task expansion",
+      "art_item": 2,
+      "primary_gate": "deterministic",
+      "workload": {"expanding_project_tasks": 60, "baseline_project_tasks": 1, "decisions": 400},
+      "pass_criteria": ["expanding project share within tolerance of its weight share (0.5)"],
+      "deterministic_probe": "anti_amplification"
+    },
+    {
+      "id": "V23-A03",
+      "title": "Two-project isolation negatives",
+      "art_item": 3,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "cross-project ops-event read denied (403)",
+        "cross-tenant worker placement rejected and audited",
+        "pack enabled for project A is not usable by project B",
+        "mismatched task/mission project is never admitted (isolation_denied)"
+      ],
+      "deterministic_probe": "isolation_negatives"
+    },
+    {
+      "id": "V23-A04",
+      "title": "Restart preserves pending work, credits, intents and fencing",
+      "art_item": 4,
+      "primary_gate": "deterministic",
+      "also_gates": ["multi_process_private"],
+      "pass_criteria": [
+        "state reloaded from the durable store equals state before restart",
+        "positive credit clamped by restart cap; debt preserved",
+        "expired PREPARED/RESERVED intents compensated exactly once",
+        "stale scheduler epoch cannot write"
+      ],
+      "deterministic_probe": "restart_recovery"
+    },
+    {
+      "id": "V23-A05",
+      "title": "Drain with active leases",
+      "art_item": 5,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "draining worker receives no new placement",
+        "draining mission receives no new admission",
+        "no duplicate accepted result"
+      ],
+      "deterministic_probe": "drain_active"
+    },
+    {
+      "id": "V23-A06",
+      "title": "Capability pack lifecycle",
+      "art_item": 6,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "install -> enable for one project -> deny other project -> drain -> disable -> uninstall",
+        "unsigned or wrongly-signed pack refused when signatures required",
+        "no implicit capability widening"
+      ],
+      "deterministic_probe": "pack_lifecycle"
+    },
+    {
+      "id": "V23-A07",
+      "title": "Portability export/import into a clean root",
+      "art_item": 7,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "no secret values in the bundle (key and value scan)",
+        "section digests verify after import",
+        "imported approvals/leases are tombstoned and cannot execute"
+      ],
+      "deterministic_probe": "portability_roundtrip"
+    },
+    {
+      "id": "V23-A08",
+      "title": "End-to-end trace chain",
+      "art_item": 8,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "trace graph links operator.action -> mission.created -> scheduler.decision -> attempt.started -> inference.call|tool.effect -> artifact.stored -> acceptance.recorded",
+        "trace is complete (no missing links) using durable ids"
+      ],
+      "deterministic_probe": "trace_chain"
+    },
+    {
+      "id": "V23-A09",
+      "title": "Failure truth: provider unavailable and worker loss",
+      "art_item": 9,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "decision is DEFER with deferred_resource_unavailable, never ADMIT",
+        "ops events record the blocked state; no mock success"
+      ],
+      "deterministic_probe": "failure_truth"
+    },
+    {
+      "id": "V23-A10",
+      "title": "Zero-spend operator profile",
+      "art_item": 10,
+      "primary_gate": "deterministic",
+      "pass_criteria": [
+        "route with billing paid or unknown is denied with paid_route_forbidden",
+        "no fallback to a paid route"
+      ],
+      "deterministic_probe": "zero_spend"
+    },
+    {
+      "id": "V23-A11",
+      "title": "Multi-process / private live evidence",
+      "art_item": 0,
+      "primary_gate": "multi_process_private",
+      "status": "pending_owner_approval",
+      "pass_criteria": ["ART protocol items 1, 4, 5, 9 repeated with separate processes on private infrastructure"],
+      "deterministic_probe": null
+    }
+  ]
+}

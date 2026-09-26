@@ -1,0 +1,150 @@
+diff --git a/src/swarm/api/store.py b/src/swarm/api/store.py
+index 6434ffca..02b87980 100644
+--- a/src/swarm/api/store.py
++++ b/src/swarm/api/store.py
+@@ -83,6 +83,8 @@ class ProductStore:
+     _mission_store: MissionStore | None = field(default=None, repr=False)
+     _goal_store: Any = field(default=None, repr=False)
+     _pursuit_engine: Any = field(default=None, repr=False)
++    _pg_factory: Any = field(default=None, repr=False)
++    _pursuit_ticker: Any = field(default=None, repr=False)
+     _durable_bootstrapped: bool = field(default=False, repr=False)
+ 
+     def bootstrap_durable(self) -> None:
+@@ -162,15 +164,67 @@ class ProductStore:
+                 executor: Any = RecordingExecutor(default_success=True)
+             else:
+                 executor = NativeMissionDispatchExecutor(self)
++            factory = self.pg_session_factory()
++            mirror: Any = None
++            lessons: Any = None
++            hold_store: Any = None
++            if factory is not None:
++                from swarm.pursuit.durable_accounting import SqlHoldStore, SqlLessonPersistence
++                from swarm.pursuit.learning import PursuitLessonStore
++                from swarm.pursuit.pg_mirror import PursuitPgMirror
++
++                mirror = PursuitPgMirror(factory)
++                lessons = PursuitLessonStore(persistence=SqlLessonPersistence(factory))
++                hold_store = SqlHoldStore(factory)
+             self._pursuit_engine = PursuitEngine(
+                 self.goal_store(),
+                 executor=executor,
++                lessons=lessons,
+                 scheduler=PursuitScheduler(clock=time.time),
+                 clock=time.time,
+-                state_store=DurablePursuitStateStore(root),
++                state_store=DurablePursuitStateStore(root, mirror=mirror),
++                hold_store=hold_store,
+             )
+         return self._pursuit_engine
+ 
++    def pg_session_factory(self) -> Any:
++        """PostgreSQL session factory for durable pursuit state, or ``None``.
++
++        Only when ``SWARM_V23_DURABLE=1`` and the database was probed reachable;
++        otherwise file-backed state under ``var/`` stays authoritative, as before.
++        """
++        if self._pg_factory is None and self.db_reachable is True:
++            import os
++
++            if os.environ.get("SWARM_V23_DURABLE", "") == "1":
++                from swarm.db.engine import create_db_engine, make_session_factory
++
++                self._pg_factory = make_session_factory(create_db_engine())
++        return self._pg_factory
++
++    def pursuit_ticker(self) -> Any:
++        """Site-wide singleton ticker; the epoch row ``pursuit-ticker`` fences other processes."""
++        if self._pursuit_ticker is None:
++            from swarm.contracts.common import new_id
++            from swarm.scheduling.epoch import (
++                InMemorySchedulerEpochService,
++                SqlSchedulerEpochService,
++            )
++            from swarm.scheduling.singleton import SingletonTicker
++
++            factory = self.pg_session_factory()
++            epochs: Any = (
++                SqlSchedulerEpochService(factory, site_id="pursuit-ticker")
++                if factory is not None
++                else InMemorySchedulerEpochService(site_id="pursuit-ticker")
++            )
++            self._pursuit_ticker = SingletonTicker(epochs, holder_id=new_id("pursuit_"))
++        return self._pursuit_ticker
++
++    def run_pursuit_tick(self) -> Any:
++        """Tick all due goals once, only if this process holds the pursuit epoch."""
++        return self.pursuit_engine().singleton_tick(self.pursuit_ticker())
++
+     def mission_store(self) -> MissionStore:
+         """Durable mission identity shared by API / CLI / console reopen paths."""
+         if self._mission_store is None:
+diff --git a/src/swarm/pursuit/loop.py b/src/swarm/pursuit/loop.py
+index 40a5fe1e..75abc59c 100644
+--- a/src/swarm/pursuit/loop.py
++++ b/src/swarm/pursuit/loop.py
+@@ -4,11 +4,12 @@ from __future__ import annotations
+ 
+ from collections.abc import Callable
+ from pathlib import Path
+-from typing import Any, Protocol
++from typing import TYPE_CHECKING, Any, Protocol
+ 
+ from swarm.contracts.common import new_id
+ from swarm.goals.models import Goal, GoalError, GoalKind, GoalStatus, GoalStore
+ from swarm.pursuit.accounting import AccountingError, GoalResourceLedger
++from swarm.pursuit.durable_accounting import HoldStore, bind_durable_ledger
+ from swarm.pursuit.frontier import assess_gap, build_frontier, choose_contribution
+ from swarm.pursuit.learning import PursuitLessonStore
+ from swarm.pursuit.models import (
+@@ -29,6 +30,9 @@ from swarm.pursuit.verification import (
+     verify_execution_outcome,
+ )
+ 
++if TYPE_CHECKING:
++    from swarm.scheduling.singleton import SingletonTicker, TickResult
++
+ 
+ class MissionExecutor(Protocol):
+     def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome: ...
+@@ -115,8 +119,10 @@ class PursuitEngine:
+         ledgers: dict[str, GoalResourceLedger] | None = None,
+         state_store: DurablePursuitStateStore | None = None,
+         state_root: Path | None = None,
++        hold_store: HoldStore | None = None,
+     ) -> None:
+         self.goals = goals
++        self.hold_store = hold_store
+         if executor is None:
+             # R20-01 defense in depth: never default to successful RecordingExecutor.
+             from swarm.pursuit.native_dispatch import BlockedMissingImplementationExecutor
+@@ -152,9 +158,28 @@ class PursuitEngine:
+         ledger = self._ledgers.get(goal_id)
+         if ledger is None:
+             ledger = GoalResourceLedger.from_envelope(goal_id, goal.resource_envelope)
++            if self.hold_store is not None:
++                bind_durable_ledger(ledger, self.hold_store)
+             self._ledgers[goal_id] = ledger
+         return ledger
+ 
++    def tick_all_due(self) -> list[CycleRecord]:
++        """Tick every active/waiting goal whose schedule is due, in goal-id order."""
++        records: list[CycleRecord] = []
++        for goal_id in sorted(self.goals.goals):
++            goal = self.goals.goals[goal_id]
++            if goal.status not in {GoalStatus.ACTIVE, GoalStatus.WAITING}:
++                continue
++            if goal_id not in self._history:
++                self.observe(goal_id)
++            if self.scheduler.is_due(goal_id):
++                records.append(self.tick(goal_id))
++        return records
++
++    def singleton_tick(self, ticker: SingletonTicker) -> TickResult:
++        """Run ``tick_all_due`` only while holding the site-wide pursuit epoch."""
++        return ticker.run_once(lambda _lease: self.tick_all_due())
++
+     def _hydrate_all(self) -> None:
+         """Load on-disk pursuit snapshots for goals already known to GoalStore."""
+         for goal in list(self.goals.goals.values()):

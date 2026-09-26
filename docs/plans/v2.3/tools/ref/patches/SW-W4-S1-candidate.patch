@@ -1,0 +1,14 @@
+diff --git a/src/swarm/release/candidate.py b/src/swarm/release/candidate.py
+index f549789e..59c60553 100644
+--- a/src/swarm/release/candidate.py
++++ b/src/swarm/release/candidate.py
+@@ -10,6 +10,9 @@ from typing import Any
+ 
+ from swarm.contracts.common import new_id, utc_now
+ 
++# Must equal the Alembic head; tests/release/test_schema_revision.py enforces it.
++CURRENT_SCHEMA_REVISION = "a23opsplatform0001"
++
+ 
+ @dataclass
+ class CandidateManifest:
