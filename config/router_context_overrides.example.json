@@ -1,0 +1,13 @@
+{
+  "schema": "swarm.router_context_overrides.v1",
+  "note": "Local metadata for models whose inference_server /v1/models entry lacks it. Never sets billing: zero-spend admission uses only the router's billing value.",
+  "models": {
+    "example-free-route": {
+      "context_window": 8192,
+      "max_output_tokens": 1024,
+      "tokenizer": "unknown",
+      "supports_tools": false,
+      "supports_json": false
+    }
+  }
+}
