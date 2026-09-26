@@ -2,8 +2,9 @@
 
 Closes R20-04: criteria progress, cycle history, dedupe, commitments, active
 missions, failed approaches and schedules must not live only in process memory.
-File-backed under ``var/pursuit/`` for local volume durability; PostgreSQL
-repositories mirror the same contracts when the DB authority is available.
+File-backed under ``var/pursuit/`` for local volume durability. When a
+``mirror`` (V20-E03 PostgreSQL write-through) is given, the database is written
+first and read first; mirror failures raise ``PursuitMirrorError`` (fail closed).
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from swarm.pursuit.models import CycleRecord, ScheduleState
+from swarm.pursuit.pg_mirror import PursuitMirror
 
 
 def _atomic_write(path: Path, payload: dict[str, Any]) -> None:
@@ -38,15 +40,16 @@ class DurablePursuitStateStore:
 
     schema_version = "2.0-pursuit-state"
 
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, *, mirror: PursuitMirror | None = None) -> None:
         self.root = root.resolve()
         self.root.mkdir(parents=True, exist_ok=True)
+        self.mirror = mirror
 
     def _path(self, goal_id: str) -> Path:
         safe = goal_id.replace("/", "_").replace("..", "_")
         return self.root / f"{safe}.json"
 
-    def load(self, goal_id: str) -> dict[str, Any] | None:
+    def _load_file(self, goal_id: str) -> dict[str, Any] | None:
         path = self._path(goal_id)
         if not path.is_file():
             return None
@@ -57,6 +60,13 @@ class DurablePursuitStateStore:
         if not isinstance(raw, dict):
             return None
         return raw
+
+    def load(self, goal_id: str) -> dict[str, Any] | None:
+        if self.mirror is not None:
+            snap = self.mirror.load_snapshot(goal_id)
+            if snap is not None:
+                return snap
+        return self._load_file(goal_id)
 
     def save(
         self,
@@ -81,6 +91,8 @@ class DurablePursuitStateStore:
             "commitments": list(commitments),
             "schedule": schedule.model_dump(mode="json") if schedule else None,
         }
+        if self.mirror is not None:
+            self.mirror.write_snapshot(goal_id, payload)
         _atomic_write(self._path(goal_id), payload)
 
     def parse_history(self, raw: dict[str, Any]) -> list[CycleRecord]:
