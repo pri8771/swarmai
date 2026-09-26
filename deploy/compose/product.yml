@@ -108,6 +108,13 @@ services:
     working_dir: /app
     entrypoint: ["/app/.venv/bin/python"]
     command: ["-m", "swarm.workers.connector"]
+    # The image HEALTHCHECK probes the API's HTTP port; the connector serves no
+    # HTTP and keeps no local heartbeat file (it heartbeats to the API), and it
+    # runs as PID 1 so a process check would only restate "container running".
+    # Worker liveness is the API-side heartbeat/lease TTL; crashes exit the
+    # container and `restart: unless-stopped` applies.
+    healthcheck:
+      disable: true
     networks:
       - product_net
     deploy:
