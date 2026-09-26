@@ -4,9 +4,9 @@ audience: ai_agent
 sot: docs/agents/
 base_branch: dev
 forbid_base: main
-verified_tip: dd7726eb8c22986ef72847994c8e435a81a869b6
-verified_at: 2026-09-25T21:07Z
-pause: true
+verified_tip: 8e1c0fdec24c131e7612d88076220945230f4c3b
+verified_at: 2026-09-26T00:47Z
+pause: false
 ---
 
 # agents SoT index
@@ -20,6 +20,8 @@ Primary session handoff for AI agents. Prefer this tree over human essays in Pro
 3. `V20_TODO.md` — remaining eng IDs V20-E01…E11
 4. `RESUME.md` — exact next steps
 5. `context.json` — same facts machine-parseable
+6. `docs/v2.3/PLAN.md` — V2.3 multitask plan
+7. `docs/v2.3/sessions/` — per-session V2.3 handoffs
 
 ## related_repo_sot_stale
 

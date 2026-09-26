@@ -1,20 +1,22 @@
 ---
 doc: agents_resume
 audience: ai_agent
-pause: true
+pause: false
 base: origin/dev
-tip_floor: dd7726eb8c22986ef72847994c8e435a81a869b6
+tip_floor: 8e1c0fdec24c131e7612d88076220945230f4c3b
 accepted: false
 ---
 
 # RESUME
+
+Active work: V2.3 per docs/v2.3/PLAN.md; each session writes docs/v2.3/sessions/<ID>.md.
 
 ## preflight
 
 ```text
 git fetch origin dev main
 git rev-parse origin/dev
-# must be >= dd7726eb8c22986ef72847994c8e435a81a869b6
+# must be >= 8e1c0fdec24c131e7612d88076220945230f4c3b
 git rev-parse origin/main
 # must remain 08b910f981eff2ab66873a71055090f2c60f2a91 unless operator moves it
 ```

@@ -3,9 +3,9 @@ doc: agents_v20_todo
 audience: ai_agent
 eng_complete: false
 accepted: false
-tip: dd7726eb8c22986ef72847994c8e435a81a869b6
+tip: 8e1c0fdec24c131e7612d88076220945230f4c3b
 harness: harness_ready_external_gates_blocked
-verified_at: 2026-09-25T21:07Z
+verified_at: 2026-09-26T00:47Z
 ---
 
 # V20_TODO
@@ -26,15 +26,15 @@ verified_at: 2026-09-25T21:07Z
 |---|---|---|---|---|---|
 | V20-E01 | P0 | in_progress | none | docs/PORT-05 | tip-sync owned by **#66** (MERGEABLE all-green); #68 WIP overlap — do not re-do STATE tip-sync here |
 | V20-E02 | P0 | in_progress | offline CI or docs-only | docs | land FAST_TRACK docs via **#67**; plan source **#59** |
-| V20-E03 | P1 | open | tip | L1 | PG write-through when db up: wire GoalAuthority/PursuitState repos (zero call sites today) |
-| V20-E04 | P1 | open | E03 helpful | L1+L5 | persist usage ledger holds + pursuit lessons across restart |
-| V20-E05 | P1 | open | L3 fences present | L2 | bounded native model/tool loop behind fake HTTP (not extract-only) |
-| V20-E06 | P1 | open | E03/E04 preferred | L2+product | singleton coordinator pursuit service (HTTP tick ≠ scheduler) |
-| V20-E07 | P1 | open | E05 preferred | L5/portable | live adapter after approved grant OR honest blocked_missing_implementation; fake/free first; no invent grant |
-| V20-E08 | P2 | open | — | L3 | cancel child-process kill-bound ≤10s non-Python |
-| V20-E09 | P2 | open | L3 APIs | L6 | console/SDK drain+revoke parity |
-| V20-E10 | P2 | open | tip as-is | L6/QA | product compose full-path smoke (Docker); packaging-only ≠ smoke |
-| V20-E11 | P2 | deferred | E03 | L4 | optional mailbox/succession PG tables |
+| V20-E03 | P1 | open | tip | SW-W1-S9 + SW-W3-S2 | PG write-through when db up: wire GoalAuthority/PursuitState repos (zero call sites today) |
+| V20-E04 | P1 | open | E03 helpful | SW-W1-S10 + SW-W3-S2 | persist usage ledger holds + pursuit lessons across restart |
+| V20-E05 | P1 | open | L3 fences present | SW-W1-S11 + SW-W2-S2 | bounded native model/tool loop behind fake HTTP (not extract-only) |
+| V20-E06 | P1 | open | E03/E04 preferred | SW-W1-S4 + SW-W3-S2 | singleton coordinator pursuit service (HTTP tick ≠ scheduler) |
+| V20-E07 | P1 | open | E05 preferred | SW-W2-S2 (fake/free first; live blocked) | live adapter after approved grant OR honest blocked_missing_implementation; fake/free first; no invent grant |
+| V20-E08 | P2 | open | — | SW-W1-S13 | cancel child-process kill-bound ≤10s non-Python |
+| V20-E09 | P2 | open | L3 APIs | SW-W1-S12 | console/SDK drain+revoke parity |
+| V20-E10 | P2 | open | tip as-is | SW-W3-S5 | product compose full-path smoke (Docker); packaging-only ≠ smoke |
+| V20-E11 | P2 | deferred | E03 | deferred | optional mailbox/succession PG tables |
 
 ## suggested_pr_order_dev_only
 

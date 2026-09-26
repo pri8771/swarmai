@@ -2,7 +2,12 @@
 
 All notable changes to SwarmAI are documented here.
 
-## [Unreleased] — V1.4→V3.0 implementation-complete + accept/launch track (2026-09-23)
+## Unreleased
+
+- docs: corrected V2.3/V3.0 status claims (scaffold, not implementation-complete).
+- config: froze scheduler policy `v23-wdrr-1` and V2.3 deterministic acceptance manifest.
+
+## [2026-09-23] — V1.4→V2.0 track + accept/launch track; V2.3/V3.0: scaffolds only — see docs/v2.3/STATUS.md
 
 ### Added
 - V1.5–V3.0 implementation packages: leases/workers, knowledge, V17 gateway, SiteEpoch recovery,

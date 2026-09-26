@@ -2,9 +2,9 @@
 doc: agents_current
 audience: ai_agent
 repo: pri8771/swarmai
-verified_at: 2026-09-25T21:07Z
-pause: true
-v20_work: STOPPED
+verified_at: 2026-09-26T00:47Z
+pause: false
+v20_work: "V23_ENGINEERING_ACTIVE"
 ---
 
 # CURRENT
@@ -13,8 +13,8 @@ v20_work: STOPPED
 
 | key | value |
 |---|---|
-| origin/dev | `dd7726eb8c22986ef72847994c8e435a81a869b6` |
-| origin/dev_subject | Merge PR #60: feat(L6) product Compose console + SDK/UI control parity |
+| origin/dev | `8e1c0fdec24c131e7612d88076220945230f4c3b` |
+| origin/dev_subject | Merge pull request #69 from pri8771/cursor/v20-agents-context-6612 |
 | origin/main | `08b910f981eff2ab66873a71055090f2c60f2a91` |
 | origin/main_status | UNTOUCHED |
 | alembic_head | `a20pursuitpersist0001` |
@@ -33,6 +33,17 @@ v20_work: STOPPED
 | versions_accepted.V1.9 | false | |
 | versions_accepted.V2.0 | false | |
 | any_version_accepted | false | |
+
+## v23
+
+| key | value |
+|---|---|
+| status | scaffold_implementation_in_progress |
+| plan | `docs/v2.3/PLAN.md` |
+| policy | `config/v23/scheduler_policy.v1.json` |
+| acceptance_freeze | `benchmarks/v23_acceptance/scenarios.freeze.json` |
+| accepted | false |
+| pause_lift | owner V2.3 request; engineering only; HL-01..HL-07 unchanged |
 
 ## hard_limits
 
