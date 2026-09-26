@@ -73,7 +73,11 @@ def test_missing_env_blocks_without_network(approved: Path, drop: str, reason: s
 
 def test_pending_approval_blocks_without_network(tmp_path: Path) -> None:
     p = tmp_path / "DECISIONS.md"
-    p.write_text("- SW-PREAPPROVAL-A3: PENDING\n", encoding="utf-8")
+    p.write_text(
+        "- SW-PREAPPROVAL-A3: PENDING\n"
+        "To approve, change it to `- SW-PREAPPROVAL-A3: APPROVED <date>`.\n",
+        encoding="utf-8",
+    )
     fake = FakeSplitSignal()
     code, rep = smoke.run(env=ENV, decisions=p, stream=False, client_factory=factory(fake))
     assert (code, rep["status"]) == (3, "blocked:sw_preapproval_a3_not_approved")

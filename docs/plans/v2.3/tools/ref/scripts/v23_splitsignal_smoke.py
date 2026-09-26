@@ -7,7 +7,7 @@ Runs only when every gate holds; otherwise it records ``blocked:<reason>`` and
 makes no network call:
 * ``SPLITSIGNAL_BASE_URL`` and ``SPLITSIGNAL_API_KEY`` are set (``SPLITSIGNAL_MODEL``
   defaults to ``DEFAULT_SPLITSIGNAL_MODEL``);
-* the decisions log contains the exact line ``SW-PREAPPROVAL-A3: APPROVED``;
+* the decisions log has a line starting ``- SW-PREAPPROVAL-A3: APPROVED``;
 * a zero-dollar, free-routes-only LiveGrant (built here from that approval, at
   most 2 calls, 64 output tokens, 60 s) passes ``preflight_live_grant``;
 * the model is listed by ``GET /v1/models`` and admissible.
@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from collections.abc import Callable, Mapping
@@ -39,7 +40,7 @@ from swarm.pursuit.live_grant import preflight_live_grant
 ROOT = Path(__file__).resolve().parents[1]
 DECISIONS = ROOT / "docs" / "swarm-mvp" / "DECISIONS.md"
 OUT = ROOT / "docs" / "evidence" / "v23" / "splitsignal_live.json"
-APPROVAL_LINE = "SW-PREAPPROVAL-A3: APPROVED"
+APPROVAL_LINE = re.compile(r"^- SW-PREAPPROVAL-A3: APPROVED\b", re.MULTILINE)
 PROMPT = "Reply with the single word: ok"
 
 
@@ -86,7 +87,7 @@ def run(
         return blocked("splitsignal_api_key_missing")
     report["route_requested"] = model
     try:
-        approved = APPROVAL_LINE in decisions.read_text(encoding="utf-8")
+        approved = APPROVAL_LINE.search(decisions.read_text(encoding="utf-8")) is not None
     except OSError:
         approved = False
     if not approved:
