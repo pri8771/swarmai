@@ -29,6 +29,9 @@ SECRET_VALUE_PATTERNS = (
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     re.compile(r"(?i)bearer\s+[A-Za-z0-9._\-]{12,}"),
     re.compile(r"(?i)(password|secret|token|api_key)=[^\s&]+"),
+    re.compile(r"ss_live_[0-9a-f]{32}_[A-Za-z0-9_-]{20,}"),
+    re.compile(r"AIza[A-Za-z0-9_-]{20,}"),
+    re.compile(r"(?i)postgres(?:ql)?(?:\+\w+)?://[^/\s:@]+:[^@\s/]+@"),
 )
 
 
@@ -36,9 +39,9 @@ def _reject_secrets(obj: Any, path: str = "") -> None:
     if isinstance(obj, dict):
         for key, value in obj.items():
             lowered = str(key).lower()
-            if any(f in lowered for f in FORBIDDEN) and not isinstance(value, dict | list):
-                if value not in (None, "") and not (
-                    isinstance(value, str) and ENV_REF.match(value)
+            if any(f in lowered for f in FORBIDDEN):
+                if value not in (None, "", [], {}) and not (
+                    isinstance(value, str) and ENV_REF.fullmatch(value)
                 ):
                     raise ValueError(f"secret_in_bundle:{path}.{key}")
             _reject_secrets(value, f"{path}.{key}")

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -68,6 +69,8 @@ class BoundedNativeLoop:
         max_turns: int = 4,
         max_model_calls: int = 8,
         max_tool_calls: int = 8,
+        max_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
     ) -> None:
         self.router = router
         self.tools = dict(tools)
@@ -75,6 +78,8 @@ class BoundedNativeLoop:
         self.max_turns = max_turns
         self.max_model_calls = max_model_calls
         self.max_tool_calls = max_tool_calls
+        self.max_tokens = max_tokens
+        self.max_wall_seconds = max_wall_seconds
 
     def _tool_specs(self) -> list[dict[str, Any]]:
         return [
@@ -91,6 +96,11 @@ class BoundedNativeLoop:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": objective})
         result = LoopResult(status="budget_exhausted")
+        deadline = (
+            time.monotonic() + self.max_wall_seconds
+            if self.max_wall_seconds is not None
+            else None
+        )
 
         def done(status: LoopStatus, **kw: Any) -> LoopResult:
             result.status = status
@@ -100,12 +110,16 @@ class BoundedNativeLoop:
             return result
 
         for _ in range(self.max_turns):
+            if deadline is not None and time.monotonic() >= deadline:
+                return done("budget_exhausted", error_code="max_wall_seconds")
             if result.model_calls >= self.max_model_calls:
                 return done("budget_exhausted", error_code="max_model_calls")
             result.turns += 1
             body: dict[str, Any] = {"model": self.model, "messages": messages}
             if self.tools:
                 body["tools"] = self._tool_specs()
+            if self.max_tokens is not None:
+                body["max_tokens"] = self.max_tokens
             try:
                 chat = self.router.chat(body)
             except RouterClientError as exc:
@@ -157,9 +171,14 @@ def native_loop_from_env(
     e = os.environ if env is None else env
     router: RouterClient
     ss_url = e.get("SPLITSIGNAL_BASE_URL", "").strip()
+    timeout_s = (
+        float(grant.max_wall_seconds)
+        if grant is not None and grant.max_wall_seconds is not None
+        else None
+    )
     if ss_url:
         model = e.get("SPLITSIGNAL_MODEL", "").strip() or DEFAULT_SPLITSIGNAL_MODEL
-        router = SplitSignalClient(ss_url)
+        router = SplitSignalClient(ss_url, **({"timeout_s": timeout_s} if timeout_s else {}))
     else:
         base_url = e.get("SWARM_ROUTER_BASE_URL", "").strip()
         if not base_url:
@@ -167,9 +186,20 @@ def native_loop_from_env(
         model = e.get("SWARM_ROUTER_MODEL", "").strip()
         if not model:
             return None, "router_model_not_configured"
-        router = RouterClient(base_url)
+        router = RouterClient(base_url, **({"timeout_s": timeout_s} if timeout_s else {}))
     pre = preflight_live_grant(grant, purpose="pursuit_native_loop", required_route=model)
     if not pre.ready:
         router.close()
         return None, pre.blocked_reason or "live_grant_not_ready"
-    return BoundedNativeLoop(router, tools, model=model), "ready"
+    assert grant is not None  # a ready preflight always has an explicit grant
+    return (
+        BoundedNativeLoop(
+            router,
+            tools,
+            model=model,
+            max_model_calls=grant.max_calls or 8,
+            max_tokens=grant.max_tokens,
+            max_wall_seconds=grant.max_wall_seconds,
+        ),
+        "ready",
+    )

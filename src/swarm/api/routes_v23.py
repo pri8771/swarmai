@@ -28,7 +28,7 @@ from swarm.capabilities.lifecycle import (
     SqlPackInstallStore,
 )
 from swarm.capabilities.signing import trusted_keys_from_env
-from swarm.contracts.common import StrictModel
+from swarm.contracts.common import StrictModel, new_id
 from swarm.contracts.v23 import DispatchIntent, DispatchIntentComponent, WorkerDrainState
 from swarm.extensions.registry import ExtensionAuthzError
 from swarm.observability import OpsEventLog, build_trace
@@ -89,7 +89,7 @@ def build_v23_runtime(
     scheduler = SchedulerService(
         store,
         epochs=epochs,
-        holder_id="api",
+        holder_id=f"api:{os.getpid()}:{new_id('sched_')}",
         reserve=_no_broker_reserve,
         release=_no_broker_release,
         ops=ops,

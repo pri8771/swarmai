@@ -439,9 +439,27 @@ class PursuitEngine:
         pending = self._is_pending_outcome(outcome)
         if pending:
             self._pending_missions[mission_id] = draft
-            # Keep active slot + hold until reconcile; do not invent failure/success.
             if hold is not None:
-                accounting_notes.append("hold_open_pending_mission")
+                # A model call already happened before the mission became pending.
+                # Preserve unknown usage now so a later mission failure/restart
+                # cannot release the reservation as though the call cost nothing.
+                if outcome.usage_unknown:
+                    ledger.settle(
+                        hold.hold_id,
+                        spend_usd=float(outcome.cost_usd),
+                        model_calls=int(outcome.model_calls),
+                        tool_calls=int(outcome.tool_calls),
+                        prompt_tokens=outcome.prompt_tokens,
+                        completion_tokens=outcome.completion_tokens,
+                        route_id=outcome.route_id,
+                        runtime=outcome.runtime,
+                        usage_unknown=True,
+                    )
+                    accounting_notes.append("usage_unknown_preserved_pending_mission")
+                else:
+                    # Known usage still leaves the admitted mission reservation
+                    # open until terminal reconciliation.
+                    accounting_notes.append("hold_open_pending_mission")
             verification = self._verify(goal, outcome)
             notes = "|".join(accounting_notes + ["submitted_pending"])
             self.scheduler.defer(goal_id, reason="submitted_pending", kind=chosen.kind)

@@ -38,6 +38,7 @@ class PackInstall(StrictModel):
     install_id: str = Field(default_factory=lambda: new_id("pki_"))
     pack_id: str
     pack_version: str
+    manifest: CapabilityPackManifest | None = None
     project_id: str = INSTALL_SCOPE
     state: PackLifecycleState = PackLifecycleState.INSTALLED
     granted_capabilities: list[str] = Field(default_factory=list)
@@ -179,6 +180,14 @@ class PackLifecycleService:
         rec = self.store.get(pack_id, version, INSTALL_SCOPE)
         if rec is None:
             raise PackLifecycleError("pack_not_installed")
+        try:
+            self.registry.verify_trust(pack_id, version)
+        except ExtensionAuthzError as exc:
+            if str(exc) != "pack_missing":
+                raise
+            if rec.manifest is None:
+                raise PackLifecycleError("pack_manifest_not_persisted") from exc
+            self.registry.register(rec.manifest)
         return rec
 
     def _move(self, rec: PackInstall, to: PackLifecycleState, action: str) -> PackInstall:
@@ -191,7 +200,11 @@ class PackLifecycleService:
 
     def install(self, manifest: CapabilityPackManifest) -> PackInstall:
         self.registry.register(manifest)
-        rec = PackInstall(pack_id=manifest.pack_id, pack_version=manifest.version)
+        rec = PackInstall(
+            pack_id=manifest.pack_id,
+            pack_version=manifest.version,
+            manifest=manifest,
+        )
         rec = rec.model_copy(update={"history": self._event(rec, "install")})
         return self.store.put(rec, expected_version=None)
 
@@ -231,6 +244,14 @@ class PackLifecycleService:
         proj = self.store.get(pack_id, version, project_id)
         if proj is None or proj.state != PackLifecycleState.ENABLED_FOR_PROJECT:
             raise PackLifecycleError("pack_not_enabled_for_project")
+        self.registry.grant(
+            ProjectPackGrant(
+                project_id=project_id,
+                pack_id=pack_id,
+                version=version,
+                granted_capabilities=list(proj.granted_capabilities),
+            )
+        )
         if capability not in self.registry.effective(project_id, pack_id, version):
             raise PackLifecycleError(f"pack_capability_denied:{capability}")
 

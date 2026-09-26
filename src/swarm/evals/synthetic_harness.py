@@ -89,6 +89,15 @@ class LiveGrant:
             raise LiveGateBlocked(
                 "live_qualification_blocked: grant budget_usd must be >= 0"
             )
+        for name, value in (
+            ("max_calls", self.max_calls),
+            ("max_tokens", self.max_tokens),
+            ("max_wall_seconds", self.max_wall_seconds),
+        ):
+            if value is not None and value <= 0:
+                raise LiveGateBlocked(
+                    f"live_qualification_blocked: grant {name} must be > 0"
+                )
         if self.budget_usd == 0:
             if not self.free_routes_only:
                 raise LiveGateBlocked(
