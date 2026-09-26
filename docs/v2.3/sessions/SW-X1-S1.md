@@ -23,6 +23,17 @@ tree: ebe199b404c718912a893afef76ebbd2d4dfee3e dirty=0
 - Fake bodies: validated against SplitSignal `docs/api/v1/openapi.yaml` by the audit (not re-run here).
 - `tests/providers/test_splitsignal_client.py tests/pursuit/test_v20_native_loop_splitsignal.py` → 27 passed; `SPLITSIGNAL_BASE_URL=http://x.test/v1 pytest tests/pursuit/test_v20_native_loop.py` → 8 passed; `-k unknown_cost` → 2 passed; `grep -rn ss_live_ src/` → nothing.
 - Step 8 (informational; SP2 not reached on the integration branch): the real `scripts/mock_splitsignal.py` from the unmerged `cursor/is-w1-s10-460c`, run on 127.0.0.1:8089 with the contract's synthetic key → `['mock/ok', 'mock/quota', 'mock/unavailable']` and `mock/ok free False` (matches the expected output). Localhost only; no real SplitSignal call.
+## SP1 re-check and real-mock run (2026-09-26 ~03:05 UTC, integrator)
+- Step 0 against `cursor/is-v23-integration-460c` @ `9ca126718163223aa2a9a4fca9f6a901636a9782` (IS-W2-MERGE): `gh api …/contents/docs/api/v1/consumers/swarmai.md?ref=cursor/is-v23-integration-460c --jq .path` → `docs/api/v1/consumers/swarmai.md`, **SP1 OK**; `scripts/mock_splitsignal.py` present, **SP2 OK**.
+- Contract diff: merged `swarmai.md` blob is `1a4a31c9836555d5389d24e91ee5774959e6bb93`, identical to the blob this adapter was built against. `git diff origin/cursor/is-w1-s10-460c origin/cursor/is-v23-integration-460c -- docs/api/v1/consumers scripts/mock_splitsignal.py` → empty (fixtures and mock unchanged). No adapter change needed.
+- Step 8 with the real mock, run from a detached worktree of the IS integration branch (so `docs/api/v1/consumers/fixtures` resolves), `127.0.0.1:8089`, synthetic contract key, no external network:
+  - `list_models()` → `['mock/ok', 'mock/quota', 'mock/unavailable']`
+  - `chat(mock/ok)` → `mock/ok free False` (fixture reports no cost → `usage_known False`, never settled as zero)
+  - `chat(mock/quota)` → `RouterClientError quota_exhausted` (`error_code quota_exhausted`, `retry_after_s 30.0`, within the RetryOwner cap)
+  - `chat(mock/unavailable)` → `RouterClientError transient` (`error_code provider_unavailable`)
+  - `chat_stream(mock/ok)` → `StreamResult`, `mock/ok free False`, 20 chars of text
+  - wrong synthetic key → `RouterClientError authentication` (`error_code unauthenticated`)
+  - mock stopped afterwards.
 ## Acceptance
 - [x] Step 0 printed `SP1 OK`, and the contract facts match (or the differences are recorded).
 - [x] `uv run pytest tests/providers/test_splitsignal_client.py tests/pursuit -q` passes (27 new tests in the two new files, plus the existing ones).
@@ -48,4 +59,4 @@ tree: ebe199b404c718912a893afef76ebbd2d4dfee3e dirty=0
 - ~~`src/swarm/broker/retry.py`: when retry_after exceeds max_retry_after_seconds, give up instead of retrying at the cap (SplitSignal contract).~~ Resolved by SW-FIX-RETRY (`cursor/sw-fix-retry-after-460c` head `a42a94bd`, merged into `cursor/sw-v23-integration-460c` at `b3162712`): over-cap or non-finite `Retry-After` → give-up `retry_after_exceeds_cap`. This adapter does not call `decide` itself (it only records `retry_after_s` on the receipt), so no code change here; trial merge of this branch with the fix is clean and `tests/providers tests/pursuit tests/broker` → `162 passed`.
 - Coordinator: merge only after SP1 (IS-W1-S10 merged into `cursor/is-v23-integration-460c`) and a re-read of the merged `swarmai.md`.
 ## Status
-implemented / offline-tested only — awaiting SP1 (IS-W1-S10 not merged into cursor/is-v23-integration-460c); NOT merged into the integration branch
+implemented / offline-tested; SP1 and SP2 reached (IS integration `9ca12671`); merged into `cursor/sw-v23-integration-460c` (Codex review pending). Live use still needs SP4 and SW-PREAPPROVAL-A3 (SW-X2-S1).
