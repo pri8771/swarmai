@@ -13,6 +13,8 @@ from swarm.contracts.enums import ErrorClass
 
 Clock = Callable[[], datetime]
 
+RETRY_AFTER_EXCEEDS_CAP = "retry_after_exceeds_cap"
+
 
 @dataclass
 class RetryDecision:
@@ -75,9 +77,11 @@ class RetryOwner:
 
         if retry_after is not None:
             wait = float(retry_after)
-            if not math.isfinite(wait):
-                wait = self.config.max_retry_after_seconds
-            wait = min(max(wait, 0.0), self.config.max_retry_after_seconds)
+            # Never retry before the upstream Retry-After has elapsed: a value
+            # above the cap (or not a number) is a give-up, not a clamped retry.
+            if not math.isfinite(wait) or wait > self.config.max_retry_after_seconds:
+                return RetryDecision(False, 0.0, RETRY_AFTER_EXCEEDS_CAP)
+            wait = max(wait, 0.0)
         else:
             exp = self.config.base_delay_seconds * (2 ** max(0, attempt - 1))
             wait = min(self.config.max_delay_seconds, exp)
