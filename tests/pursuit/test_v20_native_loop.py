@@ -96,6 +96,7 @@ def test_executor_records_loop_but_never_invents_success(tmp_path: Path) -> None
 
 def test_executor_without_loop_records_honest_blocker(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.delenv("SWARM_ROUTER_BASE_URL", raising=False)
+    monkeypatch.delenv("SPLITSIGNAL_BASE_URL", raising=False)
     store = ProductStore(repo_root=tmp_path, db_reachable=None)
     out = NativeMissionDispatchExecutor(store, enqueue_worker_task=False).execute(_proposal())
     plan = store.mission_store().load(out.mission_id).plan

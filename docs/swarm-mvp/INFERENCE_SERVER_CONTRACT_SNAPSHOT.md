@@ -37,3 +37,12 @@ Body `{"error": {"message", "type", "code"}}`. Mapping in `swarm.contracts.route
 1. Additive capability fields on `/v1/models`: `context_window`, `max_output_tokens`, `tokenizer`, `supports_tools`, `supports_json`; `billing` on aliases (resolved worst-case).
 2. Freeze the header set with a version header (e.g. `X-Router-Contract: 1`).
 3. Document the max router-side attempts per request, and `Idempotency-Key` support (or its absence).
+
+## SplitSignal consumer contract (`swarmai-consumer 1.x`) — SW-X1-S1
+
+- Source: inference_server `docs/api/v1/consumers/swarmai.md`. **SP1 not reached** when this was written (2026-09-26): IS-W1-S10 is not yet merged into `cursor/is-v23-integration-460c`. Facts were compared read-only with the unmerged session branch `cursor/is-w1-s10-460c` (blob `1a4a31c9836555d5389d24e91ee5774959e6bb93`); re-check against the integration branch once SP1 lands.
+- Env: `SPLITSIGNAL_BASE_URL` (ends in `/v1`; the client strips it), `SPLITSIGNAL_API_KEY` (bearer; never logged), `SPLITSIGNAL_MODEL` (route id `<provider>/<model>`; default `gemini/gemini-3.5-flash-lite` when unset). These win over the legacy `SWARM_ROUTER_*`.
+- `GET /v1/models`: OpenAI list shape; listed routes are admitted as free (decision D-SS1, coordinator-accepted 2026-09-26, owner may override). A `ModelPage` body's `cost_class` is authoritative.
+- Chat: served route = body `model` = `X-SplitSignal-Served-Route`; usage `null` stays unknown; a known non-zero `splitsignal.cost.amount` is refused as `paid_route_forbidden`; an unknown cost is `cost_amount: null` and the receipt does not settle (`usage_known: false`), so no budget is released as zero (C3, F-13).
+- Errors: `ErrorEnvelope`. A non-retryable 5xx is `unknown_outcome` (SplitSignal sets `retryable` only when no provider execution can still be running). SwarmAI never auto-retries after a 200 header; the stream `event: error` is `partial_stream`.
+- Offline fake: `tests/fixtures/splitsignal_http/fake_splitsignal.py`. Live use still needs a LiveGrant (V20-E07) and sync point SP4 (non-streaming) / SP5 (streaming).
