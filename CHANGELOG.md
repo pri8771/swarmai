@@ -2,7 +2,30 @@
 
 All notable changes to SwarmAI are documented here.
 
-## Unreleased
+## [Unreleased] — V2.3 implementation-complete candidate (2026-09-26)
+
+### Added
+- V2.3 scheduler: shared contracts + migration `a23opsplatform0001`, WDRR fairness, durable `SchedulingStore` (PostgreSQL), DispatchIntent reservations, scheduler epoch lease + singleton ticker, `SchedulerService` with the 11 pathological cases.
+- Capability-pack lifecycle with keyed HMAC signatures (F-02); portability bundle v2 with value-based secret scan and tombstones (F-03); fleet trust classes, drain state machine and deterministic placement; durable ops events + trace graph.
+- `routes_v23.py` API surface, `swarm v23` offline CLI, console Ops tab + worker drain/revoke, router client + bounded native loop (fake router), pursuit PostgreSQL write-through, durable holds/lessons, sandbox kill-bound, compose smoke script.
+- `scripts/v23_acceptance_campaign.py` and deterministic probes V23-A01…A10.
+
+### Fixed
+- F-01: `GET /v1/ops/events` scoped to the principal's projects.
+- F-13: unknown-usage holds never free budget; release requires reconciliation evidence.
+- F-14: single `CURRENT_SCHEMA_REVISION` pinned to the Alembic head.
+- F-16: `POST /v1/release/candidate-freeze` is admin-only.
+- F-06: upstream `Retry-After` clamped.
+
+### Evidence
+- `docs/evidence/v23/acceptance_campaign.json`: deterministic 10/10 pass; live router `blocked:router_not_configured`; compose smoke `fail`; multi-process `pending_owner_approval`.
+- `docs/v2.3/EXIT_CHECKLIST.md`.
+
+### Notes
+- Not accepted. Multi-process gate pending owner approval. Zero spend (no provider calls; cost unknown ≠ $0).
+- SplitSignal adapter (SW-X1-S1) awaiting inference_server SP1; not merged. V20-E10 compose smoke fails on the worker healthcheck (follow-up).
+
+## Unreleased (V2.3 tracking reset)
 
 - docs: corrected V2.3/V3.0 status claims (scaffold, not implementation-complete).
 - config: froze scheduler policy `v23-wdrr-1` and V2.3 deterministic acceptance manifest.

@@ -572,6 +572,7 @@ def main() -> None:
         print(json.dumps(OutageDrillHarness().run_local(commit_sha=sha).to_dict(), indent=2))
     elif args.command == "recovery" and args.recovery_command == "backup":
         from swarm.recovery import BackupService
+        from swarm.release.candidate import CURRENT_SCHEMA_REVISION
 
         out = args.out or (_repo_root() / "var" / "recovery" / "backups")
         sha = subprocess.check_output(
@@ -581,7 +582,7 @@ def main() -> None:
             site_id=args.site_id,
             epoch=args.epoch,
             commit_sha=sha,
-            schema_revision="a18tov30schema0001",
+            schema_revision=CURRENT_SCHEMA_REVISION,
             secret_ref_names=["SWARM_DATABASE_URL"],
         )
         print(json.dumps(backup_manifest.to_dict(), indent=2))
@@ -1073,13 +1074,13 @@ def main() -> None:
     elif args.command == "release" and args.release_command == "candidate-freeze":
         import subprocess as _sp
 
-        from swarm.release.candidate import CandidateFreezer
+        from swarm.release.candidate import CURRENT_SCHEMA_REVISION, CandidateFreezer
 
         sha = _sp.check_output(
             ["git", "rev-parse", "HEAD"], cwd=_repo_root(), text=True
         ).strip()
         candidate_manifest = CandidateFreezer(_repo_root()).freeze(
-            source_sha=sha, schema_revision="a18tov30schema0001"
+            source_sha=sha, schema_revision=CURRENT_SCHEMA_REVISION
         )
         print(json.dumps(candidate_manifest.to_dict(), indent=2))
     elif args.command == "acceptance" and args.acceptance_command == "freeze":

@@ -11,6 +11,8 @@ accepted: false
 
 Active work: V2.3 per docs/v2.3/PLAN.md; each session writes docs/v2.3/sessions/<ID>.md.
 
+Next step: Codex review of the V2.3 candidate range on `cursor/sw-v23-integration-460c`; SW-X2-S1 (SplitSignal live smoke, SP4–SP6); owner merges `cursor/sw-v23-integration-460c` into `dev`; owner decision on the V23-A11 multi-process gate (SW-PREAPPROVAL-A5). Also pending: SW-X1-S1 merge after SP1; V20-E10 worker healthcheck follow-up.
+
 ## preflight
 
 ```text

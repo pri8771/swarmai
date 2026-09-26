@@ -2200,16 +2200,17 @@ async def list_ops_events(
 async def freeze_candidate(
     principal: Principal = Depends(get_principal),
 ) -> dict[str, Any]:
-    _ = principal
+    if "admin" not in principal.roles:
+        raise ApiError("forbidden_admin", "admin role required", status_code=403)
     import subprocess
     from pathlib import Path
 
-    from swarm.release.candidate import CandidateFreezer
+    from swarm.release.candidate import CURRENT_SCHEMA_REVISION, CandidateFreezer
 
     root = Path(__file__).resolve().parents[3]
     sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     return (
         CandidateFreezer(root)
-        .freeze(source_sha=sha, schema_revision="a18tov30schema0001")
+        .freeze(source_sha=sha, schema_revision=CURRENT_SCHEMA_REVISION)
         .to_dict()
     )
