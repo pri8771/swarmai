@@ -15,7 +15,7 @@ All notable changes to SwarmAI are documented here.
 - F-13: unknown-usage holds never free budget; release requires reconciliation evidence.
 - F-14: single `CURRENT_SCHEMA_REVISION` pinned to the Alembic head.
 - F-16: `POST /v1/release/candidate-freeze` is admin-only.
-- F-06: upstream `Retry-After` clamped.
+- F-06: upstream `Retry-After` bounded; a value above `max_retry_after_seconds` (or non-finite) is now a terminal give-up (`retry_after_exceeds_cap`), never a retry at the cap (SW-FIX-RETRY).
 
 ### Evidence
 - `docs/evidence/v23/acceptance_campaign.json`: deterministic 10/10 pass; live router `blocked:router_not_configured`; compose smoke `fail`; multi-process `pending_owner_approval`.
