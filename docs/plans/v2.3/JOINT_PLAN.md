@@ -19,18 +19,18 @@ Owner decisions in force: D1 (Google sign-in as `priyansh.chordia@gmail.com` eve
 
 The only runtime link: SwarmAI calls `POST /v1/chat/completions` and `GET /v1/models` at `SPLITSIGNAL_BASE_URL` (SplitSignal public URL + `/v1`) with `SPLITSIGNAL_API_KEY` (`ss_live_…`) and `SPLITSIGNAL_MODEL` (default `gemini/gemini-3.5-flash-lite`). The contract is `swarmai-consumer 1.x` (§7).
 
-**Current state (fetched 2026-09-26 ~01:30 UTC; executors are still merging)**
+**Current state (inference_server row updated 2026-09-26 ~07:45 UTC; swarmai row as dated)**
 
 | Repo | Integration tip | Merged | Pushed, not merged yet | Not started |
 |---|---|---|---|---|
-| inference_server | `a685c884` (C6–C8 recorded on top of the IS-W0-S2 merge `f32647e`) | IS-W0-S1 (`e77c03c`), IS-W0-S2 (`95e0e8f`, PR #33) | IS-W1-S1 `2bbab33`, IS-W1-S2 `8220278`, IS-W1-S3 `c1e6125`, IS-W1-S4 `13ad903`, IS-W1-S5 `73b9d00`, IS-W1-S6 `aebe530` (each with handoff; REVIEW REQUIRED ones `Codex review pending`) | IS-W1-S7…S11, IS-W2-MERGE, IS-W2-DEPLOY, W3 (9), IS-W4-MERGE, W5 (7), IS-W6-MERGE, W7 (5), IS-W8-MERGE |
+| inference_server (updated 2026-09-26 ~07:45 UTC) | `c685c3d` (IS-FIX follow-ups on top of IS-W8-MERGE `91dc1f7`) | IS-W0-S1, IS-W0-S2, IS-W1-S1…S11, IS-W3-S1…S9, IS-W3-FIX1, IS-W5-S1…S7, IS-W7-S1…S5 (36 sessions) with the IS-W2/W4/W6/W8-MERGE wiring; IS-FIX-flaky-key-repr, -webhook-ssrf-rebind, -statements-close-all, -invite-accept-page, -web-routes, -readiness-docs (REVIEW REQUIRED sessions and the rebinding/definer fixes `Codex review pending`) | — | IS-W2-DEPLOY (pending owner secrets, C8), then a redeploy for SP5 |
 | swarmai (updated 2026-09-26 ~03:20 UTC) | `c34e1b0e` | SW-W0-S1…S3, SW-W1-S1…S13, SW-W2-S1, SW-W2-S2, SW-W3-S1…S5, SW-W4-S1, SW-X1-S1 (25 sessions; X1-S1 merged `2b27bc20` after SP1/SP2) + follow-ups SW-FIX-RETRY, SW-FIX-COMPOSE, SW-FIX-ALEMBIC, SW-FIX-FLAKE and docs re-runs (all `Codex review pending`) | — | SW-X2-S1 (needs SP4 + SW-PREAPPROVAL-A3), SW-MERGE-X |
 
 The plan branch `cursor/v23-plan-460c` is not yet an ancestor of either integration branch. For swarmai, the next SW-MERGE run merges it automatically. inference_server does not merge its plan branch; its sessions paste prompts from it.
 
-Sync points (updated 2026-09-26 ~03:20 UTC): **SP1 and SP2 reached** (IS-W2-MERGE, `cursor/is-v23-integration-460c` @ `9ca12671`: `docs/api/v1/consumers/swarmai.md` blob `1a4a31c9`, fixtures, `scripts/mock_splitsignal.py`). SP3–SP6 pending: SP3/SP4 need IS-W2-DEPLOY with the owner secrets (not yet stored, so C8 applies today).
+Sync points (updated 2026-09-26 ~03:20 UTC): **SP1 and SP2 reached** (IS-W2-MERGE, `cursor/is-v23-integration-460c` @ `9ca12671`: `docs/api/v1/consumers/swarmai.md` blob `1a4a31c9`, fixtures, `scripts/mock_splitsignal.py`). SP3–SP6 pending: SP3/SP4 need IS-W2-DEPLOY with the owner secrets (not yet stored, so C8 applies today). IS-W8-MERGE (`91dc1f7`) recorded `SP6: offline-tested` (not reached); SP5 needs a redeploy after IS-W2-DEPLOY (2026-09-26 ~07:45 UTC).
 
-**What remains:** 31 inference_server runs and 12 swarmai runs (43 in total, §4), plus the owner preflight (§2), the Codex review of both integration trees and the owner merges.
+**What remains:** 1 inference_server run (IS-W2-DEPLOY, then a redeploy for SP5; 2026-09-26 ~07:45 UTC) and 12 swarmai runs (13 in total, §4), plus the owner preflight (§2), the Codex review of both integration trees and the owner merges.
 
 ---
 
@@ -70,14 +70,14 @@ Sessions in one slot run in parallel (they own disjoint files). A gate is checke
 | Slot | inference_server (IS) | swarmai (SW) | Max at once | Gate to pass before the next slot |
 |---|---|---|---|---|
 | 0 | **EXECUTED** IS-W0-S1, IS-W0-S2 (both merged, integration `a685c884`) | **EXECUTED** SW-W0-S1…S3, SW-W1-S1…S13, SW-W2-S1, SW-W2-S2 (all merged, integration `94cdc07b`) | — | — |
-| 1 | **EXECUTED** IS-W1-S1…S6 (pushed; merged in slot 2). **Launch** IS-W1-S7, S8, S9, S10, S11 | **EXECUTED** SW-W3-S1, SW-W3-S2, SW-W3-S3, SW-W3-S4 (merged) | 9 | **G1**: 11 IS-W1 branches and 4 SW-W3 branches pushed with handoffs, none STOPPED |
-| 2 | IS-W2-MERGE | SW-MERGE-W3 (also merges the plan branch) | 2 | **G2 = SP1 + SP2**: `docs/api/v1/consumers/swarmai.md` and `scripts/mock_splitsignal.py` on `cursor/is-v23-integration-460c`; SW-W3-S1…S4 merged on `cursor/sw-v23-integration-460c`. **Owner preflight items 2–4 done before slot 3.** |
-| 3 | IS-W2-DEPLOY (needs the secrets; writes SP3/SP4) + IS-W3-S1…S9 | **EXECUTED** SW-W4-S1, SW-W3-S5 (merged; integration `ed388b7b`); **EXECUTED** SW-X1-S1 (SP1 reached; merged `2b27bc20`) | 13 | **G3 = SP3 + SP4**: `docs/evidence/m1/hosted-v05.md` has `SP3: reached` and `SP4: reached`; 9 IS-W3 branches pushed; SW-W4-S1 and SW-X1-S1 pushed |
-| 4 | IS-W4-MERGE (writes SP5) | **EXECUTED** by the integrator: W3-S5, W4-S1 and X1-S1 merged directly into `cursor/sw-v23-integration-460c` (tip `c34e1b0e`); SW-MERGE-X remains for SW-X2-S1 | 2 | **G4 = SP5**: `hosted-v05.md` has `SP5: reached` (if not, the W6/W8 redeploy fallback makes it); SW-W4-S1 and SW-X1-S1 merged |
-| 5 | IS-W5-S1…S7 | — (SwarmAI is done except SW-X2-S1, which waits for SP6) | 7 | **G5**: 7 IS-W5 branches pushed |
-| 6 | IS-W6-MERGE (SP5 fallback) | — | 1 | **G6**: IS-W6-MERGE handoff on the integration branch |
-| 7 | IS-W7-S1…S5 | — | 5 | **G7**: 5 IS-W7 branches pushed |
-| 8 | IS-W8-MERGE (writes SP6; SP5 fallback) | — | 1 | **G8 = SP6**: `docs/evidence/v2.3-offline.md` contains `swarmai-consumer 1.` and `SP6: reached` |
+| 1 | **EXECUTED** IS-W1-S1…S11 (all merged by IS-W2-MERGE) | **EXECUTED** SW-W3-S1, SW-W3-S2, SW-W3-S3, SW-W3-S4 (merged) | 9 | **G1**: 11 IS-W1 branches and 4 SW-W3 branches pushed with handoffs, none STOPPED |
+| 2 | **EXECUTED** IS-W2-MERGE (integration `9ca1267`) | SW-MERGE-W3 (also merges the plan branch) | 2 | **G2 = SP1 + SP2**: `docs/api/v1/consumers/swarmai.md` and `scripts/mock_splitsignal.py` on `cursor/is-v23-integration-460c`; SW-W3-S1…S4 merged on `cursor/sw-v23-integration-460c`. **Owner preflight items 2–4 done before slot 3.** |
+| 3 | IS-W2-DEPLOY (needs the secrets; writes SP3/SP4; **not executed**, C8) + **EXECUTED** IS-W3-S1…S9 and IS-W3-FIX1 (merged by IS-W4-MERGE) | **EXECUTED** SW-W4-S1, SW-W3-S5 (merged; integration `ed388b7b`); **EXECUTED** SW-X1-S1 (SP1 reached; merged `2b27bc20`) | 13 | **G3 = SP3 + SP4**: `docs/evidence/m1/hosted-v05.md` has `SP3: reached` and `SP4: reached`; 9 IS-W3 branches pushed; SW-W4-S1 and SW-X1-S1 pushed |
+| 4 | **EXECUTED** IS-W4-MERGE (integration `032d555`; SP5 not written: no hosted v0.5) | **EXECUTED** by the integrator: W3-S5, W4-S1 and X1-S1 merged directly into `cursor/sw-v23-integration-460c` (tip `c34e1b0e`); SW-MERGE-X remains for SW-X2-S1 | 2 | **G4 = SP5**: `hosted-v05.md` has `SP5: reached` (if not, the W6/W8 redeploy fallback makes it); SW-W4-S1 and SW-X1-S1 merged |
+| 5 | **EXECUTED** IS-W5-S1…S7 (merged by IS-W6-MERGE) | — (SwarmAI is done except SW-X2-S1, which waits for SP6) | 7 | **G5**: 7 IS-W5 branches pushed |
+| 6 | **EXECUTED** IS-W6-MERGE (integration `c36f72c`; SP5 fallback skipped, C8) | — | 1 | **G6**: IS-W6-MERGE handoff on the integration branch |
+| 7 | **EXECUTED** IS-W7-S1…S5 (merged by IS-W8-MERGE) | — | 5 | **G7**: 5 IS-W7 branches pushed |
+| 8 | **EXECUTED** IS-W8-MERGE (integration `91dc1f7`; `SP6: offline-tested`, SP5 fallback skipped) and the IS-FIX follow-ups (integration `c685c3d`) | — | 1 | **G8 = SP6**: `docs/evidence/v2.3-offline.md` contains `swarmai-consumer 1.` and `SP6: reached` |
 | 9 | — | SW-X2-S1 (live smoke; SP4 always, SP5 if recorded, SP6 check) | 1 | **G9**: SW-X2-S1 pushed with `docs/evidence/v23/splitsignal_live.json` |
 | 10 | — | SW-MERGE-X again (merges X2-S1) | 1 | **G10**: joint acceptance §6 |
 | 11 | Codex reviews the IS integration tree; owner merges → `main` | Codex reviews the SW integration range; owner merges → `dev` | — | done |
@@ -103,30 +103,30 @@ Why this order: SwarmAI's remaining work (W3/W4/X1) finishes in slots 1–4 alon
 
 | # | Slot | Repo | Prompt file | Parallel with | Needs |
 |---|---|---|---|---|---|
-| 1 | 1 | inference_server | `prompts/IS-W1-S7.md` | 2–9 | — |
-| 2 | 1 | inference_server | `prompts/IS-W1-S8.md` | 1, 3–9 | — |
-| 3 | 1 | inference_server | `prompts/IS-W1-S9.md` | 1–2, 4–9 | — |
-| 4 | 1 | inference_server | `prompts/IS-W1-S10.md` (the SwarmAI contract) | 1–3, 5–9 | — |
-| 5 | 1 | inference_server | `prompts/IS-W1-S11.md` (R) | 1–4, 6–9 | — |
+| 1 | 1 | inference_server | **EXECUTED** `prompts/IS-W1-S7.md` | 2–9 | — |
+| 2 | 1 | inference_server | **EXECUTED** `prompts/IS-W1-S8.md` | 1, 3–9 | — |
+| 3 | 1 | inference_server | **EXECUTED** `prompts/IS-W1-S9.md` | 1–2, 4–9 | — |
+| 4 | 1 | inference_server | **EXECUTED** `prompts/IS-W1-S10.md` (the SwarmAI contract) | 1–3, 5–9 | — |
+| 5 | 1 | inference_server | **EXECUTED** `prompts/IS-W1-S11.md` (R) | 1–4, 6–9 | — |
 | 6 | 1 | swarmai | `prompts/SW-W3-S1.md` | 1–5, 7–9 | — |
 | 7 | 1 | swarmai | `prompts/SW-W3-S2.md` | 1–6, 8–9 | — |
 | 8 | 1 | swarmai | `prompts/SW-W3-S3.md` | 1–7, 9 | — |
 | 9 | 1 | swarmai | `prompts/SW-W3-S4.md` | 1–8 | — |
-| 10 | 2 | inference_server | `prompts/IS-W2-MERGE.md` | 11 | G1 |
+| 10 | 2 | inference_server | **EXECUTED** `prompts/IS-W2-MERGE.md` | 11 | G1 |
 | 11 | 2 | swarmai | `prompts/SW-MERGE-W3.md` | 10 | G1 |
-| 12 | 3 | inference_server | `prompts/IS-W2-DEPLOY.md` (R; secrets; new agent) | 13–24 | G2 + preflight 2–4 |
-| 13–21 | 3 | inference_server | `prompts/IS-W3-S1.md` (R), `IS-W3-S2.md`, `IS-W3-S3.md` (R), `IS-W3-S4.md` (R), `IS-W3-S5.md`, `IS-W3-S6.md`, `IS-W3-S7.md`, `IS-W3-S8.md` (R), `IS-W3-S9.md` | each other, 12, 22–24 | G2 |
+| 12 | 3 | inference_server | **NOT EXECUTED** (C8) `prompts/IS-W2-DEPLOY.md` (R; secrets; new agent) | 13–24 | G2 + preflight 2–4 |
+| 13–21 | 3 | inference_server | **EXECUTED** `prompts/IS-W3-S1.md` (R), `IS-W3-S2.md`, `IS-W3-S3.md` (R), `IS-W3-S4.md` (R), `IS-W3-S5.md`, `IS-W3-S6.md`, `IS-W3-S7.md`, `IS-W3-S8.md` (R), `IS-W3-S9.md` | each other, 12, 22–24 | G2 |
 | 22 | 3 | swarmai | `prompts/SW-W4-S1.md` | 12–21, 23–24 | G2 (SW-W3 merged) |
 | 23 | 3 | swarmai | `prompts/SW-X1-S1.md` (both-repo environment) | 12–22, 24 | G2 (SP1) |
 | 24 | 3 | swarmai | `prompts/SW-W3-S5.md` (optional) | 12–23 | G2 (SW-W3-S1 merged) |
-| 25 | 4 | inference_server | `prompts/IS-W4-MERGE.md` (secrets; new agent) | 26–28 (other repo) | G3 |
+| 25 | 4 | inference_server | **EXECUTED** `prompts/IS-W4-MERGE.md` (secrets; new agent) | 26–28 (other repo) | G3 |
 | 26 | 4 | swarmai | `prompts/SW-MERGE-W3.md` (re-run; only if #24 was pushed) | 25 | G3 |
 | 27 | 4 | swarmai | `prompts/SW-MERGE-W4.md` | 25 | #26 finished |
 | 28 | 4 | swarmai | `prompts/SW-MERGE-X.md` (merges SW-X1-S1) | 25 | #27 finished |
-| 29–35 | 5 | inference_server | `prompts/IS-W5-S1.md` (R), `IS-W5-S2.md`, `IS-W5-S3.md`, `IS-W5-S4.md` (R), `IS-W5-S5.md` (R), `IS-W5-S6.md`, `IS-W5-S7.md` | each other | G4 |
-| 36 | 6 | inference_server | `prompts/IS-W6-MERGE.md` (secrets; new agent) | — | G5 |
-| 37–41 | 7 | inference_server | `prompts/IS-W7-S1.md` (R), `IS-W7-S2.md` (R), `IS-W7-S3.md` (R), `IS-W7-S4.md` (R), `IS-W7-S5.md` | each other | G6 |
-| 42 | 8 | inference_server | `prompts/IS-W8-MERGE.md` (secrets; new agent) | — | G7 |
+| 29–35 | 5 | inference_server | **EXECUTED** `prompts/IS-W5-S1.md` (R), `IS-W5-S2.md`, `IS-W5-S3.md`, `IS-W5-S4.md` (R), `IS-W5-S5.md` (R), `IS-W5-S6.md`, `IS-W5-S7.md` | each other | G4 |
+| 36 | 6 | inference_server | **EXECUTED** `prompts/IS-W6-MERGE.md` (secrets; new agent) | — | G5 |
+| 37–41 | 7 | inference_server | **EXECUTED** `prompts/IS-W7-S1.md` (R), `IS-W7-S2.md` (R), `IS-W7-S3.md` (R), `IS-W7-S4.md` (R), `IS-W7-S5.md` | each other | G6 |
+| 42 | 8 | inference_server | **EXECUTED** `prompts/IS-W8-MERGE.md` (secrets; new agent) | — | G7 |
 | 43 | 9 | swarmai | `prompts/SW-X2-S1.md` (secrets; both-repo environment; new agent) | — | G8 + SW-A3 approved |
 | 44 | 10 | swarmai | `prompts/SW-MERGE-X.md` (re-run; merges SW-X2-S1) | — | G9 |
 
