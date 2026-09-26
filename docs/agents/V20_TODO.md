@@ -33,7 +33,7 @@ verified_at: 2026-09-26T02:03Z
 | V20-E07 | P1 | implemented; live run via SplitSignal is SW-X2-S1 (blocked:router_not_configured) | E05 preferred | SW-W2-S2 `cursor/sw-w2-s2-460c`; SW-X1-S1 `cursor/sw-x1-s1-460c` awaiting SP1 | live adapter after approved grant OR honest blocked_missing_implementation; fake/free first; no invent grant |
 | V20-E08 | P2 | implemented | — | SW-W1-S13 `cursor/sw-w1-s13-460c` | cancel child-process kill-bound ≤10s non-Python |
 | V20-E09 | P2 | implemented | L3 APIs | SW-W1-S12 `cursor/sw-w1-s12-460c` | console/SDK drain+revoke parity |
-| V20-E10 | P2 | open — smoke ran, gate fail (worker healthcheck) | tip as-is | SW-W3-S5 `cursor/sw-w3-s5-460c` | product compose full-path smoke (Docker); packaging-only ≠ smoke |
+| V20-E10 | P2 | implemented — smoke `pass` on dev VM after worker healthcheck fix (not independently reviewed) | tip as-is | SW-W3-S5 `cursor/sw-w3-s5-460c` + SW-FIX-COMPOSE `cursor/sw-fix-compose-healthcheck-460c` | product compose full-path smoke (Docker); packaging-only ≠ smoke |
 | V20-E11 | P2 | deferred | E03 | deferred | optional mailbox/succession PG tables |
 
 ## suggested_pr_order_dev_only
