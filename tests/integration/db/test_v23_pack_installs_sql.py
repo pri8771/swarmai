@@ -51,7 +51,13 @@ def test_lifecycle_persists_across_service_instances(factory) -> None:
     svc = PackLifecycleService(reg, SqlPackInstallStore(factory))
     svc.install(manifest)
     svc.enable_for_project("pack.logs", "1.0.0", "proj_a", ["read_logs"])
-    svc.begin_drain("pack.logs", "1.0.0")
+
+    restarted = PackLifecycleService(
+        CapabilityPackRegistry(require_signature=True, trusted_keys={"acme": KEY}),
+        SqlPackInstallStore(factory),
+    )
+    restarted.check_use("pack.logs", "1.0.0", "proj_a", "read_logs")
+    restarted.begin_drain("pack.logs", "1.0.0")
 
     fresh = SqlPackInstallStore(factory)
     inst = fresh.get("pack.logs", "1.0.0", "*")

@@ -24,6 +24,7 @@ from swarm.pursuit import (
 )
 from swarm.pursuit.models import MissionProposalDraft
 from swarm.pursuit.policy import PursuitPolicyError
+from swarm.pursuit.durable_accounting import InMemoryHoldStore
 
 HEADERS = {"Authorization": "Bearer review-only-token"}
 
@@ -270,6 +271,48 @@ def test_failed_approach_switches_to_experiment(tmp_path: Path) -> None:
     engine._dedupe.clear()  # noqa: SLF001 — allow new proposal after failure class change
     second = engine.tick(goal.id, force=True)
     assert second.decided_kind in {ContributionKind.EXPERIMENT, ContributionKind.ASK}
+
+
+def test_pending_unknown_usage_hold_survives_terminal_reconciliation(tmp_path: Path) -> None:
+    goals, goal = _goal(
+        tmp_path,
+        verification_criteria=["c1"],
+        resource_envelope={"spend_usd_ceiling": 0.0, "max_model_calls": 1},
+    )
+
+    class PendingUnknownExecutor:
+        def execute(self, proposal: MissionProposalDraft) -> ExecutionOutcome:
+            assert proposal.mission_id is not None
+            return ExecutionOutcome(
+                mission_id=proposal.mission_id,
+                success=False,
+                failure_class="submitted_pending",
+                model_calls=1,
+                runtime="native",
+                usage_unknown=True,
+            )
+
+        def reconcile(self, mission_id: str) -> ExecutionOutcome:
+            return ExecutionOutcome(
+                mission_id=mission_id,
+                success=False,
+                failure_class="mission_failed",
+                runtime="native",
+            )
+
+    engine = PursuitEngine(
+        goals,
+        executor=PendingUnknownExecutor(),
+        scheduler=PursuitScheduler(clock=lambda: 0.0),
+        hold_store=InMemoryHoldStore(),
+    )
+    first = engine.tick(goal.id, force=True)
+    assert first.outcome is not None and first.outcome.usage_unknown
+    [hold] = engine.resource_ledger(goal.id).holds.values()
+    assert hold.state == "unknown"
+
+    engine.tick(goal.id, force=True)
+    assert engine.resource_ledger(goal.id).holds[hold.hold_id].state == "unknown"
 
 
 def test_pursuit_api_tick_and_lesson(tmp_path: Path) -> None:

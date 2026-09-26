@@ -129,3 +129,11 @@ def test_worker_drain_and_revoke_are_scoped(client: TestClient) -> None:
 def test_fleet_audit_is_admin_only(client: TestClient) -> None:
     assert client.get("/v1/fleet/audit", headers=_h(DEMO)).status_code == 403
     assert client.get("/v1/fleet/audit", headers=_h(ADMIN)).status_code == 200
+
+
+def test_each_api_runtime_has_a_distinct_scheduler_holder(tmp_path: Path) -> None:
+    first = create_app(require_auth=True, db_reachable=False, repo_root=tmp_path / "first")
+    second = create_app(require_auth=True, db_reachable=False, repo_root=tmp_path / "second")
+
+    assert first.state.v23.scheduler.holder_id != "api"
+    assert first.state.v23.scheduler.holder_id != second.state.v23.scheduler.holder_id

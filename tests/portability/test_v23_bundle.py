@@ -28,6 +28,9 @@ def test_value_based_secret_scan(tmp_path: Path) -> None:
         {"header": "Bearer abcdefghijklmnopqrstuvwxyz"},
         {"api_key": "env:not a valid ref"},
         {"password": 12345},
+        {"secret": {"value": "nested-credential-material"}},
+        {"notes": "ss_live_0123456789abcdef0123456789abcdef_abcdefghijklmnopqrstuvwxyzABCDEFG"},
+        {"notes": "postgresql://user:password@db.internal/private"},
     ):
         with pytest.raises(ValueError, match="secret"):
             _export(svc, tmp_path, project_config=config)
